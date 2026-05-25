@@ -118,6 +118,12 @@ export interface FrameModel<PageModel> {
   readonly perfHudOpen: boolean;
   /** Help visibility flag. */
   readonly helpOpen: boolean;
+  /** Footer visibility target. The footer may still be mid-animation. */
+  readonly footerVisible?: boolean;
+  /** Footer translate offset in footer heights: 0 is onscreen, 1 is below the viewport. */
+  readonly footerTranslateY?: number;
+  /** Monotonic counter to discard stale footer animation ticks. */
+  readonly footerAnimationGeneration?: number;
   /** Command palette state (undefined when closed). */
   readonly commandPalette?: CommandPaletteState;
   /** Kind of active shell palette (`search` vs `command`). */
@@ -215,6 +221,7 @@ export interface RenderResult {
 export type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'toggle-perf-hud' }
+  | { type: 'toggle-footer' }
   | { type: 'toggle-settings' }
   | { type: 'toggle-notifications' }
   | { type: 'push-notification'; notification: FrameNotificationSpec }
@@ -240,6 +247,8 @@ export type FrameAction =
   | { type: 'dock-right' }
   | { type: 'runtime-issue'; issue: RuntimeIssue }
   | { type: 'notification-tick'; atMs: number }
+  | { type: 'footer-transition'; translateY: number; generation: number }
+  | { type: 'footer-transition-complete'; visible: boolean; generation: number }
   | { type: 'transition'; progress: number; generation: number; dt: number; elapsedMs: number }
   | { type: 'transition-complete'; generation: number };
 

@@ -8,6 +8,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Input feature action maps for `bijou-tui`** — `@flyingrobots/bijou-tui`
+  now exports `createInputGestureRecognizer()` and `createInputActionMap()` so
+  apps and shells can map raw key features to semantic events such as `tap`,
+  `double-tap`, and compound patterns like `ctrl held + tab double-tap`. The
+  recognizer uses caller-provided timestamps instead of owning a timer, keeping
+  gesture behavior deterministic under test.
+- **AppFrame double-Tab footer toggle** — `createFramedApp()` now treats a
+  double tap of plain `Tab` as a frame-level footer visibility toggle while
+  preserving single-Tab pane cycling. The footer slides offscreen by one footer
+  height over 0.2 seconds with ease-out timing and slides back onscreen over 0.2
+  seconds with ease-in timing.
 - **DOGFOOD block-authored shell surfaces** — DOGFOOD now routes footer hint
   text through `FooterHintBlock`, routes frame search title text through
   `SearchPanelBlock`, and publishes registry-backed block contracts for

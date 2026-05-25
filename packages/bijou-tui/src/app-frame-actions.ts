@@ -51,8 +51,10 @@ import {
 } from './app-frame-utils.js';
 import { framePaneOutputToSurface, renderFrameNode } from './app-frame-render.js';
 import type { ViewOutput } from './view-output.js';
+import { animate } from './animate.js';
 
 let focusedPaneMeasureScratch: Surface | null = null;
+const FOOTER_TOGGLE_DURATION_MS = 200;
 
 function renderPaneSurfaceForMeasurement(output: ViewOutput, width: number, height: number): Surface {
   const scratch = focusedPaneMeasureScratch;
@@ -79,6 +81,8 @@ export function applyFrameAction<PageModel, Msg>(
       return [{ ...model, helpOpen: !model.helpOpen }, []];
     case 'toggle-perf-hud':
       return [{ ...model, perfHudOpen: !model.perfHudOpen }, []];
+    case 'toggle-footer':
+      return toggleFooter(model);
     case 'toggle-settings': {
       const activePage = pagesById.get(model.activePageId)!;
       const settings = options.settings?.({
@@ -166,10 +170,58 @@ export function applyFrameAction<PageModel, Msg>(
     case 'runtime-issue':
     case 'notification-tick':
       return [model, []];
+    case 'footer-transition':
+      if (action.generation !== (model.footerAnimationGeneration ?? 0)) return [model, []];
+      return [{
+        ...model,
+        footerTranslateY: Math.max(0, Math.min(1, action.translateY)),
+      }, []];
+    case 'footer-transition-complete':
+      if (action.generation !== (model.footerAnimationGeneration ?? 0)) return [model, []];
+      return [{
+        ...model,
+        footerVisible: action.visible,
+        footerTranslateY: action.visible ? 0 : 1,
+      }, []];
     case 'transition':
     case 'transition-complete':
       return [model, []];
   }
+}
+
+function toggleFooter<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+  const currentVisible = model.footerVisible ?? true;
+  const visible = !currentVisible;
+  const generation = (model.footerAnimationGeneration ?? 0) + 1;
+  const defaultTranslateY = currentVisible ? 0 : 1;
+  const from = Math.max(0, Math.min(1, model.footerTranslateY ?? defaultTranslateY));
+  const to = visible ? 0 : 1;
+  const ease = visible ? EASINGS.easeIn : EASINGS.easeOut;
+  return [{
+    ...model,
+    footerVisible: visible,
+    footerAnimationGeneration: generation,
+  }, [
+    animate<FramedAppMsg<Msg>>({
+      type: 'tween',
+      from,
+      to,
+      duration: FOOTER_TOGGLE_DURATION_MS,
+      ease,
+      onFrame: (translateY) => wrapFrameMsg({
+        type: 'footer-transition',
+        translateY,
+        generation,
+      }),
+      onComplete: () => wrapFrameMsg({
+        type: 'footer-transition-complete',
+        visible,
+        generation,
+      }),
+    }),
+  ]];
 }
 
 function hasNotificationCenter<PageModel, Msg>(

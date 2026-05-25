@@ -1243,24 +1243,13 @@ function standardBlockLivePreviewSurface(
   const safeWidth = Math.max(30, width);
   const contentWidth = Math.max(24, safeWidth - 4);
 
-  return boxSurface(column([
+  return column([
     standardBlockExampleSurface(block, contentWidth, ctx),
     spacer(1, 1),
     standardBlockLoweringPreviewSurface(block, contentWidth, ctx, theme, localization),
     spacer(1, 1),
     standardBlockDocumentationSurface(block, contentWidth, ctx, theme, localization),
-  ]), {
-    title: dogfoodText(
-      localization,
-      'blocks.preview.pageTitle',
-      '{blockName}',
-      { blockName: block.metadata.blockName },
-    ),
-    width: safeWidth,
-    borderToken: docsThemeBorderToken(theme),
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
+  ]);
 }
 
 function standardBlockExampleSurface(

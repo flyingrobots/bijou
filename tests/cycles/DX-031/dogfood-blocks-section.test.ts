@@ -190,6 +190,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).toContain('lowering summary');
     expect(text).toContain('interactive mode');
     expect(text).toContain('static mode');
+    expect(frameRows(result.frames.at(-1)!).filter((row) => row.includes('┌─ ReaderSurface')).length).toBe(1);
     expect(text).not.toContain('Available Blocks');
     expect(text).not.toContain('Contract: block metadata:');
     expect(text).not.toContain('Source: packages/bijou/src/core/standard-blocks.ts');
