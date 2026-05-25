@@ -98,6 +98,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       'What are Blocks',
       'How to Make Your Own Blocks',
       'Pre-made Blocks',
+      'DOGFOOD Surface Blocks',
       'Block Preview',
       ...standardBlocks.map((block) => `  ${block.metadata.blockName}`),
       '  CounterDemoBlock',
@@ -134,18 +135,10 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
     const result = await runScript(app, [
-      {
-        msg: {
-          type: 'docs',
-          msg: { type: 'select-guide', guideId: 'blocks-pre-made' },
-        },
-      },
-      {
-        msg: {
-          type: 'docs',
-          msg: { type: 'guide-next' },
-        },
-      },
+      { msg: { type: 'docs', msg: { type: 'guide-next' } } },
+      { msg: { type: 'docs', msg: { type: 'guide-next' } } },
+      { msg: { type: 'docs', msg: { type: 'guide-next' } } },
+      { msg: { type: 'docs', msg: { type: 'guide-next' } } },
     ], { ctx });
     const text = frameText(result.frames.at(-1)!);
     const blockName = firstBlock!.metadata.blockName;
