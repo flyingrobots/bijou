@@ -359,6 +359,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **DOGFOOD landing theme ownership** — The animated DOGFOOD title screen now
+  paints landing background, logo, wordmark, and panel cells with explicit
+  Bijou-owned backgrounds, so custom terminal-profile background colors do not
+  leak through the landing renderer.
 - **AppFrame foreground ownership** — Frame-rendered panes now apply the
   paired surface foreground when they paint a Bijou-owned background behind
   unstyled cells, so DOGFOOD and other framed apps do not inherit unreadable

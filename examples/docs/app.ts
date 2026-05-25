@@ -1979,7 +1979,14 @@ function paintLandingBackground(
 
       for (let y = tileY; y < maxY; y++) {
         for (let x = tileX; x < maxX; x++) {
-          surface.set(x, y, { char, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
+          surface.set(x, y, {
+            char,
+            bg: tokens.background,
+            fg,
+            modifiers: modifiers as string[] | undefined,
+            empty: false,
+            opacity: 1,
+          });
         }
       }
     }
@@ -2046,7 +2053,14 @@ function paintLogoInto(
         for (let x = tileX; x < maxX; x++) {
           const targetX = destX + x;
           if (targetX < 0 || targetX >= target.width) continue;
-          target.set(targetX, targetY, { char: glyph, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
+          target.set(targetX, targetY, {
+            char: glyph,
+            bg: tokens.background,
+            fg,
+            modifiers: modifiers as string[] | undefined,
+            empty: false,
+            opacity: 1,
+          });
         }
       }
     }
@@ -2059,6 +2073,7 @@ function createWordmarkSurface(
   tokens: LandingThemeTokens,
 ): Surface {
   return createTransparentTextSurface(lines, {
+    bg: tokens.background,
     fg: (x, y, char, totalWidth) => {
       if (char === ' ') return undefined;
       const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
@@ -2409,6 +2424,7 @@ function getLandingDogfoodPanel(
     title: panelTitle,
     width,
     borderToken: landingDogfoodPanelBorderToken(tokens),
+    bgToken: { hex: tokens.footerStrongColor, bg: tokens.background },
     padding: { left: 1, right: 1 },
     ctx,
   });
@@ -2764,6 +2780,7 @@ function landingDogfoodPanelBorderToken(theme: LandingThemeTokens): TokenValue {
       sampleColorRamp(theme.logoRamp, 0.84),
       sampleColorRamp(theme.waveRamp, 0.78),
     ]),
+    bg: theme.background,
   };
 }
 

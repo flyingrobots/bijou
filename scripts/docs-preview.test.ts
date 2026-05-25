@@ -59,6 +59,23 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   return text;
 }
 
+function cellsWithoutBackground(frame: {
+  width: number;
+  height: number;
+  get(x: number, y: number): { bg?: ColorRef; bgRGB?: readonly [number, number, number] };
+}) {
+  const missing: string[] = [];
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      const cell = frame.get(x, y);
+      if (cell.bg == null && cell.bgRGB == null) {
+        missing.push(`${x},${y}`);
+      }
+    }
+  }
+  return missing;
+}
+
 function activeDocsPageModel(model: any) {
   return model.docsModel.pageModels[model.docsModel.activePageId];
 }
@@ -188,6 +205,16 @@ describe('docs preview app', () => {
     // Gradient background chars (█▓▒░·) require pulse-driven animation;
     // the initial frame without pulses may not contain them. The pulse
     // test below ('animates the landing title screen on pulse') covers this.
+  });
+
+  it('keeps every landing title cell on a Bijou-owned background', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+
+    expect(cellsWithoutBackground(frame)).toEqual([]);
   });
 
   it('accepts localized shell and DOGFOOD catalogs for landing and onboarding copy', async () => {
