@@ -87,39 +87,50 @@ This is the shape of a small Bijou TUI: initialize state, update state from
 messages, and render a surface from the current model.
 
 ```ts
-import { stringToSurface } from '@flyingrobots/bijou';
+import { box } from '@flyingrobots/bijou';
+import { flex, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
 import { startApp } from '@flyingrobots/bijou-node';
-import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
 
-interface Model {
-  readonly count: number;
-}
+// A minimal interactive application.
+const app: App = {
+  // The initial state of our app (the "model") is empty.
+  init: () => ({ model: {} }),
 
-const app: App<Model> = {
-  init: () => [{ count: 0 }, []],
-
-  update: (msg, model) => {
-    if (isKeyMsg(msg) && msg.key === 'q') {
-      return [model, [quit()]];
+  // The update function handles messages (like key presses) and updates the model.
+  update: (model, msg) => {
+    // On 'q', issue a command to quit the app.
+    if ((msg as KeyMsg).key === 'q') {
+      return { model, cmd: quit() };
     }
-    if (isKeyMsg(msg) && msg.key === '+') {
-      return [{ count: model.count + 1 }, []];
-    }
-    if (isKeyMsg(msg) && msg.key === '-') {
-      return [{ count: model.count - 1 }, []];
-    }
-
-    return [model, []];
+    return { model };
   },
 
-  view: (model) =>
-    stringToSurface(
-      `Counter: ${model.count}\nPress + or - to change\nPress q to quit`,
-      32,
-      3,
-    ),
+  // The view function renders the UI based on the current model and context.
+  view: (model, ctx) => {
+    return flex(
+      {
+        direction: 'column',
+        width: ctx.columns,
+        height: ctx.rows,
+        align: 'center',
+        justify: 'center',
+        gap: 1,
+      },
+      {
+        content: box('This is a rich terminal UI.', {
+          title: 'Hello, Bijou',
+          padding: 1,
+        }),
+      },
+      {
+        // Use the context's style port to apply dim styling.
+        content: ctx.style.dim('Press q to exit'),
+      }
+    );
+  },
 };
 
+// Start the TUI application on the Node.js host.
 await startApp(app);
 ```
 
