@@ -70,6 +70,7 @@ Bijou is split into packages to make intent clear.
 This is the minimal app shape: initialize state, update on messages, render from model.
 
 ```ts
+import { stringToSurface } from '@flyingrobots/bijou';
 import { startApp } from '@flyingrobots/bijou-node';
 import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
 
@@ -87,7 +88,8 @@ const app: App<Model, never> = {
     return [model, []];
   },
 
-  view: (model) => `${model.text}\n\nPress q to exit.`,
+  view: (model) =>
+    stringToSurface(`${model.text}\n\nPress q to exit.`, Math.max(24, model.text.length), 3),
 };
 
 await startApp(app);
