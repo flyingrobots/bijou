@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "clean": "rm -rf packages/bijou/dist packages/bijou-i18n/dist packages/bijou-i18n-tools/dist packages/bijou-i18n-tools-node/dist packages/bijou-i18n-tools-xlsx/dist packages/bijou-mcp/dist packages/bijou-node/dist packages/bijou-tui/dist packages/bijou-tui-app/dist packages/create-bijou-tui-app/dist packages/bijou/*.tsbuildinfo packages/bijou-i18n/*.tsbuildinfo packages/bijou-i18n-tools/*.tsbuildinfo packages/bijou-i18n-tools-node/*.tsbuildinfo packages/bijou-i18n-tools-xlsx/*.tsbuildinfo packages/bijou-mcp/*.tsbuildinfo packages/bijou-node/*.tsbuildinfo packages/bijou-tui/*.tsbuildinfo packages/bijou-tui-app/*.tsbuildinfo packages/create-bijou-tui-app/*.tsbuildinfo",
-    "preinstall": "node -e \"const major = Number(process.versions.node.split('.')[0]); if (!Number.isFinite(major) || major < 18 || major >= 23) { console.error(`Unsupported Node.js ${process.version}; use >=18 <23 (18, 20, or 22 LTS recommended).`); process.exit(1); }\"",
+    "preinstall": "node -e \"const major = Number(process.versions.node.split('.')[0]); const allowed = new Set([18, 20, 22]); if (!allowed.has(major)) { console.error(`Unsupported Node.js ${process.version}; use LTS releases 18, 20, or 22.`); process.exit(1); }\"",
     "build": "tsc -b",
     "build:watch": "tsc -b -w",
     "test": "vitest run --config vitest.config.ts",
