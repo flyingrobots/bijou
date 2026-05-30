@@ -172,6 +172,7 @@ Most production apps eventually move to tier 2 or tier 3.
 | [`ADVANCED_GUIDE.md`](./ADVANCED_GUIDE.md) | Deeper runtime, rendering, shader, and proving workflows. |
 | [`docs/guides/render-pipeline.md`](./docs/guides/render-pipeline.md) | Render pipeline internals and middleware extension patterns. |
 | [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) | DOGFOOD command surface, keyboard orientation, and command coverage notes. |
+| [`DOGFOOD`](./docs/DOGFOOD.md) | Human-facing walkthrough and interactive proof surface. |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Ports, adapters, package stack, and structural rules. |
 | [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
 | [`docs/BEARING.md`](./docs/BEARING.md) | Current execution direction and active tensions. |

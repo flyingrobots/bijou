@@ -1,5 +1,8 @@
 # Bijou Specifacts
 
+This directory is **legacy** planning surface and is retained for historical context.
+Do **not** start new work here.
+
 This directory contains JSON acceptance artifacts that describe cross-cutting product
 expectations for rendering, layout, worker runtime, and component behavior.
 
