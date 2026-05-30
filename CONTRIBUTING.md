@@ -52,6 +52,26 @@ Common validation commands:
 - **Performance**: The `examples/perf-gradient` demo is a proving
   surface. Benchmarks welcome.
 
+## How the Backlog Works
+
+Contributions are tracked in `docs/method/backlog/` and organized into
+lanes. Start there, not by inventing a new tracking mechanism.
+
+- `inbox/` is the preferred first touchpoint for contributors.
+- `up-next/` holds near-term scheduled work.
+- `asap/` captures active priorities.
+- `cool-ideas/` contains exploratory follow-on ideas.
+- `bad-code/` tracks known anti-pattern cleanup.
+
+For one-off fixes, add a short task to `docs/method/backlog/inbox/` with:
+
+1. A minimal summary of the user-facing issue.
+2. Reproduction steps (if applicable).
+3. Clear success criteria.
+4. Suggested owner and expected verification step.
+
+That file is the expected entry point for all external issue intake.
+
 ## Code Style
 
 - TypeScript strict mode.
@@ -64,3 +84,17 @@ Common validation commands:
 
 Open an issue or check the [documentation map](docs/README.md) for
 existing guidance.
+
+## Good First Issues
+
+Start here if this is your first contribution:
+
+- `docs/method/backlog/inbox/` — add a concise contribution proposal for a
+  documentation or onboarding improvement.
+- `docs/specs/` — add acceptance criteria or edge-case coverage notes to one
+  existing spec.
+- `README.md` — improve one command explanation without changing code paths.
+- `docs/guides/render-pipeline.md` — add one concrete example that shows
+  `RenderState` data exchange between stages.
+- `examples/` — remove one source of confusion in an example README without
+  changing example behavior.

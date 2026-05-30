@@ -1,4 +1,5 @@
 import type { RenderMiddleware } from '../pipeline.js';
+import { getRenderLayoutRoot } from '../pipeline.js';
 import type { LayoutNode, Surface } from '@flyingrobots/bijou';
 
 /**
@@ -6,7 +7,7 @@ import type { LayoutNode, Surface } from '@flyingrobots/bijou';
  */
 export function paintMiddleware(): RenderMiddleware {
   return (state, next) => {
-    const root = (state as any).layoutRoot as LayoutNode | undefined;
+    const root = (getRenderLayoutRoot(state) ?? (state as any).layoutRoot) as LayoutNode | undefined;
     if (root) {
       paintNode(state.targetSurface, root);
     }

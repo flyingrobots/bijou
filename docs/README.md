@@ -44,7 +44,7 @@ reference material.
 | **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |
 | **[ROADMAP](./ROADMAP.md)** | Reference-only strategic horizon, not the active queue. |
-| **[specs/README.md](./specs/README.md)** | Legacy spec archive policy and migration rule. |
+| **[specs/README.md](./specs/README.md)** | Spec artifact format, acceptance criteria conventions, and validation guidance. |
 
 ---
 **For a machine-readable inventory of all documentation, run `npm run docs:inventory`.**

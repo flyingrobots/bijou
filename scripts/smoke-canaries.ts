@@ -18,6 +18,7 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE_ROOT = resolve(ROOT, 'scripts/canary-fixtures/core-static');
 const KEEP_TEMP = process.env['BIJOU_KEEP_CANARY_TMP'] === '1';
+const SKIP_PTY_TESTS = process.env['BIJOU_SKIP_PTY_TESTS'] === '1';
 const SKIP_BUILD = process.argv.includes('--skip-build');
 
 interface PublishableUnit {
@@ -63,7 +64,11 @@ function main(): void {
 
     try {
       const tarballSpecs = packPublishableUnits(tempRoot);
-      runTuiCanary(tempRoot, tarballSpecs);
+      if (SKIP_PTY_TESTS) {
+        process.stdout.write('smoke-canaries: PTY smoke tests skipped (BIJOU_SKIP_PTY_TESTS=1). These tests verify ANSI output in a real terminal and should be run before release.\n');
+      } else {
+        runTuiCanary(tempRoot, tarballSpecs);
+      }
       runCoreStaticCanary(tempRoot, tarballSpecs);
       process.stdout.write('smoke-canaries: all canaries passed\n');
     } finally {
