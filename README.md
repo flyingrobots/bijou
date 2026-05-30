@@ -16,6 +16,7 @@ Bijou is a TypeScript toolkit for building serious terminal software. It treats 
 The project is tested against Node.js 18, 20, and 22 in CI. The repository uses a strict Node floor and this check is enforced before install.
 
 The repo's primary human-facing guide is [DOGFOOD](./docs/DOGFOOD.md).
+The `examples/` tree is for runnable examples and is intentionally maintained as secondary/internal reference material.
 
 ## Start Here
 
