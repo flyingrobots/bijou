@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
 
-const SUPPORTED_NODE_MAJORS = Object.freeze([18, 20, 22]);
+const MINIMUM_NODE_MAJOR = 18;
 
 export function parseNodeMajor(version) {
   const normalized = version.startsWith('v') ? version.slice(1) : version;
@@ -11,11 +11,11 @@ export function parseNodeMajor(version) {
 
 export function isSupportedNodeVersion(version) {
   const major = parseNodeMajor(version);
-  return major !== undefined && SUPPORTED_NODE_MAJORS.includes(major);
+  return major !== undefined && major >= MINIMUM_NODE_MAJOR;
 }
 
 export function unsupportedNodeMessage(version) {
-  return `Unsupported Node.js ${version}; use LTS releases 18, 20, or 22.`;
+  return `Unsupported Node.js ${version}; use Node.js 18 or newer.`;
 }
 
 export function checkNodeVersion(version = process.version) {
