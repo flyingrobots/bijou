@@ -370,6 +370,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Node preinstall gate portability** — The repository preinstall guard now
+  runs through a checked-in Node script instead of a shell-fragile inline
+  command, so unsupported Node versions report the intended guidance without
+  shell interpolation failures.
 - **DOGFOOD block surface inventory localization** — The DOGFOOD surface block
   inventory page now resolves its title, summary, body copy, headings, and
   detail labels/descriptions through the DOGFOOD string table and generated
