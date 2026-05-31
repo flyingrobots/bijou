@@ -16,6 +16,7 @@ import { createEventBus } from './eventbus.js';
 import {
   createPipeline,
   getRenderStageTimings,
+  RENDER_LAYOUT_ROOT_KEY,
   type RenderStageTiming,
   type RenderState,
 } from './pipeline/pipeline.js';
@@ -296,10 +297,12 @@ export async function runWithLifecycleHooks<Model, M>(
       return;
     }
     const viewport = runtimeViewport();
-    (state as any).layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
+    const layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
       width: viewport.columns,
       height: viewport.rows,
     });
+    state.data[RENDER_LAYOUT_ROOT_KEY] = layoutRoot;
+    (state as any).layoutRoot = layoutRoot;
     next();
   });
 

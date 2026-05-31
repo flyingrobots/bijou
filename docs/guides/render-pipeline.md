@@ -1,9 +1,8 @@
 # Render Pipeline Guide
 
-This guide explains the programmable render pipeline in `@flyingrobots/bijou-tui`
-as it exists today.
+The render pipeline in `@flyingrobots/bijou-tui` is a deterministic, stage-ordered execution chain.
 
-The runtime renders each frame in a fixed stage order:
+It runs as:
 
 1. `Layout`
 2. `Paint`
@@ -11,52 +10,117 @@ The runtime renders each frame in a fixed stage order:
 4. `Diff`
 5. `Output`
 
-`configurePipeline()` lets you append middleware to those stages. It does not
-replace the built-in stages, and it does not change their order.
-
 ## Default Runtime Wiring
 
-`run()` builds the pipeline like this:
+`run()` installs middleware in this fixed stage order:
 
-1. `Layout`
-   Converts `app.view(model)` into a localized layout root for the current
-   viewport.
-2. `Layout`
-   Applies the built-in motion middleware.
-3. `Layout`
-   Applies BCSS middleware when `options.css` is present.
-4. `Paint`
-   Paints the localized layout tree into `targetSurface`.
-5. `Diff`
-   Computes and writes the terminal delta via `renderSurfaceFrame(...)`.
-6. `Output`
-   Swaps the runtime front/back framebuffers for the next render.
-7. `configurePipeline(pipeline)`
-   Appends your middleware after those defaults.
+1. `Layout`: call `app.view(model)` and produce the layout output.
+2. `Layout`: apply motion reconciliation.
+3. `Layout`: apply BCSS middleware when `options.css` is present.
+4. `Paint`: paint the resolved layout tree into `targetSurface`.
+5. `Diff`: compute terminal diff and fill `outBuf`.
+6. `Output`: emit diff and swap framebuffers.
+7. `configurePipeline(pipeline)` if provided by the caller.
 
-That means your custom middleware runs in the fixed global stage order, and
-within a stage it runs after the built-ins already registered for that stage.
+Custom middleware runs after the built-ins in the same stage and cannot change stage ordering.
 
-## When To Hook Which Stage
+## Default and Custom Stage Contract
 
-- Use `Layout` when you need to inspect or annotate frame-level layout state
-  before paint.
-- Use `Paint` only if you need to participate in painting itself. This stage is
-  not the calm default extension point.
-- Use `PostProcess` when you want to mutate `targetSurface` after paint but
-  before terminal diffing. This is the usual hook for visual effects,
-  instrumentation marks, and last-mile surface edits.
-- Use `Diff` only when you need to observe the frame after paint and after the
-  default diff/write path has already run.
-- Use `Output` when you need a terminal-tail hook after the built-in framebuffer
-  swap step has been scheduled.
+Use `configurePipeline()` when your middleware belongs to one of these five stages:
+
+- `Layout`: inspect or rewrite `LayoutNode` trees.
+- `Paint`: mutate `targetSurface` by painting extra marks directly.
+- `PostProcess`: apply surface-wide shaders or instrumentation before diff.
+- `Diff`: adjust output encoding just before emit (advanced usage).
+- `Output`: run end-of-frame side-effects after terminal write and swap.
+
+## Inter-Stage Data Contracts
+
+A `RenderState` instance is shared across all middleware for a single frame. The key shared state channels are:
+
+- `model`: current model value for this frame.
+- `layoutMap`: geometry metadata for resolved nodes.
+- `data`: unstructured scratchbag intended for middleware communication.
+
+### `layoutRoot` via `RenderState.data`
+
+In current runtime code, the `Layout` stage places the resolved layout tree in
+`state.data['__bijou:layoutRoot']`.
+
+That object is then consumed by `motionMiddleware()` and `paintMiddleware()` in
+later stages.
+
+Recommended access pattern for custom middleware:
+
+- Read and write your own namespaced keys, for example:
+  - `state.data['my-app:focusState']`
+  - `state.data['my-app:trace:enabled']`
+
+This avoids private runtime keys and avoids coupling across feature layers.
+
+The built-in layout keys are intentionally not part of your public app contract.
+
+### LayoutMap Semantics
+
+`layoutMap` is currently populated with keyed geometry for internal systems such as
+a11y overlays, layout debugging, and event routing.
+
+If you need layout geometry from custom middleware, guard key lookups and treat
+missing values as an expected pre-layout state.
+
+## Framebuffer Flip Model (Current Surface Truth)
+
+`Diff` compares:
+
+- `state.currentSurface`: the previous visible surface
+- `state.targetSurface`: the next surface under construction
+
+After `Output` runs, the runtime flips the internal buffers.
+
+The conceptual model is:
+
+```text
+before Output:   currentSurface is frame N, targetSurface is frame N+1
+after Output:    currentSurface is frame N+1, targetSurface becomes previous frame N
+```
+
+That means middleware appended to `Output` after swap must not assume that `state.currentSurface` still points at the old frame unless it reads it before invoking default output semantics.
+
+In practical terms:
+
+- Use `currentSurface` for diff inputs and visibility of the previous frame.
+- Use `targetSurface` as the paint target for the frame currently being built.
+- Do not retain references across frames outside `Layout`/`Paint` middleware.
+
+## Why the Pipeline Is Synchronous
+
+The pipeline is synchronous by design to keep frame cost measurable and predictable.
+
+If each stage can run with bounded synchronous cost, the frame time budget is:
+
+```text
+frameCost = layout + paint + postProcess + diff + output + middlewareOverhead
+```
+
+If an asynchronous stage is inserted without careful partitioning, total frame cost becomes:
+
+```text
+frameCost = layout + paint + postProcess + await(someAsyncIO) + diff + output
+```
+
+That removes a strict per-frame budget and can stall rendering on unrelated IO.
+
+The architectural rule is therefore:
+
+- Keep rendering synchronous and deterministic.
+- Move async work into commands.
+- Receive async results as messages, then update model and re-render.
 
 ## Worked Example
 
-This is the same pattern exercised by the runtime tests: mutate the painted
-surface in `PostProcess` so the default diff stage emits the result.
+The runtime pipeline supports middleware insertion points that preserve the fixed stage ordering.
 
-```typescript
+```ts
 import { run } from '@flyingrobots/bijou-tui';
 
 run(app, {
@@ -69,14 +133,13 @@ run(app, {
 });
 ```
 
-Because `configurePipeline()` appends after the defaults, this middleware runs
-after `paintMiddleware()` and before the built-in `Diff` stage.
+Because this middleware is registered before app execution, it runs on every frame after all built-ins for `PostProcess` and before default diffing.
 
-## Stage Timing Hooks
+## Timing Hooks
 
-The pipeline also exposes per-stage timing observers:
+You can observe per-stage timings from middleware.
 
-```typescript
+```ts
 import { getRenderStageTimings, run } from '@flyingrobots/bijou-tui';
 
 run(app, {
@@ -89,70 +152,37 @@ run(app, {
 });
 ```
 
-Important details:
+Notes:
 
-- `onStageComplete(...)` fires after each stage finishes, in global stage order.
-- `getRenderStageTimings(state)` reads the current frame's timings from
-  `state.data`.
+- `onStageComplete(...)` fires once per stage, in fixed stage order.
+- `getRenderStageTimings(state)` returns timings captured for that frame.
 - The timings array is replaced on every `pipeline.execute(state)` call.
-- Empty stages still report a timing sample so callers can see the full frame
-  breakdown.
+- Empty stages are represented in timing output.
 
-## RenderState
+## `RenderState` Reference
 
-The public `RenderState` contract gives middleware these fields:
+The public shape is:
 
-- `model`
-  The application model for the frame being rendered.
-- `ctx`
-  The active `BijouContext`.
-- `dt`
-  Seconds since the previous frame.
-- `currentSurface`
-  The surface currently visible on the terminal. Treat this as read-only.
-- `targetSurface`
-  The surface being painted for this frame. `Paint` and `PostProcess`
-  middleware are expected to work here.
-- `outBuf`
-  Optional pooled UTF-8 output buffer used by the default diff path.
-- `layoutMap`
-  Public layout metadata map. The default runtime allocates it, but the current
-  built-in middleware does not populate it yet.
-- `data`
-  Shared per-frame scratch bag for middleware coordination.
-  The pipeline now stores per-stage timings here; prefer
-  `getRenderStageTimings(state)` over reaching into raw keys yourself.
+- `model`: read by convention in rendering.
+- `ctx`: active `BijouContext`.
+- `dt`: wall time delta in seconds.
+- `currentSurface`: previous frame surface, normally treated as read-only.
+- `targetSurface`: current frame paint surface.
+- `outBuf`: optional UTF-8 output buffer for default diff stage.
+- `layoutMap`: geometry metadata map.
+- `data`: middleware coordination bag.
 
-## Important Internal Wrinkle
+`data` is also where layout root and per-frame timing metadata are held.
 
-The built-in `Layout`, motion, BCSS, and paint middleware currently pass the
-localized root through an internal `layoutRoot` scratch field that is not part
-of the typed public `RenderState` contract.
+## Stage Failure Semantics
 
-Treat that as runtime implementation detail, not stable extension API.
+A middleware exception does not kill the app immediately.
 
-If you need to share your own state between middleware, use `state.data`.
+- The exception is routed through the same diagnostics path as other runtime faults.
+- The frame may render partially or degrade for that tick.
+- Rendering continues so the app remains recoverable and operational.
 
-## configurePipeline Semantics
-
-- `configurePipeline` is called once during `run()` setup, after the built-in
-  middleware is registered.
-- `pipeline.use(stage, middleware)` appends to that stage.
-- `pipeline.onStageComplete(handler)` subscribes to per-stage timing samples.
-- Stage order is fixed. You cannot insert a new stage between `Paint` and
-  `PostProcess`, for example.
-- There is no public API for removing or replacing built-in middleware.
-
-## Limitations
-
-- The pipeline is effectively synchronous. Middleware may return a `Promise`,
-  but the runtime does not await it in frame order.
-- There is no public stage replacement hook, only stage append.
-- The default `Diff` stage writes terminal output immediately. If you need to
-  mutate frame visuals, do it in `PostProcess`, not `Diff`.
-- Middleware failures are logged through `ctx.io.writeError(...)`, then the
-  pipeline continues to the next middleware instead of crashing the whole run
-  loop immediately.
+If your custom middleware must fail fast, emit a command or message to transition into an intentional error state during `update()`.
 
 ## Read Next
 

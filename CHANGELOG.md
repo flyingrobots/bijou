@@ -1,5 +1,4 @@
 # Changelog
 
-## Unreleased
-
-- No externally meaningful changes recorded yet.
+This repository keeps its canonical changelog in
+[docs/CHANGELOG.md](./docs/CHANGELOG.md).

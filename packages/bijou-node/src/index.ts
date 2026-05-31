@@ -48,6 +48,31 @@ export {
 
 const DISABLED_THEME_ENV_VAR = '__BIJOU_THEME_DISABLED__';
 
+/** Structured bootstrap failure for Node host initialization. */
+export class BijouBootstrapError extends Error {
+  /** Human-readable reason for the failure. */
+  readonly reason: string;
+  /** Practical hint to recover from the failure. */
+  readonly hint: string;
+  /** Original error that triggered this bootstrap error, when available. */
+  public override cause?: unknown;
+
+  /**
+   * @param reason - Root cause summary.
+   * @param hint - Suggested recovery path.
+   * @param cause - Optional originating error.
+   */
+  constructor(reason: string, hint: string, cause?: unknown) {
+    super(`initDefaultContext failed: ${reason}`);
+    this.name = 'BijouBootstrapError';
+    this.reason = reason;
+    this.hint = hint;
+    if (cause !== undefined) {
+      this.cause = cause;
+    }
+  }
+}
+
 /** Theme-selection options for Node-hosted context creation. */
 export interface NodeThemeEntry {
   /** Stable selection id for env/config or app-owned override state. */
@@ -268,27 +293,51 @@ export function _resetInitializedForTesting(): void {
  *   fresh context on subsequent calls.
  */
 export function initDefaultContext(options: InitDefaultContextOptions = {}): BijouContext {
-  const hasExplicitThemeSelection =
-    options.theme !== undefined
-    || options.presets !== undefined
-    || options.envVar !== undefined
-    || options.themes !== undefined
-    || options.themeMode !== undefined
-    || options.themeOverride !== undefined;
-  if (!initialized && !hasExplicitThemeSelection) {
-    const existing = resolveSafeCtx();
-    if (existing != null) {
-      initialized = true;
-      return existing;
+  const stdoutColumns = process.stdout.columns;
+  const stdoutRows = process.stdout.rows;
+  if (stdoutColumns === 0 || stdoutRows === 0) {
+    throw new BijouBootstrapError(
+      'stdout reported zero columns/rows',
+      'stdout is not a TTY — use pipe mode or redirect to a file, or run in a real terminal.',
+    );
+  }
+
+  try {
+    const hasExplicitThemeSelection =
+      options.theme !== undefined
+      || options.presets !== undefined
+      || options.envVar !== undefined
+      || options.themes !== undefined
+      || options.themeMode !== undefined
+      || options.themeOverride !== undefined;
+    if (!initialized && !hasExplicitThemeSelection) {
+      const existing = resolveSafeCtx();
+      if (existing != null) {
+        initialized = true;
+        return existing;
+      }
     }
+    if (!initialized) {
+      const ctx = createNodeContext(options);
+      setDefaultContext(ctx);
+      initialized = true;
+      return ctx;
+    }
+    return createNodeContext(options);
+  } catch (error) {
+    if (error instanceof BijouBootstrapError) {
+      throw error;
+    }
+
+    const message = error instanceof Error ? error.message : String(error);
+    const reason = `Could not initialize Node host context: ${message}`;
+    const hint =
+      message.includes('setRawMode')
+        ? 'raw mode unavailable — run in an interactive terminal rather than a non-TTY pipeline.'
+        : 'check the active terminal environment and rerun, or start in a supported TTY context.';
+
+    throw new BijouBootstrapError(reason, hint, error);
   }
-  if (!initialized) {
-    const ctx = createNodeContext(options);
-    setDefaultContext(ctx);
-    initialized = true;
-    return ctx;
-  }
-  return createNodeContext(options);
 }
 
 /**

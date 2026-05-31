@@ -1,4 +1,4 @@
-import type { Surface, BijouContext } from '@flyingrobots/bijou';
+import type { Surface, BijouContext, LayoutNode } from '@flyingrobots/bijou';
 
 /**
  * The state passed through the rendering pipeline.
@@ -73,6 +73,17 @@ export interface RenderStageObserver {
 
 /** Key used to store per-frame stage timings in `RenderState.data`. */
 export const RENDER_STAGE_TIMINGS_KEY = '__pipelineStageTimings';
+
+/** Key used to pass the resolved layout root between middleware stages. */
+export const RENDER_LAYOUT_ROOT_KEY = '__bijou:layoutRoot';
+
+/**
+ * Read the resolved layout root from a render-state data bag.
+ * Built-in layout middleware writes this value in `Layout`.
+ */
+export function getRenderLayoutRoot(state: Pick<RenderState, 'data'>): LayoutNode | undefined {
+  return state.data[RENDER_LAYOUT_ROOT_KEY] as LayoutNode | undefined;
+}
 
 /**
  * Read per-stage timings captured during the current pipeline execution.
