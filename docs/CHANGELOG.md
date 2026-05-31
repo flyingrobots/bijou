@@ -370,6 +370,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Node version support policy** — The repository preinstall guard now enforces
+  the Node 18 floor without rejecting newer Node releases, so current and future
+  Node majors remain supported while CI continues to cover the explicit
+  18/20/22 matrix.
 - **Node preinstall gate portability** — The repository preinstall guard now
   runs through a checked-in Node script instead of a shell-fragile inline
   command, so unsupported Node versions report the intended guidance without

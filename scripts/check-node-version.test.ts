@@ -12,18 +12,18 @@ function runCheck(version: string) {
 }
 
 describe('check-node-version preinstall gate', () => {
-  it.each(['v18.0.0', 'v20.19.0', 'v22.12.0'])('allows supported Node %s', (version) => {
+  it.each(['v18.0.0', 'v20.19.0', 'v22.12.0', 'v23.0.0', 'v24.1.0', 'v26.0.0'])('allows supported Node %s', (version) => {
     const result = runCheck(version);
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
   });
 
-  it.each(['v19.9.0', 'v21.7.0', 'v23.0.0', 'v26.0.0'])('rejects unsupported Node %s', (version) => {
+  it.each(['v16.20.0', 'v17.9.1', 'not-a-version'])('rejects unsupported Node %s', (version) => {
     const result = runCheck(version);
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain(`Unsupported Node.js ${version}`);
-    expect(result.stderr).toContain('use LTS releases 18, 20, or 22');
+    expect(result.stderr).toContain('use Node.js 18 or newer');
   });
 });
