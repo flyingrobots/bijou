@@ -148,6 +148,43 @@ describe('table', () => {
     expect(maxLineWidth(result)).toBeGreaterThan(24);
   });
 
+  it('honors per-column maxWidth during fitting', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = table({
+      layout: 'intrinsic',
+      columns: [
+        { header: 'Name' },
+        { header: 'Details', maxWidth: 8 },
+      ],
+      rows: [['alpha', 'one two three four']],
+      ctx,
+    });
+
+    expect(maxLineWidth(result)).toBeLessThanOrEqual(20);
+    expect(result).toContain('one two');
+    expect(result).toContain('three');
+  });
+
+  it('uses column weights when distributing constrained width', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = table({
+      columns: [
+        { header: 'A', minWidth: 4, weight: 1 },
+        { header: 'B', minWidth: 4, weight: 3 },
+      ],
+      rows: [['alpha beta gamma delta', 'one two three four five six seven']],
+      variant: 'header-rule',
+      width: 26,
+      ctx,
+    });
+
+    const rule = result.split('\n')[1]!;
+    const [left, right] = rule.split(/ {2}/);
+    expect(left).toHaveLength(8);
+    expect(right).toHaveLength(16);
+    expect(maxLineWidth(result)).toBeLessThanOrEqual(26);
+  });
+
   it('renders an ASCII grid variant', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
 
@@ -236,17 +273,63 @@ describe('table', () => {
   it('renders an expanded record-inspection variant', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
 
-    expect(table({
+    const result = table({
       columns: [{ header: 'Name' }, { header: 'Status' }, { header: 'Score' }],
       rows: [['Alice', 'active', '95']],
       variant: 'expanded',
       ctx,
-    })).toBe([
-      '-[ RECORD 1 ]---------------------------',
+    });
+
+    expect(maxLineWidth(result)).toBeLessThanOrEqual(ctx.runtime.columns);
+    expect(result.split('\n')).toEqual([
+      '-[ RECORD 1 ]' + '-'.repeat(ctx.runtime.columns - '-[ RECORD 1 ]'.length),
       'Name   | Alice',
       'Status | active',
       'Score  | 95',
-    ].join('\n'));
+    ]);
+  });
+
+  it('fits markdown and expanded variants to explicit narrow widths', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const narrowRows = [['Alpha', 'one two three four five six']];
+    const narrowColumns = [
+      { header: 'Name', minWidth: 4 },
+      { header: 'Notes', minWidth: 5 },
+    ];
+
+    for (const variant of ['markdown', 'expanded'] as const) {
+      const result = table({
+        columns: narrowColumns,
+        rows: narrowRows,
+        variant,
+        width: 20,
+        ctx,
+      });
+
+      expect(maxLineWidth(result), variant).toBeLessThanOrEqual(20);
+    }
+    expect(table({
+      columns: narrowColumns,
+      rows: narrowRows,
+      variant: 'expanded',
+      width: 20,
+      ctx,
+    })).not.toContain('<br>');
+  });
+
+  it('fits expanded field labels and values to explicit narrow widths', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = table({
+      columns: [{ header: 'Extremely long field name' }],
+      rows: [['one two three four five six']],
+      variant: 'expanded',
+      width: 16,
+      ctx,
+    });
+
+    expect(maxLineWidth(result)).toBeLessThanOrEqual(16);
+    expect(result).toContain('one');
+    expect(result).not.toContain('<br>');
   });
 
   it('escapes tabs, newlines, and backslashes in default TSV pipe output', () => {
@@ -286,6 +369,22 @@ describe('table', () => {
       '|------|---------------|',
       '| A\\|B | line<br>break |',
     ].join('\n'));
+  });
+
+  it('honors explicit width for markdown pipe formatting', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const result = table({
+      columns: [
+        { header: 'Name', minWidth: 4 },
+        { header: 'Notes', minWidth: 5 },
+      ],
+      rows: [['Alpha', 'one two three four five six']],
+      pipeFormat: 'markdown',
+      width: 20,
+      ctx,
+    });
+
+    expect(maxLineWidth(result)).toBeLessThanOrEqual(20);
   });
 
   it('supports ASCII grid pipe formatting as an explicit human-readable lowering', () => {

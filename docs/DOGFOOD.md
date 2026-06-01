@@ -87,7 +87,9 @@ operators need when learning or validating Bijou.
 
 ### Today's Proof Points
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
-- **Documentation Jump Search**: `/` opens a global documentation search that can jump across sections, activate the right page, and select the matching guide or component story.
+- **Documentation Jump Search**: `/` opens a global documentation search that
+  can jump across sections, activate the right page, and select the matching
+  guide or component story.
 - **Component Explorer**: A live, interactive field guide to every component family.
 - **Blocks Section**: A first-class Blocks lane covering block purpose,
   authoring, first-party blocks, live surface-backed previews, and lowering

@@ -696,49 +696,83 @@ function markdownSeparator(width: number, align: TableCellAlign): string {
   return '-'.repeat(segmentWidth);
 }
 
-function flattenMarkdownLines(lines: readonly string[]): string {
-  return lines.join('<br>');
-}
-
 function renderMarkdownTable(model: FittedTable): string {
-  const renderWidths = model.columns.map((column, index) => {
-    const header = flattenMarkdownLines(model.headerLines[index] ?? ['']);
-    const rowWidth = model.rows.reduce((max, row) => {
-      return Math.max(max, visibleLength(flattenMarkdownLines(row.cells[index] ?? [''])));
-    }, 0);
-    return Math.max(3, column.width, visibleLength(header), rowWidth);
-  });
+  const renderWidths = model.columns.map(column => Math.max(1, column.width));
 
-  const header = '|' + model.columns.map((column, index) => {
-    const value = flattenMarkdownLines(model.headerLines[index] ?? ['']);
-    return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
-  }).join('|') + '|';
+  const rowLine = (
+    cells: readonly (readonly string[])[],
+    lineIndex: number,
+  ): string => {
+    return '|' + model.columns.map((column, index) => {
+      const value = cells[index]?.[lineIndex] ?? '';
+      return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
+    }).join('|') + '|';
+  };
+
+  const headerRows = Array.from({ length: model.headerHeight }, (_row, index) => {
+    return rowLine(model.headerLines, index);
+  });
   const separator = '|' + model.columns.map((column, index) => {
     return markdownSeparator(renderWidths[index]!, column.align);
   }).join('|') + '|';
-  const rows = model.rows.map((row) => {
-    return '|' + model.columns.map((column, index) => {
-      const value = flattenMarkdownLines(row.cells[index] ?? ['']);
-      return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
-    }).join('|') + '|';
+  const rows = model.rows.flatMap((row) => {
+    return Array.from({ length: row.height }, (_line, index) => rowLine(row.cells, index));
   });
 
-  return [header, separator, ...rows].join('\n');
+  return [...headerRows, separator, ...rows].join('\n');
 }
 
-function renderExpandedTable(model: FittedTable, options: TableOptions, ctx: BijouContext): string {
+function renderExpandedTable(
+  tableData: NormalizedTable,
+  options: TableOptions,
+  ctx: BijouContext,
+): string {
   const borderToken = options.borderToken ?? ctx.border('muted');
   const lines: string[] = [];
-  const labelWidth = model.columns.reduce((max, column) => Math.max(max, visibleLength(column.header)), 0);
+  const preferredLabelWidth = tableData.columns.reduce((max, column) => Math.max(max, visibleLength(column.header)), 0);
+  const layout = options.layout ?? 'auto';
+  const targetWidth = resolveTargetWidth(options, ctx, layout);
+  const ruleWidth = targetWidth ?? 40;
+  const separator = targetWidth === undefined || targetWidth >= 3
+    ? ' | '
+    : ' '.repeat(Math.max(0, targetWidth - 1));
+  const availableContentWidth = targetWidth === undefined
+    ? undefined
+    : Math.max(0, targetWidth - separator.length);
+  const labelWidth = targetWidth === undefined
+    ? preferredLabelWidth
+    : Math.min(preferredLabelWidth, Math.floor((availableContentWidth ?? 0) / 2));
+  const valueWidth = targetWidth === undefined
+    ? undefined
+    : Math.max(0, targetWidth - labelWidth - separator.length);
+  const overflow = resolveOverflowBehavior(
+    options.overflow,
+    ctx.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }),
+  );
+  const wrapMode = options.wrap ?? 'word';
 
-  for (let rowIndex = 0; rowIndex < model.rows.length; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < tableData.rows.length; rowIndex++) {
     const title = `-[ RECORD ${rowIndex + 1} ]`;
-    lines.push(ctx.style.styled(borderToken, title + '-'.repeat(Math.max(0, 40 - visibleLength(title)))));
-    const row = model.rows[rowIndex]!;
-    for (let columnIndex = 0; columnIndex < model.columns.length; columnIndex++) {
-      const label = padRight(model.columns[columnIndex]?.header ?? '', labelWidth);
-      const value = flattenMarkdownLines(row.cells[columnIndex] ?? ['']);
-      lines.push(`${label} | ${value}`.trimEnd());
+    const clippedTitle = targetWidth === undefined ? title : clipCellToWidth(title, ruleWidth);
+    lines.push(ctx.style.styled(
+      borderToken,
+      clippedTitle + '-'.repeat(Math.max(0, ruleWidth - visibleLength(clippedTitle))),
+    ));
+    const row = tableData.rows[rowIndex]!;
+    for (let columnIndex = 0; columnIndex < tableData.columns.length; columnIndex++) {
+      const rawLabel = tableData.columns[columnIndex]?.header ?? '';
+      const label = padRight(
+        targetWidth === undefined ? rawLabel : clipCellToWidth(rawLabel, labelWidth),
+        labelWidth,
+      );
+      const rawValue = row[columnIndex] ?? '';
+      const valueLines = valueWidth === undefined
+        ? rawValue.split('\n')
+        : formatCellLines(rawValue, valueWidth, overflow, wrapMode);
+      for (let lineIndex = 0; lineIndex < valueLines.length; lineIndex++) {
+        const lineLabel = lineIndex === 0 ? label : ' '.repeat(labelWidth);
+        lines.push(`${lineLabel}${separator}${valueLines[lineIndex] ?? ''}`.trimEnd());
+      }
     }
   }
 
@@ -776,6 +810,9 @@ function renderVisualTable(
     });
     return renderMarkdownTable(markdownModel);
   }
+  if (variant === 'expanded') {
+    return renderExpandedTable(tableData, options, ctx);
+  }
 
   const model = buildFittedTable(options, ctx, tableData, variant);
 
@@ -790,8 +827,6 @@ function renderVisualTable(
       return renderPlainTable(model);
     case 'definition':
       return renderRuledTable(model, options, ctx, true);
-    case 'expanded':
-      return renderExpandedTable(model, options, ctx);
     case 'box':
     default:
       return renderGridTable(model, options, ctx, 'box');

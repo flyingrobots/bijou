@@ -78,7 +78,10 @@ export function handlePaletteKey<PageModel, Msg>(
             commandPaletteKind: undefined,
           };
           const targetPageId = entry.targetPageId;
-          const nextModel = targetPageId != null && targetPageId !== model.activePageId
+          const targetPageExists = targetPageId != null
+            && pagesById.has(targetPageId)
+            && model.pageModels[targetPageId] !== undefined;
+          const nextModel = targetPageExists && targetPageId !== model.activePageId
             ? syncPageFrameState({
                 ...closed,
                 activePageId: targetPageId,

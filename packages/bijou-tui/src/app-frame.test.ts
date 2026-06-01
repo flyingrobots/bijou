@@ -1417,6 +1417,32 @@ describe('createFramedApp', () => {
     expect(result.model.commandPalette).toBeUndefined();
   });
 
+  it('ignores search result page targets that are no longer available', async () => {
+    const app = createFramedApp({
+      pages: [
+        {
+          ...makePage('home', 'Home', 'main'),
+          searchItems: () => [{
+            id: 'missing-result',
+            label: 'Missing result',
+            action: { type: 'inc' },
+            targetPageId: 'missing',
+          }],
+        },
+      ],
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      { key: '/' },
+      { key: KEY_ENTER },
+    ]);
+
+    expect(result.model.activePageId).toBe('home');
+    expect(result.model.pageModels.home?.count).toBe(0);
+    expect(result.model.commandPalette).toBeUndefined();
+  });
+
   it('uses localized shell defaults for command palette and settings footer copy', () => {
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
     runtime.loadCatalog(FRAME_I18N_CATALOG);
