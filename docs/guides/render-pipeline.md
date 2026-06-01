@@ -96,6 +96,20 @@ In practical terms:
 
 The pipeline is synchronous by design to keep frame cost measurable and predictable.
 
+Bijou's TEA runtime calls `view(model)` for a frame. That full-model render is
+intentional: state is explicit, the frame can be reproduced from one model
+snapshot, and tests can ask "what would this model render?" without replaying
+hidden mutations.
+
+The tradeoff is that expensive view work is paid on every rendered frame. Keep
+`view()` pure and bounded:
+
+- store durable app facts in the model,
+- derive only the visible slice needed for the current frame,
+- cache expensive non-visual preparation outside `view()` when the model
+  changes,
+- use commands for IO, timers, and other async work.
+
 If each stage can run with bounded synchronous cost, the frame time budget is:
 
 ```text
@@ -115,6 +129,13 @@ The architectural rule is therefore:
 - Keep rendering synchronous and deterministic.
 - Move async work into commands.
 - Receive async results as messages, then update model and re-render.
+
+Runtime diagnostics enforce that posture. If a render middleware returns a
+Promise, Bijou writes a pipeline diagnostic, keeps the current frame moving, and
+ignores any late `next()` call for stage ordering. A rejected async middleware
+Promise is also reported through the pipeline error channel. The diagnostic is
+not a supported async render mode; it is a guardrail for finding accidental
+`async` middleware before it turns into frame latency or out-of-order painting.
 
 ## Worked Example
 

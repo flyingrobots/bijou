@@ -180,6 +180,11 @@ The bus is a typed publish/subscribe system:
 - **Subscribers**: `Set<(msg) => void>` — all receive every event
 - **I/O connection**: `connectIO(io)` wires `rawInput` + `onResize`, returns disposable
 - **Command runner**: `runCmd(cmd)` resolves sync/async command results, emits final messages, retains cleanup handles for long-lived effects, or fires the quit handler
+- **Command diagnostics**: `getCommandDiagnostics()` exposes pending command
+  count, retained cleanup count, and the backpressure threshold. When pending
+  commands cross the threshold, `onCommandBackpressure` fires once per overload
+  interval so runaway command production becomes visible without imposing a hard
+  cap on legitimate high-volume workflows.
 - **Lifecycle**: `dispose()` disconnects all sources, disposes retained command cleanups, and clears all handlers
 
 The TEA runtime creates an EventBus internally. Apps can also create their own for custom event sources or testing.

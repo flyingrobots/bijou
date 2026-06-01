@@ -268,6 +268,11 @@ export interface RunOptions<M = any> {
   configurePipeline?: (pipeline: RenderPipeline) => void;
   /** Optional non-fatal render budget warnings routed as runtime issues. */
   surfaceBudget?: SurfaceBudgetThresholds;
+  /**
+   * Pending command count that triggers runtime backpressure diagnostics.
+   * Defaults to 1000. Set to 0 to disable the warning.
+   */
+  commandBackpressureThreshold?: number;
   /** Optional BCSS stylesheet string. */
   css?: string;
 }

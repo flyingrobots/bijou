@@ -17,6 +17,13 @@ covers the workflow, expectations, and resources for contributors.
 Bijou uses [METHOD](docs/METHOD.md) for work tracking. The key
 points for contributors:
 
+- **Start with a GitHub Issue**: New work intake lives in GitHub Issues, not
+  in a new local backlog file. Use the issue forms so the card captures a hill,
+  sponsored human/agent perspectives, scope, acceptance criteria, expected
+  evidence, and Method artifacts.
+- **Labels are tracker state**: Maintainers and agents apply `lane:*`,
+  `type:*`, `priority:*`, and `legend:*` labels. Do not treat historical repo
+  files as the source of live queue state.
 - **Branch naming**: `cycle/<cycle-name>` for cycle work, or a
   descriptive branch name for smaller changes.
 - **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
@@ -32,6 +39,19 @@ Common validation commands:
 - `npm test`
 - `npm run docs:inventory`
 - `npm run release:readiness` for release-sensitive changes or before cutting a release branch
+
+## Platform Support
+
+The contributor path is Node-first and should not require a Unix shell for core
+local commands. `npm run clean`, `npm run build`, `npm test`, and
+`npm run typecheck:test` are expected to work on macOS, Linux, and Windows with
+a supported Node.js version.
+
+CI keeps the full Node-version matrix on Ubuntu and adds a focused Node 22
+build/typecheck/unit-test lane on macOS and Windows. Interactive terminal
+smokes, release publishing, and benchmark artifact jobs can remain
+Linux-hosted when they depend on terminal capture tooling, trusted shell
+wrappers, or registry workflow behavior.
 
 ## Pull Requests
 
@@ -54,23 +74,38 @@ Common validation commands:
 
 ## How the Backlog Works
 
-Contributions are tracked in `docs/method/backlog/` and organized into
-lanes. Start there, not by inventing a new tracking mechanism.
+Contributions are tracked in GitHub Issues first. Open an issue before starting
+work unless a maintainer has already linked one. The issue is the live card; the
+repository stores durable evidence created while the work proceeds.
 
-- `inbox/` is the preferred first touchpoint for contributors.
-- `up-next/` holds near-term scheduled work.
-- `asap/` captures active priorities.
-- `cool-ideas/` contains exploratory follow-on ideas.
-- `bad-code/` tracks known anti-pattern cleanup.
+### Lane Labels
 
-For one-off fixes, add a short task to `docs/method/backlog/inbox/` with:
+| Label | Meaning |
+| :--- | :--- |
+| `lane:inbox` | Raw intake. The work exists but has not been shaped for a cycle. |
+| `lane:asap` | Imminent work. Maintainers expect this to be pulled next. |
+| `lane:bad-code` | Known technical debt or cleanup that should not be normalized. |
+| `lane:cool-ideas` | Interesting but uncommitted exploration. |
+| `lane:release` | Release-boundary shaping or blockers. |
+
+Use `work-in-progress` only when a branch or PR is actively carrying the issue.
+Use `blocked` when progress depends on a decision or external state. Use
+`needs-design`, `needs-witness`, and `needs-retro` when the evidence ledger is
+missing a required artifact.
+
+The repo still contains `docs/method/backlog/`, `docs/design/`,
+`docs/method/retro/`, and `docs/method/graveyard/` because those files preserve
+history and evidence. They are not the first intake path for new contributors.
+
+For one-off fixes, open a GitHub issue with:
 
 1. A minimal summary of the user-facing issue.
-2. Reproduction steps (if applicable).
+2. Reproduction steps or current repo evidence.
 3. Clear success criteria.
-4. Suggested owner and expected verification step.
+4. Expected tests, playback, docs, and closeout evidence.
 
-That file is the expected entry point for all external issue intake.
+Implementation work should link the issue from the PR and update
+`docs/CHANGELOG.md` when behavior or user-facing documentation changes.
 
 ## Code Style
 
@@ -89,8 +124,8 @@ existing guidance.
 
 Start here if this is your first contribution:
 
-- `docs/method/backlog/inbox/` — add a concise contribution proposal for a
-  documentation or onboarding improvement.
+- GitHub Issues labeled `lane:inbox` and `priority:low` — propose or pick a
+  focused documentation or onboarding improvement.
 - `docs/specs/` — add acceptance criteria or edge-case coverage notes to one
   existing spec.
 - `README.md` — improve one command explanation without changing code paths.

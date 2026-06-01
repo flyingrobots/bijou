@@ -182,6 +182,8 @@ export { run } from './runtime.js';
 // Event bus
 export {
   type BusMsg,
+  type CommandBackpressureInfo,
+  type CommandQueueDiagnostics,
   type EventBus,
   createEventBus,
 } from './eventbus.js';

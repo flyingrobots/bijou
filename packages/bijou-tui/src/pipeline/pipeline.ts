@@ -113,6 +113,13 @@ export interface CreatePipelineOptions {
   now?: () => number;
 }
 
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return typeof value === 'object'
+    && value !== null
+    && 'then' in value
+    && typeof (value as PromiseLike<unknown>).then === 'function';
+}
+
 /**
  * Create a new programmable rendering pipeline.
  */
@@ -125,6 +132,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
     Output: [],
   };
   const stageCompleteHandlers = new Set<RenderStageCompleteHandler>();
+  const warnedAsyncMiddleware = new WeakSet<RenderMiddleware>();
 
   const STAGE_ORDER: RenderStage[] = ['Layout', 'Paint', 'PostProcess', 'Diff', 'Output'];
   type StagePlanEntry = {
@@ -181,6 +189,16 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
     }
   }
 
+  function writePipelineError(state: RenderState, message: string, detail?: unknown): void {
+    if (!state.ctx.io.writeError) return;
+    const suffix = detail == null
+      ? ''
+      : detail instanceof Error
+        ? ` ${detail.stack ?? detail.message}`
+        : ` ${String(detail)}`;
+    state.ctx.io.writeError(`${message}${suffix}\n`);
+  }
+
   function execute(state: RenderState): void {
     const plan = getExecutionPlan();
     const timings: RenderStageTiming[] = [];
@@ -205,15 +223,35 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
       };
 
       try {
-        // Note: The pipeline is currently synchronous. If a middleware returns a Promise,
-        // it won't block the TEA update loop, but it might resolve out-of-order.
-        // For now, we expect render middleware to be entirely synchronous.
-        void middleware(state, next);
+        const result = middleware(state, next);
+
+        if (isPromiseLike(result)) {
+          if (!warnedAsyncMiddleware.has(middleware)) {
+            warnedAsyncMiddleware.add(middleware);
+            writePipelineError(
+              state,
+              `[Pipeline Error] Async render middleware returned a Promise in ${entry.stage}; render middleware must be synchronous. Move async work into Cmd/Msg round trips.`,
+            );
+          }
+
+          Promise.resolve(result).catch((err) => {
+            writePipelineError(
+              state,
+              `[Pipeline Error] Async render middleware rejected in ${entry.stage}:`,
+              err,
+            );
+          });
+
+          // Async middleware is unsupported because it can resume out of frame
+          // order. Keep the current frame moving and let the guarded `next`
+          // ignore any late continuation.
+          if (!advanced) {
+            next();
+          }
+        }
       } catch (err) {
         // Log and continue if a specific middleware fails, preventing full crash
-        if (state.ctx.io.writeError) {
-          state.ctx.io.writeError(`[Pipeline Error] ${err instanceof Error ? err.stack : err}\n`);
-        }
+        writePipelineError(state, '[Pipeline Error]', err);
         next();
       }
 

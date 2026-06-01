@@ -4,9 +4,8 @@ This directory holds active and landed cycle docs.
 
 ## Lifecycle
 
-- work starts in `docs/method/backlog/`
-- current queue should be visible in `asap/` and `up-next/`
-- when a cycle begins, move the file here
+- work starts in a GitHub Issue with Method labels
+- when a cycle begins, create or link the design file here
 - enrich it into a real cycle doc with hills, playbacks, and tests
 - keep the design doc as the historical record once the work lands
 

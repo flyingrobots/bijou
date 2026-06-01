@@ -16,13 +16,19 @@ Use the TEA runtime for full-screen applications with layout, motion, and overla
 - **Read**: [`@flyingrobots/bijou-tui` Guide](./packages/bijou-tui/GUIDE.md)
 - **Host**: [`@flyingrobots/bijou-node` Guide](./packages/bijou-node/GUIDE.md)
 
-### 3. Learn the Monorepo
+### 3. Build a Framed App
+Use the compact framed app tutorial when the counter is too small but DOGFOOD
+is too large to learn from.
+- **Run**: `npm run app-frame`
+- **Read**: [Framed app tutorial](./docs/guides/framed-app-tutorial.md)
+
+### 4. Learn the Monorepo
 Understand the project's identity, work doctrine, and architectural boundaries.
 - **Read**: [`docs/README.md`](./docs/README.md) (The Documentation Map)
 - **Read**: [`docs/VISION.md`](./docs/VISION.md) (Core Tenets)
 - **Read**: [`docs/METHOD.md`](./docs/METHOD.md) (Work Doctrine)
 
-### 4. Proving Ground
+### 5. Proving Ground
 See Bijou in action by running the documentation app.
 - **Run**: `npm run dogfood`
 - **Read**: [`docs/DOGFOOD.md`](./docs/DOGFOOD.md)

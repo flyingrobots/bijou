@@ -142,16 +142,39 @@ export interface EventBus<M> {
   /** Resolve once all in-flight commands have settled. */
   drain(): Promise<void>;
 
+  /** Read current command queue diagnostics. */
+  getCommandDiagnostics(): CommandQueueDiagnostics;
+
   /** Disconnect all sources and remove all subscribers. */
   dispose(): void;
+}
+
+/** Snapshot of command queue state for diagnostics and tests. */
+export interface CommandQueueDiagnostics {
+  /** Commands currently running or waiting for their promise result. */
+  readonly pendingCommands: number;
+  /** Long-lived command cleanup handles currently retained by the bus. */
+  readonly activeCommandCleanups: number;
+  /** Pending-command count that triggers backpressure diagnostics. Zero disables diagnostics. */
+  readonly backpressureThreshold: number;
+}
+
+/** Payload emitted when command backpressure diagnostics trip. */
+export interface CommandBackpressureInfo extends CommandQueueDiagnostics {
+  /** Runtime clock timestamp for deterministic reporting. */
+  readonly atMs: number;
 }
 
 /** Optional callbacks for {@link createEventBus}. */
 export interface CreateEventBusOptions {
   /** Called when a command promise rejects. */
   onCommandRejected?: (error: unknown) => void;
+  /** Called when pending commands reach the configured backpressure threshold. */
+  onCommandBackpressure?: (info: CommandBackpressureInfo) => void;
   /** Called to surface error messages (replaces direct `console.error` usage). */
   onError?: (message: string, error: unknown) => void;
+  /** Pending command threshold for backpressure diagnostics. Defaults to 1000. Set to 0 to disable. */
+  commandBackpressureThreshold?: number;
   /** Clock/scheduler override for deterministic command and pulse timing. */
   clock?: ClockPort;
 }
@@ -167,6 +190,14 @@ function normalizeCmdCleanup(cleanup: CmdCleanup): CmdDisposable {
     return { dispose: cleanup };
   }
   return cleanup;
+}
+
+const DEFAULT_COMMAND_BACKPRESSURE_THRESHOLD = 1000;
+
+function normalizeBackpressureThreshold(value: number | undefined): number {
+  if (value == null) return DEFAULT_COMMAND_BACKPRESSURE_THRESHOLD;
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return Math.floor(value);
 }
 
 // ---------------------------------------------------------------------------
@@ -187,6 +218,7 @@ function normalizeCmdCleanup(cleanup: CmdCleanup): CmdDisposable {
  */
 export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<M> {
   const clock = resolveClock(busOptions?.clock);
+  const backpressureThreshold = normalizeBackpressureThreshold(busOptions?.commandBackpressureThreshold);
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
   const pulseHandlers = new Set<(dt: number) => void>();
@@ -196,6 +228,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   let disposed = false;
   let pulseTimer: { dispose(): void } | null = null;
   let pendingCommands = 0;
+  let backpressureReported = false;
   const idleResolvers = new Set<() => void>();
 
   /** Report an error without risking an unhandled rejection. */
@@ -244,6 +277,42 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       resolve();
     }
     idleResolvers.clear();
+  }
+
+  function getCommandDiagnostics(): CommandQueueDiagnostics {
+    return {
+      pendingCommands,
+      activeCommandCleanups: activeCommandCleanups.size,
+      backpressureThreshold,
+    };
+  }
+
+  function reportCommandBackpressureIfNeeded(): void {
+    if (
+      backpressureThreshold === 0
+      || pendingCommands < backpressureThreshold
+      || backpressureReported
+    ) {
+      return;
+    }
+
+    backpressureReported = true;
+    const info: CommandBackpressureInfo = {
+      ...getCommandDiagnostics(),
+      atMs: clock.now(),
+    };
+    const message = `[EventBus] Command backpressure: ${pendingCommands} commands pending (threshold ${backpressureThreshold}).`;
+
+    try {
+      if (busOptions?.onCommandBackpressure != null) {
+        busOptions.onCommandBackpressure(info);
+      } else {
+        safeReport(message, info);
+      }
+    } catch (err: unknown) {
+      safeReport('[EventBus] onCommandBackpressure handler threw:', err);
+      safeReport(message, info);
+    }
   }
 
   return {
@@ -306,6 +375,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
     runCmd(cmd: Cmd<M>): void {
       if (disposed) return;
       pendingCommands++;
+      reportCommandBackpressureIfNeeded();
 
       const caps = {
         onPulse: (h: (dt: number) => void) => this.onPulse(h),
@@ -361,6 +431,9 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         }
       }).finally(() => {
         pendingCommands = Math.max(0, pendingCommands - 1);
+        if (pendingCommands < backpressureThreshold) {
+          backpressureReported = false;
+        }
         if (!disposed) {
           resolveIdleIfNeeded();
         }
@@ -435,6 +508,8 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         idleResolvers.add(resolve);
       });
     },
+
+    getCommandDiagnostics,
 
     dispose(): void {
       disposed = true;

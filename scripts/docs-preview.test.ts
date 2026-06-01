@@ -9,6 +9,11 @@ import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../exam
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
+import {
+  DOGFOOD_NON_INTERACTIVE_MESSAGE,
+  DOGFOOD_TERMINAL_NOTICE,
+  dogfoodTerminalReadiness,
+} from '../examples/docs/terminal-guard.js';
 import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
 import { wrapPageMsg } from '../packages/bijou-tui/src/app-frame-types.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
@@ -129,6 +134,29 @@ describe('docs preview app', () => {
     expect(source).toContain("../../packages/bijou-tui/src/index.js");
     expect(source).toContain("import { createNodeDocsApp } from './node-app.js';");
     expect(source).toContain('createNodeDocsApp(ctx)');
+    expect(source).toContain('dogfoodTerminalReadiness(ctx)');
+    expect(source).toContain('DOGFOOD_TERMINAL_NOTICE');
+  });
+
+  it('explains DOGFOOD terminal takeover and non-TTY failure modes', () => {
+    const ready = dogfoodTerminalReadiness(createTestContext({
+      runtime: { stdinIsTTY: true, stdoutIsTTY: true },
+    }));
+    const pipedStdout = dogfoodTerminalReadiness(createTestContext({
+      runtime: { stdinIsTTY: true, stdoutIsTTY: false },
+    }));
+    const pipedStdin = dogfoodTerminalReadiness(createTestContext({
+      runtime: { stdinIsTTY: false, stdoutIsTTY: true },
+    }));
+
+    expect(ready).toEqual({ ok: true });
+    expect(pipedStdout).toEqual({ ok: false, message: DOGFOOD_NON_INTERACTIVE_MESSAGE });
+    expect(pipedStdin).toEqual({ ok: false, message: DOGFOOD_NON_INTERACTIVE_MESSAGE });
+    expect(DOGFOOD_NON_INTERACTIVE_MESSAGE).toContain('stdin and stdout');
+    expect(DOGFOOD_NON_INTERACTIVE_MESSAGE).toContain('npm run smoke:dogfood');
+    expect(DOGFOOD_TERMINAL_NOTICE).toContain('full-screen interactive TUI');
+    expect(DOGFOOD_TERMINAL_NOTICE).toContain('press q');
+    expect(DOGFOOD_TERMINAL_NOTICE).toContain('Ctrl-C');
   });
 
   it('builds the Node DOGFOOD app through the locale adapter instead of process reads in view code', async () => {

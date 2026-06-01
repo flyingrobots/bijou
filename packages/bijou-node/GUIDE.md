@@ -38,6 +38,27 @@ initializer. That means low-level `run(app)` flows can still resolve ambient
 `ctx` on first use, but `startApp()` remains the preferred first-app entrypoint
 because it makes host ownership explicit in the call site.
 
+## Bootstrap Failures
+
+`initDefaultContext()` and `startApp()` frame startup failures as
+`BijouBootstrapError` when the Node host cannot create a usable terminal
+context. The error exposes:
+
+- `reason`: the direct failure summary
+- `hint`: the recovery action to show a user or log in CI
+- `cause`: the original low-level error when one exists
+
+Common cases:
+
+| Symptom | Meaning | Recovery |
+| :--- | :--- | :--- |
+| `stdout reported zero columns/rows` | The host did not provide usable terminal dimensions. | Run in a real terminal, force pipe/static behavior, or provide a test context. |
+| `raw mode unavailable` | Interactive key input is not available on stdin. | Run from an interactive terminal rather than a pipeline or non-TTY task runner. |
+| `Could not initialize Node host context` | A lower-level Node adapter failed during context construction. | Inspect `cause`, then rerun with a supported terminal environment. |
+
+For tests, prefer an explicit `ctx` created with `createTestContext(...)` over
+ambient Node process state.
+
 ## Programmatic Theme Selection
 
 If you already have a `Theme` object in code, the easiest path is:

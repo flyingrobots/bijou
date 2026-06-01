@@ -256,6 +256,17 @@ export async function runWithLifecycleHooks<Model, M>(
 
   const bus = createEventBus<M>({
     clock,
+    commandBackpressureThreshold: options?.commandBackpressureThreshold,
+    onCommandBackpressure(info) {
+      const message = `Command backpressure: ${info.pendingCommands} commands pending (threshold ${info.backpressureThreshold})`;
+      writeErrorLine(ctx.io, `[EventBus] ${message}\n`);
+      routeRuntimeIssue({
+        level: 'warning',
+        source: 'command',
+        message,
+        atMs: info.atMs,
+      });
+    },
     onCommandRejected(error) {
       const message = error instanceof Error
         ? `${error.name}: ${error.message}`

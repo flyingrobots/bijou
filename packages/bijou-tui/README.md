@@ -128,6 +128,18 @@ the shared runtime loop still does the heavy lifting, and frame timing/budget
 telemetry stays attached to the frame model for shell-owned UI. For Node-hosted
 apps, `startApp(app)` remains the default bootstrap.
 
+## Runtime Diagnostics
+
+The EventBus exposes command queue facts through `getCommandDiagnostics()`.
+`run(app, { commandBackpressureThreshold })` routes a warning when pending
+commands cross the threshold, without hard-capping legitimate bursts. The
+default threshold is 1000; use `0` to disable the warning.
+
+Render pipeline middleware is synchronous by contract. If middleware returns a
+Promise, Bijou reports a pipeline diagnostic, keeps the current frame moving,
+and ignores any late `next()` continuation so stage ordering stays
+deterministic.
+
 ## Animation
 
 ### Spring Physics
