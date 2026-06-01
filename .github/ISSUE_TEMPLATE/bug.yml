@@ -1,0 +1,102 @@
+name: Bug report
+description: Report a Bijou defect or regression with Method evidence.
+title: ""
+labels:
+  - lane:inbox
+  - type:bug
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal commands, repo state, and inputs needed to reproduce.
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Runtime, terminal, and operating system context.
+      value: |
+        - Package:
+        - Version or commit:
+        - Node.js:
+        - Terminal:
+        - OS:
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is blocked or misled by this?
+    validations:
+      required: true
+  - type: textarea
+    id: sponsored-perspectives
+    attributes:
+      label: Sponsored perspectives
+      description: Name abstract sponsored human and agent seats, not literal people or model brands.
+      value: |
+        - Sponsored Human: Name the blocked operator, maintainer, contributor, or user perspective.
+        - Sponsored Agent: Name the automation, reproduction, review, or regression-detection perspective.
+
+        These are Method sponsorship seats, not literal people, accounts, or model brands.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: witness
+    attributes:
+      label: Expected evidence
+      description: Expected evidence for tests, playback, docs, and retro.
+      value: |
+        ### Tests
+        Name the failing regression test, reproduction command, or reason no code test applies.
+
+        ### Playback
+        Name the human-visible reproduction, demo, transcript, or before/after proof.
+
+        ### Docs
+        Name the documentation, issue template, signpost, or changelog surface updated, or explain why none is required.
+
+        ### Retro / Closeout
+        Name the closeout note, follow-up issue links, shipped retro, or close reason that will preserve the decision.
+    validations:
+      required: true
+  - type: textarea
+    id: method-artifacts
+    attributes:
+      label: Method artifacts
+      description: Fill these links as the work proceeds.
+      value: |
+        - Design: Link `docs/design/<LEGEND>-<issue>-<slug>.md`, or state why issue-only triage is sufficient.
+        - Witness: Link committed witness evidence or the issue/PR comment that records verification.
+        - Retro: Link the retro/closeout artifact or the issue close comment.
+        - PR: Link the pull request before closing implementation work.
+    validations:
+      required: true

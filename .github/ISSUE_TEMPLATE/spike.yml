@@ -1,0 +1,83 @@
+name: Method spike
+description: Capture a temporary proof, learning cycle, or constraint probe.
+title: ""
+labels:
+  - lane:inbox
+  - type:spike
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are we trying to prove or learn?
+    validations:
+      required: true
+  - type: textarea
+    id: why-now
+    attributes:
+      label: Why now
+      description: What decision will this unblock?
+    validations:
+      required: true
+  - type: textarea
+    id: sponsored-perspectives
+    attributes:
+      label: Sponsored perspectives
+      description: Name abstract sponsored human and agent seats, not literal people or model brands.
+      value: |
+        - Sponsored Human: Name the decision-maker, maintainer, contributor, or user perspective served by the learning.
+        - Sponsored Agent: Name the automation, analysis, implementation, or reproducibility perspective.
+
+        These are Method sponsorship seats, not literal people, accounts, or model brands.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: Stack, time, safety, or quality constraints.
+      placeholder: |
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected-evidence
+    attributes:
+      label: Expected evidence
+      description: What transcript, demo, test, or artifact proves the learning?
+      value: |
+        ### Tests
+        Name the probe command, fixture, regression test, or reason no code test applies.
+
+        ### Playback
+        Name the transcript, demo, comparison, or decision evidence that proves the learning.
+
+        ### Docs
+        Name the documentation, issue template, signpost, or changelog surface updated, or explain why none is required.
+
+        ### Retro / Closeout
+        Name the adopt/adapt/retire decision, follow-up issue links, or close reason.
+    validations:
+      required: true
+  - type: textarea
+    id: method-artifacts
+    attributes:
+      label: Method artifacts
+      description: Fill these links as the work proceeds.
+      value: |
+        - Design: Link `docs/design/<LEGEND>-<issue>-<slug>.md`, or state why issue-only triage is sufficient.
+        - Witness: Link committed witness evidence or the issue/PR comment that records verification.
+        - Retro: Link the retro/closeout artifact or the issue close comment.
+        - PR: Link the pull request before closing implementation work.
+    validations:
+      required: true
+  - type: textarea
+    id: closeout
+    attributes:
+      label: Adopt, adapt, or retire decision
+      description: Fill this in during closeout.
+      value: |
+        Decision:
+        Follow-up:
+    validations:
+      required: false
