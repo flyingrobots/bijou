@@ -64,7 +64,7 @@ would only create fake API duplication.
 - **`separator()`**: Section divider with an optional label.
 
 ### Data & Hierarchy
-- **`table()` / `tableSurface()`**: Passive row/column comparison. The common case now supports `table(columns, rows, ctx)` and `tableSurface(columns, rows, ctx)` shorthands, while the object form remains available for advanced token/overflow options.
+- **`table()` / `tableSurface()`**: Passive row/column comparison. `table()` now fits human output to the available terminal width by default, supports visual variants such as `box`, `ruled`, `header-rule`, `plain`, `ascii-grid`, `markdown`, and `definition`, and keeps machine output explicit through `pipeFormat` (`tsv` by default, with `csv`, `markdown`, and `ascii-grid` opt-ins). The common case still supports `table(columns, rows, ctx)` and `tableSurface(columns, rows, ctx)` shorthands, while the object form remains available for layout, variant, token, and overflow options.
 - **`tree()`**: Parent/child nesting.
 - **`timeline()`**: Chronological sequences.
 - **`dag()` / `dagSlice()`**: Causal or dependency-based graphs.

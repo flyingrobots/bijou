@@ -58,6 +58,8 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
   - [DX-028 — Align front-door docs with repo truth](../method/retro/DX-028-align-front-door-docs-with-repo-truth.md)
   - [DX-020 — Layout Localization Pipeline Guide](../method/retro/DX-020-layout-localization-pipeline-guide.md)
   - [DX-019 — Third-Party Theme Reactivity Hook](../method/retro/DX-019-third-party-theme-reactivity-hook.md)
+- current backlog:
+  - [DX-037 — tableSurface Responsive Width Parity](../method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md)
 - current exploratory backlog:
   - [DX-027 — Choose-Your-Lane Starter for README and DOGFOOD](../method/backlog/cool-ideas/DX-027-choose-your-lane-starter-for-readme-and-dogfood.md)
   - [DX-026 — Mode-Lowering Linter](../method/backlog/cool-ideas/DX-026-mode-lowering-linter.md)

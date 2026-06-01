@@ -1,19 +1,54 @@
 import { RESET_SGR } from '../ansi.js';
-import { ANSI_OSC8_RE, ANSI_SGR_RE, graphemeClusterWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
+import {
+  ANSI_OSC8_RE,
+  ANSI_SGR_RE,
+  graphemeClusterWidth,
+  segmentGraphemes,
+  stripAnsi,
+} from '../text/grapheme.js';
+import { wrapToWidth } from '../text/wrap.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { makeBgFill } from '../bg-fill.js';
+import {
+  sanitizeNonNegativeInt,
+  sanitizeOptionalNonNegativeInt,
+  sanitizeOptionalPositiveInt,
+  sanitizePositiveInt,
+} from '../numeric.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import type { BijouNodeOptions } from './types.js';
+import type { BijouNodeOptions, OverflowBehavior } from './types.js';
+
+export type TableLayout = 'auto' | 'intrinsic';
+export type TableVariant =
+  | 'box'
+  | 'ascii-grid'
+  | 'ruled'
+  | 'header-rule'
+  | 'plain'
+  | 'markdown'
+  | 'definition'
+  | 'expanded';
+export type TablePipeFormat = 'tsv' | 'csv' | 'markdown' | 'ascii-grid';
+export type TableCellAlign = 'left' | 'right' | 'center';
+export type TableWrapMode = 'word' | 'grapheme';
 
 /** Definition for a single table column. */
 export interface TableColumn {
   /** Column header text. */
   header: string;
-  /** Fixed column width in characters. When omitted, width is auto-calculated from content. */
+  /** Fixed column width in characters. When omitted, width is calculated from content and layout policy. */
   width?: number;
+  /** Minimum fitted width for responsive layouts. */
+  minWidth?: number;
+  /** Maximum fitted width for responsive layouts. */
+  maxWidth?: number;
+  /** Relative share of extra responsive width. Defaults to `1`. */
+  weight?: number;
+  /** Horizontal alignment for header and cell content. Defaults to `'left'`. */
+  align?: TableCellAlign;
 }
 
 export type TableTextCell = string;
@@ -21,10 +56,24 @@ export type TableTextRow = readonly TableTextCell[];
 
 /** Configuration for rendering a table. */
 export interface TableOptions extends BijouNodeOptions {
-  /** Column definitions (headers and optional widths). */
-  columns: readonly TableColumn[];
+  /** Column definitions (headers and optional layout constraints). */
+  columns?: readonly TableColumn[];
   /** Two-dimensional array of cell strings, one inner array per row. */
   rows: readonly TableTextRow[];
+  /** Human-mode layout policy. Defaults to `'auto'`. */
+  layout?: TableLayout;
+  /** Human-mode visual style. Defaults to `'box'`. */
+  variant?: TableVariant;
+  /** Pipe-mode serialization. Defaults to `'tsv'`. */
+  pipeFormat?: TablePipeFormat;
+  /** Total render width for fitted layouts. Defaults to `ctx.runtime.columns` in human modes. */
+  width?: number;
+  /** Maximum total render width for fitted layouts. */
+  maxWidth?: number;
+  /** Spaces between columns for borderless variants. Defaults to `2`. */
+  columnGap?: number;
+  /** Wrapping strategy for constrained cells. Defaults to `'word'`. */
+  wrap?: TableWrapMode;
   /** Theme token applied to header text. */
   headerToken?: TokenValue;
   /** Theme token applied to border characters. */
@@ -34,6 +83,35 @@ export interface TableOptions extends BijouNodeOptions {
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
+
+interface NormalizedTable {
+  readonly columns: readonly TableColumn[];
+  readonly rows: readonly string[][];
+}
+
+interface FittedColumn {
+  readonly header: string;
+  readonly width: number;
+  readonly align: TableCellAlign;
+}
+
+interface FittedRow {
+  readonly cells: readonly (readonly string[])[];
+  readonly height: number;
+}
+
+interface FittedTable {
+  readonly columns: readonly FittedColumn[];
+  readonly widths: readonly number[];
+  readonly headerLines: readonly (readonly string[])[];
+  readonly headerHeight: number;
+  readonly rows: readonly FittedRow[];
+  readonly columnGap: number;
+}
+
+type TableWrapToken =
+  | { readonly kind: 'ansi'; readonly raw: string }
+  | { readonly kind: 'grapheme'; readonly raw: string; readonly width: number };
 
 /**
  * Structural width added by the interactive table frame for a given column count.
@@ -58,10 +136,10 @@ function isTableOptions(value: TableOptions | readonly TableColumn[]): value is 
 }
 
 /**
- * Calculate the visible (non-ANSI) character length of a string.
+ * Calculate the visible (non-ANSI) display width of a string.
  *
  * @param str - Input string potentially containing ANSI codes.
- * @returns The number of visible characters.
+ * @returns The number of visible terminal columns.
  */
 function visibleLength(str: string): number {
   let width = 0;
@@ -83,31 +161,219 @@ function padRight(str: string, width: number): string {
   return visible >= width ? str : str + ' '.repeat(width - visible);
 }
 
+function padLeft(str: string, width: number): string {
+  const visible = visibleLength(str);
+  return visible >= width ? str : ' '.repeat(width - visible) + str;
+}
+
+function padCenter(str: string, width: number): string {
+  const visible = visibleLength(str);
+  if (visible >= width) return str;
+  const remaining = width - visible;
+  const left = Math.floor(remaining / 2);
+  return ' '.repeat(left) + str + ' '.repeat(remaining - left);
+}
+
+function alignCell(str: string, width: number, align: TableCellAlign): string {
+  if (align === 'right') return padLeft(str, width);
+  if (align === 'center') return padCenter(str, width);
+  return padRight(str, width);
+}
+
 function normalizeColumnWidth(width: number | undefined): number | undefined {
-  if (width == null) return undefined;
-  if (!Number.isFinite(width)) return 0;
-  return Math.max(0, Math.floor(width));
+  return sanitizeOptionalNonNegativeInt(width);
+}
+
+function normalizePositiveWeight(weight: number | undefined): number {
+  if (weight == null || !Number.isFinite(weight)) return 1;
+  return Math.max(0, Math.floor(weight));
+}
+
+function maxVisibleLineWidth(value: string): number {
+  const lines = String(value ?? '').split('\n');
+  return lines.reduce((max, line) => Math.max(max, visibleLength(line)), 0);
+}
+
+function normalizeRows(rows: readonly TableTextRow[] | undefined): string[][] {
+  return (rows ?? []).map(row => (row ?? []).map(cell => String(cell ?? '')));
+}
+
+function resolveColumns(
+  suppliedColumns: readonly TableColumn[] | undefined,
+  rows: readonly string[][],
+  variant: TableVariant,
+): TableColumn[] {
+  const columns = suppliedColumns ?? [];
+  if (columns.length > 0) return [...columns];
+
+  if (variant === 'definition') {
+    return [
+      { header: 'Field', minWidth: 5 },
+      { header: 'Value', minWidth: 5, weight: 3 },
+    ];
+  }
+
+  const inferredCount = rows.reduce((max, row) => Math.max(max, row.length), 0);
+  return Array.from({ length: inferredCount }, () => ({ header: '' }));
+}
+
+function normalizeTable(options: TableOptions): NormalizedTable {
+  const rows = normalizeRows(options.rows);
+  const variant = options.variant ?? 'box';
+  return {
+    columns: resolveColumns(options.columns, rows, variant),
+    rows,
+  };
+}
+
+function structuralOverhead(variant: TableVariant, columnCount: number, columnGap: number): number {
+  if (columnCount <= 0) return variant === 'box' || variant === 'ascii-grid' ? 2 : 0;
+  if (variant === 'box' || variant === 'ascii-grid') {
+    return interactiveTableBorderOverhead(columnCount);
+  }
+  if (variant === 'markdown') {
+    return columnCount * 3 + 1;
+  }
+  return Math.max(0, columnCount - 1) * columnGap;
+}
+
+function resolveTargetWidth(
+  options: TableOptions,
+  ctx: BijouContext,
+  layout: TableLayout,
+): number | undefined {
+  const explicitWidth = sanitizeOptionalPositiveInt(options.width);
+  if (explicitWidth !== undefined) return explicitWidth;
+
+  const explicitMaxWidth = sanitizeOptionalPositiveInt(options.maxWidth);
+  if (layout === 'intrinsic') return explicitMaxWidth;
+
+  const runtimeWidth = sanitizePositiveInt(ctx.runtime.columns, 80);
+  return explicitMaxWidth === undefined ? runtimeWidth : Math.min(runtimeWidth, explicitMaxWidth);
+}
+
+function columnPreferredWidth(
+  column: TableColumn,
+  rows: readonly string[][],
+  columnIndex: number,
+): number {
+  const fixedWidth = normalizeColumnWidth(column.width);
+  if (fixedWidth !== undefined) return fixedWidth;
+
+  let preferred = Math.max(1, maxVisibleLineWidth(column.header ?? ''));
+  for (const row of rows) {
+    preferred = Math.max(preferred, maxVisibleLineWidth(row[columnIndex] ?? ''));
+  }
+
+  const maxWidth = sanitizeOptionalNonNegativeInt(column.maxWidth);
+  if (maxWidth !== undefined) preferred = Math.min(preferred, maxWidth);
+
+  const minWidth = sanitizeOptionalNonNegativeInt(column.minWidth);
+  if (minWidth !== undefined) preferred = Math.max(preferred, Math.min(minWidth, maxWidth ?? minWidth));
+
+  return preferred;
+}
+
+function columnMinWidth(column: TableColumn, preferredWidth: number): number {
+  const fixedWidth = normalizeColumnWidth(column.width);
+  if (fixedWidth !== undefined) return fixedWidth;
+
+  const maxWidth = sanitizeOptionalNonNegativeInt(column.maxWidth);
+  const rawMinWidth = sanitizeOptionalNonNegativeInt(column.minWidth) ?? Math.min(1, preferredWidth);
+  const constrainedMin = Math.min(rawMinWidth, maxWidth ?? rawMinWidth);
+  return Math.min(preferredWidth, constrainedMin);
+}
+
+function fitColumnWidths(
+  columns: readonly TableColumn[],
+  rows: readonly string[][],
+  variant: TableVariant,
+  layout: TableLayout,
+  targetWidth: number | undefined,
+  columnGap: number,
+): number[] {
+  const preferred = columns.map((column, index) => columnPreferredWidth(column, rows, index));
+  if (layout === 'intrinsic' && targetWidth === undefined) return preferred;
+
+  const contentTarget = targetWidth === undefined
+    ? undefined
+    : Math.max(0, targetWidth - structuralOverhead(variant, columns.length, columnGap));
+  if (contentTarget === undefined) return preferred;
+
+  const preferredTotal = preferred.reduce((sum, width) => sum + width, 0);
+  if (preferredTotal <= contentTarget) return preferred;
+
+  const minimum = columns.map((column, index) => columnMinWidth(column, preferred[index]!));
+  const minimumTotal = minimum.reduce((sum, width) => sum + width, 0);
+  if (minimumTotal >= contentTarget) return minimum;
+
+  const widths = [...minimum];
+  const remainingCapacity = preferred.map((width, index) => Math.max(0, width - minimum[index]!));
+  let remainingBudget = contentTarget - minimumTotal;
+
+  while (remainingBudget > 0) {
+    const active = remainingCapacity
+      .map((capacity, index) => ({ capacity, index }))
+      .filter(entry => entry.capacity > 0);
+    if (active.length === 0) break;
+
+    const totalWeight = active.reduce((sum, entry) => {
+      return sum + Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight));
+    }, 0);
+    let used = 0;
+    const remainders: Array<{ readonly index: number; readonly remainder: number; readonly capacity: number }> = [];
+
+    for (const entry of active) {
+      const weight = Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight));
+      const exact = (remainingBudget * weight) / totalWeight;
+      const add = Math.min(entry.capacity, Math.floor(exact));
+      if (add > 0) {
+        widths[entry.index]! += add;
+        remainingCapacity[entry.index]! -= add;
+        used += add;
+      }
+      remainders.push({
+        index: entry.index,
+        remainder: exact - Math.floor(exact),
+        capacity: remainingCapacity[entry.index]!,
+      });
+    }
+
+    if (used === 0) {
+      const sortedRemainders = remainders
+        .filter(entry => entry.capacity > 0)
+        .sort((left, right) => {
+          if (right.remainder !== left.remainder) return right.remainder - left.remainder;
+          return remainingCapacity[right.index]! - remainingCapacity[left.index]!;
+        });
+      const next = sortedRemainders[0];
+      if (!next) break;
+      widths[next.index]!++;
+      remainingCapacity[next.index]!--;
+      used = 1;
+    }
+
+    remainingBudget -= used;
+  }
+
+  return widths;
 }
 
 function formatCellLines(
   value: string,
   width: number,
-  overflow: 'wrap' | 'truncate',
-  fixedWidth: boolean,
+  overflow: OverflowBehavior,
+  wrapMode: TableWrapMode,
 ): string[] {
   const safeValue = value ?? '';
-  if (!fixedWidth) return safeValue.split('\n');
   if (overflow === 'truncate') {
-    return safeValue.split('\n').map((line) => clipCellToWidth(line, width));
+    return safeValue.split('\n').map(line => clipCellToWidth(line, width));
   }
-  return safeValue.split('\n').flatMap((line) => wrapCellToWidth(line, width));
+  if (wrapMode === 'word') return wrapToWidth(safeValue, width);
+  return safeValue.split('\n').flatMap(line => wrapCellToWidth(line, width));
 }
 
 const TABLE_EMOJI_PRESENTATION_RE = /\p{Emoji_Presentation}/u;
-
-type TableWrapToken =
-  | { readonly kind: 'ansi'; readonly raw: string }
-  | { readonly kind: 'grapheme'; readonly raw: string; readonly width: number };
 
 function tableGraphemeWidth(grapheme: string): number {
   if (TABLE_EMOJI_PRESENTATION_RE.test(grapheme)) return 2;
@@ -224,12 +490,374 @@ function wrapCellToWidth(str: string, maxWidth: number): string[] {
   return lines.length > 0 ? lines : [''];
 }
 
+function buildFittedTable(
+  options: TableOptions,
+  ctx: BijouContext,
+  tableData: NormalizedTable,
+  variant: TableVariant,
+  optionsOverride: {
+    readonly styleHeaders?: boolean;
+    readonly layout?: TableLayout;
+    readonly rows?: readonly string[][];
+    readonly columns?: readonly TableColumn[];
+  } = {},
+): FittedTable {
+  const columns = optionsOverride.columns ?? tableData.columns;
+  const rows = optionsOverride.rows ?? tableData.rows;
+  const layout = optionsOverride.layout ?? options.layout ?? 'auto';
+  const columnGap = sanitizeNonNegativeInt(options.columnGap, 2);
+  const overflow = resolveOverflowBehavior(
+    options.overflow,
+    ctx.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }),
+  );
+  const wrapMode = options.wrap ?? 'word';
+  const widths = fitColumnWidths(
+    columns,
+    rows,
+    variant,
+    layout,
+    resolveTargetWidth(options, ctx, layout),
+    columnGap,
+  );
+  const headerToken = options.headerToken ?? ctx.ui('tableHeader');
+  const styleHeaders = optionsOverride.styleHeaders ?? true;
+  const headerLines = columns.map((column, index) => {
+    const header = column.header ?? '';
+    const value = styleHeaders ? ctx.style.styled(headerToken, header) : header;
+    return formatCellLines(value, widths[index] ?? 0, overflow, wrapMode);
+  });
+  const headerHeight = headerLines.reduce((max, lines) => Math.max(max, lines.length), 1);
+  const fittedRows = rows.map((row) => {
+    const cells = widths.map((width, index) => {
+      return formatCellLines(row[index] ?? '', width, overflow, wrapMode);
+    });
+    const height = cells.reduce((max, lines) => Math.max(max, lines.length), 1);
+    return { cells, height };
+  });
+
+  return {
+    columns: columns.map((column, index) => ({
+      header: column.header ?? '',
+      width: widths[index] ?? 0,
+      align: column.align ?? 'left',
+    })),
+    widths,
+    headerLines,
+    headerHeight,
+    rows: fittedRows,
+    columnGap,
+  };
+}
+
+function renderGridTable(
+  model: FittedTable,
+  options: TableOptions,
+  ctx: BijouContext,
+  variant: 'box' | 'ascii-grid',
+  styled = true,
+): string {
+  const borderToken = options.borderToken ?? ctx.border('muted');
+  const bc = (s: string): string => styled ? ctx.style.styled(borderToken, s) : s;
+  const chars = variant === 'box'
+    ? {
+        h: '\u2500',
+        v: '\u2502',
+        topLeft: '\u250c',
+        topMid: '\u252c',
+        topRight: '\u2510',
+        midLeft: '\u251c',
+        midMid: '\u253c',
+        midRight: '\u2524',
+        bottomLeft: '\u2514',
+        bottomMid: '\u2534',
+        bottomRight: '\u2518',
+      }
+    : {
+        h: '-',
+        v: '|',
+        topLeft: '+',
+        topMid: '+',
+        topRight: '+',
+        midLeft: '+',
+        midMid: '+',
+        midRight: '+',
+        bottomLeft: '+',
+        bottomMid: '+',
+        bottomRight: '+',
+      };
+
+  const hLine = (left: string, mid: string, right: string): string => {
+    const segments = model.widths.map(w => chars.h.repeat(w + 2));
+    return bc(left + segments.join(mid) + right);
+  };
+
+  const top = hLine(chars.topLeft, chars.topMid, chars.topRight);
+  const midSep = hLine(chars.midLeft, chars.midMid, chars.midRight);
+  const bottom = hLine(chars.bottomLeft, chars.bottomMid, chars.bottomRight);
+  const hdrBgFill = styled ? makeBgFill(options.headerBgToken, ctx) : undefined;
+
+  const headerRows = Array.from({ length: model.headerHeight }, (_row, rowIndex) => {
+    const headerCells = model.columns.map((column, i) =>
+      ' ' + alignCell(model.headerLines[i]?.[rowIndex] ?? '', column.width, column.align) + ' ',
+    );
+    const rawHeaderRow = bc(chars.v) + headerCells.join(bc(chars.v)) + bc(chars.v);
+    return hdrBgFill ? hdrBgFill(rawHeaderRow) : rawHeaderRow;
+  });
+
+  const dataRows = model.rows.flatMap((row) => {
+    return Array.from({ length: row.height }, (_line, lineIndex) => {
+      const cells = model.columns.map((column, i) =>
+        ' ' + alignCell(row.cells[i]?.[lineIndex] ?? '', column.width, column.align) + ' ',
+      );
+      return bc(chars.v) + cells.join(bc(chars.v)) + bc(chars.v);
+    });
+  });
+
+  return [top, ...headerRows, midSep, ...dataRows, bottom].join('\n');
+}
+
+function renderBorderlessRow(
+  model: FittedTable,
+  cells: readonly (readonly string[])[],
+  rowIndex: number,
+): string {
+  const gap = ' '.repeat(model.columnGap);
+  return model.columns
+    .map((column, index) => alignCell(cells[index]?.[rowIndex] ?? '', column.width, column.align))
+    .join(gap)
+    .trimEnd();
+}
+
+function renderRule(model: FittedTable, char: string, ctx: BijouContext, options: TableOptions): string {
+  const borderToken = options.borderToken ?? ctx.border('muted');
+  const line = model.widths.map(width => char.repeat(width)).join(' '.repeat(model.columnGap)).trimEnd();
+  return ctx.style.styled(borderToken, line);
+}
+
+function renderRuledTable(
+  model: FittedTable,
+  options: TableOptions,
+  ctx: BijouContext,
+  includeRowRules: boolean,
+): string {
+  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
+    return renderBorderlessRow(model, model.headerLines, index);
+  });
+  lines.push(renderRule(model, '\u2501', ctx, options));
+
+  for (let rowIndex = 0; rowIndex < model.rows.length; rowIndex++) {
+    const row = model.rows[rowIndex]!;
+    for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
+      lines.push(renderBorderlessRow(model, row.cells, lineIndex));
+    }
+    if (includeRowRules && rowIndex < model.rows.length - 1) {
+      lines.push(renderRule(model, '\u2500', ctx, options));
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function renderHeaderRuleTable(
+  model: FittedTable,
+): string {
+  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
+    return renderBorderlessRow(model, model.headerLines, index);
+  });
+  lines.push(model.widths.map(width => '-'.repeat(width)).join(' '.repeat(model.columnGap)).trimEnd());
+
+  for (const row of model.rows) {
+    for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
+      lines.push(renderBorderlessRow(model, row.cells, lineIndex));
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function renderPlainTable(model: FittedTable): string {
+  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
+    return renderBorderlessRow(model, model.headerLines, index);
+  });
+
+  for (const row of model.rows) {
+    for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
+      lines.push(renderBorderlessRow(model, row.cells, lineIndex));
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function markdownSeparator(width: number, align: TableCellAlign): string {
+  const segmentWidth = Math.max(3, width + 2);
+  if (align === 'right') return '-'.repeat(segmentWidth - 1) + ':';
+  if (align === 'center') return ':' + '-'.repeat(segmentWidth - 2) + ':';
+  return '-'.repeat(segmentWidth);
+}
+
+function flattenMarkdownLines(lines: readonly string[]): string {
+  return lines.join('<br>');
+}
+
+function renderMarkdownTable(model: FittedTable): string {
+  const renderWidths = model.columns.map((column, index) => {
+    const header = flattenMarkdownLines(model.headerLines[index] ?? ['']);
+    const rowWidth = model.rows.reduce((max, row) => {
+      return Math.max(max, visibleLength(flattenMarkdownLines(row.cells[index] ?? [''])));
+    }, 0);
+    return Math.max(3, column.width, visibleLength(header), rowWidth);
+  });
+
+  const header = '|' + model.columns.map((column, index) => {
+    const value = flattenMarkdownLines(model.headerLines[index] ?? ['']);
+    return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
+  }).join('|') + '|';
+  const separator = '|' + model.columns.map((column, index) => {
+    return markdownSeparator(renderWidths[index]!, column.align);
+  }).join('|') + '|';
+  const rows = model.rows.map((row) => {
+    return '|' + model.columns.map((column, index) => {
+      const value = flattenMarkdownLines(row.cells[index] ?? ['']);
+      return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
+    }).join('|') + '|';
+  });
+
+  return [header, separator, ...rows].join('\n');
+}
+
+function renderExpandedTable(model: FittedTable, options: TableOptions, ctx: BijouContext): string {
+  const borderToken = options.borderToken ?? ctx.border('muted');
+  const lines: string[] = [];
+  const labelWidth = model.columns.reduce((max, column) => Math.max(max, visibleLength(column.header)), 0);
+
+  for (let rowIndex = 0; rowIndex < model.rows.length; rowIndex++) {
+    const title = `-[ RECORD ${rowIndex + 1} ]`;
+    lines.push(ctx.style.styled(borderToken, title + '-'.repeat(Math.max(0, 40 - visibleLength(title)))));
+    const row = model.rows[rowIndex]!;
+    for (let columnIndex = 0; columnIndex < model.columns.length; columnIndex++) {
+      const label = padRight(model.columns[columnIndex]?.header ?? '', labelWidth);
+      const value = flattenMarkdownLines(row.cells[columnIndex] ?? ['']);
+      lines.push(`${label} | ${value}`.trimEnd());
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function markdownEscapeCell(value: string): string {
+  return stripAnsi(String(value ?? ''))
+    .replace(/\\/g, '\\\\')
+    .replace(/\|/g, '\\|')
+    .replace(/\r\n?/g, '\n')
+    .replace(/\n/g, '<br>');
+}
+
+function markdownTableData(tableData: NormalizedTable): NormalizedTable {
+  return {
+    columns: tableData.columns.map(column => ({
+      ...column,
+      header: markdownEscapeCell(column.header ?? ''),
+    })),
+    rows: tableData.rows.map(row => row.map(cell => markdownEscapeCell(cell))),
+  };
+}
+
+function renderVisualTable(
+  options: TableOptions,
+  ctx: BijouContext,
+  tableData: NormalizedTable,
+  variant: TableVariant,
+): string {
+  if (variant === 'markdown') {
+    const markdownData = markdownTableData(tableData);
+    const markdownModel = buildFittedTable(options, ctx, markdownData, 'markdown', {
+      styleHeaders: false,
+    });
+    return renderMarkdownTable(markdownModel);
+  }
+
+  const model = buildFittedTable(options, ctx, tableData, variant);
+
+  switch (variant) {
+    case 'ascii-grid':
+      return renderGridTable(model, options, ctx, 'ascii-grid');
+    case 'ruled':
+      return renderRuledTable(model, options, ctx, true);
+    case 'header-rule':
+      return renderHeaderRuleTable(model);
+    case 'plain':
+      return renderPlainTable(model);
+    case 'definition':
+      return renderRuledTable(model, options, ctx, true);
+    case 'expanded':
+      return renderExpandedTable(model, options, ctx);
+    case 'box':
+    default:
+      return renderGridTable(model, options, ctx, 'box');
+  }
+}
+
+function escapeTsvCell(value: string): string {
+  return String(value ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\t/g, '\\t')
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n');
+}
+
+function escapeCsvCell(value: string): string {
+  const text = String(value ?? '');
+  if (!/[",\r\n]/.test(text)) return text;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function renderSeparatedPipe(
+  tableData: NormalizedTable,
+  separator: string,
+  escapeCell: (value: string) => string,
+): string {
+  const headerLine = tableData.columns.map(column => escapeCell(column.header ?? '')).join(separator);
+  const dataLines = tableData.rows.map(row => row.map(escapeCell).join(separator));
+  return [headerLine, ...dataLines].join('\n');
+}
+
+function renderPipeTable(
+  options: TableOptions,
+  ctx: BijouContext,
+  tableData: NormalizedTable,
+): string {
+  const format = options.pipeFormat ?? 'tsv';
+
+  if (format === 'csv') return renderSeparatedPipe(tableData, ',', escapeCsvCell);
+  if (format === 'markdown') {
+    const markdownData = markdownTableData(tableData);
+    const markdownModel = buildFittedTable(options, ctx, markdownData, 'markdown', {
+      layout: options.layout ?? (options.width !== undefined || options.maxWidth !== undefined ? 'auto' : 'intrinsic'),
+      styleHeaders: false,
+    });
+    return renderMarkdownTable(markdownModel);
+  }
+  if (format === 'ascii-grid') {
+    const model = buildFittedTable(options, ctx, tableData, 'ascii-grid', {
+      layout: options.layout ?? (options.width !== undefined || options.maxWidth !== undefined ? 'auto' : 'intrinsic'),
+      styleHeaders: false,
+    });
+    return renderGridTable(model, options, ctx, 'ascii-grid', false);
+  }
+
+  return renderSeparatedPipe(tableData, '\t', escapeTsvCell);
+}
+
 /**
- * Render a table with unicode box-drawing borders.
+ * Render a table with mode-aware human variants and pipe serializations.
  *
  * Output adapts to the current output mode:
- * - `interactive` / `static` — bordered table with styled headers.
- * - `pipe` — tab-separated values (TSV).
+ * - `interactive` / `static` — responsive visual table. Defaults to the boxed
+ *   variant, with optional ruled, plain, markdown, definition, and ASCII grid
+ *   variants.
+ * - `pipe` — tab-separated values (TSV) by default, with explicit CSV,
+ *   Markdown, and ASCII grid formats.
  * - `accessible` — key-value pairs per row for screen readers.
  *
  * @param options - Table configuration including columns and row data.
@@ -253,88 +881,19 @@ export function table(
     options = { columns: [...optionsOrColumns], rows: rowData ?? [], ctx: context };
   }
   const ctx = resolveCtx(options.ctx);
-  const columns = options.columns ?? [];
-  const rows = (options.rows ?? []).map(row => (row ?? []).map(cell => cell ?? ''));
+  const tableData = normalizeTable(options);
 
   return renderByMode(ctx.mode, {
-    pipe: () => {
-      const headerLine = columns.map((c) => c.header ?? '').join('\t');
-      const dataLines = rows.map((row) => row.join('\t'));
-      return [headerLine, ...dataLines].join('\n');
-    },
+    pipe: () => renderPipeTable(options, ctx, tableData),
     accessible: () => {
       const lines: string[] = [];
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i]!;
-        const pairs = columns.map((col, j) => `${col.header ?? ''}=${row[j] ?? ''}`);
+      for (let i = 0; i < tableData.rows.length; i++) {
+        const row = tableData.rows[i]!;
+        const pairs = tableData.columns.map((col, j) => `${col.header ?? ''}=${row[j] ?? ''}`);
         lines.push(`Row ${i + 1}: ${pairs.join(', ')}`);
       }
       return lines.join('\n');
     },
-    interactive: () => {
-      const headerToken = options.headerToken ?? ctx.ui('tableHeader');
-      const borderToken = options.borderToken ?? ctx.border('muted');
-      const overflow = resolveOverflowBehavior(
-        options.overflow,
-        ctx.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }),
-      );
-      const bc = (s: string): string => ctx.style.styled(borderToken, s);
-
-      const colWidths = columns.map((col, i) => {
-        const normalizedWidth = normalizeColumnWidth(col.width);
-        if (normalizedWidth !== undefined) return normalizedWidth;
-        let max = visibleLength(col.header ?? '');
-        for (const row of rows) {
-          const cell = row[i] ?? '';
-          max = Math.max(max, visibleLength(cell));
-        }
-        return max;
-      });
-
-      const h = '\u2500';
-      const v = '\u2502';
-
-      const hLine = (left: string, mid: string, right: string): string => {
-        const segments = colWidths.map((w) => h.repeat(w + 2));
-        return bc(left + segments.join(mid) + right);
-      };
-
-      const top    = hLine('\u250c', '\u252c', '\u2510');
-      const midSep = hLine('\u251c', '\u253c', '\u2524');
-      const bottom = hLine('\u2514', '\u2534', '\u2518');
-
-      const hdrBgFill = makeBgFill(options.headerBgToken, ctx);
-      const headerLinesByColumn = columns.map((col, i) => formatCellLines(
-        ctx.style.styled(headerToken, col.header ?? ''),
-        colWidths[i]!,
-        overflow,
-        col.width !== undefined,
-      ));
-      const headerHeight = headerLinesByColumn.reduce((max, lines) => Math.max(max, lines.length), 1);
-      const headerRows = Array.from({ length: headerHeight }, (_row, rowIndex) => {
-        const headerCells = columns.map((_col, i) =>
-          ' ' + padRight(headerLinesByColumn[i]![rowIndex] ?? '', colWidths[i]!) + ' ',
-        );
-        const rawHeaderRow = bc(v) + headerCells.join(bc(v)) + bc(v);
-        return hdrBgFill ? hdrBgFill(rawHeaderRow) : rawHeaderRow;
-      });
-
-      const dataRows = rows.flatMap((row) => {
-        const cellLines = colWidths.map((w, i) => formatCellLines(
-          row[i] ?? '',
-          w,
-          overflow,
-          columns[i]?.width !== undefined,
-        ));
-        const rowHeight = cellLines.reduce((max, lines) => Math.max(max, lines.length), 1);
-        return Array.from({ length: rowHeight }, (_line, lineIndex) => {
-          const cells = colWidths.map((w, i) => ' ' + padRight(cellLines[i]![lineIndex] ?? '', w) + ' ');
-          return bc(v) + cells.join(bc(v)) + bc(v);
-        });
-      });
-
-      const lines = [top, ...headerRows, midSep, ...dataRows, bottom];
-      return lines.join('\n');
-    },
+    interactive: () => renderVisualTable(options, ctx, tableData, options.variant ?? 'box'),
   }, options);
 }

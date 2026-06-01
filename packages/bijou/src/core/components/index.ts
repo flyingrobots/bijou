@@ -14,7 +14,17 @@ export { progressBar, createProgressBar, createAnimatedProgressBar } from './pro
 export type { ProgressBarOptions, LiveProgressBarOptions, AnimatedProgressBarOptions, ProgressBarController } from './progress.js';
 
 export { table } from './table.js';
-export type { TableColumn, TableTextCell, TableTextRow, TableOptions } from './table.js';
+export type {
+  TableCellAlign,
+  TableColumn,
+  TableLayout,
+  TableOptions,
+  TablePipeFormat,
+  TableTextCell,
+  TableTextRow,
+  TableVariant,
+  TableWrapMode,
+} from './table.js';
 export { tableSurface } from './table-v3.js';
 export type { TableSurfaceCell, TableSurfaceRow, TableSurfaceOptions } from './table-v3.js';
 

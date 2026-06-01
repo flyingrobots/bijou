@@ -69,4 +69,4 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 - active cycle:
   - [DX-036 — Responsive Table Layout and Variants](../../design/DX-036-responsive-table-layout-and-variants.md)
 - live backlog:
-  - none right now
+  - [DX-037 — tableSurface Responsive Width Parity](../backlog/up-next/DX-037-table-surface-responsive-width-parity.md)

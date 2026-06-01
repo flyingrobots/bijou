@@ -363,4 +363,26 @@ or preservation policy for tabs and newlines instead of accidental raw joins.
 
 ## Retrospective
 
-Not started.
+Closed by adding a shared fitted string-table model behind `table()`.
+
+Shipped behavior:
+
+- human-mode `table()` now defaults to width-aware `layout: "auto"`
+- `layout: "intrinsic"` preserves the old content-sized behavior
+- constrained cells wrap at word boundaries by default and hard-wrap only when
+  needed
+- `TableColumn` supports `minWidth`, `maxWidth`, `weight`, and `align`
+- visual variants now include `box`, `ascii-grid`, `ruled`, `header-rule`,
+  `plain`, `markdown`, `definition`, and `expanded`
+- `pipe` still defaults to TSV, with explicit CSV, Markdown, and ASCII grid
+  formats
+- accessible output remains row/header/value oriented instead of inheriting a
+  visual variant
+
+Deferred debt:
+
+- `tableSurface()` still uses its older intrinsic surface sizing path. Follow-up
+  work is tracked in
+  [DX-037](../method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md)
+  so surface width negotiation can be designed deliberately instead of copied
+  from the string renderer.

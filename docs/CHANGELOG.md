@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Responsive `table()` layout and variants** — `table()` now fits human-mode
+  output to the available terminal width by default, wraps constrained cells at
+  word boundaries, and exposes `layout: "intrinsic"` for the old content-sized
+  behavior. The string table renderer now supports `box`, `ascii-grid`,
+  `ruled`, `header-rule`, `plain`, `markdown`, `definition`, and `expanded`
+  variants, plus explicit `pipeFormat` lowerings for TSV, CSV, Markdown, and
+  ASCII grid while keeping TSV as the default pipe format.
 - **Input feature action maps for `bijou-tui`** — `@flyingrobots/bijou-tui`
   now exports `createInputGestureRecognizer()` and `createInputActionMap()` so
   apps and shells can map raw key features to semantic events such as `tap`,
