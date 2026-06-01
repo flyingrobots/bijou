@@ -64,13 +64,33 @@ function isResetEscape(raw: string): boolean {
   return raw === RESET_SGR;
 }
 
+const OSC8_CLOSE = '\x1b]8;;\x1b\\';
+const OSC8_CLOSE_BEL = '\x1b]8;;\x07';
+
 function isOsc8Escape(raw: string): boolean {
-  return ANSI_OSC8_RE.test(raw);
+  return raw.startsWith('\x1b]8;;');
 }
 
-function finalizeWrappedLine(raw: string, activeStyle: string): string {
-  if (activeStyle.length === 0 || raw.endsWith(RESET_SGR)) return raw;
-  return raw + RESET_SGR;
+function isOsc8Close(raw: string): boolean {
+  return raw === OSC8_CLOSE || raw === OSC8_CLOSE_BEL;
+}
+
+function finalizeWrappedLine(raw: string, activeStyle: string, activeOsc8: string): string {
+  let result = raw;
+  if (activeOsc8.length > 0 && !result.endsWith(OSC8_CLOSE) && !result.endsWith(OSC8_CLOSE_BEL)) {
+    result += OSC8_CLOSE;
+  }
+  if (activeStyle.length > 0 && !result.endsWith(RESET_SGR)) {
+    result += RESET_SGR;
+  }
+  return result;
+}
+
+function activeAnsiPrefix(activeStyle: string, activeOsc8: string): WrapToken[] {
+  return [
+    ...tokenizeAnsiText(activeOsc8),
+    ...tokenizeAnsiText(activeStyle),
+  ].filter((part): part is Extract<WrapToken, { kind: 'ansi' }> => part.kind === 'ansi');
 }
 
 function isWhitespaceToken(token: WrapToken): boolean {
@@ -108,13 +128,16 @@ function wrapPreparedLine(line: PreparedWrappedLine, maxWidth: number): string[]
   let currentTokens: WrapToken[] = [];
   let currentWidth = 0;
   let activeStyle = '';
+  let activeOsc8 = '';
   let lastBreakIndex = -1;
   let activeStyleAtLastBreak = '';
+  let activeOsc8AtLastBreak = '';
 
   for (const token of line.tokens) {
     if (token.kind === 'ansi') {
       currentTokens.push(token);
       if (isOsc8Escape(token.raw)) {
+        activeOsc8 = isOsc8Close(token.raw) ? '' : token.raw;
         continue;
       }
       activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
@@ -127,6 +150,7 @@ function wrapPreparedLine(line: PreparedWrappedLine, maxWidth: number): string[]
     if (isWhitespaceToken(token)) {
       lastBreakIndex = currentTokens.length - 1;
       activeStyleAtLastBreak = activeStyle;
+      activeOsc8AtLastBreak = activeOsc8;
     }
 
     if (currentWidth <= maxWidth) {
@@ -136,38 +160,36 @@ function wrapPreparedLine(line: PreparedWrappedLine, maxWidth: number): string[]
     if (lastBreakIndex >= 0) {
       const lineTokens = currentTokens.slice(0, lastBreakIndex);
       if (tokensWidth(lineTokens) > 0) {
-        lines.push(finalizeWrappedLine(tokensRaw(lineTokens), activeStyleAtLastBreak));
+        lines.push(finalizeWrappedLine(
+          tokensRaw(lineTokens),
+          activeStyleAtLastBreak,
+          activeOsc8AtLastBreak,
+        ));
       }
 
       const remainder = trimLeadingWhitespaceTokens(currentTokens.slice(lastBreakIndex + 1));
-      currentTokens = activeStyleAtLastBreak.length === 0
-        ? remainder
-        : [
-            ...tokenizeAnsiText(activeStyleAtLastBreak).filter((part): part is Extract<WrapToken, { kind: 'ansi' }> => part.kind === 'ansi'),
-            ...remainder,
-          ];
+      const prefix = activeAnsiPrefix(activeStyleAtLastBreak, activeOsc8AtLastBreak);
+      currentTokens = prefix.length === 0 ? remainder : [...prefix, ...remainder];
       currentWidth = tokensWidth(currentTokens);
       activeStyle = activeStyleAtLastBreak;
+      activeOsc8 = activeOsc8AtLastBreak;
       lastBreakIndex = -1;
       activeStyleAtLastBreak = activeStyle;
+      activeOsc8AtLastBreak = activeOsc8;
       continue;
     }
 
     const lineTokens = currentTokens.slice(0, -1);
     if (tokensWidth(lineTokens) > 0) {
-      lines.push(finalizeWrappedLine(tokensRaw(lineTokens), activeStyle));
+      lines.push(finalizeWrappedLine(tokensRaw(lineTokens), activeStyle, activeOsc8));
     }
-    currentTokens = activeStyle.length === 0
-      ? [token]
-      : [
-          ...tokenizeAnsiText(activeStyle).filter((part): part is Extract<WrapToken, { kind: 'ansi' }> => part.kind === 'ansi'),
-          token,
-        ];
+    const prefix = activeAnsiPrefix(activeStyle, activeOsc8);
+    currentTokens = prefix.length === 0 ? [token] : [...prefix, token];
     currentWidth = token.width;
   }
 
   if (currentWidth > 0) {
-    lines.push(finalizeWrappedLine(tokensRaw(currentTokens), activeStyle));
+    lines.push(finalizeWrappedLine(tokensRaw(currentTokens), activeStyle, activeOsc8));
   }
 
   return lines.length > 0 ? lines : [''];

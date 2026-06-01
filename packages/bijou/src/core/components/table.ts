@@ -384,6 +384,13 @@ function isOsc8Escape(raw: string): boolean {
   return raw.startsWith('\x1b]8;;');
 }
 
+const OSC8_CLOSE = '\x1b]8;;\x1b\\';
+const OSC8_CLOSE_BEL = '\x1b]8;;\x07';
+
+function isOsc8Close(raw: string): boolean {
+  return raw === OSC8_CLOSE || raw === OSC8_CLOSE_BEL;
+}
+
 function isResetEscape(raw: string): boolean {
   return raw === RESET_SGR;
 }
@@ -424,6 +431,21 @@ function tokenizeTableText(str: string): TableWrapToken[] {
   return tokens;
 }
 
+function activeTableAnsiPrefix(activeOsc8: string, activeStyle: string): string {
+  return activeOsc8 + activeStyle;
+}
+
+function finalizeTableWrappedLine(raw: string, activeOsc8: string, activeStyle: string): string {
+  let result = raw;
+  if (activeOsc8.length > 0 && !result.endsWith(OSC8_CLOSE) && !result.endsWith(OSC8_CLOSE_BEL)) {
+    result += OSC8_CLOSE;
+  }
+  if (activeStyle.length > 0 && !result.endsWith(RESET_SGR)) {
+    result += RESET_SGR;
+  }
+  return result;
+}
+
 function clipCellToWidth(str: string, maxWidth: number): string {
   if (maxWidth <= 0) return '';
 
@@ -431,17 +453,21 @@ function clipCellToWidth(str: string, maxWidth: number): string {
   let visible = 0;
   let result = '';
   let hasStyle = false;
+  let activeOsc8 = '';
 
   for (const token of tokens) {
     if (token.kind === 'ansi') {
       result += token.raw;
-      if (!isOsc8Escape(token.raw)) {
-        hasStyle = true;
+      if (isOsc8Escape(token.raw)) {
+        activeOsc8 = isOsc8Close(token.raw) ? '' : token.raw;
+      } else {
+        hasStyle = !isResetEscape(token.raw);
       }
       continue;
     }
 
     if (visible + token.width > maxWidth) {
+      if (activeOsc8.length > 0) result += OSC8_CLOSE;
       if (hasStyle && !result.endsWith(RESET_SGR)) result += RESET_SGR;
       break;
     }
@@ -450,7 +476,9 @@ function clipCellToWidth(str: string, maxWidth: number): string {
     visible += token.width;
   }
 
-  return result;
+  return activeOsc8.length > 0 || hasStyle
+    ? finalizeTableWrappedLine(result, activeOsc8, hasStyle ? RESET_SGR : '')
+    : result;
 }
 
 function wrapCellToWidth(str: string, maxWidth: number): string[] {
@@ -463,18 +491,22 @@ function wrapCellToWidth(str: string, maxWidth: number): string[] {
   let current = '';
   let currentWidth = 0;
   let activeStyle = '';
+  let activeOsc8 = '';
 
   for (const token of tokens) {
     if (token.kind === 'ansi') {
       current += token.raw;
-      if (isOsc8Escape(token.raw)) continue;
+      if (isOsc8Escape(token.raw)) {
+        activeOsc8 = isOsc8Close(token.raw) ? '' : token.raw;
+        continue;
+      }
       activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
       continue;
     }
 
     if (currentWidth + token.width > maxWidth && currentWidth > 0) {
-      lines.push(activeStyle.length === 0 || current.endsWith(RESET_SGR) ? current : current + RESET_SGR);
-      current = activeStyle + token.raw;
+      lines.push(finalizeTableWrappedLine(current, activeOsc8, activeStyle));
+      current = activeTableAnsiPrefix(activeOsc8, activeStyle) + token.raw;
       currentWidth = token.width;
       continue;
     }
@@ -484,7 +516,7 @@ function wrapCellToWidth(str: string, maxWidth: number): string[] {
   }
 
   if (current.length > 0) {
-    lines.push(activeStyle.length === 0 || current.endsWith(RESET_SGR) ? current : current + RESET_SGR);
+    lines.push(finalizeTableWrappedLine(current, activeOsc8, activeStyle));
   }
 
   return lines.length > 0 ? lines : [''];

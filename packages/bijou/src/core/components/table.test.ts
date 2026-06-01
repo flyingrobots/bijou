@@ -7,6 +7,17 @@ function maxLineWidth(value: string): number {
   return Math.max(...value.split('\n').map(line => graphemeWidth(line)));
 }
 
+const OSC8_OPEN = '\x1b]8;;https://example.test\x1b\\';
+const OSC8_CLOSE = '\x1b]8;;\x1b\\';
+
+function expectOpenedOsc8LinksClosed(value: string): void {
+  for (const line of value.split('\n')) {
+    if (line.includes(OSC8_OPEN)) {
+      expect(line).toContain(OSC8_CLOSE);
+    }
+  }
+}
+
 describe('table', () => {
   const columns = [
     { header: 'Name' },
@@ -62,6 +73,30 @@ describe('table', () => {
 
     expect(result).toContain('degr');
     expect(result).not.toContain('aded');
+  });
+
+  it('closes OSC 8 hyperlinks when constrained cells truncate or wrap', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const linkedWords = `${OSC8_OPEN}alpha beta gamma${OSC8_CLOSE}`;
+    const linkedToken = `${OSC8_OPEN}alphabetagamma${OSC8_CLOSE}`;
+
+    expectOpenedOsc8LinksClosed(table({
+      columns: [{ header: 'Link', width: 6 }],
+      rows: [[linkedWords]],
+      ctx,
+    }));
+    expectOpenedOsc8LinksClosed(table({
+      columns: [{ header: 'Link', width: 6 }],
+      rows: [[linkedToken]],
+      wrap: 'grapheme',
+      ctx,
+    }));
+    expectOpenedOsc8LinksClosed(table({
+      columns: [{ header: 'Link', width: 6 }],
+      rows: [[linkedToken]],
+      overflow: 'truncate',
+      ctx,
+    }));
   });
 
   it('renders TSV in pipe mode', () => {
