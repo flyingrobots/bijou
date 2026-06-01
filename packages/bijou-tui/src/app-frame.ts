@@ -211,6 +211,8 @@ export interface FramePage<PageModel, Msg> {
 export interface FrameCommandItem<Msg> extends CommandPaletteItem {
   /** Message dispatched when this item is selected. */
   readonly action?: Msg;
+  /** Optional destination page for the dispatched message. Defaults to the active page. */
+  readonly targetPageId?: string;
 }
 
 /** Declarative input ownership for a specific pane inside a frame page. */

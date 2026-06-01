@@ -773,7 +773,7 @@ const HELP_PREVIEW_KEYS = createKeyMap<{ readonly type: string }>()
   )
   .group('Actions', (g) => g
     .bind('enter', 'Open selection', { type: 'open' })
-    .bind('/', 'Search components', { type: 'search' })
+    .bind('/', 'Search documentation', { type: 'search' })
     .bind('f2', 'Open settings', { type: 'settings' })
   )
   .group('Shell', (g) => g

@@ -107,7 +107,7 @@ describe('DF-064 keybinding help and shell hints family audit', () => {
       expect(text).toContain('Move up');
       expect(text).toContain('Next pane');
       expect(text).toContain('Open selection');
-      expect(text).toContain('Search components');
+      expect(text).toContain('Search documentation');
       expect(text).toContain('Open settings');
       expect(text).toContain('Open help');
       expect(text).toContain('Quit');
