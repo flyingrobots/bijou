@@ -87,6 +87,7 @@ export interface TableOptions extends BijouNodeOptions {
 interface NormalizedTable {
   readonly columns: readonly TableColumn[];
   readonly rows: readonly string[][];
+  readonly showHeader: boolean;
 }
 
 interface FittedColumn {
@@ -107,6 +108,7 @@ interface FittedTable {
   readonly headerHeight: number;
   readonly rows: readonly FittedRow[];
   readonly columnGap: number;
+  readonly showHeader: boolean;
 }
 
 type TableWrapToken =
@@ -220,9 +222,11 @@ function resolveColumns(
 function normalizeTable(options: TableOptions): NormalizedTable {
   const rows = normalizeRows(options.rows);
   const variant = options.variant ?? 'box';
+  const columns = resolveColumns(options.columns, rows, variant);
   return {
-    columns: resolveColumns(options.columns, rows, variant),
+    columns,
     rows,
+    showHeader: variant === 'definition' || columns.some(column => (column.header ?? '').length > 0),
   };
 }
 
@@ -578,6 +582,7 @@ function buildFittedTable(
     headerHeight,
     rows: fittedRows,
     columnGap,
+    showHeader: tableData.showHeader,
   };
 }
 
@@ -645,7 +650,9 @@ function renderGridTable(
     });
   });
 
-  return [top, ...headerRows, midSep, ...dataRows, bottom].join('\n');
+  return model.showHeader
+    ? [top, ...headerRows, midSep, ...dataRows, bottom].join('\n')
+    : [top, ...dataRows, bottom].join('\n');
 }
 
 function renderBorderlessRow(
@@ -672,10 +679,14 @@ function renderRuledTable(
   ctx: BijouContext,
   includeRowRules: boolean,
 ): string {
-  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
-    return renderBorderlessRow(model, model.headerLines, index);
-  });
-  lines.push(renderRule(model, '\u2501', ctx, options));
+  const lines = model.showHeader
+    ? [
+        ...Array.from({ length: model.headerHeight }, (_row, index) => {
+          return renderBorderlessRow(model, model.headerLines, index);
+        }),
+        renderRule(model, '\u2501', ctx, options),
+      ]
+    : [];
 
   for (let rowIndex = 0; rowIndex < model.rows.length; rowIndex++) {
     const row = model.rows[rowIndex]!;
@@ -693,10 +704,14 @@ function renderRuledTable(
 function renderHeaderRuleTable(
   model: FittedTable,
 ): string {
-  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
-    return renderBorderlessRow(model, model.headerLines, index);
-  });
-  lines.push(model.widths.map(width => '-'.repeat(width)).join(' '.repeat(model.columnGap)).trimEnd());
+  const lines = model.showHeader
+    ? [
+        ...Array.from({ length: model.headerHeight }, (_row, index) => {
+          return renderBorderlessRow(model, model.headerLines, index);
+        }),
+        model.widths.map(width => '-'.repeat(width)).join(' '.repeat(model.columnGap)).trimEnd(),
+      ]
+    : [];
 
   for (const row of model.rows) {
     for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
@@ -708,9 +723,11 @@ function renderHeaderRuleTable(
 }
 
 function renderPlainTable(model: FittedTable): string {
-  const lines = Array.from({ length: model.headerHeight }, (_row, index) => {
-    return renderBorderlessRow(model, model.headerLines, index);
-  });
+  const lines = model.showHeader
+    ? Array.from({ length: model.headerHeight }, (_row, index) => {
+        return renderBorderlessRow(model, model.headerLines, index);
+      })
+    : [];
 
   for (const row of model.rows) {
     for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
@@ -751,7 +768,7 @@ function renderMarkdownTable(model: FittedTable): string {
     return Array.from({ length: row.height }, (_line, index) => rowLine(row.cells, index));
   });
 
-  return [...headerRows, separator, ...rows].join('\n');
+  return model.showHeader ? [...headerRows, separator, ...rows].join('\n') : rows.join('\n');
 }
 
 function renderExpandedTable(
@@ -761,7 +778,12 @@ function renderExpandedTable(
 ): string {
   const borderToken = options.borderToken ?? ctx.border('muted');
   const lines: string[] = [];
-  const preferredLabelWidth = tableData.columns.reduce((max, column) => Math.max(max, visibleLength(column.header)), 0);
+  const columnLabel = (index: number): string => {
+    return tableData.showHeader ? tableData.columns[index]?.header ?? '' : `Column ${index + 1}`;
+  };
+  const preferredLabelWidth = tableData.columns.reduce((max, _column, index) => {
+    return Math.max(max, visibleLength(columnLabel(index)));
+  }, 0);
   const layout = options.layout ?? 'auto';
   const targetWidth = resolveTargetWidth(options, ctx, layout);
   const ruleWidth = targetWidth ?? 40;
@@ -792,7 +814,7 @@ function renderExpandedTable(
     ));
     const row = tableData.rows[rowIndex]!;
     for (let columnIndex = 0; columnIndex < tableData.columns.length; columnIndex++) {
-      const rawLabel = tableData.columns[columnIndex]?.header ?? '';
+      const rawLabel = columnLabel(columnIndex);
       const label = padRight(
         targetWidth === undefined ? rawLabel : clipCellToWidth(rawLabel, labelWidth),
         labelWidth,
@@ -826,6 +848,7 @@ function markdownTableData(tableData: NormalizedTable): NormalizedTable {
       header: markdownEscapeCell(column.header ?? ''),
     })),
     rows: tableData.rows.map(row => row.map(cell => markdownEscapeCell(cell))),
+    showHeader: tableData.showHeader,
   };
 }
 
@@ -886,6 +909,7 @@ function renderSeparatedPipe(
 ): string {
   const headerLine = tableData.columns.map(column => escapeCell(column.header ?? '')).join(separator);
   const dataLines = tableData.rows.map(row => row.map(escapeCell).join(separator));
+  if (!tableData.showHeader) return dataLines.join('\n');
   return [headerLine, ...dataLines].join('\n');
 }
 
@@ -956,7 +980,10 @@ export function table(
       const lines: string[] = [];
       for (let i = 0; i < tableData.rows.length; i++) {
         const row = tableData.rows[i]!;
-        const pairs = tableData.columns.map((col, j) => `${col.header ?? ''}=${row[j] ?? ''}`);
+        const pairs = tableData.columns.map((col, j) => {
+          const label = tableData.showHeader ? col.header ?? '' : `Column ${j + 1}`;
+          return `${label}=${row[j] ?? ''}`;
+        });
         lines.push(`Row ${i + 1}: ${pairs.join(', ')}`);
       }
       return lines.join('\n');

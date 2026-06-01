@@ -473,6 +473,23 @@ describe('table', () => {
   });
 
   describe('defensive input handling', () => {
+    it('does not emit blank header rows when columns are omitted', () => {
+      const row = [['Alice', 'active']];
+
+      expect(table({ rows: row, ctx: createTestContext({ mode: 'pipe' }) }))
+        .toBe('Alice\tactive');
+      expect(table({ rows: row, ctx: createTestContext({ mode: 'accessible' }) }))
+        .toBe('Row 1: Column 1=Alice, Column 2=active');
+      expect(table({
+        rows: row,
+        ctx: createTestContext({ mode: 'interactive', noColor: true }),
+      })).toBe([
+        '┌───────┬────────┐',
+        '│ Alice │ active │',
+        '└───────┴────────┘',
+      ].join('\n'));
+    });
+
     it('handles empty columns gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const result = table({ columns: [], rows, ctx });

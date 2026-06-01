@@ -16,7 +16,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   variants, plus explicit `pipeFormat` lowerings for TSV, CSV, Markdown, and
   ASCII grid while keeping TSV as the default pipe format. DOGFOOD now
   demonstrates every visual table variant and pipe serialization in the
-  `table() / navigableTableSurface()` story.
+  `table() / navigableTableSurface()` story. Headerless inferred-column tables
+  now render data rows without fake blank header bands or leading pipe rows.
 - **DOGFOOD documentation jump search** — `/` in DOGFOOD now opens a global
   documentation search across component stories and documentation pages, ranks
   direct label matches ahead of incidental body matches, and can activate the
