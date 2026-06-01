@@ -42,6 +42,8 @@ export interface CommandPaletteItem {
   readonly category?: string;
   /** Optional keyboard shortcut hint displayed at the end. */
   readonly shortcut?: string;
+  /** Optional hidden text included in filtering but not rendered. */
+  readonly searchText?: string;
 }
 
 /** Immutable state for the command palette widget. */
@@ -111,22 +113,35 @@ export function createCommandPaletteState(
 // ---------------------------------------------------------------------------
 
 /**
- * Test whether an item matches a search query (case-insensitive substring).
+ * Score an item field for ranked, case-insensitive substring matching.
  *
- * Checks label, description, category, id, and shortcut fields.
- *
- * @param item - Command palette item to test.
- * @param query - Search query string.
- * @returns True if any field contains the query.
+ * Earlier fields and stronger positions rank first; hidden search text still
+ * participates without being rendered.
  */
-function matchesQuery(item: CommandPaletteItem, query: string): boolean {
+function fieldScore(value: string | undefined, query: string, baseScore: number): number | undefined {
+  if (value == null) return undefined;
+  const haystack = value.toLowerCase();
+  const index = haystack.indexOf(query);
+  if (index < 0) return undefined;
+  if (haystack === query) return baseScore;
+  if (index === 0) return baseScore + 1;
+  if (index > 0 && /\W/.test(haystack[index - 1]!)) return baseScore + 2;
+  return baseScore + 3 + Math.min(index, 100);
+}
+
+function queryScore(item: CommandPaletteItem, query: string): number | undefined {
   const q = query.toLowerCase();
-  if (item.label.toLowerCase().includes(q)) return true;
-  if (item.description?.toLowerCase().includes(q)) return true;
-  if (item.category?.toLowerCase().includes(q)) return true;
-  if (item.id.toLowerCase().includes(q)) return true;
-  if (item.shortcut?.toLowerCase().includes(q)) return true;
-  return false;
+  return [
+    fieldScore(item.label, q, 0),
+    fieldScore(item.category, q, 20),
+    fieldScore(item.description, q, 40),
+    fieldScore(item.searchText, q, 60),
+    fieldScore(item.id, q, 80),
+    fieldScore(item.shortcut, q, 100),
+  ].reduce<number | undefined>((best, score) => {
+    if (score == null) return best;
+    return best == null ? score : Math.min(best, score);
+  }, undefined);
 }
 
 /**
@@ -146,7 +161,12 @@ export function cpFilter(state: CommandPaletteState, query: string): CommandPale
       scrollY: 0,
     };
   }
-  const filtered = state.items.filter(item => matchesQuery(item, query));
+  const filtered = state.items
+    .map((item, index) => ({ item, index, score: queryScore(item, query) }))
+    .filter((entry): entry is { readonly item: CommandPaletteItem; readonly index: number; readonly score: number } =>
+      entry.score != null)
+    .sort((left, right) => left.score - right.score || left.index - right.index)
+    .map(entry => entry.item);
   return {
     ...state,
     query,

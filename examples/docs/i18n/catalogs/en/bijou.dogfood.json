@@ -438,7 +438,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "4. Press / to search by component name at any time."
+        "en": "4. Press / to search documentation at any time."
       }
     },
     {
@@ -680,7 +680,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Search components"
+        "en": "Search documentation"
       }
     },
     {

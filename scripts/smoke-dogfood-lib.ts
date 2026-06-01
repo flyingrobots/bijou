@@ -82,7 +82,7 @@ export const DOGFOOD_SCENARIOS: Readonly<Record<DogfoodScenarioName, DogfoodScen
       'Release',
       'Start Here',
       'What is Bijou?',
-      'Search components',
+      'Search documentation',
       'Settings',
       'modal()',
     ],

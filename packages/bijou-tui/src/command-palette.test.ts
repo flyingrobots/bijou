@@ -100,6 +100,27 @@ describe('cpFilter', () => {
     expect(filtered.filteredItems[0]!.id).toBe('open');
   });
 
+  it('matches hidden search text', () => {
+    const state = createCommandPaletteState([
+      ...items,
+      { id: 'release', label: 'Release Notes', searchText: 'migration guide upgrade table' },
+    ]);
+    const filtered = cpFilter(state, 'migration');
+
+    expect(filtered.filteredItems).toHaveLength(1);
+    expect(filtered.filteredItems[0]!.id).toBe('release');
+  });
+
+  it('ranks label matches before incidental description matches', () => {
+    const state = createCommandPaletteState([
+      { id: 'reference', label: 'Reference', description: 'Mentions table in body text' },
+      { id: 'table', label: 'table() / navigableTableSurface()', description: 'Dense comparison docs' },
+    ]);
+    const filtered = cpFilter(state, 'table');
+
+    expect(filtered.filteredItems.map((item) => item.id)).toEqual(['table', 'reference']);
+  });
+
   it('is case-insensitive', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'SAVE');

@@ -820,6 +820,16 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `navigableTableSurface()`
 - Variants:
   - `table()` for passive comparison in core string output
+  - `table({ variant: "box" })` for the default Unicode boxed table
+  - `table({ variant: "ruled" })` for borderless report output with a heavy
+    header rule and light row separators
+  - `table({ variant: "header-rule" })` for compact reports with only a header
+    separator
+  - `table({ variant: "plain" })` for quiet space-aligned columns
+  - `table({ variant: "ascii-grid" })` for portable `+---+` output
+  - `table({ variant: "markdown" })` for GitHub-flavored Markdown table text
+  - `table({ variant: "definition" })` for field/value reports
+  - `table({ variant: "expanded" })` for psql-style record inspection
   - `tableSurface()` for passive comparison in V3 surface-first output
   - `navigableTable()` for keyboard-owned inspection in the TUI layer
   - `navigableTableSurface()` for keyboard-owned inspection on the structured surface path
@@ -831,6 +841,10 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - column headers should describe comparable attributes, not narrative explanations
   - cell text should stay compact enough that wrapping does not obscure the comparison task
+  - `table()` fits human output to the available terminal width by default; use
+    `layout: "intrinsic"` when content-sized output is explicitly needed
+  - keep pipe/data serialization explicit with `pipeFormat`; TSV remains the
+    default pipe lowering, while CSV, Markdown, and ASCII grid are opt-in
   - use `navigableTableSurface()` when the table lives inside a rich TUI surface and the row-aware inspection model should remain structured
   - unlike list/picker/palette families, navigable tables should keep row-aware scrolling semantics rather than generic line clipping whenever wrapped rows materially affect comparison
   - if rows wrap so heavily that column comparison is no longer readable, the table should usually collapse to a summary row plus a focused drill-down region instead of pretending dense comparison still works

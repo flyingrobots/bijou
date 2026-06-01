@@ -51,7 +51,7 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
     const result = await runScript(app, [{ key: '/' }], { ctx });
     const text = frameText(result.frames.at(-1)!);
     const expectedTitle = String(searchPanelBlock.render({
-      config: { title: 'Search blocks' },
+      config: { title: 'Search documentation' },
       mode: 'accessible',
     }).output);
 

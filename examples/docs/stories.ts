@@ -35,6 +35,9 @@ import {
   timeline as processTimeline,
   tree,
   type Surface,
+  type TableColumn,
+  type TablePipeFormat,
+  type TableVariant,
 } from '@flyingrobots/bijou';
 import {
   canvas,
@@ -770,7 +773,7 @@ const HELP_PREVIEW_KEYS = createKeyMap<{ readonly type: string }>()
   )
   .group('Actions', (g) => g
     .bind('enter', 'Open selection', { type: 'open' })
-    .bind('/', 'Search components', { type: 'search' })
+    .bind('/', 'Search documentation', { type: 'search' })
     .bind('f2', 'Open settings', { type: 'settings' })
   )
   .group('Shell', (g) => g
@@ -1511,49 +1514,213 @@ function renderPerfOverlayStoryPreview(
   return renderMetricListPreview(options.title ?? 'Perf', perfOverlayEntries(stats), ctx, width);
 }
 
+const TABLE_STORY_COLUMNS: readonly TableColumn[] = [
+  { header: 'Component', minWidth: 8, maxWidth: 18 },
+  { header: 'Behavior', minWidth: 14, maxWidth: 30, weight: 3 },
+  { header: 'Owner', minWidth: 5, maxWidth: 8, align: 'center' },
+];
+
+const TABLE_STORY_ROWS: readonly (readonly string[])[] = [
+  ['table()', 'Fits terminal width and wraps cells at word boundaries.', 'core'],
+  ['variants', 'Switches box, ruled, plain, Markdown, definition, and expanded output.', 'API'],
+  ['pipeFormat', 'Exports rows to TSV, CSV, Markdown, or ASCII grid.', 'pipe'],
+  ['navigableTableSurface()', 'Adds row focus when keyboard inspection matters.', 'tui'],
+];
+
+const TABLE_STORY_EXPANDED_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.slice(0, 2);
+
+const TABLE_STORY_DEFINITION_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.map(row => [
+  row[0] ?? '',
+  row[1] ?? '',
+]);
+
+const TABLE_STORY_NAV_WIDTHS = [12, 24, 5] as const;
+
+const TABLE_STORY_NAV_COLUMNS: readonly TableColumn[] = TABLE_STORY_COLUMNS.map((column, index) => ({
+  header: column.header,
+  width: TABLE_STORY_NAV_WIDTHS[index] ?? 12,
+  align: column.align,
+}));
+
+const TABLE_STORY_NAV_BEHAVIORS: readonly string[] = [
+  'Responsive visual table',
+  'Named visual styles',
+  'Explicit lowerings',
+  'Keyboard row focus',
+];
+
+const TABLE_STORY_NAV_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.map((row, index) => [
+  row[0] ?? '',
+  TABLE_STORY_NAV_BEHAVIORS[index] ?? row[1] ?? '',
+  row[2] ?? '',
+]);
+
+interface TableVisualVariantSpec {
+  readonly id: string;
+  readonly variant: TableVariant;
+}
+
+const TABLE_VISUAL_VARIANT_STORIES: readonly TableVisualVariantSpec[] = [
+  {
+    id: 'box',
+    variant: 'box',
+  },
+  {
+    id: 'ascii-grid',
+    variant: 'ascii-grid',
+  },
+  {
+    id: 'ruled',
+    variant: 'ruled',
+  },
+  {
+    id: 'header-rule',
+    variant: 'header-rule',
+  },
+  {
+    id: 'plain',
+    variant: 'plain',
+  },
+  {
+    id: 'markdown-table',
+    variant: 'markdown',
+  },
+  {
+    id: 'definition',
+    variant: 'definition',
+  },
+  {
+    id: 'expanded',
+    variant: 'expanded',
+  },
+];
+
+interface TablePipeFormatSpec {
+  readonly id: string;
+  readonly pipeFormat: TablePipeFormat;
+}
+
+const TABLE_PIPE_FORMAT_STORIES: readonly TablePipeFormatSpec[] = [
+  {
+    id: 'pipe-tsv',
+    pipeFormat: 'tsv',
+  },
+  {
+    id: 'pipe-csv',
+    pipeFormat: 'csv',
+  },
+  {
+    id: 'pipe-markdown',
+    pipeFormat: 'markdown',
+  },
+  {
+    id: 'pipe-ascii-grid',
+    pipeFormat: 'ascii-grid',
+  },
+];
+
+function tableStoryLabel(id: string): string {
+  return id
+    .split('-')
+    .map(word => word.length <= 3 ? word.toUpperCase() : `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
+}
+
+function tableVisualVariantDescription(spec: TableVisualVariantSpec): string {
+  return `Demonstrates table() variant ${spec.variant}.`;
+}
+
+function tablePipeFormatDescription(spec: TablePipeFormatSpec): string {
+  return `Demonstrates pipeFormat ${spec.pipeFormat}.`;
+}
+
+function tablePreviewWidth(width: number): number {
+  return Math.max(28, Math.min(width, 64));
+}
+
+function tableVisualVariantPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly variant: TableVariant;
+}): string {
+  const {
+    width,
+    ctx,
+    title,
+    variant,
+  } = input;
+  const previewWidth = tablePreviewWidth(width);
+  const rendered = variant === 'definition'
+    ? table({
+        variant,
+        rows: TABLE_STORY_DEFINITION_ROWS,
+        width: previewWidth,
+        ctx,
+      })
+    : table({
+        columns: TABLE_STORY_COLUMNS,
+        rows: variant === 'expanded' ? TABLE_STORY_EXPANDED_ROWS : TABLE_STORY_ROWS,
+        variant,
+        width: previewWidth,
+        ctx,
+      });
+
+  return [title, '', rendered].join('\n');
+}
+
+function tablePipeFormatPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly pipeFormat: TablePipeFormat;
+}): string {
+  const {
+    width,
+    ctx,
+    title,
+    pipeFormat,
+  } = input;
+  const previewWidth = tablePreviewWidth(width);
+  const renderCtx: BijouContext = ctx.mode === 'pipe' || ctx.mode === 'accessible'
+    ? ctx
+    : { ...ctx, mode: 'pipe' };
+  const rendered = table({
+    columns: TABLE_STORY_COLUMNS,
+    rows: TABLE_STORY_ROWS,
+    pipeFormat,
+    width: previewWidth,
+    ctx: renderCtx,
+  });
+
+  return [title, '', rendered].join('\n');
+}
+
 function denseComparisonPreview(input: {
   readonly width: number;
   readonly ctx: BijouContext;
   readonly title: string;
-  readonly mode: 'passive' | 'navigable';
 }): string | Surface {
   const {
     width,
     ctx,
     title,
-    mode,
   } = input;
-  const columns = [
-    { header: 'Service', width: 16 },
-    { header: 'Region', width: 12 },
-    { header: 'p95', width: 8 },
-    { header: 'Error', width: 8 },
-  ];
-  const rows = [
-    ['api', 'us-east', '84ms', '0.1%'],
-    ['queue', 'eu-west', '121ms', '0.4%'],
-    ['worker', 'ap-south', '142ms', '0.7%'],
-    ['docs', 'us-west', '77ms', '0.0%'],
-  ];
 
-  if (mode === 'passive') {
-    const preview = table({ columns, rows, ctx });
-    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
-      return [title, '', preview].join('\n');
-    }
-    return boxSurface(contentSurface(preview), {
-      title,
-      width: Math.max(46, Math.min(width, 64)),
-      ctx,
-    });
-  }
-
-  const state = createNavigableTableState({ columns, rows, height: 3 });
+  const state = createNavigableTableState({
+    columns: [...TABLE_STORY_NAV_COLUMNS],
+    rows: TABLE_STORY_NAV_ROWS,
+    height: 3,
+  });
   if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
     return [
       title,
       '',
-      table({ columns, rows: rows.slice(0, 3), ctx }),
+      table({
+        columns: TABLE_STORY_NAV_COLUMNS,
+        rows: TABLE_STORY_NAV_ROWS.slice(0, 3),
+        ctx,
+      }),
     ].join('\n');
   }
 
@@ -4185,10 +4352,11 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
     title: 'table() / navigableTableSurface()',
     package: 'bijou-tui',
     docs: {
-      summary: 'Dense comparison family for row-and-column inspection when the main task is comparing attributes across records instead of reading a narrative list.',
+      summary: 'Dense comparison family for row-and-column inspection, responsive table variants, explicit pipe serializations, and keyboard-owned row focus.',
       useWhen: [
         'Row and column comparison is the main job.',
         'Headers describe comparable attributes and the table remains compact enough to stay readable.',
+        'The output needs a named table style or explicit pipe/data serialization.',
         'Keyboard-owned row inspection materially helps the task.',
       ],
       avoidWhen: [
@@ -4198,25 +4366,36 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       ],
       relatedFamilies: ['browsableListSurface()', 'tree()', 'navigableTableSurface()'],
       gracefulLowering: {
-        interactive: 'Passive or keyboard-owned table inspection preserves headers and row focus.',
-        static: 'Single-frame dense comparison remains visible where width allows.',
-        pipe: 'Plain textual row and column output keeps comparison semantics explicit.',
+        interactive: 'Responsive visual variants preserve headers, wrapped cells, and optional row focus.',
+        static: 'Single-frame dense comparison remains visible with the selected visual variant.',
+        pipe: 'TSV remains the default, while CSV, Markdown, and ASCII grid are explicit serializations.',
         accessible: 'Headers, row labels, and focused comparison state remain clear in text.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
     variants: [
-      {
-        id: 'passive-grid',
-        label: 'Passive grid',
-        description: 'A compact data table remains the honest view when comparison, not interaction, is primary.',
-        render: ({ width, ctx }) => denseComparisonPreview({
+      ...TABLE_VISUAL_VARIANT_STORIES.map(spec => ({
+        id: spec.id,
+        label: tableStoryLabel(spec.id),
+        description: tableVisualVariantDescription(spec),
+        render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tableVisualVariantPreview({
           width,
           ctx,
-          title: 'passive table',
-          mode: 'passive',
+          title: `variant: ${spec.variant}`,
+          variant: spec.variant,
         }),
-      },
+      })),
+      ...TABLE_PIPE_FORMAT_STORIES.map(spec => ({
+        id: spec.id,
+        label: tableStoryLabel(spec.id),
+        description: tablePipeFormatDescription(spec),
+        render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tablePipeFormatPreview({
+          width,
+          ctx,
+          title: `pipeFormat: ${spec.pipeFormat}`,
+          pipeFormat: spec.pipeFormat,
+        }),
+      })),
       {
         id: 'focused-inspection',
         label: 'Focused inspection',
@@ -4225,7 +4404,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           width,
           ctx,
           title: 'focused table',
-          mode: 'navigable',
         }),
       },
     ],

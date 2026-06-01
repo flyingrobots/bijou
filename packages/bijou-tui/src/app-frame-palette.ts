@@ -14,7 +14,7 @@ import type {
   FramedAppMsg,
 } from './app-frame-types.js';
 import { comboToMsg, emitMsg, emitMsgForPage } from './app-frame-types.js';
-import { applyFrameAction } from './app-frame-actions.js';
+import { applyFrameAction, syncPageFrameState } from './app-frame-actions.js';
 import type { Cmd, KeyMsg } from './types.js';
 import type { KeyMap } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
@@ -70,16 +70,29 @@ export function handlePaletteKey<PageModel, Msg>(
           return applyFrameAction(entry.frameAction, closed, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {
-          const cmd = entry.targetPageId != null
-            ? emitMsgForPage(entry.targetPageId, entry.msgAction)
-            : emitMsg(entry.msgAction);
-          return [{
+          const closed = {
             ...model,
             commandPalette: undefined,
             commandPaletteEntries: undefined,
             commandPaletteTitle: undefined,
             commandPaletteKind: undefined,
-          }, [cmd]];
+          };
+          const targetPageId = entry.targetPageId;
+          const targetPageExists = targetPageId != null
+            && pagesById.has(targetPageId)
+            && model.pageModels[targetPageId] !== undefined;
+          const nextModel = targetPageExists && targetPageId !== model.activePageId
+            ? syncPageFrameState({
+                ...closed,
+                activePageId: targetPageId,
+                previousPageId: model.activePageId,
+                transitionProgress: 1,
+              }, targetPageId, pagesById)
+            : closed;
+          const cmd = entry.targetPageId != null
+            ? emitMsgForPage(entry.targetPageId, entry.msgAction)
+            : emitMsg(entry.msgAction);
+          return [nextModel, [cmd]];
         }
         return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined, commandPaletteKind: undefined }, []];
       }
@@ -227,7 +240,7 @@ export function buildPaletteEntries<PageModel, Msg>(
           category: item.category ?? pageTitle,
         },
         msgAction: item.action,
-        targetPageId: model.activePageId,
+        targetPageId: item.targetPageId ?? model.activePageId,
       });
     }
   }
@@ -257,6 +270,6 @@ export function buildSearchEntries<PageModel, Msg>(
       category: item.category ?? pageTitle,
     },
     msgAction: item.action,
-    targetPageId: model.activePageId,
+    targetPageId: item.targetPageId ?? model.activePageId,
   }));
 }

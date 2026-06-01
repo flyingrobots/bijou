@@ -46,6 +46,9 @@ focus it and use the wheel to scroll long docs or help content.
 ## Included story families
 
 - feedback, overlays, viewport masking, forms, navigation, data visualization, shell composition, and motion/shader effects
+- the dense-comparison story demonstrates every `table()` visual variant,
+  every explicit pipe serialization, and the keyboard-owned
+  `navigableTableSurface()` path
 - `motion-and-shader-effects` now covers quad shader waves, Braille fields, glyph-fit raytracing, and spring/timeline orchestration across rich, static, pipe, and accessible profiles
 
 ## Keys
@@ -57,7 +60,7 @@ focus it and use the wheel to scroll long docs or help content.
 - `←` / `→`: cycle landing-screen themes
 - `[` / `]`: move between top-level docs sections
 - `?`: open keyboard help
-- `/`: search the current docs section in the standard shell search surface
+- `/`: search component stories and documentation pages in the standard shell search surface
 - `F2`: open the standard shell settings drawer
 - Backtick: toggle the standard shell performance HUD
 - `↑` / `↓`: move through the focused pane's rows
@@ -77,7 +80,7 @@ focus it and use the wheel to scroll long docs or help content.
 - The docs are the demo: the page text and preview are generated from the same structured story data.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The `Guides`, `Packages`, `Philosophy`, and `Release` sections are no longer just shell shape. They now publish real corpus pages inside the app, and the release-facing smoke contract now runs through DOGFOOD instead of the broad examples tree.
-- The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to the current section's content instead of walking every list manually first.
+- The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to matching guides or component stories instead of walking every list manually first.
 - `npm run storybook` opens a standalone interactive component development and testing workbench over the story catalog.
 - `npm run storybook:index` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling. `npm run dogfood:storybook` remains as the compatibility alias for that text-first path.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.

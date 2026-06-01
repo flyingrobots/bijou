@@ -327,12 +327,73 @@ Use when:
 
 - the user needs comparison across columns
 - the same attributes matter across many rows
+- the table should fit the available terminal width and wrap long cells instead
+  of forcing callers to pre-compute column widths
 
 Avoid when:
 
 - hierarchy is the main point
 - the user needs focused keyboard inspection rather than passive comparison
 - the item set is effectively one-dimensional and would read more honestly as a list
+
+Variants:
+
+- `variant: "box"` keeps the default Unicode boxed table
+- `variant: "ascii-grid"` renders a portable `+---+` grid
+- `variant: "ruled"` renders a borderless table with a heavy header rule and
+  light row separators
+- `variant: "header-rule"` keeps only the header separator
+- `variant: "plain"` renders aligned columns with spaces and no rules
+- `variant: "markdown"` renders a GitHub-flavored Markdown pipe table
+- `variant: "definition"` renders two-column field/value reports
+- `variant: "expanded"` renders psql-style record inspection
+
+Examples:
+
+```text
+box
+┌───────┬────────┐
+│ Name  │ State  │
+├───────┼────────┤
+│ Alice │ active │
+└───────┴────────┘
+
+ruled
+Name   State
+━━━━━  ━━━━━━
+Alice  active
+
+header-rule
+Name   State
+-----  ------
+Alice  active
+
+plain
+Name   State
+Alice  active
+
+markdown
+| Name  | State  |
+|-------|--------|
+| Alice | active |
+
+definition
+Field  Value
+━━━━━  ━━━━━━
+State  active
+
+expanded
+-[ RECORD 1 ]------------
+Name  | Alice
+State | active
+```
+
+Lowering:
+
+- `pipe` mode still defaults to TSV
+- callers can opt into `pipeFormat: "csv"`, `"markdown"`, or `"ascii-grid"`
+- visual aligned-column variants use spaces, not tabs; tabs are reserved for
+  TSV serialization
 
 ### `tableSurface()`
 

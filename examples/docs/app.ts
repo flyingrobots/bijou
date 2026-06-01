@@ -52,6 +52,7 @@ import {
   viewportSurface,
   type App,
   type Cmd,
+  type FrameCommandItem,
   type FramePageMsg,
   type FrameInputArea,
   type FrameModel,
@@ -1453,6 +1454,58 @@ function guideDocSummary(doc: GuideDoc, localization?: LocalizationPort): string
 
 function guideDocBody(doc: GuideDoc, localization?: LocalizationPort): string {
   return doc.localizedBody?.(localization) ?? doc.body;
+}
+
+function storySearchText(story: ComponentStory): string {
+  return [
+    story.id,
+    story.family,
+    story.title,
+    story.docs.summary,
+    ...story.docs.useWhen,
+    ...story.docs.avoidWhen,
+    ...story.docs.relatedFamilies,
+    ...Object.values(story.docs.gracefulLowering),
+    ...story.variants.flatMap((variant) => [
+      variant.id,
+      variant.label,
+      variant.description ?? '',
+    ]),
+    story.source?.examplePath ?? '',
+    story.source?.snippetLabel ?? '',
+    ...(story.tags ?? []),
+  ].join(' ');
+}
+
+function documentationSearchItems(
+  localization: LocalizationPort,
+): readonly FrameCommandItem<DocsMsg>[] {
+  const componentItems = COMPONENT_STORIES.map((story): FrameCommandItem<DocsMsg> => ({
+    id: `component:${story.id}`,
+    label: story.title,
+    description: `${story.family} • ${story.docs.summary}`,
+    category: pageTitle(COMPONENTS_PAGE_ID, localization),
+    searchText: storySearchText(story),
+    action: { type: 'select-story', storyId: story.id },
+    targetPageId: COMPONENTS_PAGE_ID,
+  }));
+  const guideItems = GUIDE_DOCS.map((doc): FrameCommandItem<DocsMsg> => ({
+    id: `doc:${doc.pageId}:${doc.id}`,
+    label: guideDocTitle(doc, localization),
+    description: guideDocSummary(doc, localization),
+    category: pageTitle(doc.pageId, localization),
+    searchText: [
+      doc.id,
+      pageTitle(doc.pageId, localization),
+      guideDocTitle(doc, localization),
+      guideDocSummary(doc, localization),
+      guideDocBody(doc, localization),
+    ].join(' '),
+    action: { type: 'select-guide', guideId: doc.id },
+    targetPageId: doc.pageId,
+  }));
+
+  return [...componentItems, ...guideItems];
 }
 
 function guideItemsForPage(
@@ -3127,7 +3180,7 @@ function renderEmptyStoryPane(
     line(dogfoodText(localization, 'docs.empty.guide.step1', '1. Browse component families in the left lane.')),
     line(dogfoodText(localization, 'docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.')),
     line(dogfoodText(localization, 'docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.')),
-    line(dogfoodText(localization, 'docs.empty.guide.step4', '4. Press / to search by component name at any time.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step4', '4. Press / to search documentation at any time.')),
     line(dogfoodText(localization, 'docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.')),
   ]), {
     title: dogfoodText(localization, 'docs.empty.guide.title', 'How to use these docs'),
@@ -3923,16 +3976,10 @@ function createDocsExplorerApp(
             ];
           },
           searchTitle: () => renderDocsSearchTitle(
-            dogfoodText(localization, 'docs.search.title', 'Search components'),
+            dogfoodText(localization, 'docs.search.title', 'Search documentation'),
           ),
-          searchItems(model) {
-            return COMPONENT_STORIES.map((story) => ({
-              id: story.id,
-              label: story.title,
-              description: `${story.family} • ${story.docs.summary}`,
-              category: story.family,
-              action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
-            }));
+          searchItems() {
+            return documentationSearchItems(localization);
           },
           layout(model) {
             const theme = resolveLandingTheme(model.landingThemeIndex);
@@ -4033,15 +4080,11 @@ function createDocsExplorerApp(
           }
           return inputAreas;
         },
-        searchTitle: () => renderDocsSearchTitle(`Search ${pageTitle(spec.id, localization).toLowerCase()}`),
+        searchTitle: () => renderDocsSearchTitle(
+          dogfoodText(localization, 'docs.search.title', 'Search documentation'),
+        ),
         searchItems() {
-          return guideDocsForPage(spec.id).map((doc) => ({
-            id: doc.id,
-            label: guideDocTitle(doc, localization),
-            description: guideDocSummary(doc, localization),
-            category: pageTitle(spec.id, localization),
-            action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
-          }));
+          return documentationSearchItems(localization);
         },
         layout(model) {
           const theme = resolveLandingTheme(model.landingThemeIndex);

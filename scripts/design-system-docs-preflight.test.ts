@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   parseFamilySections,
@@ -28,6 +30,12 @@ const COMPLETE_SECTION = `### Example Family
   - tag
 `;
 
+const REPO_ROOT = resolve(import.meta.dirname, '..');
+
+function readRepoFile(path: string): string {
+  return readFileSync(resolve(REPO_ROOT, path), 'utf8');
+}
+
 describe('design-system docs preflight', () => {
   it('finds component family sections', () => {
     const sections = parseFamilySections(`# Title\n\n${COMPLETE_SECTION}`);
@@ -54,5 +62,14 @@ describe('design-system docs preflight', () => {
       field: 'Graceful lowering',
       message: 'missing "accessible" lowering guidance',
     });
+  });
+
+  it('documents the expanded table variant anywhere table variants are enumerated', () => {
+    expect(readRepoFile('docs/design-system/component-families.md'))
+      .toContain('table({ variant: "expanded" })');
+    expect(readRepoFile('docs/design-system/patterns.md'))
+      .toContain('variant: "expanded"');
+    expect(readRepoFile('packages/bijou/GUIDE.md'))
+      .toContain('`expanded`');
   });
 });

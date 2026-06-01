@@ -8,6 +8,24 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Responsive `table()` layout and variants** — `table()` now fits human-mode
+  output to the available terminal width by default, wraps constrained cells at
+  word boundaries, and exposes `layout: "intrinsic"` for the old content-sized
+  behavior. The string table renderer now supports `box`, `ascii-grid`,
+  `ruled`, `header-rule`, `plain`, `markdown`, `definition`, and `expanded`
+  variants, plus explicit `pipeFormat` lowerings for TSV, CSV, Markdown, and
+  ASCII grid while keeping TSV as the default pipe format. DOGFOOD now
+  demonstrates every visual table variant and pipe serialization in the
+  `table() / navigableTableSurface()` story. Headerless inferred-column tables
+  now render data rows without fake blank header bands or leading pipe rows.
+- **DOGFOOD documentation jump search** — `/` in DOGFOOD now opens a global
+  documentation search across component stories and documentation pages, ranks
+  direct label matches ahead of incidental body matches, and can activate the
+  correct top-level section before opening the selected result. The table
+  component story is reachable with `/`, `table`, `Enter` without expanding the
+  component accordion first. `@flyingrobots/bijou-tui` command palette items
+  now also support hidden `searchText`, and framed command/search entries can
+  target another page before dispatching their action.
 - **Input feature action maps for `bijou-tui`** — `@flyingrobots/bijou-tui`
   now exports `createInputGestureRecognizer()` and `createInputActionMap()` so
   apps and shells can map raw key features to semantic events such as `tap`,
