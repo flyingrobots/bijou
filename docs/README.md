@@ -4,6 +4,10 @@ This is the repo documentation map for Bijou. Documentation is organized by
 intent. Do not audit the repository by recursively walking the filesystem;
 follow the entrypoints below.
 
+Current Truth: start with the root README, this repo documentation map, and the
+entrypoints below. For live work tracking, use open GitHub Issues and labels;
+`docs/method/` preserves evidence and history.
+
 ## Entrypoints
 
 | Surface | Role |
@@ -15,16 +19,6 @@ follow the entrypoints below.
 | **[ADVANCED_GUIDE.md](../ADVANCED_GUIDE.md)** | Deep dives: pipeline, motion, shaders, and proving workflows. |
 | **[Terminal Scenarios](./guides/terminal-scenarios.md)** | End-to-end guide for colored output, forms, TUI apps, and shader renderers. |
 | **[Framed App Tutorial](./guides/framed-app-tutorial.md)** | Middle path between the tiny counter and DOGFOOD-scale framed apps. |
-
-## Current Truth
-
-If you want the current-truth docs lane, start with the root README, this repo
-documentation map, and the signposts above before you drift into historical or
-reference material.
-
-For current work tracking, start with open GitHub Issues and their labels. The
-Method files under `docs/method/` preserve evidence and history; they are not a
-replacement for the live issue tracker.
 
 ## Doctrine and Direction
 
