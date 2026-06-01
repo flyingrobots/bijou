@@ -1,107 +1,115 @@
 # BEARING
 
-Current direction and active tensions. Historical ship data is in `CHANGELOG.md`.
+Current direction and active tensions. Historical ship data is in
+`CHANGELOG.md`; issue-by-release mapping is in `ROADMAP.md`.
 
 ## Recent Ships
 
+- `DX-036` — responsive `table()` layout, width fitting, visual table variants,
+  explicit pipe formats, and DOGFOOD documentation jump search have landed.
+- Day 0 audit hardening — onboarding, Method intake, cross-platform CI posture,
+  DOGFOOD terminal guardrails, bootstrap diagnostics, command backpressure, and
+  render-pipeline diagnostics have been tightened.
 - `LX-014` — DOGFOOD catalog coverage expanded across visible product
   surfaces, making locale switching more useful while preserving honest
   selected-locale catalog data.
-- `LX-018` — localization catalog data is now honest: generated non-English
-  DOGFOOD catalogs do not embed copied English fallback strings, English
-  fallback catalogs load separately at runtime, and non-production builds can
-  expose loud missing-localization markers.
+- `LX-018` / `LX-019` — localization catalog data is honest, fallback catalogs
+  are explicit, and DOGFOOD text lookup now goes through an application-facing
+  localization port.
 - `DX-031` / `DX-034` — Blocks now have public metadata, schema, data-binding,
   command-intent, lifecycle, active-binding, first-party definition, DOGFOOD
   documentation, and fixture-demo proof. The visible product layer is still
   emerging; the architecture is ahead of the rendered catalog.
-- `LX-019` — DOGFOOD text lookup now goes through an application-facing
-  localization port instead of view code reaching for the concrete runtime.
-- `DF-070` — DOGFOOD docs, Blocks preview, settings, and guide surfaces now
-  route more visible text through semantic Blocks; prose wrapping is
-  word-aware; the CounterDemoBlock fixture proves interactive intent and
-  lowering behavior inside DOGFOOD.
+- `DF-071` — DOGFOOD shell and docs surfaces moved further through semantic
+  Block contracts, including block-owned surface inventory and localized
+  inventory descriptions.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
   `@flyingrobots/bijou-mcp`.
-- `4.1.0` — DOGFOOD matures through
-  [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md),
-  [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md),
-  [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md),
-  and [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md).
 
 ## Active Gravity
 
-### 1. Visible DOGFOOD Product Truth
-- DOGFOOD now exposes two partially visible product surfaces at once: Blocks and
-  localization.
-- The next work should improve what users can see in DOGFOOD before adding
-  another abstract layer.
-- The localization pipeline is honest; the bottleneck is visible product
-  coverage and block-authored surface polish.
+### 1. Close The `v6.0.0` Release Boundary
 
-### 2. Blocks Crossing From Contracts To Product
-- Blocks have a strong data-flow and composition spine.
-- `AppShell`, `ReaderSurface`, `InspectorPanel`, and the fixture
-  `CounterDemoBlock` prove the path, but the rendered standard catalog is not
-  finished.
-- New Block work should consume the existing contracts, not invent provider,
-  lifecycle, callback, or localization policy while rendering.
+- The live `v6.0.0` milestone has four open issues and eighteen completed
+  lineage issues.
+- The release thesis is still: frame owns geometry; Blocks prove it.
+- `v6.0.0` should not tag until the remaining open release issues are closed,
+  intentionally split, or explicitly moved to another horizon.
+- The detailed issue list lives in [ROADMAP.md](./ROADMAP.md).
 
-### 3. DOGFOOD Becomes Block-Authored
+### 2. GitHub Issues Are The Work Tracker
 
-- DOGFOOD should prove Bijou's Block system by using Blocks for semantic app
-  surfaces, not merely previewing Blocks in one section.
-- Components remain the leaf rendering vocabulary inside Blocks.
-- Storybook now runs through the shared framed shell path and exposes a
-  `StorybookWorkbenchBlock` contract; the remaining work is making more
-  DOGFOOD product surfaces render through their Blocks instead of beside them.
+- GitHub Issues and milestones are now the canonical queue.
+- `docs/method/backlog/` is evidence and lineage, not the primary planning UI.
+- `ROADMAP.md` is the human-readable mirror of milestone triage, not an
+  independent source of truth.
+- Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
+  comment and a matching roadmap update.
+
+### 3. `v7.0.0` Is The Queued Product-Truth Horizon
+
+- `v7.0.0` holds the imported `up-next` lane: DOGFOOD docs truth,
+  component-family audits, `tableSurface()` responsive parity, and scoped
+  Node I/O documentation.
+- This is initial triage, not a release promise.
+- After `v6.0.0` closes, v7 should be reshaped into a smaller release thesis
+  before implementation starts.
 
 ## Tensions
 
+- **Release Scope Creep**: `v6.0.0` is close enough to become tempting to
+  widen. Resist that. Close, split, or move the remaining issues instead of
+  dragging v7 work into the current release boundary.
+- **Geometry Before Product Chrome**: Standard Blocks and DOGFOOD polish are
+  easier to see than layout truth, but RE-035 remains the release's structural
+  keystone. Product surfaces should consume geometry contracts, not bypass
+  them with bespoke string/surface measurement.
 - **Block Boundary Drift**: It is tempting to wrap every component in a Block.
-  That would blur the useful boundary; Blocks should own product semantics,
-  while components own leaf rendering.
-- **Product Proof Lag**: Blocks have better contracts than visible rendered
-  proof. AppShell rendering must consume existing data-flow contracts instead of
-  creating a parallel prop/callback path.
-- **Coverage Still Matters**: Catalog coverage has improved, but future visible
-  product work should keep moving text into the source table instead of adding
-  new hard-coded strings.
-- **Measurement Temptation**: A localization dashboard would be useful, but
-  coverage must improve before a dashboard becomes the next highest-value move.
+  Blocks should own product semantics, data contracts, and lowering facts;
+  Components should remain the leaf rendering vocabulary.
+- **Tracker / Docs Drift**: The issue tracker, `ROADMAP.md`, and Method
+  evidence files can now disagree. GitHub wins; docs must be updated when
+  milestone triage changes.
+- **DOGFOOD Truth Debt**: `v7.0.0` carries a large docs and component-family
+  audit queue. That work matters, but it should not obscure the smaller v6
+  release gate.
 
 ## Next Target
 
-The immediate focus is `DF-071` — DOGFOOD block-authored surfaces.
+The immediate focus is `v6.0.0` release closure.
 
-DF-071 should keep pushing visible DOGFOOD product surfaces through semantic
-Blocks:
+Open v6 issues:
 
-- make title, footer, navigation, article, inspector, settings, preview, and
-  workbench surfaces explain their block ownership through runtime contracts
-- keep Components as the leaf rendering vocabulary inside those Blocks
-- preserve unidirectional data-binding, command-intent, and localization-port
-  boundaries
-- keep the Blocks section useful as a product preview, not a raw metadata dump
-- improve localization coverage only where touched visible surfaces need it
+- [#180](https://github.com/flyingrobots/bijou/issues/180) — `RE-035`
+  mandatory layout envelope and constraint negotiation.
+- [#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`
+  standard Bijou blocks.
+- [#182](https://github.com/flyingrobots/bijou/issues/182) — `DX-034`
+  declarative view data binding.
+- [#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`
+  boundary-aware pointer selection and copy.
+
+Recommended pull order:
+
+1. Pull [#180](https://github.com/flyingrobots/bijou/issues/180) first unless a
+   sharper release-management reason appears. Layout envelope truth is the
+   structural dependency for the rest of the release thesis.
+2. Reassess [#181](https://github.com/flyingrobots/bijou/issues/181) and
+   [#182](https://github.com/flyingrobots/bijou/issues/182) together after
+   #180, because standard Blocks and declarative binding are already partially
+   landed and may need split-or-close decisions rather than one broad cycle.
+3. Treat [#186](https://github.com/flyingrobots/bijou/issues/186) as either a
+   focused v6 implementation slice or an explicit move to `v7.0.0`, depending
+   on whether boundary-aware copy is required for the release boundary.
 
 Non-goals for the next cycle:
 
+- no broad DOGFOOD docs ingestion from [#244](https://github.com/flyingrobots/bijou/issues/244)
+  unless it is explicitly moved into v6
+- no remaining component-family audit sweep from `v7.0.0`
 - no full visual redesign of DOGFOOD
 - no conversion of every leaf component into a Block
 - no hidden global block registry
-- no new provider lifecycle system
 - no localization runtime rewrite
-- no shipping standard block catalog expansion beyond clearly useful
-  DOGFOOD-proven surfaces
-
-Expected sequence:
-
-1. `DF-071` makes more DOGFOOD shell and docs surfaces block-authored without
-   changing the low-level component boundary.
-2. The next Blocks catalog slice can promote proven DOGFOOD surfaces into
-   first-party candidates where the semantics are stable.
-3. Product verification should prove visible block rendering and lowering
-   behavior directly instead of relying on metadata-only checks.
