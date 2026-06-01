@@ -10,6 +10,10 @@ Current direction and active tensions. Historical ship data is in
 - Day 0 audit hardening — onboarding, Method intake, cross-platform CI posture,
   DOGFOOD terminal guardrails, bootstrap diagnostics, command backpressure, and
   render-pipeline diagnostics have been tightened.
+- `DF-022` / `DF-023` / `DF-024` and `WF-003` — DOGFOOD followed through on
+  the terminal documentation system shape with the prose docs reader, top-level
+  navigation, package/release guides, philosophy/architecture guides, and
+  DOGFOOD-backed smoke closure.
 - `LX-014` — DOGFOOD catalog coverage expanded across visible product
   surfaces, making locale switching more useful while preserving honest
   selected-locale catalog data.
@@ -27,6 +31,8 @@ Current direction and active tensions. Historical ship data is in
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
   `@flyingrobots/bijou-mcp`.
+- `4.1.0` — the first DOGFOOD-centered release boundary moved release smoke
+  onto `smoke:dogfood` and closed the old temporary version-target lane.
 
 ## Active Gravity
 
