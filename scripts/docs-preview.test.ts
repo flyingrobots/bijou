@@ -576,6 +576,55 @@ describe('docs preview app', () => {
     expect(text).toContain('Bijou keeps docs');
   });
 
+  it('demonstrates every table variant in the DOGFOOD dense-comparison story', () => {
+    const story = COMPONENT_STORIES.find((candidate) => candidate.id === 'dense-comparison');
+    expect(story).toBeDefined();
+
+    const variantIds = story!.variants.map((variant) => variant.id);
+    expect(variantIds).toEqual([
+      'box',
+      'ascii-grid',
+      'ruled',
+      'header-rule',
+      'plain',
+      'markdown-table',
+      'definition',
+      'expanded',
+      'pipe-tsv',
+      'pipe-csv',
+      'pipe-markdown',
+      'pipe-ascii-grid',
+      'focused-inspection',
+    ]);
+
+    const renderVariant = (variantId: string): string => {
+      const variant = story!.variants.find((candidate) => candidate.id === variantId);
+      expect(variant).toBeDefined();
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 64, rows: 24 } });
+      const preview = variant!.render({
+        width: 60,
+        ctx,
+        state: undefined as never,
+        timeMs: 0,
+      });
+      return typeof preview === 'string' ? preview : '';
+    };
+
+    expect(renderVariant('box')).toContain('┌');
+    expect(renderVariant('ascii-grid')).toContain('+');
+    expect(renderVariant('ruled')).toContain('━━━━━━━━');
+    expect(renderVariant('header-rule')).toContain('---------');
+    expect(renderVariant('plain')).toContain('Component');
+    expect(renderVariant('markdown-table')).toContain('| Component');
+    expect(renderVariant('definition')).toContain('Merge method');
+    expect(renderVariant('expanded')).toContain('-[ RECORD 1 ]');
+    expect(renderVariant('pipe-tsv')).toContain('Component\tBehavior\tOwner');
+    expect(renderVariant('pipe-csv')).toContain('Component,Behavior,Owner');
+    expect(renderVariant('pipe-csv')).toContain('"Exports rows to TSV, CSV, Markdown, or ASCII grid."');
+    expect(renderVariant('pipe-markdown')).toContain('| Component');
+    expect(renderVariant('pipe-ascii-grid')).toContain('+');
+  });
+
   it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

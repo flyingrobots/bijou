@@ -378,6 +378,8 @@ Shipped behavior:
   formats
 - accessible output remains row/header/value oriented instead of inheriting a
   visual variant
+- DOGFOOD's `table() / navigableTableSurface()` story now demonstrates every
+  visual table variant and every explicit pipe serialization
 
 Deferred debt:
 

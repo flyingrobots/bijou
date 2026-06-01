@@ -46,6 +46,9 @@ focus it and use the wheel to scroll long docs or help content.
 ## Included story families
 
 - feedback, overlays, viewport masking, forms, navigation, data visualization, shell composition, and motion/shader effects
+- the dense-comparison story demonstrates every `table()` visual variant,
+  every explicit pipe serialization, and the keyboard-owned
+  `navigableTableSurface()` path
 - `motion-and-shader-effects` now covers quad shader waves, Braille fields, glyph-fit raytracing, and spring/timeline orchestration across rich, static, pipe, and accessible profiles
 
 ## Keys

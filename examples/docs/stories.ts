@@ -35,6 +35,9 @@ import {
   timeline as processTimeline,
   tree,
   type Surface,
+  type TableColumn,
+  type TablePipeFormat,
+  type TableVariant,
 } from '@flyingrobots/bijou';
 import {
   canvas,
@@ -1511,49 +1514,221 @@ function renderPerfOverlayStoryPreview(
   return renderMetricListPreview(options.title ?? 'Perf', perfOverlayEntries(stats), ctx, width);
 }
 
+const TABLE_STORY_COLUMNS: readonly TableColumn[] = [
+  { header: 'Component', minWidth: 8, maxWidth: 18 },
+  { header: 'Behavior', minWidth: 14, maxWidth: 30, weight: 3 },
+  { header: 'Owner', minWidth: 5, maxWidth: 8, align: 'center' },
+];
+
+const TABLE_STORY_ROWS: readonly (readonly string[])[] = [
+  ['table()', 'Fits terminal width and wraps cells at word boundaries.', 'core'],
+  ['variants', 'Switches box, ruled, plain, Markdown, definition, and expanded output.', 'API'],
+  ['pipeFormat', 'Exports rows to TSV, CSV, Markdown, or ASCII grid.', 'pipe'],
+  ['navigableTableSurface()', 'Adds row focus when keyboard inspection matters.', 'tui'],
+];
+
+const TABLE_STORY_EXPANDED_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.slice(0, 2);
+
+const TABLE_STORY_DEFINITION_ROWS: readonly (readonly string[])[] = [
+  ['PR', 'https://github.com/flyingrobots/bijou/pull/121'],
+  ['State', 'DRAFT'],
+  ['Merge method', 'Normal merge commit via gh pr merge --merge --admin when ready.'],
+  ['History rewrite', 'None'],
+  ['Force operation', 'None'],
+];
+
+const TABLE_STORY_NAV_COLUMNS: readonly TableColumn[] = [
+  { header: 'Component', width: 12 },
+  { header: 'Behavior', width: 24 },
+  { header: 'Owner', width: 5, align: 'center' },
+];
+
+const TABLE_STORY_NAV_ROWS: readonly (readonly string[])[] = [
+  ['table()', 'Responsive visual table', 'core'],
+  ['variants', 'Named visual styles', 'API'],
+  ['pipeFormat', 'Explicit lowerings', 'pipe'],
+  ['nav table', 'Keyboard row focus', 'tui'],
+];
+
+interface TableVisualVariantSpec {
+  readonly id: string;
+  readonly label: string;
+  readonly variant: TableVariant;
+  readonly description: string;
+}
+
+const TABLE_VISUAL_VARIANT_STORIES: readonly TableVisualVariantSpec[] = [
+  {
+    id: 'box',
+    label: 'Box',
+    variant: 'box',
+    description: 'Default Unicode grid, now fitted to the profile width instead of growing without bound.',
+  },
+  {
+    id: 'ascii-grid',
+    label: 'ASCII grid',
+    variant: 'ascii-grid',
+    description: 'Portable boxed table for logs or terminals where Unicode box drawing is not the right contract.',
+  },
+  {
+    id: 'ruled',
+    label: 'Heavy header, light rows',
+    variant: 'ruled',
+    description: 'Report-style table with aligned columns, a heavy header rule, and light row separators.',
+  },
+  {
+    id: 'header-rule',
+    label: 'Header rule only',
+    variant: 'header-rule',
+    description: 'Compact comparison table with aligned columns and only a header separator.',
+  },
+  {
+    id: 'plain',
+    label: 'Plain aligned',
+    variant: 'plain',
+    description: 'Borderless aligned columns using spaces for terminal-safe visual alignment.',
+  },
+  {
+    id: 'markdown-table',
+    label: 'Markdown table',
+    variant: 'markdown',
+    description: 'GitHub-flavored pipe table for docs, PRs, issues, and copyable markdown output.',
+  },
+  {
+    id: 'definition',
+    label: 'Definition table',
+    variant: 'definition',
+    description: 'Two-column field/value layout for status reports and one-record summaries.',
+  },
+  {
+    id: 'expanded',
+    label: 'Expanded records',
+    variant: 'expanded',
+    description: 'psql-style record inspection for narrow terminals or many-column rows.',
+  },
+];
+
+interface TablePipeFormatSpec {
+  readonly id: string;
+  readonly label: string;
+  readonly pipeFormat: TablePipeFormat;
+  readonly description: string;
+}
+
+const TABLE_PIPE_FORMAT_STORIES: readonly TablePipeFormatSpec[] = [
+  {
+    id: 'pipe-tsv',
+    label: 'Pipe TSV',
+    pipeFormat: 'tsv',
+    description: 'Default machine-oriented pipe lowering with tabs and escaped control characters.',
+  },
+  {
+    id: 'pipe-csv',
+    label: 'Pipe CSV',
+    pipeFormat: 'csv',
+    description: 'Spreadsheet-friendly comma-separated output with quote escaping.',
+  },
+  {
+    id: 'pipe-markdown',
+    label: 'Pipe Markdown',
+    pipeFormat: 'markdown',
+    description: 'Docs-friendly pipe lowering for README, issue, or PR bodies.',
+  },
+  {
+    id: 'pipe-ascii-grid',
+    label: 'Pipe ASCII grid',
+    pipeFormat: 'ascii-grid',
+    description: 'Opt-in human-readable pipe output while TSV remains the default.',
+  },
+];
+
+function tablePreviewWidth(width: number): number {
+  return Math.max(28, Math.min(width, 64));
+}
+
+function tableVisualVariantPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly variant: TableVariant;
+}): string {
+  const {
+    width,
+    ctx,
+    title,
+    variant,
+  } = input;
+  const previewWidth = tablePreviewWidth(width);
+  const rendered = variant === 'definition'
+    ? table({
+        variant,
+        rows: TABLE_STORY_DEFINITION_ROWS,
+        width: previewWidth,
+        ctx,
+      })
+    : table({
+        columns: TABLE_STORY_COLUMNS,
+        rows: variant === 'expanded' ? TABLE_STORY_EXPANDED_ROWS : TABLE_STORY_ROWS,
+        variant,
+        width: previewWidth,
+        ctx,
+      });
+
+  return [title, '', rendered].join('\n');
+}
+
+function tablePipeFormatPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly pipeFormat: TablePipeFormat;
+}): string {
+  const {
+    width,
+    ctx,
+    title,
+    pipeFormat,
+  } = input;
+  const previewWidth = tablePreviewWidth(width);
+  const renderCtx: BijouContext = ctx.mode === 'pipe' || ctx.mode === 'accessible'
+    ? ctx
+    : { ...ctx, mode: 'pipe' };
+  const rendered = table({
+    columns: TABLE_STORY_COLUMNS,
+    rows: TABLE_STORY_ROWS,
+    pipeFormat,
+    width: previewWidth,
+    ctx: renderCtx,
+  });
+
+  return [title, '', rendered].join('\n');
+}
+
 function denseComparisonPreview(input: {
   readonly width: number;
   readonly ctx: BijouContext;
   readonly title: string;
-  readonly mode: 'passive' | 'navigable';
 }): string | Surface {
   const {
     width,
     ctx,
     title,
-    mode,
   } = input;
-  const columns = [
-    { header: 'Service', width: 16 },
-    { header: 'Region', width: 12 },
-    { header: 'p95', width: 8 },
-    { header: 'Error', width: 8 },
-  ];
-  const rows = [
-    ['api', 'us-east', '84ms', '0.1%'],
-    ['queue', 'eu-west', '121ms', '0.4%'],
-    ['worker', 'ap-south', '142ms', '0.7%'],
-    ['docs', 'us-west', '77ms', '0.0%'],
-  ];
 
-  if (mode === 'passive') {
-    const preview = table({ columns, rows, ctx });
-    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
-      return [title, '', preview].join('\n');
-    }
-    return boxSurface(contentSurface(preview), {
-      title,
-      width: Math.max(46, Math.min(width, 64)),
-      ctx,
-    });
-  }
-
-  const state = createNavigableTableState({ columns, rows, height: 3 });
+  const state = createNavigableTableState({
+    columns: [...TABLE_STORY_NAV_COLUMNS],
+    rows: TABLE_STORY_NAV_ROWS,
+    height: 3,
+  });
   if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
     return [
       title,
       '',
-      table({ columns, rows: rows.slice(0, 3), ctx }),
+      table({
+        columns: TABLE_STORY_NAV_COLUMNS,
+        rows: TABLE_STORY_NAV_ROWS.slice(0, 3),
+        ctx,
+      }),
     ].join('\n');
   }
 
@@ -4185,10 +4360,11 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
     title: 'table() / navigableTableSurface()',
     package: 'bijou-tui',
     docs: {
-      summary: 'Dense comparison family for row-and-column inspection when the main task is comparing attributes across records instead of reading a narrative list.',
+      summary: 'Dense comparison family for row-and-column inspection, responsive table variants, explicit pipe serializations, and keyboard-owned row focus.',
       useWhen: [
         'Row and column comparison is the main job.',
         'Headers describe comparable attributes and the table remains compact enough to stay readable.',
+        'The output needs a named table style or explicit pipe/data serialization.',
         'Keyboard-owned row inspection materially helps the task.',
       ],
       avoidWhen: [
@@ -4198,25 +4374,36 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       ],
       relatedFamilies: ['browsableListSurface()', 'tree()', 'navigableTableSurface()'],
       gracefulLowering: {
-        interactive: 'Passive or keyboard-owned table inspection preserves headers and row focus.',
-        static: 'Single-frame dense comparison remains visible where width allows.',
-        pipe: 'Plain textual row and column output keeps comparison semantics explicit.',
+        interactive: 'Responsive visual variants preserve headers, wrapped cells, and optional row focus.',
+        static: 'Single-frame dense comparison remains visible with the selected visual variant.',
+        pipe: 'TSV remains the default, while CSV, Markdown, and ASCII grid are explicit serializations.',
         accessible: 'Headers, row labels, and focused comparison state remain clear in text.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
     variants: [
-      {
-        id: 'passive-grid',
-        label: 'Passive grid',
-        description: 'A compact data table remains the honest view when comparison, not interaction, is primary.',
-        render: ({ width, ctx }) => denseComparisonPreview({
+      ...TABLE_VISUAL_VARIANT_STORIES.map(spec => ({
+        id: spec.id,
+        label: spec.label,
+        description: spec.description,
+        render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tableVisualVariantPreview({
           width,
           ctx,
-          title: 'passive table',
-          mode: 'passive',
+          title: `variant: ${spec.variant}`,
+          variant: spec.variant,
         }),
-      },
+      })),
+      ...TABLE_PIPE_FORMAT_STORIES.map(spec => ({
+        id: spec.id,
+        label: spec.label,
+        description: spec.description,
+        render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tablePipeFormatPreview({
+          width,
+          ctx,
+          title: `pipeFormat: ${spec.pipeFormat}`,
+          pipeFormat: spec.pipeFormat,
+        }),
+      })),
       {
         id: 'focused-inspection',
         label: 'Focused inspection',
@@ -4225,7 +4412,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           width,
           ctx,
           title: 'focused table',
-          mode: 'navigable',
         }),
       },
     ],

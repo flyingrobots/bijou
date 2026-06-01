@@ -14,7 +14,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   behavior. The string table renderer now supports `box`, `ascii-grid`,
   `ruled`, `header-rule`, `plain`, `markdown`, `definition`, and `expanded`
   variants, plus explicit `pipeFormat` lowerings for TSV, CSV, Markdown, and
-  ASCII grid while keeping TSV as the default pipe format.
+  ASCII grid while keeping TSV as the default pipe format. DOGFOOD now
+  demonstrates every visual table variant and pipe serialization in the
+  `table() / navigableTableSurface()` story.
 - **Input feature action maps for `bijou-tui`** — `@flyingrobots/bijou-tui`
   now exports `createInputGestureRecognizer()` and `createInputActionMap()` so
   apps and shells can map raw key features to semantic events such as `tap`,
