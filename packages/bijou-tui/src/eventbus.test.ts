@@ -317,6 +317,76 @@ describe('runCmd', () => {
     expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
+  it('reports command backpressure when pending commands reach the threshold', async () => {
+    const onCommandBackpressure = vi.fn();
+    const bus = createEventBus<TestMsg>({
+      commandBackpressureThreshold: 2,
+      onCommandBackpressure,
+    });
+    const resolvers: Array<() => void> = [];
+    const cmd: Cmd<TestMsg> = () => new Promise<void>((resolve) => {
+      resolvers.push(resolve);
+    });
+
+    bus.runCmd(cmd);
+    expect(bus.getCommandDiagnostics()).toEqual({
+      pendingCommands: 1,
+      activeCommandCleanups: 0,
+      backpressureThreshold: 2,
+    });
+    expect(onCommandBackpressure).not.toHaveBeenCalled();
+
+    bus.runCmd(cmd);
+    expect(onCommandBackpressure).toHaveBeenCalledTimes(1);
+    expect(onCommandBackpressure.mock.calls[0]?.[0]).toMatchObject({
+      pendingCommands: 2,
+      activeCommandCleanups: 0,
+      backpressureThreshold: 2,
+    });
+
+    resolvers.forEach((resolve) => resolve());
+    await bus.drain();
+    expect(bus.getCommandDiagnostics().pendingCommands).toBe(0);
+  });
+
+  it('re-arms command backpressure diagnostics after the queue drains below the threshold', async () => {
+    const onCommandBackpressure = vi.fn();
+    const bus = createEventBus<TestMsg>({
+      commandBackpressureThreshold: 1,
+      onCommandBackpressure,
+    });
+
+    bus.runCmd(() => undefined);
+    await bus.drain();
+    bus.runCmd(() => undefined);
+    await bus.drain();
+
+    expect(onCommandBackpressure).toHaveBeenCalledTimes(2);
+  });
+
+  it('routes command backpressure hook failures through onError', async () => {
+    const onError = vi.fn();
+    const bus = createEventBus<TestMsg>({
+      commandBackpressureThreshold: 1,
+      onCommandBackpressure() {
+        throw new Error('backpressure reporter failed');
+      },
+      onError,
+    });
+
+    bus.runCmd(() => undefined);
+    await bus.drain();
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.stringContaining('onCommandBackpressure handler threw'),
+      expect.any(Error),
+    );
+    expect(onError).toHaveBeenCalledWith(
+      expect.stringContaining('Command backpressure'),
+      expect.objectContaining({ pendingCommands: 1, backpressureThreshold: 1 }),
+    );
+  });
+
   it('disposes cleanup results that settle after the bus is already disposed', async () => {
     const bus = createEventBus<TestMsg>();
     const dispose = vi.fn();

@@ -83,6 +83,66 @@ describe('createPipeline', () => {
     expect(state.ctx.io.writeError).toHaveBeenCalledWith(expect.stringContaining('[Pipeline Error]'));
   });
 
+  it('diagnoses async middleware and keeps the frame moving synchronously', async () => {
+    const pipeline = createPipeline();
+    const state = createMockState();
+    state.ctx.io.writeError = vi.fn();
+    const log: string[] = [];
+    let releaseAsync: (() => void) | undefined;
+    const asyncGate = new Promise<void>((resolve) => {
+      releaseAsync = resolve;
+    });
+
+    pipeline.use('Paint', async (_state, next) => {
+      log.push('async-start');
+      await asyncGate;
+      log.push('async-late');
+      next();
+    });
+    pipeline.use('PostProcess', (_state, next) => {
+      log.push('post');
+      next();
+    });
+
+    pipeline.execute(state);
+
+    expect(log).toEqual(['async-start', 'post']);
+    expect(state.ctx.io.writeError).toHaveBeenCalledTimes(1);
+    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
+      expect.stringContaining('Async render middleware returned a Promise in Paint'),
+    );
+
+    releaseAsync?.();
+    await asyncGate;
+    await Promise.resolve();
+
+    expect(log).toEqual(['async-start', 'post', 'async-late']);
+  });
+
+  it('reports rejected async middleware promises without leaving an unhandled rejection', async () => {
+    const pipeline = createPipeline();
+    const state = createMockState();
+    state.ctx.io.writeError = vi.fn();
+    const log: string[] = [];
+
+    pipeline.use('Layout', () => Promise.reject(new Error('async boom')));
+    pipeline.use('Paint', (_state, next) => {
+      log.push('paint');
+      next();
+    });
+
+    pipeline.execute(state);
+    await Promise.resolve();
+
+    expect(log).toEqual(['paint']);
+    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
+      expect.stringContaining('Async render middleware returned a Promise in Layout'),
+    );
+    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
+      expect.stringContaining('Async render middleware rejected in Layout'),
+    );
+  });
+
   it('reuses the flattened chain until middleware registration changes', () => {
     const mapSpy = vi.spyOn(Array.prototype, 'map');
     const pipeline = createPipeline();

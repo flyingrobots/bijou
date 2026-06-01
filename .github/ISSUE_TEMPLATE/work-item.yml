@@ -1,0 +1,125 @@
+name: Method work item
+description: Propose shaped Bijou work with a hill, scope, and witness plan.
+title: ""
+labels:
+  - lane:inbox
+  - type:enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use a short, branch-safe title. Active work uses a branch slug derived from this title.
+        Labels are canonical tracker metadata. If you want a lane or legend other than inbox triage,
+        request it below; a maintainer or agent must apply the actual label.
+  - type: textarea
+    id: requested-classification
+    attributes:
+      label: Requested classification
+      description: Optional triage request. This does not set canonical labels.
+      placeholder: |
+        Suggested lane:
+        Suggested legend:
+        Suggested priority:
+    validations:
+      required: false
+  - type: textarea
+    id: finding
+    attributes:
+      label: Finding
+      description: What repo truth, user need, defect, or opportunity motivates this work?
+    validations:
+      required: true
+  - type: textarea
+    id: hill
+    attributes:
+      label: Hill
+      description: Name the user value in Method/IBM Design Thinking style.
+      placeholder: As a contributor, I want ..., so that ...
+    validations:
+      required: true
+  - type: textarea
+    id: sponsored-perspectives
+    attributes:
+      label: Sponsored perspectives
+      description: Name abstract sponsored human and agent seats, not literal people or model brands.
+      value: |
+        - Sponsored Human: Name the served operator, maintainer, contributor, or user perspective.
+        - Sponsored Agent: Name the automation, implementation, review, or reproducibility perspective.
+
+        These are Method sponsorship seats, not literal people, accounts, or model brands.
+    validations:
+      required: true
+  - type: textarea
+    id: current-repo-note
+    attributes:
+      label: Current repo note
+      description: What is already true on the current main branch, if anything?
+      placeholder: Verified against main at <commit>. ...
+    validations:
+      required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is in bounds?
+      placeholder: |
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What should not be solved in this issue?
+      placeholder: |
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Concrete checks that prove the issue is complete.
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: witness
+    attributes:
+      label: Expected evidence
+      description: Expected evidence for tests, playback, docs, and retro.
+      value: |
+        ### Tests
+        Name the deterministic test command, failing-before-fix reproduction, or reason no code test applies.
+
+        ### Playback
+        Name the human-visible playback, demo, transcript, or reproduction that proves the result.
+
+        ### Docs
+        Name the documentation, issue template, signpost, or changelog surface updated, or explain why none is required.
+
+        ### Retro / Closeout
+        Name the closeout note, follow-up issue links, shipped retro, or close reason that will preserve the decision.
+    validations:
+      required: true
+  - type: textarea
+    id: method-artifacts
+    attributes:
+      label: Method artifacts
+      description: Fill these links as the work proceeds.
+      value: |
+        - Design: Link `docs/design/<LEGEND>-<issue>-<slug>.md`, or state why issue-only triage is sufficient.
+        - Witness: Link committed witness evidence or the issue/PR comment that records verification.
+        - Retro: Link the retro/closeout artifact or the issue close comment.
+        - PR: Link the pull request before closing implementation work.
+    validations:
+      required: true
+  - type: textarea
+    id: triage-rule
+    attributes:
+      label: Triage rule
+      description: What decision should move, close, split, or merge this issue?
+      placeholder: Move to lane:asap when ... Close if ...
+    validations:
+      required: true

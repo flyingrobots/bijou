@@ -17,6 +17,12 @@ The project is tested against Node.js 18, 20, and 22 in CI. Newer Node.js
 versions are supported by policy; the repository enforces only the Node 18
 floor before install.
 
+Core build and unit-test coverage runs on Ubuntu for Node 18/20/22 and on
+macOS plus Windows for Node 22. Contributor-facing root scripts such as
+`npm run clean` and `npm run version` are Node scripts so they do not require a
+Unix shell. Release, publish, and benchmark workflows may still use
+Linux-hosted Bash where the workflow itself is intentionally platform-specific.
+
 The repo's primary human-facing guide is [DOGFOOD](./docs/DOGFOOD.md).
 The `examples/` tree is for runnable examples and is intentionally maintained as secondary/internal reference material.
 
@@ -51,6 +57,15 @@ The fastest path is to get to the first visible output in under a minute.
    ```
 
    This launches a full-screen interactive TUI application. Press `q` or `Ctrl-C` to exit.
+
+## Where To Read Next
+
+| Need | Go to |
+| :--- | :--- |
+| Fast orientation after the first commands | [`GUIDE.md`](./GUIDE.md) |
+| Complete documentation map | [`docs/README.md`](./docs/README.md) |
+| Middle path between counter and DOGFOOD | [Framed app tutorial](./docs/guides/framed-app-tutorial.md) |
+| Live documentation app | [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) |
 
 ## What You Can Build
 
@@ -99,6 +114,28 @@ await startApp(app);
 
 The important rule is simple: input creates messages, update computes state + commands, and view is pure.
 
+The imports stay split because each package owns a different boundary:
+
+- `@flyingrobots/bijou` creates pure renderable values such as `Surface`.
+- `@flyingrobots/bijou-node` owns the Node host setup and terminal adapters.
+- `@flyingrobots/bijou-tui` owns the interactive app loop, messages, commands,
+  and key handling.
+
+## Core Concepts In Stages
+
+You do not need the whole architecture to build the first app.
+
+| Stage | Concept | Why it appears |
+| :--- | :--- | :--- |
+| 1 | `Surface` | A terminal-sized cell grid, not a string with escape codes. |
+| 2 | `App<Model, Msg>` | The tiny app contract: initialize, update, and render. |
+| 3 | `Msg` | Input and async results become typed messages. |
+| 4 | `Cmd<Msg>` | Runtime effects, timers, async work, and quit requests return messages later. |
+| 5 | `LayoutNode` / framed shell | Larger apps describe panes, headers, overlays, and navigation before painting cells. |
+
+The counter example stops at stages 1-4. The framed app tutorial adds stage 5.
+DOGFOOD uses all of them because it is Bijou's documentation product.
+
 ## Scaffolder: Fastest Path to Your App
 
 If you want a complete starter project instead of editing the repo examples directly, use the scaffolder:
@@ -111,6 +148,22 @@ npm run dev
 ```
 
 The generated project wires a modern host context and includes a working baseline app.
+
+## Intermediate: Framed App
+
+After the counter, use the compact framed-shell demo before reading DOGFOOD:
+
+```bash
+npm run app-frame
+```
+
+The tutorial explains the same app in smaller steps:
+
+- [Framed app tutorial](./docs/guides/framed-app-tutorial.md)
+- [Compact app-frame example](./examples/app-frame/README.md)
+
+Use this path when you want header/status chrome, tabs, panes, overlays, or a
+command palette without reverse-engineering the full DOGFOOD app.
 
 ## Dogfood Orientation and Controls
 

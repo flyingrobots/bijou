@@ -1,10 +1,13 @@
 import { initDefaultContext } from '../../packages/bijou-node/src/index.js';
 import { run } from '../../packages/bijou-tui/src/index.js';
 import { createNodeDocsApp } from './node-app.js';
+import { DOGFOOD_TERMINAL_NOTICE, dogfoodTerminalReadiness } from './terminal-guard.js';
 
 const ctx = initDefaultContext();
-if (!ctx.runtime.stdoutIsTTY) {
-  process.stderr.write('DOGFOOD requires an interactive terminal. Run this command in a terminal emulator, not a shell pipeline.\n');
+const readiness = dogfoodTerminalReadiness(ctx);
+if (!readiness.ok) {
+  process.stderr.write(readiness.message);
   process.exit(1);
 }
+process.stderr.write(DOGFOOD_TERMINAL_NOTICE);
 await run(createNodeDocsApp(ctx), { ctx, mouse: true });

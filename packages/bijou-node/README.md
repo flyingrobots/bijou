@@ -51,6 +51,7 @@ await startApp(app);
 - **`initDefaultContext()`**: Registers the first context as the global default for all Bijou components.
 - **`startApp()`**: Initializes a default Node context when needed and runs a TUI app through the hosted runtime. Pass `startApp(app, { theme })` for the one-line programmatic custom-theme path, or `startApp(app, { themes, themeMode, themeOverride })` for automatic light/dark selection plus override support. When the app is a self-running framed shell, `startApp()` delegates to that hosted runner instead of bypassing it.
 - **Ambient default initializer**: Importing `@flyingrobots/bijou-node` registers a lazy Node default-context initializer so low-level `run(app)` flows can still resolve `ctx` without a separate `initDefaultContext()` call.
+- **`BijouBootstrapError`**: Typed startup failure with `reason`, `hint`, and optional `cause` fields for terminal/context initialization errors.
 - **`scopedNodeIO()`**: Wraps the Node file adapter in a rooted filesystem boundary for app-level reads and guarded path resolution.
 - **`runInWorker()`**: Starts a TEA app inside a worker thread.
 - **`recordDemoGif()`**: Captures surface frames and rasterizes them to GIF for documentation.

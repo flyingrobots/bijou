@@ -1,5 +1,6 @@
 import { describe, it, expect, expectTypeOf, afterEach, beforeEach, vi } from 'vitest';
 import {
+  BijouBootstrapError,
   createNodeContext,
   initDefaultContext,
   startApp,
@@ -89,6 +90,19 @@ const CUSTOM_ID_THEME_SET = [
   { id: 'sunrise', scheme: 'light' as const, theme: LIGHT_THEME },
   { id: 'midnight', scheme: 'dark' as const, theme: DARK_THEME },
 ] as const;
+
+function withStdoutSize<T>(columns: number | undefined, rows: number | undefined, runTest: () => T): T {
+  const originalColumns = process.stdout.columns;
+  const originalRows = process.stdout.rows;
+  Object.defineProperty(process.stdout, 'columns', { configurable: true, value: columns });
+  Object.defineProperty(process.stdout, 'rows', { configurable: true, value: rows });
+  try {
+    return runTest();
+  } finally {
+    Object.defineProperty(process.stdout, 'columns', { configurable: true, value: originalColumns });
+    Object.defineProperty(process.stdout, 'rows', { configurable: true, value: originalRows });
+  }
+}
 
 const UNUSED_THEME: Theme = {
   ...TEST_THEME,
@@ -289,6 +303,35 @@ describe('initDefaultContext()', () => {
     expect(ctx.theme.theme.name).toBe('light-theme');
     expect(ctx.theme.colorScheme).toBe('light');
     expect(getDefaultContext()).toBe(ctx);
+  });
+
+  it('throws a structured bootstrap error when stdout reports unusable dimensions', () => {
+    withStdoutSize(0, 24, () => {
+      expect(() => initDefaultContext()).toThrow(BijouBootstrapError);
+      try {
+        initDefaultContext();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BijouBootstrapError);
+        const bootstrapError = error as BijouBootstrapError;
+        expect(bootstrapError.name).toBe('BijouBootstrapError');
+        expect(bootstrapError.reason).toBe('stdout reported zero columns/rows');
+        expect(bootstrapError.hint).toContain('use pipe mode');
+        expect(bootstrapError.message).toBe('initDefaultContext failed: stdout reported zero columns/rows');
+      }
+    });
+  });
+});
+
+describe('BijouBootstrapError', () => {
+  it('preserves reason, hint, and cause for callers that recover startup failures', () => {
+    const cause = new Error('raw mode failed');
+    const error = new BijouBootstrapError('raw mode unavailable', 'run in an interactive terminal', cause);
+
+    expect(error.name).toBe('BijouBootstrapError');
+    expect(error.message).toBe('initDefaultContext failed: raw mode unavailable');
+    expect(error.reason).toBe('raw mode unavailable');
+    expect(error.hint).toBe('run in an interactive terminal');
+    expect(error.cause).toBe(cause);
   });
 });
 

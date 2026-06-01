@@ -3,6 +3,26 @@
 This guide describes the minimum steps to add a new package to the Bijou
 monorepo without breaking workspace conventions.
 
+## Why the packages are split
+
+Bijou keeps package boundaries narrow so apps can adopt only the layer they
+need:
+
+- `@flyingrobots/bijou` is pure TypeScript and owns surfaces, components,
+  blocks, themes, and port contracts.
+- `@flyingrobots/bijou-node` adapts those ports to Node.js, terminal IO,
+  filesystem access, and host environment detection.
+- `@flyingrobots/bijou-tui` owns the interactive TEA runtime, key/input
+  routing, layout, animation, and render pipeline.
+- `@flyingrobots/bijou-tui-app` owns the batteries-included framed shell.
+- `create-bijou-tui-app` gives app authors a project scaffold instead of
+  asking them to assemble the shell manually.
+- i18n packages are split between runtime lookup and authoring/workflow tools
+  so apps do not import CSV, TSV, XLSX, or filesystem tooling at runtime.
+
+That split adds workspace setup cost, but it keeps pure rendering independent
+from host IO and lets small CLIs avoid full TUI shell dependencies.
+
 ## 1) Create package scaffold
 
 Create a package directory under `packages/<name>/` with:

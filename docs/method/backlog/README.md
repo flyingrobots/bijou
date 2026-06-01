@@ -1,18 +1,22 @@
-# METHOD Backlog
+# METHOD Backlog Evidence
 
-This directory is the canonical live backlog for Bijou.
+This directory is retained as Method evidence and release lineage.
 
-Use METHOD backlog lanes for any work that is still active, still being
-shaped, or still waiting to be pulled into a cycle.
+GitHub Issues are now the canonical live tracker for Bijou work. Use open
+issues and their labels to answer what is active, blocked, queued, or ready to
+pull. Do not create a new file here for normal work intake.
 
-## Lanes
+## Historical Lanes
 
-- [`inbox/`](./inbox/README.md) — raw captures that have not been triaged yet
-- [`asap/`](./asap/README.md) — imminent work to pull next
-- [`up-next/`](./up-next/README.md) — queued after `asap/`
-- [`bad-code/`](./bad-code/README.md) — technical debt that still needs correction
-- [`cool-ideas/`](./cool-ideas/README.md) — interesting but not yet committed work
-- `vX.Y.Z/` — temporary shaped-release lanes when a release still has grouped blockers
+These directories remain for compatibility with older links and for historical
+context:
+
+- [`inbox/`](./inbox/README.md) — older raw captures
+- [`asap/`](./asap/README.md) — older imminent work snapshots
+- [`up-next/`](./up-next/README.md) — older queued work snapshots
+- [`bad-code/`](./bad-code/README.md) — older technical-debt records
+- [`cool-ideas/`](./cool-ideas/README.md) — older exploratory ideas
+- `vX.Y.Z/` — shaped-release snapshots retained for lineage
 
 ## Release Lanes
 
@@ -24,3 +28,15 @@ shaped, or still waiting to be pulled into a cycle.
 
 - [`../retro/`](../retro/README.md) — finished ideas and completed lineage
 - [`../graveyard/`](../graveyard/README.md) — superseded or abandoned ideas
+
+## Current Tracker Labels
+
+Use GitHub labels for live state:
+
+- `lane:inbox` — raw intake
+- `lane:asap` — imminent work
+- `lane:bad-code` — technical debt cleanup
+- `lane:cool-ideas` — optional exploration
+- `lane:release` — release-boundary work
+- `work-in-progress` — branch or PR currently carrying the issue
+- `blocked` — progress is waiting on a decision or external state

@@ -6,8 +6,37 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 📚 Documentation
+
+- **Issues-first Method intake** — Contributor and Method docs now describe
+  GitHub Issues as Bijou's live work tracker, define the `lane:*` and
+  `work-in-progress` labels for contributors, and reframe
+  `docs/method/backlog/`, `retro/`, and `graveyard/` as evidence and archive
+  surfaces rather than the first intake path.
+- **Day 0 onboarding bridge** — The README now exposes the documentation map
+  and GUIDE earlier, explains the first-app package imports and staged Surface /
+  TEA / Cmd / Msg concepts, adds `npm run app-frame`, and links a framed-app
+  tutorial that sits between the counter and DOGFOOD.
+- **DOGFOOD terminal guardrails** — The DOGFOOD entrypoint now requires both
+  stdin and stdout to be attached to a TTY, points non-interactive callers to
+  `npm run smoke:dogfood`, and prints explicit quit controls before launching
+  the full-screen docs app.
+- **Node bootstrap diagnostics** — `@flyingrobots/bijou-node` docs now explain
+  `BijouBootstrapError` reason, hint, and cause fields, common startup failure
+  modes, and when tests should use an explicit context instead of ambient Node
+  process state.
+- **Cross-platform contributor path** — README and CONTRIBUTING now state the
+  supported OS verification posture, distinguish Node-first contributor scripts
+  from Linux-hosted release/benchmark jobs, and call out macOS/Windows Node 22
+  CI coverage.
+
 ### ✨ Features
 
+- **Runtime guardrails for queues and pipeline middleware** —
+  `@flyingrobots/bijou-tui` now exposes EventBus command diagnostics, emits
+  command backpressure warnings when pending commands cross a configurable
+  threshold, and diagnoses async render middleware so accidental Promise-based
+  render stages cannot silently stall or resume the frame pipeline out of order.
 - **Responsive `table()` layout and variants** — `table()` now fits human-mode
   output to the available terminal width by default, wraps constrained cells at
   word boundaries, and exposes `layout: "intrinsic"` for the old content-sized

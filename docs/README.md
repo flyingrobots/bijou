@@ -4,11 +4,9 @@ This is the repo documentation map for Bijou. Documentation is organized by
 intent. Do not audit the repository by recursively walking the filesystem;
 follow the entrypoints below.
 
-## Current Truth
-
-If you want the current-truth docs lane, start with the root README, this repo
-documentation map, and the signposts below before you drift into historical or
-reference material.
+Current Truth: start with the root README, this repo documentation map, and the
+entrypoints below. For live work tracking, use open GitHub Issues and labels;
+`docs/method/` preserves evidence and history.
 
 ## Entrypoints
 
@@ -20,6 +18,7 @@ reference material.
 | **[ARCHITECTURE.md](../ARCHITECTURE.md)** | Structural reference: ports, adapters, and package responsibilities. |
 | **[ADVANCED_GUIDE.md](../ADVANCED_GUIDE.md)** | Deep dives: pipeline, motion, shaders, and proving workflows. |
 | **[Terminal Scenarios](./guides/terminal-scenarios.md)** | End-to-end guide for colored output, forms, TUI apps, and shader renderers. |
+| **[Framed App Tutorial](./guides/framed-app-tutorial.md)** | Middle path between the tiny counter and DOGFOOD-scale framed apps. |
 
 ## Doctrine and Direction
 
@@ -28,7 +27,7 @@ reference material.
 | **[VISION](./VISION.md)** | Core tenets and project identity. |
 | **[BEARING](./BEARING.md)** | Current direction and active tensions. |
 | **[METHOD](./METHOD.md)** | Repo work doctrine: backlog lanes and the cycle loop. |
-| **[method/backlog/README.md](./method/backlog/README.md)** | Live queue: backlog lanes and shaped release lanes. |
+| **[method/backlog/README.md](./method/backlog/README.md)** | Historical evidence: older backlog lanes and shaped release lineage. |
 | **[strategy/README.md](./strategy/README.md)** | Doctrine map: living strategy notes vs historical planning artifacts. |
 | **[Design Cycles](./design/README.md)** | Active and landed cycle design docs. |
 | **[Legends](./legends/README.md)** | Thematic intent by lane and doctrine family. |
