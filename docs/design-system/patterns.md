@@ -346,6 +346,7 @@ Variants:
 - `variant: "plain"` renders aligned columns with spaces and no rules
 - `variant: "markdown"` renders a GitHub-flavored Markdown pipe table
 - `variant: "definition"` renders two-column field/value reports
+- `variant: "expanded"` renders psql-style record inspection
 
 Examples:
 
@@ -380,6 +381,11 @@ definition
 Field  Value
 ━━━━━  ━━━━━━
 State  active
+
+expanded
+-[ RECORD 1 ]------------
+Name  | Alice
+State | active
 ```
 
 Lowering:

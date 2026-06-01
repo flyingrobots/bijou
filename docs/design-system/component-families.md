@@ -829,6 +829,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `table({ variant: "ascii-grid" })` for portable `+---+` output
   - `table({ variant: "markdown" })` for GitHub-flavored Markdown table text
   - `table({ variant: "definition" })` for field/value reports
+  - `table({ variant: "expanded" })` for psql-style record inspection
   - `tableSurface()` for passive comparison in V3 surface-first output
   - `navigableTable()` for keyboard-owned inspection in the TUI layer
   - `navigableTableSurface()` for keyboard-owned inspection on the structured surface path
