@@ -64,11 +64,14 @@ function isResetEscape(raw: string): boolean {
   return raw === RESET_SGR;
 }
 
-const OSC8_CLOSE = '\x1b]8;;\x1b\\';
-const OSC8_CLOSE_BEL = '\x1b]8;;\x07';
+const ESC = String.fromCharCode(27);
+const BEL = String.fromCharCode(7);
+const OSC8_PREFIX = `${ESC}]8;;`;
+const OSC8_CLOSE = `${OSC8_PREFIX}${ESC}\\`;
+const OSC8_CLOSE_BEL = `${OSC8_PREFIX}${BEL}`;
 
 function isOsc8Escape(raw: string): boolean {
-  return raw.startsWith('\x1b]8;;');
+  return raw.startsWith(OSC8_PREFIX);
 }
 
 function isOsc8Close(raw: string): boolean {
