@@ -681,7 +681,8 @@ describe('docs preview app', () => {
         state: undefined as never,
         timeMs: 0,
       });
-      return typeof preview === 'string' ? preview : '';
+      if (typeof preview === 'string') return preview;
+      return frameText(normalizeViewOutput(preview, { width: 60, height: 24 }).surface);
     };
 
     expect(renderVariant('box')).toContain('┌');
@@ -698,6 +699,7 @@ describe('docs preview app', () => {
     expect(renderVariant('pipe-csv')).toContain('"Exports rows to TSV, CSV, Markdown, or ASCII grid."');
     expect(renderVariant('pipe-markdown')).toContain('| Component');
     expect(renderVariant('pipe-ascii-grid')).toContain('+');
+    expect(renderVariant('focused-inspection')).toContain('focused table');
   });
 
   it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
