@@ -1,3 +1,7 @@
+---
+last_updated: 2026-06-01
+---
+
 # Bijou Technical Teardown
 
 This document is an end-to-end explanation of the Bijou repository as it stands
@@ -9,9 +13,11 @@ The Elm Architecture, or the repository's history.
 ### Table Of Contents
 
 - [Executive Summary](#executive-summary)
+- [Visual Capture Artifacts](#visual-capture-artifacts)
 - [A "Domain Dictionary" (Glossary)](#a-domain-dictionary-glossary)
 - [Where This Project Stands](#where-this-project-stands)
 - [Package Overview](#package-overview)
+- [Package Deep Dives](#package-deep-dives)
 - [External Dependencies And Borders](#external-dependencies-and-borders)
 - [Bootstrapping And Runtime](#bootstrapping-and-runtime)
 - [The Entry Point](#the-entry-point)
@@ -20,6 +26,7 @@ The Elm Architecture, or the repository's history.
 - [Golden Paths](#golden-paths)
 - [Unhappy Paths And Error Handling](#unhappy-paths-and-error-handling)
 - [Concurrency And Asynchronous Flows](#concurrency-and-asynchronous-flows)
+- [Runtime Systems Deep Dive](#runtime-systems-deep-dive)
 - [Extreme Detail And Highlights](#extreme-detail-and-highlights)
 - [Test Coverage](#test-coverage)
 - [Use Cases](#use-cases)
@@ -48,6 +55,9 @@ mindmap
       Render Pipeline
       AppFrame
       Motion
+      Animation Commands
+      Surface Shaders
+      Transition Shaders
     Node Host
       RuntimePort
       IOPort
@@ -60,9 +70,11 @@ mindmap
       Blocks Section
       Search
       Locale Settings
+      VHS Captures
     i18n
       Runtime Catalogs
       LocalizationPort
+      LocalizedObject
       CSV Source Table
       Export Tools
     MCP
@@ -131,16 +143,18 @@ package is the boundary where Bijou intentionally touches `process.stdin`,
 as `chalk`.
 
 ```mermaid
-flowchart TD
-    UserInput["Keyboard, mouse, resize, timer pulse"] --> EventBus["bijou-tui EventBus"]
-    EventBus --> Update["app.update(msg, model)"]
-    Update --> Model["Next in-memory model"]
-    Update --> Commands["Cmd list"]
-    Commands --> EventBus
-    Model --> View["app.view(model)"]
-    View --> LayoutOrSurface["Surface or LayoutNode"]
-    LayoutOrSurface --> Pipeline["Layout, Paint, PostProcess, Diff, Output"]
-    Pipeline --> Terminal["stdout ANSI bytes"]
+stateDiagram-v2
+    [*] --> WaitingForInput
+    WaitingForInput --> Updating: key / mouse / resize / pulse / command msg
+    Updating --> RunningCommands: update returns Cmds
+    Updating --> Rendering: model changed or resize
+    RunningCommands --> WaitingForInput: command still pending
+    RunningCommands --> Updating: command emits Msg
+    Rendering --> Diffing: view returns Surface or LayoutNode
+    Diffing --> WaitingForInput: output written
+    Updating --> CrashMode: update throws
+    Rendering --> CrashMode: view or render throws
+    CrashMode --> [*]: quit or non-TTY auto-exit
 ```
 
 ### Current Version And Next Work
@@ -159,6 +173,80 @@ an MCP server, benchmark scenarios, and a Method-based work tracker. The most
 important remaining tension is that the semantic architecture is ahead of some
 visible product surfaces. The next release needs to close that gap without
 widening into every queued DOGFOOD and component-family audit.
+
+## Visual Capture Artifacts
+
+### DOGFOOD Landing Capture
+
+The repository already contains VHS-generated DOGFOOD captures. These are not
+decorative screenshots pasted into the docs after the fact; they are generated
+from checked-in `.tape` files that launch the real DOGFOOD app through a
+capture-specific entry point. The landing capture is produced by
+`examples/docs/landing.tape` and written to `examples/docs/landing.gif`.
+
+![DOGFOOD landing screen captured with VHS](../examples/docs/landing.gif)
+
+The tape fixes the terminal dimensions, font, theme, and padding so the result
+is reproducible enough for documentation review:
+
+```text
+Output "examples/docs/landing.gif"
+Set Shell zsh
+Set FontFamily "Monaspace Radon NF"
+Set Width 1280
+Set Height 720
+Set Theme "Catppuccin Mocha"
+Type "exec sh -c '... DOGFOOD_CAPTURE_SCENARIO=landing ./node_modules/.bin/tsx examples/docs/capture-main.ts ...'"
+```
+
+### DOGFOOD Walkthrough Capture
+
+The full DOGFOOD walkthrough capture is produced by `examples/docs/dogfood.tape`
+and written to `examples/docs/dogfood.gif`. This capture matters because it
+shows the actual shell behavior: page switching, guide selection, settings,
+command/search overlay behavior, and clean exit.
+
+![DOGFOOD documentation walkthrough captured with VHS](../examples/docs/dogfood.gif)
+
+The capture app wraps the normal docs app and injects an autoplay command. That
+keeps the source of truth in the real application while still making the demo
+repeatable:
+
+```ts
+function autoplayCmd(scenario: CaptureScenario): Cmd<CaptureMsg> {
+  return async (emit, capabilities) => {
+    const sleep = capabilities.sleep ?? ((ms: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, ms)));
+    for (const step of scenario.steps) {
+      await sleep(Math.max(0, Math.round(step.delayMs * scenario.pace)));
+      emit(keyMsg(step) as CaptureMsg);
+    }
+  };
+}
+```
+
+### Component And Motion Captures
+
+The examples directory contains additional VHS captures for components and
+motion-heavy examples. Two particularly useful artifacts for this teardown are
+the responsive table demo and the spring animation demo.
+
+![Responsive table example captured with VHS](../examples/table/demo.gif)
+
+![Spring animation example captured with VHS](../examples/spring/demo.gif)
+
+Those captures can be regenerated with VHS directly:
+
+```bash
+vhs examples/table/demo.tape
+vhs examples/spring/demo.tape
+npm run record:dogfood:gifs
+```
+
+This visual layer is important because terminal UI quality is hard to assess
+from prose alone. A static explanation can say that tables resize, motion
+settles, and DOGFOOD is a real shell. VHS captures let reviewers inspect that
+claim as terminal behavior.
 
 ## A "Domain Dictionary" (Glossary)
 
@@ -180,6 +268,10 @@ widening into every queued DOGFOOD and component-family audit.
 | [Block](#blocks-binding-and-semantic-product-surfaces) | A semantic product-surface contract with metadata, data requirements, command intents, modes, and render behavior. |
 | [BindingFrame](#blocks-binding-and-semantic-product-surfaces) | A data-binding assembly that records requirements, provider resolutions, facts, and status for semantic views. |
 | [Mode lowering](#golden-path-4-table-rendering-and-lowering) | Rendering the same semantic component differently for interactive, static, pipe, and accessible output. |
+| [Animation Command](#animation-system) | A TEA `Cmd` created by `animate()` that emits frame messages from spring or tween motion over runtime pulses. |
+| [Surface Shader](#surface-shader-system) | A post-process function that mutates a rendered `Surface` by applying effects such as scanlines, flicker, noise, or vignette. |
+| [Transition Shader](#transition-shader-system) | A per-cell transition function that decides whether a page transition should show the previous or next surface cell. |
+| [LocalizationPort](#localization-system) | The app-facing i18n boundary that resolves structured localized objects and formatting helpers. |
 | [AppFrame](#golden-path-3-documentation-search) | The framed shell system that owns pages, tabs, panes, overlays, settings, search, command palette, and shell chrome. |
 | [MCP](#golden-path-5-mcp-component-rendering) | Model Context Protocol. Bijou exposes a stdio MCP server for structured component rendering tools. |
 | [i18n Catalog](#localization-payloads) | A namespace-scoped set of localized entries used by the runtime localization system. |
@@ -318,6 +410,221 @@ flowchart TD
     Tui --> Bench
     Node --> Bench
 ```
+
+## Package Deep Dives
+
+### `@flyingrobots/bijou`
+
+`@flyingrobots/bijou` is the foundation package. It owns the concepts that must
+remain meaningful even when there is no Node process, no terminal, no stdin,
+and no real stdout. That includes `Surface`, `Cell`, `LayoutNode`,
+`BijouContext`, theme tokens, mode detection, render-by-mode helpers,
+components, forms, Blocks, data-binding primitives, and test adapters.
+
+The package's most important design decision is that it treats terminal output
+as data first. A component can produce a string for simple cases, but the
+long-term architectural center is the `Surface`: a width, height, and cell
+buffer that can be measured, blitted, transformed, diffed, and inspected. This
+is why the package can support both simple utilities like `box()` and deeper
+systems such as block trees, responsive tables, semantic bindings, and
+mode-aware authoring.
+
+The package has no runtime dependencies. That is not incidental. The core
+needs to be importable in tests, MCP render tools, benchmarks, and future host
+adapters without dragging in a terminal host. The trade-off is that anything
+which needs host facts must receive a `BijouContext` or use a context resolver.
+That explicitness is the price of keeping the core portable.
+
+### `@flyingrobots/bijou-tui`
+
+`@flyingrobots/bijou-tui` is the interactive engine. It owns the TEA runtime,
+EventBus, commands, key and mouse parsing, screen control, layout helpers,
+motion, animation, transition shaders, surface shaders, AppFrame, command
+palette, focus routing, panes, overlays, notifications, and the programmable
+render pipeline.
+
+This package exists because a full-screen terminal app has different concerns
+from one-shot CLI output. It must enter and leave alternate screen mode,
+normalize raw input, respond to resize, schedule render work, keep animation
+pulses moving, route shell and page messages, diff framebuffers, and clean up
+long-lived effects. Putting that behavior in the TUI package keeps the core
+small while still making the runtime reusable by DOGFOOD, examples, tests, and
+external apps.
+
+The runtime's key architectural choice is to centralize all inputs through an
+EventBus and all rendering through a synchronous pipeline. The EventBus makes
+keyboard, resize, mouse, pulse, command, and custom messages look like one
+stream. The pipeline makes frame work inspectable as `Layout`, `Paint`,
+`PostProcess`, `Diff`, and `Output`. Together they produce a deterministic
+application model: messages update state, state renders a frame, and side
+effects return through commands instead of hidden mutation.
+
+### `@flyingrobots/bijou-node`
+
+`@flyingrobots/bijou-node` is the official Node host adapter package. It owns
+`nodeRuntime`, `nodeIO`, `chalkStyle`, `createNodeContext`,
+`initDefaultContext`, `startApp`, scoped filesystem I/O, worker helpers, and
+recorder utilities. It is the package that intentionally crosses from Bijou's
+portable abstractions into Node's process, filesystem, terminal, timers, and
+third-party host libraries.
+
+The host adapter is deliberately more than a pile of re-exports. It defines
+bootstrap behavior and failure semantics. `initDefaultContext` refuses a zero
+column/row terminal, wraps host setup failures in `BijouBootstrapError`, and
+gives actionable hints. `startApp` chooses the simple path for hosted apps
+while still letting advanced callers pass an explicit context.
+
+The scoped I/O adapter is a security and correctness boundary. It lets a host
+constrain file reads and path joins to a declared root, resolving realpaths so
+symlink escape behavior can be reasoned about. That matters because the core
+port says "read a file"; the Node adapter decides how safe that operation is in
+a real filesystem.
+
+### `@flyingrobots/bijou-tui-app`
+
+`@flyingrobots/bijou-tui-app` is the higher-level app-shell starter. It exists
+for users who want a framed app but do not want to assemble shell chrome,
+pages, drawer behavior, split panes, quit modal behavior, footer rows, tab
+switching, and default command palette wiring from the lower-level primitives.
+
+The package's main export, `createTuiAppSkeleton`, turns a small tab
+description into a complete framed application. It builds FramePage
+definitions, default page models, split or drawer layouts, overlay stacks, and
+global key maps. In other words, it is not a rendering primitive. It is an
+opinionated application composition layer that demonstrates Bijou's preferred
+shape for multi-view terminal tools.
+
+The trade-off is that the skeleton makes choices. It assumes tabs, a header,
+footer rows, optional drawer work, and quit confirmation. That is exactly why
+it belongs in its own package: users who want those conventions get a fast
+path, and users who need bespoke runtime behavior can stay in
+`@flyingrobots/bijou-tui`.
+
+### `create-bijou-tui-app`
+
+`create-bijou-tui-app` is the project scaffolder. It is not part of runtime
+execution after an app is created. Its job is to turn a target directory into a
+runnable external Bijou TUI project, optionally install dependencies, and print
+platform-aware next steps.
+
+The scaffolder matters because Bijou has a real package stack. A new user could
+otherwise start by copying DOGFOOD or hand-wiring package imports, which would
+make the first experience far too complex. The scaffolder encodes the current
+starter shape in one command and keeps the generated path separate from the
+monorepo's internal examples.
+
+The CLI is intentionally conservative. Argument parsing and project creation
+are separated, install failures get a specific hint to retry with
+`--no-install`, and displayed shell paths are quoted differently on Windows and
+POSIX systems. This aligns with the repository's recent push to support newer
+Node versions and cross-platform contributor workflows.
+
+### `@flyingrobots/bijou-i18n`
+
+`@flyingrobots/bijou-i18n` is the runtime localization package. It owns
+catalogs, entries, references, fallback catalogs, selected-locale activation,
+formatting helpers, structured localization results, and the `LocalizationPort`
+that DOGFOOD and shell code consume.
+
+The key design decision is that localization does not collapse to `t(key) ->
+string` at the boundary. The runtime can return a `LocalizedObject` that
+preserves key, locale, fallback locale, direction, kind, status, value, issues,
+and facts. That structure lets DOGFOOD and tests distinguish translated text
+from fallback text and missing text, which is essential for honest localization
+coverage.
+
+The runtime also enforces a portability boundary for resource/data payloads.
+Localized data must be JSON-shaped. Functions, symbols, sparse arrays, accessors,
+cycles, and class instances are rejected. This is strict, but it prevents an
+i18n catalog from becoming a hidden executable object graph.
+
+### `@flyingrobots/bijou-i18n-tools`
+
+`@flyingrobots/bijou-i18n-tools` is the provider-neutral localization workflow
+package. It handles source string-table workflows, catalog compilation,
+exchange formats, pseudo-localization, stale detection, and workflow logic that
+does not need Node filesystem access.
+
+This package is separate from the runtime because authoring workflows are not
+runtime lookup. Translators, source tables, generated catalogs, coverage
+reports, and pseudo-locales belong in tooling. Runtime applications should load
+compiled catalogs and resolve keys; they should not parse spreadsheet workflows
+while rendering frames.
+
+The package's role in the domain is to keep localization honest and repeatable.
+DOGFOOD's CSV source table can be converted into runtime JSON catalogs and
+checked in CI. That means localized UI is not a hand-edited scatter of strings
+across source code.
+
+### `@flyingrobots/bijou-i18n-tools-node`
+
+`@flyingrobots/bijou-i18n-tools-node` provides Node filesystem adapters for the
+localization tooling. It reads and writes string tables, generated catalog
+files, and bundle artifacts using Node host APIs while keeping the provider
+neutral logic in `@flyingrobots/bijou-i18n-tools`.
+
+This split mirrors the broader Bijou architecture. The workflow logic is a
+portable core; filesystem I/O is a host adapter. That makes it possible to test
+catalog transformations separately from file access and leaves room for other
+hosts or storage backends later.
+
+In DOGFOOD practice, this package supports commands such as
+`dogfood:i18n:build`, `dogfood:i18n:check`, `dogfood:i18n:export`, and
+`dogfood:i18n:coverage`. It is part of the release proof surface because it
+turns source localization data into the runtime catalogs the app actually
+loads.
+
+### `@flyingrobots/bijou-i18n-tools-xlsx`
+
+`@flyingrobots/bijou-i18n-tools-xlsx` owns spreadsheet exchange. It adapts the
+provider-neutral i18n workflow to XLSX workbooks through SheetJS. This is useful
+because translators and localization vendors commonly work in spreadsheet-like
+formats even when the runtime application consumes JSON catalogs.
+
+The package is intentionally narrow. It should not decide runtime fallback
+policy, app locale state, or DOGFOOD UI behavior. Its role is border work:
+turning workbook data into the same structured localization workflow as CSV,
+TSV, or JSON exchange paths.
+
+The trade-off is another package in the monorepo, but the boundary is worth it.
+XLSX support brings a heavy and specific dependency. Keeping it isolated
+prevents spreadsheet concerns from entering the core i18n runtime or ordinary
+Node catalog file adapters.
+
+### `@flyingrobots/bijou-mcp`
+
+`@flyingrobots/bijou-mcp` exposes Bijou rendering over the Model Context
+Protocol. It creates an MCP server, registers first-party render tools, adds a
+`bijou_docs` discovery tool, validates inputs with `zod`, renders with Bijou,
+and returns text and structured content over stdio.
+
+The MCP package is valuable because agents often need rich terminal-style
+output without owning a live terminal. A tool call can ask for a table, DAG,
+box, badge, timeline, or docs entry and receive deterministic output. This is
+not a replacement for the TUI runtime. It has no alternate screen, no input
+loop, no AppFrame, no animation loop, and no live diffing.
+
+The design keeps protocol concerns outside the core. MCP has its own server
+transport, schema conventions, and result format. By isolating those in
+`@flyingrobots/bijou-mcp`, the core components remain ordinary renderers and
+the runtime remains a terminal app engine rather than a protocol server.
+
+### `@flyingrobots/bijou-bench`
+
+`@flyingrobots/bijou-bench` is the private benchmark package. It runs scenarios
+for paint, diff, wall-time formatting, gradient rendering, soak behavior, and
+performance baselines. Its job is to keep visual ambition connected to runtime
+cost.
+
+Benchmarks matter here because Bijou deliberately uses richer abstractions than
+plain strings. Surface grids, packed cells, RGB diffing, shaders, and
+full-screen frame loops can become expensive if nobody watches the hot paths.
+The benchmark package gives the project a place to measure those decisions
+without turning every component test into a performance test.
+
+The package depends on the workspace packages because it is testing integrated
+behavior. It is private because benchmark harnesses and baselines are project
+infrastructure, not a public runtime API.
 
 ## External Dependencies And Borders
 
@@ -829,19 +1136,18 @@ shows the phase, error detail, and a JSON-formatted model snapshot when
 serialization succeeds.
 
 ```mermaid
-flowchart TD
-    Message["Incoming message"] --> Update["app.update"]
-    Update --> UpdateOk{"update ok?"}
-    UpdateOk -->|yes| Render["schedule render"]
-    UpdateOk -->|no| Crash["enterCrashMode(update)"]
-    Render --> View["app.view"]
-    View --> ViewOk{"view/render ok?"}
-    ViewOk -->|yes| Diff["diff and output"]
-    ViewOk -->|no| CrashRender["enterCrashMode(render)"]
-    Crash --> TTY{"stdin is TTY?"}
-    CrashRender --> TTY
-    TTY -->|yes| Wait["show crash surface and wait for Enter"]
-    TTY -->|no| Exit["shutdown automatically"]
+stateDiagram-v2
+    [*] --> MessageReceived
+    MessageReceived --> Updating
+    Updating --> Rendering: update ok
+    Updating --> CrashMode: update throws
+    Rendering --> Diffing: view/render ok
+    Rendering --> CrashMode: view/render throws
+    Diffing --> [*]: output written
+    CrashMode --> WaitingForAcknowledgement: stdin is TTY
+    CrashMode --> Shutdown: stdin is not TTY
+    WaitingForAcknowledgement --> Shutdown: Enter
+    Shutdown --> [*]
 ```
 
 ### Command Rejections And Backpressure
@@ -932,6 +1238,241 @@ stateDiagram-v2
     ShuttingDown --> [*]
 ```
 
+## Runtime Systems Deep Dive
+
+### Animation System
+
+The animation system lives in `@flyingrobots/bijou-tui`, primarily in
+`animate.ts` and `spring.ts`. Its important architectural feature is that an
+animation is not an ambient timer that mutates UI state. `animate()` returns a
+TEA `Cmd`. That command subscribes to runtime pulses, computes intermediate
+values, emits ordinary messages, and resolves when the animation settles or
+completes.
+
+That shape keeps the source of truth in the app model. The command owns
+temporary spring or tween state while it is running, but every visible motion
+frame must still re-enter `update` as a message and write the next animated
+value into the model. The next render then reads that model like any other app
+state. This is why motion can be tested with pulse messages and why a reduced
+or immediate path can be represented as one emitted frame instead of a separate
+rendering system.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Requested
+    Requested --> ImmediateFrame: immediate true
+    Requested --> PulseSubscribed: spring or tween command starts
+    PulseSubscribed --> AccumulatingDt: pulse arrives
+    AccumulatingDt --> Stepping: fixed step available
+    Stepping --> EmittingFrame: value changed
+    EmittingFrame --> PulseSubscribed: not settled
+    EmittingFrame --> Completed: settled or duration elapsed
+    ImmediateFrame --> Completed
+    Completed --> [*]
+```
+
+A representative animation command looks like this:
+
+```ts
+return [model, [
+  animate<Msg>({
+    from: model.drawerOffset,
+    to: nextOpen ? 0 : -drawerWidth,
+    spring: 'gentle',
+    onFrame: (value) => ({ type: 'drawer-motion-frame', value }),
+    onComplete: () => ({ type: 'drawer-motion-complete' }),
+  }),
+]];
+```
+
+The spring engine uses a damped harmonic oscillator. In practical terms, it
+computes a restoring force toward the target, subtracts damping from the
+current velocity, divides by mass, and integrates velocity and value. The code
+uses semi-implicit Euler integration and marks the spring done when both
+velocity and target distance fall below the configured precision.
+
+```ts
+const displacement = state.value - target;
+const springForce = -stiffness * displacement;
+const dampingForce = -damping * state.velocity;
+const acceleration = (springForce + dampingForce) / mass;
+
+const velocity = state.velocity + acceleration * dt;
+const value = state.value + velocity * dt;
+```
+
+The implementation also caps accepted pulse time and steps springs at a stable
+fixed interval. That trades a little implementation complexity for predictable
+motion after delayed frames. A long pause should not make a drawer jump through
+an arbitrarily large physics step.
+
+### Surface Shader System
+
+Surface shaders are post-process render middleware. They run after the normal
+view, layout, and paint work has produced a target surface, but before diffing
+compares that target to the previous frame. Their job is to transform the
+rendered surface as a whole, applying effects such as scanlines, flicker,
+per-cell noise, or vignette shading.
+
+The state of a surface shader is deliberately small. The middleware keeps a
+frame counter and receives `dt`, width, and height through a
+`SurfaceShaderContext`. The rendered cells themselves live in
+`state.targetSurface`. For packed surfaces, the shader edits the packed RGB
+buffer and marks the surface dirty. For ordinary surfaces, it reads and writes
+cell objects. Both paths preserve the same public idea: the shader mutates the
+target surface before diffing.
+
+```mermaid
+sequenceDiagram
+    participant Runtime as Render pipeline
+    participant Paint as Paint stage
+    participant Shader as surfaceShaderFilter
+    participant Surface as targetSurface
+    participant Diff as Diff stage
+    Runtime->>Paint: paint view output
+    Paint-->>Runtime: targetSurface filled
+    Runtime->>Shader: post-process state
+    Shader->>Surface: shade packed buffer or cell grid
+    Shader-->>Runtime: next middleware
+    Runtime->>Diff: compare targetSurface to currentSurface
+```
+
+A shader stack is just middleware composition:
+
+```ts
+const postProcess = surfaceShaderFilter(
+  scanlines({ dimFactor: 0.82 }),
+  flicker({ minFactor: 0.97, maxFactor: 1.02 }),
+  vignette({ edgeFactor: 0.74 }),
+);
+```
+
+This system is intentionally separate from transition shaders. A surface shader
+does not choose between old and new pages. It receives one already-rendered
+surface and modifies its appearance. That makes it useful for atmospheric
+effects, instrumentation overlays, and demo surfaces, but it should not become
+the mechanism for app state or layout decisions.
+
+### Transition Shader System
+
+Transition shaders are pure per-cell functions used by page transitions. A
+transition shader receives cell coordinates, terminal dimensions, progress,
+stable random input, a frame counter, and the context. It returns whether that
+cell should show the next surface, and it may also return an override character
+or override cell for transition decoration.
+
+```ts
+export interface TransitionCell {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly progress: number;
+  readonly rand: number;
+  readonly frame: number;
+  readonly ctx: BijouContext;
+}
+
+export interface TransitionResult {
+  readonly showNext: boolean;
+  readonly overrideChar?: string;
+  readonly overrideCell?: Cell;
+  readonly overrideRole?: 'decoration' | 'marker';
+}
+```
+
+```mermaid
+classDiagram
+    class TransitionCell {
+      +x number
+      +y number
+      +width number
+      +height number
+      +progress number
+      +rand number
+      +frame number
+    }
+    class TransitionShaderFn {
+      +call(cell) TransitionResult
+    }
+    class TransitionResult {
+      +showNext boolean
+      +overrideChar string?
+      +overrideCell Cell?
+      +overrideRole role?
+    }
+    TransitionShaderFn --> TransitionCell
+    TransitionShaderFn --> TransitionResult
+```
+
+The built-ins include direct cuts, wipes, dissolves, grids, radial reveals,
+diamonds, spirals, blinds, curtains, pixelation, typewriter markers, glitch,
+static, matrix-like decoration, and scramble effects. Factories parameterize
+direction or origin. Combinators such as reverse, chain, and overlay compose
+effects without rewriting the cell loop.
+
+The design trade-off is that every transition is constrained to a cell-local
+decision. That avoids hidden layout coupling and makes shaders easy to reason
+about, but it also means transitions that require global content analysis
+belong outside this API or need a higher-level precomputation step.
+
+### Localization System
+
+The localization system spans `@flyingrobots/bijou-i18n`, the i18n tools
+packages, and DOGFOOD. The runtime package owns catalog lookup and structured
+results. The tools packages own source tables, generated catalogs, export
+formats, pseudo-localization, stale checks, and file/workbook adapters.
+DOGFOOD consumes the runtime through a `LocalizationPort`.
+
+The key point is that localization is not simply string substitution.
+`LocalizedObject` preserves key, locale, fallback locale, direction, entry
+kind, status, value, issues, and facts. That gives the app and tests enough
+information to distinguish translated text from fallback text and genuinely
+missing text.
+
+```mermaid
+sequenceDiagram
+    participant Source as CSV source table
+    participant Tools as i18n tools
+    participant Catalog as generated locale catalogs
+    participant Runtime as I18nRuntime
+    participant Port as LocalizationPort
+    participant Dogfood as DOGFOOD render code
+    Source->>Tools: build/check/export
+    Tools->>Catalog: write JSON catalogs
+    Catalog->>Runtime: loadCatalog(...)
+    Dogfood->>Port: resolve({ key, values })
+    Port->>Runtime: localize(request)
+    Runtime-->>Port: LocalizedObject
+    Port-->>Dogfood: structured translated/fallback/missing result
+```
+
+DOGFOOD creates its runtime with an explicit selected locale, fallback locale,
+fallback catalogs, and optional missing-message marker. Then it wraps that
+runtime with `createRuntimeLocalizationPort`.
+
+```ts
+const runtime = createI18nRuntime({
+  locale: resolveDogfoodRuntimeLocale(options),
+  direction: options.direction ?? initialLocale.direction,
+  fallbackLocale: DEFAULT_LOCALE.id,
+  fallbackCatalogs: dogfoodI18nCatalogsForLocale(DEFAULT_LOCALE.id),
+  missingMessage: showMissingLocalizationMarkers
+    ? dogfoodMissingLocalizationMessage
+    : undefined,
+});
+runtime.loadCatalog(FRAME_I18N_CATALOG);
+loadDogfoodRuntimeCatalogs(runtime, initialLocale.id, options.extraI18nCatalogs ?? []);
+const localization = createRuntimeLocalizationPort(runtime);
+```
+
+The source of truth moves across phases. During authoring, the source table is
+the human-editable truth. During runtime, compiled catalogs and the selected
+locale in memory are the lookup truth. During rendering, the app model and
+resolved `LocalizedObject` values decide what appears on the surface. Locale
+preference persistence is a host concern owned by DOGFOOD's Node locale port,
+not by the core rendering package.
+
 ## Extreme Detail And Highlights
 
 ### Surface Cells And Packed Rendering
@@ -955,23 +1496,19 @@ The default interactive render pipeline has five stages: `Layout`, `Paint`,
 diff the target surface against the current surface, and then swap buffers.
 
 ```mermaid
-flowchart TD
-    Layout["Layout stage<br/>view(model), layout root"]
-    Motion["Layout stage<br/>motion middleware"]
-    BCSS["Layout stage<br/>optional BCSS"]
-    Paint["Paint stage<br/>layout to targetSurface"]
-    Post["PostProcess stage<br/>custom shaders/instrumentation"]
-    Diff["Diff stage<br/>currentSurface vs targetSurface"]
-    Output["Output stage<br/>swap front/back buffers"]
-    Layout --> Motion
-    Motion --> BCSS
+stateDiagram-v2
+    [*] --> Layout
+    Layout --> MotionReconciliation
+    MotionReconciliation --> BCSS
     BCSS --> Paint
-    Paint --> Post
-    Post --> Diff
+    Paint --> PostProcess
+    PostProcess --> Diff
     Diff --> Output
+    Output --> [*]
 ```
 
-The runtime collects per-stage timings in `RenderState.data`. This makes render
+This diagram is a frame lifecycle rather than a branching decision graph. The
+runtime collects per-stage timings in `RenderState.data`. This makes render
 cost inspectable without turning timing into global mutable state. Surface
 budget warnings can be evaluated after render and routed as runtime issues.
 
@@ -1158,11 +1695,27 @@ real shell pressure is not as mature as it looks in isolation.
 
 ### Key Features
 
-Bijou's key features are surface-based rendering, mode-aware component
-lowering, a TEA runtime, a synchronous render pipeline, command-based effects,
-responsive terminal layout, a framed shell, global search and command palette,
-Block metadata and binding contracts, structured localization, DOGFOOD docs,
-MCP render tools, and benchmark support.
+| Feature | Where It Lives | Why It Matters |
+| :--- | :--- | :--- |
+| Surface-based rendering | `@flyingrobots/bijou` | Terminal output is inspectable cell data instead of an opaque string. |
+| Mode-aware lowering | `@flyingrobots/bijou` components | The same semantic component can render for interactive, static, pipe, or accessible contexts. |
+| Responsive tables | `@flyingrobots/bijou` table component | Tables fit terminal width, wrap content, and expose human and machine-oriented variants. |
+| TEA runtime | `@flyingrobots/bijou-tui` | App behavior is modeled as `init`, `update`, `view`, and commands. |
+| EventBus | `@flyingrobots/bijou-tui` | Key, mouse, resize, pulse, command, and app messages enter one predictable stream. |
+| Command effects | `@flyingrobots/bijou-tui` | Side effects return through explicit messages instead of hidden mutation. |
+| Synchronous render pipeline | `@flyingrobots/bijou-tui` | Frame work remains ordered, measurable, and bounded. |
+| Animation commands | `@flyingrobots/bijou-tui` animation system | Spring and tween motion integrates with TEA through pulse-driven commands. |
+| Surface shaders | `@flyingrobots/bijou-tui` post-process middleware | Full-surface visual effects can run after paint and before diffing. |
+| Transition shaders | `@flyingrobots/bijou-tui` transition system | Page transitions can be expressed as pure per-cell selection functions. |
+| AppFrame | `@flyingrobots/bijou-tui` | Multi-page apps get tabs, panes, overlays, search, settings, help, and command palette behavior. |
+| Framed app starter | `@flyingrobots/bijou-tui-app` | Users can start with a conventional shell without assembling every frame primitive manually. |
+| Blocks and binding | `@flyingrobots/bijou` | Product surfaces carry metadata, requirements, command intents, and mode behavior. |
+| Structured localization | `@flyingrobots/bijou-i18n` | UI text resolution preserves translated, fallback, and missing status. |
+| Localization tooling | i18n tools packages | Source tables, catalogs, pseudo-locales, and export checks keep i18n repeatable. |
+| DOGFOOD | `examples/docs` | The documentation app proves the framework through a real product shell. |
+| VHS captures | `examples/*/*.tape` and `examples/*/*.gif` | Visual behavior can be reviewed as terminal recordings, not only prose. |
+| MCP render tools | `@flyingrobots/bijou-mcp` | Agents can request deterministic component output without taking over a terminal. |
+| Benchmarks | `@flyingrobots/bijou-bench` | Paint, diff, gradient, and soak costs stay visible as the renderer gains features. |
 
 ### Design Decisions Worth Carrying Forward
 
@@ -1222,8 +1775,12 @@ The main source entry points reviewed were `packages/bijou/src/index.ts`,
 `packages/bijou-tui/src/runtime.ts`, `packages/bijou-tui/src/eventbus.ts`,
 `packages/bijou-tui/src/pipeline/pipeline.ts`, `packages/bijou-node/src/index.ts`,
 `packages/bijou-node/src/io.ts`, `packages/bijou-node/src/runtime.ts`,
-`packages/bijou-i18n/src/runtime.ts`, `packages/bijou-mcp/src/server.ts`,
-`examples/docs/main.ts`, `examples/docs/app.ts`, and `examples/docs/node-locale.ts`.
+`packages/bijou-tui/src/animate.ts`, `packages/bijou-tui/src/spring.ts`,
+`packages/bijou-tui/src/pipeline/middleware/surface-shaders.ts`,
+`packages/bijou-tui/src/transition-shaders.ts`, `packages/bijou-i18n/src/runtime.ts`,
+`packages/bijou-i18n/src/localization.ts`, `packages/bijou-mcp/src/server.ts`,
+`examples/docs/main.ts`, `examples/docs/app.ts`, `examples/docs/node-locale.ts`,
+and `examples/docs/capture-main.ts`.
 
 ### Validation Commands
 
