@@ -616,7 +616,8 @@ describe('docs preview app', () => {
     expect(renderVariant('header-rule')).toContain('---------');
     expect(renderVariant('plain')).toContain('Component');
     expect(renderVariant('markdown-table')).toContain('| Component');
-    expect(renderVariant('definition')).toContain('Merge method');
+    expect(renderVariant('definition')).toContain('Field');
+    expect(renderVariant('definition')).toContain('Value');
     expect(renderVariant('expanded')).toContain('-[ RECORD 1 ]');
     expect(renderVariant('pipe-tsv')).toContain('Component\tBehavior\tOwner');
     expect(renderVariant('pipe-csv')).toContain('Component,Behavior,Owner');

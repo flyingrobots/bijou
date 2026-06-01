@@ -1529,118 +1529,110 @@ const TABLE_STORY_ROWS: readonly (readonly string[])[] = [
 
 const TABLE_STORY_EXPANDED_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.slice(0, 2);
 
-const TABLE_STORY_DEFINITION_ROWS: readonly (readonly string[])[] = [
-  ['PR', 'https://github.com/flyingrobots/bijou/pull/121'],
-  ['State', 'DRAFT'],
-  ['Merge method', 'Normal merge commit via gh pr merge --merge --admin when ready.'],
-  ['History rewrite', 'None'],
-  ['Force operation', 'None'],
+const TABLE_STORY_DEFINITION_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.map(row => [
+  row[0] ?? '',
+  row[1] ?? '',
+]);
+
+const TABLE_STORY_NAV_WIDTHS = [12, 24, 5] as const;
+
+const TABLE_STORY_NAV_COLUMNS: readonly TableColumn[] = TABLE_STORY_COLUMNS.map((column, index) => ({
+  header: column.header,
+  width: TABLE_STORY_NAV_WIDTHS[index] ?? 12,
+  align: column.align,
+}));
+
+const TABLE_STORY_NAV_BEHAVIORS: readonly string[] = [
+  'Responsive visual table',
+  'Named visual styles',
+  'Explicit lowerings',
+  'Keyboard row focus',
 ];
 
-const TABLE_STORY_NAV_COLUMNS: readonly TableColumn[] = [
-  { header: 'Component', width: 12 },
-  { header: 'Behavior', width: 24 },
-  { header: 'Owner', width: 5, align: 'center' },
-];
-
-const TABLE_STORY_NAV_ROWS: readonly (readonly string[])[] = [
-  ['table()', 'Responsive visual table', 'core'],
-  ['variants', 'Named visual styles', 'API'],
-  ['pipeFormat', 'Explicit lowerings', 'pipe'],
-  ['nav table', 'Keyboard row focus', 'tui'],
-];
+const TABLE_STORY_NAV_ROWS: readonly (readonly string[])[] = TABLE_STORY_ROWS.map((row, index) => [
+  row[0] ?? '',
+  TABLE_STORY_NAV_BEHAVIORS[index] ?? row[1] ?? '',
+  row[2] ?? '',
+]);
 
 interface TableVisualVariantSpec {
   readonly id: string;
-  readonly label: string;
   readonly variant: TableVariant;
-  readonly description: string;
 }
 
 const TABLE_VISUAL_VARIANT_STORIES: readonly TableVisualVariantSpec[] = [
   {
     id: 'box',
-    label: 'Box',
     variant: 'box',
-    description: 'Default Unicode grid, now fitted to the profile width instead of growing without bound.',
   },
   {
     id: 'ascii-grid',
-    label: 'ASCII grid',
     variant: 'ascii-grid',
-    description: 'Portable boxed table for logs or terminals where Unicode box drawing is not the right contract.',
   },
   {
     id: 'ruled',
-    label: 'Heavy header, light rows',
     variant: 'ruled',
-    description: 'Report-style table with aligned columns, a heavy header rule, and light row separators.',
   },
   {
     id: 'header-rule',
-    label: 'Header rule only',
     variant: 'header-rule',
-    description: 'Compact comparison table with aligned columns and only a header separator.',
   },
   {
     id: 'plain',
-    label: 'Plain aligned',
     variant: 'plain',
-    description: 'Borderless aligned columns using spaces for terminal-safe visual alignment.',
   },
   {
     id: 'markdown-table',
-    label: 'Markdown table',
     variant: 'markdown',
-    description: 'GitHub-flavored pipe table for docs, PRs, issues, and copyable markdown output.',
   },
   {
     id: 'definition',
-    label: 'Definition table',
     variant: 'definition',
-    description: 'Two-column field/value layout for status reports and one-record summaries.',
   },
   {
     id: 'expanded',
-    label: 'Expanded records',
     variant: 'expanded',
-    description: 'psql-style record inspection for narrow terminals or many-column rows.',
   },
 ];
 
 interface TablePipeFormatSpec {
   readonly id: string;
-  readonly label: string;
   readonly pipeFormat: TablePipeFormat;
-  readonly description: string;
 }
 
 const TABLE_PIPE_FORMAT_STORIES: readonly TablePipeFormatSpec[] = [
   {
     id: 'pipe-tsv',
-    label: 'Pipe TSV',
     pipeFormat: 'tsv',
-    description: 'Default machine-oriented pipe lowering with tabs and escaped control characters.',
   },
   {
     id: 'pipe-csv',
-    label: 'Pipe CSV',
     pipeFormat: 'csv',
-    description: 'Spreadsheet-friendly comma-separated output with quote escaping.',
   },
   {
     id: 'pipe-markdown',
-    label: 'Pipe Markdown',
     pipeFormat: 'markdown',
-    description: 'Docs-friendly pipe lowering for README, issue, or PR bodies.',
   },
   {
     id: 'pipe-ascii-grid',
-    label: 'Pipe ASCII grid',
     pipeFormat: 'ascii-grid',
-    description: 'Opt-in human-readable pipe output while TSV remains the default.',
   },
 ];
+
+function tableStoryLabel(id: string): string {
+  return id
+    .split('-')
+    .map(word => word.length <= 3 ? word.toUpperCase() : `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
+}
+
+function tableVisualVariantDescription(spec: TableVisualVariantSpec): string {
+  return `Demonstrates table() variant ${spec.variant}.`;
+}
+
+function tablePipeFormatDescription(spec: TablePipeFormatSpec): string {
+  return `Demonstrates pipeFormat ${spec.pipeFormat}.`;
+}
 
 function tablePreviewWidth(width: number): number {
   return Math.max(28, Math.min(width, 64));
@@ -4384,8 +4376,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
     variants: [
       ...TABLE_VISUAL_VARIANT_STORIES.map(spec => ({
         id: spec.id,
-        label: spec.label,
-        description: spec.description,
+        label: tableStoryLabel(spec.id),
+        description: tableVisualVariantDescription(spec),
         render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tableVisualVariantPreview({
           width,
           ctx,
@@ -4395,8 +4387,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       })),
       ...TABLE_PIPE_FORMAT_STORIES.map(spec => ({
         id: spec.id,
-        label: spec.label,
-        description: spec.description,
+        label: tableStoryLabel(spec.id),
+        description: tablePipeFormatDescription(spec),
         render: ({ width, ctx }: { readonly width: number; readonly ctx: BijouContext }) => tablePipeFormatPreview({
           width,
           ctx,
