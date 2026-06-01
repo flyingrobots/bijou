@@ -66,5 +66,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
   - [DX-003 — Rationalize Table APIs and Public Table Types](../retro/DX_003-rationalize-table-apis-and-public-table-types.md)
   - [DX-001 — Type Framed App Messages and Updates End-to-End](../design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
   - [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
+- active cycle:
+  - [DX-036 — Responsive Table Layout and Variants](../../design/DX-036-responsive-table-layout-and-variants.md)
 - live backlog:
-  - [DX-036 — Responsive Table Layout and Variants](../backlog/up-next/DX-036-responsive-table-layout-and-variants.md)
+  - none right now

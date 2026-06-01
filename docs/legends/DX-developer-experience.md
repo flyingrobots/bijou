@@ -49,6 +49,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - active design draft:
+  - [DX-036 — Responsive Table Layout and Variants](../design/DX-036-responsive-table-layout-and-variants.md)
   - [DX-034 — Declarative View Data Binding](../design/DX-034-declarative-view-data-binding.md)
   - [DX-031 — Standard Bijou Blocks](../design/DX-031-standard-bijou-blocks.md)
 - latest completed closures:
