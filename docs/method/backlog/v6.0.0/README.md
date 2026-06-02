@@ -50,10 +50,14 @@ The boundary remains:
   beyond the first standard block set remains explicit later work instead of
   hidden v6 release scope.
 
-## Active Design Anchors
+## Landed Data Binding Anchor
 
 - [**DX-034**](../../../design/DX-034-declarative-view-data-binding.md) -
-  declarative view data binding
+  declarative view data binding landed through issue #182 with immutable
+  snapshots and frames, provider scopes, view data contracts, AppShell
+  composition, active binding lifecycle facts, active runtime binding
+  collection, provider-update frame assembly, command intent routing,
+  provider-bound AppShell proof, and DOGFOOD binding-state evidence.
 
 ## Core Runtime Scope
 

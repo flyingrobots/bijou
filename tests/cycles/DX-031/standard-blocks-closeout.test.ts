@@ -85,19 +85,13 @@ describe('DX-031 standard blocks closeout', () => {
     const roadmapOpenWork = sectionBetween(roadmap, '### Open Work', '### Completed Lineage');
     const roadmapCompletedLineage = sectionBetween(roadmap, '### Completed Lineage', '## v7.0.0');
 
-    expect(bearing).toContain('two open tracker items plus twenty-two');
     expect(bearing).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`');
-    expect(bearing).toContain('[#182](https://github.com/flyingrobots/bijou/issues/182)');
-    expect(bearing).toContain('[#186](https://github.com/flyingrobots/bijou/issues/186)');
 
-    expect(roadmap).toContain('| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 2 | 22 |');
     expect(roadmapOpenWork).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181)');
     expect(roadmapCompletedLineage).toContain('| [#181](https://github.com/flyingrobots/bijou/issues/181) | `lane:release` | `type:enhancement` | DX-031 standard Bijou blocks |');
 
     expect(backlog).toContain('## Landed Standard Blocks Anchor');
     expect(backlog).toContain('issue #181');
-    expect(backlog).toContain('## Active Design Anchors');
-    expect(backlog).toContain('DX-034');
   });
 });
 
