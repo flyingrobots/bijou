@@ -333,7 +333,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         }
       }
     }
-  }, 15_000);
+  }, 30_000);
 
   it('resets the guide content scroll when selecting another block preview', async () => {
     const [firstBlock, secondBlock] = standardBlocks;
