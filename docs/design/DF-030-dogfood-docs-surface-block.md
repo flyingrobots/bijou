@@ -4,7 +4,7 @@ Linked legend: [DF - DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Status: landed for `v7.0.0`
 Issue: [#244](https://github.com/flyingrobots/bijou/issues/244)
-PR: pending
+PR: [#258](https://github.com/flyingrobots/bijou/pull/258)
 
 ## Framing
 
