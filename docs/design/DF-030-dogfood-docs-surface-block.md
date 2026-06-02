@@ -47,7 +47,7 @@ and stable lower-mode facts.
 - Can DOGFOOD name its full docs workspace as one Block?
 - Can unknown docs-surface input be validated before rendering?
 - Do route, heading, search-hit-count, and proof-artifact facts survive every
-  output mode?
+  output mode as stable identities?
 - Does the DOGFOOD Blocks inventory show this surface as product truth?
 - Can lower modes explain the docs surface without borders, color, or terminal
   layout?
@@ -103,7 +103,7 @@ Stable facts:
 - `route`
 - `heading-id`
 - `search-hit-count`
-- `proof-artifact`
+- `proof-artifact` as the artifact id, not the display label
 
 ## TUI Mockup
 
@@ -200,7 +200,8 @@ GREEN:
 
 - The DF-030 test validates metadata, schema binding, accessor rejection,
   render lowerings, stable facts, registry coverage, DOGFOOD inventory output,
-  and the code-backed rendered docs-surface preview.
+  the code-backed rendered docs-surface preview, and proof artifact id facts
+  when display labels differ.
 - `tests/cycles/DF-069/dogfood-block-registry.test.ts` now includes
   `docs.surface` in registry coverage.
 - `tests/cycles/DF-071/dogfood-block-authored-surfaces.test.ts` continues to

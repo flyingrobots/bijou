@@ -2363,8 +2363,17 @@ function dogfoodDocsSurfaceFacts(
     { kind: 'entity' as const, key: 'route', value: normalized.selectedRoute },
     { kind: 'entity' as const, key: 'heading-id', value: normalized.selectedHeadingId },
     { kind: 'count' as const, key: 'search-hit-count', value: normalized.searchState.hitCount },
-    { kind: 'entity' as const, key: 'proof-artifact', value: dogfoodDocsSurfaceProofLabel(normalized.proofArtifacts) },
+    { kind: 'entity' as const, key: 'proof-artifact', value: dogfoodDocsSurfaceProofIds(normalized.proofArtifacts) },
   ];
+}
+
+function dogfoodDocsSurfaceProofIds(
+  artifacts: readonly DogfoodDocsSurfaceProofArtifact[],
+): string {
+  const available = artifacts
+    .filter((artifact) => artifact.available)
+    .map((artifact) => artifact.id);
+  return available.length === 0 ? 'none' : available.join(', ');
 }
 
 function dogfoodDocsSurfaceProofLabel(

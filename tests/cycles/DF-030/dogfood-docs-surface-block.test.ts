@@ -179,6 +179,31 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     }
   });
 
+  it('keeps proof artifact fact identity stable when labels are display-only', () => {
+    const rendered = dogfoodDocsSurfaceBlock.render({
+      mode: 'accessible',
+      config: {
+        docsTree: ['Guides', 'Blocks', 'Packages'],
+        selectedRoute: 'blocks',
+        selectedHeadingId: 'blocks',
+        selectedRouteLabel: 'Blocks',
+        searchState: { query: 'table', hitCount: 2 },
+        proofArtifacts: [{
+          id: 'capture.table-demo',
+          label: 'Table demo capture',
+          available: true,
+        }],
+      },
+    });
+
+    expect(rendered.output).toContain('Proof artifacts: Table demo capture.');
+    expect(rendered.facts).toContainEqual({
+      kind: 'entity',
+      key: 'proof-artifact',
+      value: 'capture.table-demo',
+    });
+  });
+
   it('registers the docs surface in DOGFOOD inventory and product docs', async () => {
     expect(dogfoodDocsSurfaceBlockRegistryEntry.block).toBe(dogfoodDocsSurfaceBlock);
     expect(dogfoodDocsSurfaceBlockRegistryEntry.role).toBe('app-shell');
