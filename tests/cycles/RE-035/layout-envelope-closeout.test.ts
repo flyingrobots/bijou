@@ -41,18 +41,27 @@ describe('RE-035 layout envelope closeout', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
+    const roadmapCompletedLineage = sectionBetween(roadmap, '### Completed Lineage', '## v7.0.0');
 
-    expect(bearing).toContain('three open tracker items');
-    expect(bearing).toContain('[#181](https://github.com/flyingrobots/bijou/issues/181)');
+    expect(bearing).toContain('RE-035');
     expect(bearing).not.toContain('[#180](https://github.com/flyingrobots/bijou/issues/180) — `RE-035`');
 
-    expect(roadmap).toContain('| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 3 | 21 |');
-    expect(roadmap).toContain('| [#180](https://github.com/flyingrobots/bijou/issues/180) | `lane:release` | `type:enhancement` | RE-035 mandatory layout envelope and constraint negotiation |');
-    expect(roadmap).toContain('| [#250](https://github.com/flyingrobots/bijou/pull/250) | `dependencies` | dependency PR | Vitest `4.0.18` to `4.1.8` release-hygiene bump |');
-    expect(roadmap).toContain('| [#251](https://github.com/flyingrobots/bijou/pull/251) | `lane:release` | implementation PR | RE-035 layout envelope primitives |');
+    expect(roadmapCompletedLineage).toContain('| [#180](https://github.com/flyingrobots/bijou/issues/180) | `lane:release` | `type:enhancement` | RE-035 mandatory layout envelope and constraint negotiation |');
+    expect(roadmapCompletedLineage).toContain('| [#250](https://github.com/flyingrobots/bijou/pull/250) | `dependencies` | dependency PR | Vitest `4.0.18` to `4.1.8` release-hygiene bump |');
+    expect(roadmapCompletedLineage).toContain('| [#251](https://github.com/flyingrobots/bijou/pull/251) | `lane:release` | implementation PR | RE-035 layout envelope primitives |');
 
     expect(backlog).toContain('## Landed Layout Anchor');
     expect(backlog).toContain('PR #251');
     expect(backlog).toContain('issue #180');
   });
 });
+
+function sectionBetween(source: string, start: string, end: string): string {
+  const startIndex = source.indexOf(start);
+  const endIndex = source.indexOf(end, startIndex + start.length);
+
+  expect(startIndex).toBeGreaterThanOrEqual(0);
+  expect(endIndex).toBeGreaterThan(startIndex);
+
+  return source.slice(startIndex, endIndex);
+}
