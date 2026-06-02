@@ -32,6 +32,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Mandatory layout envelope primitives for `bijou`** —
+  `@flyingrobots/bijou` now exposes the first RE-035 layout-envelope contract:
+  immutable constraints, preferences, assigned rectangles, direction, fit
+  policy, content extent measurement seams, parent-owned assignment, minimal
+  stack and place resolution, render-facing assigned-rect gating, and
+  inspector-friendly explanation facts. The first slice stays pure and
+  shell-agnostic, leaving text flow, viewport chrome, hit testing, responsive
+  variants, accessible lowering, and workspace behavior to later cycles.
 - **Runtime guardrails for queues and pipeline middleware** —
   `@flyingrobots/bijou-tui` now exposes EventBus command diagnostics, emits
   command backpressure warnings when pending commands cross a configurable
