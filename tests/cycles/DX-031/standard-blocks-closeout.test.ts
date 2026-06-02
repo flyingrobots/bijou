@@ -90,6 +90,13 @@ describe('DX-031 standard blocks closeout', () => {
 
     expect(changelog).toContain('DX-031 standard blocks closeout');
     expect(changelog).toContain('AppShell`, `ReaderSurface`, and `InspectorPanel`');
+    expect(changelog).toContain('Status and feedback standard Blocks');
+    expect(changelog).toContain('InlineStatusBlock');
+    expect(changelog).toContain('InFlowStatusBlock');
+    expect(changelog).toContain('TransientOverlayBlock');
+    expect(changelog).toContain('ActivityStreamBlock');
+    expect(changelog).toContain('ShortcutCueBlock');
+    expect(changelog).toContain('ProgressIndicatorBlock');
   });
 
   it('keeps v6 tracker docs aligned after closing issue 181', () => {

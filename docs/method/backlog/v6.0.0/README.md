@@ -56,8 +56,9 @@ The boundary remains:
   status and feedback standard Blocks are active through issues #220 through
   #225. The slice adds first-party `InlineStatusBlock`, `InFlowStatusBlock`,
   `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
-  `ProgressIndicatorBlock` definitions with metadata, data contracts, command
-  intents, ready stories, deterministic render output, and lower-mode facts.
+  `ProgressIndicatorBlock` definitions with metadata, data contracts,
+  schema-bound adapters, command intents, ready stories, deterministic render
+  output, and lower-mode facts.
 
 ## Landed Data Binding Anchor
 

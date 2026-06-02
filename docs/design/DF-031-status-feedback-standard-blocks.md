@@ -167,19 +167,25 @@ understand status.
 - Give each Block at least one ready story id.
 - Attach view data contracts so tooling can inspect required slot data without
   provider handles.
+- Attach schema adapters and schema-bound block exports so callers can validate
+  plain input before binding render slots.
 - Attach command intents for selecting the block, copying facts, and opening a
   story, without command callbacks.
 - Render interactive/static output as surfaces and pipe/accessible output as
   text.
-- Preserve `block` and `block.rendered` facts across modes.
+- Preserve `block`, `block.rendered`, `block.family`, `block.variant`,
+  `block.mode`, selected identity, and `semanticValue.*` facts across modes.
 
 ## Acceptance Criteria
 
 - `tests/cycles/DF-031/status-feedback-blocks.test.ts` proves the six Blocks
   publish through the standard catalog and package manifest.
 - The cycle test validates metadata and command intent shape for every Block.
+- The cycle test validates schema-bound input for every Block and rejects
+  accessor-backed boundary objects before invoking getters.
 - The cycle test renders every Block in every canonical mode.
-- The cycle test verifies lowerings remain fact-stable.
+- The cycle test verifies lowerings remain fact-stable and expose family,
+  variant, selected, mode, and semantic-value facts.
 - Existing DX-031 standard block tests expand their catalog expectations from
   three Blocks to nine Blocks.
 - Repo docs stop describing this catalog expansion as future v7 work.
@@ -190,8 +196,8 @@ understand status.
 2. Extend `BlockScale` to support the product scales needed by this slice:
    `inline` and `overlay`.
 3. Add six standard Block definitions in `standard-blocks.ts`.
-4. Register their stories, metadata, data contracts, command intents, and
-   package manifest entries.
+4. Register their stories, metadata, data contracts, schema adapters, command
+   intents, and package manifest entries.
 5. Reuse the existing section renderer pattern so visual and lower modes stay
    deterministic.
 6. Update BEARING, ROADMAP, CHANGELOG, v6 backlog evidence, design-system
@@ -219,11 +225,16 @@ commands:
   - inlineStatus.select
   - inlineStatus.copyFacts
   - inlineStatus.openStory
+facts:
+  block: InlineStatusBlock
+  block.family: status
+  block.variant: ready
+  semanticValue.label: docs
 ```
 
-A future adapter can parse this shape, validate it, and build typed
-`BlockDefinition` input or story fixtures. The runtime source of truth remains
-the typed Block contract.
+A future declaration adapter can parse this shape, route it through
+`inlineStatusSchemaBlock`, and build typed `BlockDefinition` input or story
+fixtures. The runtime source of truth remains the typed Block contract.
 
 ## Drift Check
 
@@ -240,14 +251,19 @@ audits remain separate issues after #225.
 
 - RED: the status/feedback cycle test imported six standard Blocks that did
   not exist yet and failed at module load.
-- GREEN: `@flyingrobots/bijou` now exports `InlineStatusBlock`,
-  `InFlowStatusBlock`, `TransientOverlayBlock`, `ActivityStreamBlock`,
-  `ShortcutCueBlock`, and `ProgressIndicatorBlock`.
+- RED: the review follow-up required schema-bound feedback exports and stronger
+  lowering facts; the cycle test failed before those symbols and facts existed.
+- GREEN: `@flyingrobots/bijou` now exports lower-camel block identifiers
+  `inlineStatusBlock`, `inFlowStatusBlock`, `transientOverlayBlock`,
+  `activityStreamBlock`, `shortcutCueBlock`, and `progressIndicatorBlock`, plus
+  matching `*SchemaAdapter` and `*SchemaBlock` exports.
 - The six Blocks are in `standardBlocks`, `standardBlockStories`, and
   `standardBlockPackageManifest`.
 - Interactive/static modes produce surfaces; pipe/accessibility modes produce
   semantic text.
-- Stable lowering facts are present across all modes.
+- Stable lowering facts are present across all modes, including family,
+  variant, selected identity where applicable, concrete mode, and
+  semantic-value facts.
 
 ## Retrospective
 

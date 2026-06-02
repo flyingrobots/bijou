@@ -3401,12 +3401,16 @@ What is now true:
 
 - Issues #220 through #225 moved into `v6.0.0` as a focused
   status/feedback Block slice.
-- `@flyingrobots/bijou` exports `InlineStatusBlock`, `InFlowStatusBlock`,
-  `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
-  `ProgressIndicatorBlock`.
+- The standard status/feedback block names now include `InlineStatusBlock`,
+  `InFlowStatusBlock`, `TransientOverlayBlock`, `ActivityStreamBlock`,
+  `ShortcutCueBlock`, and `ProgressIndicatorBlock`.
+- The public package barrel exposes the matching lower-camel definitions:
+  `inlineStatusBlock`, `inFlowStatusBlock`, `transientOverlayBlock`,
+  `activityStreamBlock`, `shortcutCueBlock`, and `progressIndicatorBlock`, plus
+  matching `*SchemaAdapter` and `*SchemaBlock` exports.
 - The new Blocks use the same DX-031/DX-034 public contract: validated block
-  metadata, view data contracts, command intents, story ids, deterministic
-  render output, and stable lowering facts.
+  metadata, view data contracts, schema-bound adapters, command intents, story
+  ids, deterministic render output, and stable lowering facts.
 - Status and feedback block expansion is now explicit issue-backed v6 work
   through #220 through #225, not hidden DX-031 scope.
 - YAML/JSON declaration remains a future adapter over the typed Blocks API,
@@ -3419,10 +3423,10 @@ the standard block set: public block metadata, package manifests,
 adapter-first schema-bound block contracts, first-party `AppShell`,
 `ReaderSurface`, `InspectorPanel`, `InlineStatusBlock`, `InFlowStatusBlock`,
 `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
-`ProgressIndicatorBlock` definitions, deterministic rendered output for
-interactive, static, pipe, and accessible modes, block-tree rendering, and a
-DOGFOOD Blocks section that proves the original `AppShell`, `ReaderSurface`,
-and `InspectorPanel` set in product context.
+`ProgressIndicatorBlock` definitions and schema-bound wrappers, deterministic
+rendered output for interactive, static, pipe, and accessible modes, block-tree
+rendering, and a DOGFOOD Blocks section that proves the standard set in product
+context.
 
 DOGFOOD multi-mode proof is present for the release slice through the standard
 block render tests, DOGFOOD preview tests, lowering posture checks, and story

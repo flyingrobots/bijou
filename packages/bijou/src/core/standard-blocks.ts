@@ -3,6 +3,7 @@ import {
   defineDataRequirement,
   defineViewData,
   type BindingFact,
+  type DeepReadonly,
 } from './binding.js';
 import {
   defineBlock,
@@ -77,6 +78,42 @@ export interface InspectorPanelSchemaData {
   readonly selectionId: string;
   readonly label: string;
   readonly details?: readonly string[];
+}
+
+export interface InlineStatusSchemaData {
+  readonly label: string;
+  readonly status: string;
+  readonly message?: string;
+}
+
+export interface InFlowStatusSchemaData {
+  readonly severity: string;
+  readonly source?: string;
+  readonly message: string;
+  readonly action?: string;
+}
+
+export interface TransientOverlaySchemaData {
+  readonly priority?: string;
+  readonly message: string;
+  readonly dismiss?: string;
+}
+
+export interface ActivityStreamSchemaData {
+  readonly events: readonly string[];
+  readonly selected?: string;
+}
+
+export interface ShortcutCueSchemaData {
+  readonly shortcuts: readonly string[];
+  readonly scope?: string;
+}
+
+export interface ProgressIndicatorSchemaData {
+  readonly label: string;
+  readonly value?: string | number;
+  readonly total?: string | number;
+  readonly percent: string;
 }
 
 const shellFocusRegion = commandIntent<{ readonly region: string }>('shell.focusRegion', {
@@ -384,6 +421,54 @@ export const inspectorPanelSchemaAdapter: BlockSchemaAdapter<InspectorPanelSchem
     }),
   });
 
+export const inlineStatusSchemaAdapter: BlockSchemaAdapter<InlineStatusSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'inline-status.status',
+    blockName: 'InlineStatusBlock',
+    sections: inlineStatusSections,
+    parse: parseInlineStatusSchemaData,
+  });
+
+export const inFlowStatusSchemaAdapter: BlockSchemaAdapter<InFlowStatusSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'in-flow-status.status',
+    blockName: 'InFlowStatusBlock',
+    sections: inFlowStatusSections,
+    parse: parseInFlowStatusSchemaData,
+  });
+
+export const transientOverlaySchemaAdapter: BlockSchemaAdapter<TransientOverlaySchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'transient-overlay.event',
+    blockName: 'TransientOverlayBlock',
+    sections: transientOverlaySections,
+    parse: parseTransientOverlaySchemaData,
+  });
+
+export const activityStreamSchemaAdapter: BlockSchemaAdapter<ActivityStreamSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'activity-stream.events',
+    blockName: 'ActivityStreamBlock',
+    sections: activityStreamSections,
+    parse: parseActivityStreamSchemaData,
+  });
+
+export const shortcutCueSchemaAdapter: BlockSchemaAdapter<ShortcutCueSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'shortcut-cue.shortcuts',
+    blockName: 'ShortcutCueBlock',
+    sections: shortcutCueSections,
+    parse: parseShortcutCueSchemaData,
+  });
+
+export const progressIndicatorSchemaAdapter: BlockSchemaAdapter<ProgressIndicatorSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'progress-indicator.progress',
+    blockName: 'ProgressIndicatorBlock',
+    sections: progressIndicatorSections,
+    parse: parseProgressIndicatorSchemaData,
+  });
+
 export const readerSurfaceSchemaBlock: SchemaBoundBlockDefinition<ReaderSurfaceSchemaData> =
   defineSchemaBlock({
     block: readerSurfaceBlock,
@@ -420,6 +505,72 @@ export const inspectorPanelSchemaBlock: SchemaBoundBlockDefinition<InspectorPane
         { kind: 'label', key: 'selection.label', value: selection.label },
       ],
     }),
+  });
+
+export const inlineStatusSchemaBlock: SchemaBoundBlockDefinition<InlineStatusSchemaData> =
+  defineSchemaBlock({
+    block: inlineStatusBlock,
+    schema: inlineStatusSchemaAdapter,
+    bind: (status) => bindStandardSectionSchemaData(
+      'InlineStatusBlock',
+      status as Readonly<Record<string, unknown>>,
+      inlineStatusSections,
+    ),
+  });
+
+export const inFlowStatusSchemaBlock: SchemaBoundBlockDefinition<InFlowStatusSchemaData> =
+  defineSchemaBlock({
+    block: inFlowStatusBlock,
+    schema: inFlowStatusSchemaAdapter,
+    bind: (status) => bindStandardSectionSchemaData(
+      'InFlowStatusBlock',
+      status as Readonly<Record<string, unknown>>,
+      inFlowStatusSections,
+    ),
+  });
+
+export const transientOverlaySchemaBlock: SchemaBoundBlockDefinition<TransientOverlaySchemaData> =
+  defineSchemaBlock({
+    block: transientOverlayBlock,
+    schema: transientOverlaySchemaAdapter,
+    bind: (overlay) => bindStandardSectionSchemaData(
+      'TransientOverlayBlock',
+      overlay as Readonly<Record<string, unknown>>,
+      transientOverlaySections,
+    ),
+  });
+
+export const activityStreamSchemaBlock: SchemaBoundBlockDefinition<ActivityStreamSchemaData> =
+  defineSchemaBlock({
+    block: activityStreamBlock,
+    schema: activityStreamSchemaAdapter,
+    bind: (stream) => bindStandardSectionSchemaData(
+      'ActivityStreamBlock',
+      stream as Readonly<Record<string, unknown>>,
+      activityStreamSections,
+    ),
+  });
+
+export const shortcutCueSchemaBlock: SchemaBoundBlockDefinition<ShortcutCueSchemaData> =
+  defineSchemaBlock({
+    block: shortcutCueBlock,
+    schema: shortcutCueSchemaAdapter,
+    bind: (cue) => bindStandardSectionSchemaData(
+      'ShortcutCueBlock',
+      cue as Readonly<Record<string, unknown>>,
+      shortcutCueSections,
+    ),
+  });
+
+export const progressIndicatorSchemaBlock: SchemaBoundBlockDefinition<ProgressIndicatorSchemaData> =
+  defineSchemaBlock({
+    block: progressIndicatorBlock,
+    schema: progressIndicatorSchemaAdapter,
+    bind: (progress) => bindStandardSectionSchemaData(
+      'ProgressIndicatorBlock',
+      progress as Readonly<Record<string, unknown>>,
+      progressIndicatorSections,
+    ),
   });
 
 export const standardBlocks = Object.freeze([
@@ -840,6 +991,82 @@ function commandPrefix(blockName: StandardBlockName): string {
   return withoutBlock.charAt(0).toLowerCase() + withoutBlock.slice(1);
 }
 
+function standardBlockKey(blockName: StandardBlockName): string {
+  return blockName
+    .replace(/Block$/, '')
+    .replace(
+      /[A-Z]/g,
+      (letter, index) => `${index === 0 ? '' : '-'}${letter.toLowerCase()}`,
+    );
+}
+
+interface StandardSectionSchemaAdapterOptions<Data extends object> {
+  readonly id: string;
+  readonly blockName: StandardBlockName;
+  readonly sections: readonly StandardSectionSpec[];
+  readonly parse: (input: unknown) => Data | undefined;
+}
+
+function defineStandardSectionSchemaAdapter<Data extends object>(
+  options: StandardSectionSchemaAdapterOptions<Data>,
+): BlockSchemaAdapter<Data> {
+  return defineBlockSchemaAdapter({
+    id: options.id,
+    parse(input) {
+      const data = options.parse(input);
+      if (data === undefined) {
+        return schemaError(
+          `${standardBlockKey(options.blockName)}.data.invalid`,
+          `${options.blockName} data is required.`,
+        );
+      }
+
+      return {
+        ok: true,
+        data: data as DeepReadonly<Data>,
+      };
+    },
+    describe: () => ({
+      requiredFields: options.sections
+        .filter((section) => section.required)
+        .map((section) => section.id),
+      optionalFields: options.sections
+        .filter((section) => !section.required)
+        .map((section) => section.id),
+      facts: [{ kind: 'entity', key: 'block.schema', value: options.blockName }],
+    }),
+  });
+}
+
+function bindStandardSectionSchemaData(
+  blockName: StandardBlockName,
+  data: Readonly<Record<string, unknown>>,
+  sections: readonly StandardSectionSpec[],
+) {
+  const slots: Record<string, unknown> = {};
+  const facts: BindingFact[] = [
+    { kind: 'entity', key: 'block.schema', value: blockName },
+  ];
+
+  for (const section of sections) {
+    const value = ownDataProperty(data as Record<string, unknown>, section.id);
+    if (value === undefined) {
+      continue;
+    }
+
+    slots[section.id] = value;
+    const text = slotValueText(value);
+    if (text !== undefined) {
+      facts.push({ kind: 'label', key: `semanticValue.${section.id}`, value: text });
+    }
+  }
+
+  return {
+    input: { slots },
+    facts,
+  };
+}
+
 function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
   const sections: readonly RenderSection[] = [
@@ -856,7 +1083,7 @@ function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string 
       : mode === 'pipe'
         ? renderPipeSections('AppShell', sections)
         : renderVisualSectionsSurface('AppShell', sections, renderSurfaceBounds(input)),
-    facts: renderFacts('AppShell', sections, 'region'),
+    facts: renderFacts('AppShell', sections, 'region', mode),
   });
 }
 
@@ -874,7 +1101,7 @@ function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<st
       : mode === 'pipe'
         ? renderPipeSections('ReaderSurface', sections)
         : renderVisualSectionsSurface('ReaderSurface', sections, renderSurfaceBounds(input)),
-    facts: renderFacts('ReaderSurface', sections, 'slot'),
+    facts: renderFacts('ReaderSurface', sections, 'slot', mode),
   });
 }
 
@@ -892,7 +1119,7 @@ function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<s
       : mode === 'pipe'
         ? renderPipeSections('InspectorPanel', sections)
         : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceBounds(input)),
-    facts: renderFacts('InspectorPanel', sections, 'slot'),
+    facts: renderFacts('InspectorPanel', sections, 'slot', mode),
   });
 }
 
@@ -917,7 +1144,7 @@ function renderStandardSectionBlock(
       : mode === 'pipe'
         ? renderPipeSections(blockName, sections)
         : renderVisualSectionsSurface(blockName, sections, renderSurfaceBounds(input)),
-    facts: renderFacts(blockName, sections, 'slot'),
+    facts: renderFacts(blockName, sections, 'slot', mode),
   });
 }
 
@@ -1032,11 +1259,20 @@ function renderFacts(
   blockName: StandardBlockName,
   sections: readonly RenderSection[],
   sectionFactPrefix: 'region' | 'slot',
+  mode: OutputMode,
 ): readonly BindingFact[] {
+  const identity = standardBlockRenderIdentity(blockName);
   const facts: BindingFact[] = [
     { kind: 'entity', key: 'block', value: blockName },
     { kind: 'state', key: 'block.rendered', value: true },
+    { kind: 'entity', key: 'block.family', value: identity.family },
+    { kind: 'state', key: 'block.variant', value: identity.variant },
+    { kind: 'state', key: 'block.mode', value: mode, required: false },
   ];
+  const selectedSection = sections.find((section) => section.id === 'selected' && section.present);
+  if (selectedSection !== undefined) {
+    facts.push({ kind: 'entity', key: 'block.selected', value: selectedSection.content });
+  }
 
   for (const section of sections) {
     if (section.present) {
@@ -1050,10 +1286,42 @@ function renderFacts(
         key: `${sectionFactPrefix}.${section.id}.value`,
         value: section.content,
       });
+      facts.push({
+        kind: 'label',
+        key: `semanticValue.${section.id}`,
+        value: section.content,
+      });
     }
   }
 
   return facts;
+}
+
+interface StandardBlockRenderIdentity {
+  readonly family: string;
+  readonly variant: string;
+}
+
+function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBlockRenderIdentity {
+  switch (blockName) {
+    case 'AppShell':
+      return { family: 'app-structure', variant: 'wide' };
+    case 'ReaderSurface':
+      return { family: 'content-reading', variant: 'article' };
+    case 'InspectorPanel':
+      return { family: 'inspection', variant: 'selection' };
+    case 'InlineStatusBlock':
+    case 'InFlowStatusBlock':
+      return { family: 'status', variant: 'ready' };
+    case 'TransientOverlayBlock':
+      return { family: 'overlay', variant: 'ready' };
+    case 'ActivityStreamBlock':
+      return { family: 'activity', variant: 'ready' };
+    case 'ShortcutCueBlock':
+      return { family: 'shortcut', variant: 'ready' };
+    case 'ProgressIndicatorBlock':
+      return { family: 'progress', variant: 'ready' };
+  }
 }
 
 function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
@@ -1219,6 +1487,120 @@ function schemaError<Data = never>(code: string, message: string): BlockSchemaRe
   };
 }
 
+function parseInlineStatusSchemaData(input: unknown): InlineStatusSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const status = textDataProperty(input, 'status');
+  const message = textDataProperty(input, 'message');
+  if (label === undefined || status === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    status,
+    ...(message === undefined ? {} : { message }),
+  };
+}
+
+function parseInFlowStatusSchemaData(input: unknown): InFlowStatusSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const severity = textDataProperty(input, 'severity');
+  const source = textDataProperty(input, 'source');
+  const message = textDataProperty(input, 'message');
+  const action = textDataProperty(input, 'action');
+  if (severity === undefined || message === undefined) {
+    return undefined;
+  }
+
+  return {
+    severity,
+    ...(source === undefined ? {} : { source }),
+    message,
+    ...(action === undefined ? {} : { action }),
+  };
+}
+
+function parseTransientOverlaySchemaData(input: unknown): TransientOverlaySchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const priority = textDataProperty(input, 'priority');
+  const message = textDataProperty(input, 'message');
+  const dismiss = textDataProperty(input, 'dismiss');
+  if (message === undefined) {
+    return undefined;
+  }
+
+  return {
+    ...(priority === undefined ? {} : { priority }),
+    message,
+    ...(dismiss === undefined ? {} : { dismiss }),
+  };
+}
+
+function parseActivityStreamSchemaData(input: unknown): ActivityStreamSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const events = textArrayDataProperty(input, 'events');
+  const selected = textDataProperty(input, 'selected');
+  if (events === undefined) {
+    return undefined;
+  }
+
+  return {
+    events,
+    ...(selected === undefined ? {} : { selected }),
+  };
+}
+
+function parseShortcutCueSchemaData(input: unknown): ShortcutCueSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const shortcuts = textArrayDataProperty(input, 'shortcuts');
+  const scope = textDataProperty(input, 'scope');
+  if (shortcuts === undefined) {
+    return undefined;
+  }
+
+  return {
+    shortcuts,
+    ...(scope === undefined ? {} : { scope }),
+  };
+}
+
+function parseProgressIndicatorSchemaData(input: unknown): ProgressIndicatorSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const value = textOrNumberDataProperty(input, 'value');
+  const total = textOrNumberDataProperty(input, 'total');
+  const percent = textDataProperty(input, 'percent');
+  if (label === undefined || percent === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    ...(value === undefined ? {} : { value }),
+    ...(total === undefined ? {} : { total }),
+    percent,
+  };
+}
+
 function isReaderSurfaceSchemaData(input: unknown): input is ReaderSurfaceSchemaData {
   if (!isPlainRecord(input)) {
     return false;
@@ -1272,4 +1654,21 @@ function isPlainRecord(input: unknown): input is Record<string, unknown> {
 function ownDataProperty(input: Record<string, unknown>, key: string): unknown {
   const descriptor = Object.getOwnPropertyDescriptor(input, key);
   return descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
+}
+
+function textDataProperty(input: Record<string, unknown>, key: string): string | undefined {
+  const value = ownDataProperty(input, key);
+  return typeof value === 'string' ? value : undefined;
+}
+
+function textOrNumberDataProperty(input: Record<string, unknown>, key: string): string | number | undefined {
+  const value = ownDataProperty(input, key);
+  return typeof value === 'string' || typeof value === 'number' ? value : undefined;
+}
+
+function textArrayDataProperty(input: Record<string, unknown>, key: string): readonly string[] | undefined {
+  const value = ownDataProperty(input, key);
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+    ? value
+    : undefined;
 }
