@@ -425,10 +425,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
-- **Node version support policy** — The repository preinstall guard now enforces
-  the Node 18 floor without rejecting newer Node releases, so current and future
-  Node majors remain supported while CI continues to cover the explicit
-  18/20/22 matrix.
+- **Node development floor for Vitest 4.1** — The root workspace preinstall
+  guard, engine metadata, README, and CI matrix now require Node.js
+  `^20.19.0 || >=22.12.0`, matching Vitest 4.1's Vite/Rolldown runtime instead
+  of advertising a Node 18 test lane that cannot start the new test runner.
+- **Node version support policy** — The repository preinstall guard rejects
+  unsupported Node releases before install while accepting newer supported
+  majors, so local contributors see the same runtime floor that CI proves.
 - **Node preinstall gate portability** — The repository preinstall guard now
   runs through a checked-in Node script instead of a shell-fragile inline
   command, so unsupported Node versions report the intended guidance without
