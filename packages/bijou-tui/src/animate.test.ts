@@ -1,6 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { animate, sequence } from './animate.js';
 import type { CmdCapabilities } from './types.js';
+
+const sourcePath = resolve(dirname(fileURLToPath(import.meta.url)), 'animate.ts');
 
 /** Create mock capabilities that can be manually pulsed. */
 function createMockCaps(): CmdCapabilities & { pulse(dt: number): void } {
@@ -14,6 +19,19 @@ function createMockCaps(): CmdCapabilities & { pulse(dt: number): void } {
       for (const h of handlers) h(dt);
     },
   };
+}
+
+function docsForInternalCommand(source: string, functionName: string): string {
+  const functionIndex = source.indexOf(`function ${functionName}`);
+  if (functionIndex < 0) {
+    return '';
+  }
+  const beforeFunction = source.slice(0, functionIndex);
+  const docStart = beforeFunction.lastIndexOf('/**');
+  if (docStart < 0) {
+    return '';
+  }
+  return beforeFunction.slice(docStart);
 }
 
 describe('animate', () => {
@@ -186,6 +204,26 @@ describe('animate', () => {
       expect(frames).toEqual([50]);
       expect(emitted).toEqual([50]);
     });
+  });
+});
+
+describe('animation command docs', () => {
+  it('documents pulse-driven spring and tween commands', () => {
+    const source = readFileSync(sourcePath, 'utf8');
+    const springDocs = docsForInternalCommand(source, 'createSpringCmd');
+    const tweenDocs = docsForInternalCommand(source, 'createTweenCmd');
+
+    expect(springDocs).toContain('runtime pulses');
+    expect(springDocs).toContain('fixed-step');
+    expect(springDocs).toContain('maxPulseSeconds');
+    expect(tweenDocs).toContain('pulse');
+    expect(tweenDocs).toContain('dt');
+
+    for (const docs of [springDocs, tweenDocs]) {
+      expect(docs).not.toContain('setInterval');
+      expect(docs).not.toContain('Date.now');
+      expect(docs).not.toContain('@param fps');
+    }
   });
 });
 
