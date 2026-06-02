@@ -3,8 +3,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { colorHex, type ColorRef } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { parseKey, runScript } from '@flyingrobots/bijou-tui';
+import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { parseKey } from '@flyingrobots/bijou-tui';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../tests/helpers/scripted.js';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';

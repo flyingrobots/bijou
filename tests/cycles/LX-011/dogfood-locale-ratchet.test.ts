@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { runScript } from '@flyingrobots/bijou-tui';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
 import { createDocsApp, DOGFOOD_I18N_CATALOG } from '../../../examples/docs/app.js';
 import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
 import {

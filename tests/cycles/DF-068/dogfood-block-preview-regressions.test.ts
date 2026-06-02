@@ -6,9 +6,11 @@ import {
 } from '@flyingrobots/bijou';
 import {
   _resetDefaultContextForTesting,
-  createTestContext,
 } from '@flyingrobots/bijou/adapters/test';
-import { runScript } from '@flyingrobots/bijou-tui';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   counterDemoBlockConfig,

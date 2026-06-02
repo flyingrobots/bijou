@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { runScript } from '@flyingrobots/bijou-tui';
+import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 
 const KEY_F2 = '\x1bOQ';
