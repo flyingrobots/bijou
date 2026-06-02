@@ -20,7 +20,7 @@ describe('DX-031 standard blocks closeout', () => {
         'pipe',
         'accessible',
       ]);
-      expect(block.metadata.storyIds.length).toBeGreaterThan(0);
+      expect(block.metadata.storyIds ?? []).not.toHaveLength(0);
 
       for (const mode of block.metadata.modes) {
         const rendered = block.render({
