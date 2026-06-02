@@ -146,6 +146,28 @@ describe('boundary-aware selection and copy primitives', () => {
     );
   });
 
+  it('skips ragged table rows that do not intersect the selected columns', () => {
+    const owner = defineSelectionOwner({
+      id: 'ragged-table',
+      layoutNodeId: 'ragged-table.node',
+      rect: { x: 0, y: 0, width: 4, height: 3 },
+      content: {
+        kind: 'table',
+        rows: [
+          ['Header'],
+          [],
+          ['c0', 'c1', 'c2', 'c3'],
+        ],
+      },
+    });
+    const range = selectionRange(owner, {
+      anchor: { x: 2, y: 0 },
+      focus: { x: 3, y: 2 },
+    });
+
+    expect(extractSelectionText(owner.content, range)).toBe('c2\tc3');
+  });
+
   it('does not copy the last character when selecting blank columns after a short line', () => {
     const owner = defineSelectionOwner({
       id: 'short-line',

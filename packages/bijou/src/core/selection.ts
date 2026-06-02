@@ -372,8 +372,16 @@ function extractTableSelection(
 
   for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
     const row = content.rows[rowIndex] ?? [];
-    const rowStartColumn = clamp(startColumn, 0, Math.max(0, row.length - 1));
-    const rowEndColumn = clamp(endColumn, 0, Math.max(0, row.length - 1));
+    if (row.length === 0) {
+      continue;
+    }
+
+    const rowStartColumn = Math.max(startColumn, 0);
+    const rowEndColumn = Math.min(endColumn, row.length - 1);
+    if (rowStartColumn > rowEndColumn) {
+      continue;
+    }
+
     selectedRows.push(row.slice(rowStartColumn, rowEndColumn + 1).join(delimiter));
   }
 
