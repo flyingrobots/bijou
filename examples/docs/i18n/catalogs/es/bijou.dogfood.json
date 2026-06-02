@@ -265,6 +265,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.docs.surface.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Superficie de documentación DOGFOOD, navegación, búsqueda, lector y artefactos de prueba."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.entry.frame.commandPalette.description"
       },
       "kind": "message",
@@ -423,6 +434,17 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.renderedPreview"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Vista previa renderizada"
+      }
     },
     {
       "key": {

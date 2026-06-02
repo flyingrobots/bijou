@@ -49,6 +49,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD docs surface Block** — DOGFOOD now publishes
+  `DogfoodDocsSurfaceBlock` as the canonical docs workspace surface for
+  navigation, reader content, search state, and proof artifacts. The Block adds
+  `docs-surface` metadata at `workspace` scale, typed view data requirements,
+  schema-bound boundary validation, command intents for navigation/search/proof
+  actions, stable route/heading/search/proof lowering facts, DOGFOOD registry
+  inventory coverage through `docs.surface`, a code-backed DOGFOOD inventory
+  preview, localized inventory copy, and a DF-030 Method design doc with TUI
+  and lower-mode sketches. This closes the current Block-shaped scope of issue
+  #244.
 - **Status and feedback standard Blocks** —
   `@flyingrobots/bijou` now exports six first-party status and feedback
   Blocks: standard block names `InlineStatusBlock`, `InFlowStatusBlock`,

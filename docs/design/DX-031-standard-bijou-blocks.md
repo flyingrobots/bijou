@@ -303,6 +303,7 @@ Metadata sketch:
 ```ts
 type BlockScale =
   | 'app'
+  | 'workspace'
   | 'section'
   | 'panel'
   | 'control'
@@ -851,10 +852,16 @@ pretending every useful pattern is a full application shell.
 Block scales:
 
 - app blocks: whole app states or persistent shells
+- workspace blocks: full app workspaces under a shell
 - section blocks: large content or product sections inside an app
 - panel blocks: reusable panes, drawers, modals, and diagnostics
 - control blocks: repeated input/action compositions
+- inline blocks: local status, hints, and compact feedback beside content
 - item blocks: repeated cards, comments, rows, and list entries
+- data blocks: tabular, chart, or evidence-focused semantic surfaces
+- diagnostic blocks: inspectable explanation, health, and instrumentation
+  surfaces
+- overlay blocks: transient shell-level feedback or affordances
 
 Some names are component-like on purpose. `Button` and `Slider` may remain
 primitive components, while `ButtonSet`, `ActionFooter`, or `SliderControl`

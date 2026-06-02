@@ -130,6 +130,7 @@ import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
   documentationArticleBlock,
+  dogfoodDocsSurfacePreviewOutput,
   footerHintBlock,
   guideInspectorBlock,
   navigationListBlock,
@@ -1012,6 +1013,7 @@ function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): 
         `- ${label('dataRequirements', 'Data requirements')}: ${formatDocsList(dataNames)}`,
         `- ${label('commandIntents', 'Command intents')}: ${formatDocsList(commandIds)}`,
         `- ${label('tags', 'Tags')}: ${formatDocsList(entry.tags)}`,
+        ...dogfoodSurfaceBlockPreviewMarkdown(entry, localization),
       ].join('\n');
     })
     .join('\n\n');
@@ -1040,6 +1042,24 @@ function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): 
     '',
     blockSections,
   ].join('\n');
+}
+
+function dogfoodSurfaceBlockPreviewMarkdown(
+  entry: DogfoodBlockRegistryEntry,
+  localization?: LocalizationPort,
+): readonly string[] {
+  if (entry.surfaceId !== 'docs.surface') {
+    return [];
+  }
+
+  return [
+    '',
+    `### ${dogfoodText(localization, 'blocks.surfaceInventory.renderedPreview', 'Rendered preview')}`,
+    '',
+    '```text',
+    dogfoodDocsSurfacePreviewOutput(),
+    '```',
+  ];
 }
 
 function dogfoodSurfaceBlockDescription(

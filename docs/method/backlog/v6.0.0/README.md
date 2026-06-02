@@ -50,11 +50,11 @@ The boundary remains:
   expansion is now explicit issue-backed v6 work through the status/feedback
   Block slice.
 
-## Active Status And Feedback Block Slice
+## Landed Status And Feedback Block Slice
 
 - [**DF-031**](../../../design/DF-031-status-feedback-standard-blocks.md) -
-  status and feedback standard Blocks are active through issues #220 through
-  #225. The slice adds first-party `InlineStatusBlock`, `InFlowStatusBlock`,
+  status and feedback standard Blocks landed through issues #220 through #225.
+  The slice adds first-party `InlineStatusBlock`, `InFlowStatusBlock`,
   `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
   `ProgressIndicatorBlock` definitions with metadata, data contracts,
   schema-bound adapters, command intents, ready stories, deterministic render
@@ -125,11 +125,11 @@ The boundary remains:
 
 ## Execution Order
 
-1. Ship this release lane prep.
-2. Pull one v6 item into a focused cycle.
-3. Implement it with tests, docs, and DOGFOOD proof where relevant.
-4. Commit, push, open a PR, and merge only after CI/CD is green.
-5. Repeat until this lane is empty or intentionally reshaped.
+1. Keep the v6 issue lane closed unless release-readiness validation finds a
+   true blocker.
+2. Run release-readiness validation against the completed v6 lineage.
+3. Prepare release notes, package checks, and the tag candidate only after
+   local validation and CI are green.
 
 Stop before tagging `v6.0.0`. The tag is a separate release operation after
 the lane is complete and release readiness is green.

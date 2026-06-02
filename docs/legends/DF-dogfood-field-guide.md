@@ -74,6 +74,7 @@ before DOGFOOD counts as a real terminal docs product, and can see that
     inside that shell
   - DOGFOOD now also owns the release-facing smoke contract
 - latest DOGFOOD docs-surface closure:
+  - [DF-030 — DOGFOOD Docs Surface Block](../design/DF-030-dogfood-docs-surface-block.md)
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest supporting closure:
   - [DF-071 — DOGFOOD Block-Authored Surfaces](../design/DF-071-dogfood-block-authored-surfaces.md)

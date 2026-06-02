@@ -6,34 +6,26 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues: 2026-06-02.
+Last synced from GitHub Issues and this DF-030 branch: 2026-06-02.
 
 ## Release Snapshot
 
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
-| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 6 | 24 | Current layout truth, standard blocks, and active status/feedback Block slice. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 21 | 0 | Next major-release candidate after the active v6 status/feedback slice. |
+| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 20 | 1 | Active product-truth candidate after the DF-030 DOGFOOD docs surface Block. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
 Theme: layout truth, standard blocks, and status/feedback block expansion.
 
-The v6 lane reopened deliberately for a focused status and feedback Block
-slice. It should complete this PR and release-readiness validation before
-tagging.
+The v6 lane is issue-complete. It should run release-readiness validation and
+package checks before tagging.
 
 ### Open Work
 
-| Issue | Priority | Type | Work |
-| :--- | :--- | :--- | :--- |
-| [#220](https://github.com/flyingrobots/bijou/issues/220) | `priority:medium` | `type:maintenance` | DF-031 inline status standard Block |
-| [#221](https://github.com/flyingrobots/bijou/issues/221) | `priority:medium` | `type:maintenance` | DF-032 in-flow status standard Block |
-| [#222](https://github.com/flyingrobots/bijou/issues/222) | `priority:medium` | `type:maintenance` | DF-033 transient overlay standard Block |
-| [#223](https://github.com/flyingrobots/bijou/issues/223) | `priority:medium` | `type:maintenance` | DF-035 activity stream standard Block |
-| [#224](https://github.com/flyingrobots/bijou/issues/224) | `priority:medium` | `type:maintenance` | DF-037 shortcut cue standard Block |
-| [#225](https://github.com/flyingrobots/bijou/issues/225) | `priority:medium` | `type:maintenance` | DF-038 progress indicator standard Block |
+No open v6 tracker issues remain as of 2026-06-02.
 
 ### Completed Lineage
 
@@ -65,6 +57,12 @@ These cards are included in the v6 milestone as completed release lineage.
 | [#199](https://github.com/flyingrobots/bijou/issues/199) | `lane:asap` | `type:enhancement` | LX-013 DOGFOOD locale preference persistence |
 | [#200](https://github.com/flyingrobots/bijou/issues/200) | `lane:asap` | `type:enhancement` | LX-014 expand DOGFOOD catalog coverage |
 | [#201](https://github.com/flyingrobots/bijou/issues/201) | `lane:bad-code` | `type:bug` | Fix the bijou-mcp DAG type mismatch |
+| [#220](https://github.com/flyingrobots/bijou/issues/220) | `lane:release` | `type:maintenance` | DF-031 inline status standard Block |
+| [#221](https://github.com/flyingrobots/bijou/issues/221) | `lane:release` | `type:maintenance` | DF-032 in-flow status standard Block |
+| [#222](https://github.com/flyingrobots/bijou/issues/222) | `lane:release` | `type:maintenance` | DF-033 transient overlay standard Block |
+| [#223](https://github.com/flyingrobots/bijou/issues/223) | `lane:release` | `type:maintenance` | DF-035 activity stream standard Block |
+| [#224](https://github.com/flyingrobots/bijou/issues/224) | `lane:release` | `type:maintenance` | DF-037 shortcut cue standard Block |
+| [#225](https://github.com/flyingrobots/bijou/issues/225) | `lane:release` | `type:maintenance` | DF-038 progress indicator standard Block |
 
 ## v7.0.0
 
@@ -77,9 +75,17 @@ The v7 lane is initial triage, not a release promise. It contains the imported
 
 | Issue | Priority | Type | Work |
 | :--- | :--- | :--- | :--- |
-| [#244](https://github.com/flyingrobots/bijou/issues/244) | `priority:high` | `type:docs` | DF-030 make DOGFOOD the canonical docs surface |
 | [#245](https://github.com/flyingrobots/bijou/issues/245) | `priority:medium` | `type:enhancement` | DX-037 tableSurface responsive width parity |
 | [#246](https://github.com/flyingrobots/bijou/issues/246) | `priority:medium` | `type:docs` | DX-029 document scopedNodeIO realpath and symlink semantics |
+
+### Completed Lineage
+
+These cards are included in the v7 milestone as completed release lineage once
+the closing PR merges.
+
+| Tracker | Lane | Type | Work |
+| :--- | :--- | :--- | :--- |
+| [#244](https://github.com/flyingrobots/bijou/issues/244) | `lane:release` | `type:docs` / `type:enhancement` | DF-030 DOGFOOD docs surface Block |
 
 ### Component-Family Audits
 
