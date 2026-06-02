@@ -265,6 +265,15 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.docs.surface.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.entry.frame.commandPalette.description"
       },
       "kind": "message",
@@ -419,6 +428,15 @@
       "key": {
         "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.label.tags"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.renderedPreview"
       },
       "kind": "message",
       "sourceLocale": "en",

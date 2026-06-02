@@ -41,6 +41,10 @@ Current direction and active tensions. Historical ship data is in
 - `DF-071` — DOGFOOD shell and docs surfaces moved further through semantic
   Block contracts, including block-owned surface inventory and localized
   inventory descriptions.
+- `DF-030` — DOGFOOD now has a canonical docs surface Block contract:
+  `DogfoodDocsSurfaceBlock` owns navigation, reader, search, proof artifact,
+  command-intent, schema-bound input, and lower-mode fact truth for the docs
+  app.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -50,14 +54,14 @@ Current direction and active tensions. Historical ship data is in
 
 ## Active Gravity
 
-### 1. Close The `v6.0.0` Release Boundary
+### 1. Keep The `v6.0.0` Release Boundary Closed
 
-- The live `v6.0.0` milestone has six open tracker items plus twenty-four
-  completed lineage trackers. The open items are the status/feedback Block
-  slice: #220, #221, #222, #223, #224, and #225.
-- The release thesis is still: frame owns geometry; Blocks prove it. The
-  current proof adds standard status and feedback Blocks on top of the landed
-  layout, standard block, data-binding, and selection/copy floors.
+- The live `v6.0.0` milestone has zero open tracker items and twenty-eight
+  completed issue trackers. PR #257 closed the status/feedback Block slice:
+  #220, #221, #222, #223, #224, and #225.
+- The release thesis is still complete: frame owns geometry; Blocks prove it.
+  The shipped proof now includes layout, standard Blocks, data binding,
+  selection/copy, and status/feedback Blocks.
 - `v6.0.0` should not tag until release-readiness validation and packaging
   checks are green.
 - The detailed issue list lives in [ROADMAP.md](./ROADMAP.md).
@@ -71,22 +75,23 @@ Current direction and active tensions. Historical ship data is in
 - Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
   comment and a matching roadmap update.
 
-### 3. `v7.0.0` Is The Queued Product-Truth Horizon
+### 3. `v7.0.0` Is The Active Product-Truth Horizon
 
 - `v7.0.0` holds the imported `up-next` lane: DOGFOOD docs truth,
   component-family audits, `tableSurface()` responsive parity, and scoped
   Node I/O documentation.
-- Its current open count is twenty-one after moving #220 through #225 into the
-  active v6 status/feedback slice.
-- This is initial triage, not a release promise.
-- After `v6.0.0` closes, v7 should be reshaped into a smaller release thesis
-  before implementation starts.
+- Its current open count is twenty-one before this DF-030 branch closes #244.
+  After this PR merges, the remaining open v7 queue should be #245, #246, and
+  the eighteen component-family audits #226 through #243.
+- DF-030 is the first product-truth slice: DOGFOOD's docs surface becomes one
+  inspectable Block contract instead of adjacent docs rendering concepts.
+- The remaining v7 queue should be reshaped into smaller, issue-backed release
+  slices rather than treated as one broad sweep.
 
 ## Tensions
 
-- **Release Scope Creep**: `v6.0.0` deliberately widened for six
-  status/feedback Block issues. Keep that widening bounded to #220 through
-  #225, then return to release-readiness validation.
+- **Release Scope Creep**: `v6.0.0` is issue-complete. Do not reopen it for new
+  feature work unless release-readiness validation uncovers a true blocker.
 - **Geometry Before Product Chrome**: RE-035 has landed the release's
   structural layout floor. Remaining product-facing v6 work should consume
   geometry contracts, not bypass them with bespoke string/surface measurement.
@@ -96,40 +101,35 @@ Current direction and active tensions. Historical ship data is in
 - **Tracker / Docs Drift**: The issue tracker, `ROADMAP.md`, and Method
   evidence files can now disagree. GitHub wins; docs must be updated when
   milestone triage changes.
-- **DOGFOOD Truth Debt**: `v7.0.0` carries a large docs and component-family
-  audit queue. That work matters, but it should not obscure the smaller v6
-  release gate.
+- **DOGFOOD Truth Debt**: DF-030 converts the docs app into a named Block
+  contract. The remaining v7 DOGFOOD work is still broad: table surface parity,
+  scoped Node I/O docs, and the component-family audit queue need focused
+  cycles with proof instead of prose-only closeouts.
 
 ## Next Target
 
-The immediate focus is the active `v6.0.0` status/feedback Block PR.
+The immediate focus is the active DF-030 DOGFOOD docs surface Block PR for
+[#244](https://github.com/flyingrobots/bijou/issues/244).
 
-Open v6 tracker items:
+The PR must prove:
 
-- [#220](https://github.com/flyingrobots/bijou/issues/220) inline status
-  standard Block
-- [#221](https://github.com/flyingrobots/bijou/issues/221) in-flow status
-  standard Block
-- [#222](https://github.com/flyingrobots/bijou/issues/222) transient overlay
-  standard Block
-- [#223](https://github.com/flyingrobots/bijou/issues/223) activity stream
-  standard Block
-- [#224](https://github.com/flyingrobots/bijou/issues/224) shortcut cue
-  standard Block
-- [#225](https://github.com/flyingrobots/bijou/issues/225) progress indicator
-  standard Block
+- `DogfoodDocsSurfaceBlock` metadata, data requirements, command intents, and
+  schema-bound input validation
+- visual/static rendering plus pipe and accessible lowerings with stable route,
+  heading, search-hit-count, and proof-artifact facts
+- DOGFOOD registry and inventory coverage for `docs.surface`
+- Method/design documentation with TUI and lower-mode mockups
 
 Recommended pull order:
 
-1. Complete the status/feedback Blocks slice for #220 through #225.
-2. Run release-readiness validation against the updated v6 lineage.
-3. Prepare the `v6.0.0` release notes, package checks, and tag candidate only
-   after local validation and CI are green.
+1. Finish and merge DF-030 for #244.
+2. Run release-readiness validation against the now-closed v6 issue lane.
+3. Pull the next v7 slice from #245, #246, or the component-family audit queue
+   only after the current PR is clean.
 
 Non-goals for the next cycle:
 
-- no broad DOGFOOD docs ingestion from [#244](https://github.com/flyingrobots/bijou/issues/244)
-  unless it is explicitly moved into v6
+- no broad DOGFOOD runtime rewrite
 - no remaining component-family audit sweep from `v7.0.0`
 - no full visual redesign of DOGFOOD
 - no conversion of every leaf component into a Block

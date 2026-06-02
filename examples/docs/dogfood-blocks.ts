@@ -1,13 +1,18 @@
 import {
   commandIntent,
   defineBlock,
+  defineBlockSchemaAdapter,
   defineDataRequirement,
+  defineSchemaBlock,
   defineViewData,
   isBlockDefinition,
   type BlockDefinition,
   type BlockRenderInput,
   type BlockRenderResult,
+  type BlockSchemaAdapter,
+  type BlockSchemaResult,
   type OutputMode,
+  type SchemaBoundBlockDefinition,
 } from '@flyingrobots/bijou';
 
 const DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND: unique symbol = Symbol('DogfoodBlockRegistryEntry');
@@ -199,6 +204,35 @@ export interface DocumentationArticleBlockConfig {
   readonly headingCount?: number;
 }
 
+export interface DogfoodDocsSurfaceSearchState {
+  readonly query: string;
+  readonly hitCount: number;
+}
+
+export interface DogfoodDocsSurfaceProofArtifact {
+  readonly id: string;
+  readonly label: string;
+  readonly available: boolean;
+}
+
+export interface DogfoodDocsSurfaceBlockConfig {
+  readonly docsTree?: readonly string[];
+  readonly selectedRoute?: string;
+  readonly selectedRouteLabel?: string;
+  readonly selectedHeadingId?: string;
+  readonly searchState?: DogfoodDocsSurfaceSearchState;
+  readonly proofArtifacts?: readonly DogfoodDocsSurfaceProofArtifact[];
+}
+
+export interface DogfoodDocsSurfaceSchemaData {
+  readonly docsTree: readonly string[];
+  readonly selectedRoute: string;
+  readonly selectedRouteLabel?: string;
+  readonly selectedHeadingId: string;
+  readonly searchState: DogfoodDocsSurfaceSearchState;
+  readonly proofArtifacts: readonly DogfoodDocsSurfaceProofArtifact[];
+}
+
 export interface SettingsMenuBlockRow {
   readonly id: string;
   readonly label: string;
@@ -268,6 +302,195 @@ export interface FooterHintBlockConfig {
   readonly controls?: string;
   readonly activeHint?: string;
   readonly status?: string;
+}
+
+export const docsSurfaceTreeRequirement = defineDataRequirement({
+  id: 'docs-surface.docsTree',
+  resource: 'dogfood.docs.tree',
+  label: 'Docs tree',
+  description: 'DOGFOOD documentation navigation tree available to the docs surface.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' }],
+});
+
+export const docsSurfaceRouteRequirement = defineDataRequirement({
+  id: 'docs-surface.selectedRoute',
+  resource: 'dogfood.docs.route',
+  label: 'Selected route',
+  description: 'Selected DOGFOOD docs route and heading identity.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' }],
+});
+
+export const docsSurfaceSearchRequirement = defineDataRequirement({
+  id: 'docs-surface.searchState',
+  resource: 'dogfood.docs.search',
+  label: 'Search state',
+  description: 'DOGFOOD documentation search query and hit count.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' }],
+});
+
+export const docsSurfaceProofRequirement = defineDataRequirement({
+  id: 'docs-surface.proofArtifacts',
+  resource: 'dogfood.docs.proofs',
+  label: 'Proof artifacts',
+  description: 'Capture or proof artifact inventory linked to the selected docs surface.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' }],
+});
+
+export const dogfoodDocsSurfaceData = defineViewData({
+  id: 'dogfood-docs-surface.data',
+  label: 'DogfoodDocsSurfaceBlock data',
+  description: 'DOGFOOD docs tree, active route, search posture, and proof artifacts.',
+  requirements: [
+    { name: 'docsTree', requirement: docsSurfaceTreeRequirement },
+    { name: 'selectedRoute', requirement: docsSurfaceRouteRequirement },
+    { name: 'searchState', requirement: docsSurfaceSearchRequirement },
+    { name: 'proofArtifacts', requirement: docsSurfaceProofRequirement },
+  ],
+});
+
+export const docsNavigateIntent = commandIntent<{ readonly route: string }>(
+  'docs.navigate',
+  {
+    label: 'Navigate docs',
+    description: 'Request navigation to a DOGFOOD documentation route.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'DogfoodDocsSurfaceBlock' }],
+  },
+);
+
+export const docsSearchIntent = commandIntent<{ readonly query: string }>(
+  'docs.search',
+  {
+    label: 'Search docs',
+    description: 'Request DOGFOOD documentation search for a query.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'DogfoodDocsSurfaceBlock' }],
+  },
+);
+
+export const docsOpenProofIntent = commandIntent<{ readonly proofArtifactId: string }>(
+  'docs.openProof',
+  {
+    label: 'Open proof',
+    description: 'Request opening a linked DOGFOOD proof artifact.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'DogfoodDocsSurfaceBlock' }],
+  },
+);
+
+export const docsCopyLinkIntent = commandIntent<{ readonly route: string }>(
+  'docs.copyLink',
+  {
+    label: 'Copy docs link',
+    description: 'Request copying a canonical DOGFOOD documentation link.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'DogfoodDocsSurfaceBlock' }],
+  },
+);
+
+export const dogfoodDocsSurfaceBlock: BlockDefinition<DogfoodDocsSurfaceBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'DogfoodDocsSurfaceBlock',
+    family: 'docs-surface',
+    scale: 'workspace',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the canonical DOGFOOD docs workspace across navigation, reader, search, and proof artifacts.',
+      useWhen: ['DOGFOOD needs one inspectable Block contract for the documentation app surface.'],
+      avoidWhen: ['A page only needs one local article, nav list, or search overlay.'],
+      relatedDocs: ['docs/DOGFOOD.md', 'docs/design/DF-030-dogfood-docs-surface-block.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'navigation', required: true, description: 'Docs tree and selected route.' },
+      { id: 'reader', required: true, description: 'Selected documentation reader content.' },
+      { id: 'search', required: false, description: 'Current search query and hit count.' },
+      { id: 'proofPanel', required: false, description: 'Linked proof artifact inventory.' },
+    ],
+    variants: [
+      {
+        id: 'canonical',
+        label: 'Canonical docs',
+        requiredSlots: ['navigation', 'reader'],
+        optionalSlots: ['search', 'proofPanel'],
+        facts: [{ kind: 'state', key: 'dogfood.docsSurface.layout', value: 'canonical' }],
+      },
+    ],
+    composedComponents: [
+      'NavigationListBlock',
+      'DocumentationArticleBlock',
+      'SearchPanelBlock',
+      'GuideInspectorBlock',
+      'createDocsApp()',
+    ],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' }],
+    storyIds: ['dogfood-docs-surface.canonical'],
+    examples: [{ id: 'dogfood.docs.surface', label: 'DOGFOOD docs surface' }],
+    tags: ['dogfood', 'docs', 'surface', 'canonical'],
+  },
+  data: dogfoodDocsSurfaceData,
+  commands: [
+    docsNavigateIntent,
+    docsSearchIntent,
+    docsOpenProofIntent,
+    docsCopyLinkIntent,
+  ],
+  render: renderDogfoodDocsSurfaceBlock,
+});
+
+export const dogfoodDocsSurfaceSchemaAdapter: BlockSchemaAdapter<DogfoodDocsSurfaceSchemaData> =
+  defineBlockSchemaAdapter({
+    id: 'dogfood-docs-surface.schema',
+    parse(input) {
+      const data = parseDogfoodDocsSurfaceSchemaData(input);
+      if (data === undefined) {
+        return schemaError(
+          'dogfood.docsSurface.invalid',
+          'DOGFOOD docs surface data is required.',
+        );
+      }
+
+      return {
+        ok: true,
+        data,
+      };
+    },
+    describe: () => ({
+      requiredFields: ['docsTree', 'selectedRoute', 'selectedHeadingId', 'searchState', 'proofArtifacts'],
+      optionalFields: ['selectedRouteLabel'],
+      facts: [{ kind: 'entity', key: 'block.schema', value: 'DogfoodDocsSurfaceBlock' }],
+    }),
+  });
+
+export const dogfoodDocsSurfaceSchemaBlock:
+  SchemaBoundBlockDefinition<DogfoodDocsSurfaceSchemaData, DogfoodDocsSurfaceBlockConfig, string> =
+  defineSchemaBlock<DogfoodDocsSurfaceSchemaData, DogfoodDocsSurfaceBlockConfig, string>({
+    block: dogfoodDocsSurfaceBlock,
+    schema: dogfoodDocsSurfaceSchemaAdapter,
+    bind: (data) => ({
+      input: {
+        config: {
+          docsTree: data.docsTree,
+          selectedRoute: data.selectedRoute,
+          ...(data.selectedRouteLabel === undefined ? {} : { selectedRouteLabel: data.selectedRouteLabel }),
+          selectedHeadingId: data.selectedHeadingId,
+          searchState: data.searchState,
+          proofArtifacts: data.proofArtifacts,
+        },
+      },
+      facts: dogfoodDocsSurfaceFacts(data),
+    }),
+  });
+
+export function dogfoodDocsSurfacePreviewOutput(): string {
+  return String(dogfoodDocsSurfaceBlock.render({
+    mode: 'static',
+    config: {
+      docsTree: ['Guides', 'Blocks', 'Packages'],
+      selectedRoute: 'blocks',
+      selectedHeadingId: 'blocks',
+      selectedRouteLabel: 'Blocks',
+      searchState: { query: 'table', hitCount: 2 },
+      proofArtifacts: [{ id: 'table-demo.gif', label: 'table-demo.gif', available: true }],
+    },
+  }).output);
 }
 
 export const blockPreviewDefinitionRequirement = defineDataRequirement({
@@ -1411,6 +1634,14 @@ export const documentationArticleBlockRegistryEntry = dogfoodBlockRegistryEntry(
   tags: ['docs', 'article'],
 });
 
+export const dogfoodDocsSurfaceBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: dogfoodDocsSurfaceBlock,
+  role: 'app-shell',
+  surfaceId: 'docs.surface',
+  description: 'DOGFOOD docs, navigation, search, reader, and proof artifact surface.',
+  tags: ['docs', 'surface', 'canonical'],
+});
+
 export const blockPreviewBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: blockPreviewBlock,
   role: 'preview',
@@ -1487,6 +1718,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'landing.title',
   'docs.navigation',
   'docs.article',
+  'docs.surface',
   'blocks.preview',
   'guide.inspector',
   'frame.settings',
@@ -1503,6 +1735,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   titleScreenBlockRegistryEntry,
   navigationListBlockRegistryEntry,
   documentationArticleBlockRegistryEntry,
+  dogfoodDocsSurfaceBlockRegistryEntry,
   blockPreviewBlockRegistryEntry,
   guideInspectorBlockRegistryEntry,
   settingsMenuBlockRegistryEntry,
@@ -1595,6 +1828,52 @@ export function isDogfoodBlockRegistry(value: unknown): value is DogfoodBlockReg
       && Object.prototype.hasOwnProperty.call(value, DOGFOOD_BLOCK_REGISTRY_BRAND)
       && (value as DogfoodBlockRegistryBrandCarrier)[DOGFOOD_BLOCK_REGISTRY_BRAND] === true,
   );
+}
+
+function renderDogfoodDocsSurfaceBlock(
+  input: BlockRenderInput<DogfoodDocsSurfaceBlockConfig>,
+): BlockRenderResult<string> {
+  const config = normalizeDogfoodDocsSurfaceConfig(input.config);
+  const routeLabel = config.selectedRouteLabel ?? config.selectedRoute;
+  const proofLabel = dogfoodDocsSurfaceProofLabel(config.proofArtifacts);
+  const facts = dogfoodDocsSurfaceFacts(config);
+
+  if (input.mode === 'pipe') {
+    return {
+      output: [
+        'route\theading\tsearch-hit-count\tproofs',
+        `${config.selectedRoute}\t${config.selectedHeadingId}\t${config.searchState.hitCount}\t${proofLabel}`,
+      ].join('\n'),
+      facts,
+    };
+  }
+
+  if (input.mode === 'accessible') {
+    return {
+      output: [
+        `DOGFOOD docs surface. ${routeLabel} page selected.`,
+        `Reader heading ${config.selectedHeadingId}.`,
+        `Search query ${config.searchState.query || 'empty'} has ${config.searchState.hitCount} hits.`,
+        `Proof artifacts: ${proofLabel}.`,
+      ].join(' '),
+      facts,
+    };
+  }
+
+  return {
+    output: [
+      '+-- DOGFOOD Docs Surface ------------------------------------------+',
+      '| navigation             | reader                                  |',
+      `| ${dogfoodDocsSurfaceCell(dogfoodDocsSurfaceSelectedNavLabel(config), 22)} | ${dogfoodDocsSurfaceCell(`# ${routeLabel}`, 39)} |`,
+      `| ${dogfoodDocsSurfaceCell(dogfoodDocsSurfaceNavLabel(config, 1), 22)} | ${dogfoodDocsSurfaceCell('Blocks are reusable contracts...', 39)} |`,
+      `| ${dogfoodDocsSurfaceCell(dogfoodDocsSurfaceNavLabel(config, 2), 22)} | ${dogfoodDocsSurfaceCell('', 39)} |`,
+      '|------------------------+-----------------------------------------|',
+      `| ${dogfoodDocsSurfaceCell(`search: ${config.searchState.query || 'empty'} (${config.searchState.hitCount} hits)`, 22)} | ${dogfoodDocsSurfaceCell(`proof: ${dogfoodDocsSurfaceProofStatus(config.proofArtifacts)}`, 39)} |`,
+      '+------------------------------------------------------------------+',
+      'Intents: docs.navigate; docs.search; docs.openProof; docs.copyLink',
+    ].join('\n'),
+    facts,
+  };
 }
 
 function renderStorybookWorkbenchBlock(
@@ -2060,6 +2339,158 @@ function dogfoodBlockKey(packageName: string, blockName: string): string {
   return `${packageName}/${blockName}`;
 }
 
+function normalizeDogfoodDocsSurfaceConfig(
+  config: DogfoodDocsSurfaceBlockConfig | undefined,
+): DogfoodDocsSurfaceSchemaData {
+  const selectedRoute = config?.selectedRoute ?? 'docs';
+  const selectedHeadingId = config?.selectedHeadingId ?? selectedRoute;
+  return {
+    docsTree: config?.docsTree ?? [],
+    selectedRoute,
+    ...(config?.selectedRouteLabel === undefined ? {} : { selectedRouteLabel: config.selectedRouteLabel }),
+    selectedHeadingId,
+    searchState: config?.searchState ?? { query: '', hitCount: 0 },
+    proofArtifacts: config?.proofArtifacts ?? [],
+  };
+}
+
+function dogfoodDocsSurfaceFacts(
+  config: DogfoodDocsSurfaceBlockConfig,
+) {
+  const normalized = normalizeDogfoodDocsSurfaceConfig(config);
+  return [
+    { kind: 'entity' as const, key: 'dogfood.block', value: 'DogfoodDocsSurfaceBlock' },
+    { kind: 'entity' as const, key: 'route', value: normalized.selectedRoute },
+    { kind: 'entity' as const, key: 'heading-id', value: normalized.selectedHeadingId },
+    { kind: 'count' as const, key: 'search-hit-count', value: normalized.searchState.hitCount },
+    { kind: 'entity' as const, key: 'proof-artifact', value: dogfoodDocsSurfaceProofLabel(normalized.proofArtifacts) },
+  ];
+}
+
+function dogfoodDocsSurfaceProofLabel(
+  artifacts: readonly DogfoodDocsSurfaceProofArtifact[],
+): string {
+  const available = artifacts
+    .filter((artifact) => artifact.available)
+    .map((artifact) => artifact.label);
+  return available.length === 0 ? 'none' : available.join(', ');
+}
+
+function dogfoodDocsSurfaceProofStatus(
+  artifacts: readonly DogfoodDocsSurfaceProofArtifact[],
+): string {
+  const label = dogfoodDocsSurfaceProofLabel(artifacts);
+  return label === 'none' ? 'none' : `${label} available`;
+}
+
+function dogfoodDocsSurfaceSelectedNavLabel(config: DogfoodDocsSurfaceSchemaData): string {
+  const selectedLabel = config.selectedRouteLabel ?? config.selectedRoute;
+  return `> ${selectedLabel}`;
+}
+
+function dogfoodDocsSurfaceCell(value: string, width: number): string {
+  return value.slice(0, width).padEnd(width);
+}
+
+function dogfoodDocsSurfaceNavLabel(
+  config: DogfoodDocsSurfaceSchemaData,
+  index: number,
+): string {
+  const selectedLabel = config.selectedRouteLabel ?? config.selectedRoute;
+  const remainingLabels = config.docsTree.filter((label) => label !== selectedLabel);
+  const label = remainingLabels[index - 1] ?? '';
+  if (label.length === 0) {
+    return '';
+  }
+
+  return `  ${label}`;
+}
+
+function parseDogfoodDocsSurfaceSchemaData(input: unknown): DogfoodDocsSurfaceSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const docsTree = textArrayProperty(input, 'docsTree');
+  const selectedRoute = textProperty(input, 'selectedRoute');
+  const selectedRouteLabel = textProperty(input, 'selectedRouteLabel');
+  const selectedHeadingId = textProperty(input, 'selectedHeadingId');
+  const searchState = parseDogfoodDocsSurfaceSearchState(ownDataProperty(input, 'searchState'));
+  const proofArtifacts = parseDogfoodDocsSurfaceProofArtifacts(ownDataProperty(input, 'proofArtifacts'));
+
+  if (
+    docsTree === undefined
+    || selectedRoute === undefined
+    || selectedHeadingId === undefined
+    || searchState === undefined
+    || proofArtifacts === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    docsTree,
+    selectedRoute,
+    ...(selectedRouteLabel === undefined ? {} : { selectedRouteLabel }),
+    selectedHeadingId,
+    searchState,
+    proofArtifacts,
+  };
+}
+
+function parseDogfoodDocsSurfaceSearchState(input: unknown): DogfoodDocsSurfaceSearchState | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const query = textProperty(input, 'query');
+  const hitCount = numberProperty(input, 'hitCount');
+  if (query === undefined || hitCount === undefined) {
+    return undefined;
+  }
+
+  return { query, hitCount };
+}
+
+function parseDogfoodDocsSurfaceProofArtifacts(
+  input: unknown,
+): readonly DogfoodDocsSurfaceProofArtifact[] | undefined {
+  if (!Array.isArray(input)) {
+    return undefined;
+  }
+
+  const artifacts = input.map(parseDogfoodDocsSurfaceProofArtifact);
+  return artifacts.every((artifact): artifact is DogfoodDocsSurfaceProofArtifact => artifact !== undefined)
+    ? artifacts
+    : undefined;
+}
+
+function parseDogfoodDocsSurfaceProofArtifact(input: unknown): DogfoodDocsSurfaceProofArtifact | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const id = textProperty(input, 'id');
+  const label = textProperty(input, 'label');
+  const available = booleanProperty(input, 'available');
+  if (id === undefined || label === undefined || available === undefined) {
+    return undefined;
+  }
+
+  return { id, label, available };
+}
+
+function schemaError<Data = never>(code: string, message: string): BlockSchemaResult<Data> {
+  return {
+    ok: false,
+    issues: [{
+      severity: 'error',
+      code,
+      message,
+    }],
+  };
+}
+
 function normalizeDogfoodBlockRole(role: DogfoodBlockRole): DogfoodBlockRole {
   const normalized = normalizeRequiredText({
     scope: 'dogfood block registry entry',
@@ -2098,6 +2529,42 @@ function optionalTrimmedText(value: unknown): string | undefined {
     field: 'description',
     value,
   });
+}
+
+function isPlainRecord(input: unknown): input is Record<string, unknown> {
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    return false;
+  }
+
+  const prototype = Object.getPrototypeOf(input);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function ownDataProperty(input: Record<string, unknown>, key: string): unknown {
+  const descriptor = Object.getOwnPropertyDescriptor(input, key);
+  return descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
+}
+
+function textProperty(input: Record<string, unknown>, key: string): string | undefined {
+  const value = ownDataProperty(input, key);
+  return typeof value === 'string' ? value : undefined;
+}
+
+function numberProperty(input: Record<string, unknown>, key: string): number | undefined {
+  const value = ownDataProperty(input, key);
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function booleanProperty(input: Record<string, unknown>, key: string): boolean | undefined {
+  const value = ownDataProperty(input, key);
+  return typeof value === 'boolean' ? value : undefined;
+}
+
+function textArrayProperty(input: Record<string, unknown>, key: string): readonly string[] | undefined {
+  const value = ownDataProperty(input, key);
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+    ? value
+    : undefined;
 }
 
 interface DogfoodBlockRegistryEntryBrandCarrier {

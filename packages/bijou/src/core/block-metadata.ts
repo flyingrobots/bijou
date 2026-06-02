@@ -18,7 +18,8 @@ export type BlockScale =
   | 'item'
   | 'data'
   | 'diagnostic'
-  | 'overlay';
+  | 'overlay'
+  | 'workspace';
 
 export type BlockConfigOptionKind =
   | 'boolean'
@@ -162,6 +163,7 @@ const BLOCK_SCALES: readonly BlockScale[] = [
   'data',
   'diagnostic',
   'overlay',
+  'workspace',
 ];
 const OUTPUT_MODES: readonly OutputMode[] = [
   'interactive',

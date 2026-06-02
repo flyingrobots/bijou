@@ -188,7 +188,7 @@ describe('block metadata contract', () => {
   it('reports unsupported enum-like values from untyped package consumers', () => {
     const report = validateBlockMetadata({
       ...appShellMetadata,
-      scale: 'workspace' as never,
+      scale: 'screenlet' as never,
       modes: ['interactive', 'screen' as never],
     });
 
@@ -198,7 +198,7 @@ describe('block metadata contract', () => {
       'modes[1]',
     ]);
     expect(blockMetadataReportText(report)).toContain(
-      '- error invalid-value path=scale: unsupported block scale workspace',
+      '- error invalid-value path=scale: unsupported block scale screenlet',
     );
   });
 

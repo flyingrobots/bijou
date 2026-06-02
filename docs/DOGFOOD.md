@@ -85,8 +85,17 @@ It gathers the package guides for the published workspace, release guidance,
 and the doctrine, architecture, invariants, and design-system guidance that
 operators need when learning or validating Bijou.
 
+DOGFOOD also publishes its own docs experience as
+`DogfoodDocsSurfaceBlock`, the canonical app-level Block for navigation,
+reader content, search state, and proof artifacts. That contract gives humans
+and agents one inspectable surface identity for the docs app instead of
+reconstructing product truth from adjacent rendering code.
+
 ### Today's Proof Points
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
+- **Canonical Docs Surface Block**: `DogfoodDocsSurfaceBlock` owns the
+  DOGFOOD docs surface contract across navigation, reader, search, proof
+  artifacts, command intents, and lower-mode facts.
 - **Documentation Jump Search**: `/` opens a global documentation search that
   can jump across sections, activate the right page, and select the matching
   guide or component story.

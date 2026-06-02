@@ -12,6 +12,8 @@ import {
   defaultDogfoodBlockRegistry,
   documentationArticleBlock,
   documentationArticleBlockRegistryEntry,
+  dogfoodDocsSurfaceBlock,
+  dogfoodDocsSurfaceBlockRegistryEntry,
   dogfoodBlockCoverageReport,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
@@ -337,6 +339,37 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Article: Blocks; headings: 5');
   });
 
+  it('publishes the canonical DOGFOOD docs surface as an app-level block', () => {
+    expect(dogfoodDocsSurfaceBlockRegistryEntry.block).toBe(dogfoodDocsSurfaceBlock);
+    expect(dogfoodDocsSurfaceBlockRegistryEntry.role).toBe('app-shell');
+    expect(defaultDogfoodBlockRegistry.forSurface('docs.surface')).toBe(
+      dogfoodDocsSurfaceBlockRegistryEntry,
+    );
+    expect(dogfoodDocsSurfaceBlock.data?.names()).toEqual([
+      'docsTree',
+      'selectedRoute',
+      'searchState',
+      'proofArtifacts',
+    ]);
+    expect(dogfoodDocsSurfaceBlock.commands?.map((intent) => intent.id)).toEqual([
+      'docs.navigate',
+      'docs.search',
+      'docs.openProof',
+      'docs.copyLink',
+    ]);
+
+    expect(dogfoodDocsSurfaceBlock.render({
+      config: {
+        docsTree: ['Guides', 'Blocks'],
+        selectedRoute: 'blocks',
+        selectedHeadingId: 'blocks',
+        searchState: { query: 'block', hitCount: 3 },
+        proofArtifacts: [{ id: 'blocks.gif', label: 'blocks.gif', available: true }],
+      },
+      mode: 'pipe',
+    }).output).toBe('route\theading\tsearch-hit-count\tproofs\nblocks\tblocks\t3\tblocks.gif');
+  });
+
   it('publishes DOGFOOD settings as a frame-owned block surface', () => {
     expect(settingsMenuBlockRegistryEntry.block).toBe(settingsMenuBlock);
     expect(settingsMenuBlockRegistryEntry.role).toBe('settings');
@@ -421,6 +454,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'landing.title',
       'docs.navigation',
       'docs.article',
+      'docs.surface',
       'blocks.preview',
       'guide.inspector',
       'frame.settings',
@@ -436,6 +470,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'TitleScreenBlock',
       'NavigationListBlock',
       'DocumentationArticleBlock',
+      'DogfoodDocsSurfaceBlock',
       'BlockPreviewBlock',
       'GuideInspectorBlock',
       'SettingsMenuBlock',
