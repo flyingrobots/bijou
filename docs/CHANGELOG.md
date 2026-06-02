@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **DX-034 data binding closeout** — BEARING, ROADMAP, the v6 backlog
+  evidence, and cycle tests now mark declarative view data binding as landed
+  through issue #182. The closeout records immutable binding frames, provider
+  scopes, AppShell composition, active binding lifecycle facts, provider-update
+  frame assembly, command intent routing, provider-bound AppShell proof, and
+  DOGFOOD binding-state evidence as the shipped v6 data-binding floor.
 - **DX-031 standard blocks closeout** — BEARING, ROADMAP, the v6 backlog
   evidence, and cycle tests now mark the standard block release floor as
   landed through issue #181. The closeout records `AppShell`, `ReaderSurface`,

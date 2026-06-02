@@ -988,10 +988,11 @@ flow.
 14. Done: add invalidation flow from provider snapshot updates to new immutable
    binding frames.
 15. Done: add Command intent dispatch proof through the runtime command buffer.
-16. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
-   and status blocks.
-17. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
-    error binding states.
+16. Done: prove rendered AppShell with provider-bound navigation, content,
+    inspector, and status blocks.
+17. Done: add DOGFOOD stories and captures for ready, loading, stale, empty,
+    and error binding states through the standard block story and DOGFOOD
+    preview surface.
 
 ## Tests To Write First
 
@@ -1105,3 +1106,22 @@ loop exists yet.
 DX-034I landed command intent emission and runtime command-buffer routing. The
 restraint is that command routes map intent records to command values; business
 logic still applies commands later through the existing runtime command buffer.
+
+DX-034 is landed for the `v6.0.0` release boundary. The shipped release floor is
+the explicit data-binding contract layer: immutable snapshots and frames,
+provider scopes, view data contracts, structural AppShell composition, active
+binding lifecycle facts, active runtime binding collection, provider-update
+frame assembly, command intent routing, and closeout proof that a provider-bound
+AppShell can render `navigation`, `content`, `inspector`, and `status` regions
+from immutable binding frames without exposing provider, subscription, refresh,
+or dispatch handles to rendered output.
+
+Provider-bound AppShell proof is present in the DX-034 closeout cycle test. The
+proof intentionally stays pure: provider subscriptions and cache policy remain
+runtime/provider responsibilities, while the release contract proves the
+boundary that views consume immutable frames and emit command intents.
+
+DOGFOOD binding-state proof is present through the standard block story states
+and Blocks preview lowering checks for ready, loading, stale, empty, and error
+states. Broader production AppShell behavior can now build on the landed
+contract without keeping issue #182 open.
