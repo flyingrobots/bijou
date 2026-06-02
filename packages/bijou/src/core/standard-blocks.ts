@@ -757,7 +757,7 @@ function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): Blo
 }
 
 function firstFeedbackStoryId(options: StandardFeedbackMetadataOptions): string {
-  const storyId = options.storyIds[0];
+  const [storyId] = options.storyIds;
   if (typeof storyId !== 'string' || storyId.trim() === '') {
     throw new Error(`${options.blockName} standard metadata requires a story id`);
   }
