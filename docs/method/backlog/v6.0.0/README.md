@@ -31,10 +31,17 @@ The boundary remains:
 - modes lower
 - inspector explains
 
-## Active Design Anchors
+## Landed Layout Anchor
 
 - [**RE-035**](../../../design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md) -
-  mandatory layout envelope and constraint negotiation
+  mandatory layout envelope and constraint negotiation landed through PR #251
+  and issue #180. Follow-on renderer adoption, text measurement, viewport
+  overflow, hit-testing, responsive fallback, accessible layout lowering, and
+  workspace behavior remain explicit later cycles instead of hidden RE-035
+  scope.
+
+## Active Design Anchors
+
 - [**DX-031**](../../../design/DX-031-standard-bijou-blocks.md) -
   standard Bijou blocks
 - [**DX-034**](../../../design/DX-034-declarative-view-data-binding.md) -
@@ -81,8 +88,8 @@ The boundary remains:
 - [**WF-009**](../../../design/WF-009-keep-release-prs-under-automated-review-file-limits.md) -
   keep release PRs under automated review file limits
 - [**PR #250**](https://github.com/flyingrobots/bijou/pull/250) -
-  keep the v6 release validation toolchain current with the Vitest `4.0.18` to
-  `4.1.8` dependency-hygiene bump
+  landed the v6 release validation toolchain update from Vitest `4.0.18` to
+  `4.1.8`
 
 ## Execution Order
 

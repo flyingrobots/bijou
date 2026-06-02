@@ -17,9 +17,9 @@ import {
 } from './envelope.js';
 
 describe('RE-035 layout envelope scope', () => {
-  it('records the active cycle and deferred layout work', () => {
+  it('records the landed cycle and deferred layout work', () => {
     expect(RE035_LAYOUT_SCOPE.design).toBe('RE-035');
-    expect(RE035_LAYOUT_SCOPE.status).toBe('active');
+    expect(RE035_LAYOUT_SCOPE.status).toBe('landed');
     expect(RE035_LAYOUT_SCOPE.included).toEqual([
       'layout-envelope',
       'constraint-negotiation',
