@@ -269,7 +269,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "DOGFOOD-Dokumentation, Navigation, Suche, Lesefläche und Oberfläche für Nachweisartefakte."
+      }
     },
     {
       "key": {
@@ -440,7 +442,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Gerenderte Vorschau"
+      }
     },
     {
       "key": {

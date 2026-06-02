@@ -269,7 +269,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Surface de documentation DOGFOOD, navigation, recherche, lecture et artefacts de preuve."
+      }
     },
     {
       "key": {
@@ -440,7 +442,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Aperçu rendu"
+      }
     },
     {
       "key": {

@@ -303,6 +303,7 @@ Metadata sketch:
 ```ts
 type BlockScale =
   | 'app'
+  | 'workspace'
   | 'section'
   | 'panel'
   | 'control'

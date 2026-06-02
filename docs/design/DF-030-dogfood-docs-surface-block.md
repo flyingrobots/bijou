@@ -103,7 +103,7 @@ Stable facts:
 - `route`
 - `heading-id`
 - `search-hit-count`
-- `proof-artifact` as the artifact id, not the display label
+- `proof-artifact` as one fact per available artifact id, not the display label
 
 ## TUI Mockup
 
@@ -149,9 +149,10 @@ agent consumers.
 ## Localization And Directionality Posture
 
 The registry description for `docs.surface` is catalog-backed through the
-DOGFOOD string table. This slice adds the English source row and generated
-runtime catalog entries while leaving non-English locales explicitly missing
-rather than hiding untranslated copy behind silent selected-locale fallback.
+DOGFOOD string table. This slice adds English source rows plus generated
+German, Spanish, and French runtime catalog entries for the docs-surface
+description and rendered-preview label. Any untranslated neighboring strings
+remain explicit catalog debt rather than hidden selected-locale fallback.
 The Block contract itself carries ids, routes, counts, and artifact labels as
 data so future locale and directionality adapters can format presentation
 without changing the semantic facts.

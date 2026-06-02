@@ -269,7 +269,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Superficie de documentación DOGFOOD, navegación, búsqueda, lector y artefactos de prueba."
+      }
     },
     {
       "key": {
@@ -440,7 +442,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Vista previa renderizada"
+      }
     },
     {
       "key": {
