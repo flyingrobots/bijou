@@ -1836,13 +1836,14 @@ function renderDogfoodDocsSurfaceBlock(
   const config = normalizeDogfoodDocsSurfaceConfig(input.config);
   const routeLabel = config.selectedRouteLabel ?? config.selectedRoute;
   const proofLabel = dogfoodDocsSurfaceProofLabel(config.proofArtifacts);
+  const proofIds = dogfoodDocsSurfaceProofIds(config.proofArtifacts);
   const facts = dogfoodDocsSurfaceFacts(config);
 
   if (input.mode === 'pipe') {
     return {
       output: [
         'route\theading\tsearch-hit-count\tproofs',
-        `${config.selectedRoute}\t${config.selectedHeadingId}\t${config.searchState.hitCount}\t${proofLabel}`,
+        `${config.selectedRoute}\t${config.selectedHeadingId}\t${config.searchState.hitCount}\t${proofIds}`,
       ].join('\n'),
       facts,
     };
@@ -2363,7 +2364,7 @@ function dogfoodDocsSurfaceFacts(
     { kind: 'entity' as const, key: 'route', value: normalized.selectedRoute },
     { kind: 'entity' as const, key: 'heading-id', value: normalized.selectedHeadingId },
     { kind: 'count' as const, key: 'search-hit-count', value: normalized.searchState.hitCount },
-    { kind: 'entity' as const, key: 'proof-artifact', value: dogfoodDocsSurfaceProofIds(normalized.proofArtifacts) },
+    ...dogfoodDocsSurfaceProofFacts(normalized.proofArtifacts),
   ];
 }
 
@@ -2374,6 +2375,19 @@ function dogfoodDocsSurfaceProofIds(
     .filter((artifact) => artifact.available)
     .map((artifact) => artifact.id);
   return available.length === 0 ? 'none' : available.join(', ');
+}
+
+function dogfoodDocsSurfaceProofFacts(
+  artifacts: readonly DogfoodDocsSurfaceProofArtifact[],
+) {
+  const available = artifacts.filter((artifact) => artifact.available);
+  return available.length === 0
+    ? [{ kind: 'entity' as const, key: 'proof-artifact', value: 'none' }]
+    : available.map((artifact) => ({
+      kind: 'entity' as const,
+      key: 'proof-artifact',
+      value: artifact.id,
+    }));
 }
 
 function dogfoodDocsSurfaceProofLabel(
@@ -2421,15 +2435,19 @@ function parseDogfoodDocsSurfaceSchemaData(input: unknown): DogfoodDocsSurfaceSc
   }
 
   const docsTree = textArrayProperty(input, 'docsTree');
-  const selectedRoute = textProperty(input, 'selectedRoute');
-  const selectedRouteLabel = textProperty(input, 'selectedRouteLabel');
-  const selectedHeadingId = textProperty(input, 'selectedHeadingId');
+  const selectedRoute = requiredNonEmptyTextProperty(input, 'selectedRoute');
+  const selectedRouteLabelValue = ownDataProperty(input, 'selectedRouteLabel');
+  const selectedRouteLabel = selectedRouteLabelValue === undefined
+    ? undefined
+    : nonEmptyTextValue(selectedRouteLabelValue);
+  const selectedHeadingId = requiredNonEmptyTextProperty(input, 'selectedHeadingId');
   const searchState = parseDogfoodDocsSurfaceSearchState(ownDataProperty(input, 'searchState'));
   const proofArtifacts = parseDogfoodDocsSurfaceProofArtifacts(ownDataProperty(input, 'proofArtifacts'));
 
   if (
     docsTree === undefined
     || selectedRoute === undefined
+    || (selectedRouteLabelValue !== undefined && selectedRouteLabel === undefined)
     || selectedHeadingId === undefined
     || searchState === undefined
     || proofArtifacts === undefined
@@ -2480,7 +2498,7 @@ function parseDogfoodDocsSurfaceProofArtifact(input: unknown): DogfoodDocsSurfac
     return undefined;
   }
 
-  const id = textProperty(input, 'id');
+  const id = requiredNonEmptyTextProperty(input, 'id');
   const label = textProperty(input, 'label');
   const available = booleanProperty(input, 'available');
   if (id === undefined || label === undefined || available === undefined) {
@@ -2558,6 +2576,14 @@ function ownDataProperty(input: Record<string, unknown>, key: string): unknown {
 function textProperty(input: Record<string, unknown>, key: string): string | undefined {
   const value = ownDataProperty(input, key);
   return typeof value === 'string' ? value : undefined;
+}
+
+function requiredNonEmptyTextProperty(input: Record<string, unknown>, key: string): string | undefined {
+  return nonEmptyTextValue(ownDataProperty(input, key));
+}
+
+function nonEmptyTextValue(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined;
 }
 
 function numberProperty(input: Record<string, unknown>, key: string): number | undefined {

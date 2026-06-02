@@ -204,6 +204,67 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     });
   });
 
+  it('emits one machine-facing proof fact per available artifact id', () => {
+    const rendered = dogfoodDocsSurfaceBlock.render({
+      mode: 'pipe',
+      config: {
+        docsTree: ['Guides', 'Blocks', 'Packages'],
+        selectedRoute: 'blocks',
+        selectedHeadingId: 'blocks',
+        selectedRouteLabel: 'Blocks',
+        searchState: { query: 'table', hitCount: 2 },
+        proofArtifacts: [
+          {
+            id: 'capture.table-demo',
+            label: 'Table demo capture',
+            available: true,
+          },
+          {
+            id: 'capture.block-registry',
+            label: 'Block registry screenshot',
+            available: true,
+          },
+          {
+            id: 'capture.future-proof',
+            label: 'Future proof',
+            available: false,
+          },
+        ],
+      },
+    });
+
+    expect(rendered.output).toBe([
+      'route\theading\tsearch-hit-count\tproofs',
+      'blocks\tblocks\t2\tcapture.table-demo, capture.block-registry',
+    ].join('\n'));
+    expect(rendered.output).not.toContain('Table demo capture');
+    expect(rendered.facts?.filter((fact) => fact.key === 'proof-artifact')).toEqual([
+      { kind: 'entity', key: 'proof-artifact', value: 'capture.table-demo' },
+      { kind: 'entity', key: 'proof-artifact', value: 'capture.block-registry' },
+    ]);
+  });
+
+  it('rejects blank docs-surface identifiers at the schema boundary', () => {
+    for (const patch of [
+      { selectedRoute: '' },
+      { selectedRoute: '   ' },
+      { selectedHeadingId: '' },
+      { selectedRouteLabel: '' },
+      { proofArtifacts: [{ id: '', label: 'Table demo capture', available: true }] },
+    ]) {
+      expect(bindSchemaBlockInput(dogfoodDocsSurfaceSchemaBlock, {
+        ...dogfoodDocsFixture(),
+        ...patch,
+      })).toMatchObject({
+        ok: false,
+        issues: [{
+          severity: 'error',
+          code: 'dogfood.docsSurface.invalid',
+        }],
+      });
+    }
+  });
+
   it('registers the docs surface in DOGFOOD inventory and product docs', async () => {
     expect(dogfoodDocsSurfaceBlockRegistryEntry.block).toBe(dogfoodDocsSurfaceBlock);
     expect(dogfoodDocsSurfaceBlockRegistryEntry.role).toBe('app-shell');
