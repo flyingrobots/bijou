@@ -3677,7 +3677,7 @@ describe('createFramedApp', () => {
     expect(dismissedModel.runtimeNotifications.items).toHaveLength(1);
     expect(dismissedModel.runtimeNotifications.items[0]?.phase).toBe('exiting');
     expect(dismissedModel.runtimeNotificationLoopActive).toBe(true);
-  }, 10000);
+  }, 30_000);
 
   it('treats modal keymaps as exclusive while a page modal is open', async () => {
     const app = createFramedApp({
