@@ -4,12 +4,122 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.event.prOpened"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "10:42 PR opened"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.event.testsPassed"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "10:41 tests passed"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.selected"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "10:41 tests passed"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.documentationTitle"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {
         "en": "documentation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.action"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Open story"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Preview data should stay explicit."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.severity"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "warning"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.source"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD Blocks"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Docs inventory"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "catalog synced"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.status"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "ready"
       }
     },
     {
@@ -59,12 +169,100 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.progressIndicator.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Install packages"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.separator"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {
         "en": "blocks • live preview"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.close"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Esc Close"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.help"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "? Help"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.scope"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Blocks page"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.search"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "/ Search"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.dismiss"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Esc dismisses"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Saved DOGFOOD route"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.priority"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "normal"
       }
     },
     {
