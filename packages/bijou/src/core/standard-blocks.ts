@@ -34,7 +34,16 @@ const ALL_OUTPUT_MODES = Object.freeze([
   'accessible',
 ] as const);
 
-export type StandardBlockName = 'AppShell' | 'ReaderSurface' | 'InspectorPanel';
+export type StandardBlockName =
+  | 'AppShell'
+  | 'ReaderSurface'
+  | 'InspectorPanel'
+  | 'InlineStatusBlock'
+  | 'InFlowStatusBlock'
+  | 'TransientOverlayBlock'
+  | 'ActivityStreamBlock'
+  | 'ShortcutCueBlock'
+  | 'ProgressIndicatorBlock';
 export type StandardBlockStoryState =
   | 'ready'
   | 'narrow'
@@ -156,6 +165,80 @@ const inspectorFocusSource = commandIntent<{ readonly sourceId: string }>('inspe
   facts: [{ kind: 'entity', key: 'block.command', value: 'InspectorPanel' }],
 });
 
+const inlineStatusSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'status', label: 'Status', required: true },
+  { id: 'message', label: 'Message', required: false },
+]);
+const inFlowStatusSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'severity', label: 'Severity', required: true },
+  { id: 'source', label: 'Source', required: false },
+  { id: 'message', label: 'Message', required: true },
+  { id: 'action', label: 'Action', required: false },
+]);
+const transientOverlaySections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'priority', label: 'Priority', required: false },
+  { id: 'message', label: 'Message', required: true },
+  { id: 'dismiss', label: 'Dismiss', required: false },
+]);
+const activityStreamSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'events', label: 'Events', required: true },
+  { id: 'selected', label: 'Selected', required: false },
+]);
+const shortcutCueSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'shortcuts', label: 'Shortcuts', required: true },
+  { id: 'scope', label: 'Scope', required: false },
+]);
+const progressIndicatorSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'value', label: 'Value', required: false },
+  { id: 'total', label: 'Total', required: false },
+  { id: 'percent', label: 'Percent', required: true },
+]);
+
+const inlineStatusData = standardBlockData('inline-status', 'InlineStatusBlock', [
+  {
+    name: 'status',
+    label: 'Inline status facts',
+    description: 'Label, status key, and optional status message.',
+  },
+]);
+const inFlowStatusData = standardBlockData('in-flow-status', 'InFlowStatusBlock', [
+  {
+    name: 'status',
+    label: 'In-flow status message',
+    description: 'Durable in-flow severity, message, source, and action facts.',
+  },
+]);
+const transientOverlayData = standardBlockData('transient-overlay', 'TransientOverlayBlock', [
+  {
+    name: 'overlay',
+    label: 'Transient overlay event',
+    description: 'Short-lived overlay message plus priority and dismissal facts.',
+  },
+]);
+const activityStreamData = standardBlockData('activity-stream', 'ActivityStreamBlock', [
+  {
+    name: 'events',
+    label: 'Activity events',
+    description: 'Chronological event records and selected event state.',
+  },
+]);
+const shortcutCueData = standardBlockData('shortcut-cue', 'ShortcutCueBlock', [
+  {
+    name: 'shortcuts',
+    label: 'Shortcut cues',
+    description: 'Keyboard shortcuts, action labels, and active scope facts.',
+  },
+]);
+const progressIndicatorData = standardBlockData('progress-indicator', 'ProgressIndicatorBlock', [
+  {
+    name: 'progress',
+    label: 'Progress state',
+    description: 'Progress label, current value, total value, and percent facts.',
+  },
+]);
+
 export const appShellBlock: BlockDefinition = defineBlock({
   metadata: appShellMetadata(),
   commands: [
@@ -184,6 +267,48 @@ export const inspectorPanelBlock: BlockDefinition = defineBlock({
     inspectorFocusSource,
   ],
   render: renderInspectorPanelBlock,
+});
+
+export const inlineStatusBlock: BlockDefinition = defineBlock({
+  metadata: inlineStatusMetadata(),
+  data: inlineStatusData,
+  commands: standardFeedbackCommands('InlineStatusBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'InlineStatusBlock', inlineStatusSections),
+});
+
+export const inFlowStatusBlock: BlockDefinition = defineBlock({
+  metadata: inFlowStatusMetadata(),
+  data: inFlowStatusData,
+  commands: standardFeedbackCommands('InFlowStatusBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'InFlowStatusBlock', inFlowStatusSections),
+});
+
+export const transientOverlayBlock: BlockDefinition = defineBlock({
+  metadata: transientOverlayMetadata(),
+  data: transientOverlayData,
+  commands: standardFeedbackCommands('TransientOverlayBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'TransientOverlayBlock', transientOverlaySections),
+});
+
+export const activityStreamBlock: BlockDefinition = defineBlock({
+  metadata: activityStreamMetadata(),
+  data: activityStreamData,
+  commands: standardFeedbackCommands('ActivityStreamBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'ActivityStreamBlock', activityStreamSections),
+});
+
+export const shortcutCueBlock: BlockDefinition = defineBlock({
+  metadata: shortcutCueMetadata(),
+  data: shortcutCueData,
+  commands: standardFeedbackCommands('ShortcutCueBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'ShortcutCueBlock', shortcutCueSections),
+});
+
+export const progressIndicatorBlock: BlockDefinition = defineBlock({
+  metadata: progressIndicatorMetadata(),
+  data: progressIndicatorData,
+  commands: standardFeedbackCommands('ProgressIndicatorBlock'),
+  render: (input) => renderStandardSectionBlock(input, 'ProgressIndicatorBlock', progressIndicatorSections),
 });
 
 export const readerSurfaceSchemaAdapter: BlockSchemaAdapter<ReaderSurfaceSchemaData> =
@@ -277,6 +402,12 @@ export const standardBlocks = Object.freeze([
   appShellBlock,
   readerSurfaceBlock,
   inspectorPanelBlock,
+  inlineStatusBlock,
+  inFlowStatusBlock,
+  transientOverlayBlock,
+  activityStreamBlock,
+  shortcutCueBlock,
+  progressIndicatorBlock,
 ]);
 
 export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze([
@@ -293,6 +424,12 @@ export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze
   standardBlockStory('inspector-panel.loading', 'InspectorPanel', 'Inspector loading', 'loading'),
   standardBlockStory('inspector-panel.stale', 'InspectorPanel', 'Inspector stale', 'stale'),
   standardBlockStory('inspector-panel.error', 'InspectorPanel', 'Inspector error', 'error'),
+  standardBlockStory('inline-status.ready', 'InlineStatusBlock', 'Inline status ready', 'ready'),
+  standardBlockStory('in-flow-status.ready', 'InFlowStatusBlock', 'In-flow status ready', 'ready'),
+  standardBlockStory('transient-overlay.ready', 'TransientOverlayBlock', 'Transient overlay ready', 'ready'),
+  standardBlockStory('activity-stream.ready', 'ActivityStreamBlock', 'Activity stream ready', 'ready'),
+  standardBlockStory('shortcut-cue.ready', 'ShortcutCueBlock', 'Shortcut cue ready', 'ready'),
+  standardBlockStory('progress-indicator.ready', 'ProgressIndicatorBlock', 'Progress indicator ready', 'ready'),
 ]);
 
 export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPackage({
@@ -444,6 +581,148 @@ function inspectorPanelMetadata(): BlockMetadata {
   };
 }
 
+function inlineStatusMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'InlineStatusBlock',
+    family: 'status',
+    scale: 'inline',
+    summary: 'Attaches concise status facts to labels, rows, and command hints without relying on color-only meaning.',
+    useWhen: ['Showing compact status beside a label, command, row, or fact.'],
+    avoidWhen: ['The message needs durable body copy, action text, or a review history.'],
+    slots: inlineStatusSections,
+    storyIds: ['inline-status.ready'],
+    composedComponents: ['Badge', 'StatusToken', 'Text'],
+    tags: ['standard', 'status', 'inline', 'df-031'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+function inFlowStatusMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'InFlowStatusBlock',
+    family: 'status',
+    scale: 'section',
+    summary: 'Shows durable in-flow status messages with severity, source, action, and lower-mode facts.',
+    useWhen: ['A page needs status copy that remains in the normal reading flow.'],
+    avoidWhen: ['The feedback should disappear automatically or interrupt as an overlay.'],
+    slots: inFlowStatusSections,
+    storyIds: ['in-flow-status.ready'],
+    composedComponents: ['Alert', 'Callout', 'StatusToken'],
+    tags: ['standard', 'status', 'in-flow', 'df-032'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+function transientOverlayMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'TransientOverlayBlock',
+    family: 'overlay',
+    scale: 'overlay',
+    summary: 'Announces short-lived state with priority, dismissal, and accessible text facts.',
+    useWhen: ['A low-level toast or temporary overlay needs consistent semantics.'],
+    avoidWhen: ['The feedback needs durable notification history or blocking confirmation.'],
+    slots: transientOverlaySections,
+    storyIds: ['transient-overlay.ready'],
+    composedComponents: ['Toast', 'OverlayLayer', 'StatusToken'],
+    tags: ['standard', 'overlay', 'transient', 'df-033'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+function activityStreamMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'ActivityStreamBlock',
+    family: 'activity',
+    scale: 'section',
+    summary: 'Renders chronological events with selected-event and lower-mode facts.',
+    useWhen: ['A view needs accumulating activity, event history, or release progress logs.'],
+    avoidWhen: ['Only one inline status or one temporary overlay is needed.'],
+    slots: activityStreamSections,
+    storyIds: ['activity-stream.ready'],
+    composedComponents: ['Timeline', 'Log', 'StatusToken'],
+    tags: ['standard', 'activity', 'timeline', 'df-035'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+function shortcutCueMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'ShortcutCueBlock',
+    family: 'shortcut',
+    scale: 'inline',
+    summary: 'Renders inline shortcut hints with key, action, scope, and lower-mode semantics.',
+    useWhen: ['A page or shell needs compact keyboard hints near a command surface.'],
+    avoidWhen: ['The user needs a complete grouped help reference.'],
+    slots: shortcutCueSections,
+    storyIds: ['shortcut-cue.ready'],
+    composedComponents: ['Kbd', 'KeyMap', 'HelpHint'],
+    tags: ['standard', 'shortcut', 'keyboard', 'df-037'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+function progressIndicatorMetadata(): BlockMetadata {
+  return standardFeedbackMetadata({
+    blockName: 'ProgressIndicatorBlock',
+    family: 'progress',
+    scale: 'section',
+    summary: 'Exposes progress label, value, total, percent, and lower-mode progress facts.',
+    useWhen: ['A task, release checklist, or operation needs explicit progress state.'],
+    avoidWhen: ['The view only needs a static status label without completion state.'],
+    slots: progressIndicatorSections,
+    storyIds: ['progress-indicator.ready'],
+    composedComponents: ['ProgressBar', 'Stepper', 'StatusToken'],
+    tags: ['standard', 'progress', 'feedback', 'df-038'],
+    relatedDocs: ['docs/design/DF-031-status-feedback-standard-blocks.md'],
+  });
+}
+
+interface StandardFeedbackMetadataOptions {
+  readonly blockName: StandardBlockName;
+  readonly family: string;
+  readonly scale: BlockMetadata['scale'];
+  readonly summary: string;
+  readonly useWhen: readonly string[];
+  readonly avoidWhen: readonly string[];
+  readonly slots: readonly StandardSectionSpec[];
+  readonly storyIds: readonly string[];
+  readonly composedComponents: readonly string[];
+  readonly tags: readonly string[];
+  readonly relatedDocs: readonly string[];
+}
+
+function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): BlockMetadata {
+  return {
+    packageName: BIJOU_PACKAGE,
+    blockName: options.blockName,
+    family: options.family,
+    scale: options.scale,
+    modes: ALL_OUTPUT_MODES,
+    docs: {
+      summary: options.summary,
+      useWhen: options.useWhen,
+      avoidWhen: options.avoidWhen,
+      relatedDocs: options.relatedDocs,
+    },
+    sourcePath: 'packages/bijou/src/core/standard-blocks.ts',
+    slots: options.slots,
+    variants: [
+      {
+        id: 'ready',
+        label: 'Ready',
+        requiredSlots: options.slots.filter((slot) => slot.required).map((slot) => slot.id),
+        optionalSlots: options.slots.filter((slot) => !slot.required).map((slot) => slot.id),
+        facts: [{ kind: 'state', key: 'story.state', value: 'ready' }],
+      },
+    ],
+    composedComponents: options.composedComponents,
+    semanticFacts: [{ kind: 'entity', key: 'block', value: options.blockName }],
+    storyIds: options.storyIds,
+    examples: [{ id: `${options.storyIds[0]}.example`, label: `${options.blockName} ready example` }],
+    tags: options.tags,
+  };
+}
+
 function standardBlockStory(
   id: string,
   blockName: StandardBlockName,
@@ -462,6 +741,62 @@ function standardBlockStory(
     state,
     facts,
   });
+}
+
+interface StandardBlockDataRequirementInput {
+  readonly name: string;
+  readonly label: string;
+  readonly description: string;
+  readonly optional?: boolean;
+}
+
+function standardBlockData(
+  blockKey: string,
+  blockName: StandardBlockName,
+  requirements: readonly StandardBlockDataRequirementInput[],
+) {
+  return defineViewData({
+    id: `${blockKey}.data`,
+    label: `${blockName} data`,
+    description: `Boundary data required to render ${blockName}.`,
+    requirements: requirements.map((requirement) => ({
+      name: requirement.name,
+      requirement: defineDataRequirement({
+        id: `${blockKey}.${requirement.name}`,
+        resource: `blocks.${blockKey}.${requirement.name}`,
+        label: requirement.label,
+        description: requirement.description,
+        optional: requirement.optional,
+        facts: [{ kind: 'entity', key: 'block.data', value: blockName }],
+      }),
+    })),
+  });
+}
+
+function standardFeedbackCommands(blockName: StandardBlockName) {
+  const prefix = commandPrefix(blockName);
+  return Object.freeze([
+    commandIntent(`${prefix}.select`, {
+      label: 'Select',
+      description: `Request focus for ${blockName}.`,
+      facts: [{ kind: 'entity', key: 'block.command', value: blockName }],
+    }),
+    commandIntent(`${prefix}.copyFacts`, {
+      label: 'Copy facts',
+      description: `Copy semantic facts from ${blockName}.`,
+      facts: [{ kind: 'entity', key: 'block.command', value: blockName }],
+    }),
+    commandIntent(`${prefix}.openStory`, {
+      label: 'Open story',
+      description: `Open the DOGFOOD story for ${blockName}.`,
+      facts: [{ kind: 'entity', key: 'block.command', value: blockName }],
+    }),
+  ]);
+}
+
+function commandPrefix(blockName: StandardBlockName): string {
+  const withoutBlock = blockName.replace(/Block$/, '');
+  return withoutBlock.charAt(0).toLowerCase() + withoutBlock.slice(1);
 }
 
 function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
@@ -518,6 +853,38 @@ function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<s
         : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceBounds(input)),
     facts: renderFacts('InspectorPanel', sections, 'slot'),
   });
+}
+
+function renderStandardSectionBlock(
+  input: BlockRenderInput,
+  blockName: StandardBlockName,
+  sectionSpecs: readonly StandardSectionSpec[],
+): BlockRenderResult<string | Surface> {
+  const mode = normalizeOutputMode(input.mode);
+  const sections = sectionSpecs
+    .map((section) => renderSection(
+      section.id,
+      section.label,
+      ownSlotValue(input.slots, section.id),
+      section.required,
+    ))
+    .filter((section) => section.required || section.present);
+
+  return renderedBlockResult({
+    output: mode === 'accessible'
+      ? renderAccessibleSections(blockName, sections)
+      : mode === 'pipe'
+        ? renderPipeSections(blockName, sections)
+        : renderVisualSectionsSurface(blockName, sections, renderSurfaceBounds(input)),
+    facts: renderFacts(blockName, sections, 'slot'),
+  });
+}
+
+interface StandardSectionSpec {
+  readonly id: string;
+  readonly label: string;
+  readonly required: boolean;
+  readonly description?: string;
 }
 
 interface RenderSection {
@@ -633,6 +1000,7 @@ function renderFacts(
   for (const section of sections) {
     if (section.present) {
       facts.push({ kind: 'entity', key: `${sectionFactPrefix}.${section.id}`, value: 'present' });
+      facts.push({ kind: 'label', key: `${sectionFactPrefix}.${section.id}.value`, value: section.content });
     }
   }
 

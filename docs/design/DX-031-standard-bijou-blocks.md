@@ -306,9 +306,11 @@ type BlockScale =
   | 'section'
   | 'panel'
   | 'control'
+  | 'inline'
   | 'item'
   | 'data'
-  | 'diagnostic';
+  | 'diagnostic'
+  | 'overlay';
 
 interface BlockMetadataDocs {
   readonly summary: string;
@@ -3161,15 +3163,17 @@ blocks.
    rendered proof output and stable lowering facts for `AppShell`,
    `ReaderSurface`, and `InspectorPanel`.
 11. Done: add explicit block-tree rendering so nested block declarations render
-   child output without making ordinary `block.render()` recursive.
-12. Next: add an optional Zod schema adapter package or helper.
-13. Done: capture interactive, static, pipe, and accessible outputs for the
+    child output without making ordinary `block.render()` recursive.
+12. Done: expand the standard catalog through the explicit DF-031
+    status/feedback Block slice.
+13. Next: add an optional Zod schema adapter package or helper.
+14. Done: capture interactive, static, pipe, and accessible outputs for the
     first implementation set.
-14. Done: prove the first three blocks in DOGFOOD before broadening the
+15. Done: prove the first three blocks in DOGFOOD before broadening the
     catalog.
-15. Next: add catalog-only variant/config metadata for later blocks without
+16. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-16. Keep modal stacks, notifications, auth forms, animated carousels, complex
+17. Keep modal stacks, notifications, auth forms, animated carousels, complex
     controls, and workspace-like behavior outside DX-031; each needs an
     explicit later block cycle with its own tests and Method evidence.
 
@@ -3248,9 +3252,10 @@ blocks.
   workflows are captured as application-domain candidate blocks.
 - Auth blocks can describe manual-password, one-time-code, and
   credential-provider modes without exposing credential values.
-- The first implementation set is limited to `AppShell`, `ReaderSurface`, and
-  `InspectorPanel`.
-- Follow-on blocks are captured without expanding first implementation scope.
+- The original first implementation milestone landed as `AppShell`,
+  `ReaderSurface`, and `InspectorPanel`.
+- Follow-on blocks are captured or promoted through explicit issue-backed
+  slices instead of hidden first-implementation scope.
 - DOGFOOD is named as the proving surface for block behavior.
 
 ## Risks / Unknowns
@@ -3387,17 +3392,37 @@ Still out of scope after this slice:
 - Active runtime traversal.
 - Command dispatch integration.
 - Production AppShell behavior.
-- Catalog expansion beyond `AppShell`, `ReaderSurface`, and `InspectorPanel`
-  belongs to later issues instead of hidden `v6.0.0` release scope.
+- Hidden catalog expansion beyond `AppShell`, `ReaderSurface`, and
+  `InspectorPanel`.
+
+DF-031 Status Feedback Expansion makes the next catalog step explicit.
+
+What is now true:
+
+- Issues #220 through #225 moved into `v6.0.0` as a focused
+  status/feedback Block slice.
+- `@flyingrobots/bijou` exports `InlineStatusBlock`, `InFlowStatusBlock`,
+  `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
+  `ProgressIndicatorBlock`.
+- The new Blocks use the same DX-031/DX-034 public contract: validated block
+  metadata, view data contracts, command intents, story ids, deterministic
+  render output, and stable lowering facts.
+- Status and feedback block expansion is now explicit issue-backed v6 work
+  through #220 through #225, not hidden DX-031 scope.
+- YAML/JSON declaration remains a future adapter over the typed Blocks API,
+  not a second runtime IR in this slice.
 
 ## Retrospective
 
 DX-031 is landed for the `v6.0.0` release boundary. The shipped release floor is
-the first standard block set: public block metadata, package manifests,
+the standard block set: public block metadata, package manifests,
 adapter-first schema-bound block contracts, first-party `AppShell`,
-`ReaderSurface`, and `InspectorPanel` definitions, deterministic rendered output
-for interactive, static, pipe, and accessible modes, block-tree rendering, and a
-DOGFOOD Blocks section that proves the first set in product context.
+`ReaderSurface`, `InspectorPanel`, `InlineStatusBlock`, `InFlowStatusBlock`,
+`TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
+`ProgressIndicatorBlock` definitions, deterministic rendered output for
+interactive, static, pipe, and accessible modes, block-tree rendering, and a
+DOGFOOD Blocks section that proves the original `AppShell`, `ReaderSurface`,
+and `InspectorPanel` set in product context.
 
 DOGFOOD multi-mode proof is present for the release slice through the standard
 block render tests, DOGFOOD preview tests, lowering posture checks, and story

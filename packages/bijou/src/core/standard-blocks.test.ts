@@ -20,22 +20,34 @@ import {
 } from './schema-block.js';
 import { lintModeLowering } from './mode-lowering.js';
 import {
+  activityStreamBlock,
   appShellBlock,
+  inFlowStatusBlock,
+  inlineStatusBlock,
   inspectorPanelBlock,
   inspectorPanelSchemaBlock,
+  progressIndicatorBlock,
   readerSurfaceBlock,
   readerSurfaceSchemaBlock,
+  shortcutCueBlock,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
+  transientOverlayBlock,
 } from './standard-blocks.js';
 
 describe('first-party standard block definitions', () => {
-  it('exports valid AppShell, ReaderSurface, and InspectorPanel block definitions', () => {
+  it('exports valid first-party standard block definitions', () => {
     expect(standardBlocks).toEqual([
       appShellBlock,
       readerSurfaceBlock,
       inspectorPanelBlock,
+      inlineStatusBlock,
+      inFlowStatusBlock,
+      transientOverlayBlock,
+      activityStreamBlock,
+      shortcutCueBlock,
+      progressIndicatorBlock,
     ]);
     expect(Object.isFrozen(standardBlocks)).toBe(true);
 
@@ -51,6 +63,12 @@ describe('first-party standard block definitions', () => {
       'AppShell',
       'ReaderSurface',
       'InspectorPanel',
+      'InlineStatusBlock',
+      'InFlowStatusBlock',
+      'TransientOverlayBlock',
+      'ActivityStreamBlock',
+      'ShortcutCueBlock',
+      'ProgressIndicatorBlock',
     ]);
   });
 
@@ -103,7 +121,17 @@ describe('first-party standard block definitions', () => {
 
   it('publishes deterministic stories and metadata story ids without rendering', () => {
     const storiesByBlock = new Map<string, readonly string[]>(
-      ['AppShell', 'ReaderSurface', 'InspectorPanel'].map((blockName) => [
+      [
+        'AppShell',
+        'ReaderSurface',
+        'InspectorPanel',
+        'InlineStatusBlock',
+        'InFlowStatusBlock',
+        'TransientOverlayBlock',
+        'ActivityStreamBlock',
+        'ShortcutCueBlock',
+        'ProgressIndicatorBlock',
+      ].map((blockName) => [
         blockName,
         standardBlockStories
           .filter((story) => story.blockName === blockName)
@@ -130,6 +158,12 @@ describe('first-party standard block definitions', () => {
       'stale',
       'error',
     ]);
+    expect(storiesByBlock.get('InlineStatusBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('InFlowStatusBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('TransientOverlayBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ActivityStreamBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ShortcutCueBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ProgressIndicatorBlock')).toEqual(['ready']);
 
     for (const block of standardBlocks) {
       const storyIds = standardBlockStories

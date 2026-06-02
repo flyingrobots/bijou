@@ -52,10 +52,12 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Close The `v6.0.0` Release Boundary
 
-- The live `v6.0.0` milestone has zero open tracker items plus twenty-four
-  completed lineage trackers after RE-035, DX-031, DX-034, DX-030, and the
-  Vitest dependency hygiene work landed.
-- The release thesis is still: frame owns geometry; Blocks prove it.
+- The live `v6.0.0` milestone has six open tracker items plus twenty-four
+  completed lineage trackers. The open items are the status/feedback Block
+  slice: #220, #221, #222, #223, #224, and #225.
+- The release thesis is still: frame owns geometry; Blocks prove it. The
+  current proof adds standard status and feedback Blocks on top of the landed
+  layout, standard block, data-binding, and selection/copy floors.
 - `v6.0.0` should not tag until release-readiness validation and packaging
   checks are green.
 - The detailed issue list lives in [ROADMAP.md](./ROADMAP.md).
@@ -74,15 +76,17 @@ Current direction and active tensions. Historical ship data is in
 - `v7.0.0` holds the imported `up-next` lane: DOGFOOD docs truth,
   component-family audits, `tableSurface()` responsive parity, and scoped
   Node I/O documentation.
+- Its current open count is twenty-one after moving #220 through #225 into the
+  active v6 status/feedback slice.
 - This is initial triage, not a release promise.
 - After `v6.0.0` closes, v7 should be reshaped into a smaller release thesis
   before implementation starts.
 
 ## Tensions
 
-- **Release Scope Creep**: `v6.0.0` is close enough to become tempting to
-  widen. Resist that. Close, split, or move the remaining issues instead of
-  dragging v7 work into the current release boundary.
+- **Release Scope Creep**: `v6.0.0` deliberately widened for six
+  status/feedback Block issues. Keep that widening bounded to #220 through
+  #225, then return to release-readiness validation.
 - **Geometry Before Product Chrome**: RE-035 has landed the release's
   structural layout floor. Remaining product-facing v6 work should consume
   geometry contracts, not bypass them with bespoke string/surface measurement.
@@ -98,16 +102,28 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate focus is `v6.0.0` release readiness.
+The immediate focus is the active `v6.0.0` status/feedback Block PR.
 
 Open v6 tracker items:
 
-- None.
+- [#220](https://github.com/flyingrobots/bijou/issues/220) inline status
+  standard Block
+- [#221](https://github.com/flyingrobots/bijou/issues/221) in-flow status
+  standard Block
+- [#222](https://github.com/flyingrobots/bijou/issues/222) transient overlay
+  standard Block
+- [#223](https://github.com/flyingrobots/bijou/issues/223) activity stream
+  standard Block
+- [#224](https://github.com/flyingrobots/bijou/issues/224) shortcut cue
+  standard Block
+- [#225](https://github.com/flyingrobots/bijou/issues/225) progress indicator
+  standard Block
 
 Recommended pull order:
 
-1. Run release-readiness validation against the completed v6 lineage.
-2. Prepare the `v6.0.0` release notes, package checks, and tag candidate only
+1. Complete the status/feedback Blocks slice for #220 through #225.
+2. Run release-readiness validation against the updated v6 lineage.
+3. Prepare the `v6.0.0` release notes, package checks, and tag candidate only
    after local validation and CI are green.
 
 Non-goals for the next cycle:

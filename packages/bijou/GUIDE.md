@@ -266,7 +266,10 @@ const renderedShell = renderBlockTree(blockRenderNode(appShellBlock, {
 
 These definitions declare metadata, semantic slots, data requirements, command
 intents, story ids, package visibility, and deterministic first-proof render
-output for `AppShell`, `ReaderSurface`, and `InspectorPanel`.
+output for `AppShell`, `ReaderSurface`, `InspectorPanel`, and the standard
+status/feedback Blocks: `InlineStatusBlock`, `InFlowStatusBlock`,
+`TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
+`ProgressIndicatorBlock`.
 
 Use `renderBlockTree()` when nested block declarations should become rendered
 child output inside a parent slot. Ordinary `block.render()` remains a local
@@ -275,7 +278,7 @@ declaration introspection rather than rendering.
 
 They do not implement provider subscriptions, active runtime traversal, command
 dispatch, production AppShell behavior, DOGFOOD multi-mode captures, or the
-full standard block catalog.
+full standard block catalog beyond the explicit first-party v6 set.
 
 ## AppShell Composition
 

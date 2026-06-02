@@ -95,12 +95,13 @@ fake duplication rather than a real second API.
 - **`defineBlock()`**: Declare a validated reusable block with package, family,
   scale, mode, slot, variant, config, component, story, semantic facts, optional
   view data contracts, and command intents.
-- **`standardBlocks` / `appShellBlock` / `readerSurfaceBlock` /
-  `inspectorPanelBlock`**: Import the first-party standard block
-  definitions for AppShell, ReaderSurface, and InspectorPanel. These expose
-  contracts, stories, data requirements, command intents, and schema-bound
-  posture, with deterministic first-proof render output across all output
-  modes. Production AppShell behavior remains a later runtime slice.
+- **`standardBlocks` / standard block exports**: Import the first-party
+  standard block definitions for AppShell, ReaderSurface, InspectorPanel,
+  inline status, in-flow status, transient overlay feedback, activity stream,
+  shortcut cues, and progress. These expose contracts, stories, data
+  requirements, command intents, and schema-bound posture, with deterministic
+  first-proof render output across all output modes. Production AppShell
+  behavior remains a later runtime slice.
 - **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
   Bijou peer compatibility for ordinary NPM block packages.
 - **`defineBlockSchemaAdapter()` / `defineSchemaBlock()`**: Validate unknown

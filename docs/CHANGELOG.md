@@ -49,6 +49,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Status and feedback standard Blocks** —
+  `@flyingrobots/bijou` now exports six first-party status and feedback
+  Blocks: `InlineStatusBlock`, `InFlowStatusBlock`,
+  `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
+  `ProgressIndicatorBlock`. The slice adds `inline` and `overlay` block
+  scales, data contracts, command intents, ready story ids, standard catalog
+  and package manifest entries, surface output for interactive/static modes,
+  text output for pipe/accessible modes, and stable lowering facts. This moves
+  issues #220 through #225 into explicit v6 block-catalog work instead of
+  treating status feedback as a deferred v7 audit.
 - **DX-030 boundary-aware selection and copy** —
   `@flyingrobots/bijou` now exports pure selection/copy primitives for
   retained-geometry UI surfaces: `SelectionOwner`, `SelectionRegion`,

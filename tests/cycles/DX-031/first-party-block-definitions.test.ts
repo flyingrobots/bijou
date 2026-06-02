@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+  activityStreamBlock,
   appShellBlock,
   defineBlock,
   defineAppShellComposition,
+  inFlowStatusBlock,
+  inlineStatusBlock,
   inspectorPanelBlock,
+  progressIndicatorBlock,
   readerSurfaceBlock,
+  shortcutCueBlock,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
+  transientOverlayBlock,
   validateBlockMetadata,
   validateBlockPackageManifest,
 } from '../../../packages/bijou/src/index.js';
@@ -18,11 +24,23 @@ describe('DX-031C first-party block definitions', () => {
       appShellBlock,
       readerSurfaceBlock,
       inspectorPanelBlock,
+      inlineStatusBlock,
+      inFlowStatusBlock,
+      transientOverlayBlock,
+      activityStreamBlock,
+      shortcutCueBlock,
+      progressIndicatorBlock,
     ]);
     expect(standardBlocks.map((block) => block.metadata.blockName)).toEqual([
       'AppShell',
       'ReaderSurface',
       'InspectorPanel',
+      'InlineStatusBlock',
+      'InFlowStatusBlock',
+      'TransientOverlayBlock',
+      'ActivityStreamBlock',
+      'ShortcutCueBlock',
+      'ProgressIndicatorBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -112,6 +130,12 @@ describe('DX-031C first-party block definitions', () => {
       'inspector-panel.loading',
       'inspector-panel.stale',
       'inspector-panel.error',
+      'inline-status.ready',
+      'in-flow-status.ready',
+      'transient-overlay.ready',
+      'activity-stream.ready',
+      'shortcut-cue.ready',
+      'progress-indicator.ready',
     ]);
     expect(standardBlockStories.map((story) => story.blockName)).toEqual([
       'AppShell',
@@ -127,6 +151,12 @@ describe('DX-031C first-party block definitions', () => {
       'InspectorPanel',
       'InspectorPanel',
       'InspectorPanel',
+      'InlineStatusBlock',
+      'InFlowStatusBlock',
+      'TransientOverlayBlock',
+      'ActivityStreamBlock',
+      'ShortcutCueBlock',
+      'ProgressIndicatorBlock',
     ]);
   });
 });
