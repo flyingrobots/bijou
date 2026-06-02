@@ -33,6 +33,11 @@ Current direction and active tensions. Historical ship data is in
   binding lifecycle facts, active runtime binding collection, provider-update
   frame assembly, command intent routing, provider-bound AppShell proof, and
   DOGFOOD binding-state evidence.
+- `DX-030` — boundary-aware selection and copy landed as pure
+  `@flyingrobots/bijou` primitives: retained-geometry selection owners,
+  viewport-aware ranges, semantic prose/surface/table/mixed-region extraction,
+  higher-priority blocker arbitration, terminal-native fallback, and
+  clipboard-effect records with no OS clipboard side effects.
 - `DF-071` — DOGFOOD shell and docs surfaces moved further through semantic
   Block contracts, including block-owned surface inventory and localized
   inventory descriptions.
@@ -47,12 +52,12 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Close The `v6.0.0` Release Boundary
 
-- The live `v6.0.0` milestone has one open tracker item plus twenty-three
-  completed lineage trackers after RE-035, DX-031, DX-034, and the Vitest
-  dependency hygiene work landed.
+- The live `v6.0.0` milestone has zero open tracker items plus twenty-four
+  completed lineage trackers after RE-035, DX-031, DX-034, DX-030, and the
+  Vitest dependency hygiene work landed.
 - The release thesis is still: frame owns geometry; Blocks prove it.
-- `v6.0.0` should not tag until the remaining open release issues are closed,
-  intentionally split, or explicitly moved to another horizon.
+- `v6.0.0` should not tag until release-readiness validation and packaging
+  checks are green.
 - The detailed issue list lives in [ROADMAP.md](./ROADMAP.md).
 
 ### 2. GitHub Issues Are The Work Tracker
@@ -93,18 +98,17 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate focus is `v6.0.0` release closure.
+The immediate focus is `v6.0.0` release readiness.
 
 Open v6 tracker items:
 
-- [#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`
-  boundary-aware pointer selection and copy.
+- None.
 
 Recommended pull order:
 
-1. Close [#186](https://github.com/flyingrobots/bijou/issues/186) with the
-   smallest boundary-aware selection/copy implementation slice that consumes
-   retained layout truth and semantic extraction.
+1. Run release-readiness validation against the completed v6 lineage.
+2. Prepare the `v6.0.0` release notes, package checks, and tag candidate only
+   after local validation and CI are green.
 
 Non-goals for the next cycle:
 

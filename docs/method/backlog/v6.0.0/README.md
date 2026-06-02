@@ -59,6 +59,18 @@ The boundary remains:
   collection, provider-update frame assembly, command intent routing,
   provider-bound AppShell proof, and DOGFOOD binding-state evidence.
 
+## Landed Selection And Copy Anchor
+
+- [**DX-030**](../../../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md) -
+  boundary-aware selection and copy landed through issue #186 with public
+  `@flyingrobots/bijou` selection owners, selection regions, viewport-aware
+  ranges, semantic prose/surface/table/mixed-region extraction, topmost
+  retained-geometry owner selection, higher-priority blocker arbitration,
+  terminal-native fallback, and clipboard-effect records. OS clipboard
+  adapters, full `createFramedApp()` drag capture, and cross-pane rich
+  extraction remain explicit later host/runtime slices instead of hidden v6
+  release scope.
+
 ## Core Runtime Scope
 
 - [**DF-065**](../../../design/DF-065-audit-workspace-layout-family-across-real-surfaces.md) -
@@ -67,8 +79,6 @@ The boundary remains:
   audit viewport masking and scrollable inspection panes
 - [**DL-012**](../../../design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md) -
   separate focus gutter chrome from scrollbar UI tokens
-- [**DX-030**](../../../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md) -
-  add boundary-aware pointer selection and copy
 
 ## First Blocks And Shell Proof
 

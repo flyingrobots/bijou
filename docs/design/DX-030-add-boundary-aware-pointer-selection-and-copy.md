@@ -21,11 +21,13 @@ surface should not copy whatever cells happen to be painted across the whole
 terminal. It should resolve the owning pane, clamp the drag to that pane's
 geometry, and reconstruct text from the component's semantic content model.
 
-This cycle defines the contract. It does not implement full runtime selection,
-OS clipboard writes, or cross-pane rich extraction. Those pieces touch the
-runtime engine, app frame, node adapter, pointer routing, viewports, and
-component metadata. Shipping the contract first prevents the eventual runtime
-work from becoming a hidden terminal-row scraper.
+This cycle defines the contract and lands the pure selection coordinator in
+`@flyingrobots/bijou`. The runtime primitive consumes retained rectangles,
+viewport transforms, semantic content models, higher-priority blockers, and
+pointer ranges, then returns selected text plus an inspectable clipboard-effect
+record. It still does not implement OS clipboard writes, full app-frame drag
+capture, or cross-pane rich extraction. Those pieces remain host/runtime
+adapters rather than render logic.
 
 ## Sponsored Users
 
@@ -106,6 +108,7 @@ Required facts:
 - anchor point
 - focus point
 - normalized start/end points
+- content-space clipping rect
 - direction
 - drag source device
 
@@ -148,6 +151,10 @@ Responsibilities:
 - clamp movement to the owner region
 - request extraction on release
 - emit a clipboard effect or copy result command
+
+The shipped `coordinateSelection()` primitive covers this flow in pure package
+space. It does not own pointer capture or host clipboard IO; it gives those
+adapters a deterministic contract to call.
 
 ## Runtime Flow
 
@@ -219,12 +226,13 @@ This cycle does not:
 - implement OS clipboard adapters
 - implement drag selection in `createFramedApp()`
 - define multi-pane selection
+- define cross-pane rich extraction
 - define rich clipboard formats
 - define image or shader-region copying
 - make terminal-native selection disappear
 
-Those are follow-on implementation slices once this contract has a stable
-shape.
+Those are follow-on implementation slices once host and framed-app adapters are
+ready to consume the pure coordinator.
 
 ## Acceptance Criteria
 
@@ -235,6 +243,8 @@ shape.
   raw terminal rows.
 - The contract defines arbitration against overlays, drag handles, component
   pointer handlers, and terminal-native fallback.
+- `@flyingrobots/bijou` exports a pure selection coordinator that uses retained
+  geometry and semantic extraction.
 - The v6 release lane points at this design closure instead of the backlog
   note.
 - The DX legend records this as the latest completed selection/copy closure.
@@ -242,25 +252,37 @@ shape.
 ## Implementation Outline
 
 1. Promote the backlog item into this design-cycle contract.
-2. Add a focused DX-030 test that protects the selection metadata and
-   arbitration vocabulary.
-3. Update the v6 lane and DX legend pointers.
-4. Leave runtime implementation to a later slice with this contract as the
-   target.
+2. Add `SelectionOwner`, `SelectionRegion`, `SelectionRange`,
+   `SelectionContentModel`, `SelectionBlocker`, and clipboard-effect records to
+   `@flyingrobots/bijou`.
+3. Implement `coordinateSelection()`, `selectionRange()`, and
+   `extractSelectionText()` as pure primitives backed by retained geometry and
+   semantic content.
+4. Add package and Method-cycle tests that prove bounded prose extraction,
+   table extraction, topmost owner selection, higher-priority blocker
+   arbitration, terminal-native fallback, and v6 closeout evidence.
+5. Update the v6 lane, roadmap, bearing, changelog, and backlog anchors so
+   issue #186 closes through implementation rather than contract-only deferral.
 
 ## Playback
 
 - RED: the backlog named the need, but no stable design artifact defined the
-  selection owner, range, extraction, and clipboard-effect contract.
-- GREEN: this cycle defines the records and runtime flow that future code can
-  implement.
+  selection owner, range, extraction, and clipboard-effect contract; the new
+  package and Method-cycle tests failed because no public selection module or
+  v6 closeout evidence existed.
+- GREEN: this cycle defines the records, exports the pure selection
+  coordinator, and proves semantic copy behavior without terminal-row scraping.
 - The contract keeps selection bounded by retained layout truth.
 - The contract keeps copying semantic and inspectable.
 - The contract keeps clipboard writes outside render logic.
 
 ## Retrospective
 
-This should not be rushed as a narrow DOGFOOD patch. Boundary-aware copy is a
-runtime feature crossing layout, pointer routing, semantic content, viewports,
-and host effects. The right first move is to make the contract boring, explicit,
-and test-protected.
+DX-030 is landed for the `v6.0.0` release boundary.
+
+The implementation intentionally stops at the pure selection coordinator
+because that is the correct package boundary for v6: layout truth and semantic
+content can now decide what would be copied, while host clipboard writes and
+framed-app drag capture remain explicit adapters. That keeps boundary-aware
+copy inspectable, deterministic, and test-protected without smuggling terminal
+row scraping into the renderer.
