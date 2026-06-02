@@ -24,10 +24,13 @@ Current direction and active tensions. Historical ship data is in
 - `LX-018` / `LX-019` — localization catalog data is honest, fallback catalogs
   are explicit, and DOGFOOD text lookup now goes through an application-facing
   localization port.
-- `DX-031` / `DX-034` — Blocks now have public metadata, schema, data-binding,
-  command-intent, lifecycle, active-binding, first-party definition, DOGFOOD
-  documentation, and fixture-demo proof. The visible product layer is still
-  emerging; the architecture is ahead of the rendered catalog.
+- `DX-031` — the standard block release floor landed with public metadata,
+  schema-bound block contracts, first-party `AppShell`, `ReaderSurface`, and
+  `InspectorPanel` definitions, rendered multi-mode proof, block-tree
+  rendering, and DOGFOOD Blocks preview evidence.
+- `DX-034` — Blocks now have data-binding, command-intent, lifecycle, active
+  binding, provider update, and command-buffer proof. The provider manager and
+  product AppShell integration remain the active release edge.
 - `DF-071` — DOGFOOD shell and docs surfaces moved further through semantic
   Block contracts, including block-owned surface inventory and localized
   inventory descriptions.
@@ -42,9 +45,9 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Close The `v6.0.0` Release Boundary
 
-- The live `v6.0.0` milestone has three open tracker items plus twenty-one
-  completed lineage trackers after RE-035 and the Vitest dependency hygiene
-  work landed.
+- The live `v6.0.0` milestone has two open tracker items plus twenty-two
+  completed lineage trackers after RE-035, DX-031, and the Vitest dependency
+  hygiene work landed.
 - The release thesis is still: frame owns geometry; Blocks prove it.
 - `v6.0.0` should not tag until the remaining open release issues are closed,
   intentionally split, or explicitly moved to another horizon.
@@ -92,8 +95,6 @@ The immediate focus is `v6.0.0` release closure.
 
 Open v6 tracker items:
 
-- [#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`
-  standard Bijou blocks.
 - [#182](https://github.com/flyingrobots/bijou/issues/182) — `DX-034`
   declarative view data binding.
 - [#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`
@@ -101,14 +102,13 @@ Open v6 tracker items:
 
 Recommended pull order:
 
-1. Reassess [#181](https://github.com/flyingrobots/bijou/issues/181) and
-   [#182](https://github.com/flyingrobots/bijou/issues/182) together after
-   RE-035, because standard Blocks and declarative binding are already
-   partially landed and may need split-or-close decisions rather than one broad
-   cycle.
-2. Treat [#186](https://github.com/flyingrobots/bijou/issues/186) as either a
-   focused v6 implementation slice or an explicit move to `v7.0.0`, depending
-   on whether boundary-aware copy is required for the release boundary.
+1. Close [#182](https://github.com/flyingrobots/bijou/issues/182) next by
+   turning the landed DX-034 binding contracts into explicit release closeout
+   evidence, or by adding the one missing provider/AppShell proof if the design
+   audit still finds it necessary for `v6.0.0`.
+2. Close [#186](https://github.com/flyingrobots/bijou/issues/186) with the
+   smallest boundary-aware selection/copy implementation slice that consumes
+   retained layout truth and semantic extraction.
 
 Non-goals for the next cycle:
 

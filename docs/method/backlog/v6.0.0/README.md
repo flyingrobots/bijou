@@ -40,10 +40,18 @@ The boundary remains:
   workspace behavior remain explicit later cycles instead of hidden RE-035
   scope.
 
-## Active Design Anchors
+## Landed Standard Blocks Anchor
 
 - [**DX-031**](../../../design/DX-031-standard-bijou-blocks.md) -
-  standard Bijou blocks
+  standard Bijou blocks landed through issue #181 with public block metadata,
+  package manifests, schema-bound block contracts, first-party `AppShell`,
+  `ReaderSurface`, and `InspectorPanel` definitions, rendered multi-mode proof,
+  block-tree rendering, and DOGFOOD Blocks preview evidence. Catalog expansion
+  beyond the first standard block set remains explicit later work instead of
+  hidden v6 release scope.
+
+## Active Design Anchors
+
 - [**DX-034**](../../../design/DX-034-declarative-view-data-binding.md) -
   declarative view data binding
 
