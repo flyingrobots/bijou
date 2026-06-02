@@ -49,6 +49,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DX-030 boundary-aware selection and copy** —
+  `@flyingrobots/bijou` now exports pure selection/copy primitives for
+  retained-geometry UI surfaces: `SelectionOwner`, `SelectionRegion`,
+  viewport-aware `SelectionRange` records, semantic prose/surface/table
+  extraction, ordered mixed-region extraction inside one owner,
+  `coordinateSelection()` owner arbitration, higher-priority blockers,
+  terminal-native fallback, and clipboard-effect records. The first slice
+  deliberately keeps OS clipboard IO and framed-app drag capture in host
+  adapters while making copied text deterministic and inspectable.
 - **Mandatory layout envelope primitives for `bijou`** —
   `@flyingrobots/bijou` now exposes the first RE-035 layout-envelope contract:
   immutable constraints, preferences, assigned rectangles, direction, fit

@@ -12,7 +12,7 @@ Last synced from GitHub Issues: 2026-06-02.
 
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
-| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 1 | 23 | Current layout truth, standard blocks, and release hygiene lane. |
+| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 24 | Current layout truth, standard blocks, and release hygiene lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 27 | 0 | Next major-release candidate after v6 triage. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
@@ -20,14 +20,12 @@ Last synced from GitHub Issues: 2026-06-02.
 
 Theme: layout truth and standard blocks.
 
-The v6 lane is the current release target. It should close or explicitly split
-the remaining open release issues before tagging.
+The v6 lane has no remaining open tracker items. It should complete
+release-readiness validation before tagging.
 
 ### Open Work
 
-| Tracker | Lane / Labels | Type | Work |
-| :--- | :--- | :--- | :--- |
-| [#186](https://github.com/flyingrobots/bijou/issues/186) | `lane:release` | `type:enhancement` | DX-030 boundary-aware pointer selection and copy |
+No open v6 tracker items remain.
 
 ### Completed Lineage
 
@@ -38,6 +36,7 @@ These cards are included in the v6 milestone as completed release lineage.
 | [#180](https://github.com/flyingrobots/bijou/issues/180) | `lane:release` | `type:enhancement` | RE-035 mandatory layout envelope and constraint negotiation |
 | [#181](https://github.com/flyingrobots/bijou/issues/181) | `lane:release` | `type:enhancement` | DX-031 standard Bijou blocks |
 | [#182](https://github.com/flyingrobots/bijou/issues/182) | `lane:release` | `type:enhancement` | DX-034 declarative view data binding |
+| [#186](https://github.com/flyingrobots/bijou/issues/186) | `lane:release` | `type:enhancement` | DX-030 boundary-aware pointer selection and copy |
 | [#250](https://github.com/flyingrobots/bijou/pull/250) | `dependencies` | dependency PR | Vitest `4.0.18` to `4.1.8` release-hygiene bump |
 | [#251](https://github.com/flyingrobots/bijou/pull/251) | `lane:release` | implementation PR | RE-035 layout envelope primitives |
 | [#183](https://github.com/flyingrobots/bijou/issues/183) | `lane:release` | `type:maintenance` | DF-065 audit workspace layout family across real surfaces |
