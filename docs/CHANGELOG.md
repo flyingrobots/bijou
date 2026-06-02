@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **DX-031 standard blocks closeout** — BEARING, ROADMAP, the v6 backlog
+  evidence, and cycle tests now mark the standard block release floor as
+  landed through issue #181. The closeout records `AppShell`, `ReaderSurface`,
+  and `InspectorPanel` as the first shipped block set with public metadata,
+  schema-bound contracts, rendered multi-mode proof, block-tree rendering, and
+  DOGFOOD Blocks preview evidence.
 - **RE-035 layout envelope closeout** — BEARING, ROADMAP, the v6 backlog
   evidence, and cycle tests now mark the mandatory layout envelope floor as
   landed while keeping text measurement, viewport overflow, hit testing,

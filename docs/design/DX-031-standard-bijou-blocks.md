@@ -3163,15 +3163,15 @@ blocks.
 11. Done: add explicit block-tree rendering so nested block declarations render
    child output without making ordinary `block.render()` recursive.
 12. Next: add an optional Zod schema adapter package or helper.
-13. Next: capture interactive, static, pipe, and accessible outputs for the
-   first implementation set.
-14. Next: prove the first three blocks in DOGFOOD before broadening the
-   catalog.
+13. Done: capture interactive, static, pipe, and accessible outputs for the
+    first implementation set.
+14. Done: prove the first three blocks in DOGFOOD before broadening the
+    catalog.
 15. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-16. Continue to defer modal stacks, notifications, auth forms, animated
-   carousels, complex controls, and workspace-like behavior until the first
-   rendered block set is proven.
+16. Keep modal stacks, notifications, auth forms, animated carousels, complex
+    controls, and workspace-like behavior outside DX-031; each needs an
+    explicit later block cycle with its own tests and Method evidence.
 
 ## Tests To Write First
 
@@ -3348,6 +3348,23 @@ Still out of scope after this slice:
 - Modal stacks, notifications, auth blocks, workspace docking, and complex
   domain-specific block packages.
 
+DX-031D DOGFOOD Blocks Section publishes the standard blocks through the
+project's proving surface.
+
+What is now true:
+
+- DOGFOOD exposes a top-level Blocks section with "What are Blocks", authoring,
+  pre-made catalog, surface-block, preview, and lowering pages.
+- Standard block preview pages are selectable from side navigation and render
+  live `AppShell`, `ReaderSurface`, and `InspectorPanel` examples instead of
+  raw metadata dumps.
+- The preview keeps lower-mode output visible as a compact lowering summary.
+- The local `CounterDemoBlock` fixture proves a block-shaped command-intent
+  surface can update through DOGFOOD without becoming part of the shipped
+  standard block package.
+- DOGFOOD tests assert the Blocks section, preview routing, curated catalog,
+  live examples, lowering posture, and fixture command keys.
+
 DX-031E Rendered Standard Block Proof replaces the first-party placeholders
 with deterministic render output.
 
@@ -3370,12 +3387,22 @@ Still out of scope after this slice:
 - Active runtime traversal.
 - Command dispatch integration.
 - Production AppShell behavior.
-- DOGFOOD multi-mode captures for rendered blocks.
-- Catalog expansion beyond `AppShell`, `ReaderSurface`, and `InspectorPanel`.
+- Catalog expansion beyond `AppShell`, `ReaderSurface`, and `InspectorPanel`
+  belongs to later issues instead of hidden `v6.0.0` release scope.
 
 ## Retrospective
 
-DX-031 is now partially landed rather than not started. The first slice gives
-the ecosystem a stable block contract to index, review, and publish against,
-but "full block availability" still requires DOGFOOD multi-mode proof, story
-captures, and catalog expansion.
+DX-031 is landed for the `v6.0.0` release boundary. The shipped release floor is
+the first standard block set: public block metadata, package manifests,
+adapter-first schema-bound block contracts, first-party `AppShell`,
+`ReaderSurface`, and `InspectorPanel` definitions, deterministic rendered output
+for interactive, static, pipe, and accessible modes, block-tree rendering, and a
+DOGFOOD Blocks section that proves the first set in product context.
+
+DOGFOOD multi-mode proof is present for the release slice through the standard
+block render tests, DOGFOOD preview tests, lowering posture checks, and story
+declarations. Broader "full block availability" remains intentionally larger
+than this release issue: optional Zod adapters, schema-to-block compilers,
+modal stacks, notifications, auth blocks, workspace docking, and broad catalog
+expansion should land as explicit future issues with their own tests and Method
+evidence.
