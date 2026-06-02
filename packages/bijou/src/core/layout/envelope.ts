@@ -179,7 +179,7 @@ export interface LayoutRenderResult<Output> {
 
 export const RE035_LAYOUT_SCOPE = Object.freeze({
   design: 'RE-035',
-  status: 'active',
+  status: 'landed',
   included: Object.freeze([
     'layout-envelope',
     'constraint-negotiation',

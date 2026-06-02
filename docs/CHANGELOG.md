@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **RE-035 layout envelope closeout** — BEARING, ROADMAP, the v6 backlog
+  evidence, and cycle tests now mark the mandatory layout envelope floor as
+  landed while keeping text measurement, viewport overflow, hit testing,
+  responsive fallbacks, accessible layout lowering, and workspace behavior in
+  their explicit follow-on cycles.
 - **Issues-first Method intake** — Contributor and Method docs now describe
   GitHub Issues as Bijou's live work tracker, define the `lane:*` and
   `work-in-progress` labels for contributors, and reframe

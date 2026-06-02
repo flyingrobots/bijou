@@ -5,6 +5,10 @@ Current direction and active tensions. Historical ship data is in
 
 ## Recent Ships
 
+- `RE-035` — mandatory layout envelope and constraint negotiation landed as a
+  pure `@flyingrobots/bijou` layout floor: immutable constraints, preferences,
+  assigned rectangles, stack/place proof helpers, content measurement seams,
+  render-facing assigned-rect gating, and explanation facts.
 - `DX-036` — responsive `table()` layout, width fitting, visual table variants,
   explicit pipe formats, and DOGFOOD documentation jump search have landed.
 - Day 0 audit hardening — onboarding, Method intake, cross-platform CI posture,
@@ -38,8 +42,9 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Close The `v6.0.0` Release Boundary
 
-- The live `v6.0.0` milestone has five open tracker items: four release issues
-  and one dependency-hygiene PR, plus eighteen completed lineage issues.
+- The live `v6.0.0` milestone has three open tracker items plus twenty-one
+  completed lineage trackers after RE-035 and the Vitest dependency hygiene
+  work landed.
 - The release thesis is still: frame owns geometry; Blocks prove it.
 - `v6.0.0` should not tag until the remaining open release issues are closed,
   intentionally split, or explicitly moved to another horizon.
@@ -68,10 +73,9 @@ Current direction and active tensions. Historical ship data is in
 - **Release Scope Creep**: `v6.0.0` is close enough to become tempting to
   widen. Resist that. Close, split, or move the remaining issues instead of
   dragging v7 work into the current release boundary.
-- **Geometry Before Product Chrome**: Standard Blocks and DOGFOOD polish are
-  easier to see than layout truth, but RE-035 remains the release's structural
-  keystone. Product surfaces should consume geometry contracts, not bypass
-  them with bespoke string/surface measurement.
+- **Geometry Before Product Chrome**: RE-035 has landed the release's
+  structural layout floor. Remaining product-facing v6 work should consume
+  geometry contracts, not bypass them with bespoke string/surface measurement.
 - **Block Boundary Drift**: It is tempting to wrap every component in a Block.
   Blocks should own product semantics, data contracts, and lowering facts;
   Components should remain the leaf rendering vocabulary.
@@ -88,33 +92,23 @@ The immediate focus is `v6.0.0` release closure.
 
 Open v6 tracker items:
 
-- [#180](https://github.com/flyingrobots/bijou/issues/180) — `RE-035`
-  mandatory layout envelope and constraint negotiation.
 - [#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`
   standard Bijou blocks.
 - [#182](https://github.com/flyingrobots/bijou/issues/182) — `DX-034`
   declarative view data binding.
 - [#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`
   boundary-aware pointer selection and copy.
-- [#250](https://github.com/flyingrobots/bijou/pull/250) — Dependabot Vitest
-  `4.0.18` to `4.1.8` dependency-hygiene PR.
 
 Recommended pull order:
 
-1. Pull [#180](https://github.com/flyingrobots/bijou/issues/180) first unless a
-   sharper release-management reason appears. Layout envelope truth is the
-   structural dependency for the rest of the release thesis.
-2. Reassess [#181](https://github.com/flyingrobots/bijou/issues/181) and
+1. Reassess [#181](https://github.com/flyingrobots/bijou/issues/181) and
    [#182](https://github.com/flyingrobots/bijou/issues/182) together after
-   #180, because standard Blocks and declarative binding are already partially
-   landed and may need split-or-close decisions rather than one broad cycle.
-3. Treat [#186](https://github.com/flyingrobots/bijou/issues/186) as either a
+   RE-035, because standard Blocks and declarative binding are already
+   partially landed and may need split-or-close decisions rather than one broad
+   cycle.
+2. Treat [#186](https://github.com/flyingrobots/bijou/issues/186) as either a
    focused v6 implementation slice or an explicit move to `v7.0.0`, depending
    on whether boundary-aware copy is required for the release boundary.
-4. Keep [#250](https://github.com/flyingrobots/bijou/pull/250) in the v6
-   boundary as validation hygiene; merge it when checks are clean, but do not
-   let it displace the RE-035 layout-envelope work unless the Vitest bump
-   changes local validation behavior.
 
 Non-goals for the next cycle:
 
