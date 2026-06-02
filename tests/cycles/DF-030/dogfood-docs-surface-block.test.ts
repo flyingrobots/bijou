@@ -110,6 +110,39 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     expect(getterCalls).toBe(0);
   });
 
+  it('rejects accessor-backed docs-surface arrays without invoking nested getters', () => {
+    let getterCalls = 0;
+    const docsTree = Object.defineProperty([], '0', {
+      enumerable: true,
+      get() {
+        getterCalls += 1;
+        return 'Guides';
+      },
+    });
+    const proofArtifacts = Object.defineProperty([], '0', {
+      enumerable: true,
+      get() {
+        getterCalls += 1;
+        return {
+          id: 'table-demo.gif',
+          label: 'table-demo.gif',
+          available: true,
+        };
+      },
+    });
+
+    expect(bindSchemaBlockInput(dogfoodDocsSurfaceSchemaBlock, {
+      docsTree,
+      selectedRoute: 'blocks',
+      selectedHeadingId: 'blocks',
+      searchState: { query: 'table', hitCount: 2 },
+      proofArtifacts,
+    })).toMatchObject({
+      ok: false,
+    });
+    expect(getterCalls).toBe(0);
+  });
+
   it('renders visual and lower modes with stable route, heading, search, and proof facts', () => {
     const config = dogfoodDocsFixture();
     const modes = ['interactive', 'static', 'pipe', 'accessible'] as const;

@@ -2455,11 +2455,12 @@ function parseDogfoodDocsSurfaceSearchState(input: unknown): DogfoodDocsSurfaceS
 function parseDogfoodDocsSurfaceProofArtifacts(
   input: unknown,
 ): readonly DogfoodDocsSurfaceProofArtifact[] | undefined {
-  if (!Array.isArray(input)) {
+  const values = dataArrayValues(input);
+  if (values === undefined) {
     return undefined;
   }
 
-  const artifacts = input.map(parseDogfoodDocsSurfaceProofArtifact);
+  const artifacts = values.map(parseDogfoodDocsSurfaceProofArtifact);
   return artifacts.every((artifact): artifact is DogfoodDocsSurfaceProofArtifact => artifact !== undefined)
     ? artifacts
     : undefined;
@@ -2562,9 +2563,26 @@ function booleanProperty(input: Record<string, unknown>, key: string): boolean |
 
 function textArrayProperty(input: Record<string, unknown>, key: string): readonly string[] | undefined {
   const value = ownDataProperty(input, key);
-  return Array.isArray(value) && value.every((item) => typeof item === 'string')
-    ? value
+  const values = dataArrayValues(value);
+  return values !== undefined && values.every((item) => typeof item === 'string')
+    ? values
     : undefined;
+}
+
+function dataArrayValues(input: unknown): readonly unknown[] | undefined {
+  if (!Array.isArray(input)) {
+    return undefined;
+  }
+
+  const values: unknown[] = [];
+  for (let index = 0; index < input.length; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(input, String(index));
+    if (descriptor === undefined || !('value' in descriptor)) {
+      return undefined;
+    }
+    values.push(descriptor.value);
+  }
+  return values;
 }
 
 interface DogfoodBlockRegistryEntryBrandCarrier {
