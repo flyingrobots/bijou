@@ -53,8 +53,8 @@ Current direction and active tensions. Historical ship data is in
 ### 1. Close The `v6.0.0` Release Boundary
 
 - The live `v6.0.0` milestone has zero open tracker items plus twenty-four
-  completed lineage trackers after RE-035, DX-031, DX-034, and the Vitest
-  dependency hygiene work landed.
+  completed lineage trackers after RE-035, DX-031, DX-034, DX-030, and the
+  Vitest dependency hygiene work landed.
 - The release thesis is still: frame owns geometry; Blocks prove it.
 - `v6.0.0` should not tag until release-readiness validation and packaging
   checks are green.

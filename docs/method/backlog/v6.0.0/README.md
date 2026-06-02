@@ -66,9 +66,10 @@ The boundary remains:
   `@flyingrobots/bijou` selection owners, selection regions, viewport-aware
   ranges, semantic prose/surface/table/mixed-region extraction, topmost
   retained-geometry owner selection, higher-priority blocker arbitration,
-  terminal-native fallback, and clipboard-effect records. OS clipboard adapters, full
-  `createFramedApp()` drag capture, and cross-pane rich extraction remain
-  explicit later host/runtime slices instead of hidden v6 release scope.
+  terminal-native fallback, and clipboard-effect records. OS clipboard
+  adapters, full `createFramedApp()` drag capture, and cross-pane rich
+  extraction remain explicit later host/runtime slices instead of hidden v6
+  release scope.
 
 ## Core Runtime Scope
 

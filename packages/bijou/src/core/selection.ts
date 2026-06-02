@@ -359,11 +359,14 @@ function extractTableSelection(
   const endRow = clamp(range.end.y, 0, rowCount - 1);
   const selectedRows: string[] = [];
 
+  const startColumn = Math.min(range.start.x, range.end.x);
+  const endColumn = Math.max(range.start.x, range.end.x);
+
   for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
     const row = content.rows[rowIndex] ?? [];
-    const startColumn = clamp(range.start.x, 0, Math.max(0, row.length - 1));
-    const endColumn = clamp(range.end.x, 0, Math.max(0, row.length - 1));
-    selectedRows.push(row.slice(startColumn, endColumn + 1).join(delimiter));
+    const rowStartColumn = clamp(startColumn, 0, Math.max(0, row.length - 1));
+    const rowEndColumn = clamp(endColumn, 0, Math.max(0, row.length - 1));
+    selectedRows.push(row.slice(rowStartColumn, rowEndColumn + 1).join(delimiter));
   }
 
   return selectedRows.join('\n');

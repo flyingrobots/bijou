@@ -122,6 +122,30 @@ describe('boundary-aware selection and copy primitives', () => {
     );
   });
 
+  it('normalizes diagonal table drags into rectangular semantic cell ranges', () => {
+    const owner = defineSelectionOwner({
+      id: 'table',
+      layoutNodeId: 'table.node',
+      rect: { x: 0, y: 0, width: 3, height: 3 },
+      content: {
+        kind: 'table',
+        rows: [
+          ['Name', 'Status', 'Owner'],
+          ['DX-030', 'ready', 'Bijou'],
+          ['DX-034', 'landed', 'Bijou'],
+        ],
+      },
+    });
+    const range = selectionRange(owner, {
+      anchor: { x: 2, y: 0 },
+      focus: { x: 1, y: 2 },
+    });
+
+    expect(extractSelectionText(owner.content, range)).toBe(
+      'Status\tOwner\nready\tBijou\nlanded\tBijou',
+    );
+  });
+
   it('extracts mixed content regions in semantic child order within one owner', () => {
     const owner = defineSelectionOwner({
       id: 'mixed',
