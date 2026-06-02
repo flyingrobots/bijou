@@ -12,20 +12,28 @@ Last synced from GitHub Issues: 2026-06-02.
 
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
-| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 24 | Current layout truth, standard blocks, and release hygiene lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 27 | 0 | Next major-release candidate after v6 triage. |
+| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 6 | 24 | Current layout truth, standard blocks, and active status/feedback Block slice. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 21 | 0 | Next major-release candidate after the active v6 status/feedback slice. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
-Theme: layout truth and standard blocks.
+Theme: layout truth, standard blocks, and status/feedback block expansion.
 
-The v6 lane has no remaining open tracker items. It should complete
-release-readiness validation before tagging.
+The v6 lane reopened deliberately for a focused status and feedback Block
+slice. It should complete this PR and release-readiness validation before
+tagging.
 
 ### Open Work
 
-No open v6 tracker items remain.
+| Issue | Priority | Type | Work |
+| :--- | :--- | :--- | :--- |
+| [#220](https://github.com/flyingrobots/bijou/issues/220) | `priority:medium` | `type:maintenance` | DF-031 inline status standard Block |
+| [#221](https://github.com/flyingrobots/bijou/issues/221) | `priority:medium` | `type:maintenance` | DF-032 in-flow status standard Block |
+| [#222](https://github.com/flyingrobots/bijou/issues/222) | `priority:medium` | `type:maintenance` | DF-033 transient overlay standard Block |
+| [#223](https://github.com/flyingrobots/bijou/issues/223) | `priority:medium` | `type:maintenance` | DF-035 activity stream standard Block |
+| [#224](https://github.com/flyingrobots/bijou/issues/224) | `priority:medium` | `type:maintenance` | DF-037 shortcut cue standard Block |
+| [#225](https://github.com/flyingrobots/bijou/issues/225) | `priority:medium` | `type:maintenance` | DF-038 progress indicator standard Block |
 
 ### Completed Lineage
 
@@ -77,12 +85,6 @@ The v7 lane is initial triage, not a release promise. It contains the imported
 
 | Issue | Priority | Type | Work |
 | :--- | :--- | :--- | :--- |
-| [#220](https://github.com/flyingrobots/bijou/issues/220) | `priority:medium` | `type:maintenance` | DF-031 audit inline status family across real surfaces |
-| [#221](https://github.com/flyingrobots/bijou/issues/221) | `priority:medium` | `type:maintenance` | DF-032 audit in-flow status block family across real surfaces |
-| [#222](https://github.com/flyingrobots/bijou/issues/222) | `priority:medium` | `type:maintenance` | DF-033 audit low-level transient overlay family across real surfaces |
-| [#223](https://github.com/flyingrobots/bijou/issues/223) | `priority:medium` | `type:maintenance` | DF-035 audit activity stream family across real surfaces |
-| [#224](https://github.com/flyingrobots/bijou/issues/224) | `priority:medium` | `type:maintenance` | DF-037 audit inline shortcut cues family across real surfaces |
-| [#225](https://github.com/flyingrobots/bijou/issues/225) | `priority:medium` | `type:maintenance` | DF-038 audit progress indicators family across real surfaces |
 | [#226](https://github.com/flyingrobots/bijou/issues/226) | `priority:medium` | `type:maintenance` | DF-039 audit framed grouping family across real surfaces |
 | [#227](https://github.com/flyingrobots/bijou/issues/227) | `priority:medium` | `type:maintenance` | DF-040 audit explainability walkthroughs family across real surfaces |
 | [#228](https://github.com/flyingrobots/bijou/issues/228) | `priority:medium` | `type:maintenance` | DF-042 audit formatted documents and prose family across real surfaces |

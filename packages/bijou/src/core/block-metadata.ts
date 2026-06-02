@@ -14,9 +14,11 @@ export type BlockScale =
   | 'section'
   | 'panel'
   | 'control'
+  | 'inline'
   | 'item'
   | 'data'
-  | 'diagnostic';
+  | 'diagnostic'
+  | 'overlay';
 
 export type BlockConfigOptionKind =
   | 'boolean'
@@ -155,9 +157,11 @@ const BLOCK_SCALES: readonly BlockScale[] = [
   'section',
   'panel',
   'control',
+  'inline',
   'item',
   'data',
   'diagnostic',
+  'overlay',
 ];
 const OUTPUT_MODES: readonly OutputMode[] = [
   'interactive',

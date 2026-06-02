@@ -102,6 +102,18 @@ function renderSlotsFor(blockName: string): Readonly<Record<string, unknown>> {
         details: ['schema-aware', 'command-aware'],
         actions: ['reveal source'],
       };
+    case 'InlineStatusBlock':
+      return { label: 'docs', status: 'ok', message: 'synced' };
+    case 'InFlowStatusBlock':
+      return { severity: 'warning', source: 'docs', message: 'inventory stale', action: 'run docs:inventory' };
+    case 'TransientOverlayBlock':
+      return { priority: 'normal', message: 'Saved DOGFOOD route', dismiss: 'Esc dismisses' };
+    case 'ActivityStreamBlock':
+      return { events: ['10:41 tests passed', '10:42 PR opened'], selected: '10:41 tests passed' };
+    case 'ShortcutCueBlock':
+      return { shortcuts: ['/ Search', '? Help', 'Esc Close'], scope: 'page' };
+    case 'ProgressIndicatorBlock':
+      return { label: 'Install packages', value: '3', total: '5', percent: '60%' };
     default:
       throw new Error(`unknown standard block ${blockName}`);
   }

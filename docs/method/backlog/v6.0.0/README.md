@@ -46,9 +46,19 @@ The boundary remains:
   standard Bijou blocks landed through issue #181 with public block metadata,
   package manifests, schema-bound block contracts, first-party `AppShell`,
   `ReaderSurface`, and `InspectorPanel` definitions, rendered multi-mode proof,
-  block-tree rendering, and DOGFOOD Blocks preview evidence. Catalog expansion
-  beyond the first standard block set remains explicit later work instead of
-  hidden v6 release scope.
+  block-tree rendering, and DOGFOOD Blocks preview evidence. The first catalog
+  expansion is now explicit issue-backed v6 work through the status/feedback
+  Block slice.
+
+## Active Status And Feedback Block Slice
+
+- [**DF-031**](../../../design/DF-031-status-feedback-standard-blocks.md) -
+  status and feedback standard Blocks are active through issues #220 through
+  #225. The slice adds first-party `InlineStatusBlock`, `InFlowStatusBlock`,
+  `TransientOverlayBlock`, `ActivityStreamBlock`, `ShortcutCueBlock`, and
+  `ProgressIndicatorBlock` definitions with metadata, data contracts,
+  schema-bound adapters, command intents, ready stories, deterministic render
+  output, and lower-mode facts.
 
 ## Landed Data Binding Anchor
 

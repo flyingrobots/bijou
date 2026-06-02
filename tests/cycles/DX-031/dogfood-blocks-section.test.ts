@@ -311,6 +311,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       expect(text).not.toContain('pipe:');
       expect(text).not.toContain('accessible:');
       expect(text).not.toContain('provider snapshots idle; commands ready');
+      expect(text).not.toContain('(missing required');
       expect(text).toContain(block.metadata.blockName);
       if (block.metadata.blockName === 'AppShell') {
         expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
@@ -319,16 +320,20 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         expect(text).not.toContain('ReaderSurface block page');
       }
       expect(foregroundStyledTextCellExists(result.frames.at(-1)!, block.metadata.blockName)).toBe(true);
-      for (const story of standardBlockStories.filter((candidate) => candidate.blockName === block.metadata.blockName)) {
+      for (const story of standardBlockStories.filter(
+        (candidate) => candidate.blockName === block.metadata.blockName,
+      )) {
         expect(text).toContain(story.id);
       }
       for (const otherBlock of otherBlocks) {
-        for (const story of standardBlockStories.filter((candidate) => candidate.blockName === otherBlock.metadata.blockName)) {
+        for (const story of standardBlockStories.filter(
+          (candidate) => candidate.blockName === otherBlock.metadata.blockName,
+        )) {
           expect(text).not.toContain(story.id);
         }
       }
     }
-  });
+  }, 15_000);
 
   it('resets the guide content scroll when selecting another block preview', async () => {
     const [firstBlock, secondBlock] = standardBlocks;

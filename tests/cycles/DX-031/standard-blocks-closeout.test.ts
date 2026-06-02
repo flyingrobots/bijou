@@ -11,6 +11,12 @@ describe('DX-031 standard blocks closeout', () => {
       'AppShell',
       'ReaderSurface',
       'InspectorPanel',
+      'InlineStatusBlock',
+      'InFlowStatusBlock',
+      'TransientOverlayBlock',
+      'ActivityStreamBlock',
+      'ShortcutCueBlock',
+      'ProgressIndicatorBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -63,6 +69,12 @@ describe('DX-031 standard blocks closeout', () => {
       'stale',
       'error',
     ]);
+    expect(storyStates.get('InlineStatusBlock')).toEqual(['ready']);
+    expect(storyStates.get('InFlowStatusBlock')).toEqual(['ready']);
+    expect(storyStates.get('TransientOverlayBlock')).toEqual(['ready']);
+    expect(storyStates.get('ActivityStreamBlock')).toEqual(['ready']);
+    expect(storyStates.get('ShortcutCueBlock')).toEqual(['ready']);
+    expect(storyStates.get('ProgressIndicatorBlock')).toEqual(['ready']);
   });
 
   it('marks DX-031 landed in Method evidence after closing issue 181', () => {
@@ -71,11 +83,20 @@ describe('DX-031 standard blocks closeout', () => {
 
     expect(design).toContain('DX-031 is landed for the `v6.0.0` release boundary.');
     expect(design).toContain('DOGFOOD multi-mode proof is present');
-    expect(design).toMatch(/Catalog expansion beyond `AppShell`, `ReaderSurface`, and `InspectorPanel`\s+belongs to later issues/);
+    expect(design).toMatch(
+      /Status and feedback block expansion is now explicit issue-backed v6 work\s+through #220 through #225/,
+    );
     expect(design).not.toContain('DX-031 is now partially landed rather than not started.');
 
     expect(changelog).toContain('DX-031 standard blocks closeout');
     expect(changelog).toContain('AppShell`, `ReaderSurface`, and `InspectorPanel`');
+    expect(changelog).toContain('Status and feedback standard Blocks');
+    expect(changelog).toContain('InlineStatusBlock');
+    expect(changelog).toContain('InFlowStatusBlock');
+    expect(changelog).toContain('TransientOverlayBlock');
+    expect(changelog).toContain('ActivityStreamBlock');
+    expect(changelog).toContain('ShortcutCueBlock');
+    expect(changelog).toContain('ProgressIndicatorBlock');
   });
 
   it('keeps v6 tracker docs aligned after closing issue 181', () => {
@@ -117,6 +138,30 @@ function renderSlotsFor(blockName: string): Readonly<Record<string, unknown>> {
         details: ['schema-aware', 'command-aware'],
         actions: ['reveal source'],
       };
+    case 'InlineStatusBlock':
+      return { label: 'docs', status: 'ok', message: 'synced' };
+    case 'InFlowStatusBlock':
+      return {
+        severity: 'warning',
+        source: 'docs',
+        message: 'inventory stale',
+        action: 'run docs:inventory',
+      };
+    case 'TransientOverlayBlock':
+      return {
+        priority: 'normal',
+        message: 'Saved DOGFOOD route',
+        dismiss: 'Esc dismisses',
+      };
+    case 'ActivityStreamBlock':
+      return {
+        events: ['10:41 tests passed', '10:42 PR opened'],
+        selected: '10:41 tests passed',
+      };
+    case 'ShortcutCueBlock':
+      return { shortcuts: ['/ Search', '? Help', 'Esc Close'], scope: 'page' };
+    case 'ProgressIndicatorBlock':
+      return { label: 'Install packages', value: '3', total: '5', percent: '60%' };
     default:
       throw new Error(`unknown standard block ${blockName}`);
   }

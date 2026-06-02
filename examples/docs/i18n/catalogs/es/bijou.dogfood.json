@@ -4,7 +4,97 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.event.prOpened"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.event.testsPassed"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.activityStream.selected"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.documentationTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.action"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.severity"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inFlowStatus.source"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inlineStatus.status"
       },
       "kind": "message",
       "sourceLocale": "en",
@@ -49,7 +139,79 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.progressIndicator.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.close"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.help"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.scope"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.shortcutCue.search"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.dismiss"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.message"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.transientOverlay.priority"
       },
       "kind": "message",
       "sourceLocale": "en",
