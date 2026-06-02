@@ -62,8 +62,11 @@ and `workflow:shell:preflight` output.
   `dist/` directories plus workspace `.tsbuildinfo` files without shell globs.
 - `npm run version` becomes `node scripts/version.mjs`, preserving the existing
   workspace version bump and internal dependency pinning behavior.
-- CI keeps the full Node 18/20/22 lane on Ubuntu and adds Node 22 focused unit
-  coverage on macOS and Windows.
+- CI keeps the full supported Node 20/22 lane on Ubuntu and adds Node 22
+  focused unit coverage on macOS and Windows.
+- The repository development floor is `^20.19.0 || >=22.12.0` after the Vitest
+  4.1 toolchain moved through Vite 8/Rolldown APIs that cannot start on Node 18
+  or earlier 20/22 minors.
 - Existing release, publish, benchmark, retry, and hook shell scripts remain
   explicit shell-owned infrastructure. They are not the Day 0 contributor path.
 

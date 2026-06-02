@@ -9,16 +9,17 @@ Bijou is a TypeScript toolkit for building serious terminal software. It treats 
 
 ## Prerequisites
 
-- Node.js 18 or newer
-- Node.js 22 or newer is recommended for local development
+- Node.js 20.19 or newer, or Node.js 22.12 or newer
+- Node.js 22.12 or newer is recommended for local development
 - npm 8+ (or your preferred npm-compatible package manager)
 
-The project is tested against Node.js 18, 20, and 22 in CI. Newer Node.js
-versions are supported by policy; the repository enforces only the Node 18
-floor before install.
+The repository development toolchain is tested against Node.js 20 and 22 in
+CI. Newer Node.js versions are supported by policy; the repository enforces the
+same `^20.19.0 || >=22.12.0` floor before install because Vitest 4.1 and its
+Vite/Rolldown runtime require that range.
 
-Core build and unit-test coverage runs on Ubuntu for Node 18/20/22 and on
-macOS plus Windows for Node 22. Contributor-facing root scripts such as
+Core build and unit-test coverage runs on Ubuntu for Node 20/22 and on macOS
+plus Windows for Node 22. Contributor-facing root scripts such as
 `npm run clean` and `npm run version` are Node scripts so they do not require a
 Unix shell. Release, publish, and benchmark workflows may still use
 Linux-hosted Bash where the workflow itself is intentionally platform-specific.
