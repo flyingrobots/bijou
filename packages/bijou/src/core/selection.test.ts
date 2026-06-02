@@ -146,6 +146,21 @@ describe('boundary-aware selection and copy primitives', () => {
     );
   });
 
+  it('does not copy the last character when selecting blank columns after a short line', () => {
+    const owner = defineSelectionOwner({
+      id: 'short-line',
+      layoutNodeId: 'short-line.node',
+      rect: { x: 0, y: 0, width: 20, height: 1 },
+      content: { kind: 'surface', lines: ['short'] },
+    });
+    const range = selectionRange(owner, {
+      anchor: { x: 10, y: 0 },
+      focus: { x: 18, y: 0 },
+    });
+
+    expect(extractSelectionText(owner.content, range)).toBe('');
+  });
+
   it('extracts mixed content regions in semantic child order within one owner', () => {
     const owner = defineSelectionOwner({
       id: 'mixed',

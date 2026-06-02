@@ -553,11 +553,11 @@ function comparePoints(a: SelectionPoint, b: SelectionPoint): number {
 }
 
 function sliceInclusive(text: string, start: number, end: number): string {
-  if (text.length === 0 || end < 0 || start > end) {
+  if (text.length === 0 || end < 0 || start > end || start >= text.length) {
     return '';
   }
 
-  const safeStart = clamp(start, 0, text.length - 1);
+  const safeStart = Math.max(0, start);
   const safeEnd = clamp(end, 0, text.length - 1);
   if (safeStart > safeEnd) {
     return '';
