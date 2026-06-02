@@ -329,8 +329,16 @@ function pickSelectionOwner(
 }
 
 function extractLineSelection(lines: readonly string[], range: SelectionRange): string {
-  const startY = clamp(range.start.y, 0, Math.max(0, lines.length - 1));
-  const endY = clamp(range.end.y, 0, Math.max(0, lines.length - 1));
+  if (lines.length === 0) {
+    return '';
+  }
+
+  const startY = Math.max(range.start.y, 0);
+  const endY = Math.min(range.end.y, lines.length - 1);
+  if (startY > endY) {
+    return '';
+  }
+
   const selected: string[] = [];
 
   for (let y = startY; y <= endY; y += 1) {

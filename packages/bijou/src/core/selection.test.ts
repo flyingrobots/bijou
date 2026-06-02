@@ -161,6 +161,21 @@ describe('boundary-aware selection and copy primitives', () => {
     expect(extractSelectionText(owner.content, range)).toBe('');
   });
 
+  it('does not copy the final content row when selecting blank rows below content', () => {
+    const owner = defineSelectionOwner({
+      id: 'short-content',
+      layoutNodeId: 'short-content.node',
+      rect: { x: 0, y: 0, width: 20, height: 4 },
+      content: { kind: 'prose', paragraphs: ['only row'] },
+    });
+    const range = selectionRange(owner, {
+      anchor: { x: 0, y: 2 },
+      focus: { x: 7, y: 3 },
+    });
+
+    expect(extractSelectionText(owner.content, range)).toBe('');
+  });
+
   it('extracts mixed content regions in semantic child order within one owner', () => {
     const owner = defineSelectionOwner({
       id: 'mixed',
