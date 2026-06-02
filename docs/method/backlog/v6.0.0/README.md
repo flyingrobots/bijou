@@ -80,6 +80,9 @@ The boundary remains:
   remove showcase layout sludge and manual scrolling/string assembly
 - [**WF-009**](../../../design/WF-009-keep-release-prs-under-automated-review-file-limits.md) -
   keep release PRs under automated review file limits
+- [**PR #250**](https://github.com/flyingrobots/bijou/pull/250) -
+  keep the v6 release validation toolchain current with the Vitest `4.0.18` to
+  `4.1.8` dependency-hygiene bump
 
 ## Execution Order
 

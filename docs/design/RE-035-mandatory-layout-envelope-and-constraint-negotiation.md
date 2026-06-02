@@ -535,6 +535,60 @@ differently, but the underlying layout truth should be shared.
    deriving geometry from rendered output.
 8. Keep the implementation pure and shell-agnostic.
 
+## Design Thinking Slice Plan
+
+This cycle uses the Method loop with an IBM Design Thinking posture: sponsored
+users, measurable Hills, explicit assumptions, low-ceremony prototypes, and
+playback after each slice. The team should keep asking whether the slice helps
+a maintainer or agent inspect layout truth before render.
+
+### Sponsored Users
+
+- Sponsored Human: Bijou maintainer closing the v6 release boundary and
+  auditing layout behavior without parsing painted terminal rows.
+- Sponsored Agent: Implementation or review agent generating deterministic
+  assertions against layout facts, not renderer strings.
+
+### Hill For The First Ten Slices
+
+A maintainer or agent can construct visible layout nodes, resolve parent-owned
+integer rectangles through stack and place, inspect the explanation facts, and
+hand the assigned rectangle to a renderer-facing seam without executing a
+renderer.
+
+### Assumptions To Test
+
+- A small pure module in `@flyingrobots/bijou` can establish layout truth before
+  DOGFOOD or `bijou-tui` adopts it.
+- Mandatory render-facing envelopes can be proven as an adapter seam before
+  every existing component is migrated.
+- Surface and buffer extents are already cell-native enough to seed the
+  measurement seam.
+- Text measurement can remain an adapter placeholder in RE-035 without
+  smuggling JavaScript string length into the canonical layout model.
+
+### Ten Slices
+
+| Slice | Prototype | Test Playback |
+| :--- | :--- | :--- |
+| 1. Active cycle guard | Record RE-035 as the active runtime-engine design and freeze out RE-036+ scope. | A cycle test proves text flow, viewport chrome, responsive variants, and workspace behavior remain out of scope. |
+| 2. Envelope facts | Add constraints, preferences, assigned rects, direction, fit policy, and explanation records. | Tests assert immutable plain data for id, role, direction, constraints, preference, assignment, and reason. |
+| 3. Visible render gate | Add a render-facing helper that only accepts resolved envelopes. | Tests prove a visible node cannot enter the render seam without an assigned layout envelope. |
+| 4. Measurement seam | Add content extent records for surface and buffer content plus a text-adapter hook. | Tests prove surface/buffer extents flow directly and text measurement remains injectable. |
+| 5. Measure/assign protocol | Add pure child measurement and parent-owned assignment helpers. | Tests prove child preferences cannot force parent geometry after assignment. |
+| 6. Stack fixed/flex tracks | Add minimal logical stack resolution with gaps and fixed/flexible tracks. | Tests prove fixed and flexible tracks receive deterministic integer rectangles. |
+| 7. Rounding policy | Add stable leftover-cell distribution for flexible tracks. | Tests prove extra cells are assigned by a named, repeatable policy. |
+| 8. Place alignment | Add logical place alignment inside an assigned rectangle. | Tests prove start, center, end, and stretch along both axes. |
+| 9. Direction mapping | Resolve inline-start/inline-end under LTR and RTL for placement. | Tests prove RTL flips inline placement without changing source order. |
+| 10. Inspector facts | Add explanation summaries for resolved layout nodes and render assignments. | Tests assert layout explanations without rendering strings or ANSI output. |
+
+### Playback Cadence
+
+- RED: write the slice test first, tied to the playback question above.
+- GREEN: add only the pure runtime code needed for that slice.
+- LEARN: update this design doc's Drift Check, Playback, and Retrospective when
+  a slice changes the boundary or leaves follow-on debt.
+
 ## Tests To Write First
 
 - Cycle test proving RE-035 is the active runtime-engine design and that later
@@ -596,12 +650,49 @@ behind the layout engine's back.
 
 ## Drift Check
 
-Not started.
+Started on 2026-06-02 as a pure `@flyingrobots/bijou` core layout slice.
+
+The first ten slices intentionally landed in `packages/bijou/src/core/layout/`
+instead of `bijou-tui`, DOGFOOD, or shell renderers. That keeps the contract
+mode-neutral and lets tests assert layout truth before any renderer paints.
+
+Confirmed scope boundaries:
+
+- stack and place are proof containers, not a full flexbox or workspace model
+- text content uses an injected measurement adapter, not JavaScript string
+  length
+- render-facing code receives assigned rectangles through a seam, but existing
+  components are not migrated in this slice
+- layout explanation facts are plain data and do not require ANSI output
 
 ## Playback
 
-Not started.
+RED:
+
+- Added `packages/bijou/src/core/layout/envelope.test.ts` before the module
+  existed. The focused test failed because `./envelope.js` was missing.
+
+GREEN:
+
+- Added immutable layout constraints, preferences, assigned rectangles,
+  directions, fit policy, and resolved-envelope facts.
+- Added a render-facing seam that rejects unresolved visible nodes and passes
+  parent-assigned rectangles to the renderer callback.
+- Added surface and buffer cell extent helpers plus an injected text
+  measurement seam.
+- Added parent-owned child assignment, minimal stack fixed/flex layout,
+  source-order largest-remainder rounding, place alignment, RTL inline
+  start/end mapping, and inspectable explanation facts.
+- Exported the RE-035 primitives from `@flyingrobots/bijou`.
 
 ## Retrospective
 
-Not started.
+The first ten slices establish the boring floor: visible layout facts can now
+exist and be tested before rendering. The main restraint was keeping RE-035
+from turning into RE-036 through RE-040. The current module deliberately does
+not solve text flow, overflow, hit testing, responsive fallbacks, accessible
+layout lowering, or workspace behavior.
+
+Follow-on adoption should be separate and test-led: migrate one render-facing
+surface family at a time to consume assigned rectangles, then introduce text
+measurement, viewport overflow, and hit-test facts as their own cycles.

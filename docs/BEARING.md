@@ -38,8 +38,8 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Close The `v6.0.0` Release Boundary
 
-- The live `v6.0.0` milestone has four open issues and eighteen completed
-  lineage issues.
+- The live `v6.0.0` milestone has five open tracker items: four release issues
+  and one dependency-hygiene PR, plus eighteen completed lineage issues.
 - The release thesis is still: frame owns geometry; Blocks prove it.
 - `v6.0.0` should not tag until the remaining open release issues are closed,
   intentionally split, or explicitly moved to another horizon.
@@ -86,7 +86,7 @@ Current direction and active tensions. Historical ship data is in
 
 The immediate focus is `v6.0.0` release closure.
 
-Open v6 issues:
+Open v6 tracker items:
 
 - [#180](https://github.com/flyingrobots/bijou/issues/180) — `RE-035`
   mandatory layout envelope and constraint negotiation.
@@ -96,6 +96,8 @@ Open v6 issues:
   declarative view data binding.
 - [#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`
   boundary-aware pointer selection and copy.
+- [#250](https://github.com/flyingrobots/bijou/pull/250) — Dependabot Vitest
+  `4.0.18` to `4.1.8` dependency-hygiene PR.
 
 Recommended pull order:
 
@@ -109,6 +111,10 @@ Recommended pull order:
 3. Treat [#186](https://github.com/flyingrobots/bijou/issues/186) as either a
    focused v6 implementation slice or an explicit move to `v7.0.0`, depending
    on whether boundary-aware copy is required for the release boundary.
+4. Keep [#250](https://github.com/flyingrobots/bijou/pull/250) in the v6
+   boundary as validation hygiene; merge it when checks are clean, but do not
+   let it displace the RE-035 layout-envelope work unless the Vitest bump
+   changes local validation behavior.
 
 Non-goals for the next cycle:
 

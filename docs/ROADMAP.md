@@ -6,13 +6,13 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues: 2026-06-01.
+Last synced from GitHub Issues: 2026-06-02.
 
 ## Release Snapshot
 
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
-| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 4 | 18 | Current layout truth and standard blocks release lane. |
+| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 5 | 18 | Current layout truth, standard blocks, and release hygiene lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 27 | 0 | Next major-release candidate after v6 triage. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
@@ -25,12 +25,13 @@ the remaining open release issues before tagging.
 
 ### Open Work
 
-| Issue | Lane | Type | Work |
+| Tracker | Lane / Labels | Type | Work |
 | :--- | :--- | :--- | :--- |
 | [#180](https://github.com/flyingrobots/bijou/issues/180) | `lane:release` | `type:enhancement` | RE-035 mandatory layout envelope and constraint negotiation |
 | [#181](https://github.com/flyingrobots/bijou/issues/181) | `lane:release` | `type:enhancement` | DX-031 standard Bijou blocks |
 | [#182](https://github.com/flyingrobots/bijou/issues/182) | `lane:release` | `type:enhancement` | DX-034 declarative view data binding |
 | [#186](https://github.com/flyingrobots/bijou/issues/186) | `lane:release` | `type:enhancement` | DX-030 boundary-aware pointer selection and copy |
+| [#250](https://github.com/flyingrobots/bijou/pull/250) | `dependencies`, `javascript` | dependency PR | Vitest `4.0.18` to `4.1.8` release-hygiene bump |
 
 ### Completed Lineage
 
