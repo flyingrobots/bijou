@@ -146,15 +146,20 @@ interface SpringIntegrationOptions {
 }
 
 /**
- * Build a TEA command that runs a spring animation via `setInterval`.
+ * Build a TEA command that advances a spring animation from runtime pulses.
+ *
+ * The command subscribes through `caps.onPulse`, caps each accepted pulse with
+ * `maxPulseSeconds`, and accumulates that time into fixed-step spring physics
+ * updates. Slow runtime pulses may delay progress, but they do not feed one
+ * large raw delta into the spring integrator.
  *
  * @template M - The message type emitted into the TEA update cycle.
- * @param from       - Starting value.
- * @param to         - Target value.
- * @param config     - Resolved spring physics parameters.
- * @param fps        - Frames per second for the interval timer.
- * @param onFrame    - Callback invoked each frame with the interpolated value.
- * @param onComplete - Optional callback invoked when the spring settles.
+ * @param from        - Starting value.
+ * @param to          - Target value.
+ * @param config      - Resolved spring physics parameters.
+ * @param integration - `fixedStepSeconds` and `maxPulseSeconds` integration policy.
+ * @param onFrame     - Callback invoked after spring physics advances.
+ * @param onComplete  - Optional callback invoked when the spring settles.
  * @returns A TEA command that resolves when the spring is done.
  */
 function createSpringCmd<M>(
@@ -220,19 +225,17 @@ function acceptedPulseSeconds(dt: number, maxPulseSeconds: number): number {
 // ---------------------------------------------------------------------------
 
 /**
- * Build a TEA command that runs a tween animation via `setInterval`.
+ * Build a TEA command that advances a tween animation from runtime pulse `dt`.
  *
- * Uses wall-clock time (`Date.now()`) to compute actual elapsed time
- * per frame, so animations run at the correct speed regardless of
- * timer jitter or system load.
+ * The command subscribes through `caps.onPulse`; each pulse supplies elapsed
+ * seconds, which are converted to milliseconds before calling `tweenStep()`.
  *
  * @template M - The message type emitted into the TEA update cycle.
  * @param from       - Starting value.
  * @param to         - Target value.
  * @param duration   - Total animation duration in milliseconds.
  * @param ease       - Easing function applied to normalized progress.
- * @param fps        - Frames per second for the interval timer.
- * @param onFrame    - Callback invoked each frame with the interpolated value.
+ * @param onFrame    - Callback invoked after tween progress advances.
  * @param onComplete - Optional callback invoked when the tween completes.
  * @returns A TEA command that resolves when the tween is done.
  */
@@ -251,7 +254,7 @@ function createTweenCmd<M>(
       let state = createTweenState(from);
 
       const handle = caps.onPulse((dt) => {
-        // TweenStep expects milliseconds for delta
+        // tweenStep expects the pulse delta in milliseconds.
         state = tweenStep(state, config, dt * 1000);
         emit(onFrame(state.value));
 

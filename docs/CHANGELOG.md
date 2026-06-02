@@ -425,6 +425,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Animation command source docs** — `createSpringCmd()` and
+  `createTweenCmd()` internals now describe the current pulse-driven runtime
+  path instead of the old timer-based `setInterval` / `Date.now()` model.
 - **Node development floor for Vitest 4.1** — The root workspace preinstall
   guard, engine metadata, README, and CI matrix now require Node.js
   `^20.19.0 || >=22.12.0`, matching Vitest 4.1's Vite/Rolldown runtime instead
