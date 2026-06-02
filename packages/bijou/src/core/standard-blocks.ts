@@ -273,42 +273,66 @@ export const inlineStatusBlock: BlockDefinition = defineBlock({
   metadata: inlineStatusMetadata(),
   data: inlineStatusData,
   commands: standardFeedbackCommands('InlineStatusBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'InlineStatusBlock', inlineStatusSections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'InlineStatusBlock',
+    inlineStatusSections,
+  ),
 });
 
 export const inFlowStatusBlock: BlockDefinition = defineBlock({
   metadata: inFlowStatusMetadata(),
   data: inFlowStatusData,
   commands: standardFeedbackCommands('InFlowStatusBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'InFlowStatusBlock', inFlowStatusSections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'InFlowStatusBlock',
+    inFlowStatusSections,
+  ),
 });
 
 export const transientOverlayBlock: BlockDefinition = defineBlock({
   metadata: transientOverlayMetadata(),
   data: transientOverlayData,
   commands: standardFeedbackCommands('TransientOverlayBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'TransientOverlayBlock', transientOverlaySections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'TransientOverlayBlock',
+    transientOverlaySections,
+  ),
 });
 
 export const activityStreamBlock: BlockDefinition = defineBlock({
   metadata: activityStreamMetadata(),
   data: activityStreamData,
   commands: standardFeedbackCommands('ActivityStreamBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'ActivityStreamBlock', activityStreamSections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ActivityStreamBlock',
+    activityStreamSections,
+  ),
 });
 
 export const shortcutCueBlock: BlockDefinition = defineBlock({
   metadata: shortcutCueMetadata(),
   data: shortcutCueData,
   commands: standardFeedbackCommands('ShortcutCueBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'ShortcutCueBlock', shortcutCueSections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ShortcutCueBlock',
+    shortcutCueSections,
+  ),
 });
 
 export const progressIndicatorBlock: BlockDefinition = defineBlock({
   metadata: progressIndicatorMetadata(),
   data: progressIndicatorData,
   commands: standardFeedbackCommands('ProgressIndicatorBlock'),
-  render: (input) => renderStandardSectionBlock(input, 'ProgressIndicatorBlock', progressIndicatorSections),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ProgressIndicatorBlock',
+    progressIndicatorSections,
+  ),
 });
 
 export const readerSurfaceSchemaAdapter: BlockSchemaAdapter<ReaderSurfaceSchemaData> =
@@ -692,6 +716,8 @@ interface StandardFeedbackMetadataOptions {
 }
 
 function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): BlockMetadata {
+  const readyStoryId = firstFeedbackStoryId(options);
+
   return {
     packageName: BIJOU_PACKAGE,
     blockName: options.blockName,
@@ -710,17 +736,32 @@ function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): Blo
       {
         id: 'ready',
         label: 'Ready',
-        requiredSlots: options.slots.filter((slot) => slot.required).map((slot) => slot.id),
-        optionalSlots: options.slots.filter((slot) => !slot.required).map((slot) => slot.id),
+        requiredSlots: options.slots
+          .filter((slot) => slot.required)
+          .map((slot) => slot.id),
+        optionalSlots: options.slots
+          .filter((slot) => !slot.required)
+          .map((slot) => slot.id),
         facts: [{ kind: 'state', key: 'story.state', value: 'ready' }],
       },
     ],
     composedComponents: options.composedComponents,
     semanticFacts: [{ kind: 'entity', key: 'block', value: options.blockName }],
     storyIds: options.storyIds,
-    examples: [{ id: `${options.storyIds[0]}.example`, label: `${options.blockName} ready example` }],
+    examples: [{
+      id: `${readyStoryId}.example`,
+      label: `${options.blockName} ready example`,
+    }],
     tags: options.tags,
   };
+}
+
+function firstFeedbackStoryId(options: StandardFeedbackMetadataOptions): string {
+  const storyId = options.storyIds[0];
+  if (typeof storyId !== 'string' || storyId.trim() === '') {
+    throw new Error(`${options.blockName} standard metadata requires a story id`);
+  }
+  return storyId;
 }
 
 function standardBlockStory(
@@ -999,8 +1040,16 @@ function renderFacts(
 
   for (const section of sections) {
     if (section.present) {
-      facts.push({ kind: 'entity', key: `${sectionFactPrefix}.${section.id}`, value: 'present' });
-      facts.push({ kind: 'label', key: `${sectionFactPrefix}.${section.id}.value`, value: section.content });
+      facts.push({
+        kind: 'entity',
+        key: `${sectionFactPrefix}.${section.id}`,
+        value: 'present',
+      });
+      facts.push({
+        kind: 'label',
+        key: `${sectionFactPrefix}.${section.id}.value`,
+        value: section.content,
+      });
     }
   }
 
