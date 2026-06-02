@@ -1360,6 +1360,42 @@ function standardBlockExampleSlots(blockName: string): Readonly<Record<string, u
         details: ['schema-bound', 'provider-ready', 'command-aware'],
         actions: ['Reveal selection', 'Focus source'],
       };
+    case 'InlineStatusBlock':
+      return {
+        label: 'Docs inventory',
+        status: 'ready',
+        message: 'catalog synced',
+      };
+    case 'InFlowStatusBlock':
+      return {
+        severity: 'warning',
+        source: 'DOGFOOD Blocks',
+        message: 'Preview data should stay explicit.',
+        action: 'Open story',
+      };
+    case 'TransientOverlayBlock':
+      return {
+        priority: 'normal',
+        message: 'Saved DOGFOOD route',
+        dismiss: 'Esc dismisses',
+      };
+    case 'ActivityStreamBlock':
+      return {
+        events: ['10:41 tests passed', '10:42 PR opened'],
+        selected: '10:41 tests passed',
+      };
+    case 'ShortcutCueBlock':
+      return {
+        shortcuts: ['/ Search', '? Help', 'Esc Close'],
+        scope: 'Blocks page',
+      };
+    case 'ProgressIndicatorBlock':
+      return {
+        label: 'Install packages',
+        value: '3',
+        total: '5',
+        percent: '60%',
+      };
     default:
       return {};
   }
