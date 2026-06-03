@@ -34,8 +34,8 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}"
-            npm run dogfood:i18n:complete -- --base "origin/${GITHUB_BASE_REF}"
+            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}"
+            npm run dogfood:i18n:complete -- --base FETCH_HEAD
           else
             npm run dogfood:i18n:complete -- --base HEAD^
           fi
