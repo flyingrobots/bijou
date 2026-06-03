@@ -26,7 +26,10 @@ export function createScriptTestContext(options: Omit<TestContextOptions, 'clock
 export function runScriptDeterministic<Model, M>(
   app: App<Model, M>,
   steps: ScriptStep<M>[],
-  options: RunScriptOptions & { readonly ctx: ScriptTestContext },
+  options: Omit<RunScriptOptions, 'pulseFps'> & {
+    readonly ctx: ScriptTestContext;
+    readonly pulseFps?: false;
+  },
 ): Promise<RunScriptResult<Model>> {
   return runScript(app, steps, {
     ...options,
