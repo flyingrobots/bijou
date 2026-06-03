@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Live notification word wrapping** — active `@flyingrobots/bijou-tui`
+  notification stack entries now wrap rendered title, body, and action rows at
+  word boundaries when possible instead of hard-splitting words in the live
+  overlay path. Long unbroken words still hard-wrap to stay inside the
+  notification width. This closes issue #292.
 - **DOGFOOD CI path gates** — CI now classifies changed paths before test jobs
   run, skips DOGFOOD coverage/i18n policy steps and expensive DOGFOOD
   docs/landing smoke steps on pull requests that do not touch
