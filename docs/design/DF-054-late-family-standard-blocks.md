@@ -39,8 +39,8 @@ The work follows a Design Thinking loop:
   semantics instead of visual one-offs
 - frame each family as a named Block contract with explicit data fields and
   facts
-- prototype wide, narrow, pipe, and accessible shapes before treating the
-  implementation as landed
+- prototype interactive, static, pipe, and accessible shapes before treating
+  the implementation as landed
 - prove catalog, schema, render, story, command, preview, and lowering behavior
   in tests
 
