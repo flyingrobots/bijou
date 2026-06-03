@@ -876,12 +876,49 @@ function wrapLineSurface(surface: Surface, width: number): readonly Surface[] {
   if (surface.width === 0) return [createBlankLineSurface(safeWidth)];
 
   const rows: Surface[] = [];
-  for (let offset = 0; offset < surface.width; offset += safeWidth) {
-    const row = createSurface(safeWidth, 1);
-    row.blit(surface, 0, 0, offset, 0, safeWidth, 1);
-    rows.push(row);
+  let offset = trimLeadingSurfaceWhitespace(surface, 0);
+  while (offset < surface.width) {
+    const hardEnd = Math.min(surface.width, offset + safeWidth);
+    const end = hardEnd >= surface.width
+      ? surface.width
+      : wordBoundarySurfaceEnd(surface, offset, hardEnd);
+    rows.push(sliceLineSurface(surface, offset, end, safeWidth));
+    offset = hardEnd >= surface.width
+      ? surface.width
+      : trimLeadingSurfaceWhitespace(surface, end < hardEnd ? end + 1 : hardEnd);
   }
-  return rows;
+  return rows.length === 0 ? [createBlankLineSurface(safeWidth)] : rows;
+}
+
+function sliceLineSurface(surface: Surface, start: number, end: number, width: number): Surface {
+  const row = createSurface(width, 1);
+  const span = Math.max(0, Math.min(surface.width, end) - start);
+  if (span > 0) {
+    row.blit(surface, 0, 0, start, 0, span, 1);
+  }
+  return row;
+}
+
+function wordBoundarySurfaceEnd(surface: Surface, start: number, hardEnd: number): number {
+  let breakAt = -1;
+  for (let index = start; index < hardEnd; index++) {
+    if (isWhitespaceSurfaceCell(surface, index)) {
+      breakAt = index;
+    }
+  }
+  return breakAt > start ? breakAt : hardEnd;
+}
+
+function trimLeadingSurfaceWhitespace(surface: Surface, start: number): number {
+  let offset = start;
+  while (offset < surface.width && isWhitespaceSurfaceCell(surface, offset)) {
+    offset++;
+  }
+  return offset;
+}
+
+function isWhitespaceSurfaceCell(surface: Surface, col: number): boolean {
+  return /^\s+$/.test(surface.get(col, 0).char);
 }
 
 function renderPlainSurface(surface: Surface): string {

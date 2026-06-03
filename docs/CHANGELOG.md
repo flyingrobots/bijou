@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Live notification word wrapping** — active `@flyingrobots/bijou-tui`
+  notification stack entries now wrap rendered title, body, and action rows at
+  word boundaries when possible instead of hard-splitting words in the live
+  overlay path. Long unbroken words still hard-wrap to stay inside the
+  notification width. This closes issue #292.
 - **Safe GitHub comments and milestone item mirrors** —
   `docs/WORKFLOW.md`, `docs/METHOD.md`, `AGENTS.md`, and `CONTRIBUTING.md`
   now prefer `--body-file` with quoted heredocs for Markdown-heavy GitHub
