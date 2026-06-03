@@ -48,7 +48,7 @@ function renderMotionVariantText(variantId: string, mode: OutputMode): string {
 describe('DF-053 motion and shader DOGFOOD audit', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
-  it('keeps the active cycle doc tied to the IBM-style playback contract', () => {
+  it('keeps the active cycle doc tied to the Design Thinking playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-053-audit-motion-and-shader-effects-family-across-real-surfaces.md');
 
     expect(cycle).toContain('## Sponsored Users');

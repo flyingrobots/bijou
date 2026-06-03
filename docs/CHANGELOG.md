@@ -49,6 +49,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD component-family standard Blocks** —
+  `@flyingrobots/bijou` now exports six first-party Blocks for the next
+  DOGFOOD component-family slice: `FramedGroupBlock`,
+  `ExplainabilityWalkthroughBlock`, `FormattedDocumentBlock`,
+  `LinkDestinationBlock`, `DividerBlock`, and `TextEntryBlock`, with matching
+  lower-camel block definitions, schema adapters, and schema-bound block
+  exports. The slice adds ready stories, standard catalog and package manifest
+  entries, DOGFOOD Blocks preview sample data, command intents, typed schema
+  validation, deterministic visual/static output, pipe/accessible lowerings,
+  and stable semantic facts for grouping, explainability, document,
+  navigation, structure, and input families. This closes issues #226 through
+  #231.
 - **DOGFOOD docs surface Block** — DOGFOOD now publishes
   `DogfoodDocsSurfaceBlock` as the canonical docs workspace surface for
   navigation, reader content, search state, and proof artifacts. The Block adds

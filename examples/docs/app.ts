@@ -427,6 +427,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Pre-made Blocks',
     summary: 'The first-party standard blocks exported by @flyingrobots/bijou.',
     body: BLOCKS_PRE_MADE_TEXT,
+    localizedBody: (localization) => standardBlockInventoryMarkdown(localization),
   },
   {
     id: 'blocks-dogfood-surfaces',
@@ -461,6 +462,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'How Blocks Lower',
     summary: 'How standard block declarations carry mode and semantic facts before rendered block output lands.',
     body: BLOCKS_LOWERING_TEXT,
+    localizedBody: (localization) => standardBlockLoweringMarkdown(localization),
   },
   {
     id: 'packages-overview',
@@ -944,7 +946,10 @@ function countMarkdownHeadings(markdownText: string): number {
     .length;
 }
 
-function standardBlockInventoryMarkdown(): string {
+function standardBlockInventoryMarkdown(localization?: LocalizationPort): string {
+  const blockIndex = standardBlocks
+    .map((block) => `- ${block.metadata.blockName}`)
+    .join('\n');
   const blockSections = standardBlocks
     .map((block) => {
       const metadata = block.metadata;
@@ -979,6 +984,12 @@ function standardBlockInventoryMarkdown(): string {
     `First-party standard blocks shipped by @flyingrobots/bijou: ${standardBlocks.length}.`,
     '',
     'These are public block authoring contracts with semantic slots, declared modes, data requirements, command intents, variants, and stories. Select a block under Block Preview for the live rendered example.',
+    '',
+    `## ${dogfoodText(localization, 'blocks.standard.catalogTitle', 'Catalog')}`,
+    '',
+    blockIndex,
+    '',
+    `## ${dogfoodText(localization, 'blocks.standard.detailsTitle', 'Details')}`,
     '',
     blockSections,
   ].join('\n');
@@ -1111,10 +1122,13 @@ function standardBlockPreviewMarkdown(): string {
   ].join('\n');
 }
 
-function standardBlockLoweringMarkdown(): string {
+function standardBlockLoweringMarkdown(localization?: LocalizationPort): string {
   const declaredModes = Array.from(
     new Set(standardBlocks.flatMap((block) => block.metadata.modes)),
   ).sort();
+  const blockIndex = standardBlocks
+    .map((block) => `- ${block.metadata.blockName}`)
+    .join('\n');
   const blockRows = standardBlocks
     .map((block) => {
       const metadata = block.metadata;
@@ -1140,6 +1154,12 @@ function standardBlockLoweringMarkdown(): string {
     'Blocks lower by preserving declared modes, semantic facts, story states, data requirements, and command intents as inspectable contract data before rendered output exists.',
     '',
     `Declared modes: ${declaredModes.join(', ')}`,
+    '',
+    `## ${dogfoodText(localization, 'blocks.standard.catalogTitle', 'Catalog')}`,
+    '',
+    blockIndex,
+    '',
+    `## ${dogfoodText(localization, 'blocks.standard.detailsTitle', 'Details')}`,
     '',
     blockRows,
   ].join('\n');
@@ -1442,6 +1462,116 @@ function standardBlockExampleSlots(
         value: '3',
         total: '5',
         percent: '60%',
+      };
+    case 'FramedGroupBlock':
+      {
+        const testsGreen = dogfoodText(
+          localization,
+          'blocks.preview.framedGroup.item.testsGreen',
+          'tests green',
+        );
+        return {
+          title: dogfoodText(localization, 'blocks.preview.framedGroup.title', 'Release Checks'),
+          items: [
+            testsGreen,
+            dogfoodText(localization, 'blocks.preview.framedGroup.item.docsUpdated', 'docs updated'),
+            dogfoodText(localization, 'blocks.preview.framedGroup.item.prLinked', 'PR linked'),
+          ],
+          selected: testsGreen,
+          mode: dogfoodText(localization, 'blocks.preview.framedGroup.mode', 'review'),
+        };
+      }
+    case 'ExplainabilityWalkthroughBlock':
+      return {
+        title: dogfoodText(
+          localization,
+          'blocks.preview.explainabilityWalkthrough.title',
+          'Why this changed',
+        ),
+        steps: [
+          dogfoodText(
+            localization,
+            'blocks.preview.explainabilityWalkthrough.step.inputChanged',
+            'input changed',
+          ),
+          dogfoodText(
+            localization,
+            'blocks.preview.explainabilityWalkthrough.step.constraintTightened',
+            'constraint tightened',
+          ),
+          dogfoodText(
+            localization,
+            'blocks.preview.explainabilityWalkthrough.step.previewRerendered',
+            'preview re-rendered',
+          ),
+        ],
+        evidence: dogfoodText(
+          localization,
+          'blocks.preview.explainabilityWalkthrough.evidence',
+          'DF-040 playback',
+        ),
+        decision: dogfoodText(
+          localization,
+          'blocks.preview.explainabilityWalkthrough.decision',
+          'keep grouped proof visible',
+        ),
+        nextStep: dogfoodText(
+          localization,
+          'blocks.preview.explainabilityWalkthrough.nextStep',
+          'open lower-mode output',
+        ),
+      };
+    case 'FormattedDocumentBlock':
+      return {
+        heading: dogfoodText(
+          localization,
+          'blocks.preview.formattedDocument.heading',
+          'Blocks document',
+        ),
+        body: dogfoodText(
+          localization,
+          'blocks.preview.formattedDocument.body',
+          'Use prose for persistent product truth.',
+        ),
+        callout: dogfoodText(
+          localization,
+          'blocks.preview.formattedDocument.callout',
+          'Lower modes keep the same heading and body facts.',
+        ),
+        code: dogfoodText(
+          localization,
+          'blocks.preview.formattedDocument.code',
+          'block: FormattedDocumentBlock',
+        ),
+      };
+    case 'LinkDestinationBlock':
+      return {
+        label: dogfoodText(localization, 'blocks.preview.linkDestination.label', 'DOGFOOD.md'),
+        destination: dogfoodText(
+          localization,
+          'blocks.preview.linkDestination.destination',
+          'docs/DOGFOOD.md',
+        ),
+        kind: dogfoodText(localization, 'blocks.preview.linkDestination.kind', 'docs'),
+        status: dogfoodText(localization, 'blocks.preview.linkDestination.status', 'available'),
+      };
+    case 'DividerBlock':
+      return {
+        label: dogfoodText(localization, 'blocks.preview.divider.label', 'Release Evidence'),
+        style: dogfoodText(localization, 'blocks.preview.divider.style', 'rule'),
+        density: dogfoodText(localization, 'blocks.preview.divider.density', 'compact'),
+      };
+    case 'TextEntryBlock':
+      return {
+        field: dogfoodText(localization, 'blocks.preview.textEntry.field', 'Search docs'),
+        value: dogfoodText(localization, 'blocks.preview.textEntry.value', 'table'),
+        placeholder: dogfoodText(
+          localization,
+          'blocks.preview.textEntry.placeholder',
+          'type a query',
+        ),
+        validation: dogfoodText(localization, 'blocks.preview.textEntry.validation', '4 results'),
+        results: 4,
       };
     default:
       return {};

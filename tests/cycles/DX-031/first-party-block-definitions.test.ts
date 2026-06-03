@@ -2,17 +2,23 @@ import { describe, expect, it } from 'vitest';
 import {
   activityStreamBlock,
   appShellBlock,
+  dividerBlock,
   defineBlock,
   defineAppShellComposition,
+  explainabilityWalkthroughBlock,
+  formattedDocumentBlock,
+  framedGroupBlock,
   inFlowStatusBlock,
   inlineStatusBlock,
   inspectorPanelBlock,
+  linkDestinationBlock,
   progressIndicatorBlock,
   readerSurfaceBlock,
   shortcutCueBlock,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
+  textEntryBlock,
   transientOverlayBlock,
   validateBlockMetadata,
   validateBlockPackageManifest,
@@ -30,6 +36,12 @@ describe('DX-031C first-party block definitions', () => {
       activityStreamBlock,
       shortcutCueBlock,
       progressIndicatorBlock,
+      framedGroupBlock,
+      explainabilityWalkthroughBlock,
+      formattedDocumentBlock,
+      linkDestinationBlock,
+      dividerBlock,
+      textEntryBlock,
     ]);
     expect(standardBlocks.map((block) => block.metadata.blockName)).toEqual([
       'AppShell',
@@ -41,6 +53,12 @@ describe('DX-031C first-party block definitions', () => {
       'ActivityStreamBlock',
       'ShortcutCueBlock',
       'ProgressIndicatorBlock',
+      'FramedGroupBlock',
+      'ExplainabilityWalkthroughBlock',
+      'FormattedDocumentBlock',
+      'LinkDestinationBlock',
+      'DividerBlock',
+      'TextEntryBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -136,6 +154,12 @@ describe('DX-031C first-party block definitions', () => {
       'activity-stream.ready',
       'shortcut-cue.ready',
       'progress-indicator.ready',
+      'framed-group.ready',
+      'explainability-walkthrough.ready',
+      'formatted-document.ready',
+      'link-destination.ready',
+      'divider.ready',
+      'text-entry.ready',
     ]);
     expect(standardBlockStories.map((story) => story.blockName)).toEqual([
       'AppShell',
@@ -157,6 +181,12 @@ describe('DX-031C first-party block definitions', () => {
       'ActivityStreamBlock',
       'ShortcutCueBlock',
       'ProgressIndicatorBlock',
+      'FramedGroupBlock',
+      'ExplainabilityWalkthroughBlock',
+      'FormattedDocumentBlock',
+      'LinkDestinationBlock',
+      'DividerBlock',
+      'TextEntryBlock',
     ]);
   });
 });
