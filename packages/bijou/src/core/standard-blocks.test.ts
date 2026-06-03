@@ -22,6 +22,7 @@ import { lintModeLowering } from './mode-lowering.js';
 import {
   activityStreamBlock,
   appShellBlock,
+  binaryDecisionBlock,
   dividerBlock,
   explainabilityWalkthroughBlock,
   formattedDocumentBlock,
@@ -31,10 +32,15 @@ import {
   inspectorPanelBlock,
   inspectorPanelSchemaBlock,
   linkDestinationBlock,
+  multipleChoiceBlock,
+  pathProgressBlock,
+  peerNavigationBlock,
   progressIndicatorBlock,
+  progressiveDisclosureBlock,
   readerSurfaceBlock,
   readerSurfaceSchemaBlock,
   shortcutCueBlock,
+  singleChoiceBlock,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
@@ -60,6 +66,12 @@ describe('first-party standard block definitions', () => {
       linkDestinationBlock,
       dividerBlock,
       textEntryBlock,
+      singleChoiceBlock,
+      multipleChoiceBlock,
+      binaryDecisionBlock,
+      peerNavigationBlock,
+      progressiveDisclosureBlock,
+      pathProgressBlock,
     ]);
     expect(Object.isFrozen(standardBlocks)).toBe(true);
 
@@ -87,6 +99,12 @@ describe('first-party standard block definitions', () => {
       'LinkDestinationBlock',
       'DividerBlock',
       'TextEntryBlock',
+      'SingleChoiceBlock',
+      'MultipleChoiceBlock',
+      'BinaryDecisionBlock',
+      'PeerNavigationBlock',
+      'ProgressiveDisclosureBlock',
+      'PathProgressBlock',
     ]);
   });
 
@@ -155,6 +173,12 @@ describe('first-party standard block definitions', () => {
         'LinkDestinationBlock',
         'DividerBlock',
         'TextEntryBlock',
+        'SingleChoiceBlock',
+        'MultipleChoiceBlock',
+        'BinaryDecisionBlock',
+        'PeerNavigationBlock',
+        'ProgressiveDisclosureBlock',
+        'PathProgressBlock',
       ].map((blockName) => [
         blockName,
         standardBlockStories
@@ -194,6 +218,12 @@ describe('first-party standard block definitions', () => {
     expect(storiesByBlock.get('LinkDestinationBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('DividerBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('TextEntryBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('SingleChoiceBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('MultipleChoiceBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('BinaryDecisionBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('PeerNavigationBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ProgressiveDisclosureBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('PathProgressBlock')).toEqual(['ready']);
 
     for (const block of standardBlocks) {
       const storyIds = standardBlockStories

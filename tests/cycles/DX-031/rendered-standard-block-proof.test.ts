@@ -157,6 +157,54 @@ function renderSlotsFor(blockName: string): Readonly<Record<string, unknown>> {
         validation: '4 results',
         results: 4,
       };
+    case 'SingleChoiceBlock':
+      return {
+        label: 'Output mode',
+        options: ['interactive', 'pipe', 'accessible'],
+        selected: 'pipe',
+        mode: 'radio',
+        validation: 'available',
+      };
+    case 'MultipleChoiceBlock':
+      return {
+        label: 'Release proof',
+        checked: ['lint', 'tests'],
+        unchecked: ['screenshots'],
+        selected: 'lint; tests',
+        validation: '2 of 3 complete',
+      };
+    case 'BinaryDecisionBlock':
+      return {
+        label: 'Merge gate',
+        selected: 'yes',
+        consequence: 'admin merge',
+        confirmation: 'CI green',
+        disabledReason: 'none',
+      };
+    case 'PeerNavigationBlock':
+      return {
+        previous: 'Architecture',
+        current: 'Blocks',
+        next: 'Method',
+        route: 'docs/blocks',
+        status: 'available',
+      };
+    case 'ProgressiveDisclosureBlock':
+      return {
+        label: 'Advanced options',
+        state: 'closed',
+        hiddenCount: 6,
+        summary: '6 options hidden',
+        details: ['debug traces', 'layout facts'],
+      };
+    case 'PathProgressBlock':
+      return {
+        path: ['Setup', 'Blocks', 'Preview'],
+        current: 'Blocks',
+        step: 2,
+        total: 3,
+        status: 'current',
+      };
     default:
       throw new Error(`unknown standard block ${blockName}`);
   }

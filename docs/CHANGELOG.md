@@ -49,6 +49,21 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD choice and navigation standard Blocks** —
+  `@flyingrobots/bijou` now exports the next six first-party DOGFOOD
+  component-family Blocks: `SingleChoiceBlock`, `MultipleChoiceBlock`,
+  `BinaryDecisionBlock`, `PeerNavigationBlock`,
+  `ProgressiveDisclosureBlock`, and `PathProgressBlock`, with matching
+  lower-camel block definitions, schema adapters, and schema-bound block
+  exports. The slice adds ready stories, standard catalog and package manifest
+  entries, DOGFOOD Blocks preview sample data, command intents, typed schema
+  validation, deterministic visual/static output, pipe/accessible lowerings,
+  stable semantic facts for input choice, decision, navigation, disclosure,
+  and path-progress families, and translated DOGFOOD preview copy for every
+  supported locale. The slice also adds a `dogfood:i18n:complete` policy gate
+  to pre-push and CI so newly added or source-changed localization keys must
+  carry current values for `en`, `fr`, `es`, and `de` before merging. This
+  closes issues #232 through #237.
 - **DOGFOOD component-family standard Blocks** —
   `@flyingrobots/bijou` now exports six first-party Blocks for the next
   DOGFOOD component-family slice: `FramedGroupBlock`,

@@ -289,10 +289,18 @@ Useful scripts:
 ```bash
 npm run dogfood:i18n:build
 npm run dogfood:i18n:check
+npm run dogfood:i18n:complete
 npm run dogfood:i18n:coverage
 ```
 
 Runtime uses English as fallback and overlays the selected locale. Development mode keeps missing translations visible instead of silently hiding them.
+
+Policy: when a branch adds a DOGFOOD localization key or changes an existing
+source string, it must provide current translations for every supported
+DOGFOOD locale (`en`, `fr`, `es`, and `de`). `npm run dogfood:i18n:complete`
+checks changed source strings against `origin/main`; pre-push and CI run that
+gate with `npm run dogfood:i18n:check` so new strings cannot land with missing
+generated catalogs or untranslated supported-locale rows.
 
 ## Blocks
 

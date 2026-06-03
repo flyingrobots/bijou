@@ -28,6 +28,18 @@ jobs:
       - name: DOGFOOD coverage gate
         if: matrix.node-version == 22
         run: npm run dogfood:coverage:gate
+      - name: DOGFOOD i18n policy gate
+        if: matrix.node-version == 22
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}"
+            npm run dogfood:i18n:complete -- --base "origin/${GITHUB_BASE_REF}"
+          else
+            npm run dogfood:i18n:complete -- --base HEAD^
+          fi
+          npm run dogfood:i18n:check
       - run: npm test
       - name: Smoke interactive examples
         if: matrix.node-version == 22

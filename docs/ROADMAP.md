@@ -6,7 +6,7 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and this component-family six-pack branch:
+Last synced from GitHub Issues and this choice/navigation six-pack branch:
 2026-06-03.
 
 ## Release Snapshot
@@ -14,7 +14,7 @@ Last synced from GitHub Issues and this component-family six-pack branch:
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 14 | 7 | Active product-truth candidate after the first component-family six-pack. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 8 | 13 | Active product-truth candidate after the second component-family six-pack. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
@@ -93,17 +93,17 @@ the closing PR merges.
 | [#229](https://github.com/flyingrobots/bijou/issues/229) | `lane:up-next` | `type:maintenance` | DF-043 linked destination standard Block |
 | [#230](https://github.com/flyingrobots/bijou/issues/230) | `lane:up-next` | `type:maintenance` | DF-044 divider standard Block |
 | [#231](https://github.com/flyingrobots/bijou/issues/231) | `lane:up-next` | `type:maintenance` | DF-045 text entry standard Block |
+| [#232](https://github.com/flyingrobots/bijou/issues/232) | `lane:up-next` | `type:maintenance` | DF-046 single choice standard Block |
+| [#233](https://github.com/flyingrobots/bijou/issues/233) | `lane:up-next` | `type:maintenance` | DF-047 multiple choice standard Block |
+| [#234](https://github.com/flyingrobots/bijou/issues/234) | `lane:up-next` | `type:maintenance` | DF-048 binary decision standard Block |
+| [#235](https://github.com/flyingrobots/bijou/issues/235) | `lane:up-next` | `type:maintenance` | DF-050 peer navigation standard Block |
+| [#236](https://github.com/flyingrobots/bijou/issues/236) | `lane:up-next` | `type:maintenance` | DF-051 progressive disclosure standard Block |
+| [#237](https://github.com/flyingrobots/bijou/issues/237) | `lane:up-next` | `type:maintenance` | DF-052 path progress standard Block |
 
 ### Component-Family Audits
 
 | Issue | Priority | Type | Work |
 | :--- | :--- | :--- | :--- |
-| [#232](https://github.com/flyingrobots/bijou/issues/232) | `priority:medium` | `type:maintenance` | DF-046 audit single choice family across real surfaces |
-| [#233](https://github.com/flyingrobots/bijou/issues/233) | `priority:medium` | `type:maintenance` | DF-047 audit multiple choice family across real surfaces |
-| [#234](https://github.com/flyingrobots/bijou/issues/234) | `priority:medium` | `type:maintenance` | DF-048 audit binary decision family across real surfaces |
-| [#235](https://github.com/flyingrobots/bijou/issues/235) | `priority:medium` | `type:maintenance` | DF-050 audit peer navigation family across real surfaces |
-| [#236](https://github.com/flyingrobots/bijou/issues/236) | `priority:medium` | `type:maintenance` | DF-051 audit progressive disclosure family across real surfaces |
-| [#237](https://github.com/flyingrobots/bijou/issues/237) | `priority:medium` | `type:maintenance` | DF-052 audit path and progress family across real surfaces |
 | [#238](https://github.com/flyingrobots/bijou/issues/238) | `priority:medium` | `type:maintenance` | DF-054 audit expressive branding and decorative emphasis family across real surfaces |
 | [#239](https://github.com/flyingrobots/bijou/issues/239) | `priority:medium` | `type:maintenance` | DF-055 audit mode-aware custom primitives family across real surfaces |
 | [#240](https://github.com/flyingrobots/bijou/issues/240) | `priority:medium` | `type:maintenance` | DF-056 audit dense comparison family across real surfaces |

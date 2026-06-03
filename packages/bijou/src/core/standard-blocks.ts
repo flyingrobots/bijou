@@ -50,7 +50,13 @@ export type StandardBlockName =
   | 'FormattedDocumentBlock'
   | 'LinkDestinationBlock'
   | 'DividerBlock'
-  | 'TextEntryBlock';
+  | 'TextEntryBlock'
+  | 'SingleChoiceBlock'
+  | 'MultipleChoiceBlock'
+  | 'BinaryDecisionBlock'
+  | 'PeerNavigationBlock'
+  | 'ProgressiveDisclosureBlock'
+  | 'PathProgressBlock';
 export type StandardBlockStoryState =
   | 'ready'
   | 'narrow'
@@ -163,6 +169,54 @@ export interface TextEntrySchemaData {
   readonly placeholder?: string;
   readonly validation?: string;
   readonly results?: string | number;
+}
+
+export interface SingleChoiceSchemaData {
+  readonly label: string;
+  readonly options: readonly string[];
+  readonly selected: string;
+  readonly mode?: string;
+  readonly validation?: string;
+}
+
+export interface MultipleChoiceSchemaData {
+  readonly label: string;
+  readonly checked: readonly string[];
+  readonly unchecked: readonly string[];
+  readonly selected?: string;
+  readonly validation?: string;
+}
+
+export interface BinaryDecisionSchemaData {
+  readonly label: string;
+  readonly selected: string;
+  readonly consequence: string;
+  readonly confirmation?: string;
+  readonly disabledReason?: string;
+}
+
+export interface PeerNavigationSchemaData {
+  readonly previous: string;
+  readonly current: string;
+  readonly next: string;
+  readonly route?: string;
+  readonly status?: string;
+}
+
+export interface ProgressiveDisclosureSchemaData {
+  readonly label: string;
+  readonly state: string;
+  readonly hiddenCount: string | number;
+  readonly summary?: string;
+  readonly details?: readonly string[];
+}
+
+export interface PathProgressSchemaData {
+  readonly path: readonly string[];
+  readonly current: string;
+  readonly step: string | number;
+  readonly total: string | number;
+  readonly status?: string;
 }
 
 const shellFocusRegion = commandIntent<{ readonly region: string }>('shell.focusRegion', {
@@ -318,6 +372,48 @@ const textEntrySections: readonly StandardSectionSpec[] = Object.freeze([
   { id: 'validation', label: 'Validation', required: false },
   { id: 'results', label: 'Results', required: false },
 ]);
+const singleChoiceSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'options', label: 'Options', required: true },
+  { id: 'selected', label: 'Selected', required: true },
+  { id: 'mode', label: 'Mode', required: false },
+  { id: 'validation', label: 'Validation', required: false },
+]);
+const multipleChoiceSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'checked', label: 'Checked', required: true },
+  { id: 'unchecked', label: 'Unchecked', required: true },
+  { id: 'selected', label: 'Selected', required: false },
+  { id: 'validation', label: 'Validation', required: false },
+]);
+const binaryDecisionSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'selected', label: 'Selected', required: true },
+  { id: 'consequence', label: 'Consequence', required: true },
+  { id: 'confirmation', label: 'Confirmation', required: false },
+  { id: 'disabledReason', label: 'Disabled reason', required: false },
+]);
+const peerNavigationSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'previous', label: 'Previous', required: true },
+  { id: 'current', label: 'Current', required: true },
+  { id: 'next', label: 'Next', required: true },
+  { id: 'route', label: 'Route', required: false },
+  { id: 'status', label: 'Status', required: false },
+]);
+const progressiveDisclosureSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'state', label: 'State', required: true },
+  { id: 'hiddenCount', label: 'Hidden count', required: true },
+  { id: 'summary', label: 'Summary', required: false },
+  { id: 'details', label: 'Details', required: false },
+]);
+const pathProgressSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'path', label: 'Path', required: true },
+  { id: 'current', label: 'Current', required: true },
+  { id: 'step', label: 'Step', required: true },
+  { id: 'total', label: 'Total', required: true },
+  { id: 'status', label: 'Status', required: false },
+]);
 
 const inlineStatusData = standardBlockData('inline-status', 'InlineStatusBlock', [
   {
@@ -405,6 +501,52 @@ const textEntryData = standardBlockData('text-entry', 'TextEntryBlock', [
     name: 'entry',
     label: 'Text entry state',
     description: 'Field label, current value, placeholder, validation, and result-count facts.',
+  },
+]);
+const singleChoiceData = standardBlockData('single-choice', 'SingleChoiceBlock', [
+  {
+    name: 'choice',
+    label: 'Single choice state',
+    description: 'Choice label, option list, selected value, mode, and validation facts.',
+  },
+]);
+const multipleChoiceData = standardBlockData('multiple-choice', 'MultipleChoiceBlock', [
+  {
+    name: 'choices',
+    label: 'Multiple choice state',
+    description: 'Checklist label, checked options, unchecked options, selected summary, and validation facts.',
+  },
+]);
+const binaryDecisionData = standardBlockData('binary-decision', 'BinaryDecisionBlock', [
+  {
+    name: 'decision',
+    label: 'Binary decision state',
+    description: 'Decision label, selected side, consequence, confirmation, and disabled-reason facts.',
+  },
+]);
+const peerNavigationData = standardBlockData('peer-navigation', 'PeerNavigationBlock', [
+  {
+    name: 'peers',
+    label: 'Peer navigation state',
+    description: 'Previous, current, next, route, and availability facts.',
+  },
+]);
+const progressiveDisclosureData = standardBlockData(
+  'progressive-disclosure',
+  'ProgressiveDisclosureBlock',
+  [
+    {
+      name: 'disclosure',
+      label: 'Progressive disclosure state',
+      description: 'Disclosure label, open or closed state, hidden count, summary, and detail facts.',
+    },
+  ],
+);
+const pathProgressData = standardBlockData('path-progress', 'PathProgressBlock', [
+  {
+    name: 'path',
+    label: 'Path progress state',
+    description: 'Path labels, current step, ordinal step, total step count, and status facts.',
   },
 ]);
 
@@ -570,6 +712,72 @@ export const textEntryBlock: BlockDefinition = defineBlock({
   ),
 });
 
+export const singleChoiceBlock: BlockDefinition = defineBlock({
+  metadata: singleChoiceMetadata(),
+  data: singleChoiceData,
+  commands: standardSectionCommands('SingleChoiceBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'SingleChoiceBlock',
+    singleChoiceSections,
+  ),
+});
+
+export const multipleChoiceBlock: BlockDefinition = defineBlock({
+  metadata: multipleChoiceMetadata(),
+  data: multipleChoiceData,
+  commands: standardSectionCommands('MultipleChoiceBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'MultipleChoiceBlock',
+    multipleChoiceSections,
+  ),
+});
+
+export const binaryDecisionBlock: BlockDefinition = defineBlock({
+  metadata: binaryDecisionMetadata(),
+  data: binaryDecisionData,
+  commands: standardSectionCommands('BinaryDecisionBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'BinaryDecisionBlock',
+    binaryDecisionSections,
+  ),
+});
+
+export const peerNavigationBlock: BlockDefinition = defineBlock({
+  metadata: peerNavigationMetadata(),
+  data: peerNavigationData,
+  commands: standardSectionCommands('PeerNavigationBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'PeerNavigationBlock',
+    peerNavigationSections,
+  ),
+});
+
+export const progressiveDisclosureBlock: BlockDefinition = defineBlock({
+  metadata: progressiveDisclosureMetadata(),
+  data: progressiveDisclosureData,
+  commands: standardSectionCommands('ProgressiveDisclosureBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ProgressiveDisclosureBlock',
+    progressiveDisclosureSections,
+  ),
+});
+
+export const pathProgressBlock: BlockDefinition = defineBlock({
+  metadata: pathProgressMetadata(),
+  data: pathProgressData,
+  commands: standardSectionCommands('PathProgressBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'PathProgressBlock',
+    pathProgressSections,
+  ),
+});
+
 export const readerSurfaceSchemaAdapter: BlockSchemaAdapter<ReaderSurfaceSchemaData> =
   defineBlockSchemaAdapter({
     id: 'reader-surface.article',
@@ -714,6 +922,55 @@ export const textEntrySchemaAdapter: BlockSchemaAdapter<TextEntrySchemaData> =
     blockName: 'TextEntryBlock',
     sections: textEntrySections,
     parse: parseTextEntrySchemaData,
+  });
+
+export const singleChoiceSchemaAdapter: BlockSchemaAdapter<SingleChoiceSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'single-choice.choice',
+    blockName: 'SingleChoiceBlock',
+    sections: singleChoiceSections,
+    parse: parseSingleChoiceSchemaData,
+  });
+
+export const multipleChoiceSchemaAdapter: BlockSchemaAdapter<MultipleChoiceSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'multiple-choice.choices',
+    blockName: 'MultipleChoiceBlock',
+    sections: multipleChoiceSections,
+    parse: parseMultipleChoiceSchemaData,
+  });
+
+export const binaryDecisionSchemaAdapter: BlockSchemaAdapter<BinaryDecisionSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'binary-decision.decision',
+    blockName: 'BinaryDecisionBlock',
+    sections: binaryDecisionSections,
+    parse: parseBinaryDecisionSchemaData,
+  });
+
+export const peerNavigationSchemaAdapter: BlockSchemaAdapter<PeerNavigationSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'peer-navigation.peers',
+    blockName: 'PeerNavigationBlock',
+    sections: peerNavigationSections,
+    parse: parsePeerNavigationSchemaData,
+  });
+
+export const progressiveDisclosureSchemaAdapter:
+  BlockSchemaAdapter<ProgressiveDisclosureSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'progressive-disclosure.disclosure',
+    blockName: 'ProgressiveDisclosureBlock',
+    sections: progressiveDisclosureSections,
+    parse: parseProgressiveDisclosureSchemaData,
+  });
+
+export const pathProgressSchemaAdapter: BlockSchemaAdapter<PathProgressSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'path-progress.path',
+    blockName: 'PathProgressBlock',
+    sections: pathProgressSections,
+    parse: parsePathProgressSchemaData,
   });
 
 export const readerSurfaceSchemaBlock: SchemaBoundBlockDefinition<ReaderSurfaceSchemaData> =
@@ -887,6 +1144,73 @@ export const textEntrySchemaBlock: SchemaBoundBlockDefinition<TextEntrySchemaDat
     ),
   });
 
+export const singleChoiceSchemaBlock: SchemaBoundBlockDefinition<SingleChoiceSchemaData> =
+  defineSchemaBlock({
+    block: singleChoiceBlock,
+    schema: singleChoiceSchemaAdapter,
+    bind: (choice) => bindStandardSectionSchemaData(
+      'SingleChoiceBlock',
+      choice as Readonly<Record<string, unknown>>,
+      singleChoiceSections,
+    ),
+  });
+
+export const multipleChoiceSchemaBlock: SchemaBoundBlockDefinition<MultipleChoiceSchemaData> =
+  defineSchemaBlock({
+    block: multipleChoiceBlock,
+    schema: multipleChoiceSchemaAdapter,
+    bind: (choices) => bindStandardSectionSchemaData(
+      'MultipleChoiceBlock',
+      choices as Readonly<Record<string, unknown>>,
+      multipleChoiceSections,
+    ),
+  });
+
+export const binaryDecisionSchemaBlock: SchemaBoundBlockDefinition<BinaryDecisionSchemaData> =
+  defineSchemaBlock({
+    block: binaryDecisionBlock,
+    schema: binaryDecisionSchemaAdapter,
+    bind: (decision) => bindStandardSectionSchemaData(
+      'BinaryDecisionBlock',
+      decision as Readonly<Record<string, unknown>>,
+      binaryDecisionSections,
+    ),
+  });
+
+export const peerNavigationSchemaBlock: SchemaBoundBlockDefinition<PeerNavigationSchemaData> =
+  defineSchemaBlock({
+    block: peerNavigationBlock,
+    schema: peerNavigationSchemaAdapter,
+    bind: (peers) => bindStandardSectionSchemaData(
+      'PeerNavigationBlock',
+      peers as Readonly<Record<string, unknown>>,
+      peerNavigationSections,
+    ),
+  });
+
+export const progressiveDisclosureSchemaBlock:
+  SchemaBoundBlockDefinition<ProgressiveDisclosureSchemaData> =
+  defineSchemaBlock({
+    block: progressiveDisclosureBlock,
+    schema: progressiveDisclosureSchemaAdapter,
+    bind: (disclosure) => bindStandardSectionSchemaData(
+      'ProgressiveDisclosureBlock',
+      disclosure as Readonly<Record<string, unknown>>,
+      progressiveDisclosureSections,
+    ),
+  });
+
+export const pathProgressSchemaBlock: SchemaBoundBlockDefinition<PathProgressSchemaData> =
+  defineSchemaBlock({
+    block: pathProgressBlock,
+    schema: pathProgressSchemaAdapter,
+    bind: (path) => bindStandardSectionSchemaData(
+      'PathProgressBlock',
+      path as Readonly<Record<string, unknown>>,
+      pathProgressSections,
+    ),
+  });
+
 export const standardBlocks = Object.freeze([
   appShellBlock,
   readerSurfaceBlock,
@@ -903,6 +1227,12 @@ export const standardBlocks = Object.freeze([
   linkDestinationBlock,
   dividerBlock,
   textEntryBlock,
+  singleChoiceBlock,
+  multipleChoiceBlock,
+  binaryDecisionBlock,
+  peerNavigationBlock,
+  progressiveDisclosureBlock,
+  pathProgressBlock,
 ]);
 
 export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze([
@@ -936,6 +1266,17 @@ export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze
   standardBlockStory('link-destination.ready', 'LinkDestinationBlock', 'Link destination ready', 'ready'),
   standardBlockStory('divider.ready', 'DividerBlock', 'Divider ready', 'ready'),
   standardBlockStory('text-entry.ready', 'TextEntryBlock', 'Text entry ready', 'ready'),
+  standardBlockStory('single-choice.ready', 'SingleChoiceBlock', 'Single choice ready', 'ready'),
+  standardBlockStory('multiple-choice.ready', 'MultipleChoiceBlock', 'Multiple choice ready', 'ready'),
+  standardBlockStory('binary-decision.ready', 'BinaryDecisionBlock', 'Binary decision ready', 'ready'),
+  standardBlockStory('peer-navigation.ready', 'PeerNavigationBlock', 'Peer navigation ready', 'ready'),
+  standardBlockStory(
+    'progressive-disclosure.ready',
+    'ProgressiveDisclosureBlock',
+    'Progressive disclosure ready',
+    'ready',
+  ),
+  standardBlockStory('path-progress.ready', 'PathProgressBlock', 'Path progress ready', 'ready'),
 ]);
 
 export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPackage({
@@ -947,6 +1288,7 @@ export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPac
     'docs/design-system/blocks.md',
     'docs/design/DX-031-standard-bijou-blocks.md',
     'docs/design/DF-039-component-family-standard-blocks.md',
+    'docs/design/DF-046-choice-navigation-standard-blocks.md',
   ],
   tags: ['standard-blocks', 'dx-031', 'first-party'],
 });
@@ -1277,6 +1619,102 @@ function textEntryMetadata(): BlockMetadata {
     composedComponents: ['Input', 'SearchBox', 'ValidationMessage'],
     tags: ['standard', 'input', 'text-entry', 'df-045'],
     relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function singleChoiceMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'SingleChoiceBlock',
+    family: 'input',
+    scale: 'section',
+    summary: 'Describes a single-choice control with option list, selected value, mode, and validation facts.',
+    useWhen: ['A radio, select, or segmented control needs semantic option and selected-value lowerings.'],
+    avoidWhen: ['More than one option can be selected at the same time.'],
+    slots: singleChoiceSections,
+    storyIds: ['single-choice.ready'],
+    composedComponents: ['RadioGroup', 'Select', 'SegmentedControl'],
+    tags: ['standard', 'input', 'single-choice', 'df-046'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function multipleChoiceMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'MultipleChoiceBlock',
+    family: 'input',
+    scale: 'section',
+    summary: 'Describes a checklist with checked, unchecked, selected summary, and validation facts.',
+    useWhen: ['A checklist or multi-select surface needs option identity and checked-state lowerings.'],
+    avoidWhen: ['The interaction permits exactly one selected option.'],
+    slots: multipleChoiceSections,
+    storyIds: ['multiple-choice.ready'],
+    composedComponents: ['CheckboxGroup', 'Checklist', 'ValidationMessage'],
+    tags: ['standard', 'input', 'multiple-choice', 'df-047'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function binaryDecisionMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'BinaryDecisionBlock',
+    family: 'input',
+    scale: 'section',
+    summary: 'Describes a yes/no decision with selected side, consequence, confirmation, and disabled-reason facts.',
+    useWhen: ['A confirmation, destructive action, or merge gate needs explicit binary decision semantics.'],
+    avoidWhen: ['The choice has more than two meaningful options or needs a free-form reason field.'],
+    slots: binaryDecisionSections,
+    storyIds: ['binary-decision.ready'],
+    composedComponents: ['ConfirmDialog', 'ButtonGroup', 'DecisionPrompt'],
+    tags: ['standard', 'input', 'binary-decision', 'df-048'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function peerNavigationMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'PeerNavigationBlock',
+    family: 'navigation',
+    scale: 'section',
+    summary: 'Describes sibling navigation with previous, current, next, route, and availability facts.',
+    useWhen: ['A document or workflow needs peer navigation without losing previous/current/next relationships.'],
+    avoidWhen: ['The navigation is a full tree, global sidebar, or breadcrumb path.'],
+    slots: peerNavigationSections,
+    storyIds: ['peer-navigation.ready'],
+    composedComponents: ['Pager', 'Tabs', 'Breadcrumb'],
+    tags: ['standard', 'navigation', 'peer', 'df-050'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function progressiveDisclosureMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'ProgressiveDisclosureBlock',
+    family: 'disclosure',
+    scale: 'section',
+    summary: 'Describes expandable content with disclosure state, hidden count, summary, and details.',
+    useWhen: ['A details region, advanced options group, or expandable explainer needs durable state facts.'],
+    avoidWhen: ['The hidden content should be modeled as navigation, pagination, or a modal overlay.'],
+    slots: progressiveDisclosureSections,
+    storyIds: ['progressive-disclosure.ready'],
+    composedComponents: ['Disclosure', 'Details', 'Accordion'],
+    tags: ['standard', 'disclosure', 'progressive', 'df-051'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function pathProgressMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'PathProgressBlock',
+    family: 'navigation',
+    scale: 'section',
+    summary: 'Describes breadcrumb and step progress state with path, current step, ordinal, total, and status facts.',
+    useWhen: ['A workflow needs both path context and step progress lowerings.'],
+    avoidWhen: ['The surface is a scalar progress meter without path or current-step semantics.'],
+    slots: pathProgressSections,
+    storyIds: ['path-progress.ready'],
+    composedComponents: ['Breadcrumb', 'Stepper', 'ProgressIndicator'],
+    tags: ['standard', 'navigation', 'path-progress', 'df-052'],
+    relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
   });
 }
 
@@ -1761,6 +2199,15 @@ function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBloc
       return { family: 'structure', variant: 'ready' };
     case 'TextEntryBlock':
       return { family: 'input', variant: 'ready' };
+    case 'SingleChoiceBlock':
+    case 'MultipleChoiceBlock':
+    case 'BinaryDecisionBlock':
+      return { family: 'input', variant: 'ready' };
+    case 'PeerNavigationBlock':
+    case 'PathProgressBlock':
+      return { family: 'navigation', variant: 'ready' };
+    case 'ProgressiveDisclosureBlock':
+      return { family: 'disclosure', variant: 'ready' };
   }
 }
 
@@ -2168,6 +2615,146 @@ function parseTextEntrySchemaData(input: unknown): TextEntrySchemaData | undefin
     ...(placeholder === undefined ? {} : { placeholder }),
     ...(validation === undefined ? {} : { validation }),
     ...(results === undefined ? {} : { results }),
+  };
+}
+
+function parseSingleChoiceSchemaData(input: unknown): SingleChoiceSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const options = textArrayDataProperty(input, 'options');
+  const selected = textDataProperty(input, 'selected');
+  const mode = textDataProperty(input, 'mode');
+  const validation = textDataProperty(input, 'validation');
+  if (label === undefined || options === undefined || selected === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    options,
+    selected,
+    ...(mode === undefined ? {} : { mode }),
+    ...(validation === undefined ? {} : { validation }),
+  };
+}
+
+function parseMultipleChoiceSchemaData(input: unknown): MultipleChoiceSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const checked = textArrayDataProperty(input, 'checked');
+  const unchecked = textArrayDataProperty(input, 'unchecked');
+  const selected = textDataProperty(input, 'selected');
+  const validation = textDataProperty(input, 'validation');
+  if (label === undefined || checked === undefined || unchecked === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    checked,
+    unchecked,
+    ...(selected === undefined ? {} : { selected }),
+    ...(validation === undefined ? {} : { validation }),
+  };
+}
+
+function parseBinaryDecisionSchemaData(input: unknown): BinaryDecisionSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const selected = textDataProperty(input, 'selected');
+  const consequence = textDataProperty(input, 'consequence');
+  const confirmation = textDataProperty(input, 'confirmation');
+  const disabledReason = textDataProperty(input, 'disabledReason');
+  if (label === undefined || selected === undefined || consequence === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    selected,
+    consequence,
+    ...(confirmation === undefined ? {} : { confirmation }),
+    ...(disabledReason === undefined ? {} : { disabledReason }),
+  };
+}
+
+function parsePeerNavigationSchemaData(input: unknown): PeerNavigationSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const previous = textDataProperty(input, 'previous');
+  const current = textDataProperty(input, 'current');
+  const next = textDataProperty(input, 'next');
+  const route = textDataProperty(input, 'route');
+  const status = textDataProperty(input, 'status');
+  if (previous === undefined || current === undefined || next === undefined) {
+    return undefined;
+  }
+
+  return {
+    previous,
+    current,
+    next,
+    ...(route === undefined ? {} : { route }),
+    ...(status === undefined ? {} : { status }),
+  };
+}
+
+function parseProgressiveDisclosureSchemaData(
+  input: unknown,
+): ProgressiveDisclosureSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const state = textDataProperty(input, 'state');
+  const hiddenCount = textOrNumberDataProperty(input, 'hiddenCount');
+  const summary = textDataProperty(input, 'summary');
+  const details = textArrayDataProperty(input, 'details');
+  if (label === undefined || state === undefined || hiddenCount === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    state,
+    hiddenCount,
+    ...(summary === undefined ? {} : { summary }),
+    ...(details === undefined ? {} : { details }),
+  };
+}
+
+function parsePathProgressSchemaData(input: unknown): PathProgressSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const path = textArrayDataProperty(input, 'path');
+  const current = textDataProperty(input, 'current');
+  const step = textOrNumberDataProperty(input, 'step');
+  const total = textOrNumberDataProperty(input, 'total');
+  const status = textDataProperty(input, 'status');
+  if (path === undefined || current === undefined || step === undefined || total === undefined) {
+    return undefined;
+  }
+
+  return {
+    path,
+    current,
+    step,
+    total,
+    ...(status === undefined ? {} : { status }),
   };
 }
 

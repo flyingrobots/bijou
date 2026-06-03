@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   activityStreamBlock,
   appShellBlock,
+  binaryDecisionBlock,
   dividerBlock,
   defineBlock,
   defineAppShellComposition,
@@ -12,9 +13,14 @@ import {
   inlineStatusBlock,
   inspectorPanelBlock,
   linkDestinationBlock,
+  multipleChoiceBlock,
+  pathProgressBlock,
+  peerNavigationBlock,
   progressIndicatorBlock,
+  progressiveDisclosureBlock,
   readerSurfaceBlock,
   shortcutCueBlock,
+  singleChoiceBlock,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
@@ -42,6 +48,12 @@ describe('DX-031C first-party block definitions', () => {
       linkDestinationBlock,
       dividerBlock,
       textEntryBlock,
+      singleChoiceBlock,
+      multipleChoiceBlock,
+      binaryDecisionBlock,
+      peerNavigationBlock,
+      progressiveDisclosureBlock,
+      pathProgressBlock,
     ]);
     expect(standardBlocks.map((block) => block.metadata.blockName)).toEqual([
       'AppShell',
@@ -59,6 +71,12 @@ describe('DX-031C first-party block definitions', () => {
       'LinkDestinationBlock',
       'DividerBlock',
       'TextEntryBlock',
+      'SingleChoiceBlock',
+      'MultipleChoiceBlock',
+      'BinaryDecisionBlock',
+      'PeerNavigationBlock',
+      'ProgressiveDisclosureBlock',
+      'PathProgressBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -160,6 +178,12 @@ describe('DX-031C first-party block definitions', () => {
       'link-destination.ready',
       'divider.ready',
       'text-entry.ready',
+      'single-choice.ready',
+      'multiple-choice.ready',
+      'binary-decision.ready',
+      'peer-navigation.ready',
+      'progressive-disclosure.ready',
+      'path-progress.ready',
     ]);
     expect(standardBlockStories.map((story) => story.blockName)).toEqual([
       'AppShell',
@@ -187,6 +211,12 @@ describe('DX-031C first-party block definitions', () => {
       'LinkDestinationBlock',
       'DividerBlock',
       'TextEntryBlock',
+      'SingleChoiceBlock',
+      'MultipleChoiceBlock',
+      'BinaryDecisionBlock',
+      'PeerNavigationBlock',
+      'ProgressiveDisclosureBlock',
+      'PathProgressBlock',
     ]);
   });
 });

@@ -37,6 +37,7 @@
     "record:dogfood:gifs": "npm run record:dogfood:landing && npm run record:dogfood:docs",
     "dogfood:coverage:gate": "tsx scripts/dogfood-coverage-gate.ts",
     "dogfood:i18n:debt": "tsx scripts/dogfood-i18n-debt.ts",
+    "dogfood:i18n:complete": "tsx scripts/dogfood-i18n-completeness.ts",
     "dogfood:i18n:build": "tsx scripts/dogfood-i18n-build.ts",
     "dogfood:i18n:check": "tsx scripts/dogfood-i18n-build.ts --check",
     "dogfood:i18n:export": "tsx scripts/dogfood-i18n-export.ts",
