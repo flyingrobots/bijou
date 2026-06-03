@@ -272,7 +272,9 @@ status/feedback Blocks (`InlineStatusBlock`, `InFlowStatusBlock`,
 `ProgressIndicatorBlock`), and the DOGFOOD component-family Blocks
 (`FramedGroupBlock`, `ExplainabilityWalkthroughBlock`,
 `FormattedDocumentBlock`, `LinkDestinationBlock`, `DividerBlock`,
-`TextEntryBlock`).
+`TextEntryBlock`, `SingleChoiceBlock`, `MultipleChoiceBlock`,
+`BinaryDecisionBlock`, `PeerNavigationBlock`, `ProgressiveDisclosureBlock`,
+and `PathProgressBlock`).
 
 Use `renderBlockTree()` when nested block declarations should become rendered
 child output inside a parent slot. Ordinary `block.render()` remains a local
