@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **DOGFOOD release-title gallery** — DOGFOOD now keeps release-title
+  treatments as a latest-first artifact gallery, adds a unique post-release
+  `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the
+  original `V7 Product Truth` treatment as historical release identity. This
+  closes issue #289.
+
 ## [7.0.0] - 2026-06-03
 
 ### 🐛 Fixes

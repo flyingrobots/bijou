@@ -127,9 +127,10 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import {
+  DOGFOOD_RELEASE_TITLE_GALLERY,
+  type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
   renderDogfoodReleaseTitleText,
-  V7_DOGFOOD_RELEASE_TITLE,
 } from './release-title.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
@@ -192,7 +193,6 @@ const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-u
 const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
 const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
-const RELEASE_TITLE_TEXT = dogfoodReleaseTitleMarkdown();
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
@@ -256,6 +256,29 @@ interface GuideDoc {
   readonly localizedSummary?: (localization: LocalizationPort | undefined) => string;
   readonly localizedBody?: (localization: LocalizationPort | undefined) => string;
 }
+
+function releaseTitleGuide(release: DogfoodReleaseTitle): GuideDoc {
+  return {
+    id: `release-title-${release.id}`,
+    pageId: RELEASE_PAGE_ID,
+    title: release.title,
+    summary: release.summary,
+    body: dogfoodReleaseTitleMarkdown(undefined, release),
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      release.titleKey,
+      release.title,
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      release.summaryKey,
+      release.summary,
+    ),
+    localizedBody: (localization) => dogfoodReleaseTitleMarkdown(localization, release),
+  };
+}
+
+const RELEASE_TITLE_GUIDES = DOGFOOD_RELEASE_TITLE_GALLERY.map(releaseTitleGuide);
 
 interface DocsPageSpec {
   readonly id: DocsPageId;
@@ -582,24 +605,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     summary: 'The foundations, patterns, blocks, and component-family doctrine behind Bijou UI.',
     body: PHILOSOPHY_DESIGN_SYSTEM_TEXT,
   },
-  {
-    id: 'release-title-v7',
-    pageId: RELEASE_PAGE_ID,
-    title: V7_DOGFOOD_RELEASE_TITLE.title,
-    summary: 'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.',
-    body: RELEASE_TITLE_TEXT,
-    localizedTitle: (localization) => dogfoodText(
-      localization,
-      V7_DOGFOOD_RELEASE_TITLE.titleKey,
-      V7_DOGFOOD_RELEASE_TITLE.title,
-    ),
-    localizedSummary: (localization) => dogfoodText(
-      localization,
-      'release.title.v7.summary',
-      'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.',
-    ),
-    localizedBody: (localization) => dogfoodReleaseTitleMarkdown(localization),
-  },
+  ...RELEASE_TITLE_GUIDES,
   {
     id: 'release-overview',
     pageId: RELEASE_PAGE_ID,

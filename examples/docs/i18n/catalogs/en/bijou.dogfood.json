@@ -2314,6 +2314,116 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "v7.0.0 released, patch lane open"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Wake lines, not fireworks: proof remains visible after ship."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Release Notes | Migration | DOGFOOD | BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.followUpPatch"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "follow-up patch"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.mainCi"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "green main CI"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.publishedRelease"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "published release"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.titleGallery"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "title gallery"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "A released line leaves a readable trail."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Post-release title treatment, visible release proof, and lower-mode facts for DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "V7 Launch Wake"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "settings.landingQuality.description.auto"
       },
       "kind": "message",
