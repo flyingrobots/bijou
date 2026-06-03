@@ -23,15 +23,20 @@ import {
   activityStreamBlock,
   appShellBlock,
   binaryDecisionBlock,
+  brandEmphasisBlock,
+  denseComparisonBlock,
   dividerBlock,
+  explorationListBlock,
   explainabilityWalkthroughBlock,
   formattedDocumentBlock,
   framedGroupBlock,
+  hierarchyBlock,
   inFlowStatusBlock,
   inlineStatusBlock,
   inspectorPanelBlock,
   inspectorPanelSchemaBlock,
   linkDestinationBlock,
+  modeAwarePrimitiveBlock,
   multipleChoiceBlock,
   pathProgressBlock,
   peerNavigationBlock,
@@ -45,6 +50,7 @@ import {
   standardBlocks,
   standardBlockStories,
   textEntryBlock,
+  temporalDependencyBlock,
   transientOverlayBlock,
 } from './standard-blocks.js';
 
@@ -72,6 +78,12 @@ describe('first-party standard block definitions', () => {
       peerNavigationBlock,
       progressiveDisclosureBlock,
       pathProgressBlock,
+      brandEmphasisBlock,
+      modeAwarePrimitiveBlock,
+      denseComparisonBlock,
+      hierarchyBlock,
+      explorationListBlock,
+      temporalDependencyBlock,
     ]);
     expect(Object.isFrozen(standardBlocks)).toBe(true);
 
@@ -105,6 +117,12 @@ describe('first-party standard block definitions', () => {
       'PeerNavigationBlock',
       'ProgressiveDisclosureBlock',
       'PathProgressBlock',
+      'BrandEmphasisBlock',
+      'ModeAwarePrimitiveBlock',
+      'DenseComparisonBlock',
+      'HierarchyBlock',
+      'ExplorationListBlock',
+      'TemporalDependencyBlock',
     ]);
   });
 
@@ -179,6 +197,12 @@ describe('first-party standard block definitions', () => {
         'PeerNavigationBlock',
         'ProgressiveDisclosureBlock',
         'PathProgressBlock',
+        'BrandEmphasisBlock',
+        'ModeAwarePrimitiveBlock',
+        'DenseComparisonBlock',
+        'HierarchyBlock',
+        'ExplorationListBlock',
+        'TemporalDependencyBlock',
       ].map((blockName) => [
         blockName,
         standardBlockStories
@@ -224,6 +248,12 @@ describe('first-party standard block definitions', () => {
     expect(storiesByBlock.get('PeerNavigationBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('ProgressiveDisclosureBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('PathProgressBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('BrandEmphasisBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ModeAwarePrimitiveBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('DenseComparisonBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('HierarchyBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ExplorationListBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('TemporalDependencyBlock')).toEqual(['ready']);
 
     for (const block of standardBlocks) {
       const storyIds = standardBlockStories

@@ -3,16 +3,21 @@ import {
   activityStreamBlock,
   appShellBlock,
   binaryDecisionBlock,
+  brandEmphasisBlock,
+  denseComparisonBlock,
   dividerBlock,
   defineBlock,
   defineAppShellComposition,
+  explorationListBlock,
   explainabilityWalkthroughBlock,
   formattedDocumentBlock,
   framedGroupBlock,
+  hierarchyBlock,
   inFlowStatusBlock,
   inlineStatusBlock,
   inspectorPanelBlock,
   linkDestinationBlock,
+  modeAwarePrimitiveBlock,
   multipleChoiceBlock,
   pathProgressBlock,
   peerNavigationBlock,
@@ -25,6 +30,7 @@ import {
   standardBlocks,
   standardBlockStories,
   textEntryBlock,
+  temporalDependencyBlock,
   transientOverlayBlock,
   validateBlockMetadata,
   validateBlockPackageManifest,
@@ -54,6 +60,12 @@ describe('DX-031C first-party block definitions', () => {
       peerNavigationBlock,
       progressiveDisclosureBlock,
       pathProgressBlock,
+      brandEmphasisBlock,
+      modeAwarePrimitiveBlock,
+      denseComparisonBlock,
+      hierarchyBlock,
+      explorationListBlock,
+      temporalDependencyBlock,
     ]);
     expect(standardBlocks.map((block) => block.metadata.blockName)).toEqual([
       'AppShell',
@@ -77,6 +89,12 @@ describe('DX-031C first-party block definitions', () => {
       'PeerNavigationBlock',
       'ProgressiveDisclosureBlock',
       'PathProgressBlock',
+      'BrandEmphasisBlock',
+      'ModeAwarePrimitiveBlock',
+      'DenseComparisonBlock',
+      'HierarchyBlock',
+      'ExplorationListBlock',
+      'TemporalDependencyBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -184,6 +202,12 @@ describe('DX-031C first-party block definitions', () => {
       'peer-navigation.ready',
       'progressive-disclosure.ready',
       'path-progress.ready',
+      'brand-emphasis.ready',
+      'mode-aware-primitive.ready',
+      'dense-comparison.ready',
+      'hierarchy.ready',
+      'exploration-list.ready',
+      'temporal-dependency.ready',
     ]);
     expect(standardBlockStories.map((story) => story.blockName)).toEqual([
       'AppShell',
@@ -217,6 +241,12 @@ describe('DX-031C first-party block definitions', () => {
       'PeerNavigationBlock',
       'ProgressiveDisclosureBlock',
       'PathProgressBlock',
+      'BrandEmphasisBlock',
+      'ModeAwarePrimitiveBlock',
+      'DenseComparisonBlock',
+      'HierarchyBlock',
+      'ExplorationListBlock',
+      'TemporalDependencyBlock',
     ]);
   });
 });
