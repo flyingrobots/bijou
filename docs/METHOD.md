@@ -120,7 +120,11 @@ stateDiagram-v2
 4. **Red**: Write failing tests based on the design's playback questions.
 5. **Green**: Implement the solution until tests pass.
 6. **Review**: Update witness/retro/debt notes, run local validation, and do the
-   required self-review before marking the draft PR ready for review.
+   required self-review before marking the draft PR ready for review. Use the
+   GitHub Comment Safety pattern in `docs/WORKFLOW.md` when posting
+   Markdown-heavy self-review, Code Lawyer, or activity-summary comments. Do
+   not use inline `--body "..."` for review bodies that contain backticks,
+   `$()` text, command examples, or Markdown tables.
 7. **Ship**: Mark the PR ready, keep it linked from the issue, and update
    `BEARING.md` and `CHANGELOG.md` when the change affects direction or
    user-facing behavior.

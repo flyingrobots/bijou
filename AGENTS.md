@@ -8,6 +8,9 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 - **NEVER** rebase or force-push.
 - **NEVER** push to `main` without explicit permission.
 - Always use standard commits and regular pushes.
+- Post Markdown-heavy GitHub comments through `--body-file` with a quoted
+  heredoc or body file. Do not inline shell-sensitive review/comment bodies
+  through `--body "..."`.
 
 ## Cycle Start Protocol
 

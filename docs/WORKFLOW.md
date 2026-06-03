@@ -44,6 +44,42 @@ Bijou now tracks work through:
 11. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
     signposts that changed.
 
+## GitHub Comment Safety
+
+Structured review comments often contain Markdown tables, code spans, shell
+examples, `$()` text, and copied command output. Post those comments through
+`--body-file` with a quoted heredoc or a real body file so the shell cannot
+evaluate the body before GitHub receives it. Do not use inline `--body "..."`
+for self-review findings, Code Lawyer reports, activity summaries, or any other
+Markdown-heavy comment.
+
+Safe PR comment pattern:
+
+```sh
+gh pr comment "$PR_NUMBER" --body-file - <<'EOF'
+# Self-Code Review
+
+| Severity | Count |
+| :--- | ---: |
+| P0 | 0 |
+
+Commands stay literal: `npm test`, `gh pr checks`, and $().
+EOF
+```
+
+Safe issue comment pattern:
+
+```sh
+gh issue comment "$ISSUE_NUMBER" --body-file - <<'EOF'
+Linked artifacts:
+- Design: `docs/design/WF-128-safe-gh-comments-and-milestone-items.md`
+- Tests: `tests/cycles/WF-128/safe-comments-and-milestone-items.test.ts`
+EOF
+```
+
+Use a temporary file with `--body-file "$PATH"` when the comment is generated
+by a script. Delete the temporary file after the command succeeds.
+
 ## PR Size Discipline
 
 Release-boundary work must still move through reviewable PRs.

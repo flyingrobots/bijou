@@ -1,17 +1,23 @@
 # ROADMAP
 
-This roadmap maps GitHub Issues to release horizons.
+This roadmap maps GitHub milestone items to release horizons.
 
 GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and the V7 tracker-sync cleanup branch:
+Release snapshot counts are GitHub milestone item totals: issues and pull
+requests assigned to each milestone. They are not issue-only totals. Completed
+lineage includes milestone PR rows when those PRs contribute to the totals. Do
+not compare release snapshot item totals to issue-only `gh issue list` output
+without also accounting for milestone pull requests.
+
+Last synced from GitHub milestone items and the V7 tracker-sync cleanup branch:
 2026-06-03.
 
 ## Release Snapshot
 
-| Horizon | Milestone | Open | Closed | Intent |
+| Horizon | Milestone | Open Items | Closed Items | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Issue-complete V7 Product Truth, BlockLab naming, and release-facing proof. |
@@ -157,13 +163,16 @@ Use GitHub as the source of truth:
 
 ```sh
 gh issue list --state all --milestone v6.0.0
+gh pr list --state all --search 'milestone:"v6.0.0"'
 gh issue list --state all --milestone v7.0.0
+gh pr list --state all --search 'milestone:"v7.0.0"'
 gh issue list --state all --milestone Beyond
+gh pr list --state all --search 'milestone:Beyond'
 ```
 
 When roadmap triage changes:
 
-1. Move the issue to the correct GitHub milestone.
+1. Move the issue or pull request to the correct GitHub milestone.
 2. Preserve the issue's Method lane label unless the lane itself changes.
 3. Update this document in the same commit or planning pass.
 4. Leave a GitHub comment when moving work between release horizons.
