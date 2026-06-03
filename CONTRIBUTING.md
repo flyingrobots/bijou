@@ -63,6 +63,9 @@ wrappers, or registry workflow behavior.
 - Open draft PRs against `main` at cycle start for visibility.
 - Mark draft PRs ready for review only after local validation and self-review
   pass.
+- Use `--body-file` for Markdown-heavy GitHub comments. Inline `--body "..."`
+  is only safe for short literal comments that do not contain backticks,
+  `$()` text, command examples, or Markdown tables.
 - Keep PRs focused — one concern per PR.
 - Update `docs/CHANGELOG.md` if the change is user-facing.
 - Update relevant documentation when behavior changes.

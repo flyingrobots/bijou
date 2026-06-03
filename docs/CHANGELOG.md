@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Safe GitHub comments and milestone item mirrors** —
+  `docs/WORKFLOW.md`, `docs/METHOD.md`, `AGENTS.md`, and `CONTRIBUTING.md`
+  now prefer `--body-file` with quoted heredocs for Markdown-heavy GitHub
+  comments so review summaries preserve backticks, commands, and tables
+  literally. `docs/ROADMAP.md` now labels release snapshot counts as milestone
+  items and states that those totals include issues plus pull requests assigned
+  to the milestone. This closes issues #287 and #288.
 - **V7 tracker docs sync** — BEARING, ROADMAP, and WF-126 now mirror the
   issue-complete V7 milestone after the post-merge review follow-up: zero open
   milestone items, twenty-seven closed milestone items after this cleanup
