@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Fixes
+
+- **V7 review regression fixes** — DOGFOOD release-title interactive rendering
+  now stays within the requested width for compact viewports, and fitted
+  `tableSurface()` string cells preserve word boundaries by default instead of
+  hard-splitting words when width fitting shrinks a column. This closes issue
+  #283.
+
 ### 📚 Documentation
 
 - **v7 closeout tracker and workflow evidence** — BEARING and ROADMAP now track
