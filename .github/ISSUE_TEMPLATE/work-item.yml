@@ -110,7 +110,7 @@ body:
     attributes:
       label: User experience / product shape
       description: Describe what the user sees or does. Include TUI mockups for user-visible surfaces.
-      value: |
+      placeholder: |
         If this work changes a user-visible surface, include concrete sketches.
 
         ### Wide TUI mockup
@@ -133,7 +133,7 @@ body:
     attributes:
       label: Lower modes
       description: State how this work behaves in static, pipe, and accessible modes.
-      value: |
+      placeholder: |
         ### Static mode
 
         ```text
@@ -257,7 +257,7 @@ body:
     attributes:
       label: Tests to write first
       description: Name the RED tests that prove the work.
-      value: |
+      placeholder: |
         ### Behavior/software proof required for implementation work
 
         - [ ] Name at least one test against package API, runtime behavior, rendered output, scripted app flow, command behavior, schema validation, lower-mode output, or CI/tooling behavior.
@@ -274,7 +274,7 @@ body:
     attributes:
       label: Acceptance criteria
       description: Concrete checks that prove the issue is complete.
-      value: |
+      placeholder: |
         - [ ] Behavior test proves the runtime/API/render/command/tooling contract, or this is documentation/process-only work.
         - [ ] Rendered output or runtime API proves the user-visible outcome, if relevant.
         - [ ] Lower modes are covered, if relevant.
@@ -289,7 +289,7 @@ body:
     attributes:
       label: Validation plan
       description: Name the commands expected before PR.
-      value: |
+      placeholder: |
         ```bash
         npm test -- --run <focused behavior tests>
         npm run typecheck:test
@@ -330,7 +330,7 @@ body:
     attributes:
       label: Method artifacts
       description: Fill these links as the work proceeds.
-      value: |
+      placeholder: |
         - Design: Link `docs/design/<LEGEND>-<issue>-<slug>.md`, or state why issue-only triage is sufficient.
         - Witness: Link committed witness evidence or the issue/PR comment that records verification.
         - Retro: Link the retro/closeout artifact or the issue close comment.

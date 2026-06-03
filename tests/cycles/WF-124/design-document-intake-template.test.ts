@@ -48,6 +48,15 @@ describe('WF-124 design-document intake template', () => {
     expect(workItemTemplate).toContain('schema validation, lower-mode output, or CI/tooling behavior');
   });
 
+  it('does not prefill required textareas so issue submitters must supply concrete proof', () => {
+    const workItemTemplate = readRepoFile('.github/ISSUE_TEMPLATE/work-item.yml');
+    const prefilledRequiredLabels = requiredTextareaBlocks(workItemTemplate)
+      .filter((block) => /^\s{6}value:/m.test(block))
+      .map(fieldLabel);
+
+    expect(prefilledRequiredLabels).toEqual([]);
+  });
+
   it('documents issue-template-first enforcement instead of branch-name commit blocking', () => {
     const method = normalizeWhitespace(readRepoFile('docs/METHOD.md'));
 
@@ -61,6 +70,17 @@ function issueFormFieldLabels(source: string): readonly string[] {
   return [...source.matchAll(/^\s{6}label:\s*(.+)$/gm)]
     .map((match) => match[1]?.trim())
     .filter((label): label is string => label !== undefined && label.length > 0);
+}
+
+function requiredTextareaBlocks(source: string): readonly string[] {
+  return source
+    .split(/\n(?=  - type: )/)
+    .filter((block) => block.startsWith('  - type: textarea'))
+    .filter((block) => /^\s{6}required: true$/m.test(block));
+}
+
+function fieldLabel(source: string): string {
+  return source.match(/^\s{6}label:\s*(.+)$/m)?.[1]?.trim() ?? '<missing label>';
 }
 
 function normalizeWhitespace(source: string): string {
