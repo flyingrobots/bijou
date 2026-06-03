@@ -3,8 +3,9 @@
 This roadmap maps GitHub milestone items to release horizons.
 
 GitHub milestones and issue labels are the live tracker. This file is the
-human-readable release index for the current plan. When an issue moves between
-release horizons in GitHub, update this file in the same planning pass.
+human-readable release index for the current plan. When an issue or pull
+request moves between release horizons in GitHub, update this file in the same
+planning pass.
 
 Release snapshot counts are GitHub milestone item totals: issues and pull
 requests assigned to each milestone. They are not issue-only totals. Completed
@@ -12,7 +13,7 @@ lineage includes milestone PR rows when those PRs contribute to the totals. Do
 not compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items and the V7 tracker-sync cleanup branch:
+Last synced from GitHub milestone items and the WF-128 workflow cleanup branch:
 2026-06-03.
 
 ## Release Snapshot
