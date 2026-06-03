@@ -6,7 +6,7 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and the V7 Product Truth closeout branch:
+Last synced from GitHub Issues and the V7 tracker-sync cleanup branch:
 2026-06-03.
 
 ## Release Snapshot
@@ -14,7 +14,7 @@ Last synced from GitHub Issues and the V7 Product Truth closeout branch:
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 3 | 20 | Active V7 Product Truth closeout candidate after the component-family audits. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Issue-complete V7 Product Truth, BlockLab naming, and release-facing proof. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 22 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
@@ -69,17 +69,14 @@ These cards are included in the v6 milestone as completed release lineage.
 
 Theme: DOGFOOD truth, BlockLab naming, and release-facing proof.
 
-The v7 lane is active closeout work. The component-family audit queue is
-issue-complete; the remaining open items prove width parity, scoped Node I/O
-semantics, and the DOGFOOD release identity.
+The v7 lane is issue-complete. The component-family audit queue, width parity,
+scoped Node I/O semantics, BlockLab naming, workflow evidence, DOGFOOD release
+identity, and post-merge review regression fixes are complete. It should run
+release-readiness validation before tagging.
 
-### Product And Docs Truth
+### Open Work
 
-| Issue | Priority | Type | Work |
-| :--- | :--- | :--- | :--- |
-| [#245](https://github.com/flyingrobots/bijou/issues/245) | `priority:medium` | `type:enhancement` | DX-037 tableSurface responsive width parity |
-| [#246](https://github.com/flyingrobots/bijou/issues/246) | `priority:medium` | `type:docs` | DX-029 document scopedNodeIO realpath and symlink semantics |
-| [#281](https://github.com/flyingrobots/bijou/issues/281) | `priority:medium` | `type:enhancement` | DOGFOOD release title screen |
+No open v7 tracker issues remain as of 2026-06-03.
 
 ### Completed Lineage
 
@@ -88,7 +85,14 @@ These cards are included in the v7 milestone as completed release lineage.
 | Tracker | Lane | Type | Work |
 | :--- | :--- | :--- | :--- |
 | [#244](https://github.com/flyingrobots/bijou/issues/244) | `lane:release` | `type:docs` / `type:enhancement` | DF-030 DOGFOOD docs surface Block |
+| [#245](https://github.com/flyingrobots/bijou/issues/245) | `lane:release` | `type:enhancement` | DX-037 tableSurface responsive width parity |
+| [#246](https://github.com/flyingrobots/bijou/issues/246) | `lane:up-next` | `type:docs` | DX-029 scopedNodeIO realpath and symlink semantics |
+| [#278](https://github.com/flyingrobots/bijou/pull/278) | `lane:up-next` | implementation PR | DF-054 through DF-059 late-family DOGFOOD standard Blocks |
 | [#279](https://github.com/flyingrobots/bijou/issues/279) | `lane:release` | `type:enhancement` | WF-125 draft-first cycle start workflow |
+| [#280](https://github.com/flyingrobots/bijou/pull/280) | `lane:release` | implementation PR | WF-125 draft-first cycle start workflow |
+| [#281](https://github.com/flyingrobots/bijou/issues/281) | `lane:release` | `type:enhancement` | DOGFOOD release title screen |
+| [#283](https://github.com/flyingrobots/bijou/issues/283) | `lane:bad-code` / `lane:release` | `type:bug` | V7 Codex review regression fixes |
+| [#285](https://github.com/flyingrobots/bijou/issues/285) | `lane:bad-code` / `lane:release` | `type:docs` / `type:maintenance` | V7 tracker docs sync after review follow-up |
 | [#226](https://github.com/flyingrobots/bijou/issues/226) | `lane:up-next` | `type:maintenance` | DF-039 framed grouping standard Block |
 | [#227](https://github.com/flyingrobots/bijou/issues/227) | `lane:up-next` | `type:maintenance` | DF-040 explainability walkthrough standard Block |
 | [#228](https://github.com/flyingrobots/bijou/issues/228) | `lane:up-next` | `type:maintenance` | DF-042 formatted document standard Block |

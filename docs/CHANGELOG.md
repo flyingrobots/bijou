@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **V7 tracker docs sync** — BEARING, ROADMAP, and WF-126 now mirror the
+  issue-complete V7 milestone after the post-merge review follow-up: zero open
+  milestone items, twenty-seven closed milestone items after this cleanup
+  closes, and release-readiness validation as the next action. This closes
+  issue #285.
 - **V7 review regression fixes** — DOGFOOD release-title interactive rendering
   now stays within the requested width for compact viewports, and fitted
   `tableSurface()` string cells preserve word boundaries by default instead of
