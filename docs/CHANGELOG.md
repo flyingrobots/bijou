@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-06-03
+
 ### 🐛 Fixes
 
 - **Live notification word wrapping** — active `@flyingrobots/bijou-tui`

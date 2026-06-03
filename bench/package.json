@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-bench",
-  "version": "5.0.0",
+  "version": "7.0.0",
   "description": "Headless performance benchmarks for bijou — frame-time, memory, and interactive sandbox.",
   "private": true,
   "type": "module",
@@ -10,9 +10,9 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou": "5.0.0",
-    "@flyingrobots/bijou-node": "5.0.0",
-    "@flyingrobots/bijou-tui": "5.0.0"
+    "@flyingrobots/bijou": "7.0.0",
+    "@flyingrobots/bijou-node": "7.0.0",
+    "@flyingrobots/bijou-tui": "7.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
