@@ -13,6 +13,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   word boundaries when possible instead of hard-splitting words in the live
   overlay path. Long unbroken words still hard-wrap to stay inside the
   notification width. This closes issue #292.
+- **DOGFOOD CI path gates** — CI now classifies changed paths before test jobs
+  run, skips DOGFOOD coverage/i18n policy steps and expensive DOGFOOD
+  docs/landing smoke steps on pull requests that do not touch
+  DOGFOOD-relevant paths, and still runs the full DOGFOOD proof path for `main`
+  pushes and tags. This closes issue #293.
 - **Safe GitHub comments and milestone item mirrors** —
   `docs/WORKFLOW.md`, `docs/METHOD.md`, `AGENTS.md`, and `CONTRIBUTING.md`
   now prefer `--body-file` with quoted heredocs for Markdown-heavy GitHub
