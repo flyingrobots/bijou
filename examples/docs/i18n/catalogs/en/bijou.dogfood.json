@@ -1335,6 +1335,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.blocklab.workbench.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "BlockLab component workstation entrypoint."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.entry.blocks.preview.description"
       },
       "kind": "message",
@@ -2199,6 +2210,105 @@
       "sourceLocale": "en",
       "values": {
         "en": "Landing quality: {quality}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "v6 issue-complete, v7 closeout in flight"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Docs | Blocks | BlockLab | Release Notes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.blocklab"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.releaseTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "release title"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.scopedNodeIo"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "scoped Node I/O"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.tableParity"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "table parity"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Blocks prove product surfaces. DOGFOOD proves Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Release identity, current proof lanes, and lower-mode release facts for DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "V7 Product Truth"
       }
     },
     {

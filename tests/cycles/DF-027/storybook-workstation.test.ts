@@ -17,7 +17,7 @@ import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { readRepoFile } from '../repo.js';
 
-describe('DF-027 Storybook-style DOGFOOD workstation', () => {
+describe('DF-027 BlockLab DOGFOOD workstation', () => {
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-027-storybook-style-tool-for-bijou.md');
 
@@ -35,7 +35,7 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     const model = createDogfoodStorybookWorkbenchModel();
     const familyStoryCount = model.families.reduce((total, family) => total + family.stories.length, 0);
 
-    expect(model.title).toBe('Bijou Storybook-style Workstation');
+    expect(model.title).toBe('Bijou BlockLab Workstation');
     expect(model.storyCount).toBe(COMPONENT_STORIES.length);
     expect(familyStoryCount).toBe(COMPONENT_STORIES.length);
     expect(model.variantCount).toBe(COMPONENT_STORIES.reduce((total, story) => total + story.variants.length, 0));
@@ -44,10 +44,10 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     expect(model.families.flatMap((family) => family.stories).some((story) => story.id === 'notification-system')).toBe(true);
   });
 
-  it('renders a deterministic Storybook-style index for humans and agents', () => {
+  it('renders a deterministic BlockLab index for humans and agents', () => {
     const index = renderDogfoodStorybookIndex();
 
-    expect(index).toContain('# Bijou Storybook-style Workstation');
+    expect(index).toContain('# Bijou BlockLab Workstation');
     expect(index).toContain(`Stories: ${COMPONENT_STORIES.length}`);
     expect(index).toContain('Required modes: interactive, static, pipe, accessible');
     expect(index).toContain('## Feedback overlays and history');
@@ -82,6 +82,7 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
   it('registers the text-first workstation commands', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
 
+    expect(packageJson.scripts['blocklab:index']).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['storybook:index']).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['dogfood:storybook']).toBe('tsx examples/docs/storybook-workstation.ts');
   });
@@ -90,12 +91,13 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
     const entrypoint = readRepoFile('examples/docs/storybook.ts');
 
+    expect(packageJson.scripts.blocklab).toBe('node --import tsx examples/docs/storybook.ts');
     expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
-    expect(entrypoint).toContain('createStorybookFrameApp');
+    expect(entrypoint).toContain('createBlockLabFrameApp');
     expect(entrypoint).not.toContain('createDocsApp');
   });
 
-  it('can start a standalone interactive Storybook workbench', () => {
+  it('can start a standalone interactive BlockLab workbench', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createStorybookApp(ctx, { initialStoryId: 'notification-system' });
     const [model] = app.init();
@@ -105,7 +107,7 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     expect(selectedStorybookStory(model).id).toBe('notification-system');
     expect((model as any).route).toBeUndefined();
     expect((model as any).docsModel).toBeUndefined();
-    expect(text).toContain('Bijou Storybook');
+    expect(text).toContain('Bijou BlockLab');
     expect(text).toContain('notification-system');
     expect(text).toContain('test matrix');
     expect(text).toContain('all required modes');
@@ -122,8 +124,8 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
 
     expect((model as any).activePageId).toBe('storybook');
     expect(selectedStorybookStory(pageModel).id).toBe('notification-system');
-    expect(text).toContain('Bijou Storybook');
-    expect(text).toContain('Storybook');
+    expect(text).toContain('Bijou BlockLab');
+    expect(text).toContain('BlockLab');
     expect(text).toContain('notification-system');
   });
 });

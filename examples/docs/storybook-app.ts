@@ -51,7 +51,7 @@ import {
 import { COMPONENT_STORIES } from './stories.js';
 
 const REQUIRED_MODES: readonly OutputMode[] = ['interactive', 'static', 'pipe', 'accessible'];
-const DEFAULT_TITLE = 'Bijou Storybook';
+const DEFAULT_TITLE = 'Bijou BlockLab';
 const FOOTER_HINT = 'q quit | up/down story | d/u page | [/] story | ,/. variant | 1-4 profile';
 
 export interface StorybookAppOptions {
@@ -116,6 +116,9 @@ export function createStorybookFrameApp(
   });
 }
 
+export const createBlockLabApp = createStorybookApp;
+export const createBlockLabFrameApp = createStorybookFrameApp;
+
 export function createStorybookPage(
   ctx: BijouContext,
   stories: readonly ComponentStory[] = COMPONENT_STORIES,
@@ -124,7 +127,7 @@ export function createStorybookPage(
 ): FramePage<StorybookModel, StorybookPageMsg> {
   return {
     id: 'storybook',
-    title: 'Storybook',
+    title: 'BlockLab',
     init: () => [createInitialStorybookModel(ctx, stories, title, initialStoryId), []],
     update(msg: FramePageMsg<StorybookPageMsg>, model) {
       return updateStorybookMessage(msg, model, stories);
@@ -132,7 +135,7 @@ export function createStorybookPage(
     keyMap: storybookPageKeys,
     layout: (model) => ({
       kind: 'pane',
-      paneId: 'storybook-workbench',
+      paneId: 'blocklab-workbench',
       overflowX: 'scroll',
       render: (width, height) => renderStorybookBody({
         ...model,
@@ -255,7 +258,7 @@ function updateKey(
 }
 
 const storybookPageKeys = createKeyMap<StorybookPageMsg>()
-  .group('Storybook', (group) => group
+  .group('BlockLab', (group) => group
     .bind('down', 'Next story', { type: 'storybook-key', key: 'down' })
     .bind('j', 'Next story', { type: 'storybook-key', key: 'j' })
     .bind(']', 'Next story', { type: 'storybook-key', key: ']' })

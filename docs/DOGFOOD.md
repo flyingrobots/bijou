@@ -75,14 +75,14 @@ The CSV/TSV and JSON conversions are produced by `@flyingrobots/bijou-i18n-tools
 DOGFOOD still loads generated runtime catalog JSON rather than parsing
 spreadsheet files during rendering.
 
-For the standalone Storybook-style development and testing workbench:
+For the standalone BlockLab development and testing workbench:
 ```bash
-npm run storybook
+npm run blocklab
 ```
 
 For the deterministic text-first story index and capture matrix:
 ```bash
-npm run storybook:index
+npm run blocklab:index
 ```
 
 ## Purpose
@@ -120,7 +120,7 @@ reconstructing product truth from adjacent rendering code.
 - **Localization Completeness Gate**: `npm run dogfood:i18n:complete` requires
   every newly added or source-changed DOGFOOD string to carry current values for
   all supported locales before pre-push or CI can pass.
-- **Storybook Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
+- **BlockLab Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
 - **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.
 - **Motion and Shader Surfaces**: Exercising canvas, glyph-fit raytracing, transitions, springs, and timelines from the docs app itself.

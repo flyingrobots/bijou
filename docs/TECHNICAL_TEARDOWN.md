@@ -1835,8 +1835,8 @@ emit line or branch coverage percentages by default.
 | `npm run counter` | Small TEA counter app. |
 | `npm run app-frame` | Intermediate framed-shell demo. |
 | `npm run dogfood` | Canonical documentation app. |
-| `npm run storybook` | Interactive story workstation. |
-| `npm run storybook:index` | Deterministic story index/capture path. |
+| `npm run blocklab` | Interactive story workstation. |
+| `npm run blocklab:index` | Deterministic story index/capture path. |
 | `npm run dogfood:i18n:build` | Generate runtime catalogs from source string table. |
 | `npm run dogfood:i18n:check` | Verify generated catalogs are current. |
 | `npm run dogfood:i18n:debt` | Enforce source-level DOGFOOD localization debt baseline. |

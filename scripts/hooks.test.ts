@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { readCiWorkflowPolicy } from './ci-workflow-policy.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -22,24 +23,14 @@ describe('git hooks', () => {
     expect(interactiveSmokeIndex).toBeGreaterThan(testIndex);
   });
 
-  it('CI runs the DOGFOOD i18n completeness and generated-catalog gates', () => {
-    const workflow = readFileSync(resolve(ROOT, '.github/workflows/ci.yml'), 'utf8');
+  it('CI workflow policy is parsed from the test job instead of raw string scanning', () => {
+    const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
 
-    expect(workflow).toContain('DOGFOOD i18n policy gate');
-    expect(workflow).toContain('npm run dogfood:i18n:complete');
-    expect(workflow).toContain('npm run dogfood:i18n:check');
-  });
-
-  it('CI fetches enough history before comparing DOGFOOD i18n source rows to HEAD^', () => {
-    const workflow = readFileSync(resolve(ROOT, '.github/workflows/ci.yml'), 'utf8');
-    const checkoutIndex = workflow.indexOf('- uses: actions/checkout@v6');
-    const fetchDepthIndex = workflow.indexOf('fetch-depth: 2', checkoutIndex);
-    const i18nGateIndex = workflow.indexOf('DOGFOOD i18n policy gate');
-    const headParentBaseIndex = workflow.indexOf('npm run dogfood:i18n:complete -- --base HEAD^');
-
-    expect(checkoutIndex).toBeGreaterThanOrEqual(0);
-    expect(fetchDepthIndex).toBeGreaterThan(checkoutIndex);
-    expect(fetchDepthIndex).toBeLessThan(i18nGateIndex);
-    expect(headParentBaseIndex).toBeGreaterThan(i18nGateIndex);
+    expect(policy.testJob.checkoutUses).toBe('actions/checkout@v6');
+    expect(policy.testJob.checkoutFetchDepth).toBeGreaterThanOrEqual(2);
+    expect(policy.testJob.i18nPolicyGateName).toBe('DOGFOOD i18n policy gate');
+    expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base FETCH_HEAD');
+    expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base HEAD^');
+    expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
   });
 });

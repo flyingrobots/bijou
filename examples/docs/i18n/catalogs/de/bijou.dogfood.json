@@ -1225,6 +1225,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.blocklab.workbench.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "BlockLab-Komponentenarbeitsplatz-Einstiegspunkt."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.entry.blocks.preview.description"
       },
       "kind": "message",
@@ -1942,6 +1953,105 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "v6 issue-vollstandig, v7-Abschluss lauft"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Docs | Blocks | BlockLab | Release Notes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.blocklab"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.releaseTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Release-Titelbildschirm"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.scopedNodeIo"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "begrenzte Node-E/A"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.tableParity"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Tabellenparitat"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Blocks belegen Produktoberflachen. DOGFOOD belegt Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Release-Identitat, aktuelle Nachweisbahnen und Lower-Mode-Release-Fakten fur DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "V7-Produktwahrheit"
+      }
     },
     {
       "key": {

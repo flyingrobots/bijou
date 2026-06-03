@@ -21,7 +21,7 @@ npm run dogfood
 For focused component and preview work, run:
 
 ```bash
-npm run storybook
+npm run blocklab
 ```
 
 ## Package Stack
@@ -693,7 +693,7 @@ For user-facing product proof:
 
 ```bash
 npm run dogfood
-npm run storybook
+npm run blocklab
 ```
 
 For rendering or long-running runtime changes:

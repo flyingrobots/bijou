@@ -118,7 +118,7 @@ they render into.
 
 ## Tests To Write First
 
-- behavior tests proving the Storybook app is framed rather than bespoke
+- behavior tests proving the BlockLab app is framed rather than bespoke
 - behavior tests proving DOGFOOD block registry discovery does not call render
 - behavior tests proving core DOGFOOD surfaces have Block definitions
 - behavior tests proving localization and command intent boundaries stay
@@ -131,19 +131,19 @@ DF-069A lands the block-authored DOGFOOD contract layer:
 - DOGFOOD has a local, branded `DogfoodBlockRegistry`.
 - Registry discovery rejects loose block-shaped objects.
 - Registry discovery records surface ownership without calling `render()`.
-- Storybook now has a `StorybookWorkbenchBlock` contract and the interactive
-  Storybook entrypoint uses the AppFrame shell.
+- BlockLab now has a `BlockLabWorkbenchBlock` contract and the interactive
+  BlockLab entrypoint uses the AppFrame shell.
 - DOGFOOD surface blocks now cover title, navigation, documentation article,
-  block preview, guide inspector, settings, and Storybook workbench surfaces.
+  block preview, guide inspector, settings, and BlockLab workbench surfaces.
 
 ## Retrospective
 
-This slice deliberately stops at semantic surface contracts and the Storybook
+This slice deliberately stops at semantic surface contracts and the BlockLab
 frame migration. It does not rewrite every DOGFOOD renderer yet, does not move
 provider lifecycle policy, and does not convert leaf components into Blocks.
 
 The final review gate also tightened the DOGFOOD i18n debt scanner so framed
-Storybook machine tokens such as key names, event discriminants, mode literals,
+BlockLab machine tokens such as key names, event discriminants, mode literals,
 pane overflow policy, tones, and internal thrown errors do not count as visible
-English copy. Storybook labels and rendered text still count as localization
+English copy. BlockLab labels and rendered text still count as localization
 debt until they move behind a localization port.

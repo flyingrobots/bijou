@@ -6,7 +6,7 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and this late-family six-pack branch:
+Last synced from GitHub Issues and the V7 Product Truth closeout branch:
 2026-06-03.
 
 ## Release Snapshot
@@ -14,8 +14,8 @@ Last synced from GitHub Issues and this late-family six-pack branch:
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 2 | 19 | Active product-truth candidate after the late-family component-family six-pack. |
-| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 3 | 20 | Active V7 Product Truth closeout candidate after the component-family audits. |
+| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 22 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
@@ -67,10 +67,11 @@ These cards are included in the v6 milestone as completed release lineage.
 
 ## v7.0.0
 
-Theme: DOGFOOD truth and remaining component-family audit coverage.
+Theme: DOGFOOD truth, BlockLab naming, and release-facing proof.
 
-The v7 lane is initial triage, not a release promise. It contains the imported
-`up-next` queue that should be reviewed after the v6 release boundary is clear.
+The v7 lane is active closeout work. The component-family audit queue is
+issue-complete; the remaining open items prove width parity, scoped Node I/O
+semantics, and the DOGFOOD release identity.
 
 ### Product And Docs Truth
 
@@ -78,15 +79,16 @@ The v7 lane is initial triage, not a release promise. It contains the imported
 | :--- | :--- | :--- | :--- |
 | [#245](https://github.com/flyingrobots/bijou/issues/245) | `priority:medium` | `type:enhancement` | DX-037 tableSurface responsive width parity |
 | [#246](https://github.com/flyingrobots/bijou/issues/246) | `priority:medium` | `type:docs` | DX-029 document scopedNodeIO realpath and symlink semantics |
+| [#281](https://github.com/flyingrobots/bijou/issues/281) | `priority:medium` | `type:enhancement` | DOGFOOD release title screen |
 
 ### Completed Lineage
 
-These cards are included in the v7 milestone as completed release lineage once
-the closing PR merges.
+These cards are included in the v7 milestone as completed release lineage.
 
 | Tracker | Lane | Type | Work |
 | :--- | :--- | :--- | :--- |
 | [#244](https://github.com/flyingrobots/bijou/issues/244) | `lane:release` | `type:docs` / `type:enhancement` | DF-030 DOGFOOD docs surface Block |
+| [#279](https://github.com/flyingrobots/bijou/issues/279) | `lane:release` | `type:enhancement` | WF-125 draft-first cycle start workflow |
 | [#226](https://github.com/flyingrobots/bijou/issues/226) | `lane:up-next` | `type:maintenance` | DF-039 framed grouping standard Block |
 | [#227](https://github.com/flyingrobots/bijou/issues/227) | `lane:up-next` | `type:maintenance` | DF-040 explainability walkthrough standard Block |
 | [#228](https://github.com/flyingrobots/bijou/issues/228) | `lane:up-next` | `type:maintenance` | DF-042 formatted document standard Block |
@@ -108,8 +110,7 @@ the closing PR merges.
 
 ### Component-Family Audits
 
-No open component-family audit cards remain in the v7 milestone once this
-late-family closing PR merges.
+No open component-family audit cards remain in the v7 milestone.
 
 ## Beyond
 

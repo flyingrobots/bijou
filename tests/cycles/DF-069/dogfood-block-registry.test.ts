@@ -35,8 +35,8 @@ import {
   searchPanelBlockRegistryEntry,
   settingsMenuBlock,
   settingsMenuBlockRegistryEntry,
-  storybookWorkbenchBlock,
-  storybookWorkbenchBlockRegistryEntry,
+  blockLabWorkbenchBlock,
+  blockLabWorkbenchBlockRegistryEntry,
   titleScreenBlock,
   titleScreenBlockRegistryEntry,
   type DogfoodBlockRegistryEntry,
@@ -146,21 +146,21 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     expect(next.forSurface('docs.settings')).toBe(settings);
   });
 
-  it('publishes Storybook as an inspectable DOGFOOD workbench block', () => {
-    expect(storybookWorkbenchBlockRegistryEntry.block).toBe(storybookWorkbenchBlock);
-    expect(storybookWorkbenchBlockRegistryEntry.role).toBe('workbench');
-    expect(defaultDogfoodBlockRegistry.forSurface('storybook.workbench')).toBe(
-      storybookWorkbenchBlockRegistryEntry,
+  it('publishes BlockLab as an inspectable DOGFOOD workbench block', () => {
+    expect(blockLabWorkbenchBlockRegistryEntry.block).toBe(blockLabWorkbenchBlock);
+    expect(blockLabWorkbenchBlockRegistryEntry.role).toBe('workbench');
+    expect(defaultDogfoodBlockRegistry.forSurface('blocklab.workbench')).toBe(
+      blockLabWorkbenchBlockRegistryEntry,
     );
-    expect(defaultDogfoodBlockRegistry.blockNames()).toContain('StorybookWorkbenchBlock');
-    expect(storybookWorkbenchBlock.data?.names()).toEqual(['stories', 'selection']);
-    expect(storybookWorkbenchBlock.commands?.map((intent) => intent.id)).toEqual([
-      'storybook.selectStory',
-      'storybook.cycleVariant',
-      'storybook.setProfile',
+    expect(defaultDogfoodBlockRegistry.blockNames()).toContain('BlockLabWorkbenchBlock');
+    expect(blockLabWorkbenchBlock.data?.names()).toEqual(['stories', 'selection']);
+    expect(blockLabWorkbenchBlock.commands?.map((intent) => intent.id)).toEqual([
+      'blocklab.selectStory',
+      'blocklab.cycleVariant',
+      'blocklab.setProfile',
     ]);
 
-    const output = storybookWorkbenchBlock.render({
+    const output = blockLabWorkbenchBlock.render({
       config: {
         storyCount: 12,
         selectedStoryLabel: 'Button / Primary',
@@ -170,7 +170,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output;
 
     expect(output).toBe(
-      'StorybookWorkbench stories: 12; selected: Button / Primary; profile: desktop',
+      'BlockLabWorkbench stories: 12; selected: Button / Primary; profile: desktop',
     );
   });
 
@@ -181,7 +181,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     expect(titleScreenBlock.data?.names()).toEqual(['route']);
     expect(titleScreenBlock.commands?.map((intent) => intent.id)).toEqual([
       'title.openDocs',
-      'title.openStorybook',
+      'title.openBlockLab',
       'title.openSettings',
     ]);
 
@@ -464,7 +464,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'frame.help',
       'frame.commandPalette',
       'frame.footer',
-      'storybook.workbench',
+      'blocklab.workbench',
     ]);
     expect(defaultDogfoodBlockRegistry.blockNames()).toEqual([
       'TitleScreenBlock',
@@ -480,7 +480,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'HelpOverlayBlock',
       'CommandPaletteBlock',
       'FooterHintBlock',
-      'StorybookWorkbenchBlock',
+      'BlockLabWorkbenchBlock',
     ]);
   });
 });

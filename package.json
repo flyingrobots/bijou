@@ -46,6 +46,8 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "blocklab": "node --import tsx examples/docs/storybook.ts",
+    "blocklab:index": "tsx examples/docs/storybook-workstation.ts",
     "storybook": "node --import tsx examples/docs/storybook.ts",
     "storybook:index": "tsx examples/docs/storybook-workstation.ts",
     "dogfood:storybook": "tsx examples/docs/storybook-workstation.ts",
@@ -65,7 +67,8 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "yaml": "^2.9.0"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

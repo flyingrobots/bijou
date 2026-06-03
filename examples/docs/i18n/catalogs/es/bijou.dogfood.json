@@ -1225,6 +1225,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.blocklab.workbench.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Punto de entrada del puesto de trabajo de componentes BlockLab."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.surfaceInventory.entry.blocks.preview.description"
       },
       "kind": "message",
@@ -1942,6 +1953,105 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "v6 completa en issues, cierre de v7 en curso"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Docs | Blocks | BlockLab | Notas de la version"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.blocklab"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.releaseTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "pantalla de titulo de version"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.scopedNodeIo"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "E/S Node con alcance"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.proofLane.tableParity"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "paridad de tablas"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Los Blocks prueban las superficies de producto. DOGFOOD prueba los Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Identidad de la version, lineas de prueba actuales y hechos de version en modos bajos para DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Verdad de producto V7"
+      }
     },
     {
       "key": {
