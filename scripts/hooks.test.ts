@@ -29,4 +29,17 @@ describe('git hooks', () => {
     expect(workflow).toContain('npm run dogfood:i18n:complete');
     expect(workflow).toContain('npm run dogfood:i18n:check');
   });
+
+  it('CI fetches enough history before comparing DOGFOOD i18n source rows to HEAD^', () => {
+    const workflow = readFileSync(resolve(ROOT, '.github/workflows/ci.yml'), 'utf8');
+    const checkoutIndex = workflow.indexOf('- uses: actions/checkout@v6');
+    const fetchDepthIndex = workflow.indexOf('fetch-depth: 2', checkoutIndex);
+    const i18nGateIndex = workflow.indexOf('DOGFOOD i18n policy gate');
+    const headParentBaseIndex = workflow.indexOf('npm run dogfood:i18n:complete -- --base HEAD^');
+
+    expect(checkoutIndex).toBeGreaterThanOrEqual(0);
+    expect(fetchDepthIndex).toBeGreaterThan(checkoutIndex);
+    expect(fetchDepthIndex).toBeLessThan(i18nGateIndex);
+    expect(headParentBaseIndex).toBeGreaterThan(i18nGateIndex);
+  });
 });
