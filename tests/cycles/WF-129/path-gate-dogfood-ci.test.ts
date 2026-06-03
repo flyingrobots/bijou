@@ -52,8 +52,12 @@ describe('WF-129 path-gate DOGFOOD CI', () => {
     expect(ci).toMatch(/smoke_dogfood:\n(?:[\s\S]*?)needs: changes/);
     expect(ci).toContain('name: Skip unrelated DOGFOOD smoke');
     expect(ci).toContain("if: needs.changes.outputs.dogfood != 'true'");
-    expect(ci).toMatch(/uses: actions\/checkout@v6[\s\S]*?if: needs\.changes\.outputs\.dogfood == 'true'/);
-    expect(ci).toMatch(/run: npm run \$\{\{ matrix\.lane\.command \}\}[\s\S]*?if: needs\.changes\.outputs\.dogfood == 'true'|if: needs\.changes\.outputs\.dogfood == 'true'[\s\S]*?run: npm run \$\{\{ matrix\.lane\.command \}\}/);
+    expect(ci).toContain(
+      "- uses: actions/checkout@v6\n        if: needs.changes.outputs.dogfood == 'true'",
+    );
+    expect(ci).toContain(
+      "- if: needs.changes.outputs.dogfood == 'true'\n        run: npm run ${{ matrix.lane.command }}",
+    );
   });
 
   it('records the CI speedup in the changelog', () => {
