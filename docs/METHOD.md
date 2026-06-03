@@ -27,15 +27,38 @@ honest bookkeeping.
 New intake starts as a GitHub Issue. Use the repo issue forms so every card
 names:
 
+- the decision summary
 - the hill
 - sponsored human and agent perspectives
+- current truth and the exact problem
 - scope and out-of-scope boundaries
+- runtime/API or product-surface contract
+- lower-mode, accessibility, localization, and inspectability posture
+- implementation slices and tests to write first
 - acceptance criteria
 - expected tests, playback, docs, and retro/closeout evidence
 - Method artifact links for design, witness, retro, and PR
 
 Labels are canonical tracker metadata. Maintainers and agents apply them after
 triage; contributors may request labels in the issue body.
+
+## Design Document Intake
+
+Issue templates are the default shaping enforcement. The work-item form should
+produce an issue body that can be lifted into a design document without
+inventing missing sections after the fact.
+
+For implementation work, the issue or design document must name at least one
+behavior/software proof against an actual product surface: package API, runtime
+behavior, rendered output, scripted app flow, command behavior, schema
+validation, lower-mode output, or CI/tooling behavior. Documentation-only proof
+is acceptable only for documentation/process work.
+
+Do not block every commit on branch-name-to-design-doc matching. Hotfixes, CI
+repairs, dependency repairs, and small maintenance work may not have a full
+design doc. Branch/design matching can become a targeted pre-push or CI guard
+later for issues explicitly marked `needs-design`, but it should not be the
+default commit gate.
 
 ## Lane Labels
 

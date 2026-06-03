@@ -1,5 +1,5 @@
 name: Method work item
-description: Propose shaped Bijou work with a hill, scope, and witness plan.
+description: Propose shaped Bijou work with a design-doc-ready contract and proof plan.
 title: ""
 labels:
   - lane:inbox
@@ -9,8 +9,12 @@ body:
     attributes:
       value: |
         Use a short, branch-safe title. Active work uses a branch slug derived from this title.
+
         Labels are canonical tracker metadata. If you want a lane or legend other than inbox triage,
         request it below; a maintainer or agent must apply the actual label.
+
+        Implementation work must name software behavior proof. Documentation-only proof is
+        acceptable only for documentation or process work.
   - type: textarea
     id: requested-classification
     attributes:
@@ -23,84 +27,302 @@ body:
     validations:
       required: false
   - type: textarea
-    id: finding
+    id: decision-summary
     attributes:
-      label: Finding
-      description: What repo truth, user need, defect, or opportunity motivates this work?
+      label: Decision summary
+      description: What decision or work shape should this issue establish?
+      placeholder: |
+        This issue will establish ...
+    validations:
+      required: true
+  - type: textarea
+    id: sponsored-human
+    attributes:
+      label: Sponsored human
+      description: Name the human perspective and job this work serves.
+      placeholder: |
+        A <type of user> wants <capability/outcome> so that <reason>, without having to <current pain or unsafe workaround>.
+    validations:
+      required: true
+  - type: textarea
+    id: sponsored-agent
+    attributes:
+      label: Sponsored agent
+      description: Name the automation, implementation, review, or reproducibility perspective this work serves.
+      placeholder: |
+        An agent needs <inspectable contract/tool/surface> so it can <operation>, without inferring <unstable/private/visual-only state>.
     validations:
       required: true
   - type: textarea
     id: hill
     attributes:
       label: Hill
-      description: Name the user value in Method/Design Thinking style.
-      placeholder: As a contributor, I want ..., so that ...
+      description: State the observable outcome, not the task list.
+      placeholder: |
+        By the end of this cycle, <user/agent> can <observable outcome> through <surface/API/command>, and the repo proves it with <tests/witnesses>.
     validations:
       required: true
   - type: textarea
-    id: sponsored-perspectives
+    id: current-truth
     attributes:
-      label: Sponsored perspectives
-      description: Name abstract sponsored human and agent seats, not literal people or model brands.
-      value: |
-        - Sponsored Human: Name the served operator, maintainer, contributor, or user perspective.
-        - Sponsored Agent: Name the automation, implementation, review, or reproducibility perspective.
+      label: Current truth
+      description: What is already true on current main?
+      placeholder: |
+        Verified against main at <commit>.
 
-        These are Method sponsorship seats, not literal people, accounts, or model brands.
+        Current anchors:
+        - File/API/command:
+        - Current test coverage:
+        - Current failure mode or gap:
     validations:
       required: true
   - type: textarea
-    id: current-repo-note
+    id: problem
     attributes:
-      label: Current repo note
-      description: What is already true on the current main branch, if anything?
-      placeholder: Verified against main at <commit>. ...
+      label: Problem
+      description: What exact defect, gap, ambiguity, or opportunity motivates this work?
+      placeholder: |
+        The problem is ...
     validations:
-      required: false
+      required: true
   - type: textarea
     id: scope
     attributes:
       label: Scope
       description: What is in bounds?
       placeholder: |
+        This issue includes:
         - ...
     validations:
       required: true
   - type: textarea
-    id: out-of-scope
+    id: non-goals
     attributes:
-      label: Out of scope
+      label: Non-goals
       description: What should not be solved in this issue?
       placeholder: |
+        This issue does not include:
         - ...
     validations:
       required: true
   - type: textarea
-    id: acceptance
+    id: user-experience-product-shape
+    attributes:
+      label: User experience / product shape
+      description: Describe what the user sees or does. Include TUI mockups for user-visible surfaces.
+      value: |
+        If this work changes a user-visible surface, include concrete sketches.
+
+        ### Wide TUI mockup
+
+        ```text
+        <ASCII sketch>
+        ```
+
+        ### Narrow TUI mockup
+
+        ```text
+        <ASCII sketch>
+        ```
+
+        If this work is not user-visible, explain why this section is not applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: lower-modes
+    attributes:
+      label: Lower modes
+      description: State how this work behaves in static, pipe, and accessible modes.
+      value: |
+        ### Static mode
+
+        ```text
+        <stable readable output, or Not applicable with reason>
+        ```
+
+        ### Pipe mode
+
+        ```text
+        <deterministic machine-friendly output, or Not applicable with reason>
+        ```
+
+        ### Accessible mode
+
+        ```text
+        <state, actions, and facts, or Not applicable with reason>
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: runtime-api-contract
+    attributes:
+      label: Runtime / API contract
+      description: Name the software contract this work will create, change, or preserve.
+      placeholder: |
+        Relevant contracts:
+        - Exported functions/types:
+        - Block metadata:
+        - Command intents:
+        - Schema input/output:
+        - Facts emitted:
+        - State transitions:
+        - Layout/focus/input boundaries:
+        - Error behavior:
+        - Compatibility aliases or migration behavior:
+    validations:
+      required: true
+  - type: textarea
+    id: data-state-model
+    attributes:
+      label: Data / state model
+      description: Describe state that persists, mutates, or crosses boundaries.
+      placeholder: |
+        Source of truth:
+        Derived state:
+        Invalid states:
+        Reset behavior:
+        Serialization:
+        Deterministic clock/runtime assumptions:
+    validations:
+      required: true
+  - type: textarea
+    id: accessibility-posture
+    attributes:
+      label: Accessibility posture
+      description: How does the result preserve semantic meaning and keyboard/assistive access?
+      placeholder: |
+        - Semantic labels or facts:
+        - Focus order or focus ownership:
+        - Hidden visual-only information that must still be available:
+        - Keyboard behavior:
+        - Secret/redaction behavior:
+    validations:
+      required: true
+  - type: textarea
+    id: localization-directionality-posture
+    attributes:
+      label: Localization / directionality posture
+      description: Required when visible strings are added or changed. Otherwise explain why it is not applicable.
+      placeholder: |
+        - User-visible strings:
+        - Catalog keys:
+        - Supported locale rows needed:
+        - Directionality assumptions:
+        - `npm run dogfood:i18n:complete` applicability:
+    validations:
+      required: true
+  - type: textarea
+    id: agent-inspectability-explainability-posture
+    attributes:
+      label: Agent inspectability / explainability posture
+      description: How can an agent inspect the result without scraping pixels or prose?
+      placeholder: |
+        - Stable ids:
+        - Metadata fields:
+        - Emitted facts:
+        - Deterministic pipe output:
+        - Registry entries:
+        - Schema descriptions:
+        - Command ids:
+        - Machine-readable witness output:
+    validations:
+      required: true
+  - type: textarea
+    id: linked-invariants
+    attributes:
+      label: Linked invariants
+      description: Which Bijou invariants must this work preserve?
+      placeholder: |
+        - Tests Are the Spec
+        - Runtime Truth Wins
+        - Layout Owns Interaction Geometry
+        - Commands Change State, Effects Do Not
+        - Docs Are the Demo
+        - Blocks Own Product Semantics
+    validations:
+      required: true
+  - type: textarea
+    id: implementation-slices
+    attributes:
+      label: Implementation slices
+      description: Split the work into small testable steps.
+      placeholder: |
+        1. <Smallest testable slice>
+        2. <Next slice>
+        3. <Next slice>
+    validations:
+      required: true
+  - type: textarea
+    id: tests-to-write-first
+    attributes:
+      label: Tests to write first
+      description: Name the RED tests that prove the work.
+      value: |
+        ### Behavior/software proof required for implementation work
+
+        - [ ] Name at least one test against package API, runtime behavior, rendered output, scripted app flow, command behavior, schema validation, lower-mode output, or CI/tooling behavior.
+        - [ ] Name the expected RED failure before implementation.
+        - [ ] Name the focused GREEN command after implementation.
+
+        ### Documentation/process proof
+
+        - [ ] Documentation-only proof is acceptable only for documentation/process work.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
     attributes:
       label: Acceptance criteria
       description: Concrete checks that prove the issue is complete.
-      placeholder: |
-        - [ ] ...
+      value: |
+        - [ ] Behavior test proves the runtime/API/render/command/tooling contract, or this is documentation/process-only work.
+        - [ ] Rendered output or runtime API proves the user-visible outcome, if relevant.
+        - [ ] Lower modes are covered, if relevant.
+        - [ ] New visible strings include supported translations, if relevant.
+        - [ ] DOGFOOD/docs/changelog are updated, if behavior or direction changed.
+        - [ ] Issue and PR are linked correctly.
+        - [ ] CI and local validation are green.
     validations:
       required: true
   - type: textarea
-    id: witness
+    id: validation-plan
     attributes:
-      label: Expected evidence
-      description: Expected evidence for tests, playback, docs, and retro.
+      label: Validation plan
+      description: Name the commands expected before PR.
       value: |
-        ### Tests
-        Name the deterministic test command, failing-before-fix reproduction, or reason no code test applies.
+        ```bash
+        npm test -- --run <focused behavior tests>
+        npm run typecheck:test
+        npm run lint
+        npm run docs:inventory
+        npm run dogfood:i18n:complete
+        npm run dogfood:i18n:check
+        ```
 
-        ### Playback
-        Name the human-visible playback, demo, transcript, or reproduction that proves the result.
+        Trim commands that do not apply. Add package-specific commands when needed.
+    validations:
+      required: true
+  - type: textarea
+    id: playback-witness
+    attributes:
+      label: Playback / witness
+      description: What can a reviewer run or inspect to prove this is real?
+      placeholder: |
+        Commands, routes, key sequences, terminal sizes, screenshots, transcripts, or CI artifacts:
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: risks-follow-on-debt
+    attributes:
+      label: Risks and follow-on debt
+      description: Name known risks and create GitHub issues for anything intentionally deferred.
+      placeholder: |
+        Risks:
+        - ...
 
-        ### Docs
-        Name the documentation, issue template, signpost, or changelog surface updated, or explain why none is required.
-
-        ### Retro / Closeout
-        Name the closeout note, follow-up issue links, shipped retro, or close reason that will preserve the decision.
+        Follow-on issues to create:
+        - ...
     validations:
       required: true
   - type: textarea
@@ -120,6 +342,9 @@ body:
     attributes:
       label: Triage rule
       description: What decision should move, close, split, or merge this issue?
-      placeholder: Move to lane:asap when ... Close if ...
+      placeholder: |
+        Move to lane:asap when ...
+        Close if ...
+        Split if ...
     validations:
       required: true
