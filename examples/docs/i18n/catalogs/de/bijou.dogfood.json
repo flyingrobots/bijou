@@ -2056,6 +2056,116 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "v7.0.0 veroffentlicht, Patch-Lane offen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Spurlinien statt Feuerwerk: Nachweis bleibt nach dem Ship sichtbar."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Release Notes | Migration | DOGFOOD | BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.followUpPatch"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Folge-Patch"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.mainCi"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "grune Main-CI"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.publishedRelease"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "veroffentlichte Version"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.titleGallery"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Titelgalerie"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Eine veroffentlichte Linie hinterlasst eine lesbare Spur."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Nach-Release-Titelbehandlung, sichtbarer Release-Nachweis und Lower-Mode-Fakten fur DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "V7-Startspur"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "settings.landingQuality.description.auto"
       },
       "kind": "message",

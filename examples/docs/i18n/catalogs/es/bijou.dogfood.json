@@ -2056,6 +2056,116 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "v7.0.0 publicada, carril de parche abierto"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Lineas de estela, no fuegos artificiales: la prueba sigue visible despues del envio."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Notas de la version | Migracion | DOGFOOD | BlockLab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.followUpPatch"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "parche de seguimiento"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.mainCi"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "CI verde en main"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.publishedRelease"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "version publicada"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.proofLane.titleGallery"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "galeria de titulos"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Una linea publicada deja un rastro legible."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Tratamiento de titulo posterior a la version, prueba visible de version y hechos en modos bajos para DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v7Launch.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Estela de lanzamiento V7"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "settings.landingQuality.description.auto"
       },
       "kind": "message",
