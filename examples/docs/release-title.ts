@@ -109,8 +109,8 @@ export function renderDogfoodReleaseTitleText(options: RenderDogfoodReleaseTitle
     ].join(' ');
   }
 
-  return options.width < 42
-    ? renderNarrowReleaseTitle({ title, subtitle, proofLanes, gate })
+  return options.width < 60
+    ? renderNarrowReleaseTitle({ title, subtitle, proofLanes, gate }, options.width)
     : renderWideReleaseTitle({ title, subtitle, proofLanes, gate, navigation });
 }
 
@@ -160,15 +160,32 @@ function renderNarrowReleaseTitle(input: {
   readonly subtitle: string;
   readonly proofLanes: readonly string[];
   readonly gate: string;
-}): string {
+}, width: number): string {
+  const frameWidth = Math.max(1, Math.floor(width));
+  if (frameWidth < 4) return fitLine(input.title, frameWidth);
+  const contentWidth = Math.max(0, frameWidth - 4);
   return [
-    '+ BIJOU DOGFOOD ----+',
-    `| ${fitLine(input.title, 18)} |`,
-    `| ${fitLine(shortenSubtitle(input.subtitle), 18)} |`,
-    `| ${fitLine(`lanes: ${input.proofLanes.slice(0, 2).join(', ')}`, 18)} |`,
-    `| ${fitLine(input.gate.includes('closeout') ? 'gate: closeout' : input.gate, 18)} |`,
-    '+-------------------+',
+    labeledRule(' BIJOU DOGFOOD ', frameWidth),
+    `| ${fitLine(input.title, contentWidth)} |`,
+    `| ${fitLine(shortenSubtitle(input.subtitle), contentWidth)} |`,
+    `| ${fitLine(`lanes: ${input.proofLanes.slice(0, 2).join(', ')}`, contentWidth)} |`,
+    `| ${fitLine(input.gate.includes('closeout') ? 'gate: closeout' : input.gate, contentWidth)} |`,
+    framedRule(frameWidth),
   ].join('\n');
+}
+
+function labeledRule(label: string, width: number): string {
+  if (width <= 0) return '';
+  if (width === 1) return '+';
+  const innerWidth = Math.max(0, width - 2);
+  const text = label.slice(0, innerWidth);
+  return `+${text}${'-'.repeat(Math.max(0, innerWidth - text.length))}+`;
+}
+
+function framedRule(width: number): string {
+  if (width <= 0) return '';
+  if (width === 1) return '+';
+  return `+${'-'.repeat(Math.max(0, width - 2))}+`;
 }
 
 function shortenSubtitle(subtitle: string): string {

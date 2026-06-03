@@ -43,6 +43,14 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
     );
   });
 
+  it('keeps interactive release-title output within the requested width', () => {
+    const output = renderDogfoodReleaseTitleText({ mode: 'interactive', width: 42 });
+    const lineWidths = output.split('\n').map((line) => line.length);
+
+    expect(lineWidths.every((width) => width <= 42)).toBe(true);
+    expect(output).toContain('V7 Product Truth');
+  });
+
   it('renders the v7 release title as the first DOGFOOD Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });

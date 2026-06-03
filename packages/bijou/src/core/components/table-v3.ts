@@ -2,8 +2,14 @@ import type { BijouContext } from '../../ports/context.js';
 import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { colorRgb, type ColorRef } from '../theme/color.js';
-import { interactiveTableBorderOverhead, type TableColumn, type TableLayout, type TableOptions } from './table.js';
-import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
+import {
+  interactiveTableBorderOverhead,
+  type TableColumn,
+  type TableLayout,
+  type TableOptions,
+  type TableWrapMode,
+} from './table.js';
+import { createTextSurface, tokenToCellStyle, type CellTextStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
 import { encodeModifiers } from '../render/packed-cell.js';
 import {
@@ -11,12 +17,19 @@ import {
   sanitizeOptionalPositiveInt,
   sanitizePositiveInt,
 } from '../numeric.js';
+import { wrapToWidth } from '../text/wrap.js';
 
 export type TableSurfaceCell = string | Surface;
 export type TableSurfaceRow = readonly TableSurfaceCell[];
 
 export interface TableSurfaceOptions extends Omit<TableOptions, 'rows'> {
   readonly rows: readonly TableSurfaceRow[];
+}
+
+interface PreparedTableSurfaceCell {
+  readonly surface: Surface;
+  readonly text?: string;
+  readonly style?: CellTextStyle;
 }
 
 function isTableSurfaceOptions(
@@ -176,6 +189,28 @@ function resolveColumns(
   return Array.from({ length: inferredCount }, () => ({ header: '' }));
 }
 
+function createPreparedTextCell(text: string, style: CellTextStyle = {}): PreparedTableSurfaceCell {
+  return { text, style, surface: createTextSurface(text, style) };
+}
+
+function createPreparedSurfaceCell(cell: TableSurfaceCell, style: CellTextStyle = {}): PreparedTableSurfaceCell {
+  if (typeof cell === 'string') return createPreparedTextCell(cell, style);
+  return { surface: cell };
+}
+
+function fitPreparedCell(
+  cell: PreparedTableSurfaceCell,
+  width: number,
+  overflow: ReturnType<typeof resolveOverflowBehavior>,
+  wrapMode: TableWrapMode,
+): Surface {
+  if (cell.surface.width <= width || overflow === 'truncate') return cell.surface;
+  if (cell.text !== undefined && wrapMode === 'word') {
+    return createTextSurface(wrapToWidth(cell.text, width).join('\n'), cell.style ?? {});
+  }
+  return wrapSurfaceToWidth(cell.surface, width);
+}
+
 /**
  * Render a bordered data table as a Surface for V3-native composition.
  */
@@ -208,12 +243,16 @@ export function tableSurface(
   const headerStyle = tokenToCellStyle(headerToken);
   const borderStyle = tokenToCellStyle(options.borderToken ?? ctx?.border('muted'));
   const headerBg = options.headerBgToken == null ? undefined : tokenToCellStyle(options.headerBgToken);
-  const headerSurfaces = columns.map((column) => createTextSurface(column.header ?? '', {
+  const headerCellStyle = {
     ...headerStyle,
     bg: headerBg?.bg ?? headerStyle.bg,
-  }));
-  const cellSurfaces = rows.map((row) => row.map((cell) => typeof cell === 'string' ? createTextSurface(cell) : cell));
+  };
+  const headerCells = columns.map((column) => createPreparedTextCell(column.header ?? '', headerCellStyle));
+  const headerSurfaces = headerCells.map((cell) => cell.surface);
+  const preparedCells = rows.map((row) => row.map((cell) => createPreparedSurfaceCell(cell)));
+  const cellSurfaces = preparedCells.map((row) => row.map((cell) => cell.surface));
   const layout = options.layout ?? 'auto';
+  const wrapMode = options.wrap ?? 'word';
   const colWidths = fitTableSurfaceColumnWidths(
     columns,
     headerSurfaces,
@@ -221,16 +260,14 @@ export function tableSurface(
     layout,
     resolveTargetWidth(options, ctx, layout),
   );
-  const fittedHeaderSurfaces = headerSurfaces.map((cell, index) => {
+  const fittedHeaderSurfaces = headerSurfaces.map((_cell, index) => {
     const cellWidth = colWidths[index] ?? 0;
-    if (cell.width <= cellWidth || overflow === 'truncate') return cell;
-    return wrapSurfaceToWidth(cell, cellWidth);
+    return fitPreparedCell(headerCells[index]!, cellWidth, overflow, wrapMode);
   });
   const headerHeight = fittedHeaderSurfaces.reduce((max, cell) => Math.max(max, cell.height), 1);
-  const fittedCellSurfaces = cellSurfaces.map((row) => row.map((cell, index) => {
+  const fittedCellSurfaces = preparedCells.map((row) => row.map((cell, index) => {
     const cellWidth = colWidths[index] ?? 0;
-    if (cell.width <= cellWidth || overflow === 'truncate') return cell;
-    return wrapSurfaceToWidth(cell, cellWidth);
+    return fitPreparedCell(cell, cellWidth, overflow, wrapMode);
   }));
   const rowHeights = fittedCellSurfaces.map((row) => row.reduce((max, cell, index) => {
     const cellWidth = colWidths[index] ?? 0;
