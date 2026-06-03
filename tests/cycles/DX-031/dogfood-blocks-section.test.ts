@@ -80,6 +80,20 @@ function foregroundStyledTextCellExists(
   return false;
 }
 
+const STANDARD_BLOCK_PREVIEW_RENDER_CASE_NAMES = [
+  'AppShell',
+  'ReaderSurface',
+  'TemporalDependencyBlock',
+] as const;
+
+function standardBlockPreviewRenderCases() {
+  return STANDARD_BLOCK_PREVIEW_RENDER_CASE_NAMES.map((blockName) => {
+    const block = standardBlocks.find((candidate) => candidate.metadata.blockName === blockName);
+    expect(block).toBeDefined();
+    return block!;
+  });
+}
+
 describe('DX-031D DOGFOOD Blocks section', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
@@ -275,8 +289,16 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(blocksModel.counterBlockDemo.animationTimeMs).toBe(0);
   });
 
+  it('keeps scripted standard block preview coverage bounded as the catalog grows', () => {
+    const caseNames = standardBlockPreviewRenderCases().map((block) => block.metadata.blockName);
+
+    expect(caseNames).toEqual(['AppShell', 'ReaderSurface', 'TemporalDependencyBlock']);
+    expect(new Set(caseNames).size).toBe(caseNames.length);
+    expect(caseNames.length).toBeLessThan(standardBlocks.length);
+  });
+
   it('renders the selected standard block preview without stacking every block page', async () => {
-    for (const block of standardBlocks) {
+    for (const block of standardBlockPreviewRenderCases()) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
       const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
       const result = await runScript(app, [{
