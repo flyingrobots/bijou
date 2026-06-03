@@ -62,15 +62,18 @@ CI
     dogfood = true on main pushes and tags
     dogfood = true on PRs touching:
       .github/workflows/**
+      package.json
+      package-lock.json
       packages/**
-      bench/**
       examples/docs/**
       scripts/dogfood-*
       scripts/smoke-dogfood*
       tests/cycles/DF-*
+      tests/cycles/*dogfood*
       docs/DOGFOOD.md
       docs/design/DF-*
       docs/legends/DF-*
+      docs/method/legends/DF-*
 ```
 
 ### Gated DOGFOOD Proof
@@ -81,8 +84,8 @@ test (22)
   when dogfood-relevant: DOGFOOD coverage + DOGFOOD i18n policy
 
 Smoke DOGFOOD (landing/docs)
-  when dogfood-relevant: run smoke job matrix
-  otherwise: skipped by job-level if
+  when dogfood-relevant: run checkout, install, build, and smoke command
+  otherwise: keep check names present and skip expensive smoke steps
 ```
 
 ## Runtime And API Contract
@@ -118,8 +121,8 @@ No TUI output changes are included.
 - PR CI has an explicit `changes` job.
 - DOGFOOD coverage/i18n policy steps run only when the classifier says DOGFOOD
   proof is needed.
-- DOGFOOD landing/docs smoke jobs run only when the classifier says DOGFOOD
-  proof is needed.
+- DOGFOOD landing/docs smoke commands run only when the classifier says DOGFOOD
+  proof is needed, while the check names remain present.
 - Pushes to `main` and tags still set the DOGFOOD classifier to true.
 - WF-129 passes.
 - `docs/CHANGELOG.md` records the change.

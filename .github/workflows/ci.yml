@@ -8,8 +8,67 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    name: Classify changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      dogfood: ${{ steps.dogfood.outputs.dogfood }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Classify DOGFOOD relevance
+        id: dogfood
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
+            echo "dogfood=true" >> "$GITHUB_OUTPUT"
+            echo "DOGFOOD CI path gate: full proof for ${GITHUB_EVENT_NAME}" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          is_dogfood_relevant() {
+            case "$1" in
+              .github/workflows/*) return 0 ;;
+              package.json|package-lock.json) return 0 ;;
+              packages/*) return 0 ;;
+              examples/docs/*) return 0 ;;
+              scripts/dogfood-*) return 0 ;;
+              scripts/smoke-dogfood*) return 0 ;;
+              tests/cycles/DF-*) return 0 ;;
+              tests/cycles/*dogfood*) return 0 ;;
+              docs/DOGFOOD.md) return 0 ;;
+              docs/design/DF-*) return 0 ;;
+              docs/legends/DF-*) return 0 ;;
+              docs/method/legends/DF-*) return 0 ;;
+            esac
+
+            return 1
+          }
+
+          if git rev-parse HEAD^1 >/dev/null 2>&1; then
+            diff_args=(HEAD^1 HEAD)
+          else
+            git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}"
+            diff_args=(FETCH_HEAD...HEAD)
+          fi
+
+          dogfood=false
+          while IFS= read -r path; do
+            if is_dogfood_relevant "$path"; then
+              dogfood=true
+            fi
+          done < <(git diff --name-only "${diff_args[@]}")
+
+          echo "dogfood=${dogfood}" >> "$GITHUB_OUTPUT"
+          echo "DOGFOOD CI path gate: ${dogfood}" >> "$GITHUB_STEP_SUMMARY"
+
   test:
     runs-on: ubuntu-latest
+    needs: changes
     strategy:
       matrix:
         node-version: [20, 22]
@@ -28,10 +87,10 @@ jobs:
         if: matrix.node-version == 22
         run: npm run docs:design-system:preflight
       - name: DOGFOOD coverage gate
-        if: matrix.node-version == 22
+        if: matrix.node-version == 22 && needs.changes.outputs.dogfood == 'true'
         run: npm run dogfood:coverage:gate
       - name: DOGFOOD i18n policy gate
-        if: matrix.node-version == 22
+        if: matrix.node-version == 22 && needs.changes.outputs.dogfood == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -75,6 +134,7 @@ jobs:
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
     runs-on: ubuntu-latest
+    needs: changes
     strategy:
       matrix:
         lane:
@@ -83,14 +143,23 @@ jobs:
           - label: docs
             command: smoke:dogfood:docs
     steps:
+      - name: Skip unrelated DOGFOOD smoke
+        if: needs.changes.outputs.dogfood != 'true'
+        run: echo "DOGFOOD smoke skipped because no DOGFOOD-relevant paths changed."
+
       - uses: actions/checkout@v6
+        if: needs.changes.outputs.dogfood == 'true'
       - uses: actions/setup-node@v6
+        if: needs.changes.outputs.dogfood == 'true'
         with:
           node-version: "22"
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm run ${{ matrix.lane.command }}
+      - if: needs.changes.outputs.dogfood == 'true'
+        run: npm ci
+      - if: needs.changes.outputs.dogfood == 'true'
+        run: npm run build
+      - if: needs.changes.outputs.dogfood == 'true'
+        run: npm run ${{ matrix.lane.command }}
 
   bench_gradient:
     name: Bench Gradient
