@@ -82,7 +82,7 @@ The work follows a Design Thinking loop:
 | `FormattedDocumentBlock` | `heading`, `body` | `callout`, `code` | section |
 | `LinkDestinationBlock` | `label`, `destination` | `kind`, `status` | inline |
 | `DividerBlock` | `label` | `style`, `density` | inline |
-| `TextEntryBlock` | `field`, `value` | `placeholder`, `validation`, `results` | control |
+| `TextEntryBlock` | `field`, `value` | `placeholder`, `validation`, `results` | section |
 
 Each Block gets the same first-party command contract:
 

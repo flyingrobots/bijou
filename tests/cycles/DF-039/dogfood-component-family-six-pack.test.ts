@@ -176,6 +176,14 @@ describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
       'structure',
       'input',
     ]);
+    expect(COMPONENT_FAMILY_BLOCKS.map((block) => block.metadata.scale)).toEqual([
+      'section',
+      'section',
+      'section',
+      'inline',
+      'inline',
+      'section',
+    ]);
 
     for (const block of COMPONENT_FAMILY_BLOCKS) {
       expect(validateBlockMetadata(block.metadata).passed).toBe(true);

@@ -1268,7 +1268,7 @@ function textEntryMetadata(): BlockMetadata {
   return standardSectionMetadata({
     blockName: 'TextEntryBlock',
     family: 'input',
-    scale: 'control',
+    scale: 'section',
     summary: 'Describes a text input state with field, value, placeholder, validation, and result facts.',
     useWhen: ['A search, filter, or form surface needs inspectable text-entry semantics.'],
     avoidWhen: ['The control is a choice, toggle, or multi-field form that needs its own structured contract.'],
