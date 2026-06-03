@@ -280,7 +280,7 @@ body:
         - [ ] Lower modes are covered, if relevant.
         - [ ] New visible strings include supported translations, if relevant.
         - [ ] DOGFOOD/docs/changelog are updated, if behavior or direction changed.
-        - [ ] Issue and PR are linked correctly.
+        - [ ] Issue, design doc, and draft PR are linked correctly.
         - [ ] CI and local validation are green.
     validations:
       required: true
@@ -288,7 +288,7 @@ body:
     id: validation-plan
     attributes:
       label: Validation plan
-      description: Name the commands expected before PR.
+      description: Name the commands expected before marking the PR ready for review.
       placeholder: |
         ```bash
         npm test -- --run <focused behavior tests>

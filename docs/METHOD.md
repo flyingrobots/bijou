@@ -72,7 +72,8 @@ default commit gate.
 
 Supporting state labels:
 
-- **`work-in-progress`** means a branch or PR is actively carrying the issue.
+- **`work-in-progress`** means a branch or draft/ready PR is actively carrying
+  the issue.
 - **`blocked`** means a decision or external state is preventing progress.
 - **`needs-design`**, **`needs-witness`**, and **`needs-retro`** mean the
   evidence ledger is missing a required artifact.
@@ -96,25 +97,33 @@ labels. Use repo files to recover context, evidence, and history.
 ```mermaid
 stateDiagram-v2
     direction LR
-    [*] --> Pull: GitHub issue
-    Pull --> Branch: cycle/
-    Branch --> Red: failing tests
+    [*] --> Sync: git fetch + target
+    Sync --> Branch: cycle/
+    Branch --> Shape: issue + design doc + draft PR
+    Shape --> Red: failing tests
     Red --> Green: passing tests
-    Green --> Retro: findings/debt
-    Retro --> Ship: PR to main
+    Green --> Review: validation + self-review
+    Review --> Ship: ready PR to main
     Ship --> [*]
 ```
 
-1. **Pull**: Select a shaped GitHub issue, usually from `lane:asap`.
-   Create or link the design artifact under `docs/design/` when the work needs
-   a design record.
-2. **Branch**: Create `cycle/<cycle_name>`.
-3. **Red**: Write failing tests based on the design's playback questions.
-4. **Green**: Implement the solution until tests pass.
-5. **Retro**: Document findings and follow-on debt in the cycle doc.
-6. **Ship**: Push the cycle branch and open a pull request to `main`.
-   Link the PR from the issue and update `BEARING.md` and `CHANGELOG.md` when
-   the change affects direction or user-facing behavior.
+1. **Sync**: Run `git fetch`. Sync to the merge target branch, almost always
+   `origin/main`, using a regular fast-forward merge before starting local
+   work.
+2. **Branch**: Create `cycle/<cycle_name>` from the synced merge target.
+3. **Shape**: Create or update the GitHub Issue and write the design artifact
+   under `docs/design/`. Stage and commit the shaping artifact, push the branch,
+   open a draft pull request to `main`, link the issue, design doc, and draft
+   PR, and apply `work-in-progress` to the GitHub Issue. The draft counts as the
+   open pull request to `main` for visibility, not as the merge-ready review
+   artifact.
+4. **Red**: Write failing tests based on the design's playback questions.
+5. **Green**: Implement the solution until tests pass.
+6. **Review**: Update witness/retro/debt notes, run local validation, and do the
+   required self-review before marking the draft PR ready for review.
+7. **Ship**: Mark the PR ready, keep it linked from the issue, and update
+   `BEARING.md` and `CHANGELOG.md` when the change affects direction or
+   user-facing behavior.
 
 ## Naming Convention
 Design and retro files follow: `<LEGEND>-<id>-<slug>.md`

@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **Draft-first cycle workflow** — `AGENTS.md`, `docs/METHOD.md`,
+  `docs/WORKFLOW.md`, `CONTRIBUTING.md`, and the Method work-item issue
+  template now define the cycle-start sequence as fetch/sync merge target,
+  branch, write the GitHub Issue and design doc, commit and push shaping
+  artifacts, open a draft PR to `main`, link the issue/design/PR, and apply
+  `work-in-progress` before implementation begins. PRs move to ready-for-review
+  only after implementation, validation, and self-review pass. This closes
+  issue #279.
 - **Design-document-ready Method intake** — The GitHub Method work-item issue
   template now guides new work through the standard design document shape:
   decision summary, sponsored human and agent perspectives, current truth,

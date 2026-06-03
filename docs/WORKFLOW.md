@@ -29,17 +29,20 @@ Bijou now tracks work through:
 
 ## Working Loop
 
-1. Pull from `docs/method/backlog/asap/`, `docs/method/backlog/up-next/`,
-   or the active shaped release lane.
+1. Sync to the merge target branch after `git fetch`.
 2. Create a branch named `cycle/<cycle_name>` for that cycle.
-3. Move the file into `docs/design/` and enrich it into a real cycle doc.
-4. Write failing tests. Playback questions become the executable spec.
-5. Green the tests.
-6. Record witness material when needed.
-7. Close honestly: retrospective, drift notes, and follow-on backlog.
-8. Push the cycle branch and open a pull request to `main`.
-9. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
-   signposts that changed.
+3. Write or enrich the GitHub Issue and the `docs/design/` cycle doc.
+4. Stage and commit the shaping artifact, push the branch, and open a draft
+   pull request to `main` before implementation work starts.
+5. Link the GitHub Issue, design doc, and draft PR. Apply
+   `work-in-progress` to the GitHub Issue.
+6. Write failing tests. Playback questions become the executable spec.
+7. Green the tests.
+8. Record witness material when needed.
+9. Close honestly: retrospective, drift notes, and follow-on backlog.
+10. Run validation and self-review, then mark the draft PR ready for review.
+11. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
+    signposts that changed.
 
 ## PR Size Discipline
 
@@ -48,11 +51,11 @@ Release-boundary work must still move through reviewable PRs.
 Use precursor PRs before the final release sync when a branch is likely to
 cross automated review limits.
 
-Hard stop before opening a PR:
+Hard stop before marking a PR ready for review:
 
 - more than 140 changed files
 
-Caution threshold before opening a PR:
+Caution threshold before marking a PR ready for review:
 
 - more than 10 commits
 - unrelated legends or cycle families on one branch

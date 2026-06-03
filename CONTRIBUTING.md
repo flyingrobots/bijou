@@ -26,6 +26,11 @@ points for contributors:
   files as the source of live queue state.
 - **Branch naming**: `cycle/<cycle-name>` for cycle work, or a
   descriptive branch name for smaller changes.
+- **Open a draft PR at cycle start**: After syncing the merge target, branch,
+  create or update the GitHub Issue, and commit the design artifact, push the
+  branch and open a draft PR against `main`. Link the issue, design doc, and
+  draft PR, then mark it ready for review only after validation and self-review
+  pass.
 - **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
 - **Tests first**: Write failing tests before implementing. Never
@@ -55,7 +60,9 @@ wrappers, or registry workflow behavior.
 
 ## Pull Requests
 
-- Open PRs against `main`.
+- Open draft PRs against `main` at cycle start for visibility.
+- Mark draft PRs ready for review only after local validation and self-review
+  pass.
 - Keep PRs focused — one concern per PR.
 - Update `docs/CHANGELOG.md` if the change is user-facing.
 - Update relevant documentation when behavior changes.
