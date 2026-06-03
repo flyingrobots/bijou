@@ -126,6 +126,11 @@ import {
   type CounterDemoIntentAction,
   type CounterDemoModel,
 } from './counter-block-demo.js';
+import {
+  dogfoodReleaseTitleMarkdown,
+  renderDogfoodReleaseTitleText,
+  V7_DOGFOOD_RELEASE_TITLE,
+} from './release-title.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
@@ -187,6 +192,7 @@ const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-u
 const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
 const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
+const RELEASE_TITLE_TEXT = dogfoodReleaseTitleMarkdown();
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
@@ -577,6 +583,24 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: PHILOSOPHY_DESIGN_SYSTEM_TEXT,
   },
   {
+    id: 'release-title-v7',
+    pageId: RELEASE_PAGE_ID,
+    title: V7_DOGFOOD_RELEASE_TITLE.title,
+    summary: 'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.',
+    body: RELEASE_TITLE_TEXT,
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      V7_DOGFOOD_RELEASE_TITLE.titleKey,
+      V7_DOGFOOD_RELEASE_TITLE.title,
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'release.title.v7.summary',
+      'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.',
+    ),
+    localizedBody: (localization) => dogfoodReleaseTitleMarkdown(localization),
+  },
+  {
     id: 'release-overview',
     pageId: RELEASE_PAGE_ID,
     title: 'Release Overview',
@@ -615,8 +639,8 @@ interface LandingFrameCache {
 }
 const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   {
-    id: 'storybook-workstation',
-    label: 'Storybook Workstation',
+    id: 'blocklab-workstation',
+    label: 'BlockLab Workstation',
     background: '#18172b',
     waveGradient: ['#2f3f66', '#5f87c8', '#f2c96b'],
     logoGradient: ['#8ba8ff', '#f3b57a', '#ffd86d'],

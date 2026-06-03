@@ -79,7 +79,7 @@ Bijou is split into packages to make intent clear.
 | A framed application shell | [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) or `create-bijou-tui-app` |
 | Runtime localization | [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) |
 | CSV/TSV/JSON localization workflow tools | [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) |
-| Story and component preview work | `npm run storybook` |
+| Story and component preview work | `npm run blocklab` |
 | Performance and long-running stability checks | `npm run bench` and `npm run soak` |
 | MCP integration | [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) |
 
@@ -315,16 +315,18 @@ The binding model is unidirectional:
 
 This model lets blocks reuse layout and behavior across apps while preserving deterministic render semantics.
 
-## Storybook and Preview Workflow
+## BlockLab And Preview Workflow
 
 Run focused previews without entering the full DOGFOOD structure:
 
 ```bash
-npm run storybook
-npm run storybook:index
+npm run blocklab
+npm run blocklab:index
 ```
 
-`storybook:index` is especially useful for deterministic fixture capture and API review.
+`blocklab:index` is especially useful for deterministic fixture capture and
+API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
+script names remain as compatibility aliases during the rename window.
 
 ## What's New in v5.0.0
 
@@ -370,7 +372,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for workflow and PR expectations.
 Bijou is moving from architecture-heavy foundations into more visible product proof. The next areas of investment are:
 
 - more complete first-party Blocks and rendered block previews
-- richer DOGFOOD coverage for Blocks, localization, Storybook, and examples
+- richer DOGFOOD coverage for Blocks, localization, BlockLab, and examples
 - stronger localization workflows, including broader catalog coverage and better translator ergonomics
 - replay and scenario pipelines for deterministic debugging
 - lower-allocation rendering and more soak/performance gates

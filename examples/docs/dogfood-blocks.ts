@@ -174,11 +174,12 @@ export class DogfoodBlockRegistry {
   }
 }
 
-export interface StorybookWorkbenchBlockConfig {
+export interface BlockLabWorkbenchBlockConfig {
   readonly storyCount?: number;
   readonly selectedStoryLabel?: string;
   readonly profileLabel?: string;
 }
+export type StorybookWorkbenchBlockConfig = BlockLabWorkbenchBlockConfig;
 
 export interface TitleScreenBlockConfig {
   readonly title?: string;
@@ -1440,11 +1441,12 @@ export const titleOpenDocsIntent = commandIntent('title.openDocs', {
   facts: [{ kind: 'entity', key: 'dogfood.command', value: 'TitleScreenBlock' }],
 });
 
-export const titleOpenStorybookIntent = commandIntent('title.openStorybook', {
-  label: 'Open Storybook',
-  description: 'Request navigation from the title screen into the Storybook workbench.',
+export const titleOpenBlockLabIntent = commandIntent('title.openBlockLab', {
+  label: 'Open BlockLab',
+  description: 'Request navigation from the title screen into the BlockLab workbench.',
   facts: [{ kind: 'entity', key: 'dogfood.command', value: 'TitleScreenBlock' }],
 });
+export const titleOpenStorybookIntent = titleOpenBlockLabIntent;
 
 export const titleOpenSettingsIntent = commandIntent('title.openSettings', {
   label: 'Open settings',
@@ -1460,7 +1462,7 @@ export const titleScreenBlock: BlockDefinition<TitleScreenBlockConfig, string> =
     scale: 'app',
     modes: DOGFOOD_BLOCK_MODES,
     docs: {
-      summary: 'Introduces Bijou DOGFOOD and routes users toward docs, Storybook, or settings.',
+      summary: 'Introduces Bijou DOGFOOD and routes users toward docs, BlockLab, or settings.',
       useWhen: ['DOGFOOD needs a first screen that exposes app-level entry intents.'],
       avoidWhen: ['A nested documentation article needs local section content.'],
       relatedDocs: ['docs/DOGFOOD.md'],
@@ -1488,69 +1490,75 @@ export const titleScreenBlock: BlockDefinition<TitleScreenBlockConfig, string> =
   data: titleScreenData,
   commands: [
     titleOpenDocsIntent,
-    titleOpenStorybookIntent,
+    titleOpenBlockLabIntent,
     titleOpenSettingsIntent,
   ],
   render: renderTitleScreenBlock,
 });
 
-export const storybookStoriesRequirement = defineDataRequirement({
-  id: 'storybook.stories',
-  resource: 'dogfood.storybook.stories',
+export const blockLabStoriesRequirement = defineDataRequirement({
+  id: 'blocklab.stories',
+  resource: 'dogfood.blocklab.stories',
   label: 'Story catalog',
-  description: 'Available component stories for the DOGFOOD Storybook workbench.',
-  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+  description: 'Available component stories for the DOGFOOD BlockLab workbench.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
 });
+export const storybookStoriesRequirement = blockLabStoriesRequirement;
 
-export const storybookSelectionRequirement = defineDataRequirement({
-  id: 'storybook.selection',
-  resource: 'dogfood.storybook.selection',
+export const blockLabSelectionRequirement = defineDataRequirement({
+  id: 'blocklab.selection',
+  resource: 'dogfood.blocklab.selection',
   label: 'Selected story',
-  description: 'The active story, variant, and profile in the Storybook workbench.',
-  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+  description: 'The active story, variant, and profile in the BlockLab workbench.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
 });
+export const storybookSelectionRequirement = blockLabSelectionRequirement;
 
-export const storybookWorkbenchData = defineViewData({
-  id: 'storybook-workbench.data',
-  label: 'StorybookWorkbenchBlock data',
-  description: 'DOGFOOD Storybook catalog and selection data.',
+export const blockLabWorkbenchData = defineViewData({
+  id: 'blocklab-workbench.data',
+  label: 'BlockLabWorkbenchBlock data',
+  description: 'DOGFOOD BlockLab catalog and selection data.',
   requirements: [
-    { name: 'stories', requirement: storybookStoriesRequirement },
-    { name: 'selection', requirement: storybookSelectionRequirement },
+    { name: 'stories', requirement: blockLabStoriesRequirement },
+    { name: 'selection', requirement: blockLabSelectionRequirement },
   ],
 });
+export const storybookWorkbenchData = blockLabWorkbenchData;
 
-export const storybookSelectStoryIntent = commandIntent<{ readonly storyId: string }>(
-  'storybook.selectStory',
+export const blockLabSelectStoryIntent = commandIntent<{ readonly storyId: string }>(
+  'blocklab.selectStory',
   {
     label: 'Select story',
     description: 'Request focus for a component story.',
-    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'BlockLabWorkbenchBlock' }],
   },
 );
+export const storybookSelectStoryIntent = blockLabSelectStoryIntent;
 
-export const storybookCycleVariantIntent = commandIntent<{ readonly direction: -1 | 1 }>(
-  'storybook.cycleVariant',
+export const blockLabCycleVariantIntent = commandIntent<{ readonly direction: -1 | 1 }>(
+  'blocklab.cycleVariant',
   {
     label: 'Cycle variant',
     description: 'Request the next or previous variant for the selected story.',
-    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'BlockLabWorkbenchBlock' }],
   },
 );
+export const storybookCycleVariantIntent = blockLabCycleVariantIntent;
 
-export const storybookSetProfileIntent = commandIntent<{ readonly profileIndex: number }>(
-  'storybook.setProfile',
+export const blockLabSetProfileIntent = commandIntent<{ readonly profileIndex: number }>(
+  'blocklab.setProfile',
   {
     label: 'Set profile',
     description: 'Request a viewport/profile preset for the selected story.',
-    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'BlockLabWorkbenchBlock' }],
   },
 );
+export const storybookSetProfileIntent = blockLabSetProfileIntent;
 
-export const storybookWorkbenchBlock: BlockDefinition<StorybookWorkbenchBlockConfig, string> = defineBlock({
+export const blockLabWorkbenchBlock: BlockDefinition<BlockLabWorkbenchBlockConfig, string> = defineBlock({
   metadata: {
     packageName: DOGFOOD_BLOCK_PACKAGE,
-    blockName: 'StorybookWorkbenchBlock',
+    blockName: 'BlockLabWorkbenchBlock',
     family: 'dogfood-workbench',
     scale: 'app',
     modes: DOGFOOD_BLOCK_MODES,
@@ -1577,38 +1585,40 @@ export const storybookWorkbenchBlock: BlockDefinition<StorybookWorkbenchBlockCon
         label: 'Wide',
         requiredSlots: ['catalog', 'preview'],
         optionalSlots: ['testing', 'footer'],
-        facts: [{ kind: 'state', key: 'dogfood.storybook.layout', value: 'wide' }],
+        facts: [{ kind: 'state', key: 'dogfood.blocklab.layout', value: 'wide' }],
       },
       {
         id: 'narrow',
         label: 'Narrow',
         requiredSlots: ['preview'],
         optionalSlots: ['catalog', 'testing', 'footer'],
-        facts: [{ kind: 'state', key: 'dogfood.storybook.layout', value: 'narrow' }],
+        facts: [{ kind: 'state', key: 'dogfood.blocklab.layout', value: 'narrow' }],
       },
     ],
     composedComponents: ['createFramedApp()', 'viewportSurface()', 'browsableListSurface()'],
-    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
-    storyIds: ['storybook.workbench.wide', 'storybook.workbench.narrow'],
-    examples: [{ id: 'storybook.dogfood', label: 'DOGFOOD Storybook workbench' }],
-    tags: ['dogfood', 'storybook', 'workbench', 'app-frame'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
+    storyIds: ['blocklab.workbench.wide', 'blocklab.workbench.narrow'],
+    examples: [{ id: 'blocklab.dogfood', label: 'DOGFOOD BlockLab workbench' }],
+    tags: ['dogfood', 'blocklab', 'workbench', 'app-frame'],
   },
-  data: storybookWorkbenchData,
+  data: blockLabWorkbenchData,
   commands: [
-    storybookSelectStoryIntent,
-    storybookCycleVariantIntent,
-    storybookSetProfileIntent,
+    blockLabSelectStoryIntent,
+    blockLabCycleVariantIntent,
+    blockLabSetProfileIntent,
   ],
-  render: renderStorybookWorkbenchBlock,
+  render: renderBlockLabWorkbenchBlock,
 });
+export const storybookWorkbenchBlock = blockLabWorkbenchBlock;
 
-export const storybookWorkbenchBlockRegistryEntry = dogfoodBlockRegistryEntry({
-  block: storybookWorkbenchBlock,
+export const blockLabWorkbenchBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: blockLabWorkbenchBlock,
   role: 'workbench',
-  surfaceId: 'storybook.workbench',
-  description: 'Storybook component workstation entrypoint.',
-  tags: ['storybook', 'workbench'],
+  surfaceId: 'blocklab.workbench',
+  description: 'BlockLab component workstation entrypoint.',
+  tags: ['blocklab', 'workbench'],
 });
+export const storybookWorkbenchBlockRegistryEntry = blockLabWorkbenchBlockRegistryEntry;
 
 export const titleScreenBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: titleScreenBlock,
@@ -1728,7 +1738,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'frame.help',
   'frame.commandPalette',
   'frame.footer',
-  'storybook.workbench',
+  'blocklab.workbench',
 ]);
 
 export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
@@ -1745,7 +1755,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   helpOverlayBlockRegistryEntry,
   commandPaletteBlockRegistryEntry,
   footerHintBlockRegistryEntry,
-  storybookWorkbenchBlockRegistryEntry,
+  blockLabWorkbenchBlockRegistryEntry,
 ]);
 
 export interface DogfoodBlockCoverageReport {
@@ -1877,8 +1887,8 @@ function renderDogfoodDocsSurfaceBlock(
   };
 }
 
-function renderStorybookWorkbenchBlock(
-  input: BlockRenderInput<StorybookWorkbenchBlockConfig>,
+function renderBlockLabWorkbenchBlock(
+  input: BlockRenderInput<BlockLabWorkbenchBlockConfig>,
 ): BlockRenderResult<string> {
   const storyCount = input.config?.storyCount ?? 0;
   const selectedStoryLabel = input.config?.selectedStoryLabel ?? 'none';
@@ -1886,19 +1896,19 @@ function renderStorybookWorkbenchBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `StorybookWorkbench stories: ${storyCount}; selected: ${selectedStoryLabel}; profile: ${profileLabel}`,
-      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+      output: `BlockLabWorkbench stories: ${storyCount}; selected: ${selectedStoryLabel}; profile: ${profileLabel}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
     };
   }
 
   return {
     output: [
-      'StorybookWorkbench',
+      'BlockLabWorkbench',
       `stories: ${storyCount}`,
       `selected: ${selectedStoryLabel}`,
       `profile: ${profileLabel}`,
     ].join('\n'),
-    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
   };
 }
 
@@ -1919,7 +1929,7 @@ function renderTitleScreenBlock(
     output: [
       title,
       subtitle,
-      'Actions: open docs; open Storybook; open settings',
+      'Actions: open docs; open BlockLab; open settings',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'TitleScreenBlock' }],
   };

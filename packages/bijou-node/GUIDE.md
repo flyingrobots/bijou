@@ -157,9 +157,14 @@ const themeJson = io.readFile('themes/app.json');
 const capturePath = io.resolvePath('captures/demo.gif');
 ```
 
-`readFile()`, `readDir()`, and `joinPath()` reject any path that escapes the declared
-root. `resolvePath()` is the companion escape hatch for host-owned writes that still need
-the same boundary before calling `fs.writeFileSync()` or similar Node APIs.
+`readFile()`, `readDir()`, and `joinPath()` reject any path that escapes the
+declared root. `resolvePath()` is the companion escape hatch for host-owned
+writes that still need the same boundary before calling `fs.writeFileSync()` or
+similar Node APIs. `resolvePath()` and `joinPath()` can return
+realpath-normalized paths, not the caller's lexical path string, because
+`scopedNodeIO()` resolves symlinks before checking the root boundary. A lexical
+prefix such as `root/link/../file` is not trusted if a symlink escape would land
+outside the scoped root.
 
 ## Worker Runtime
 

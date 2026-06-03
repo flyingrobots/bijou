@@ -70,9 +70,13 @@ const theme = io.readFile('themes/app.json');
 const outputPath = io.resolvePath('captures/demo.gif');
 ```
 
-`readFile()`, `readDir()`, and `joinPath()` now stay inside the declared root. `resolvePath()`
-gives hosts the same boundary check before they hand a path to raw Node writes such as
-`fs.writeFileSync()`.
+`readFile()`, `readDir()`, and `joinPath()` now stay inside the declared root.
+`resolvePath()` gives hosts the same boundary check before they hand a path to
+raw Node writes such as `fs.writeFileSync()`. Both `resolvePath()` and
+`joinPath()` may return a realpath-normalized path rather than the lexical input
+path, because the boundary check resolves symlinks before validating the final
+location. A path with a valid lexical prefix is still rejected when it resolves
+through a symlink escape outside the scoped root.
 
 ## Documentation
 

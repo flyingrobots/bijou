@@ -67,6 +67,11 @@ Boundary rule:
 
 - `readFile()`, `readDir()`, and `joinPath()` stay inside the declared root
 - `resolvePath()` is for host-owned writes or interop with raw Node APIs
+- `resolvePath()` and `joinPath()` may return realpath-normalized paths after
+  symlink resolution, so callers should not expect the lexical input spelling to
+  be preserved
+- a path with an apparently valid lexical prefix is rejected when a symlink
+  escape resolves outside the scoped root
 - if the app truly needs unrestricted filesystem access, keep using raw `nodeIO()`
   and make that choice explicit
 

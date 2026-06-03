@@ -53,9 +53,9 @@ Current direction and active tensions. Historical ship data is in
   has standard Block contracts for single choice, multiple choice, binary
   decision, peer navigation, progressive disclosure, and path progress state.
 - `DF-054` through `DF-059` — the late-family DOGFOOD component-family
-  six-pack is now being carried as standard Block contracts for brand
-  emphasis, mode-aware primitives, dense comparisons, hierarchies, exploration
-  lists, and temporal/dependency views.
+  six-pack landed as standard Block contracts for brand emphasis, mode-aware
+  primitives, dense comparisons, hierarchies, exploration lists, and
+  temporal/dependency views.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -88,19 +88,19 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. `v7.0.0` Is The Active Product-Truth Horizon
 
-- `v7.0.0` holds the imported `up-next` lane: DOGFOOD docs truth,
-  component-family audits, `tableSurface()` responsive parity, and scoped
-  Node I/O documentation.
-- Its current open count is eight before this late-family six-pack closes #238
-  through #243. After this PR merges, the remaining open v7 queue should be
-  #245 and #246.
+- `v7.0.0` holds the active V7 Product Truth closeout: DOGFOOD docs truth,
+  completed component-family audits, `tableSurface()` responsive parity,
+  scoped Node I/O documentation, and the DOGFOOD release-title proof surface.
+- Its current open count is three: #245, #246, and #281. This closeout branch
+  also carries workflow evidence (#266), CI policy evidence (#267), and the
+  BlockLab rename (#271) as support work for the release boundary.
 - DF-030 is the first product-truth slice: DOGFOOD's docs surface became one
   inspectable Block contract instead of adjacent docs rendering concepts. The
   component-family six-packs extend the standard Block catalog across grouping,
   explainability, document, navigation, structure, input, disclosure, and path
-  progress families.
-- The remaining v7 queue should be reshaped into smaller, issue-backed release
-  slices rather than treated as one broad sweep.
+  progress families. V7 Product Truth closes the remaining release-facing gap:
+  the docs app now has a release identity that points at the proof lanes still
+  under active validation.
 
 ## Tensions
 
@@ -116,43 +116,44 @@ Current direction and active tensions. Historical ship data is in
   evidence files can now disagree. GitHub wins; docs must be updated when
   milestone triage changes.
 - **DOGFOOD Truth Debt**: DF-030 converts the docs app into a named Block
-  contract. The remaining v7 DOGFOOD work is still broad: table surface parity,
-  scoped Node I/O docs, and the component-family audit queue need focused
-  cycles with proof instead of prose-only closeouts.
+  contract. The current v7 DOGFOOD debt is focused: table surface parity,
+  scoped Node I/O docs, BlockLab naming, workflow evidence, and the release
+  title screen need code-backed proof instead of prose-only closeouts.
 
 ## Next Target
 
-The immediate focus is the active DOGFOOD late-family standard Block six-pack
-for [#238](https://github.com/flyingrobots/bijou/issues/238),
-[#239](https://github.com/flyingrobots/bijou/issues/239),
-[#240](https://github.com/flyingrobots/bijou/issues/240),
-[#241](https://github.com/flyingrobots/bijou/issues/241),
-[#242](https://github.com/flyingrobots/bijou/issues/242), and
-[#243](https://github.com/flyingrobots/bijou/issues/243).
+The immediate focus is the active V7 Product Truth closeout for
+[#245](https://github.com/flyingrobots/bijou/issues/245),
+[#246](https://github.com/flyingrobots/bijou/issues/246),
+[#266](https://github.com/flyingrobots/bijou/issues/266),
+[#267](https://github.com/flyingrobots/bijou/issues/267),
+[#271](https://github.com/flyingrobots/bijou/issues/271), and
+[#281](https://github.com/flyingrobots/bijou/issues/281).
 
 The PR must prove:
 
-- `BrandEmphasisBlock`, `ModeAwarePrimitiveBlock`, `DenseComparisonBlock`,
-  `HierarchyBlock`, `ExplorationListBlock`, and `TemporalDependencyBlock`
-  metadata, data requirements, command intents, and schema-bound input
-  validation
-- visual/static rendering plus pipe and accessible lowerings with stable
-  family, variant, selected, mode, and semantic-value facts
-- DOGFOOD Blocks preview sample data for every new standard Block
-- Method/design documentation with TUI and lower-mode mockups
+- `tableSurface()` honors bounded widths without regressing the existing
+  surface primitive tests
+- scoped Node I/O docs state realpath and symlink escape behavior precisely
+- CI policy tests parse the workflow instead of text-sniffing it
+- BlockLab is the current visible story/workstation name while old npm script
+  aliases continue to work
+- DOGFOOD has a V7 Product Truth title guide with lower-mode release facts and
+  translated strings
+- BEARING and ROADMAP mirror the live v7 tracker
 
 Recommended pull order:
 
-1. Finish and merge the #238 through #243 late-family six-pack.
-2. Run release-readiness validation against the now-closed v6 issue lane.
-3. Pull #245 / #246 if table parity or scoped Node I/O docs becomes higher
-   leverage.
+1. Finish and merge the V7 Product Truth closeout branch.
+2. Run release-readiness validation against the now-closed v6 and v7 lanes.
+3. Cut release title treatment variants for the next release boundary only
+   after the tracker, docs, and CI proof are green.
 
 Non-goals for the next cycle:
 
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
-- no full visual redesign of DOGFOOD
+- no full visual redesign of DOGFOOD beyond the release-title guide
 - no conversion of every leaf component into a Block
 - no hidden global block registry
 - no localization runtime rewrite

@@ -1,11 +1,11 @@
 import { initDefaultContext } from '../../packages/bijou-node/src/index.js';
 import { run } from '../../packages/bijou-tui/src/index.js';
-import { createStorybookFrameApp } from './storybook-app.js';
+import { createBlockLabFrameApp } from './storybook-app.js';
 
 const ctx = initDefaultContext();
 const initialStoryId = valueAfter(process.argv.slice(2), '--story');
 
-await run(createStorybookFrameApp(ctx, { initialStoryId }), { ctx, mouse: true });
+await run(createBlockLabFrameApp(ctx, { initialStoryId }), { ctx, mouse: true });
 
 function valueAfter(argv: readonly string[], flag: string): string | undefined {
   const index = argv.indexOf(flag);

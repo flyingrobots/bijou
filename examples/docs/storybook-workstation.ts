@@ -76,7 +76,7 @@ export function createDogfoodStorybookWorkbenchModel(
     .sort((a, b) => a.label.localeCompare(b.label));
 
   return {
-    title: 'Bijou Storybook-style Workstation',
+    title: 'Bijou BlockLab Workstation',
     storyCount: stories.length,
     familyCount: familySummaries.length,
     variantCount: stories.reduce((total, story) => total + story.variants.length, 0),

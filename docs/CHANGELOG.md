@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **v7 closeout tracker and workflow evidence** — BEARING and ROADMAP now track
+  the active V7 Product Truth closeout around `tableSurface()` width parity,
+  scoped Node I/O realpath semantics, CI workflow policy evidence, BlockLab,
+  and the DOGFOOD release title screen instead of pointing at the already
+  merged late-family Block six-pack.
+- **Scoped Node I/O symlink semantics** — `@flyingrobots/bijou-node` package
+  docs now spell out that scoped path helpers return realpath-normalized paths,
+  resolve symlinks before root validation, reject symlink escapes outside the
+  scoped root, and do not trust lexical prefix checks as a security boundary.
 - **Draft-first cycle workflow** — `AGENTS.md`, `docs/METHOD.md`,
   `docs/WORKFLOW.md`, `CONTRIBUTING.md`, and the Method work-item issue
   template now define the cycle-start sequence as fetch/sync merge target,
@@ -67,6 +76,25 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD V7 Product Truth title screen** — DOGFOOD now publishes a release
+  title guide for `V7 Product Truth` as the first Release page. The guide
+  renders a TUI-style title card, lower-mode release facts, proof lanes for
+  table parity, scoped Node I/O, BlockLab, and the release title itself, and
+  localized copy for every supported DOGFOOD locale. This closes issue #281.
+- **BlockLab workstation rename** — The current story and component preview
+  surface now presents itself as BlockLab through `npm run blocklab`,
+  `npm run blocklab:index`, visible DOGFOOD labels, Block registry metadata,
+  command intents, and docs. The older `storybook`, `storybook:index`, and
+  `dogfood:storybook` script names remain as compatibility aliases during the
+  migration window. This closes issue #271.
+- **`tableSurface()` width parity** — `tableSurface()` now honors explicit
+  width and layout options with the same bounded-width posture as string
+  `table()`: columns fit the target width, wrapped cells respect fitted column
+  widths, and intrinsic layout remains opt-in. This closes issue #245.
+- **CI workflow policy parser** — The pre-push/CI localization policy is now
+  backed by a YAML parser test that verifies checkout happens before the
+  DOGFOOD i18n policy gate and that CI runs the same generated-catalog and
+  completeness checks as local pre-push. This closes issue #267.
 - **DOGFOOD late-family standard Blocks** —
   `@flyingrobots/bijou` now exports the remaining open v7 DOGFOOD
   component-family Blocks: `BrandEmphasisBlock`,
@@ -221,8 +249,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block
-  preview, guide inspector, settings menu, and Storybook workbench. The
-  interactive Storybook entrypoint now runs through the AppFrame shell instead
+  preview, guide inspector, settings menu, and BlockLab workbench. The
+  interactive BlockLab entrypoint now runs through the AppFrame shell instead
   of a parallel bespoke TUI, while registry discovery remains render-free and
   does not introduce provider handles, subscriptions, command dispatch, or a
   hidden global block registry.

@@ -12,16 +12,16 @@ First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 npm run dogfood
 ```
 
-For the standalone Storybook-style development and testing workbench, run:
+For the standalone BlockLab development and testing workbench, run:
 
 ```sh
-npm run storybook
+npm run blocklab
 ```
 
-For a text-first Storybook-style index and capture matrix over the same DOGFOOD story catalog, run:
+For a text-first BlockLab index and capture matrix over the same DOGFOOD story catalog, run:
 
 ```sh
-npm run storybook:index
+npm run blocklab:index
 ```
 
 You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
@@ -35,7 +35,7 @@ focus it and use the wheel to scroll long docs or help content.
 
 - `ComponentStory` v0 can hold structured teaching fields instead of one markdown blob
 - a landing page and a documentation shell can both be driven from the same story substrate
-- the same story substrate can also produce a standalone Storybook-style workbench and deterministic capture matrix
+- the same story substrate can also produce a standalone BlockLab workbench and deterministic capture matrix
 - the docs shell can carry both prose guides and the component explorer
 - the docs pane and preview pane both derive from the same story record once you enter the `Components` section
 - profile switching is part of the experience, not an afterthought
@@ -81,8 +81,8 @@ focus it and use the wheel to scroll long docs or help content.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The `Guides`, `Packages`, `Philosophy`, and `Release` sections are no longer just shell shape. They now publish real corpus pages inside the app, and the release-facing smoke contract now runs through DOGFOOD instead of the broad examples tree.
 - The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to matching guides or component stories instead of walking every list manually first.
-- `npm run storybook` opens a standalone interactive component development and testing workbench over the story catalog.
-- `npm run storybook:index` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling. `npm run dogfood:storybook` remains as the compatibility alias for that text-first path.
+- `npm run blocklab` opens a standalone interactive component development and testing workbench over the story catalog.
+- `npm run blocklab:index` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling. `npm run storybook`, `npm run storybook:index`, and `npm run dogfood:storybook` remain as compatibility aliases during the rename window.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.
 - The docs shell uses explicit responsive layout variants: wide keeps navigation, content, and metadata/variant context visible; standard and narrow fold secondary panes; tiny renders one useful content pane instead of a crushed multi-column surface.

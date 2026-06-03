@@ -67,11 +67,13 @@ Wraps `nodeIO()` with a rooted filesystem boundary:
 |---|---|
 | `readFile(path)` | Resolves inside the declared root, then delegates to `nodeIO().readFile` |
 | `readDir(path)` | Resolves inside the declared root, then delegates to `nodeIO().readDir` |
-| `joinPath(...segs)` | Joins and resolves inside the declared root |
-| `resolvePath(path)` | Returns an absolute in-root path or throws on escape |
+| `joinPath(...segs)` | Joins, resolves symlinks, and returns a realpath-normalized in-root path |
+| `resolvePath(path)` | Returns a realpath-normalized in-root path or throws on escape |
 
 This keeps app-level reads and traversal constrained without moving Node filesystem
-policy into the pure packages.
+policy into the pure packages. The guard does not trust lexical prefix checks:
+if a path appears to start inside the root but follows a symlink escape outside
+it, `scopedNodeIO()` rejects it before returning the path.
 
 ### chalkStyle()
 
