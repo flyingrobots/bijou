@@ -57,6 +57,8 @@ describe('WF-001 workflow adoption', () => {
 
     expect(normalizedAgents).toContain('Start cycles from a synced merge target branch.');
     expect(normalizedAgents).toContain('Draft PRs are expected at cycle start.');
+    expect(normalizedAgents).toContain('link the issue, design doc, and draft PR');
+    expect(normalizedMethod).toContain('link the issue, design doc, and draft PR');
 
     expect(issueTemplate).toContain('Issue, design doc, and draft PR are linked correctly.');
   });

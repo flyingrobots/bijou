@@ -113,9 +113,10 @@ stateDiagram-v2
 2. **Branch**: Create `cycle/<cycle_name>` from the synced merge target.
 3. **Shape**: Create or update the GitHub Issue and write the design artifact
    under `docs/design/`. Stage and commit the shaping artifact, push the branch,
-   open a draft pull request to `main`, link the issue and PR, and apply
-   `work-in-progress` to the GitHub Issue. The draft counts as the open pull
-   request to `main` for visibility, not as the merge-ready review artifact.
+   open a draft pull request to `main`, link the issue, design doc, and draft
+   PR, and apply `work-in-progress` to the GitHub Issue. The draft counts as the
+   open pull request to `main` for visibility, not as the merge-ready review
+   artifact.
 4. **Red**: Write failing tests based on the design's playback questions.
 5. **Green**: Implement the solution until tests pass.
 6. **Review**: Update witness/retro/debt notes, run local validation, and do the
