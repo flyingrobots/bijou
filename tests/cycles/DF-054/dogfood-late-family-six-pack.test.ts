@@ -278,6 +278,29 @@ describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
     }
   });
 
+  it('accepts numeric dense-comparison values at the schema boundary', () => {
+    expect(bindSchemaBlockInput(denseComparisonSchemaBlock, {
+      title: 'Compare packages',
+      metric: 'tests',
+      left: 1820,
+      right: 640,
+      delta: 12,
+      selected: 'tests',
+    })).toMatchObject({
+      ok: true,
+      input: {
+        slots: {
+          title: 'Compare packages',
+          metric: 'tests',
+          left: 1820,
+          right: 640,
+          delta: 12,
+          selected: 'tests',
+        },
+      },
+    });
+  });
+
   it('rejects late-family schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorEntry = Object.defineProperties({}, {

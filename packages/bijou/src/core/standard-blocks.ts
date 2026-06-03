@@ -245,9 +245,9 @@ export interface ModeAwarePrimitiveSchemaData {
 export interface DenseComparisonSchemaData {
   readonly title: string;
   readonly metric: string;
-  readonly left: string;
-  readonly right: string;
-  readonly delta: string;
+  readonly left: string | number;
+  readonly right: string | number;
+  readonly delta: string | number;
   readonly selected?: string;
 }
 
@@ -3272,9 +3272,9 @@ function parseDenseComparisonSchemaData(input: unknown): DenseComparisonSchemaDa
 
   const title = textDataProperty(input, 'title');
   const metric = textDataProperty(input, 'metric');
-  const left = textDataProperty(input, 'left');
-  const right = textDataProperty(input, 'right');
-  const delta = textDataProperty(input, 'delta');
+  const left = textOrNumberDataProperty(input, 'left');
+  const right = textOrNumberDataProperty(input, 'right');
+  const delta = textOrNumberDataProperty(input, 'delta');
   const selected = textDataProperty(input, 'selected');
   if (
     title === undefined
