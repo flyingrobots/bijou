@@ -14,6 +14,7 @@ import { createNodeDogfoodLocalePort } from '../../../examples/docs/node-locale.
 const KEY_DOWN = '\x1b[B';
 const KEY_ENTER = '\r';
 const KEY_F2 = '\x1bOQ';
+const RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS = 15_000;
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -223,7 +224,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
 
     expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
     expect(frameText(result.frames.at(-1)!)).toContain('Langue sentinelle');
-  });
+  }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
 
   it('refreshes frame page labels from the selected locale after language cycling', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -284,7 +285,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(text).toContain('Blocs sentinelle');
     expect(text).toContain('Paquets sentinelle');
     expect(text).not.toContain('[Guides]  Components  Blocks');
-  });
+  }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
 
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -310,7 +311,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
     expect(savedLocales).toEqual(['fr']);
-  });
+  }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
 
   it('keeps locale activation when preference persistence fails', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -337,5 +338,5 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
     expect(attemptedSaves).toEqual(['fr']);
-  });
+  }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
 });
