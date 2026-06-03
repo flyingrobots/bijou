@@ -6,7 +6,7 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and this choice/navigation six-pack branch:
+Last synced from GitHub Issues and this late-family six-pack branch:
 2026-06-03.
 
 ## Release Snapshot
@@ -14,7 +14,7 @@ Last synced from GitHub Issues and this choice/navigation six-pack branch:
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 8 | 13 | Active product-truth candidate after the second component-family six-pack. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 2 | 19 | Active product-truth candidate after the late-family component-family six-pack. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
@@ -99,17 +99,17 @@ the closing PR merges.
 | [#235](https://github.com/flyingrobots/bijou/issues/235) | `lane:up-next` | `type:maintenance` | DF-050 peer navigation standard Block |
 | [#236](https://github.com/flyingrobots/bijou/issues/236) | `lane:up-next` | `type:maintenance` | DF-051 progressive disclosure standard Block |
 | [#237](https://github.com/flyingrobots/bijou/issues/237) | `lane:up-next` | `type:maintenance` | DF-052 path progress standard Block |
+| [#238](https://github.com/flyingrobots/bijou/issues/238) | `lane:up-next` | `type:maintenance` | DF-054 brand emphasis standard Block |
+| [#239](https://github.com/flyingrobots/bijou/issues/239) | `lane:up-next` | `type:maintenance` | DF-055 mode-aware primitive standard Block |
+| [#240](https://github.com/flyingrobots/bijou/issues/240) | `lane:up-next` | `type:maintenance` | DF-056 dense comparison standard Block |
+| [#241](https://github.com/flyingrobots/bijou/issues/241) | `lane:up-next` | `type:maintenance` | DF-057 hierarchy standard Block |
+| [#242](https://github.com/flyingrobots/bijou/issues/242) | `lane:up-next` | `type:maintenance` | DF-058 exploration list standard Block |
+| [#243](https://github.com/flyingrobots/bijou/issues/243) | `lane:up-next` | `type:maintenance` | DF-059 temporal dependency standard Block |
 
 ### Component-Family Audits
 
-| Issue | Priority | Type | Work |
-| :--- | :--- | :--- | :--- |
-| [#238](https://github.com/flyingrobots/bijou/issues/238) | `priority:medium` | `type:maintenance` | DF-054 audit expressive branding and decorative emphasis family across real surfaces |
-| [#239](https://github.com/flyingrobots/bijou/issues/239) | `priority:medium` | `type:maintenance` | DF-055 audit mode-aware custom primitives family across real surfaces |
-| [#240](https://github.com/flyingrobots/bijou/issues/240) | `priority:medium` | `type:maintenance` | DF-056 audit dense comparison family across real surfaces |
-| [#241](https://github.com/flyingrobots/bijou/issues/241) | `priority:medium` | `type:maintenance` | DF-057 audit hierarchy family across real surfaces |
-| [#242](https://github.com/flyingrobots/bijou/issues/242) | `priority:medium` | `type:maintenance` | DF-058 audit lists for exploration family across real surfaces |
-| [#243](https://github.com/flyingrobots/bijou/issues/243) | `priority:medium` | `type:maintenance` | DF-059 audit temporal or dependency views family across real surfaces |
+No open component-family audit cards remain in the v7 milestone once this
+late-family closing PR merges.
 
 ## Beyond
 

@@ -52,6 +52,10 @@ Current direction and active tensions. Historical ship data is in
 - `DF-046` through `DF-052` — the second DOGFOOD component-family six-pack now
   has standard Block contracts for single choice, multiple choice, binary
   decision, peer navigation, progressive disclosure, and path progress state.
+- `DF-054` through `DF-059` — the late-family DOGFOOD component-family
+  six-pack is now being carried as standard Block contracts for brand
+  emphasis, mode-aware primitives, dense comparisons, hierarchies, exploration
+  lists, and temporal/dependency views.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -87,10 +91,9 @@ Current direction and active tensions. Historical ship data is in
 - `v7.0.0` holds the imported `up-next` lane: DOGFOOD docs truth,
   component-family audits, `tableSurface()` responsive parity, and scoped
   Node I/O documentation.
-- Its current open count is fourteen before this choice/navigation six-pack
-  closes #232 through #237. After this PR merges, the remaining open v7 queue
-  should be #245, #246, and the six remaining component-family audits #238
-  through #243.
+- Its current open count is eight before this late-family six-pack closes #238
+  through #243. After this PR merges, the remaining open v7 queue should be
+  #245 and #246.
 - DF-030 is the first product-truth slice: DOGFOOD's docs surface became one
   inspectable Block contract instead of adjacent docs rendering concepts. The
   component-family six-packs extend the standard Block catalog across grouping,
@@ -119,20 +122,20 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate focus is the active DOGFOOD choice/navigation standard Block
-six-pack for [#232](https://github.com/flyingrobots/bijou/issues/232),
-[#233](https://github.com/flyingrobots/bijou/issues/233),
-[#234](https://github.com/flyingrobots/bijou/issues/234),
-[#235](https://github.com/flyingrobots/bijou/issues/235),
-[#236](https://github.com/flyingrobots/bijou/issues/236), and
-[#237](https://github.com/flyingrobots/bijou/issues/237).
+The immediate focus is the active DOGFOOD late-family standard Block six-pack
+for [#238](https://github.com/flyingrobots/bijou/issues/238),
+[#239](https://github.com/flyingrobots/bijou/issues/239),
+[#240](https://github.com/flyingrobots/bijou/issues/240),
+[#241](https://github.com/flyingrobots/bijou/issues/241),
+[#242](https://github.com/flyingrobots/bijou/issues/242), and
+[#243](https://github.com/flyingrobots/bijou/issues/243).
 
 The PR must prove:
 
-- `SingleChoiceBlock`, `MultipleChoiceBlock`, `BinaryDecisionBlock`,
-  `PeerNavigationBlock`, `ProgressiveDisclosureBlock`, and
-  `PathProgressBlock` metadata, data requirements, command intents, and
-  schema-bound input validation
+- `BrandEmphasisBlock`, `ModeAwarePrimitiveBlock`, `DenseComparisonBlock`,
+  `HierarchyBlock`, `ExplorationListBlock`, and `TemporalDependencyBlock`
+  metadata, data requirements, command intents, and schema-bound input
+  validation
 - visual/static rendering plus pipe and accessible lowerings with stable
   family, variant, selected, mode, and semantic-value facts
 - DOGFOOD Blocks preview sample data for every new standard Block
@@ -140,10 +143,10 @@ The PR must prove:
 
 Recommended pull order:
 
-1. Finish and merge the #232 through #237 choice/navigation six-pack.
+1. Finish and merge the #238 through #243 late-family six-pack.
 2. Run release-readiness validation against the now-closed v6 issue lane.
-3. Pull the next v7 six-pack from #238 through #243, or take #245 / #246 if
-   table parity or scoped Node I/O docs becomes higher leverage.
+3. Pull #245 / #246 if table parity or scoped Node I/O docs becomes higher
+   leverage.
 
 Non-goals for the next cycle:
 

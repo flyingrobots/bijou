@@ -59,6 +59,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD late-family standard Blocks** —
+  `@flyingrobots/bijou` now exports the remaining open v7 DOGFOOD
+  component-family Blocks: `BrandEmphasisBlock`,
+  `ModeAwarePrimitiveBlock`, `DenseComparisonBlock`, `HierarchyBlock`,
+  `ExplorationListBlock`, and `TemporalDependencyBlock`, with matching
+  lower-camel block definitions, schema adapters, and schema-bound block
+  exports. The slice adds ready stories, standard catalog and package manifest
+  entries, DOGFOOD Blocks preview sample data, command intents, typed schema
+  validation, deterministic visual/static output, pipe/accessible lowerings,
+  stable semantic facts for branding, primitive, comparison, hierarchy, list,
+  and graph families, and translated DOGFOOD preview copy for every supported
+  locale. This closes issues #238 through #243.
 - **DOGFOOD choice and navigation standard Blocks** —
   `@flyingrobots/bijou` now exports the next six first-party DOGFOOD
   component-family Blocks: `SingleChoiceBlock`, `MultipleChoiceBlock`,

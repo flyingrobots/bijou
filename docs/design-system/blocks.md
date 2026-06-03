@@ -65,10 +65,15 @@ Bijou now exposes a metadata-first block authoring contract from
 - `appShellBlock`, `readerSurfaceBlock`, `inspectorPanelBlock`,
   `inlineStatusBlock`, `inFlowStatusBlock`, `transientOverlayBlock`,
   `activityStreamBlock`, `shortcutCueBlock`, `progressIndicatorBlock`,
-  `standardBlocks`, `standardBlockStories`, and
+  the DOGFOOD component-family block exports, `standardBlocks`,
+  `standardBlockStories`, and
   `standardBlockPackageManifest` expose the first-party block definitions:
   AppShell, ReaderSurface, InspectorPanel, inline status, in-flow status,
-  transient overlay feedback, activity stream, shortcut cues, and progress.
+  transient overlay feedback, activity stream, shortcut cues, progress,
+  grouping, explainability, documents, links, dividers, text entry, choices,
+  navigation, disclosure, path progress, brand emphasis, mode-aware primitives,
+  dense comparisons, hierarchies, exploration lists, and temporal dependency
+  views.
   Their render functions now produce deterministic first-proof output across
   interactive, static, pipe, and accessible modes while keeping provider
   lifecycle, command dispatch, and production AppShell behavior out of the

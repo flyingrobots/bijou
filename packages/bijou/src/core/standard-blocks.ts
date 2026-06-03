@@ -56,7 +56,13 @@ export type StandardBlockName =
   | 'BinaryDecisionBlock'
   | 'PeerNavigationBlock'
   | 'ProgressiveDisclosureBlock'
-  | 'PathProgressBlock';
+  | 'PathProgressBlock'
+  | 'BrandEmphasisBlock'
+  | 'ModeAwarePrimitiveBlock'
+  | 'DenseComparisonBlock'
+  | 'HierarchyBlock'
+  | 'ExplorationListBlock'
+  | 'TemporalDependencyBlock';
 export type StandardBlockStoryState =
   | 'ready'
   | 'narrow'
@@ -217,6 +223,57 @@ export interface PathProgressSchemaData {
   readonly step: string | number;
   readonly total: string | number;
   readonly status?: string;
+}
+
+export interface BrandEmphasisSchemaData {
+  readonly brand: string;
+  readonly tagline: string;
+  readonly decoration: string;
+  readonly role?: string;
+  readonly selected?: string;
+}
+
+export interface ModeAwarePrimitiveSchemaData {
+  readonly primitive: string;
+  readonly fact: string;
+  readonly value: string | number;
+  readonly status?: string;
+  readonly modeContract?: string;
+  readonly selected?: string;
+}
+
+export interface DenseComparisonSchemaData {
+  readonly title: string;
+  readonly metric: string;
+  readonly left: string;
+  readonly right: string;
+  readonly delta: string;
+  readonly selected?: string;
+}
+
+export interface HierarchySchemaData {
+  readonly root: string;
+  readonly nodes: readonly string[];
+  readonly selected: string;
+  readonly parent?: string;
+  readonly depth?: string | number;
+  readonly expanded?: string;
+}
+
+export interface ExplorationListSchemaData {
+  readonly title: string;
+  readonly facet: string;
+  readonly items: readonly string[];
+  readonly selected: string;
+  readonly preview?: string;
+}
+
+export interface TemporalDependencySchemaData {
+  readonly title: string;
+  readonly events: readonly string[];
+  readonly dependency: string;
+  readonly selected?: string;
+  readonly dependsOn?: string;
 }
 
 const shellFocusRegion = commandIntent<{ readonly region: string }>('shell.focusRegion', {
@@ -414,6 +471,51 @@ const pathProgressSections: readonly StandardSectionSpec[] = Object.freeze([
   { id: 'total', label: 'Total', required: true },
   { id: 'status', label: 'Status', required: false },
 ]);
+const brandEmphasisSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'brand', label: 'Brand', required: true },
+  { id: 'tagline', label: 'Tagline', required: true },
+  { id: 'decoration', label: 'Decoration', required: true },
+  { id: 'role', label: 'Role', required: false },
+  { id: 'selected', label: 'Selected', required: false },
+]);
+const modeAwarePrimitiveSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'primitive', label: 'Primitive', required: true },
+  { id: 'fact', label: 'Fact', required: true },
+  { id: 'value', label: 'Value', required: true },
+  { id: 'status', label: 'Status', required: false },
+  { id: 'modeContract', label: 'Mode contract', required: false },
+  { id: 'selected', label: 'Selected', required: false },
+]);
+const denseComparisonSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'title', label: 'Title', required: true },
+  { id: 'metric', label: 'Metric', required: true },
+  { id: 'left', label: 'Left', required: true },
+  { id: 'right', label: 'Right', required: true },
+  { id: 'delta', label: 'Delta', required: true },
+  { id: 'selected', label: 'Selected', required: false },
+]);
+const hierarchySections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'root', label: 'Root', required: true },
+  { id: 'nodes', label: 'Nodes', required: true },
+  { id: 'selected', label: 'Selected', required: true },
+  { id: 'parent', label: 'Parent', required: false },
+  { id: 'depth', label: 'Depth', required: false },
+  { id: 'expanded', label: 'Expanded', required: false },
+]);
+const explorationListSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'title', label: 'Title', required: true },
+  { id: 'facet', label: 'Facet', required: true },
+  { id: 'items', label: 'Items', required: true },
+  { id: 'selected', label: 'Selected', required: true },
+  { id: 'preview', label: 'Preview', required: false },
+]);
+const temporalDependencySections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'title', label: 'Title', required: true },
+  { id: 'events', label: 'Events', required: true },
+  { id: 'dependency', label: 'Dependency', required: true },
+  { id: 'selected', label: 'Selected', required: false },
+  { id: 'dependsOn', label: 'Depends on', required: false },
+]);
 
 const inlineStatusData = standardBlockData('inline-status', 'InlineStatusBlock', [
   {
@@ -547,6 +649,48 @@ const pathProgressData = standardBlockData('path-progress', 'PathProgressBlock',
     name: 'path',
     label: 'Path progress state',
     description: 'Path labels, current step, ordinal step, total step count, and status facts.',
+  },
+]);
+const brandEmphasisData = standardBlockData('brand-emphasis', 'BrandEmphasisBlock', [
+  {
+    name: 'brand',
+    label: 'Brand emphasis facts',
+    description: 'Brand text, tagline, decorative treatment, role, and selected emphasis facts.',
+  },
+]);
+const modeAwarePrimitiveData = standardBlockData('mode-aware-primitive', 'ModeAwarePrimitiveBlock', [
+  {
+    name: 'primitive',
+    label: 'Mode-aware primitive facts',
+    description: 'Primitive identity, fact key, value, status, mode contract, and selected primitive facts.',
+  },
+]);
+const denseComparisonData = standardBlockData('dense-comparison', 'DenseComparisonBlock', [
+  {
+    name: 'comparison',
+    label: 'Dense comparison facts',
+    description: 'Comparison title, metric, left value, right value, delta, and selected metric facts.',
+  },
+]);
+const hierarchyData = standardBlockData('hierarchy', 'HierarchyBlock', [
+  {
+    name: 'hierarchy',
+    label: 'Hierarchy facts',
+    description: 'Root, node list, selected node, parent, depth, and expansion facts.',
+  },
+]);
+const explorationListData = standardBlockData('exploration-list', 'ExplorationListBlock', [
+  {
+    name: 'list',
+    label: 'Exploration list facts',
+    description: 'List title, facet, item list, selected item, and preview facts.',
+  },
+]);
+const temporalDependencyData = standardBlockData('temporal-dependency', 'TemporalDependencyBlock', [
+  {
+    name: 'timeline',
+    label: 'Temporal dependency facts',
+    description: 'Timeline title, ordered events, dependency summary, selected event, and depends-on facts.',
   },
 ]);
 
@@ -778,6 +922,72 @@ export const pathProgressBlock: BlockDefinition = defineBlock({
   ),
 });
 
+export const brandEmphasisBlock: BlockDefinition = defineBlock({
+  metadata: brandEmphasisMetadata(),
+  data: brandEmphasisData,
+  commands: standardSectionCommands('BrandEmphasisBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'BrandEmphasisBlock',
+    brandEmphasisSections,
+  ),
+});
+
+export const modeAwarePrimitiveBlock: BlockDefinition = defineBlock({
+  metadata: modeAwarePrimitiveMetadata(),
+  data: modeAwarePrimitiveData,
+  commands: standardSectionCommands('ModeAwarePrimitiveBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ModeAwarePrimitiveBlock',
+    modeAwarePrimitiveSections,
+  ),
+});
+
+export const denseComparisonBlock: BlockDefinition = defineBlock({
+  metadata: denseComparisonMetadata(),
+  data: denseComparisonData,
+  commands: standardSectionCommands('DenseComparisonBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'DenseComparisonBlock',
+    denseComparisonSections,
+  ),
+});
+
+export const hierarchyBlock: BlockDefinition = defineBlock({
+  metadata: hierarchyMetadata(),
+  data: hierarchyData,
+  commands: standardSectionCommands('HierarchyBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'HierarchyBlock',
+    hierarchySections,
+  ),
+});
+
+export const explorationListBlock: BlockDefinition = defineBlock({
+  metadata: explorationListMetadata(),
+  data: explorationListData,
+  commands: standardSectionCommands('ExplorationListBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ExplorationListBlock',
+    explorationListSections,
+  ),
+});
+
+export const temporalDependencyBlock: BlockDefinition = defineBlock({
+  metadata: temporalDependencyMetadata(),
+  data: temporalDependencyData,
+  commands: standardSectionCommands('TemporalDependencyBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'TemporalDependencyBlock',
+    temporalDependencySections,
+  ),
+});
+
 export const readerSurfaceSchemaAdapter: BlockSchemaAdapter<ReaderSurfaceSchemaData> =
   defineBlockSchemaAdapter({
     id: 'reader-surface.article',
@@ -971,6 +1181,54 @@ export const pathProgressSchemaAdapter: BlockSchemaAdapter<PathProgressSchemaDat
     blockName: 'PathProgressBlock',
     sections: pathProgressSections,
     parse: parsePathProgressSchemaData,
+  });
+
+export const brandEmphasisSchemaAdapter: BlockSchemaAdapter<BrandEmphasisSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'brand-emphasis.brand',
+    blockName: 'BrandEmphasisBlock',
+    sections: brandEmphasisSections,
+    parse: parseBrandEmphasisSchemaData,
+  });
+
+export const modeAwarePrimitiveSchemaAdapter: BlockSchemaAdapter<ModeAwarePrimitiveSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'mode-aware-primitive.primitive',
+    blockName: 'ModeAwarePrimitiveBlock',
+    sections: modeAwarePrimitiveSections,
+    parse: parseModeAwarePrimitiveSchemaData,
+  });
+
+export const denseComparisonSchemaAdapter: BlockSchemaAdapter<DenseComparisonSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'dense-comparison.comparison',
+    blockName: 'DenseComparisonBlock',
+    sections: denseComparisonSections,
+    parse: parseDenseComparisonSchemaData,
+  });
+
+export const hierarchySchemaAdapter: BlockSchemaAdapter<HierarchySchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'hierarchy.hierarchy',
+    blockName: 'HierarchyBlock',
+    sections: hierarchySections,
+    parse: parseHierarchySchemaData,
+  });
+
+export const explorationListSchemaAdapter: BlockSchemaAdapter<ExplorationListSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'exploration-list.list',
+    blockName: 'ExplorationListBlock',
+    sections: explorationListSections,
+    parse: parseExplorationListSchemaData,
+  });
+
+export const temporalDependencySchemaAdapter: BlockSchemaAdapter<TemporalDependencySchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'temporal-dependency.timeline',
+    blockName: 'TemporalDependencyBlock',
+    sections: temporalDependencySections,
+    parse: parseTemporalDependencySchemaData,
   });
 
 export const readerSurfaceSchemaBlock: SchemaBoundBlockDefinition<ReaderSurfaceSchemaData> =
@@ -1211,6 +1469,74 @@ export const pathProgressSchemaBlock: SchemaBoundBlockDefinition<PathProgressSch
     ),
   });
 
+export const brandEmphasisSchemaBlock: SchemaBoundBlockDefinition<BrandEmphasisSchemaData> =
+  defineSchemaBlock({
+    block: brandEmphasisBlock,
+    schema: brandEmphasisSchemaAdapter,
+    bind: (brand) => bindStandardSectionSchemaData(
+      'BrandEmphasisBlock',
+      brand as Readonly<Record<string, unknown>>,
+      brandEmphasisSections,
+    ),
+  });
+
+export const modeAwarePrimitiveSchemaBlock:
+  SchemaBoundBlockDefinition<ModeAwarePrimitiveSchemaData> =
+  defineSchemaBlock({
+    block: modeAwarePrimitiveBlock,
+    schema: modeAwarePrimitiveSchemaAdapter,
+    bind: (primitive) => bindStandardSectionSchemaData(
+      'ModeAwarePrimitiveBlock',
+      primitive as Readonly<Record<string, unknown>>,
+      modeAwarePrimitiveSections,
+    ),
+  });
+
+export const denseComparisonSchemaBlock: SchemaBoundBlockDefinition<DenseComparisonSchemaData> =
+  defineSchemaBlock({
+    block: denseComparisonBlock,
+    schema: denseComparisonSchemaAdapter,
+    bind: (comparison) => bindStandardSectionSchemaData(
+      'DenseComparisonBlock',
+      comparison as Readonly<Record<string, unknown>>,
+      denseComparisonSections,
+    ),
+  });
+
+export const hierarchySchemaBlock: SchemaBoundBlockDefinition<HierarchySchemaData> =
+  defineSchemaBlock({
+    block: hierarchyBlock,
+    schema: hierarchySchemaAdapter,
+    bind: (hierarchy) => bindStandardSectionSchemaData(
+      'HierarchyBlock',
+      hierarchy as Readonly<Record<string, unknown>>,
+      hierarchySections,
+    ),
+  });
+
+export const explorationListSchemaBlock: SchemaBoundBlockDefinition<ExplorationListSchemaData> =
+  defineSchemaBlock({
+    block: explorationListBlock,
+    schema: explorationListSchemaAdapter,
+    bind: (list) => bindStandardSectionSchemaData(
+      'ExplorationListBlock',
+      list as Readonly<Record<string, unknown>>,
+      explorationListSections,
+    ),
+  });
+
+export const temporalDependencySchemaBlock:
+  SchemaBoundBlockDefinition<TemporalDependencySchemaData> =
+  defineSchemaBlock({
+    block: temporalDependencyBlock,
+    schema: temporalDependencySchemaAdapter,
+    bind: (timeline) => bindStandardSectionSchemaData(
+      'TemporalDependencyBlock',
+      timeline as Readonly<Record<string, unknown>>,
+      temporalDependencySections,
+    ),
+  });
+
 export const standardBlocks = Object.freeze([
   appShellBlock,
   readerSurfaceBlock,
@@ -1233,6 +1559,12 @@ export const standardBlocks = Object.freeze([
   peerNavigationBlock,
   progressiveDisclosureBlock,
   pathProgressBlock,
+  brandEmphasisBlock,
+  modeAwarePrimitiveBlock,
+  denseComparisonBlock,
+  hierarchyBlock,
+  explorationListBlock,
+  temporalDependencyBlock,
 ]);
 
 export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze([
@@ -1277,6 +1609,22 @@ export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze
     'ready',
   ),
   standardBlockStory('path-progress.ready', 'PathProgressBlock', 'Path progress ready', 'ready'),
+  standardBlockStory('brand-emphasis.ready', 'BrandEmphasisBlock', 'Brand emphasis ready', 'ready'),
+  standardBlockStory(
+    'mode-aware-primitive.ready',
+    'ModeAwarePrimitiveBlock',
+    'Mode-aware primitive ready',
+    'ready',
+  ),
+  standardBlockStory('dense-comparison.ready', 'DenseComparisonBlock', 'Dense comparison ready', 'ready'),
+  standardBlockStory('hierarchy.ready', 'HierarchyBlock', 'Hierarchy ready', 'ready'),
+  standardBlockStory('exploration-list.ready', 'ExplorationListBlock', 'Exploration list ready', 'ready'),
+  standardBlockStory(
+    'temporal-dependency.ready',
+    'TemporalDependencyBlock',
+    'Temporal dependency ready',
+    'ready',
+  ),
 ]);
 
 export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPackage({
@@ -1289,6 +1637,7 @@ export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPac
     'docs/design/DX-031-standard-bijou-blocks.md',
     'docs/design/DF-039-component-family-standard-blocks.md',
     'docs/design/DF-046-choice-navigation-standard-blocks.md',
+    'docs/design/DF-054-late-family-standard-blocks.md',
   ],
   tags: ['standard-blocks', 'dx-031', 'first-party'],
 });
@@ -1715,6 +2064,102 @@ function pathProgressMetadata(): BlockMetadata {
     composedComponents: ['Breadcrumb', 'Stepper', 'ProgressIndicator'],
     tags: ['standard', 'navigation', 'path-progress', 'df-052'],
     relatedDocs: ['docs/design/DF-046-choice-navigation-standard-blocks.md'],
+  });
+}
+
+function brandEmphasisMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'BrandEmphasisBlock',
+    family: 'branding',
+    scale: 'section',
+    summary: 'Describes brand and decorative emphasis with explicit nonessential-decoration semantics.',
+    useWhen: ['A product surface needs brand text, tagline, and decorative treatment to lower without color or chrome.'],
+    avoidWhen: ['The emphasis is only a structural divider or a navigable destination.'],
+    slots: brandEmphasisSections,
+    storyIds: ['brand-emphasis.ready'],
+    composedComponents: ['LogoLockup', 'AccentRule', 'Heading'],
+    tags: ['standard', 'branding', 'emphasis', 'df-054'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
+  });
+}
+
+function modeAwarePrimitiveMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'ModeAwarePrimitiveBlock',
+    family: 'primitive',
+    scale: 'section',
+    summary: 'Captures custom primitive output with explicit mode contracts and fact/value semantics.',
+    useWhen: ['A custom primitive needs to publish its meaning before DOGFOOD treats it as reusable.'],
+    avoidWhen: ['The surface already has a richer family contract such as comparison, hierarchy, or list.'],
+    slots: modeAwarePrimitiveSections,
+    storyIds: ['mode-aware-primitive.ready'],
+    composedComponents: ['Badge', 'Metric', 'PrimitiveAdapter'],
+    tags: ['standard', 'primitive', 'mode-aware', 'df-055'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
+  });
+}
+
+function denseComparisonMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'DenseComparisonBlock',
+    family: 'comparison',
+    scale: 'workspace',
+    summary: 'Publishes dense comparison rows with metric, left value, right value, delta, and selected row facts.',
+    useWhen: ['A workspace needs compact side-by-side comparison data that survives narrow and lower modes.'],
+    avoidWhen: ['The view is a scalar progress state or a free-form document.'],
+    slots: denseComparisonSections,
+    storyIds: ['dense-comparison.ready'],
+    composedComponents: ['Table', 'MetricGrid', 'ComparisonRow'],
+    tags: ['standard', 'comparison', 'dense', 'df-056'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
+  });
+}
+
+function hierarchyMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'HierarchyBlock',
+    family: 'hierarchy',
+    scale: 'section',
+    summary: 'Describes tree state with root, nodes, selected node, parent, depth, and expansion facts.',
+    useWhen: ['A docs tree, file tree, or outline must expose hierarchy without relying on indentation alone.'],
+    avoidWhen: ['The surface is only peer navigation or a flat exploratory list.'],
+    slots: hierarchySections,
+    storyIds: ['hierarchy.ready'],
+    composedComponents: ['Tree', 'Outline', 'Explorer'],
+    tags: ['standard', 'hierarchy', 'tree', 'df-057'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
+  });
+}
+
+function explorationListMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'ExplorationListBlock',
+    family: 'list',
+    scale: 'workspace',
+    summary: 'Combines title, facet, items, selected item, and preview detail into a browsing Block.',
+    useWhen: ['A workspace needs filtered exploration with selectable rows and preview context.'],
+    avoidWhen: ['The list is a strict hierarchy, timeline, or dense metric comparison.'],
+    slots: explorationListSections,
+    storyIds: ['exploration-list.ready'],
+    composedComponents: ['List', 'FacetBar', 'PreviewPane'],
+    tags: ['standard', 'list', 'exploration', 'df-058'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
+  });
+}
+
+function temporalDependencyMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'TemporalDependencyBlock',
+    family: 'graph',
+    scale: 'workspace',
+    summary: 'Shows timeline and dependency facts with sequence, selected event, and depends-on semantics.',
+    useWhen: ['A workflow needs time ordering and dependency meaning in one lowerable view.'],
+    avoidWhen: ['The surface only needs unordered activity, scalar progress, or a static list.'],
+    slots: temporalDependencySections,
+    storyIds: ['temporal-dependency.ready'],
+    composedComponents: ['Timeline', 'DependencyGraph', 'ActivityStream'],
+    tags: ['standard', 'graph', 'temporal', 'dependency', 'df-059'],
+    relatedDocs: ['docs/design/DF-054-late-family-standard-blocks.md'],
   });
 }
 
@@ -2208,6 +2653,18 @@ function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBloc
       return { family: 'navigation', variant: 'ready' };
     case 'ProgressiveDisclosureBlock':
       return { family: 'disclosure', variant: 'ready' };
+    case 'BrandEmphasisBlock':
+      return { family: 'branding', variant: 'ready' };
+    case 'ModeAwarePrimitiveBlock':
+      return { family: 'primitive', variant: 'ready' };
+    case 'DenseComparisonBlock':
+      return { family: 'comparison', variant: 'ready' };
+    case 'HierarchyBlock':
+      return { family: 'hierarchy', variant: 'ready' };
+    case 'ExplorationListBlock':
+      return { family: 'list', variant: 'ready' };
+    case 'TemporalDependencyBlock':
+      return { family: 'graph', variant: 'ready' };
   }
 }
 
@@ -2755,6 +3212,160 @@ function parsePathProgressSchemaData(input: unknown): PathProgressSchemaData | u
     step,
     total,
     ...(status === undefined ? {} : { status }),
+  };
+}
+
+function parseBrandEmphasisSchemaData(input: unknown): BrandEmphasisSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const brand = textDataProperty(input, 'brand');
+  const tagline = textDataProperty(input, 'tagline');
+  const decoration = textDataProperty(input, 'decoration');
+  const role = textDataProperty(input, 'role');
+  const selected = textDataProperty(input, 'selected');
+  if (brand === undefined || tagline === undefined || decoration === undefined) {
+    return undefined;
+  }
+
+  return {
+    brand,
+    tagline,
+    decoration,
+    ...(role === undefined ? {} : { role }),
+    ...(selected === undefined ? {} : { selected }),
+  };
+}
+
+function parseModeAwarePrimitiveSchemaData(
+  input: unknown,
+): ModeAwarePrimitiveSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const primitive = textDataProperty(input, 'primitive');
+  const fact = textDataProperty(input, 'fact');
+  const value = textOrNumberDataProperty(input, 'value');
+  const status = textDataProperty(input, 'status');
+  const modeContract = textDataProperty(input, 'modeContract');
+  const selected = textDataProperty(input, 'selected');
+  if (primitive === undefined || fact === undefined || value === undefined) {
+    return undefined;
+  }
+
+  return {
+    primitive,
+    fact,
+    value,
+    ...(status === undefined ? {} : { status }),
+    ...(modeContract === undefined ? {} : { modeContract }),
+    ...(selected === undefined ? {} : { selected }),
+  };
+}
+
+function parseDenseComparisonSchemaData(input: unknown): DenseComparisonSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const title = textDataProperty(input, 'title');
+  const metric = textDataProperty(input, 'metric');
+  const left = textDataProperty(input, 'left');
+  const right = textDataProperty(input, 'right');
+  const delta = textDataProperty(input, 'delta');
+  const selected = textDataProperty(input, 'selected');
+  if (
+    title === undefined
+    || metric === undefined
+    || left === undefined
+    || right === undefined
+    || delta === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    title,
+    metric,
+    left,
+    right,
+    delta,
+    ...(selected === undefined ? {} : { selected }),
+  };
+}
+
+function parseHierarchySchemaData(input: unknown): HierarchySchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const root = textDataProperty(input, 'root');
+  const nodes = textArrayDataProperty(input, 'nodes');
+  const selected = textDataProperty(input, 'selected');
+  const parent = textDataProperty(input, 'parent');
+  const depth = textOrNumberDataProperty(input, 'depth');
+  const expanded = textDataProperty(input, 'expanded');
+  if (root === undefined || nodes === undefined || selected === undefined) {
+    return undefined;
+  }
+
+  return {
+    root,
+    nodes,
+    selected,
+    ...(parent === undefined ? {} : { parent }),
+    ...(depth === undefined ? {} : { depth }),
+    ...(expanded === undefined ? {} : { expanded }),
+  };
+}
+
+function parseExplorationListSchemaData(input: unknown): ExplorationListSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const title = textDataProperty(input, 'title');
+  const facet = textDataProperty(input, 'facet');
+  const items = textArrayDataProperty(input, 'items');
+  const selected = textDataProperty(input, 'selected');
+  const preview = textDataProperty(input, 'preview');
+  if (title === undefined || facet === undefined || items === undefined || selected === undefined) {
+    return undefined;
+  }
+
+  return {
+    title,
+    facet,
+    items,
+    selected,
+    ...(preview === undefined ? {} : { preview }),
+  };
+}
+
+function parseTemporalDependencySchemaData(
+  input: unknown,
+): TemporalDependencySchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const title = textDataProperty(input, 'title');
+  const events = textArrayDataProperty(input, 'events');
+  const dependency = textDataProperty(input, 'dependency');
+  const selected = textDataProperty(input, 'selected');
+  const dependsOn = textDataProperty(input, 'dependsOn');
+  if (title === undefined || events === undefined || dependency === undefined) {
+    return undefined;
+  }
+
+  return {
+    title,
+    events,
+    dependency,
+    ...(selected === undefined ? {} : { selected }),
+    ...(dependsOn === undefined ? {} : { dependsOn }),
   };
 }
 

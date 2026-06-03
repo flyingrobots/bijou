@@ -274,7 +274,9 @@ status/feedback Blocks (`InlineStatusBlock`, `InFlowStatusBlock`,
 `FormattedDocumentBlock`, `LinkDestinationBlock`, `DividerBlock`,
 `TextEntryBlock`, `SingleChoiceBlock`, `MultipleChoiceBlock`,
 `BinaryDecisionBlock`, `PeerNavigationBlock`, `ProgressiveDisclosureBlock`,
-and `PathProgressBlock`).
+`PathProgressBlock`, `BrandEmphasisBlock`, `ModeAwarePrimitiveBlock`,
+`DenseComparisonBlock`, `HierarchyBlock`, `ExplorationListBlock`, and
+`TemporalDependencyBlock`).
 
 Use `renderBlockTree()` when nested block declarations should become rendered
 child output inside a parent slot. Ordinary `block.render()` remains a local
