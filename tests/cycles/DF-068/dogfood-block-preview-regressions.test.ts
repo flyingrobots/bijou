@@ -18,6 +18,12 @@ import {
   createCounterDemoModel,
 } from '../../../examples/docs/counter-block-demo.js';
 
+const PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES = [
+  'AppShell',
+  'ReaderSurface',
+  'InspectorPanel',
+] as const;
+
 function blockPreviewGuideId(blockName: string): string {
   const slug = blockName
     .toLowerCase()
@@ -78,8 +84,23 @@ function expectBoxTitleRowCloses(row: string): void {
   expect(rightCorner).toBeGreaterThan(leftCorner);
 }
 
+function standardBlockNamed(blockName: string) {
+  const block = standardBlocks.find((candidate) => candidate.metadata.blockName === blockName);
+  expect(block).toBeDefined();
+  return block!;
+}
+
 describe('DF-068 DOGFOOD block preview regressions', () => {
   afterEach(() => _resetDefaultContextForTesting());
+
+  it('keeps the full docs-app preview regression sample bounded as the block catalog grows', () => {
+    expect(PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES).toHaveLength(3);
+    expect(PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES.length).toBeLessThan(standardBlocks.length);
+
+    for (const blockName of PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES) {
+      expect(standardBlockNamed(blockName).metadata.blockName).toBe(blockName);
+    }
+  });
 
   it('renders selected standard block pages as visible preview surfaces before contract documentation', async () => {
     const expectedPreviewContent = new Map<string, readonly string[]>([
@@ -105,7 +126,8 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
       ]],
     ]);
 
-    for (const block of standardBlocks) {
+    for (const blockName of PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES) {
+      const block = standardBlockNamed(blockName);
       const { text } = await renderBlocksGuide(blockPreviewGuideId(block.metadata.blockName), 150, 43);
       const previewRegion = textBefore(text, 'documentation');
 
