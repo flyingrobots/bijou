@@ -33,7 +33,7 @@ body:
     id: hill
     attributes:
       label: Hill
-      description: Name the user value in Method/IBM Design Thinking style.
+      description: Name the user value in Method/Design Thinking style.
       placeholder: As a contributor, I want ..., so that ...
     validations:
       required: true

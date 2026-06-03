@@ -537,7 +537,7 @@ differently, but the underlying layout truth should be shared.
 
 ## Design Thinking Slice Plan
 
-This cycle uses the Method loop with an IBM Design Thinking posture: sponsored
+This cycle uses the Method loop with a Design Thinking posture: sponsored
 users, measurable Hills, explicit assumptions, low-ceremony prototypes, and
 playback after each slice. The team should keep asking whether the slice helps
 a maintainer or agent inspect layout truth before render.
