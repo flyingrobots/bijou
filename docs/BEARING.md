@@ -86,21 +86,22 @@ Current direction and active tensions. Historical ship data is in
 - Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
   comment and a matching roadmap update.
 
-### 3. `v7.0.0` Is The Active Product-Truth Horizon
+### 3. `v7.0.0` Is Issue-Complete Product Truth
 
-- `v7.0.0` holds the active V7 Product Truth closeout: DOGFOOD docs truth,
-  completed component-family audits, `tableSurface()` responsive parity,
-  scoped Node I/O documentation, and the DOGFOOD release-title proof surface.
-- Its current open count is three: #245, #246, and #281. This closeout branch
-  also carries workflow evidence (#266), CI policy evidence (#267), and the
-  BlockLab rename (#271) as support work for the release boundary.
+- `v7.0.0` now has zero open milestone items and twenty-seven closed milestone
+  items after the tracker-sync cleanup closes. The closed lineage includes
+  DOGFOOD docs truth, completed component-family audits, `tableSurface()`
+  responsive parity, scoped Node I/O documentation, BlockLab naming, workflow
+  evidence, the DOGFOOD release-title proof surface, and post-merge review
+  regression fixes.
+- The next release-facing action is release-readiness validation against the
+  issue-complete V7 Product Truth lane.
 - DF-030 is the first product-truth slice: DOGFOOD's docs surface became one
   inspectable Block contract instead of adjacent docs rendering concepts. The
   component-family six-packs extend the standard Block catalog across grouping,
   explainability, document, navigation, structure, input, disclosure, and path
-  progress families. V7 Product Truth closes the remaining release-facing gap:
-  the docs app now has a release identity that points at the proof lanes still
-  under active validation.
+  progress families. V7 Product Truth closes the release-facing gap: the docs
+  app now has a release identity that points at shipped proof lanes.
 
 ## Tensions
 
@@ -116,36 +117,26 @@ Current direction and active tensions. Historical ship data is in
   evidence files can now disagree. GitHub wins; docs must be updated when
   milestone triage changes.
 - **DOGFOOD Truth Debt**: DF-030 converts the docs app into a named Block
-  contract. The current v7 DOGFOOD debt is focused: table surface parity,
-  scoped Node I/O docs, BlockLab naming, workflow evidence, and the release
-  title screen need code-backed proof instead of prose-only closeouts.
+  contract. The current V7 DOGFOOD proof lane is issue-complete; any new
+  DOGFOOD truth work should be shaped as a new release lane or a Beyond issue
+  rather than reopening the closed V7 closeout queue.
 
 ## Next Target
 
-The immediate focus is the active V7 Product Truth closeout for
-[#245](https://github.com/flyingrobots/bijou/issues/245),
-[#246](https://github.com/flyingrobots/bijou/issues/246),
-[#266](https://github.com/flyingrobots/bijou/issues/266),
-[#267](https://github.com/flyingrobots/bijou/issues/267),
-[#271](https://github.com/flyingrobots/bijou/issues/271), and
-[#281](https://github.com/flyingrobots/bijou/issues/281).
+The immediate focus is V7 release-readiness validation now that the Product
+Truth tracker is issue-complete.
 
-The PR must prove:
+The validation pass must prove:
 
-- `tableSurface()` honors bounded widths without regressing the existing
-  surface primitive tests
-- scoped Node I/O docs state realpath and symlink escape behavior precisely
-- CI policy tests parse the workflow instead of text-sniffing it
-- BlockLab is the current visible story/workstation name while old npm script
-  aliases continue to work
-- DOGFOOD has a V7 Product Truth title guide with lower-mode release facts and
-  translated strings
-- BEARING and ROADMAP mirror the live v7 tracker
+- release-readiness checks pass against the closed V6 and V7 lanes
+- BEARING and ROADMAP mirror the live V7 tracker
+- no unresolved review comments or failed CI remain from the closeout PRs
+- package/version metadata is ready for the release boundary
 
 Recommended pull order:
 
-1. Finish and merge the V7 Product Truth closeout branch.
-2. Run release-readiness validation against the now-closed v6 and v7 lanes.
+1. Finish this tracker-sync cleanup branch.
+2. Run release-readiness validation against the now-closed V6 and V7 lanes.
 3. Cut release title treatment variants for the next release boundary only
    after the tracker, docs, and CI proof are green.
 
