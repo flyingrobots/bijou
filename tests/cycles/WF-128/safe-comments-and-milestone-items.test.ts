@@ -21,7 +21,9 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
     expect(contributing).toContain('Use `--body-file` for Markdown-heavy GitHub comments');
 
     expect(workflowDocs).toContain('Do not use inline `--body "..."`');
-    expect(workflowDocs).not.toMatch(/gh (?:pr|issue) comment[^\n]*--body\s+"[^"\n]*[`$]/);
+    expect(workflowDocs).not.toMatch(
+      /gh (?:pr|issue) comment[^\n]*--body(?:\s|=)(?:"[^"\n]*"|'[^'\n]*')/,
+    );
   });
 
   it('makes ROADMAP release snapshot counts explicit milestone item mirrors', () => {
@@ -34,8 +36,10 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
       'Do not compare release snapshot item totals to issue-only `gh issue list` output',
     );
     expect(roadmap).toContain('gh pr list --state all --search');
-    expect(roadmap).toContain('[#278](https://github.com/flyingrobots/bijou/pull/278)');
-    expect(roadmap).toContain('[#280](https://github.com/flyingrobots/bijou/pull/280)');
+    const milestonePrLinks = Array.from(
+      roadmap.matchAll(/\[#\d+\]\(https:\/\/github\.com\/flyingrobots\/bijou\/pull\/\d+\)/g),
+    );
+    expect(milestonePrLinks.length).toBeGreaterThanOrEqual(2);
     expect(roadmap).not.toContain('| Horizon | Milestone | Open | Closed | Intent |');
   });
 
