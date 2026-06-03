@@ -49,6 +49,18 @@ function normalizeDelay(ms: number): number {
   return Math.max(0, Math.floor(ms));
 }
 
+/**
+ * Creates a deterministic script clock that advances through scheduled timeout work.
+ *
+ * Each timeout queues one global microtask that drains all pending timeouts in
+ * timestamp order, including timeouts scheduled by earlier callbacks. Disposed
+ * timeouts stay in the small in-memory queue and are skipped, which is acceptable
+ * for bounded test scripts.
+ *
+ * Intervals are intentionally unsupported; use explicit pulse steps or a
+ * dedicated mock clock for periodic behavior. Microtasks still delegate to the
+ * host queue so promise ordering matches the runtime.
+ */
 function autoAdvancingScriptClock(): ClockPort {
   let nowMs = 0;
   let nextId = 1;
@@ -106,12 +118,14 @@ function autoAdvancingScriptClock(): ClockPort {
     },
 
     setInterval(): TimerHandle {
+      // Scripted tests should drive periodic behavior through explicit pulse steps.
       throw new Error(
         'autoAdvancingScriptClock does not support intervals; use explicit pulse steps or a dedicated mockClock.',
       );
     },
 
     queueMicrotask(callback: () => void): void {
+      // Preserve host microtask ordering while keeping timeout advancement deterministic.
       globalThis.queueMicrotask(callback);
     },
   };
