@@ -107,4 +107,25 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
     expect(text).toContain('Release Notes');
     expect(text).not.toContain('Press [Enter]');
   });
+
+  it('keeps the original v7 title selectable as a historical Release guide', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });
+    const result = await runScript(app, [{
+      msg: {
+        type: 'docs',
+        msg: { type: 'select-guide', guideId: 'release-title-v7' },
+      },
+    }], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+    const releaseModel = (result.model as any).docsModel.pageModels.release;
+
+    expect(releaseModel.selectedGuideId).toBe('release-title-v7');
+    expect(text).toContain('V7 Product Truth');
+    expect(text).toContain('Blocks prove product surfaces');
+    expect(text).toContain('table parity');
+    expect(text).toContain('BlockLab');
+    expect(text).toContain('release_id  v7');
+    expect(text).not.toContain('release_motif');
+  });
 });
