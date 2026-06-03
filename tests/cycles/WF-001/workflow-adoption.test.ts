@@ -19,14 +19,46 @@ describe('WF-001 workflow adoption', () => {
 
     const workflow = read('docs/WORKFLOW.md');
     const method = read('docs/METHOD.md');
+    const normalizedWorkflow = normalizeWhitespace(workflow);
+    const normalizedMethod = normalizeWhitespace(method);
     expect(workflow).toContain('Legends');
     expect(workflow).toContain('Cycles');
     expect(workflow).toContain('tests/cycles/<cycle>/');
     expect(workflow).toContain('docs/specs/');
     expect(workflow).toContain('cycle/<cycle_name>');
-    expect(workflow).toContain('open a pull request to `main`');
+    expect(normalizedWorkflow).toContain('open a draft pull request to `main`');
     expect(method).toContain('cycle/<cycle_name>');
-    expect(method).toContain('open a pull request to `main`');
+    expect(normalizedMethod).toContain('open a draft pull request to `main`');
+  });
+
+  it('starts cycles with a synced branch, design issue, and draft PR', () => {
+    const agents = read('AGENTS.md');
+    const contributing = read('CONTRIBUTING.md');
+    const workflow = read('docs/WORKFLOW.md');
+    const method = read('docs/METHOD.md');
+    const issueTemplate = read('.github/ISSUE_TEMPLATE/work-item.yml');
+    const normalizedAgents = normalizeWhitespace(agents);
+    const normalizedContributing = normalizeWhitespace(contributing);
+    const normalizedWorkflow = normalizeWhitespace(workflow);
+    const normalizedMethod = normalizeWhitespace(method);
+
+    expect(normalizedMethod).toContain('git fetch');
+    expect(normalizedMethod).toContain('Sync to the merge target branch');
+    expect(normalizedMethod).toContain('Create `cycle/<cycle_name>` from the synced merge target');
+    expect(normalizedMethod).toContain('open a draft pull request to `main`');
+    expect(normalizedMethod).toContain('apply `work-in-progress` to the GitHub Issue');
+
+    expect(normalizedWorkflow).toContain('Sync to the merge target branch after `git fetch`.');
+    expect(normalizedWorkflow).toContain('open a draft pull request to `main` before implementation work starts.');
+    expect(normalizedWorkflow).toContain('Apply `work-in-progress` to the GitHub Issue.');
+
+    expect(normalizedContributing).toContain('Open a draft PR at cycle start');
+    expect(normalizedContributing).toContain('mark it ready for review only after validation and self-review pass');
+
+    expect(normalizedAgents).toContain('Start cycles from a synced merge target branch.');
+    expect(normalizedAgents).toContain('Draft PRs are expected at cycle start.');
+
+    expect(issueTemplate).toContain('Issue, design doc, and draft PR are linked correctly.');
   });
 
   it('adds explicit legend and invariant docs', () => {
@@ -62,3 +94,7 @@ describe('WF-001 workflow adoption', () => {
     expect(existsSync(resolve(ROOT, 'docs/specs/bijou-i18n-tools.spec.json'))).toBe(false);
   });
 });
+
+function normalizeWhitespace(source: string): string {
+  return source.replace(/\s+/g, ' ').trim();
+}

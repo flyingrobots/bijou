@@ -9,6 +9,18 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 - **NEVER** push to `main` without explicit permission.
 - Always use standard commits and regular pushes.
 
+## Cycle Start Protocol
+
+- Start cycles from a synced merge target branch. Run `git fetch`, switch to the
+  merge target, and sync it with a regular fast-forward merge before branching.
+- Create a new `cycle/<cycle_name>` branch for the cycle.
+- Create or update the GitHub Issue and write the cycle design document before
+  implementation. Stage and commit the shaping artifact, push the branch, open
+  a draft pull request to `main`, link the issue and draft PR, and apply
+  `work-in-progress` to the GitHub Issue.
+- Draft PRs are expected at cycle start. Mark the PR ready for review only
+  after implementation, validation, and self-review are complete.
+
 ## Documentation & Planning Map
 
 Do not audit the repository by recursively walking the filesystem. Follow the authoritative manifests:
