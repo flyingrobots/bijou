@@ -179,6 +179,7 @@ export interface BlockLabWorkbenchBlockConfig {
   readonly selectedStoryLabel?: string;
   readonly profileLabel?: string;
 }
+export type StorybookWorkbenchBlockConfig = BlockLabWorkbenchBlockConfig;
 
 export interface TitleScreenBlockConfig {
   readonly title?: string;

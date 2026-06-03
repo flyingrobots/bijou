@@ -161,7 +161,9 @@ Accessible mode:
 DOGFOOD title screen for V7 Product Truth. Current release proof lanes are table parity, scoped Node I/O, BlockLab, and release title. Navigation remains available after the title.
 ```
 
-`tableSurface()` lower modes must preserve the same semantic table facts:
+`tableSurface()` is the surface-native path, so this cycle proves bounded
+surface width rather than adding a new lowering contract. Semantic table facts
+remain owned by `table()` and `navigableTableSurface()`:
 
 ```text
 row-id	bijou
@@ -253,4 +255,3 @@ selected-cell	bijou/status
 - Do not broaden table work into a full table redesign; target
   `tableSurface()` parity only.
 - Do not make BEARING/ROADMAP the source of truth. They mirror GitHub Issues.
-
