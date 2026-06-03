@@ -153,8 +153,8 @@ block:
 
 ## Acceptance Criteria
 
-- The design doc names this as a Block candidate and uses IBM Design
-  Thinking-style framing: hill, sponsored human, sponsored agent, playback
+- The design doc names this as a Block candidate and uses Design Thinking
+  framing: hill, sponsored human, sponsored agent, playback
   questions, and evidence.
 - The block metadata is declared with `defineBlock()` or an explicitly
   justified narrower helper.

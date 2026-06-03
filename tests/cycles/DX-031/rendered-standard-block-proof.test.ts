@@ -114,6 +114,49 @@ function renderSlotsFor(blockName: string): Readonly<Record<string, unknown>> {
       return { shortcuts: ['/ Search', '? Help', 'Esc Close'], scope: 'page' };
     case 'ProgressIndicatorBlock':
       return { label: 'Install packages', value: '3', total: '5', percent: '60%' };
+    case 'FramedGroupBlock':
+      return {
+        title: 'Release Checks',
+        items: ['tests green', 'docs updated', 'PR linked'],
+        selected: 'tests green',
+        mode: 'review',
+      };
+    case 'ExplainabilityWalkthroughBlock':
+      return {
+        title: 'Why this changed',
+        steps: ['input changed', 'constraint tightened', 'preview re-rendered'],
+        evidence: 'DF-040 playback',
+        decision: 'keep grouped proof visible',
+        nextStep: 'open lower-mode output',
+      };
+    case 'FormattedDocumentBlock':
+      return {
+        heading: 'Blocks document',
+        body: 'Use prose for persistent product truth.',
+        callout: 'Lower modes keep the same heading and body facts.',
+        code: 'block: FormattedDocumentBlock',
+      };
+    case 'LinkDestinationBlock':
+      return {
+        label: 'DOGFOOD.md',
+        destination: 'docs/DOGFOOD.md',
+        kind: 'docs',
+        status: 'available',
+      };
+    case 'DividerBlock':
+      return {
+        label: 'Release Evidence',
+        style: 'rule',
+        density: 'compact',
+      };
+    case 'TextEntryBlock':
+      return {
+        field: 'Search docs',
+        value: 'table',
+        placeholder: 'type a query',
+        validation: '4 results',
+        results: 4,
+      };
     default:
       throw new Error(`unknown standard block ${blockName}`);
   }

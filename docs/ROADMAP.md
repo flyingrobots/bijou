@@ -6,14 +6,15 @@ GitHub milestones and issue labels are the live tracker. This file is the
 human-readable release index for the current plan. When an issue moves between
 release horizons in GitHub, update this file in the same planning pass.
 
-Last synced from GitHub Issues and this DF-030 branch: 2026-06-02.
+Last synced from GitHub Issues and this component-family six-pack branch:
+2026-06-03.
 
 ## Release Snapshot
 
 | Horizon | Milestone | Open | Closed | Intent |
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 28 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 20 | 1 | Active product-truth candidate after the DF-030 DOGFOOD docs surface Block. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 14 | 7 | Active product-truth candidate after the first component-family six-pack. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 18 | 0 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
@@ -86,17 +87,17 @@ the closing PR merges.
 | Tracker | Lane | Type | Work |
 | :--- | :--- | :--- | :--- |
 | [#244](https://github.com/flyingrobots/bijou/issues/244) | `lane:release` | `type:docs` / `type:enhancement` | DF-030 DOGFOOD docs surface Block |
+| [#226](https://github.com/flyingrobots/bijou/issues/226) | `lane:up-next` | `type:maintenance` | DF-039 framed grouping standard Block |
+| [#227](https://github.com/flyingrobots/bijou/issues/227) | `lane:up-next` | `type:maintenance` | DF-040 explainability walkthrough standard Block |
+| [#228](https://github.com/flyingrobots/bijou/issues/228) | `lane:up-next` | `type:maintenance` | DF-042 formatted document standard Block |
+| [#229](https://github.com/flyingrobots/bijou/issues/229) | `lane:up-next` | `type:maintenance` | DF-043 linked destination standard Block |
+| [#230](https://github.com/flyingrobots/bijou/issues/230) | `lane:up-next` | `type:maintenance` | DF-044 divider standard Block |
+| [#231](https://github.com/flyingrobots/bijou/issues/231) | `lane:up-next` | `type:maintenance` | DF-045 text entry standard Block |
 
 ### Component-Family Audits
 
 | Issue | Priority | Type | Work |
 | :--- | :--- | :--- | :--- |
-| [#226](https://github.com/flyingrobots/bijou/issues/226) | `priority:medium` | `type:maintenance` | DF-039 audit framed grouping family across real surfaces |
-| [#227](https://github.com/flyingrobots/bijou/issues/227) | `priority:medium` | `type:maintenance` | DF-040 audit explainability walkthroughs family across real surfaces |
-| [#228](https://github.com/flyingrobots/bijou/issues/228) | `priority:medium` | `type:maintenance` | DF-042 audit formatted documents and prose family across real surfaces |
-| [#229](https://github.com/flyingrobots/bijou/issues/229) | `priority:medium` | `type:maintenance` | DF-043 audit linked destinations family across real surfaces |
-| [#230](https://github.com/flyingrobots/bijou/issues/230) | `priority:medium` | `type:maintenance` | DF-044 audit dividers family across real surfaces |
-| [#231](https://github.com/flyingrobots/bijou/issues/231) | `priority:medium` | `type:maintenance` | DF-045 audit text entry family across real surfaces |
 | [#232](https://github.com/flyingrobots/bijou/issues/232) | `priority:medium` | `type:maintenance` | DF-046 audit single choice family across real surfaces |
 | [#233](https://github.com/flyingrobots/bijou/issues/233) | `priority:medium` | `type:maintenance` | DF-047 audit multiple choice family across real surfaces |
 | [#234](https://github.com/flyingrobots/bijou/issues/234) | `priority:medium` | `type:maintenance` | DF-048 audit binary decision family across real surfaces |

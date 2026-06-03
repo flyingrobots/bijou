@@ -44,7 +44,13 @@ export type StandardBlockName =
   | 'TransientOverlayBlock'
   | 'ActivityStreamBlock'
   | 'ShortcutCueBlock'
-  | 'ProgressIndicatorBlock';
+  | 'ProgressIndicatorBlock'
+  | 'FramedGroupBlock'
+  | 'ExplainabilityWalkthroughBlock'
+  | 'FormattedDocumentBlock'
+  | 'LinkDestinationBlock'
+  | 'DividerBlock'
+  | 'TextEntryBlock';
 export type StandardBlockStoryState =
   | 'ready'
   | 'narrow'
@@ -114,6 +120,49 @@ export interface ProgressIndicatorSchemaData {
   readonly value?: string | number;
   readonly total?: string | number;
   readonly percent: string;
+}
+
+export interface FramedGroupSchemaData {
+  readonly title: string;
+  readonly items: readonly string[];
+  readonly selected?: string;
+  readonly mode?: string;
+}
+
+export interface ExplainabilityWalkthroughSchemaData {
+  readonly title: string;
+  readonly steps: readonly string[];
+  readonly evidence?: string;
+  readonly decision?: string;
+  readonly nextStep?: string;
+}
+
+export interface FormattedDocumentSchemaData {
+  readonly heading: string;
+  readonly body: string;
+  readonly callout?: string;
+  readonly code?: string;
+}
+
+export interface LinkDestinationSchemaData {
+  readonly label: string;
+  readonly destination: string;
+  readonly kind?: string;
+  readonly status?: string;
+}
+
+export interface DividerSchemaData {
+  readonly label: string;
+  readonly style?: string;
+  readonly density?: string;
+}
+
+export interface TextEntrySchemaData {
+  readonly field: string;
+  readonly value: string;
+  readonly placeholder?: string;
+  readonly validation?: string;
+  readonly results?: string | number;
 }
 
 const shellFocusRegion = commandIntent<{ readonly region: string }>('shell.focusRegion', {
@@ -232,6 +281,43 @@ const progressIndicatorSections: readonly StandardSectionSpec[] = Object.freeze(
   { id: 'total', label: 'Total', required: false },
   { id: 'percent', label: 'Percent', required: true },
 ]);
+const framedGroupSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'title', label: 'Title', required: true },
+  { id: 'items', label: 'Items', required: true },
+  { id: 'selected', label: 'Selected', required: false },
+  { id: 'mode', label: 'Mode', required: false },
+]);
+const explainabilityWalkthroughSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'title', label: 'Title', required: true },
+  { id: 'steps', label: 'Steps', required: true },
+  { id: 'evidence', label: 'Evidence', required: false },
+  { id: 'decision', label: 'Decision', required: false },
+  { id: 'nextStep', label: 'Next step', required: false },
+]);
+const formattedDocumentSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'heading', label: 'Heading', required: true },
+  { id: 'body', label: 'Body', required: true },
+  { id: 'callout', label: 'Callout', required: false },
+  { id: 'code', label: 'Code', required: false },
+]);
+const linkDestinationSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'destination', label: 'Destination', required: true },
+  { id: 'kind', label: 'Kind', required: false },
+  { id: 'status', label: 'Status', required: false },
+]);
+const dividerSections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'label', label: 'Label', required: true },
+  { id: 'style', label: 'Style', required: false },
+  { id: 'density', label: 'Density', required: false },
+]);
+const textEntrySections: readonly StandardSectionSpec[] = Object.freeze([
+  { id: 'field', label: 'Field', required: true },
+  { id: 'value', label: 'Value', required: true },
+  { id: 'placeholder', label: 'Placeholder', required: false },
+  { id: 'validation', label: 'Validation', required: false },
+  { id: 'results', label: 'Results', required: false },
+]);
 
 const inlineStatusData = standardBlockData('inline-status', 'InlineStatusBlock', [
   {
@@ -275,6 +361,52 @@ const progressIndicatorData = standardBlockData('progress-indicator', 'ProgressI
     description: 'Progress label, current value, total value, and percent facts.',
   },
 ]);
+const framedGroupData = standardBlockData('framed-group', 'FramedGroupBlock', [
+  {
+    name: 'group',
+    label: 'Framed grouping facts',
+    description: 'Group title, ordered items, selected item, and review mode facts.',
+  },
+]);
+const explainabilityWalkthroughData = standardBlockData(
+  'explainability-walkthrough',
+  'ExplainabilityWalkthroughBlock',
+  [
+    {
+      name: 'walkthrough',
+      label: 'Explainability walkthrough',
+      description: 'Decision title, ordered explanation steps, evidence, decision, and next-step facts.',
+    },
+  ],
+);
+const formattedDocumentData = standardBlockData('formatted-document', 'FormattedDocumentBlock', [
+  {
+    name: 'document',
+    label: 'Formatted document content',
+    description: 'Heading, body, callout, and code facts for persistent prose.',
+  },
+]);
+const linkDestinationData = standardBlockData('link-destination', 'LinkDestinationBlock', [
+  {
+    name: 'link',
+    label: 'Linked destination',
+    description: 'Link label, destination, kind, and availability facts.',
+  },
+]);
+const dividerData = standardBlockData('divider', 'DividerBlock', [
+  {
+    name: 'divider',
+    label: 'Divider structure',
+    description: 'Divider label, visual style, and density facts.',
+  },
+]);
+const textEntryData = standardBlockData('text-entry', 'TextEntryBlock', [
+  {
+    name: 'entry',
+    label: 'Text entry state',
+    description: 'Field label, current value, placeholder, validation, and result-count facts.',
+  },
+]);
 
 export const appShellBlock: BlockDefinition = defineBlock({
   metadata: appShellMetadata(),
@@ -309,7 +441,7 @@ export const inspectorPanelBlock: BlockDefinition = defineBlock({
 export const inlineStatusBlock: BlockDefinition = defineBlock({
   metadata: inlineStatusMetadata(),
   data: inlineStatusData,
-  commands: standardFeedbackCommands('InlineStatusBlock'),
+  commands: standardSectionCommands('InlineStatusBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'InlineStatusBlock',
@@ -320,7 +452,7 @@ export const inlineStatusBlock: BlockDefinition = defineBlock({
 export const inFlowStatusBlock: BlockDefinition = defineBlock({
   metadata: inFlowStatusMetadata(),
   data: inFlowStatusData,
-  commands: standardFeedbackCommands('InFlowStatusBlock'),
+  commands: standardSectionCommands('InFlowStatusBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'InFlowStatusBlock',
@@ -331,7 +463,7 @@ export const inFlowStatusBlock: BlockDefinition = defineBlock({
 export const transientOverlayBlock: BlockDefinition = defineBlock({
   metadata: transientOverlayMetadata(),
   data: transientOverlayData,
-  commands: standardFeedbackCommands('TransientOverlayBlock'),
+  commands: standardSectionCommands('TransientOverlayBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'TransientOverlayBlock',
@@ -342,7 +474,7 @@ export const transientOverlayBlock: BlockDefinition = defineBlock({
 export const activityStreamBlock: BlockDefinition = defineBlock({
   metadata: activityStreamMetadata(),
   data: activityStreamData,
-  commands: standardFeedbackCommands('ActivityStreamBlock'),
+  commands: standardSectionCommands('ActivityStreamBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'ActivityStreamBlock',
@@ -353,7 +485,7 @@ export const activityStreamBlock: BlockDefinition = defineBlock({
 export const shortcutCueBlock: BlockDefinition = defineBlock({
   metadata: shortcutCueMetadata(),
   data: shortcutCueData,
-  commands: standardFeedbackCommands('ShortcutCueBlock'),
+  commands: standardSectionCommands('ShortcutCueBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'ShortcutCueBlock',
@@ -364,11 +496,77 @@ export const shortcutCueBlock: BlockDefinition = defineBlock({
 export const progressIndicatorBlock: BlockDefinition = defineBlock({
   metadata: progressIndicatorMetadata(),
   data: progressIndicatorData,
-  commands: standardFeedbackCommands('ProgressIndicatorBlock'),
+  commands: standardSectionCommands('ProgressIndicatorBlock'),
   render: (input) => renderStandardSectionBlock(
     input,
     'ProgressIndicatorBlock',
     progressIndicatorSections,
+  ),
+});
+
+export const framedGroupBlock: BlockDefinition = defineBlock({
+  metadata: framedGroupMetadata(),
+  data: framedGroupData,
+  commands: standardSectionCommands('FramedGroupBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'FramedGroupBlock',
+    framedGroupSections,
+  ),
+});
+
+export const explainabilityWalkthroughBlock: BlockDefinition = defineBlock({
+  metadata: explainabilityWalkthroughMetadata(),
+  data: explainabilityWalkthroughData,
+  commands: standardSectionCommands('ExplainabilityWalkthroughBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'ExplainabilityWalkthroughBlock',
+    explainabilityWalkthroughSections,
+  ),
+});
+
+export const formattedDocumentBlock: BlockDefinition = defineBlock({
+  metadata: formattedDocumentMetadata(),
+  data: formattedDocumentData,
+  commands: standardSectionCommands('FormattedDocumentBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'FormattedDocumentBlock',
+    formattedDocumentSections,
+  ),
+});
+
+export const linkDestinationBlock: BlockDefinition = defineBlock({
+  metadata: linkDestinationMetadata(),
+  data: linkDestinationData,
+  commands: standardSectionCommands('LinkDestinationBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'LinkDestinationBlock',
+    linkDestinationSections,
+  ),
+});
+
+export const dividerBlock: BlockDefinition = defineBlock({
+  metadata: dividerMetadata(),
+  data: dividerData,
+  commands: standardSectionCommands('DividerBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'DividerBlock',
+    dividerSections,
+  ),
+});
+
+export const textEntryBlock: BlockDefinition = defineBlock({
+  metadata: textEntryMetadata(),
+  data: textEntryData,
+  commands: standardSectionCommands('TextEntryBlock'),
+  render: (input) => renderStandardSectionBlock(
+    input,
+    'TextEntryBlock',
+    textEntrySections,
   ),
 });
 
@@ -467,6 +665,55 @@ export const progressIndicatorSchemaAdapter: BlockSchemaAdapter<ProgressIndicato
     blockName: 'ProgressIndicatorBlock',
     sections: progressIndicatorSections,
     parse: parseProgressIndicatorSchemaData,
+  });
+
+export const framedGroupSchemaAdapter: BlockSchemaAdapter<FramedGroupSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'framed-group.group',
+    blockName: 'FramedGroupBlock',
+    sections: framedGroupSections,
+    parse: parseFramedGroupSchemaData,
+  });
+
+export const explainabilityWalkthroughSchemaAdapter:
+  BlockSchemaAdapter<ExplainabilityWalkthroughSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'explainability-walkthrough.walkthrough',
+    blockName: 'ExplainabilityWalkthroughBlock',
+    sections: explainabilityWalkthroughSections,
+    parse: parseExplainabilityWalkthroughSchemaData,
+  });
+
+export const formattedDocumentSchemaAdapter: BlockSchemaAdapter<FormattedDocumentSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'formatted-document.document',
+    blockName: 'FormattedDocumentBlock',
+    sections: formattedDocumentSections,
+    parse: parseFormattedDocumentSchemaData,
+  });
+
+export const linkDestinationSchemaAdapter: BlockSchemaAdapter<LinkDestinationSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'link-destination.link',
+    blockName: 'LinkDestinationBlock',
+    sections: linkDestinationSections,
+    parse: parseLinkDestinationSchemaData,
+  });
+
+export const dividerSchemaAdapter: BlockSchemaAdapter<DividerSchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'divider.divider',
+    blockName: 'DividerBlock',
+    sections: dividerSections,
+    parse: parseDividerSchemaData,
+  });
+
+export const textEntrySchemaAdapter: BlockSchemaAdapter<TextEntrySchemaData> =
+  defineStandardSectionSchemaAdapter({
+    id: 'text-entry.entry',
+    blockName: 'TextEntryBlock',
+    sections: textEntrySections,
+    parse: parseTextEntrySchemaData,
   });
 
 export const readerSurfaceSchemaBlock: SchemaBoundBlockDefinition<ReaderSurfaceSchemaData> =
@@ -573,6 +820,73 @@ export const progressIndicatorSchemaBlock: SchemaBoundBlockDefinition<ProgressIn
     ),
   });
 
+export const framedGroupSchemaBlock: SchemaBoundBlockDefinition<FramedGroupSchemaData> =
+  defineSchemaBlock({
+    block: framedGroupBlock,
+    schema: framedGroupSchemaAdapter,
+    bind: (group) => bindStandardSectionSchemaData(
+      'FramedGroupBlock',
+      group as Readonly<Record<string, unknown>>,
+      framedGroupSections,
+    ),
+  });
+
+export const explainabilityWalkthroughSchemaBlock:
+  SchemaBoundBlockDefinition<ExplainabilityWalkthroughSchemaData> =
+  defineSchemaBlock({
+    block: explainabilityWalkthroughBlock,
+    schema: explainabilityWalkthroughSchemaAdapter,
+    bind: (walkthrough) => bindStandardSectionSchemaData(
+      'ExplainabilityWalkthroughBlock',
+      walkthrough as Readonly<Record<string, unknown>>,
+      explainabilityWalkthroughSections,
+    ),
+  });
+
+export const formattedDocumentSchemaBlock: SchemaBoundBlockDefinition<FormattedDocumentSchemaData> =
+  defineSchemaBlock({
+    block: formattedDocumentBlock,
+    schema: formattedDocumentSchemaAdapter,
+    bind: (document) => bindStandardSectionSchemaData(
+      'FormattedDocumentBlock',
+      document as Readonly<Record<string, unknown>>,
+      formattedDocumentSections,
+    ),
+  });
+
+export const linkDestinationSchemaBlock: SchemaBoundBlockDefinition<LinkDestinationSchemaData> =
+  defineSchemaBlock({
+    block: linkDestinationBlock,
+    schema: linkDestinationSchemaAdapter,
+    bind: (link) => bindStandardSectionSchemaData(
+      'LinkDestinationBlock',
+      link as Readonly<Record<string, unknown>>,
+      linkDestinationSections,
+    ),
+  });
+
+export const dividerSchemaBlock: SchemaBoundBlockDefinition<DividerSchemaData> =
+  defineSchemaBlock({
+    block: dividerBlock,
+    schema: dividerSchemaAdapter,
+    bind: (divider) => bindStandardSectionSchemaData(
+      'DividerBlock',
+      divider as Readonly<Record<string, unknown>>,
+      dividerSections,
+    ),
+  });
+
+export const textEntrySchemaBlock: SchemaBoundBlockDefinition<TextEntrySchemaData> =
+  defineSchemaBlock({
+    block: textEntryBlock,
+    schema: textEntrySchemaAdapter,
+    bind: (entry) => bindStandardSectionSchemaData(
+      'TextEntryBlock',
+      entry as Readonly<Record<string, unknown>>,
+      textEntrySections,
+    ),
+  });
+
 export const standardBlocks = Object.freeze([
   appShellBlock,
   readerSurfaceBlock,
@@ -583,6 +897,12 @@ export const standardBlocks = Object.freeze([
   activityStreamBlock,
   shortcutCueBlock,
   progressIndicatorBlock,
+  framedGroupBlock,
+  explainabilityWalkthroughBlock,
+  formattedDocumentBlock,
+  linkDestinationBlock,
+  dividerBlock,
+  textEntryBlock,
 ]);
 
 export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze([
@@ -605,6 +925,17 @@ export const standardBlockStories: readonly StandardBlockStory[] = Object.freeze
   standardBlockStory('activity-stream.ready', 'ActivityStreamBlock', 'Activity stream ready', 'ready'),
   standardBlockStory('shortcut-cue.ready', 'ShortcutCueBlock', 'Shortcut cue ready', 'ready'),
   standardBlockStory('progress-indicator.ready', 'ProgressIndicatorBlock', 'Progress indicator ready', 'ready'),
+  standardBlockStory('framed-group.ready', 'FramedGroupBlock', 'Framed group ready', 'ready'),
+  standardBlockStory(
+    'explainability-walkthrough.ready',
+    'ExplainabilityWalkthroughBlock',
+    'Explainability walkthrough ready',
+    'ready',
+  ),
+  standardBlockStory('formatted-document.ready', 'FormattedDocumentBlock', 'Formatted document ready', 'ready'),
+  standardBlockStory('link-destination.ready', 'LinkDestinationBlock', 'Link destination ready', 'ready'),
+  standardBlockStory('divider.ready', 'DividerBlock', 'Divider ready', 'ready'),
+  standardBlockStory('text-entry.ready', 'TextEntryBlock', 'Text entry ready', 'ready'),
 ]);
 
 export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPackage({
@@ -615,6 +946,7 @@ export const standardBlockPackageManifest: BlockPackageManifest = defineBlockPac
   docs: [
     'docs/design-system/blocks.md',
     'docs/design/DX-031-standard-bijou-blocks.md',
+    'docs/design/DF-039-component-family-standard-blocks.md',
   ],
   tags: ['standard-blocks', 'dx-031', 'first-party'],
 });
@@ -757,7 +1089,7 @@ function inspectorPanelMetadata(): BlockMetadata {
 }
 
 function inlineStatusMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'InlineStatusBlock',
     family: 'status',
     scale: 'inline',
@@ -773,7 +1105,7 @@ function inlineStatusMetadata(): BlockMetadata {
 }
 
 function inFlowStatusMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'InFlowStatusBlock',
     family: 'status',
     scale: 'section',
@@ -789,7 +1121,7 @@ function inFlowStatusMetadata(): BlockMetadata {
 }
 
 function transientOverlayMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'TransientOverlayBlock',
     family: 'overlay',
     scale: 'overlay',
@@ -805,7 +1137,7 @@ function transientOverlayMetadata(): BlockMetadata {
 }
 
 function activityStreamMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'ActivityStreamBlock',
     family: 'activity',
     scale: 'section',
@@ -821,7 +1153,7 @@ function activityStreamMetadata(): BlockMetadata {
 }
 
 function shortcutCueMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'ShortcutCueBlock',
     family: 'shortcut',
     scale: 'inline',
@@ -837,7 +1169,7 @@ function shortcutCueMetadata(): BlockMetadata {
 }
 
 function progressIndicatorMetadata(): BlockMetadata {
-  return standardFeedbackMetadata({
+  return standardSectionMetadata({
     blockName: 'ProgressIndicatorBlock',
     family: 'progress',
     scale: 'section',
@@ -852,7 +1184,103 @@ function progressIndicatorMetadata(): BlockMetadata {
   });
 }
 
-interface StandardFeedbackMetadataOptions {
+function framedGroupMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'FramedGroupBlock',
+    family: 'grouping',
+    scale: 'section',
+    summary: 'Groups related content in a framed region with title, selected item, and lower-mode grouping facts.',
+    useWhen: ['A page needs a named group of related rows, checks, or facts that should lower as one unit.'],
+    avoidWhen: ['The content is a document section that does not need a framed group boundary.'],
+    slots: framedGroupSections,
+    storyIds: ['framed-group.ready'],
+    composedComponents: ['Box', 'HeaderBox', 'SectionGroup'],
+    tags: ['standard', 'grouping', 'framed', 'df-039'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function explainabilityWalkthroughMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'ExplainabilityWalkthroughBlock',
+    family: 'explainability',
+    scale: 'section',
+    summary: 'Explains why a state changed with ordered steps, evidence, decision, and next action facts.',
+    useWhen: ['A workflow needs a durable walkthrough of reasoning, evidence, or change causality.'],
+    avoidWhen: ['The view only needs a compact status message or an activity log.'],
+    slots: explainabilityWalkthroughSections,
+    storyIds: ['explainability-walkthrough.ready'],
+    composedComponents: ['Callout', 'Timeline', 'Inspector'],
+    tags: ['standard', 'explainability', 'walkthrough', 'df-040'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function formattedDocumentMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'FormattedDocumentBlock',
+    family: 'document',
+    scale: 'section',
+    summary: 'Publishes persistent prose with heading, body, callout, and code facts that survive lower modes.',
+    useWhen: ['A docs or report surface needs formatted prose semantics without owning app navigation.'],
+    avoidWhen: ['The content is a one-line label, status, link, or editable input.'],
+    slots: formattedDocumentSections,
+    storyIds: ['formatted-document.ready'],
+    composedComponents: ['Markdown', 'Prose', 'Callout', 'CodeBlock'],
+    tags: ['standard', 'document', 'prose', 'df-042'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function linkDestinationMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'LinkDestinationBlock',
+    family: 'navigation',
+    scale: 'inline',
+    summary: 'Describes a navigable destination with label, target, kind, status, and lower-mode link facts.',
+    useWhen: ['A surface needs a concrete destination that can lower to plain text without losing the target.'],
+    avoidWhen: ['The interaction changes local state without navigating to an external or document destination.'],
+    slots: linkDestinationSections,
+    storyIds: ['link-destination.ready'],
+    composedComponents: ['Link', 'Breadcrumb', 'CommandItem'],
+    tags: ['standard', 'link', 'navigation', 'df-043'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function dividerMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'DividerBlock',
+    family: 'structure',
+    scale: 'inline',
+    summary: 'Separates sections with a labeled structural rule that remains meaningful in pipe and accessible modes.',
+    useWhen: ['A page needs a named break between content regions or evidence groups.'],
+    avoidWhen: ['The break is purely decorative and has no semantic label.'],
+    slots: dividerSections,
+    storyIds: ['divider.ready'],
+    composedComponents: ['Rule', 'Separator', 'HeadingRule'],
+    tags: ['standard', 'divider', 'structure', 'df-044'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+function textEntryMetadata(): BlockMetadata {
+  return standardSectionMetadata({
+    blockName: 'TextEntryBlock',
+    family: 'input',
+    scale: 'section',
+    summary: 'Describes a text input state with field, value, placeholder, validation, and result facts.',
+    useWhen: ['A search, filter, or form surface needs inspectable text-entry semantics.'],
+    avoidWhen: ['The control is a choice, toggle, or multi-field form that needs its own structured contract.'],
+    slots: textEntrySections,
+    storyIds: ['text-entry.ready'],
+    composedComponents: ['Input', 'SearchBox', 'ValidationMessage'],
+    tags: ['standard', 'input', 'text-entry', 'df-045'],
+    relatedDocs: ['docs/design/DF-039-component-family-standard-blocks.md'],
+  });
+}
+
+interface StandardSectionMetadataOptions {
   readonly blockName: StandardBlockName;
   readonly family: string;
   readonly scale: BlockMetadata['scale'];
@@ -866,8 +1294,8 @@ interface StandardFeedbackMetadataOptions {
   readonly relatedDocs: readonly string[];
 }
 
-function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): BlockMetadata {
-  const readyStoryId = firstFeedbackStoryId(options);
+function standardSectionMetadata(options: StandardSectionMetadataOptions): BlockMetadata {
+  const readyStoryId = firstStandardStoryId(options);
 
   return {
     packageName: BIJOU_PACKAGE,
@@ -907,7 +1335,7 @@ function standardFeedbackMetadata(options: StandardFeedbackMetadataOptions): Blo
   };
 }
 
-function firstFeedbackStoryId(options: StandardFeedbackMetadataOptions): string {
+function firstStandardStoryId(options: StandardSectionMetadataOptions): string {
   const [storyId] = options.storyIds;
   if (typeof storyId !== 'string' || storyId.trim() === '') {
     throw new Error(`${options.blockName} standard metadata requires a story id`);
@@ -965,7 +1393,7 @@ function standardBlockData(
   });
 }
 
-function standardFeedbackCommands(blockName: StandardBlockName) {
+function standardSectionCommands(blockName: StandardBlockName) {
   const prefix = commandPrefix(blockName);
   return Object.freeze([
     commandIntent(`${prefix}.select`, {
@@ -1321,6 +1749,18 @@ function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBloc
       return { family: 'shortcut', variant: 'ready' };
     case 'ProgressIndicatorBlock':
       return { family: 'progress', variant: 'ready' };
+    case 'FramedGroupBlock':
+      return { family: 'grouping', variant: 'ready' };
+    case 'ExplainabilityWalkthroughBlock':
+      return { family: 'explainability', variant: 'ready' };
+    case 'FormattedDocumentBlock':
+      return { family: 'document', variant: 'ready' };
+    case 'LinkDestinationBlock':
+      return { family: 'navigation', variant: 'ready' };
+    case 'DividerBlock':
+      return { family: 'structure', variant: 'ready' };
+    case 'TextEntryBlock':
+      return { family: 'input', variant: 'ready' };
   }
 }
 
@@ -1598,6 +2038,136 @@ function parseProgressIndicatorSchemaData(input: unknown): ProgressIndicatorSche
     ...(value === undefined ? {} : { value }),
     ...(total === undefined ? {} : { total }),
     percent,
+  };
+}
+
+function parseFramedGroupSchemaData(input: unknown): FramedGroupSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const title = textDataProperty(input, 'title');
+  const items = textArrayDataProperty(input, 'items');
+  const selected = textDataProperty(input, 'selected');
+  const mode = textDataProperty(input, 'mode');
+  if (title === undefined || items === undefined) {
+    return undefined;
+  }
+
+  return {
+    title,
+    items,
+    ...(selected === undefined ? {} : { selected }),
+    ...(mode === undefined ? {} : { mode }),
+  };
+}
+
+function parseExplainabilityWalkthroughSchemaData(
+  input: unknown,
+): ExplainabilityWalkthroughSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const title = textDataProperty(input, 'title');
+  const steps = textArrayDataProperty(input, 'steps');
+  const evidence = textDataProperty(input, 'evidence');
+  const decision = textDataProperty(input, 'decision');
+  const nextStep = textDataProperty(input, 'nextStep');
+  if (title === undefined || steps === undefined) {
+    return undefined;
+  }
+
+  return {
+    title,
+    steps,
+    ...(evidence === undefined ? {} : { evidence }),
+    ...(decision === undefined ? {} : { decision }),
+    ...(nextStep === undefined ? {} : { nextStep }),
+  };
+}
+
+function parseFormattedDocumentSchemaData(input: unknown): FormattedDocumentSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const heading = textDataProperty(input, 'heading');
+  const body = textDataProperty(input, 'body');
+  const callout = textDataProperty(input, 'callout');
+  const code = textDataProperty(input, 'code');
+  if (heading === undefined || body === undefined) {
+    return undefined;
+  }
+
+  return {
+    heading,
+    body,
+    ...(callout === undefined ? {} : { callout }),
+    ...(code === undefined ? {} : { code }),
+  };
+}
+
+function parseLinkDestinationSchemaData(input: unknown): LinkDestinationSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const destination = textDataProperty(input, 'destination');
+  const kind = textDataProperty(input, 'kind');
+  const status = textDataProperty(input, 'status');
+  if (label === undefined || destination === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    destination,
+    ...(kind === undefined ? {} : { kind }),
+    ...(status === undefined ? {} : { status }),
+  };
+}
+
+function parseDividerSchemaData(input: unknown): DividerSchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const label = textDataProperty(input, 'label');
+  const style = textDataProperty(input, 'style');
+  const density = textDataProperty(input, 'density');
+  if (label === undefined) {
+    return undefined;
+  }
+
+  return {
+    label,
+    ...(style === undefined ? {} : { style }),
+    ...(density === undefined ? {} : { density }),
+  };
+}
+
+function parseTextEntrySchemaData(input: unknown): TextEntrySchemaData | undefined {
+  if (!isPlainRecord(input)) {
+    return undefined;
+  }
+
+  const field = textDataProperty(input, 'field');
+  const value = textDataProperty(input, 'value');
+  const placeholder = textDataProperty(input, 'placeholder');
+  const validation = textDataProperty(input, 'validation');
+  const results = textOrNumberDataProperty(input, 'results');
+  if (field === undefined || value === undefined) {
+    return undefined;
+  }
+
+  return {
+    field,
+    value,
+    ...(placeholder === undefined ? {} : { placeholder }),
+    ...(validation === undefined ? {} : { validation }),
+    ...(results === undefined ? {} : { results }),
   };
 }
 

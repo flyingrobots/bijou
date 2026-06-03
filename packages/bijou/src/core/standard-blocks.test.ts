@@ -22,10 +22,15 @@ import { lintModeLowering } from './mode-lowering.js';
 import {
   activityStreamBlock,
   appShellBlock,
+  dividerBlock,
+  explainabilityWalkthroughBlock,
+  formattedDocumentBlock,
+  framedGroupBlock,
   inFlowStatusBlock,
   inlineStatusBlock,
   inspectorPanelBlock,
   inspectorPanelSchemaBlock,
+  linkDestinationBlock,
   progressIndicatorBlock,
   readerSurfaceBlock,
   readerSurfaceSchemaBlock,
@@ -33,6 +38,7 @@ import {
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
+  textEntryBlock,
   transientOverlayBlock,
 } from './standard-blocks.js';
 
@@ -48,6 +54,12 @@ describe('first-party standard block definitions', () => {
       activityStreamBlock,
       shortcutCueBlock,
       progressIndicatorBlock,
+      framedGroupBlock,
+      explainabilityWalkthroughBlock,
+      formattedDocumentBlock,
+      linkDestinationBlock,
+      dividerBlock,
+      textEntryBlock,
     ]);
     expect(Object.isFrozen(standardBlocks)).toBe(true);
 
@@ -69,6 +81,12 @@ describe('first-party standard block definitions', () => {
       'ActivityStreamBlock',
       'ShortcutCueBlock',
       'ProgressIndicatorBlock',
+      'FramedGroupBlock',
+      'ExplainabilityWalkthroughBlock',
+      'FormattedDocumentBlock',
+      'LinkDestinationBlock',
+      'DividerBlock',
+      'TextEntryBlock',
     ]);
   });
 
@@ -131,6 +149,12 @@ describe('first-party standard block definitions', () => {
         'ActivityStreamBlock',
         'ShortcutCueBlock',
         'ProgressIndicatorBlock',
+        'FramedGroupBlock',
+        'ExplainabilityWalkthroughBlock',
+        'FormattedDocumentBlock',
+        'LinkDestinationBlock',
+        'DividerBlock',
+        'TextEntryBlock',
       ].map((blockName) => [
         blockName,
         standardBlockStories
@@ -164,6 +188,12 @@ describe('first-party standard block definitions', () => {
     expect(storiesByBlock.get('ActivityStreamBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('ShortcutCueBlock')).toEqual(['ready']);
     expect(storiesByBlock.get('ProgressIndicatorBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('FramedGroupBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('ExplainabilityWalkthroughBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('FormattedDocumentBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('LinkDestinationBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('DividerBlock')).toEqual(['ready']);
+    expect(storiesByBlock.get('TextEntryBlock')).toEqual(['ready']);
 
     for (const block of standardBlocks) {
       const storyIds = standardBlockStories

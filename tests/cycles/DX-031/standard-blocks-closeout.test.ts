@@ -17,6 +17,12 @@ describe('DX-031 standard blocks closeout', () => {
       'ActivityStreamBlock',
       'ShortcutCueBlock',
       'ProgressIndicatorBlock',
+      'FramedGroupBlock',
+      'ExplainabilityWalkthroughBlock',
+      'FormattedDocumentBlock',
+      'LinkDestinationBlock',
+      'DividerBlock',
+      'TextEntryBlock',
     ]);
 
     for (const block of standardBlocks) {
@@ -75,6 +81,12 @@ describe('DX-031 standard blocks closeout', () => {
     expect(storyStates.get('ActivityStreamBlock')).toEqual(['ready']);
     expect(storyStates.get('ShortcutCueBlock')).toEqual(['ready']);
     expect(storyStates.get('ProgressIndicatorBlock')).toEqual(['ready']);
+    expect(storyStates.get('FramedGroupBlock')).toEqual(['ready']);
+    expect(storyStates.get('ExplainabilityWalkthroughBlock')).toEqual(['ready']);
+    expect(storyStates.get('FormattedDocumentBlock')).toEqual(['ready']);
+    expect(storyStates.get('LinkDestinationBlock')).toEqual(['ready']);
+    expect(storyStates.get('DividerBlock')).toEqual(['ready']);
+    expect(storyStates.get('TextEntryBlock')).toEqual(['ready']);
   });
 
   it('marks DX-031 landed in Method evidence after closing issue 181', () => {
@@ -97,6 +109,12 @@ describe('DX-031 standard blocks closeout', () => {
     expect(changelog).toContain('ActivityStreamBlock');
     expect(changelog).toContain('ShortcutCueBlock');
     expect(changelog).toContain('ProgressIndicatorBlock');
+    expect(changelog).toContain('FramedGroupBlock');
+    expect(changelog).toContain('ExplainabilityWalkthroughBlock');
+    expect(changelog).toContain('FormattedDocumentBlock');
+    expect(changelog).toContain('LinkDestinationBlock');
+    expect(changelog).toContain('DividerBlock');
+    expect(changelog).toContain('TextEntryBlock');
   });
 
   it('keeps v6 tracker docs aligned after closing issue 181', () => {
@@ -162,6 +180,49 @@ function renderSlotsFor(blockName: string): Readonly<Record<string, unknown>> {
       return { shortcuts: ['/ Search', '? Help', 'Esc Close'], scope: 'page' };
     case 'ProgressIndicatorBlock':
       return { label: 'Install packages', value: '3', total: '5', percent: '60%' };
+    case 'FramedGroupBlock':
+      return {
+        title: 'Release Checks',
+        items: ['tests green', 'docs updated', 'PR linked'],
+        selected: 'tests green',
+        mode: 'review',
+      };
+    case 'ExplainabilityWalkthroughBlock':
+      return {
+        title: 'Why this changed',
+        steps: ['input changed', 'constraint tightened', 'preview re-rendered'],
+        evidence: 'DF-040 playback',
+        decision: 'keep grouped proof visible',
+        nextStep: 'open lower-mode output',
+      };
+    case 'FormattedDocumentBlock':
+      return {
+        heading: 'Blocks document',
+        body: 'Use prose for persistent product truth.',
+        callout: 'Lower modes keep the same heading and body facts.',
+        code: 'block: FormattedDocumentBlock',
+      };
+    case 'LinkDestinationBlock':
+      return {
+        label: 'DOGFOOD.md',
+        destination: 'docs/DOGFOOD.md',
+        kind: 'docs',
+        status: 'available',
+      };
+    case 'DividerBlock':
+      return {
+        label: 'Release Evidence',
+        style: 'rule',
+        density: 'compact',
+      };
+    case 'TextEntryBlock':
+      return {
+        field: 'Search docs',
+        value: 'table',
+        placeholder: 'type a query',
+        validation: '4 results',
+        results: 4,
+      };
     default:
       throw new Error(`unknown standard block ${blockName}`);
   }
