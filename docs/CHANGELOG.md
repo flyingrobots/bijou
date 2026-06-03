@@ -8,6 +8,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📚 Documentation
 
+- **Design-document-ready Method intake** — The GitHub Method work-item issue
+  template now guides new work through the standard design document shape:
+  decision summary, sponsored human and agent perspectives, current truth,
+  problem, scope, non-goals, product shape, lower modes, runtime/API contract,
+  accessibility, localization, inspectability, implementation slices, tests to
+  write first, validation, playback, risks, follow-on debt, and Method
+  artifacts. `docs/METHOD.md` now makes issue templates the default shaping
+  enforcement and explicitly avoids blanket branch-name-to-design-doc commit
+  blocking for hotfixes, CI repairs, dependency repairs, and small maintenance
+  work. This closes issue #275.
 - **DX-034 data binding closeout** — BEARING, ROADMAP, the v6 backlog
   evidence, and cycle tests now mark declarative view data binding as landed
   through issue #182. The closeout records immutable binding frames, provider
