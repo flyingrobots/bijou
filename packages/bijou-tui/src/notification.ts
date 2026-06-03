@@ -876,7 +876,7 @@ function wrapLineSurface(surface: Surface, width: number): readonly Surface[] {
   if (surface.width === 0) return [createBlankLineSurface(safeWidth)];
 
   const rows: Surface[] = [];
-  let offset = trimLeadingSurfaceWhitespace(surface, 0);
+  let offset = 0;
   while (offset < surface.width) {
     const hardEnd = Math.min(surface.width, offset + safeWidth);
     const end = hardEnd >= surface.width

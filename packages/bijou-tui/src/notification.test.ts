@@ -326,6 +326,44 @@ describe('renderNotificationStack', () => {
     expect(stripAnsi(overlay!.content)).toContain('[ Retry deploy ]');
   });
 
+  it('preserves leading padding for unfocused actionable buttons', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Unfocused deploy',
+      message: 'Kept visible behind the focused notification.',
+      variant: 'ACTIONABLE',
+      action: { label: 'Retry deploy', payload: { type: 'retry', id: 7 } },
+      durationMs: null,
+    }, 0);
+    state = pushNotification(state, {
+      title: 'Focused deploy',
+      message: 'Newest actionable notification owns focus.',
+      variant: 'ACTIONABLE',
+      action: { label: 'Open logs', payload: { type: 'ignore' } },
+      durationMs: null,
+    }, 10);
+    state = tickNotifications(state, 250);
+
+    const overlays = renderNotificationStack(state, {
+      screenWidth: 80,
+      screenHeight: 24,
+    });
+    const unfocused = overlays.find((overlay) => stripAnsi(overlay.content).includes('Unfocused deploy'));
+    if (unfocused == null) {
+      throw new Error('expected unfocused actionable notification overlay');
+    }
+
+    const actionLine = stripAnsi(unfocused.content).split('\n')
+      .find((line) => line.includes('Retry deploy'));
+    if (actionLine == null) {
+      throw new Error('expected unfocused actionable notification action row');
+    }
+
+    const labelStart = actionLine.indexOf('Retry deploy');
+    expect(actionLine).not.toContain('[ Retry deploy ]');
+    expect(actionLine.slice(labelStart - 2, labelStart)).toBe('  ');
+  });
+
   it('renders multilingual actionable stack entries without losing wrapped title or action text', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
