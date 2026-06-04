@@ -146,4 +146,52 @@ describe('rasterToGlyphSurface()', () => {
     expect(surface.get(1, 0).char).toBe('#');
     expect(surface.get(2, 0).char).toBe(' ');
   });
+
+  it('fit mode fills the target and crops horizontal overflow from the center', () => {
+    const surface = rasterToGlyphSurface(
+      frame(5, 1, [
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [0, 0, 0, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+      ]),
+      {
+        columns: 1,
+        rows: 1,
+        fit: 'fit',
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe('#');
+  });
+
+  it('fit mode fills the target and crops vertical overflow from the center', () => {
+    const surface = rasterToGlyphSurface(
+      frame(1, 5, [
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [0, 0, 0, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+      ]),
+      {
+        columns: 1,
+        rows: 1,
+        fit: 'fit',
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe('#');
+  });
 });

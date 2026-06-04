@@ -1,6 +1,6 @@
 import { createSurface, type Cell, type Surface } from '@flyingrobots/bijou';
 
-export type RasterGlyphFit = 'stretch' | 'contain' | 'cover';
+export type RasterGlyphFit = 'stretch' | 'contain' | 'fit';
 export type RasterGlyphColorMode = 'none' | 'fg' | 'fg-bg';
 export type RasterGlyphCharsetOrder = 'light-to-dark' | 'dark-to-light';
 
@@ -271,9 +271,9 @@ function createFitTransform(
 
   const scaleX = columns / frame.width;
   const scaleY = rows / frame.height;
-  const scale = fit === 'cover'
-    ? Math.max(scaleX, scaleY)
-    : Math.min(scaleX, scaleY);
+  const scale = fit === 'contain'
+    ? Math.min(scaleX, scaleY)
+    : Math.max(scaleX, scaleY);
   const drawWidth = frame.width * scale;
   const drawHeight = frame.height * scale;
 

@@ -36,7 +36,7 @@ const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
 const KEY_NEXT_TAB = ']';
-const V7_RASTER_TITLE_GLYPHS = new Set(['/', '\\', 'M', 'X', 'Y', 'Z']);
+const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -68,12 +68,6 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
     text += '\n';
   }
   return text;
-}
-
-function rasterTitleGlyphSignature(text: string): string {
-  return Array.from(text)
-    .map((char) => V7_RASTER_TITLE_GLYPHS.has(char) ? char : ' ')
-    .join('');
 }
 
 function rasterTitleGlyphCount(text: string): number {
@@ -373,7 +367,7 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
-  it('renders pulse-driven raster-to-glyph V7 title art on the landing title screen', async () => {
+  it('renders the decoded raster-to-glyph V7 title image on the landing title screen', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -383,9 +377,9 @@ describe('docs preview app', () => {
     const initialText = frameText(initial.frames[0]!);
     const pulsedText = frameText(pulsed.frames[pulsed.frames.length - 1]!);
 
-    expect(rasterTitleGlyphCount(initialText)).toBeGreaterThan(20);
-    expect(rasterTitleGlyphCount(pulsedText)).toBeGreaterThan(20);
-    expect(rasterTitleGlyphSignature(initialText)).not.toEqual(rasterTitleGlyphSignature(pulsedText));
+    expect(rasterTitleGlyphCount(initialText)).toBeGreaterThan(1000);
+    expect(rasterTitleGlyphCount(pulsedText)).toBeGreaterThan(1000);
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
   it('reuses giant landing frames across small pulses within the same quality bucket', async () => {

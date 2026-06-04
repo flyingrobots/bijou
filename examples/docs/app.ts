@@ -46,7 +46,6 @@ import {
   mapCmds,
   placeSurface,
   quit,
-  RASTER_GLYPH_CHARSETS,
   rasterToGlyphSurface,
   renderShellQuitOverlay,
   shouldUseShellQuitConfirm,
@@ -66,7 +65,6 @@ import {
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
-  type RgbaFrame,
 } from '../../packages/bijou-tui/src/index.js';
 import {
   createI18nRuntime,
@@ -136,6 +134,7 @@ import {
   dogfoodReleaseTitleMarkdown,
   renderDogfoodReleaseTitleText,
 } from './release-title.js';
+import { decodePngRgba } from './png-rgba.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
@@ -166,6 +165,9 @@ const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', impo
 const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
 const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
 const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
+const LANDING_TITLE_IMAGE_FRAME = decodePngRgba(
+  readFileSync(new URL('../../assets/title.png', import.meta.url)),
+);
 const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
 ) as { readonly version: string };
@@ -634,7 +636,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
-const LANDING_TITLE_ART_CHARSET = RASTER_GLYPH_CHARSETS.launch;
+const LANDING_TITLE_IMAGE_CHARSET = '░▒▓█';
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
@@ -2348,15 +2350,9 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       return cache.front;
     }
 
-    const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
-    const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
-    const logoX = Math.floor((width - logoWidth) / 2);
-    const logoY = Math.floor((height - logoHeight) / 2);
-
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-    paintV7RasterTitleArt(surface, logoY, logoHeight, quantizedTimeMs, tokens);
-    paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, quantizedTimeMs, tokens, quality);
+    paintV7RasterTitleArt(surface, quantizedTimeMs, tokens);
 
     const wordmarkGlyphs = width >= 110 && height >= 30
       ? FLYING_ROBOTS_LARGE_LINES
@@ -2374,7 +2370,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     const panelPromptGap = 1;
     const promptWordmarkGap = 1;
     const footerY = Math.max(0, height - 1);
-    const contentTop = Math.min(height - 1, logoY + logoHeight + 1);
+    const contentTop = Math.min(height - 1, Math.max(1, Math.floor(height * 0.68)));
     const contentBottom = Math.max(contentTop, footerY - 2);
     const availableHeight = Math.max(0, contentBottom - contentTop + 1);
     const fullClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap + wordmark.height;
@@ -2520,8 +2516,6 @@ function paintLandingBackground(
 
 function paintV7RasterTitleArt(
   surface: Surface,
-  logoY: number,
-  logoHeight: number,
   timeMs: number,
   tokens: LandingThemeTokens,
 ): void {
@@ -2529,38 +2523,31 @@ function paintV7RasterTitleArt(
   const height = surface.height;
   if (width < 40 || height < 14) return;
 
-  const artRows = Math.max(5, Math.min(height - 3, height >= 34 ? 18 : 10));
-  const preferredY = logoY + logoHeight - Math.floor(artRows * 0.55);
-  const artY = Math.max(1, Math.min(height - artRows - 2, preferredY));
-  const frame = createV7RasterTitleFrame(width * 2, artRows * 3, timeMs, tokens);
-  const titleArt = rasterToGlyphSurface(frame, {
+  const titleArt = rasterToGlyphSurface(LANDING_TITLE_IMAGE_FRAME, {
     columns: width,
-    rows: artRows,
-    fit: 'stretch',
-    colorMode: 'fg',
+    rows: height,
+    fit: 'fit',
+    colorMode: 'none',
     renderer: {
       kind: 'charset',
-      chars: LANDING_TITLE_ART_CHARSET,
-      order: 'dark-to-light',
+      chars: LANDING_TITLE_IMAGE_CHARSET,
+      order: 'light-to-dark',
     },
   });
 
   for (let y = 0; y < titleArt.height; y++) {
-    const targetY = artY + y;
-    if (targetY < 0 || targetY >= height) continue;
-
     for (let x = 0; x < titleArt.width; x++) {
       const cell = titleArt.get(x, y);
-      if ((cell.char ?? ' ') === ' ') continue;
+      const char = cell.char ?? ' ';
+      if (char === ' ') continue;
 
-      const sourceIndex = LANDING_TITLE_ART_CHARSET.indexOf(cell.char ?? ' ');
-      const modifiers = sourceIndex >= 0 && sourceIndex < 4 ? BOLD_MODIFIERS : DIM_MODIFIERS;
-      surface.set(x, targetY, {
+      surface.set(x, y, {
         char: cell.char,
         bg: tokens.background,
-        fgRGB: cell.fgRGB,
-        fg: cell.fg,
-        modifiers: modifiers as string[] | undefined,
+        fg: landingTitleImageColor(char, x, y, width, height, timeMs, tokens),
+        modifiers: char === '█' || char === '▓'
+          ? BOLD_MODIFIERS as string[]
+          : DIM_MODIFIERS as string[],
         empty: false,
         opacity: 1,
       });
@@ -2568,83 +2555,21 @@ function paintV7RasterTitleArt(
   }
 }
 
-function createV7RasterTitleFrame(
+function landingTitleImageColor(
+  char: string,
+  x: number,
+  y: number,
   width: number,
   height: number,
   timeMs: number,
   tokens: LandingThemeTokens,
-): RgbaFrame {
-  const data = new Uint8ClampedArray(width * height * 4);
-  const time = timeMs / 1000;
-  const widthDenominator = width - 1 || 1;
-  const heightDenominator = height - 1 || 1;
-
-  for (let y = 0; y < height; y++) {
-    const v = y / heightDenominator;
-    for (let x = 0; x < width; x++) {
-      const u = x / widthDenominator;
-      const wake = v7WakeDensity(u, v, time);
-      if (wake <= 0.05) continue;
-
-      const colorT = clamp01(
-        (u * 0.68)
-        + (wake * 0.24)
-        + (0.08 * Math.sin((time * 0.7) + (u * 4.4))),
-      );
-      const rgb = hexToRgb(sampleColorRamp(tokens.logoRamp, colorT));
-      const shade = 0.26 + ((1 - wake) * 0.34);
-      const offset = ((y * width) + x) * 4;
-      data[offset] = Math.round(rgb[0] * shade);
-      data[offset + 1] = Math.round(rgb[1] * shade);
-      data[offset + 2] = Math.round(rgb[2] * shade);
-      data[offset + 3] = Math.round(clamp01(wake) * 255);
-    }
-  }
-
-  return { width, height, data };
-}
-
-function v7WakeDensity(u: number, v: number, time: number): number {
-  const worldline = 0.58
-    + (0.08 * Math.sin((u * Math.PI * 3.4) - (time * 1.15)))
-    - (0.24 * (u - 0.5));
-  const counterline = 0.34
-    + (0.06 * Math.cos((u * Math.PI * 4.2) + (time * 0.9)))
-    + (0.20 * (u - 0.5));
-  const launchCore = radialFalloff(u, v, 0.5 + (0.03 * Math.sin(time * 0.8)), 0.54, 0.16, 0.24);
-  const primaryWake = lineFalloff(v, worldline, 0.045);
-  const secondaryWake = lineFalloff(v, counterline, 0.036);
-  const echoPhase = ((Math.hypot(u - 0.5, v - 0.52) * 7.6) - (time * 0.9));
-  const echoes = Math.max(0, Math.cos(echoPhase * Math.PI * 2)) * radialFalloff(u, v, 0.5, 0.52, 0.58, 0.42);
-  const shear = 0.5 + (0.5 * Math.sin((u * Math.PI * 18) + (v * Math.PI * 8) + (time * 1.7)));
-  const stars = shear > 0.92
-    ? (shear - 0.92) * 4 * radialFalloff(u, v, 0.5, 0.52, 0.72, 0.5)
-    : 0;
-
-  return clamp01(
-    (launchCore * 0.92)
-    + (primaryWake * 0.72)
-    + (secondaryWake * 0.48)
-    + (echoes * 0.22)
-    + stars,
-  );
-}
-
-function lineFalloff(value: number, center: number, width: number): number {
-  return Math.exp(-Math.pow((value - center) / width, 2));
-}
-
-function radialFalloff(
-  u: number,
-  v: number,
-  centerU: number,
-  centerV: number,
-  radiusU: number,
-  radiusV: number,
-): number {
-  const du = (u - centerU) / radiusU;
-  const dv = (v - centerV) / radiusV;
-  return Math.exp(-((du * du) + (dv * dv)));
+): string {
+  const darkness = char === '█' ? 1 : char === '▓' ? 0.72 : char === '▒' ? 0.44 : 0.18;
+  const u = width <= 1 ? 0 : x / (width - 1);
+  const v = height <= 1 ? 0 : y / (height - 1);
+  const shimmer = 0.06 * Math.sin((timeMs / 1000) + (u * 5.7) - (v * 3.2));
+  const ramp = darkness >= 0.6 ? tokens.logoRamp : tokens.waveRamp;
+  return sampleColorRamp(ramp, clamp01((u * 0.64) + (darkness * 0.22) + 0.1 + shimmer));
 }
 
 function paintLogoInto(
