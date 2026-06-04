@@ -46,6 +46,7 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "image-viewer": "node --import tsx examples/image-viewer/main.ts",
     "blocklab": "node --import tsx examples/docs/storybook.ts",
     "blocklab:index": "tsx examples/docs/storybook-workstation.ts",
     "storybook": "node --import tsx examples/docs/storybook.ts",

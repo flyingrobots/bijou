@@ -22,6 +22,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `Bijou.svg` wordmark in complementary background colors for the `V7 Launch
   Wake` landing screen while preserving the existing landing quality buckets
   and lower-mode release facts. This closes issue #303.
+- **Image-to-glyph side app** — `npm run image-viewer` now opens a runnable
+  side app with a `filePickerSurface()` sidebar and a main preview that renders
+  selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.
+  Users can hot-swap between Braille and ASCII glyph rendering with `m` or
+  `Tab`. This closes issue #305.
 
 ## [7.0.0] - 2026-06-03
 
