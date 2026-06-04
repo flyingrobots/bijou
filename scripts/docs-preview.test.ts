@@ -184,7 +184,7 @@ function stackedWakeWave(
   );
 }
 
-function replacedBijouSvgOverlayGlyphCount(frame: {
+function matchingBijouSvgOverlayGlyphCount(frame: {
   width: number;
   height: number;
   get(x: number, y: number): { char?: string; fg?: ColorRef };
@@ -515,13 +515,13 @@ describe('docs preview app', () => {
     expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
     expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
     expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
-    const overlay = replacedBijouSvgOverlayGlyphCount(initial.frames[0]!);
+    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
     expect(overlay.expected).toBeGreaterThan(450);
-    expect(overlay.matched).toBeLessThan(Math.floor(overlay.expected * 0.5));
+    expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
-  it('uses the Bijou SVG as a foreground-only title mask', async () => {
+  it('uses the Bijou SVG as a transparent-background title mask', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -533,9 +533,7 @@ describe('docs preview app', () => {
 
     expect(overlay.mask.get(0, 0).char).toBe('▓');
     expect(overlay.mask.get(15, 0).char).toBe(' ');
-    expect(frame.get(paintedPathCell.x, paintedPathCell.y).char).toBe(
-      expectedStackedWakeChar(paintedPathCell.x, paintedPathCell.y, frame.width),
-    );
+    expect(frame.get(paintedPathCell.x, paintedPathCell.y).char).toBe(overlay.mask.get(0, 0).char);
     expect(frame.get(transparentMaskCell.x, transparentMaskCell.y).char).toBe(
       expectedStackedWakeChar(transparentMaskCell.x, transparentMaskCell.y, frame.width),
     );

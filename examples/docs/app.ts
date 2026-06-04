@@ -2573,6 +2573,7 @@ function paintBijouSvgOverlay(
         empty: false,
         opacity: 1,
       }, {
+        char: true,
         fg: true,
         modifiers: true,
       });

@@ -199,8 +199,8 @@ instead of looking vertically stretched.
   and current terminal dimensions, then paints it through the existing landing
   shader.
 - DOGFOOD reads `assets/Bijou.svg` once, rasterizes the wordmark into a cached
-  mask per terminal size, and uses the mask to recolor foreground glyphs without
-  replacing the underlying characters or backgrounds.
+  mask per terminal size, and uses the mask to write foreground glyphs without
+  replacing the underlying backgrounds.
 - Target dimensions are bounded by landing quality profiles before rendering.
 - Cache keys include viewport, theme, quality, quantized time, and FPS badge
   state, preserving the existing landing frame cache behavior.
@@ -236,8 +236,8 @@ Agents should be able to prove the slice by checking:
 - RED: DOGFOOD landing frame does not render enough stacked sine-wave glyph art.
 - RED: the committed `Bijou.svg` wordmark is not rasterized into the rendered
   landing frame.
-- RED: the committed `Bijou.svg` wordmark replaces background glyphs or paints
-  transparent SVG pixels instead of acting as a foreground-only mask.
+- RED: the committed `Bijou.svg` wordmark replaces backgrounds or paints
+  transparent SVG pixels instead of acting as a background-transparent mask.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
   wake field.
 
