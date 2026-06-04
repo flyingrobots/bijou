@@ -77,6 +77,32 @@ function titleBackgroundGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
 }
 
+function stackedWakeRowCount(frame: {
+  width: number;
+  height: number;
+  get(x: number, y: number): { char?: string };
+}): number {
+  let rows = 0;
+  const maxY = Math.max(1, Math.floor(frame.height * 0.58));
+
+  for (let y = 1; y < maxY; y++) {
+    let line = '';
+    for (let x = 0; x < frame.width; x++) {
+      line += frame.get(x, y).char ?? ' ';
+    }
+
+    const full = line.indexOf('█');
+    const dark = full < 0 ? -1 : line.indexOf('▓', full + 1);
+    const mid = dark < 0 ? -1 : line.indexOf('▒', dark + 1);
+    const light = mid < 0 ? -1 : line.indexOf('░', mid + 1);
+    if (full >= 0 && dark > full && mid > dark && light > mid) {
+      rows++;
+    }
+  }
+
+  return rows;
+}
+
 function bijouSvgOverlayMetrics(width: number, height: number) {
   const aspectRatio = svgViewBoxAspectRatio(V7_BIJOU_SVG_TEXT);
   const maxColumns = Math.max(1, width - 4);
@@ -438,7 +464,7 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
-  it('renders the background.txt V7 title field with the Bijou SVG overlay', async () => {
+  it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -450,6 +476,8 @@ describe('docs preview app', () => {
 
     expect(titleBackgroundGlyphCount(initialText)).toBeGreaterThan(1000);
     expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
+    expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
+    expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
     const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
     expect(overlay.expected).toBeGreaterThan(450);
     expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));

@@ -17,11 +17,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `@flyingrobots/bijou-tui` now exposes a deterministic raw-RGBA-to-`Surface`
   renderer with charset, Braille, and quad modes, including custom density
   character sets, centered `fit` crop semantics, and optional terminal
-  cell-aspect correction. DOGFOOD now uses the committed `background.txt`
-  density field as the V7 landing background and overlays the committed
-  `Bijou.svg` wordmark in complementary background colors for the `V7 Launch
-  Wake` landing screen while preserving the existing landing quality buckets
-  and lower-mode release facts. This closes issue #303.
+  cell-aspect correction. DOGFOOD now paints a procedural stacked sine-wave
+  wake as the V7 landing background and overlays the committed `Bijou.svg`
+  wordmark in complementary background colors for the `V7 Launch Wake` landing
+  screen while preserving the existing landing quality buckets and lower-mode
+  release facts. This closes issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.

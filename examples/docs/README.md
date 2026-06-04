@@ -24,13 +24,13 @@ For a text-first BlockLab index and capture matrix over the same DOGFOOD story c
 npm run blocklab:index
 ```
 
-You now land on a dedicated full-screen title screen first: the app renders
-[assets/background.txt](../../assets/background.txt) through the landing
-background shader, then overlays the [assets/Bijou.svg](../../assets/Bijou.svg)
-wordmark in complementary foreground colors. The landing screen keeps the
-treatment sparse: the V7 title art, a centered `Press [Enter]` cue, the
-FlyingRobots wordmark, and a reserved last-line footer for quit/continue
-guidance plus the Bijou version.
+You now land on a dedicated full-screen title screen first: the app renders a
+procedural stacked sine-wave wake through the landing background shader, then
+overlays the [assets/Bijou.svg](../../assets/Bijou.svg) wordmark in
+complementary foreground colors. The landing screen keeps the treatment sparse:
+the V7 title art, a centered `Press [Enter]` cue, the FlyingRobots wordmark,
+and a reserved last-line footer for quit/continue guidance plus the Bijou
+version.
 
 On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs shell.
 

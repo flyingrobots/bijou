@@ -20,8 +20,8 @@ keywords:
 
 Issue #303 asks the current DOGFOOD landing screen to carry a unique
 `V7 Launch Wake` release identity. The first prototype used a textual wake
-ribbon; the new direction is stronger: reuse the committed `background.txt`
-density field as the animated title background and layer the committed
+ribbon; the current direction is stronger: render a deterministic stacked
+sine-wave wake as the animated title background and layer the committed
 `Bijou.svg` wordmark over that field in complementary colors.
 
 The design follows a Design Thinking loop: observe that terminal title art is
@@ -53,8 +53,8 @@ rendered-frame tests.
 ## Hill
 
 A DOGFOOD reader can open the landing title screen and see `V7 Launch Wake`
-named in the entry panel while `background.txt` fills the terminal as animated
-glyph art and the `Bijou.svg` wordmark sits above it in complementary colors.
+named in the entry panel while stacked sine-wave glyph strata fill the terminal
+and the `Bijou.svg` wordmark sits above them in complementary colors.
 Braille is one supported glyph mode, but the renderer can also use custom
 density character sets such as `/\MXYZabc!?=-. `. The screen remains
 pulse-driven, deterministic, bounded by the current landing quality profiles,
@@ -74,12 +74,12 @@ and lowerable through existing release-title facts.
 
 ### Wide Landing Screen
 
-The `background.txt` density field occupies the first-viewport title surface.
-It uses the existing landing pulse shader and quality buckets, so the field
-stays animated without adding a new image decode path. Foreground content still
-wins. The visible Bijou wordmark is rasterized from `assets/Bijou.svg`, fit to
-the terminal cell aspect, and colored with the inverse of the background glyph
-color beneath each mark cell.
+The stacked sine-wave wake occupies the first-viewport title surface. It uses
+the existing landing pulse shader and quality buckets, so the field stays
+animated without adding a new image decode path or GPU dependency. Foreground
+content still wins. The visible Bijou wordmark is rasterized from
+`assets/Bijou.svg`, fit to the terminal cell aspect, and colored with the
+inverse of the background glyph color beneath each mark cell.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -194,8 +194,9 @@ instead of looking vertically stretched.
   required.
 - DOGFOOD uses the existing pulse timestamp and quality frame-step
   quantization.
-- DOGFOOD reads `assets/background.txt` once and uses the existing landing
-  shader to paint it as the animated title background.
+- DOGFOOD computes the stacked sine-wave wake from quantized landing pulse time
+  and current terminal dimensions, then paints it through the existing landing
+  shader.
 - DOGFOOD reads `assets/Bijou.svg` once, rasterizes the wordmark into a cached
   mask per terminal size, and paints the mask over the background in
   complementary foreground colors.
@@ -218,7 +219,7 @@ Agents should be able to prove the slice by checking:
 - pulse changes the title art deterministically;
 - raw RGBA filter tests cover charset, Braille, quad, fit, color, and invalid
   charset behavior;
-- the committed `background.txt` field remains the visible landing background;
+- the stacked sine-wave wake remains the visible landing background;
 - pipe/accessibility release facts remain sourced from release-title metadata.
 
 ## Tests To Write First
@@ -231,11 +232,11 @@ Agents should be able to prove the slice by checking:
   fill-cropping.
 - RED: terminal `fit` mode assumes square cells and crops the wrong axis in
   typical tall-cell terminals.
-- RED: DOGFOOD landing frame does not render enough `background.txt` glyph art.
+- RED: DOGFOOD landing frame does not render enough stacked sine-wave glyph art.
 - RED: the committed `Bijou.svg` wordmark is not rasterized into the rendered
   landing frame.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
-  background field.
+  wake field.
 
 ## Validation
 
@@ -244,7 +245,7 @@ Run focused tests first:
 ```bash
 npx vitest run packages/bijou-tui/src/raster-glyph.test.ts
 npx vitest run scripts/svg-raster.test.ts
-npx vitest run scripts/docs-preview.test.ts -t "raster-to-glyph"
+npx vitest run scripts/docs-preview.test.ts -t "stacked sine-wave"
 ```
 
 Then run the relevant DOGFOOD and package validation lane:

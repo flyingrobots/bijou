@@ -158,10 +158,6 @@ const FLYING_ROBOTS_WIDE_SMALL_TEXT = readFileSync(
   new URL('../../assets/flyingrobots-wide-small.txt', import.meta.url),
   'utf8',
 ).trimEnd();
-const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', import.meta.url), 'utf8').trimEnd();
-const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
-const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
-const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
 const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
 const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
@@ -631,6 +627,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
+const LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
+const LANDING_WAKE_WAVES = [
+  { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
+  { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
+  { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
+  { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
+] as const;
 const LANDING_BIJOU_SVG_CHARSET = '░▒▓█';
 const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
 const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
@@ -796,14 +799,6 @@ const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = LANDING_THEMES.map((theme)
     : landingTokensToShellTheme(theme),
 }));
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
-const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
-  const row = new Float32Array(BACKGROUND_WIDTH);
-  for (let x = 0; x < BACKGROUND_WIDTH; x++) {
-    row[x] = densityFromChar(lineText[x] ?? ' ');
-  }
-  return row;
-});
-
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -2458,49 +2453,36 @@ function paintLandingBackground(
 ): void {
   const width = surface.width;
   const height = surface.height;
-  const time = timeMs / 1000;
-  const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
-  const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
+  const time = timeMs * 0.002;
   const widthDenominator = width - 1 || 1;
   const heightDenominator = height - 1 || 1;
 
   const cells = surface.cells;
   const tile = quality.backgroundTile;
+  const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
 
   for (let tileY = 0; tileY < height; tileY += tile) {
     const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
     const v = sampleY / heightDenominator;
-    const rowShift = Math.round(
-      (Math.sin((sampleY * 0.075) + (time * 0.7)) * 18)
-      + (Math.cos((sampleY * 0.03) - (time * 0.35)) * 7),
-    );
     for (let tileX = 0; tileX < width; tileX += tile) {
       const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
       const u = sampleX / widthDenominator;
-      const columnShift = Math.round(Math.sin((sampleX * 0.028) + (time * 0.42)) * 2);
-      const sourceX = mod(baseX + sampleX + rowShift, BACKGROUND_WIDTH);
-      const sourceY = mod(baseY + sampleY + columnShift, BACKGROUND_HEIGHT);
-      const density = BACKGROUND_DENSITY_ROWS[sourceY]?.[sourceX] ?? 0;
-      if (density === 0) {
-        continue;
-      }
-
-      const wave = 0.54
-        + (Math.sin((sampleX * 0.042) + (sampleY * 0.016) + (time * 1.45)) * 0.24)
-        + (Math.cos((sampleX * 0.012) - (sampleY * 0.085) + (time * 0.95)) * 0.22);
-      const level = clamp01(density * wave);
-      const char = densityGlyph(level, { airy: true });
+      const layer = landingWakeLayer(sampleX, sampleY, width, time, amplitudeScale);
+      const char = LANDING_WAKE_CHARS[layer] ?? ' ';
       if (char === ' ') {
         continue;
       }
 
+      const level = 1 - (layer / (LANDING_WAKE_CHARS.length - 1));
       const colorT = clamp01(
-        (u * 0.66)
-        + (0.22 * (0.5 + (Math.sin((time * 0.3) + (v * 5.2)) * 0.5)))
-        + (0.08 * Math.sin((time * 0.55) + (sampleX * 0.02))),
+        0.1
+        + (layer * 0.16)
+        + (u * 0.26)
+        + (0.18 * (0.5 + (Math.sin((time * 0.9) + (v * 5.2)) * 0.5)))
+        + (0.06 * Math.sin((time * 0.7) + (sampleX * 0.035))),
       );
       const fg = sampleColorRamp(tokens.waveRamp, colorT);
-      const modifiers = level < 0.52 ? DIM_MODIFIERS : undefined;
+      const modifiers = level < 0.55 ? DIM_MODIFIERS : undefined;
       const maxY = Math.min(height, tileY + tile);
       const maxX = Math.min(width, tileX + tile);
 
@@ -2518,6 +2500,41 @@ function paintLandingBackground(
       }
     }
   }
+}
+
+function landingWakeLayer(
+  x: number,
+  y: number,
+  width: number,
+  time: number,
+  amplitudeScale: number,
+): number {
+  const edges: number[] = [];
+  let edge = width / 4;
+
+  for (const spec of LANDING_WAKE_WAVES) {
+    edge += stackedWakeWave(time, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
+    edges.push(edge);
+  }
+
+  for (let index = edges.length - 1; index >= 0; index--) {
+    if (x > edges[index]!) return index + 1;
+  }
+
+  return 0;
+}
+
+function stackedWakeWave(
+  time: number,
+  y: number,
+  seeds: readonly [number, number, number],
+  amps: readonly [number, number, number],
+): number {
+  return (
+    ((Math.sin(time + (y * seeds[0])) + 1) * amps[0])
+    + ((Math.sin(time + (y * seeds[1])) + 1) * amps[1])
+    + (Math.sin(time + (y * seeds[2])) * amps[2])
+  );
 }
 
 function paintV7TitleArt(
@@ -2640,38 +2657,6 @@ function createWordmarkSurface(
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
-}
-
-function densityFromChar(char: string): number {
-  switch (char) {
-    case '█':
-      return 1;
-    case '▓':
-      return 0.78;
-    case '▒':
-      return 0.56;
-    case '░':
-      return 0.32;
-    case '·':
-    case '.':
-      return 0.14;
-    default:
-      return 0;
-  }
-}
-
-function densityGlyph(level: number, options: { readonly airy: boolean }): string {
-  if (level <= 0.08) return ' ';
-  if (options.airy) {
-    if (level > 0.82) return '▓';
-    if (level > 0.58) return '▒';
-    if (level > 0.34) return '░';
-    return '·';
-  }
-  if (level > 0.84) return '█';
-  if (level > 0.66) return '▓';
-  if (level > 0.44) return '▒';
-  return '░';
 }
 
 function clamp01(value: number): number {
