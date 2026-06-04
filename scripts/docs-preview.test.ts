@@ -40,6 +40,13 @@ const KEY_NEXT_TAB = ']';
 const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
 const V7_TITLE_CELL_ASPECT_RATIO = 0.5;
 const V7_BIJOU_SVG_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'Bijou.svg'), 'utf8');
+const V7_LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
+const V7_LANDING_WAKE_WAVES = [
+  { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
+  { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
+  { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
+  { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
+] as const;
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -147,7 +154,37 @@ function expectedBijouSvgOverlay(width: number, height: number) {
   return { ...metrics, mask };
 }
 
-function matchingBijouSvgOverlayGlyphCount(frame: {
+function expectedStackedWakeChar(x: number, y: number, width: number): string {
+  const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
+  let edge = width / 4;
+  const edges: number[] = [];
+
+  for (const spec of V7_LANDING_WAKE_WAVES) {
+    edge += stackedWakeWave(0, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
+    edges.push(edge);
+  }
+
+  for (let index = edges.length - 1; index >= 0; index--) {
+    if (x > edges[index]!) return V7_LANDING_WAKE_CHARS[index + 1] ?? ' ';
+  }
+
+  return V7_LANDING_WAKE_CHARS[0];
+}
+
+function stackedWakeWave(
+  time: number,
+  y: number,
+  seeds: readonly [number, number, number],
+  amps: readonly [number, number, number],
+): number {
+  return (
+    ((Math.sin(time + (y * seeds[0])) + 1) * amps[0])
+    + ((Math.sin(time + (y * seeds[1])) + 1) * amps[1])
+    + (Math.sin(time + (y * seeds[2])) * amps[2])
+  );
+}
+
+function replacedBijouSvgOverlayGlyphCount(frame: {
   width: number;
   height: number;
   get(x: number, y: number): { char?: string; fg?: ColorRef };
@@ -478,10 +515,32 @@ describe('docs preview app', () => {
     expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
     expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
     expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
-    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
+    const overlay = replacedBijouSvgOverlayGlyphCount(initial.frames[0]!);
     expect(overlay.expected).toBeGreaterThan(450);
-    expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
+    expect(overlay.matched).toBeLessThan(Math.floor(overlay.expected * 0.5));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+  });
+
+  it('uses the Bijou SVG as a foreground-only title mask', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
+    const paintedPathCell = { x: overlay.left, y: overlay.top };
+    const transparentMaskCell = { x: overlay.left + 15, y: overlay.top };
+
+    expect(overlay.mask.get(0, 0).char).toBe('▓');
+    expect(overlay.mask.get(15, 0).char).toBe(' ');
+    expect(frame.get(paintedPathCell.x, paintedPathCell.y).char).toBe(
+      expectedStackedWakeChar(paintedPathCell.x, paintedPathCell.y, frame.width),
+    );
+    expect(frame.get(transparentMaskCell.x, transparentMaskCell.y).char).toBe(
+      expectedStackedWakeChar(transparentMaskCell.x, transparentMaskCell.y, frame.width),
+    );
+    expect(colorHex(frame.get(paintedPathCell.x, paintedPathCell.y).fg)).not.toBeNull();
+    expect(colorHex(frame.get(transparentMaskCell.x, transparentMaskCell.y).fg)).not.toBeNull();
   });
 
   it('reuses giant landing frames across small pulses within the same quality bucket', async () => {

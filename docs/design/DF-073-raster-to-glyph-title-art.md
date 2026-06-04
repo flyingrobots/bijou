@@ -21,8 +21,8 @@ keywords:
 Issue #303 asks the current DOGFOOD landing screen to carry a unique
 `V7 Launch Wake` release identity. The first prototype used a textual wake
 ribbon; the current direction is stronger: render a deterministic stacked
-sine-wave wake as the animated title background and layer the committed
-`Bijou.svg` wordmark over that field in complementary colors.
+sine-wave wake as the animated title background and use the committed
+`Bijou.svg` wordmark as a transparent foreground mask in complementary colors.
 
 The design follows a Design Thinking loop: observe that terminal title art is
 most useful when it can be generated, inspected, tested, and lowered; frame the
@@ -54,7 +54,8 @@ rendered-frame tests.
 
 A DOGFOOD reader can open the landing title screen and see `V7 Launch Wake`
 named in the entry panel while stacked sine-wave glyph strata fill the terminal
-and the `Bijou.svg` wordmark sits above them in complementary colors.
+and the `Bijou.svg` wordmark tints those foreground glyphs in complementary
+colors without painting an opaque background box.
 Braille is one supported glyph mode, but the renderer can also use custom
 density character sets such as `/\MXYZabc!?=-. `. The screen remains
 pulse-driven, deterministic, bounded by the current landing quality profiles,
@@ -78,8 +79,8 @@ The stacked sine-wave wake occupies the first-viewport title surface. It uses
 the existing landing pulse shader and quality buckets, so the field stays
 animated without adding a new image decode path or GPU dependency. Foreground
 content still wins. The visible Bijou wordmark is rasterized from
-`assets/Bijou.svg`, fit to the terminal cell aspect, and colored with the
-inverse of the background glyph color beneath each mark cell.
+`assets/Bijou.svg`, fit to the terminal cell aspect, and used as a transparent
+mask that recolors only the foreground glyphs beneath each mark cell.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -198,8 +199,8 @@ instead of looking vertically stretched.
   and current terminal dimensions, then paints it through the existing landing
   shader.
 - DOGFOOD reads `assets/Bijou.svg` once, rasterizes the wordmark into a cached
-  mask per terminal size, and paints the mask over the background in
-  complementary foreground colors.
+  mask per terminal size, and uses the mask to recolor foreground glyphs without
+  replacing the underlying characters or backgrounds.
 - Target dimensions are bounded by landing quality profiles before rendering.
 - Cache keys include viewport, theme, quality, quantized time, and FPS badge
   state, preserving the existing landing frame cache behavior.
@@ -235,6 +236,8 @@ Agents should be able to prove the slice by checking:
 - RED: DOGFOOD landing frame does not render enough stacked sine-wave glyph art.
 - RED: the committed `Bijou.svg` wordmark is not rasterized into the rendered
   landing frame.
+- RED: the committed `Bijou.svg` wordmark replaces background glyphs or paints
+  transparent SVG pixels instead of acting as a foreground-only mask.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
   wake field.
 

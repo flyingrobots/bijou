@@ -26,8 +26,8 @@ npm run blocklab:index
 
 You now land on a dedicated full-screen title screen first: the app renders a
 procedural stacked sine-wave wake through the landing background shader, then
-overlays the [assets/Bijou.svg](../../assets/Bijou.svg) wordmark in
-complementary foreground colors. The landing screen keeps the treatment sparse:
+uses [assets/Bijou.svg](../../assets/Bijou.svg) as a transparent foreground mask
+in complementary colors. The landing screen keeps the treatment sparse:
 the V7 title art, a centered `Press [Enter]` cue, the FlyingRobots wordmark,
 and a reserved last-line footer for quit/continue guidance plus the Bijou
 version.

@@ -634,7 +634,7 @@ const LANDING_WAKE_WAVES = [
   { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
   { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
 ] as const;
-const LANDING_BIJOU_SVG_CHARSET = '░▒▓█';
+const LANDING_BIJOU_SVG_CHARSET = ' ░▒▓█';
 const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
 const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
 const DIM_MODIFIERS = ['dim'];
@@ -2568,11 +2568,13 @@ function paintBijouSvgOverlay(
 
       surface.set(targetX, targetY, {
         char: markChar,
-        bg: tokens.background,
         fg: oppositeHexColor(underColor),
         modifiers: BOLD_MODIFIERS as string[],
         empty: false,
         opacity: 1,
+      }, {
+        fg: true,
+        modifiers: true,
       });
     }
   }
