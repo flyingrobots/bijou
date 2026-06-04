@@ -5,6 +5,7 @@ import {
   cloneContextWithTheme,
   createSurface,
   CYAN_MAGENTA,
+  colorHex,
   inspector,
   inspectorPanelBlock,
   lerp3,
@@ -19,6 +20,7 @@ import {
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
+  type Cell,
   type OutputMode,
   type PreferenceListTheme,
   type Surface,
@@ -134,7 +136,6 @@ import {
   dogfoodReleaseTitleMarkdown,
   renderDogfoodReleaseTitleText,
 } from './release-title.js';
-import { decodePngRgba } from './png-rgba.js';
 import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from './svg-raster.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
@@ -161,9 +162,6 @@ const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', impo
 const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
 const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
 const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
-const LANDING_TITLE_IMAGE_FRAME = decodePngRgba(
-  readFileSync(new URL('../../assets/title.png', import.meta.url)),
-);
 const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
 const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
@@ -633,7 +631,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
-const LANDING_TITLE_IMAGE_CHARSET = '░▒▓█';
+const LANDING_BIJOU_SVG_CHARSET = '░▒▓█';
 const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
 const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
 const DIM_MODIFIERS = ['dim'];
@@ -2360,7 +2358,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-    paintV7RasterTitleArt(surface, quantizedTimeMs, tokens);
+    paintV7TitleArt(surface, tokens);
 
     const wordmarkGlyphs = width >= 110 && height >= 30
       ? FLYING_ROBOTS_LARGE_LINES
@@ -2522,54 +2520,19 @@ function paintLandingBackground(
   }
 }
 
-function paintV7RasterTitleArt(
+function paintV7TitleArt(
   surface: Surface,
-  timeMs: number,
   tokens: LandingThemeTokens,
 ): void {
   const width = surface.width;
   const height = surface.height;
   if (width < 40 || height < 14) return;
 
-  const titleArt = rasterToGlyphSurface(LANDING_TITLE_IMAGE_FRAME, {
-    columns: width,
-    rows: height,
-    fit: 'fit',
-    cellAspectRatio: LANDING_TITLE_CELL_ASPECT_RATIO,
-    colorMode: 'none',
-    renderer: {
-      kind: 'charset',
-      chars: LANDING_TITLE_IMAGE_CHARSET,
-      order: 'light-to-dark',
-    },
-  });
-
-  for (let y = 0; y < titleArt.height; y++) {
-    for (let x = 0; x < titleArt.width; x++) {
-      const cell = titleArt.get(x, y);
-      const char = cell.char ?? ' ';
-      if (char === ' ') continue;
-
-      surface.set(x, y, {
-        char: cell.char,
-        bg: tokens.background,
-        fg: landingTitleImageColor(char, x, y, width, height, timeMs, tokens),
-        modifiers: char === '█' || char === '▓'
-          ? BOLD_MODIFIERS as string[]
-          : DIM_MODIFIERS as string[],
-        empty: false,
-        opacity: 1,
-      });
-    }
-  }
-
-  paintBijouSvgOverlay(surface, titleArt, timeMs, tokens);
+  paintBijouSvgOverlay(surface, tokens);
 }
 
 function paintBijouSvgOverlay(
   surface: Surface,
-  titleArt: Surface,
-  timeMs: number,
   tokens: LandingThemeTokens,
 ): void {
   const metrics = bijouSvgOverlayMetrics(surface.width, surface.height);
@@ -2584,16 +2547,7 @@ function paintBijouSvgOverlay(
 
       const targetX = metrics.left + x;
       const targetY = metrics.top + y;
-      const underChar = titleArt.get(targetX, targetY).char ?? '░';
-      const underColor = landingTitleImageColor(
-        underChar,
-        targetX,
-        targetY,
-        surface.width,
-        surface.height,
-        timeMs,
-        tokens,
-      );
+      const underColor = landingBackgroundCellColor(surface.get(targetX, targetY), tokens);
 
       surface.set(targetX, targetY, {
         char: markChar,
@@ -2648,7 +2602,7 @@ function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
     colorMode: 'none',
     renderer: {
       kind: 'charset',
-      chars: LANDING_TITLE_IMAGE_CHARSET,
+      chars: LANDING_BIJOU_SVG_CHARSET,
       order: 'light-to-dark',
     },
   });
@@ -2657,21 +2611,12 @@ function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
   return surface;
 }
 
-function landingTitleImageColor(
-  char: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  timeMs: number,
-  tokens: LandingThemeTokens,
-): string {
-  const darkness = char === '█' ? 1 : char === '▓' ? 0.72 : char === '▒' ? 0.44 : 0.18;
-  const u = width <= 1 ? 0 : x / (width - 1);
-  const v = height <= 1 ? 0 : y / (height - 1);
-  const shimmer = 0.06 * Math.sin((timeMs / 1000) + (u * 5.7) - (v * 3.2));
-  const ramp = darkness >= 0.6 ? tokens.logoRamp : tokens.waveRamp;
-  return sampleColorRamp(ramp, clamp01((u * 0.64) + (darkness * 0.22) + 0.1 + shimmer));
+function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): string {
+  if (cell.fgRGB != null) {
+    return rgbHex(cell.fgRGB[0], cell.fgRGB[1], cell.fgRGB[2]);
+  }
+
+  return colorHex(cell.fg) ?? sampleColorRamp(tokens.waveRamp, 0.58);
 }
 
 function createWordmarkSurface(

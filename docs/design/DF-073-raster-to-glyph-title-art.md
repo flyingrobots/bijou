@@ -20,17 +20,17 @@ keywords:
 
 Issue #303 asks the current DOGFOOD landing screen to carry a unique
 `V7 Launch Wake` release identity. The first prototype used a textual wake
-ribbon; the new direction is stronger: decode a real title image into a raw
-RGBA frame, render it into a Bijou `Surface` at the current terminal size, and
-layer the committed `Bijou.svg` wordmark over that field in complementary
-colors.
+ribbon; the new direction is stronger: reuse the committed `background.txt`
+density field as the animated title background and layer the committed
+`Bijou.svg` wordmark over that field in complementary colors.
 
 The design follows a Design Thinking loop: observe that terminal title art is
 most useful when it can be generated, inspected, tested, and lowered; frame the
 problem as a reusable raster adapter rather than a one-off DOGFOOD paint pass;
-prototype a deterministic `RgbaFrame -> Surface` filter; decode the committed
-title PNG without adding a browser canvas dependency; and prove the result with
-synthetic-frame tests plus DOGFOOD rendered-frame tests.
+prototype a deterministic `RgbaFrame -> Surface` filter for vector and image
+masks; rasterize the committed SVG wordmark without adding a browser canvas
+dependency; and prove the result with synthetic-frame tests plus DOGFOOD
+rendered-frame tests.
 
 ## Sponsor Human
 
@@ -53,11 +53,12 @@ synthetic-frame tests plus DOGFOOD rendered-frame tests.
 ## Hill
 
 A DOGFOOD reader can open the landing title screen and see `V7 Launch Wake`
-named in the entry panel while the release-specific checker image fills the
-terminal as raster-to-glyph art. Braille is one supported glyph mode, but the
-renderer can also use custom density character sets such as `/\MXYZabc!?=-. `.
-The screen remains pulse-driven, deterministic, bounded by the current landing
-quality profiles, and lowerable through existing release-title facts.
+named in the entry panel while `background.txt` fills the terminal as animated
+glyph art and the `Bijou.svg` wordmark sits above it in complementary colors.
+Braille is one supported glyph mode, but the renderer can also use custom
+density character sets such as `/\MXYZabc!?=-. `. The screen remains
+pulse-driven, deterministic, bounded by the current landing quality profiles,
+and lowerable through existing release-title facts.
 
 ## Current Truth
 
@@ -73,13 +74,11 @@ quality profiles, and lowerable through existing release-title facts.
 
 ### Wide Landing Screen
 
-The raster image occupies the first-viewport title surface. It fills the
-terminal without stretching: whichever source dimension must scale to cover the
-terminal does so, and overflow is cropped from the centered opposite axis. The
-fit math accounts for terminal cell shape so a cell can be treated as narrower
-than it is tall instead of assuming square pixels. Foreground content still
+The `background.txt` density field occupies the first-viewport title surface.
+It uses the existing landing pulse shader and quality buckets, so the field
+stays animated without adding a new image decode path. Foreground content still
 wins. The visible Bijou wordmark is rasterized from `assets/Bijou.svg`, fit to
-the same terminal cell aspect, and colored with the inverse of the title-image
+the terminal cell aspect, and colored with the inverse of the background glyph
 color beneath each mark cell.
 
 ```text
@@ -156,8 +155,8 @@ interface RgbaFrame {
 }
 ```
 
-The public TUI primitive accepts already-decoded RGBA. DOGFOOD keeps PNG file
-decoding in the example app layer so the core package contract stays
+The public TUI primitive accepts already-decoded RGBA. DOGFOOD keeps SVG
+rasterization in the example app layer so the core package contract stays
 deterministic and dependency-free.
 
 ### Renderer Modes
@@ -173,14 +172,14 @@ deterministic and dependency-free.
 ### Fit Modes
 
 - `fit`: preserve aspect ratio, fill the target, crop overflow, and center
-  both axes. This is the terminal title-image default.
+  both axes.
 - `contain`: preserve aspect ratio and letterbox with empty cells.
 - `stretch`: map the frame directly into the requested grid.
 
 `cellAspectRatio` is the visual width divided by height of one terminal cell.
-The default is `1` for square-cell math. DOGFOOD uses `0.5` for the V7 title
-image so the checkerboard source fits the visible iTerm-style viewport instead
-of looking vertically stretched.
+The default is `1` for square-cell math. DOGFOOD uses `0.5` for the V7 SVG
+wordmark mask so the rendered logo fits the visible iTerm-style viewport
+instead of looking vertically stretched.
 
 ### Color Modes
 
@@ -195,10 +194,10 @@ of looking vertically stretched.
   required.
 - DOGFOOD uses the existing pulse timestamp and quality frame-step
   quantization.
-- DOGFOOD decodes `assets/title.png` once into RGBA, then rasterizes that frame
-  at the current terminal dimensions during landing render.
+- DOGFOOD reads `assets/background.txt` once and uses the existing landing
+  shader to paint it as the animated title background.
 - DOGFOOD reads `assets/Bijou.svg` once, rasterizes the wordmark into a cached
-  mask per terminal size, and paints the mask over the title image in
+  mask per terminal size, and paints the mask over the background in
   complementary foreground colors.
 - Target dimensions are bounded by landing quality profiles before rendering.
 - Cache keys include viewport, theme, quality, quantized time, and FPS badge
@@ -219,6 +218,7 @@ Agents should be able to prove the slice by checking:
 - pulse changes the title art deterministically;
 - raw RGBA filter tests cover charset, Braille, quad, fit, color, and invalid
   charset behavior;
+- the committed `background.txt` field remains the visible landing background;
 - pipe/accessibility release facts remain sourced from release-title metadata.
 
 ## Tests To Write First
@@ -231,13 +231,11 @@ Agents should be able to prove the slice by checking:
   fill-cropping.
 - RED: terminal `fit` mode assumes square cells and crops the wrong axis in
   typical tall-cell terminals.
-- RED: the committed PNG title asset cannot decode to RGBA.
-- RED: DOGFOOD landing frame has no raster title art using the configured
-  charset.
+- RED: DOGFOOD landing frame does not render enough `background.txt` glyph art.
 - RED: the committed `Bijou.svg` wordmark is not rasterized into the rendered
   landing frame.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
-  decoded image.
+  background field.
 
 ## Validation
 
@@ -245,7 +243,6 @@ Run focused tests first:
 
 ```bash
 npx vitest run packages/bijou-tui/src/raster-glyph.test.ts
-npx vitest run scripts/png-rgba.test.ts
 npx vitest run scripts/svg-raster.test.ts
 npx vitest run scripts/docs-preview.test.ts -t "raster-to-glyph"
 ```

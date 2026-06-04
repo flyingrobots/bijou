@@ -17,9 +17,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `@flyingrobots/bijou-tui` now exposes a deterministic raw-RGBA-to-`Surface`
   renderer with charset, Braille, and quad modes, including custom density
   character sets, centered `fit` crop semantics, and optional terminal
-  cell-aspect correction. DOGFOOD decodes the committed V7 title PNG into RGBA
-  at runtime, renders it as terminal glyph art, and overlays the committed
-  `Bijou.svg` wordmark in complementary title-art colors for the `V7 Launch
+  cell-aspect correction. DOGFOOD now uses the committed `background.txt`
+  density field as the V7 landing background and overlays the committed
+  `Bijou.svg` wordmark in complementary background colors for the `V7 Launch
   Wake` landing screen while preserving the existing landing quality buckets
   and lower-mode release facts. This closes issue #303.
 

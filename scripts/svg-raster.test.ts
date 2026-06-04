@@ -44,6 +44,8 @@ describe('svg rasterizer', () => {
     const frame = rasterizeSvgToRgba(svg, { width: 180, height: 40 });
 
     expect(svgViewBoxAspectRatio(svg)).toBeCloseTo(673.602 / 150.001, 5);
+    expect(alphaAt(frame, 0, 0)).toBe(0);
+    expect(alphaAt(frame, frame.width - 1, frame.height - 1)).toBe(0);
     expect(filledPixelCount(frame)).toBeGreaterThan(2800);
     expect(filledPixelCount(frame)).toBeLessThan(6200);
   });

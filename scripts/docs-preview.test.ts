@@ -73,7 +73,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   return text;
 }
 
-function rasterTitleGlyphCount(text: string): number {
+function titleBackgroundGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
 }
 
@@ -438,7 +438,7 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
-  it('renders the decoded raster-to-glyph V7 title image on the landing title screen', async () => {
+  it('renders the background.txt V7 title field with the Bijou SVG overlay', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -448,8 +448,8 @@ describe('docs preview app', () => {
     const initialText = frameText(initial.frames[0]!);
     const pulsedText = frameText(pulsed.frames[pulsed.frames.length - 1]!);
 
-    expect(rasterTitleGlyphCount(initialText)).toBeGreaterThan(1000);
-    expect(rasterTitleGlyphCount(pulsedText)).toBeGreaterThan(1000);
+    expect(titleBackgroundGlyphCount(initialText)).toBeGreaterThan(1000);
+    expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
     const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
     expect(overlay.expected).toBeGreaterThan(450);
     expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
