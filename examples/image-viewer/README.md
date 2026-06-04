@@ -4,6 +4,9 @@ Browse local image files in a sidebar and render the selected image as terminal
 glyph art in the main pane.
 
 ```sh
+npm run img
+npm run img -- assets
+npm run img -- assets/Bijou.svg
 npm run image-viewer
 npm run image-viewer -- assets
 npm run image-viewer -- assets/Bijou.svg
