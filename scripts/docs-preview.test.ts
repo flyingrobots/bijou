@@ -232,6 +232,7 @@ describe('docs preview app', () => {
     expect(text).not.toContain('Documentation coverage');
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
+    expect(text).toContain('V7 Launch Wake');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -359,6 +360,25 @@ describe('docs preview app', () => {
 
     expect((pulsed.model as any).route).toBe('landing');
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+  });
+
+  it('renders a pulse-driven V7 launch wake ribbon on the landing title screen', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
+
+    const initialWakeRows = frameText(initial.frames[0]!)
+      .split('\n')
+      .filter((row) => row.includes('~~~~'));
+    const pulsedWakeRows = frameText(pulsed.frames[pulsed.frames.length - 1]!)
+      .split('\n')
+      .filter((row) => row.includes('~~~~'));
+
+    expect(initialWakeRows.length).toBeGreaterThanOrEqual(2);
+    expect(pulsedWakeRows.length).toBeGreaterThanOrEqual(2);
+    expect(initialWakeRows.join('\n')).not.toEqual(pulsedWakeRows.join('\n'));
   });
 
   it('reuses giant landing frames across small pulses within the same quality bucket', async () => {

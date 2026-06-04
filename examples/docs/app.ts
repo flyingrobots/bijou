@@ -127,6 +127,7 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import {
+  CURRENT_DOGFOOD_RELEASE_TITLE,
   DOGFOOD_RELEASE_TITLE_GALLERY,
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
@@ -630,6 +631,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
+const LANDING_WAKE_PATTERN = '~~~~----....    ';
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
@@ -2343,13 +2345,14 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       return cache.front;
     }
 
-    const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
-    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-
     const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
     const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
     const logoX = Math.floor((width - logoWidth) / 2);
     const logoY = Math.floor((height - logoHeight) / 2);
+
+    const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
+    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
+    paintLaunchWakeRibbon(surface, logoY + logoHeight, quantizedTimeMs, tokens, quality);
     paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, quantizedTimeMs, tokens, quality);
 
     const wordmarkGlyphs = width >= 110 && height >= 30
@@ -2507,6 +2510,56 @@ function paintLandingBackground(
             opacity: 1,
           });
         }
+      }
+    }
+  }
+}
+
+function paintLaunchWakeRibbon(
+  surface: Surface,
+  anchorY: number,
+  timeMs: number,
+  tokens: LandingThemeTokens,
+  quality: LandingQualityProfile,
+): void {
+  const width = surface.width;
+  const height = surface.height;
+  if (width < 48 || height < 16) return;
+
+  const time = timeMs / 1000;
+  const rowCount = height >= 30 ? 3 : 2;
+  const startY = Math.max(1, Math.min(height - rowCount - 2, anchorY - 1));
+  const ribbonWidth = Math.max(28, Math.floor(width * 0.84));
+  const left = Math.floor((width - ribbonWidth) / 2);
+  const xStep = Math.max(1, quality.backgroundTile);
+  const phase = Math.floor(time * 14);
+
+  for (let row = 0; row < rowCount; row++) {
+    const y = startY + row;
+    const drift = Math.round(Math.sin((time * 1.35) + (row * 0.9)) * 4);
+    const rowPhase = phase + (row * 5) - drift;
+    for (let x = 0; x < ribbonWidth; x += xStep) {
+      const patternIndex = mod(x + rowPhase, LANDING_WAKE_PATTERN.length);
+      const char = LANDING_WAKE_PATTERN[patternIndex]!;
+      if (char === ' ') continue;
+
+      const targetX = left + x;
+      if (targetX < 0 || targetX >= width) continue;
+
+      const local = ribbonWidth <= 1 ? 0 : x / (ribbonWidth - 1);
+      const crest = 0.5 + (Math.sin((local * Math.PI * 2.4) + (time * 1.9) + row) * 0.5);
+      const fg = sampleColorRamp(tokens.logoRamp, clamp01(0.34 + (local * 0.48) + (crest * 0.18)));
+      const modifiers = char === '~' ? BOLD_MODIFIERS : DIM_MODIFIERS;
+
+      for (let fillX = targetX; fillX < Math.min(width, targetX + xStep); fillX++) {
+        surface.set(fillX, y, {
+          char,
+          bg: tokens.background,
+          fg,
+          modifiers: modifiers as string[] | undefined,
+          empty: false,
+          opacity: 1,
+        });
       }
     }
   }
@@ -2917,10 +2970,15 @@ function getLandingDogfoodPanel(
     'landing.dogfood.expansion',
     'Documentation Of Good Foundational Onboarding and Discovery',
   );
+  const releaseTitle = dogfoodText(
+    localization,
+    CURRENT_DOGFOOD_RELEASE_TITLE.titleKey,
+    CURRENT_DOGFOOD_RELEASE_TITLE.title,
+  );
   const renderedTitle = titleScreenBlock.render({
     config: {
       title,
-      subtitle: expansion,
+      subtitle: `${releaseTitle} / ${expansion}`,
     },
     mode: 'interactive',
   });

@@ -13,6 +13,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the
   original `V7 Product Truth` treatment as historical release identity. This
   closes issue #289.
+- **V7 Launch Wake landing animation** — DOGFOOD now brings the current
+  `V7 Launch Wake` title treatment onto the landing screen with a localized
+  release label and deterministic pulse-driven wake ribbon, while preserving
+  the existing landing quality buckets and lower-mode release facts. This
+  closes issue #303.
 
 ## [7.0.0] - 2026-06-03
 
