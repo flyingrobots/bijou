@@ -2,6 +2,7 @@ import { createSurface, type Cell, type Surface } from '@flyingrobots/bijou';
 
 export type RasterGlyphFit = 'stretch' | 'contain' | 'fit';
 export type RasterGlyphColorMode = 'none' | 'fg' | 'fg-bg';
+export type RasterGlyphDitherMode = 'none' | 'ordered';
 export type RasterGlyphCharsetOrder = 'light-to-dark' | 'dark-to-light';
 
 export interface RgbaFrame {
@@ -40,6 +41,8 @@ export interface RasterToGlyphSurfaceOptions {
   readonly panX?: number;
   readonly panY?: number;
   readonly colorMode?: RasterGlyphColorMode;
+  readonly contrast?: number;
+  readonly dither?: RasterGlyphDitherMode;
   readonly renderer?: RasterGlyphRenderer;
 }
 
@@ -71,6 +74,11 @@ interface RasterSample {
   readonly color: readonly [number, number, number] | undefined;
 }
 
+interface RasterGlyphAdjustments {
+  readonly contrast: number;
+  readonly dither: RasterGlyphDitherMode;
+}
+
 const DEFAULT_RASTER_GLYPH_CHARSET = ' .:-=+*#%@';
 
 const DEFAULT_RENDERER: RasterGlyphCharsetRenderer = {
@@ -81,6 +89,17 @@ const DEFAULT_RENDERER: RasterGlyphCharsetRenderer = {
 
 const DEFAULT_THRESHOLD = 0.5;
 const DEFAULT_CELL_ASPECT_RATIO = 1;
+const DEFAULT_CONTRAST = 1;
+const MIN_CONTRAST = 0.1;
+const MAX_CONTRAST = 4;
+const ORDERED_DITHER_STRENGTH = 0.2;
+
+const BAYER_4X4 = [
+  [0, 8, 2, 10],
+  [12, 4, 14, 6],
+  [3, 11, 1, 9],
+  [15, 7, 13, 5],
+] as const;
 
 const BRAILLE_DOT_MAP = [
   [0x01, 0x08],
@@ -137,17 +156,21 @@ export function rasterToGlyphSurface(frame: RgbaFrame, options: RasterToGlyphSur
   const panY = sanitizePan(options.panY);
   const colorMode = options.colorMode ?? 'none';
   const renderer = options.renderer ?? DEFAULT_RENDERER;
+  const adjustments: RasterGlyphAdjustments = {
+    contrast: sanitizeContrast(options.contrast),
+    dither: sanitizeDitherMode(options.dither),
+  };
   const transform = createFitTransform(frame, columns, rows, fit, cellAspectRatio, zoom, panX, panY);
 
   switch (renderer.kind) {
     case 'charset':
-      renderCharset(surface, frame, transform, renderer, colorMode);
+      renderCharset(surface, frame, transform, renderer, colorMode, adjustments);
       break;
     case 'braille':
-      renderBraille(surface, frame, transform, renderer.threshold ?? DEFAULT_THRESHOLD, colorMode);
+      renderBraille(surface, frame, transform, renderer.threshold, colorMode, adjustments);
       break;
     case 'quad':
-      renderQuad(surface, frame, transform, renderer.threshold ?? DEFAULT_THRESHOLD, colorMode);
+      renderQuad(surface, frame, transform, renderer.threshold, colorMode, adjustments);
       break;
   }
 
@@ -160,6 +183,7 @@ function renderCharset(
   transform: FitTransform,
   renderer: RasterGlyphCharsetRenderer,
   colorMode: RasterGlyphColorMode,
+  adjustments: RasterGlyphAdjustments,
 ): void {
   const glyphs = validateRasterGlyphCharset(renderer.chars ?? DEFAULT_RASTER_GLYPH_CHARSET);
   const order = renderer.order ?? 'light-to-dark';
@@ -167,10 +191,11 @@ function renderCharset(
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const sample = sampleTargetRect(frame, transform, x, y, x + 1, y + 1);
-      const char = sample === undefined
+      const adjustedSample = adjustSample(sample, x, y, adjustments);
+      const char = adjustedSample === undefined
         ? ' '
-        : glyphForDarkness(sample.darkness, glyphs, order);
-      surface.set(x, y, cellForSample(char, sample, colorMode, DEFAULT_THRESHOLD));
+        : glyphForDarkness(adjustedSample.darkness, glyphs, order);
+      surface.set(x, y, cellForSample(char, adjustedSample, colorMode, DEFAULT_THRESHOLD));
     }
   }
 }
@@ -179,9 +204,12 @@ function renderBraille(
   surface: Surface,
   frame: RgbaFrame,
   transform: FitTransform,
-  threshold: number,
+  thresholdValue: number | undefined,
   colorMode: RasterGlyphColorMode,
+  adjustments: RasterGlyphAdjustments,
 ): void {
+  const threshold = sanitizeThreshold(thresholdValue);
+
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       let code = 0;
@@ -199,8 +227,9 @@ function renderBraille(
             x + ((sx + 1) / 2),
             y + ((sy + 1) / 4),
           );
-          accumulateSampleColors(sample, colors, darkColors, lightColors, threshold);
-          if (sample !== undefined && sample.darkness >= threshold) {
+          const adjustedSample = adjustSample(sample, (x * 2) + sx, (y * 4) + sy, adjustments);
+          accumulateSampleColors(adjustedSample, colors, darkColors, lightColors, threshold);
+          if (adjustedSample !== undefined && adjustedSample.darkness >= threshold) {
             code |= BRAILLE_DOT_MAP[sy]![sx]!;
           }
         }
@@ -216,9 +245,12 @@ function renderQuad(
   surface: Surface,
   frame: RgbaFrame,
   transform: FitTransform,
-  threshold: number,
+  thresholdValue: number | undefined,
   colorMode: RasterGlyphColorMode,
+  adjustments: RasterGlyphAdjustments,
 ): void {
+  const threshold = sanitizeThreshold(thresholdValue);
+
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       let mask = 0;
@@ -236,8 +268,9 @@ function renderQuad(
             x + ((sx + 1) / 2),
             y + ((sy + 1) / 2),
           );
-          accumulateSampleColors(sample, colors, darkColors, lightColors, threshold);
-          if (sample !== undefined && sample.darkness >= threshold) {
+          const adjustedSample = adjustSample(sample, (x * 2) + sx, (y * 2) + sy, adjustments);
+          accumulateSampleColors(adjustedSample, colors, darkColors, lightColors, threshold);
+          if (adjustedSample !== undefined && adjustedSample.darkness >= threshold) {
             mask |= 1 << (sy * 2 + sx);
           }
         }
@@ -259,6 +292,38 @@ function glyphForDarkness(
   const t = order === 'light-to-dark' ? darkness : 1 - darkness;
   const index = Math.round(clampUnit(t) * (glyphs.length - 1));
   return glyphs[index] ?? glyphs[glyphs.length - 1] ?? ' ';
+}
+
+function adjustSample(
+  sample: RasterSample | undefined,
+  x: number,
+  y: number,
+  adjustments: RasterGlyphAdjustments,
+): RasterSample | undefined {
+  if (sample === undefined) return undefined;
+  return {
+    ...sample,
+    darkness: adjustedDarkness(sample.darkness, x, y, adjustments),
+  };
+}
+
+function adjustedDarkness(
+  darkness: number,
+  x: number,
+  y: number,
+  adjustments: RasterGlyphAdjustments,
+): number {
+  let next = ((darkness - 0.5) * adjustments.contrast) + 0.5;
+  if (adjustments.dither === 'ordered') {
+    next += orderedDitherOffset(x, y);
+  }
+  return clampUnit(next);
+}
+
+function orderedDitherOffset(x: number, y: number): number {
+  const row = BAYER_4X4[Math.abs(Math.floor(y)) % BAYER_4X4.length]!;
+  const value = row[Math.abs(Math.floor(x)) % row.length]!;
+  return ((value - 7.5) / 16) * ORDERED_DITHER_STRENGTH;
 }
 
 function createFitTransform(
@@ -520,6 +585,22 @@ function sanitizeZoom(value: number | undefined): number {
 function sanitizePan(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 0;
   return value;
+}
+
+function sanitizeContrast(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value) || value <= 0) {
+    return DEFAULT_CONTRAST;
+  }
+  return clampRange(value, MIN_CONTRAST, MAX_CONTRAST);
+}
+
+function sanitizeThreshold(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return DEFAULT_THRESHOLD;
+  return clampUnit(value);
+}
+
+function sanitizeDitherMode(value: RasterGlyphDitherMode | undefined): RasterGlyphDitherMode {
+  return value === 'ordered' ? 'ordered' : 'none';
 }
 
 function byteAt(data: Uint8ClampedArray | readonly number[], index: number): number {

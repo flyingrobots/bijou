@@ -20,7 +20,8 @@ keywords:
 Issue #305 adds a small, runnable side app that proves image browsing and
 image-to-glyph rendering as a real workflow instead of only as DOGFOOD title
 art. The app should use a sidebar file explorer, render the selected image in a
-main preview pane, and let the user hot-swap between Braille and ASCII output.
+main preview pane, let the user hot-swap between Braille and ASCII output, and
+expose enough tuning controls to discuss how image-to-text filters behave.
 
 The app stays intentionally small: it reuses `filePickerSurface()` for the
 filesystem browser and `rasterToGlyphSurface()` for glyph rendering. Codec
@@ -49,7 +50,8 @@ A user can launch the image viewer, browse supported image files in a sidebar,
 select an image, and see the main pane render that image as Braille or ASCII
 glyphs. Pressing `m` swaps the render mode immediately. The preview pane also
 supports pan and zoom so a user can inspect image details without leaving the
-side app.
+side app. The same pane lets the user preserve sampled image colors, adjust
+Braille threshold and contrast, and toggle ordered dithering.
 
 ## Product Shape
 
@@ -60,7 +62,8 @@ side app.
 |   - Bijou.svg               | |   ⣿⣿⣿⣿⣿⣶⣤...                    |
 |   - sample.ppm              | |                                            |
 +-----------------------------+ +--------------------------------------------+
-q quit  Enter open/select  <- parent  m mode  r refresh
+Mode: braille  Color: monochrome  Dither: none  Threshold: 45%  Contrast: 100%
+q quit  Enter open/select  <- parent  m mode  c color  d dither
 ```
 
 ## Scope
@@ -70,6 +73,8 @@ q quit  Enter open/select  <- parent  m mode  r refresh
   decoding.
 - Reuse the existing SVG rasterizer for SVG preview.
 - Add `npm run image-viewer`.
+- Expose color mode, threshold, contrast, and ordered-dither controls in the
+  preview model.
 - Add focused tests for codec behavior, render-mode switching, and app view
   output.
 
@@ -77,8 +82,8 @@ q quit  Enter open/select  <- parent  m mode  r refresh
 
 - JPEG/WebP decoding.
 - Public package-level image codec APIs.
-- A generalized image-workbench product with cropping, dithering controls, or
-  export.
+- A generalized image-workbench product with cropping, palette quantization,
+  error-diffusion dithering, or export.
 - Promoting a new public image block in this slice.
 
 ## Runtime Contract
@@ -103,11 +108,16 @@ Navigation contract:
 - `-`: zoom out.
 - `0`: reset to fit.
 - `m` / `Tab`: switch Braille and ASCII rendering.
+- `c`: cycle color mode between monochrome, foreground color, and
+  foreground/background color.
+- `d`: toggle ordered dithering.
+- `[` / `]`: lower or raise the Braille threshold.
+- `,` / `.`: lower or raise contrast.
 
 The file picker marks focus with `>` and the rendered image with `*`. The
-preview gutter reports zoom percentage and pan offset. The initial image and
-every newly selected image start at `100%` fit, centered horizontally and
-vertically.
+preview gutter reports zoom percentage, pan offset, color mode, dithering mode,
+threshold, and contrast. The initial image and every newly selected image start
+at `100%` fit, centered horizontally and vertically.
 
 ## Lower Modes
 
@@ -118,8 +128,8 @@ for tests.
 ## Accessibility / Assistive Posture
 
 The file picker remains textual. The preview pane names the selected file,
-render mode, format, and dimensions so the image is not only communicated by
-glyph art.
+render mode, format, dimensions, and tuning state so the image is not only
+communicated by glyph art.
 
 ## Tests To Write First
 
@@ -127,6 +137,9 @@ glyph art.
 - RED: PPM decoder cannot map `P3` and `P6` RGB data into RGBA.
 - RED: image viewer starts with an image selected from the root.
 - RED: pressing `m` does not change Braille mode to ASCII mode.
+- RED: pressing `c` does not preserve sampled image colors on rendered glyphs.
+- RED: threshold, contrast, and dither controls do not change visible tuning
+  state.
 - RED: rendered view does not contain the file picker and preview panes.
 
 ## Validation
@@ -143,3 +156,7 @@ npm run lint
 - Decide whether this app should become part of DOGFOOD or stay an example.
 - Promote a first-class image/file-browser block only after the side-app shape
   proves stable.
+- Add error-diffusion algorithms such as Floyd-Steinberg or Atkinson once the
+  ordered-dither baseline has enough usage feedback.
+- Add palette quantization and custom charset editing if the side app graduates
+  into a broader image-to-text workbench.

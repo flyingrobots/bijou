@@ -813,6 +813,7 @@ export {
   type RasterGlyphQuadRenderer,
   type RasterGlyphFit,
   type RasterGlyphColorMode,
+  type RasterGlyphDitherMode,
   type RasterToGlyphSurfaceOptions,
   type RgbaFrame,
   RASTER_GLYPH_CHARSETS,

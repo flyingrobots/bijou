@@ -28,7 +28,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   Users can hot-swap between Braille and ASCII glyph rendering with `m` or
   `Tab`, pan the preview viewport with arrow keys, zoom with `+` / `-`, and
   distinguish file-picker focus from the rendered image through `>` and `*`
-  row markers. This closes issue #305.
+  row markers. The preview can now preserve sampled image colors, toggle
+  foreground/background color sampling, adjust Braille threshold and contrast,
+  and enable deterministic ordered dithering from the keyboard. This closes
+  issue #305.
 
 ### 🛠 Maintenance
 

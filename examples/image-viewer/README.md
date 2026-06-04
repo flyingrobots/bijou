@@ -26,12 +26,17 @@ the preview with `*`.
 - `-`: zoom out
 - `0`: reset to fit
 - `m` / `Tab`: switch between Braille and ASCII rendering
+- `c`: cycle color mode between monochrome, foreground color, and
+  foreground/background color
+- `d`: toggle ordered dithering
+- `[` / `]`: lower or raise the Braille threshold
+- `,` / `.`: lower or raise contrast
 - `r`: refresh the current directory
 - `q` / `Ctrl+C`: quit
 
-The preview gutter reports the current zoom percentage and pan offset. Loading
-a new image resets the viewport to fit mode at `100%`, centered horizontally
-and vertically.
+The preview gutter reports the current zoom percentage, pan offset, color
+mode, dithering mode, threshold, and contrast. Loading a new image resets the
+viewport to fit mode at `100%`, centered horizontally and vertically.
 
 ## Formats
 

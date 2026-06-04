@@ -221,6 +221,47 @@ describe('image viewer app', () => {
     expect(frameText(app.view(next) as Surface)).toContain('Mode: ascii');
   });
 
+  it('can preserve sampled image colors on rendered glyphs', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n255 0 0\n');
+    const ctx = createTestContext({ runtime: { columns: 180, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [colored] = app.update(keyMsg('c'), model);
+    const glyphCells = brailleGlyphCells(app.view(colored) as Surface);
+    const text = frameText(app.view(colored) as Surface);
+
+    expect(colored.tuning.colorMode).toBe('fg');
+    expect(glyphCells.some((cell) => {
+      const rgb = cell.fgRGB;
+      return rgb !== undefined && rgb[0] === 255 && rgb[1] === 0 && rgb[2] === 0;
+    }))
+      .toBe(true);
+    expect(text).toContain('Color: foreground');
+  });
+
+  it('adjusts threshold, contrast, and ordered dithering from preview keys', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n128 128 128\n');
+    const ctx = createTestContext({ runtime: { columns: 220, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [thresholdUp] = app.update(keyMsg(']'), model);
+    const [contrastUp] = app.update(keyMsg('.'), thresholdUp);
+    const [dithered] = app.update(keyMsg('d'), contrastUp);
+    const text = frameText(app.view(dithered) as Surface);
+
+    expect(dithered.tuning).toEqual({
+      colorMode: 'none',
+      thresholdPercent: 50,
+      contrastPercent: 110,
+      dither: 'ordered',
+    });
+    expect(text).toContain('Dither: ordered');
+    expect(text).toContain('Threshold: 50%');
+    expect(text).toContain('Contrast: 110%');
+  });
+
   it('selects the focused image file through the file picker key map', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');

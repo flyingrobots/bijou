@@ -27,6 +27,8 @@ import {
   type FileEntry,
   type FilePickerState,
   type KeyMsg,
+  type RasterGlyphColorMode,
+  type RasterGlyphDitherMode,
 } from '@flyingrobots/bijou-tui';
 import { rasterizeSvgToRgba } from '../docs/svg-raster.js';
 import { decodeImageRgba, type DecodedImageFormat } from './image-codecs.js';
@@ -39,6 +41,13 @@ export interface ImageViewportModel {
   readonly panY: number;
 }
 
+export interface ImageTuningModel {
+  readonly colorMode: RasterGlyphColorMode;
+  readonly thresholdPercent: number;
+  readonly contrastPercent: number;
+  readonly dither: RasterGlyphDitherMode;
+}
+
 export interface ImageViewerModel {
   readonly columns: number;
   readonly rows: number;
@@ -46,6 +55,7 @@ export interface ImageViewerModel {
   readonly selectedPath: string | undefined;
   readonly mode: ImageRenderMode;
   readonly viewport: ImageViewportModel;
+  readonly tuning: ImageTuningModel;
   readonly lastError: string | undefined;
 }
 
@@ -85,11 +95,23 @@ const DEFAULT_IMAGE_VIEWPORT: ImageViewportModel = {
   panX: 0,
   panY: 0,
 };
+const DEFAULT_IMAGE_TUNING: ImageTuningModel = {
+  colorMode: 'none',
+  thresholdPercent: 45,
+  contrastPercent: 100,
+  dither: 'none',
+};
 const ZOOM_FACTOR = 1.25;
 const MIN_ZOOM_PERCENT = 25;
 const MAX_ZOOM_PERCENT = 800;
 const PAN_STEP_COLUMNS = 4;
 const PAN_STEP_ROWS = 2;
+const THRESHOLD_STEP_PERCENT = 5;
+const MIN_THRESHOLD_PERCENT = 5;
+const MAX_THRESHOLD_PERCENT = 95;
+const CONTRAST_STEP_PERCENT = 10;
+const MIN_CONTRAST_PERCENT = 50;
+const MAX_CONTRAST_PERCENT = 200;
 const pickerKeys = filePickerKeyMap<ImageViewerMsg>({
   focusNext: { type: 'focus-next' },
   focusPrev: { type: 'focus-prev' },
@@ -118,6 +140,7 @@ export function createImageViewerApp(
         selectedPath,
         mode: 'braille',
         viewport: DEFAULT_IMAGE_VIEWPORT,
+        tuning: DEFAULT_IMAGE_TUNING,
         lastError: undefined,
       }, []];
     },
@@ -175,6 +198,66 @@ function updateKey(
 ): [ImageViewerModel, Cmd<ImageViewerMsg>[]] | [ImageViewerModel, []] {
   if (msg.key === 'm' || msg.key === 'tab') {
     return [{ ...model, mode: nextMode(model.mode), lastError: undefined }, []];
+  }
+  if (msg.key === 'c') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        colorMode: nextColorMode(model.tuning.colorMode),
+      },
+      lastError: undefined,
+    }, []];
+  }
+  if (msg.key === '[') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        thresholdPercent: clampThresholdPercent(model.tuning.thresholdPercent - THRESHOLD_STEP_PERCENT),
+      },
+      lastError: undefined,
+    }, []];
+  }
+  if (msg.key === ']') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        thresholdPercent: clampThresholdPercent(model.tuning.thresholdPercent + THRESHOLD_STEP_PERCENT),
+      },
+      lastError: undefined,
+    }, []];
+  }
+  if (msg.key === ',') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        contrastPercent: clampContrastPercent(model.tuning.contrastPercent - CONTRAST_STEP_PERCENT),
+      },
+      lastError: undefined,
+    }, []];
+  }
+  if (msg.key === '.') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        contrastPercent: clampContrastPercent(model.tuning.contrastPercent + CONTRAST_STEP_PERCENT),
+      },
+      lastError: undefined,
+    }, []];
+  }
+  if (msg.key === 'd') {
+    return [{
+      ...model,
+      tuning: {
+        ...model.tuning,
+        dither: nextDitherMode(model.tuning.dither),
+      },
+      lastError: undefined,
+    }, []];
   }
   if (msg.key === '+' || msg.key === '=') {
     return [{ ...model, viewport: zoomViewport(model.viewport, ZOOM_FACTOR), lastError: undefined }, []];
@@ -466,7 +549,10 @@ function renderPreview(
   ctx: BijouContext,
   io: ScopedNodeIO,
 ): Surface {
-  const footer = `Explorer: j/k focus  Enter select/open  Backspace parent  Preview: arrows pan  +/- zoom  0 fit  m ${model.mode}`;
+  const footer = [
+    'Explorer: j/k focus  Enter select/open  Backspace parent',
+    'Preview: arrows pan  +/- zoom  0 fit  m mode  c color  d dither  [] threshold  ,. contrast',
+  ].join('  ');
   const previewHeight = Math.max(1, height - 5);
   const previewWidth = Math.max(1, width - 2);
   let title = 'Preview';
@@ -483,18 +569,33 @@ function renderPreview(
       previewHeight,
       model.mode,
       model.viewport,
+      model.tuning,
       io,
     );
     if (loaded instanceof Error) {
       status = loaded.message;
       body = stringToSurface(status, previewWidth, previewHeight);
     } else {
+      const thresholdStatus = `Threshold: ${formatPercentSlider(
+        model.tuning.thresholdPercent,
+        MIN_THRESHOLD_PERCENT,
+        MAX_THRESHOLD_PERCENT,
+      )}`;
+      const contrastStatus = `Contrast: ${formatPercentSlider(
+        model.tuning.contrastPercent,
+        MIN_CONTRAST_PERCENT,
+        MAX_CONTRAST_PERCENT,
+      )}`;
       status = [
         `Mode: ${model.mode}`,
-        `Zoom: ${model.viewport.zoomPercent}%`,
-        `Pan: ${formatPan(model.viewport.panX)},${formatPan(model.viewport.panY)}`,
         `Format: ${loaded.format.toUpperCase()}`,
         `Source: ${loaded.width}x${loaded.height}`,
+        `Zoom: ${model.viewport.zoomPercent}%`,
+        `Pan: ${formatPan(model.viewport.panX)},${formatPan(model.viewport.panY)}`,
+        `Color: ${formatColorMode(model.tuning.colorMode)}`,
+        `Dither: ${model.tuning.dither}`,
+        thresholdStatus,
+        contrastStatus,
       ].join('  ');
       body = loaded.surface;
     }
@@ -525,6 +626,7 @@ function loadImagePreview(
   rows: number,
   mode: ImageRenderMode,
   viewport: ImageViewportModel,
+  tuning: ImageTuningModel,
   io: ScopedNodeIO,
 ): LoadedImage | Error {
   try {
@@ -552,9 +654,11 @@ function loadImagePreview(
         zoom: viewport.zoomPercent / 100,
         panX: -viewport.panX,
         panY: -viewport.panY,
-        colorMode: 'none',
+        colorMode: tuning.colorMode,
+        contrast: tuning.contrastPercent / 100,
+        dither: tuning.dither,
         renderer: mode === 'braille'
-          ? { kind: 'braille', threshold: 0.45 }
+          ? { kind: 'braille', threshold: tuning.thresholdPercent / 100 }
           : { kind: 'charset', chars: ' .:-=+*#%@', order: 'light-to-dark' },
       }),
     };
@@ -565,6 +669,16 @@ function loadImagePreview(
 
 function nextMode(mode: ImageRenderMode): ImageRenderMode {
   return mode === 'braille' ? 'ascii' : 'braille';
+}
+
+function nextColorMode(mode: RasterGlyphColorMode): RasterGlyphColorMode {
+  if (mode === 'none') return 'fg';
+  if (mode === 'fg') return 'fg-bg';
+  return 'none';
+}
+
+function nextDitherMode(mode: RasterGlyphDitherMode): RasterGlyphDitherMode {
+  return mode === 'none' ? 'ordered' : 'none';
 }
 
 function zoomViewport(viewport: ImageViewportModel, factor: number): ImageViewportModel {
@@ -587,9 +701,36 @@ function clampZoomPercent(value: number): number {
   return Math.max(MIN_ZOOM_PERCENT, Math.min(MAX_ZOOM_PERCENT, value));
 }
 
+function clampThresholdPercent(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_IMAGE_TUNING.thresholdPercent;
+  return Math.max(MIN_THRESHOLD_PERCENT, Math.min(MAX_THRESHOLD_PERCENT, Math.round(value)));
+}
+
+function clampContrastPercent(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_IMAGE_TUNING.contrastPercent;
+  return Math.max(MIN_CONTRAST_PERCENT, Math.min(MAX_CONTRAST_PERCENT, Math.round(value)));
+}
+
 function sanitizePanValue(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.max(-9999, Math.min(9999, value));
+}
+
+function formatColorMode(mode: RasterGlyphColorMode): string {
+  if (mode === 'fg') return 'foreground';
+  if (mode === 'fg-bg') return 'foreground/background';
+  return 'monochrome';
+}
+
+function formatPercentSlider(value: number, min: number, max: number): string {
+  const slots = 10;
+  const clamped = Math.max(min, Math.min(max, value));
+  const position = Math.round(((clamped - min) / (max - min)) * (slots - 1));
+  let bar = '';
+  for (let index = 0; index < slots; index++) {
+    bar += index === position ? '|' : '-';
+  }
+  return `${value}% [${bar}]`;
 }
 
 function formatPan(value: number): string {

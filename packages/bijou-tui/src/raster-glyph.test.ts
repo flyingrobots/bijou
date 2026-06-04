@@ -6,7 +6,11 @@ import {
   type RgbaFrame,
 } from './raster-glyph.js';
 
-function frame(width: number, height: number, pixels: readonly (readonly [number, number, number, number])[]): RgbaFrame {
+function frame(
+  width: number,
+  height: number,
+  pixels: readonly (readonly [number, number, number, number])[],
+): RgbaFrame {
   const data = new Uint8ClampedArray(width * height * 4);
   for (let index = 0; index < pixels.length; index++) {
     const [r, g, b, a] = pixels[index]!;
@@ -125,6 +129,62 @@ describe('rasterToGlyphSurface()', () => {
 
     expect(surface.get(0, 0).char).toBe('#');
     expect(surface.get(0, 0).fgRGB).toEqual([0, 64, 128]);
+  });
+
+  it('applies contrast before selecting charset density glyphs', () => {
+    const base = rasterToGlyphSurface(
+      frame(1, 1, [[80, 80, 80, 255]]),
+      {
+        columns: 1,
+        rows: 1,
+        renderer: {
+          kind: 'charset',
+          chars: ' .#',
+          order: 'light-to-dark',
+        },
+      },
+    );
+    const contrasted = rasterToGlyphSurface(
+      frame(1, 1, [[80, 80, 80, 255]]),
+      {
+        columns: 1,
+        rows: 1,
+        contrast: 2,
+        renderer: {
+          kind: 'charset',
+          chars: ' .#',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(base.get(0, 0).char).toBe('.');
+    expect(contrasted.get(0, 0).char).toBe('#');
+  });
+
+  it('applies ordered dithering to density decisions without dropping source color', () => {
+    const surface = rasterToGlyphSurface(
+      frame(2, 1, [
+        [128, 128, 128, 255],
+        [128, 128, 128, 255],
+      ]),
+      {
+        columns: 2,
+        rows: 1,
+        colorMode: 'fg',
+        dither: 'ordered',
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe(' ');
+    expect(surface.get(1, 0).char).toBe('#');
+    expect(surface.get(0, 0).fgRGB).toEqual([128, 128, 128]);
+    expect(surface.get(1, 0).fgRGB).toEqual([128, 128, 128]);
   });
 
   it('letterboxes contained frames into empty cells', () => {
