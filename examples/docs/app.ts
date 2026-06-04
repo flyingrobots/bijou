@@ -46,6 +46,8 @@ import {
   mapCmds,
   placeSurface,
   quit,
+  RASTER_GLYPH_CHARSETS,
+  rasterToGlyphSurface,
   renderShellQuitOverlay,
   shouldUseShellQuitConfirm,
   toast,
@@ -64,6 +66,7 @@ import {
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
+  type RgbaFrame,
 } from '../../packages/bijou-tui/src/index.js';
 import {
   createI18nRuntime,
@@ -631,7 +634,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
-const LANDING_WAKE_PATTERN = '~~~~----....    ';
+const LANDING_TITLE_ART_CHARSET = RASTER_GLYPH_CHARSETS.launch;
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
@@ -2352,7 +2355,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-    paintLaunchWakeRibbon(surface, logoY + logoHeight, quantizedTimeMs, tokens, quality);
+    paintV7RasterTitleArt(surface, logoY, logoHeight, quantizedTimeMs, tokens);
     paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, quantizedTimeMs, tokens, quality);
 
     const wordmarkGlyphs = width >= 110 && height >= 30
@@ -2515,54 +2518,133 @@ function paintLandingBackground(
   }
 }
 
-function paintLaunchWakeRibbon(
+function paintV7RasterTitleArt(
   surface: Surface,
-  anchorY: number,
+  logoY: number,
+  logoHeight: number,
   timeMs: number,
   tokens: LandingThemeTokens,
-  quality: LandingQualityProfile,
 ): void {
   const width = surface.width;
   const height = surface.height;
-  if (width < 48 || height < 16) return;
+  if (width < 40 || height < 14) return;
 
-  const time = timeMs / 1000;
-  const rowCount = height >= 30 ? 3 : 2;
-  const startY = Math.max(1, Math.min(height - rowCount - 2, anchorY - 1));
-  const ribbonWidth = Math.max(28, Math.floor(width * 0.84));
-  const left = Math.floor((width - ribbonWidth) / 2);
-  const xStep = Math.max(1, quality.backgroundTile);
-  const phase = Math.floor(time * 14);
+  const artRows = Math.max(5, Math.min(height - 3, height >= 34 ? 18 : 10));
+  const preferredY = logoY + logoHeight - Math.floor(artRows * 0.55);
+  const artY = Math.max(1, Math.min(height - artRows - 2, preferredY));
+  const frame = createV7RasterTitleFrame(width * 2, artRows * 3, timeMs, tokens);
+  const titleArt = rasterToGlyphSurface(frame, {
+    columns: width,
+    rows: artRows,
+    fit: 'stretch',
+    colorMode: 'fg',
+    renderer: {
+      kind: 'charset',
+      chars: LANDING_TITLE_ART_CHARSET,
+      order: 'dark-to-light',
+    },
+  });
 
-  for (let row = 0; row < rowCount; row++) {
-    const y = startY + row;
-    const drift = Math.round(Math.sin((time * 1.35) + (row * 0.9)) * 4);
-    const rowPhase = phase + (row * 5) - drift;
-    for (let x = 0; x < ribbonWidth; x += xStep) {
-      const patternIndex = mod(x + rowPhase, LANDING_WAKE_PATTERN.length);
-      const char = LANDING_WAKE_PATTERN[patternIndex]!;
-      if (char === ' ') continue;
+  for (let y = 0; y < titleArt.height; y++) {
+    const targetY = artY + y;
+    if (targetY < 0 || targetY >= height) continue;
 
-      const targetX = left + x;
-      if (targetX < 0 || targetX >= width) continue;
+    for (let x = 0; x < titleArt.width; x++) {
+      const cell = titleArt.get(x, y);
+      if ((cell.char ?? ' ') === ' ') continue;
 
-      const local = ribbonWidth <= 1 ? 0 : x / (ribbonWidth - 1);
-      const crest = 0.5 + (Math.sin((local * Math.PI * 2.4) + (time * 1.9) + row) * 0.5);
-      const fg = sampleColorRamp(tokens.logoRamp, clamp01(0.34 + (local * 0.48) + (crest * 0.18)));
-      const modifiers = char === '~' ? BOLD_MODIFIERS : DIM_MODIFIERS;
-
-      for (let fillX = targetX; fillX < Math.min(width, targetX + xStep); fillX++) {
-        surface.set(fillX, y, {
-          char,
-          bg: tokens.background,
-          fg,
-          modifiers: modifiers as string[] | undefined,
-          empty: false,
-          opacity: 1,
-        });
-      }
+      const sourceIndex = LANDING_TITLE_ART_CHARSET.indexOf(cell.char ?? ' ');
+      const modifiers = sourceIndex >= 0 && sourceIndex < 4 ? BOLD_MODIFIERS : DIM_MODIFIERS;
+      surface.set(x, targetY, {
+        char: cell.char,
+        bg: tokens.background,
+        fgRGB: cell.fgRGB,
+        fg: cell.fg,
+        modifiers: modifiers as string[] | undefined,
+        empty: false,
+        opacity: 1,
+      });
     }
   }
+}
+
+function createV7RasterTitleFrame(
+  width: number,
+  height: number,
+  timeMs: number,
+  tokens: LandingThemeTokens,
+): RgbaFrame {
+  const data = new Uint8ClampedArray(width * height * 4);
+  const time = timeMs / 1000;
+  const widthDenominator = width - 1 || 1;
+  const heightDenominator = height - 1 || 1;
+
+  for (let y = 0; y < height; y++) {
+    const v = y / heightDenominator;
+    for (let x = 0; x < width; x++) {
+      const u = x / widthDenominator;
+      const wake = v7WakeDensity(u, v, time);
+      if (wake <= 0.05) continue;
+
+      const colorT = clamp01(
+        (u * 0.68)
+        + (wake * 0.24)
+        + (0.08 * Math.sin((time * 0.7) + (u * 4.4))),
+      );
+      const rgb = hexToRgb(sampleColorRamp(tokens.logoRamp, colorT));
+      const shade = 0.26 + ((1 - wake) * 0.34);
+      const offset = ((y * width) + x) * 4;
+      data[offset] = Math.round(rgb[0] * shade);
+      data[offset + 1] = Math.round(rgb[1] * shade);
+      data[offset + 2] = Math.round(rgb[2] * shade);
+      data[offset + 3] = Math.round(clamp01(wake) * 255);
+    }
+  }
+
+  return { width, height, data };
+}
+
+function v7WakeDensity(u: number, v: number, time: number): number {
+  const worldline = 0.58
+    + (0.08 * Math.sin((u * Math.PI * 3.4) - (time * 1.15)))
+    - (0.24 * (u - 0.5));
+  const counterline = 0.34
+    + (0.06 * Math.cos((u * Math.PI * 4.2) + (time * 0.9)))
+    + (0.20 * (u - 0.5));
+  const launchCore = radialFalloff(u, v, 0.5 + (0.03 * Math.sin(time * 0.8)), 0.54, 0.16, 0.24);
+  const primaryWake = lineFalloff(v, worldline, 0.045);
+  const secondaryWake = lineFalloff(v, counterline, 0.036);
+  const echoPhase = ((Math.hypot(u - 0.5, v - 0.52) * 7.6) - (time * 0.9));
+  const echoes = Math.max(0, Math.cos(echoPhase * Math.PI * 2)) * radialFalloff(u, v, 0.5, 0.52, 0.58, 0.42);
+  const shear = 0.5 + (0.5 * Math.sin((u * Math.PI * 18) + (v * Math.PI * 8) + (time * 1.7)));
+  const stars = shear > 0.92
+    ? (shear - 0.92) * 4 * radialFalloff(u, v, 0.5, 0.52, 0.72, 0.5)
+    : 0;
+
+  return clamp01(
+    (launchCore * 0.92)
+    + (primaryWake * 0.72)
+    + (secondaryWake * 0.48)
+    + (echoes * 0.22)
+    + stars,
+  );
+}
+
+function lineFalloff(value: number, center: number, width: number): number {
+  return Math.exp(-Math.pow((value - center) / width, 2));
+}
+
+function radialFalloff(
+  u: number,
+  v: number,
+  centerU: number,
+  centerV: number,
+  radiusU: number,
+  radiusV: number,
+): number {
+  const du = (u - centerU) / radiusU;
+  const dv = (v - centerV) / radiusV;
+  return Math.exp(-((du * du) + (dv * dv)));
 }
 
 function paintLogoInto(

@@ -804,6 +804,22 @@ export {
   canvas,
 } from './canvas.js';
 
+// Raster glyph rendering — decoded/generated RGBA frames to terminal surfaces
+export {
+  type RasterGlyphCharsetOrder,
+  type RasterGlyphRenderer,
+  type RasterGlyphCharsetRenderer,
+  type RasterGlyphBrailleRenderer,
+  type RasterGlyphQuadRenderer,
+  type RasterGlyphFit,
+  type RasterGlyphColorMode,
+  type RasterToGlyphSurfaceOptions,
+  type RgbaFrame,
+  RASTER_GLYPH_CHARSETS,
+  rasterToGlyphSurface,
+  validateRasterGlyphCharset,
+} from './raster-glyph.js';
+
 // Command palette
 export {
   type CommandPaletteItem,

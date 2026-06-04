@@ -1,0 +1,237 @@
+---
+title: DF-073 Raster-to-Glyph Title Art
+legend: DF
+lane: release
+priority: high
+issue: https://github.com/flyingrobots/bijou/issues/303
+keywords:
+  - dogfood
+  - image-filter
+  - landing
+  - raster
+  - release
+  - title-screen
+  - v7
+---
+
+# DF-073 Raster-to-Glyph Title Art
+
+## Framing
+
+Issue #303 asks the current DOGFOOD landing screen to carry a unique
+`V7 Launch Wake` release identity. The first prototype used a textual wake
+ribbon; the new direction is stronger: render image-like title art from a raw
+RGBA frame into a Bijou `Surface`.
+
+The design follows a Design Thinking loop: observe that terminal title art is
+most useful when it can be generated, inspected, tested, and lowered; frame the
+problem as a reusable raster adapter rather than a one-off DOGFOOD paint pass;
+prototype a deterministic `RgbaFrame -> Surface` filter; and prove the result
+with synthetic-frame tests plus DOGFOOD rendered-frame tests.
+
+## Sponsor Human
+
+- A maintainer opening DOGFOOD after `v7.0.0` wants the first screen to feel
+  release-specific without becoming a blocking splash page.
+- A visual designer should be able to provide an image, generated frame, or
+  procedural RGBA buffer and choose the terminal character set used to render
+  it.
+- A reader should still see the normal DOGFOOD entry point, prompt, footer
+  controls, and release documentation route.
+
+## Sponsor Agent
+
+- A review agent needs the release title, raster filter contract, renderer
+  mode, charset, pulse behavior, and lower modes to remain inspectable through
+  existing artifacts and tests.
+- A future capture/export agent should be able to feed decoded frames through
+  the same primitive without depending on browser canvas or VHS.
+
+## Hill
+
+A DOGFOOD reader can open the landing title screen and see `V7 Launch Wake`
+named in the entry panel while image-like raster art renders behind the normal
+entry flow. Braille is one supported glyph mode, but the renderer can also use
+custom density character sets such as `/\MXYZabc!?=-. `. The screen remains
+pulse-driven, deterministic, bounded by the current landing quality profiles,
+and lowerable through existing release-title facts.
+
+## Current Truth
+
+- `V7 Launch Wake` is already the current release-title artifact.
+- The landing renderer is already pulse-driven, cached, and quality-bucketed.
+- `@flyingrobots/bijou-tui` already has shader-based `canvas()` output for
+  cell, quad, Braille, and fitted-glyph resolutions.
+- `cell-glyph-fit.ts` already establishes density ramps and coverage fitting.
+- Static, pipe, and accessible release-title output already comes from
+  `examples/docs/release-title.ts`.
+
+## Product Shape
+
+### Wide Landing Screen
+
+The raster art occupies the same first-viewport title surface as the existing
+animated background. Foreground content still wins.
+
+```text
++------------------------------------------------------------------------------+
+|                         BIJOU                                                |
+|                                                                              |
+|          /\\MXYZabc!?=-.   /\\MXYZabc!?=-.    /\\MXYZabc!?=-.                |
+|       /\\MMXYZabc!?=-.  //\\MXYZabc!?=-.   /\\MMXYZabc!?=-.                 |
+|     ////\\MMXYZabc!!?=-..  /\\MXYZabc!?=-.  ////\\MXYZabc!?=-.              |
+|                                                                              |
+|  + DOGFOOD / V7 Launch Wake ----------------------------------------------+ |
+|  | Documentation Of Good Foundational Onboarding and Discovery             | |
+|  +-------------------------------------------------------------------------+ |
+|                                                                              |
+|                              Press [Enter]                                  |
+| Esc/q quit ...                                      60 fps - auto/full v7.0.0 |
++------------------------------------------------------------------------------+
+```
+
+### Small Landing Screen
+
+Small terminals keep the title identity and use fewer glyph cells.
+
+```text
++------------------------------------------+
+|                 BIJOU                    |
+|        /\\MXYZ!?=-.  /\\MXYZ!?=-.        |
+| + DOGFOOD / V7 Launch Wake ------------+ |
+| | Documentation Of Good Foundational... | |
+| +---------------------------------------+ |
+|              Press [Enter]               |
+| Esc/q quit                auto/compact    |
++------------------------------------------+
+```
+
+### Lower Modes
+
+The art is decorative. Lower modes keep exposing semantic release facts.
+
+```text
+pipe:
+  release_id=v7.0.0
+  release_title="V7 Launch Wake"
+  release_motif="launch wake"
+
+accessible:
+  DOGFOOD opens on the V7 Launch Wake release title. The interactive
+  screen includes decorative raster title art rendered as terminal glyphs.
+```
+
+## Raster Adapter
+
+The primitive belongs in `@flyingrobots/bijou-tui` so DOGFOOD is only the first
+consumer.
+
+```text
+RgbaFrame
+  -> fit source pixels into target cell grid
+  -> sample brightness/alpha/color per cell or sub-cell
+  -> choose renderer:
+       charset: density ramp from custom characters
+       braille: 2x4 dot mask
+       quad:    2x2 quadrant mask
+  -> emit Bijou Surface
+```
+
+### Input
+
+```ts
+interface RgbaFrame {
+  width: number;
+  height: number;
+  data: Uint8ClampedArray | readonly number[];
+}
+```
+
+The input is already-decoded RGBA. Image file decoding is intentionally outside
+this slice so the core contract stays deterministic and dependency-free.
+
+### Renderer Modes
+
+- `charset`: render each output cell with a density ramp. The caller can pass a
+  custom glyph string such as `/\MXYZabc!?=-. ` and choose whether it is ordered
+  dark-to-light or light-to-dark.
+- `braille`: render each output cell with a 2x4 Braille mask sampled from
+  darkness/alpha.
+- `quad`: render each output cell with a 2x2 quadrant mask sampled from
+  darkness/alpha.
+
+### Fit Modes
+
+- `stretch`: map the frame directly into the requested grid.
+- `contain`: preserve aspect ratio and letterbox with empty cells.
+- `cover`: preserve aspect ratio and crop overflow.
+
+### Color Modes
+
+- `none`: only glyphs.
+- `fg`: average visible source pixels into foreground RGB.
+- `fg-bg`: average visible/dark pixels into foreground and light pixels into
+  background when available.
+
+## Determinism And Performance
+
+- No browser canvas, wall clock, image decoder, or GPU dependency is required.
+- DOGFOOD uses the existing pulse timestamp and quality frame-step
+  quantization.
+- The title art frame is generated procedurally for this slice, then passed
+  through the same adapter an image decoder would use.
+- Target dimensions are bounded by landing quality profiles before rendering.
+- Cache keys include viewport, theme, quality, quantized time, and FPS badge
+  state, preserving the existing landing frame cache behavior.
+
+## Accessibility / Assistive Posture
+
+The raster title art is decorative in interactive mode. Assistive output must
+not depend on parsing glyph art. It continues to rely on the release title,
+motif, proof lanes, and accessible release prose.
+
+## Agent Inspectability / Explainability Posture
+
+Agents should be able to prove the slice by checking:
+
+- the current release title appears on the landing frame;
+- raster art uses the configured renderer and charset;
+- pulse changes the title art deterministically;
+- raw RGBA filter tests cover charset, Braille, quad, fit, color, and invalid
+  charset behavior;
+- pipe/accessibility release facts remain sourced from release-title metadata.
+
+## Tests To Write First
+
+- RED: `rasterToGlyphSurface()` does not exist or is not exported.
+- RED: custom charset rendering cannot map a synthetic black/white frame.
+- RED: invalid charsets are not rejected.
+- RED: Braille rendering cannot map a single top-left subpixel to dot 1.
+- RED: DOGFOOD landing frame has no raster title art using the configured
+  charset.
+- RED: DOGFOOD raster title art does not change after pulse.
+
+## Validation
+
+Run focused tests first:
+
+```bash
+npx vitest run packages/bijou-tui/src/raster-glyph.test.ts
+npx vitest run scripts/docs-preview.test.ts -t "raster-to-glyph"
+```
+
+Then run the relevant DOGFOOD and package validation lane:
+
+```bash
+npx vitest run scripts/docs-preview.test.ts
+npm run typecheck:test
+npm run docs:inventory
+npm run dogfood:i18n:check
+```
+
+## Playback
+
+This slice lands when DOGFOOD has a visible, localized `V7 Launch Wake` landing
+identity and a deterministic raster-to-glyph title treatment, without adding
+new strings, bypassing the landing cache, adding image decoding dependencies,
+or changing lower-mode release facts.
