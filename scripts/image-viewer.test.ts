@@ -1,10 +1,10 @@
 import { deflateSync } from 'node:zlib';
-import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import type { Surface } from '@flyingrobots/bijou';
+import { colorHex, type Surface } from '@flyingrobots/bijou';
 import { createImageViewerApp } from '../examples/image-viewer/main.js';
 import { decodeImageRgba, decodePngRgba, decodePpmRgba } from '../examples/image-viewer/image-codecs.js';
 
@@ -41,6 +41,20 @@ function keyMsg(key: string) {
     alt: false,
     shift: false,
   };
+}
+
+function brailleGlyphCells(frame: Surface): Array<ReturnType<Surface['get']>> {
+  const cells: Array<ReturnType<Surface['get']>> = [];
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      const cell = frame.get(x, y);
+      const codePoint = cell.char?.codePointAt(0);
+      if (codePoint !== undefined && codePoint > 0x2800 && codePoint <= 0x28ff) {
+        cells.push(cell);
+      }
+    }
+  }
+  return cells;
 }
 
 function pngChunk(type: string, data = Buffer.alloc(0)): Buffer {
@@ -171,11 +185,26 @@ describe('image viewer app', () => {
     const [model] = app.init();
 
     expect(model.selectedPath).toBe(realpathSync.native(join(root, 'sample.ppm')));
+    expect(model.picker.focusIndex).toBe(0);
     const text = frameText(app.view(model) as Surface);
     expect(text).toContain('Images');
-    expect(text).toContain('sample.ppm');
+    expect(text).toContain('> * - sample.ppm');
     expect(text).toContain('Mode: braille');
     expect(text).toContain('Format: PPM');
+  });
+
+  it('focuses the selected image when directories sort before files', () => {
+    const root = createTempDir();
+    mkdirSync(join(root, 'child'));
+    writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n0 0 0\n');
+    const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+
+    expect(model.picker.entries[0]).toEqual({ name: 'child', isDirectory: true });
+    expect(model.picker.entries[1]).toEqual({ name: 'sample.ppm', isDirectory: false });
+    expect(model.picker.focusIndex).toBe(1);
+    expect(frameText(app.view(model) as Surface)).toContain('> * - sample.ppm');
   });
 
   it('hot-swaps the selected image renderer from Braille to ASCII', () => {
@@ -204,5 +233,29 @@ describe('image viewer app', () => {
     const text = frameText(app.view(selected) as Surface);
     expect(text).toContain('b.ppm');
     expect(text).toContain('Format: PPM');
+  });
+
+  it('keeps selected and focused image rows visually distinct', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');
+    writeFileSync(join(root, 'b.ppm'), 'P3\n1 1\n255\n0 0 255\n');
+    const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [focused] = app.update(keyMsg('down'), model);
+    const text = frameText(app.view(focused) as Surface);
+
+    expect(text).toContain('  * - a.ppm');
+    expect(text).toContain('>   - b.ppm');
+  });
+
+  it('renders SVG preview glyphs with the terminal default foreground', () => {
+    const ctx = createTestContext({ runtime: { columns: 120, rows: 32 } });
+    const app = createImageViewerApp(ctx, { initialPath: 'assets/Bijou.svg' });
+    const [model] = app.init();
+    const glyphCells = brailleGlyphCells(app.view(model) as Surface);
+
+    expect(glyphCells.length).toBeGreaterThan(20);
+    expect(glyphCells.every((cell) => colorHex(cell.fg) === undefined)).toBe(true);
   });
 });

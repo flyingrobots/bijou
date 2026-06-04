@@ -69,6 +69,10 @@ export interface FilePickerOptions {
 export interface FilePickerRenderOptions {
   /** Character(s) shown next to the focused entry (default: `"\u25b8"`). */
   readonly focusIndicator?: string;
+  /** Index of the entry that is selected by the hosting application. */
+  readonly selectedIndex?: number;
+  /** Character(s) shown next to the selected entry when `selectedIndex` is set (default: `"*"`). */
+  readonly selectedIndicator?: string;
   /** Character(s) shown before directory names (default: `"d"`). */
   readonly dirIndicator?: string;
   /** Character(s) shown before file names (default: `"-"`). */
@@ -264,17 +268,25 @@ function renderFilePickerEntryLines(
   options?: FilePickerRenderOptions,
 ): string[] {
   const indicator = options?.focusIndicator ?? '\u25b8';
+  const selectedIndicator = options?.selectedIndicator ?? '*';
+  const hasSelection = options?.selectedIndex !== undefined
+    && options.selectedIndex >= 0
+    && options.selectedIndex < state.entries.length;
   const dirIcon = options?.dirIndicator ?? 'd';
   const fileIcon = options?.fileIndicator ?? '-';
   const pad = ' '.repeat(indicator.length);
+  const selectedPad = ' '.repeat(selectedIndicator.length);
 
   if (state.entries.length === 0) return ['  (empty)'];
 
   return state.entries.map((entry, index) => {
     const prefix = index === state.focusIndex ? indicator : pad;
+    const selected = hasSelection && index === options?.selectedIndex ? selectedIndicator : selectedPad;
     const icon = entry.isDirectory ? dirIcon : fileIcon;
     const suffix = entry.isDirectory ? '/' : '';
-    return `${prefix} ${icon} ${entry.name}${suffix}`;
+    return hasSelection
+      ? `${prefix} ${selected} ${icon} ${entry.name}${suffix}`
+      : `${prefix} ${icon} ${entry.name}${suffix}`;
   });
 }
 

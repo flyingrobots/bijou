@@ -14,6 +14,9 @@ npm run image-viewer -- assets/Bijou.svg
 
 ## Keys
 
+The sidebar marks the focused row with `>` and the image currently rendered in
+the preview with `*`.
+
 - `j` / `Down`: focus next file-picker entry
 - `k` / `Up`: focus previous file-picker entry
 - `Enter`: open a directory or select an image

@@ -93,11 +93,12 @@ export function createImageViewerApp(
       const columns = Math.max(1, options.columns ?? ctx.runtime.columns);
       const rows = Math.max(1, options.rows ?? ctx.runtime.rows);
       const picker = createImagePickerState(startup.cwd, io, pickerHeight(rows));
+      const selectedPath = startup.selectedPath ?? firstImagePath(picker, io);
       return [{
         columns,
         rows,
-        picker,
-        selectedPath: startup.selectedPath ?? firstImagePath(picker, io),
+        picker: focusSelectedEntry(picker, selectedPath, io),
+        selectedPath,
         mode: 'braille',
         lastError: undefined,
       }, []];
@@ -275,10 +276,11 @@ function resizePicker(state: FilePickerState, height: number): FilePickerState {
 
 function refreshModel(model: ImageViewerModel, io: ScopedNodeIO): ImageViewerModel {
   const picker = createImagePickerState(model.picker.cwd, io, model.picker.height);
+  const selectedPath = model.selectedPath ?? firstImagePath(picker, io);
   return {
     ...model,
-    picker,
-    selectedPath: model.selectedPath ?? firstImagePath(picker, io),
+    picker: focusSelectedEntry(picker, selectedPath, io),
+    selectedPath,
     lastError: undefined,
   };
 }
@@ -322,6 +324,50 @@ function firstImagePath(state: FilePickerState, io: IOPort): string | undefined 
   return entry === undefined ? undefined : safeJoinPath(io, state.cwd, entry.name);
 }
 
+function focusSelectedEntry(
+  state: FilePickerState,
+  selectedPath: string | undefined,
+  io: ScopedNodeIO,
+): FilePickerState {
+  const selectedIndex = selectedEntryIndex(state, selectedPath, io);
+  if (selectedIndex === undefined) return state;
+  return {
+    ...state,
+    focusIndex: selectedIndex,
+    scrollY: scrollForFocus(selectedIndex, state.height, state.entries.length),
+  };
+}
+
+function selectedEntryIndex(
+  state: FilePickerState,
+  selectedPath: string | undefined,
+  io: ScopedNodeIO,
+): number | undefined {
+  const resolvedSelectedPath = safeResolvePath(io, selectedPath);
+  if (resolvedSelectedPath === undefined) return undefined;
+
+  const index = state.entries.findIndex((entry) => {
+    if (entry.isDirectory) return false;
+    const entryPath = safeJoinPath(io, state.cwd, entry.name);
+    return safeResolvePath(io, entryPath) === resolvedSelectedPath;
+  });
+  return index >= 0 ? index : undefined;
+}
+
+function scrollForFocus(focusIndex: number, height: number, totalItems: number): number {
+  if (focusIndex < height) return 0;
+  return Math.min(focusIndex - height + 1, Math.max(0, totalItems - height));
+}
+
+function safeResolvePath(io: ScopedNodeIO, path: string | undefined): string | undefined {
+  if (path === undefined) return undefined;
+  try {
+    return io.resolvePath(path);
+  } catch {
+    return undefined;
+  }
+}
+
 function safeJoinPath(io: IOPort, ...parts: string[]): string | undefined {
   try {
     return io.joinPath(...parts);
@@ -344,7 +390,7 @@ function renderImageViewer(
   return placeSurface(
     hstackSurface(
       gap,
-      renderSidebar(model, sidebarWidth, height, ctx),
+      renderSidebar(model, sidebarWidth, height, ctx, io),
       renderPreview(model, mainWidth, height, ctx, io),
     ),
     { width, height },
@@ -356,12 +402,14 @@ function renderSidebar(
   width: number,
   height: number,
   ctx: BijouContext,
+  io: ScopedNodeIO,
 ): Surface {
   const picker = resizePicker(model.picker, Math.max(1, height - 5));
   const pickerSurface = filePickerSurface(picker, {
     width: Math.max(1, width - 2),
     showScrollbar: true,
     focusIndicator: '>',
+    selectedIndex: selectedEntryIndex(picker, model.selectedPath, io),
     dirIndicator: 'd',
     fileIndicator: '-',
   });
@@ -447,7 +495,7 @@ function loadImagePreview(
         rows,
         fit: 'contain',
         cellAspectRatio: 0.5,
-        colorMode: 'fg',
+        colorMode: 'none',
         renderer: mode === 'braille'
           ? { kind: 'braille', threshold: 0.45 }
           : { kind: 'charset', chars: ' .:-=+*#%@', order: 'light-to-dark' },
