@@ -672,8 +672,8 @@ function nextMode(mode: ImageRenderMode): ImageRenderMode {
 }
 
 function nextColorMode(mode: RasterGlyphColorMode): RasterGlyphColorMode {
-  if (mode === 'none') return 'fg';
-  if (mode === 'fg') return 'fg-bg';
+  if (mode === 'none') return 'fg-bg';
+  if (mode === 'fg-bg') return 'fg';
   return 'none';
 }
 
@@ -718,7 +718,7 @@ function sanitizePanValue(value: number): number {
 
 function formatColorMode(mode: RasterGlyphColorMode): string {
   if (mode === 'fg') return 'foreground';
-  if (mode === 'fg-bg') return 'foreground/background';
+  if (mode === 'fg-bg') return 'full color';
   return 'monochrome';
 }
 

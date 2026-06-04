@@ -131,6 +131,31 @@ describe('rasterToGlyphSurface()', () => {
     expect(surface.get(0, 0).fgRGB).toEqual([0, 64, 128]);
   });
 
+  it('preserves light Braille samples as background color in foreground/background mode', () => {
+    const surface = rasterToGlyphSurface(
+      frame(2, 4, [
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+      ]),
+      {
+        columns: 1,
+        rows: 1,
+        colorMode: 'fg-bg',
+        renderer: { kind: 'braille', threshold: 0.5 },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe('\u2800');
+    expect(surface.get(0, 0).fgRGB).toBeUndefined();
+    expect(surface.get(0, 0).bgRGB).toEqual([255, 255, 255]);
+  });
+
   it('applies contrast before selecting charset density glyphs', () => {
     const base = rasterToGlyphSurface(
       frame(1, 1, [[80, 80, 80, 255]]),

@@ -108,8 +108,8 @@ Navigation contract:
 - `-`: zoom out.
 - `0`: reset to fit.
 - `m` / `Tab`: switch Braille and ASCII rendering.
-- `c`: cycle color mode between monochrome, foreground color, and
-  foreground/background color.
+- `c`: cycle color mode between monochrome, full color, and foreground-only
+  color.
 - `d`: toggle ordered dithering.
 - `[` / `]`: lower or raise the Braille threshold.
 - `,` / `.`: lower or raise contrast.
@@ -137,7 +137,8 @@ communicated by glyph art.
 - RED: PPM decoder cannot map `P3` and `P6` RGB data into RGBA.
 - RED: image viewer starts with an image selected from the root.
 - RED: pressing `m` does not change Braille mode to ASCII mode.
-- RED: pressing `c` does not preserve sampled image colors on rendered glyphs.
+- RED: pressing `c` does not preserve sampled light and dark image colors on
+  rendered glyph cells.
 - RED: threshold, contrast, and dither controls do not change visible tuning
   state.
 - RED: rendered view does not contain the file picker and preview panes.

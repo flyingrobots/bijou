@@ -26,8 +26,7 @@ the preview with `*`.
 - `-`: zoom out
 - `0`: reset to fit
 - `m` / `Tab`: switch between Braille and ASCII rendering
-- `c`: cycle color mode between monochrome, foreground color, and
-  foreground/background color
+- `c`: cycle color mode between monochrome, full color, and foreground-only color
 - `d`: toggle ordered dithering
 - `[` / `]`: lower or raise the Braille threshold
 - `,` / `.`: lower or raise contrast

@@ -223,7 +223,7 @@ describe('image viewer app', () => {
 
   it('can preserve sampled image colors on rendered glyphs', () => {
     const root = createTempDir();
-    writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n255 0 0\n');
+    writeFileSync(join(root, 'sample.ppm'), 'P3\n2 1\n255\n255 255 255 0 0 0\n');
     const ctx = createTestContext({ runtime: { columns: 180, rows: 28 } });
     const app = createImageViewerApp(ctx, { root });
     const [model] = app.init();
@@ -231,13 +231,13 @@ describe('image viewer app', () => {
     const glyphCells = brailleGlyphCells(app.view(colored) as Surface);
     const text = frameText(app.view(colored) as Surface);
 
-    expect(colored.tuning.colorMode).toBe('fg');
+    expect(colored.tuning.colorMode).toBe('fg-bg');
     expect(glyphCells.some((cell) => {
-      const rgb = cell.fgRGB;
-      return rgb !== undefined && rgb[0] === 255 && rgb[1] === 0 && rgb[2] === 0;
+      const bg = cell.bgRGB;
+      return bg !== undefined && bg[0] === 255 && bg[1] === 255 && bg[2] === 255;
     }))
       .toBe(true);
-    expect(text).toContain('Color: foreground');
+    expect(text).toContain('Color: full color');
   });
 
   it('adjusts threshold, contrast, and ordered dithering from preview keys', () => {
