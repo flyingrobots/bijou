@@ -35,6 +35,7 @@ export interface RasterToGlyphSurfaceOptions {
   readonly columns: number;
   readonly rows: number;
   readonly fit?: RasterGlyphFit;
+  readonly cellAspectRatio?: number;
   readonly colorMode?: RasterGlyphColorMode;
   readonly renderer?: RasterGlyphRenderer;
 }
@@ -76,6 +77,7 @@ const DEFAULT_RENDERER: RasterGlyphCharsetRenderer = {
 };
 
 const DEFAULT_THRESHOLD = 0.5;
+const DEFAULT_CELL_ASPECT_RATIO = 1;
 
 const BRAILLE_DOT_MAP = [
   [0x01, 0x08],
@@ -126,9 +128,10 @@ export function rasterToGlyphSurface(frame: RgbaFrame, options: RasterToGlyphSur
   if (columns === 0 || rows === 0) return surface;
 
   const fit = options.fit ?? 'stretch';
+  const cellAspectRatio = sanitizeCellAspectRatio(options.cellAspectRatio);
   const colorMode = options.colorMode ?? 'none';
   const renderer = options.renderer ?? DEFAULT_RENDERER;
-  const transform = createFitTransform(frame, columns, rows, fit);
+  const transform = createFitTransform(frame, columns, rows, fit, cellAspectRatio);
 
   switch (renderer.kind) {
     case 'charset':
@@ -257,6 +260,7 @@ function createFitTransform(
   columns: number,
   rows: number,
   fit: RasterGlyphFit,
+  cellAspectRatio: number,
 ): FitTransform {
   if (fit === 'stretch') {
     return {
@@ -269,16 +273,17 @@ function createFitTransform(
     };
   }
 
-  const scaleX = columns / frame.width;
+  const visualTargetWidth = columns * cellAspectRatio;
+  const scaleX = visualTargetWidth / frame.width;
   const scaleY = rows / frame.height;
   const scale = fit === 'contain'
     ? Math.min(scaleX, scaleY)
     : Math.max(scaleX, scaleY);
-  const drawWidth = frame.width * scale;
+  const drawWidth = (frame.width * scale) / cellAspectRatio;
   const drawHeight = frame.height * scale;
 
   return {
-    scaleX: scale,
+    scaleX: scale / cellAspectRatio,
     scaleY: scale,
     offsetX: (columns - drawWidth) / 2,
     offsetY: (rows - drawHeight) / 2,
@@ -481,6 +486,12 @@ function validateRgbaFrame(frame: RgbaFrame): void {
 function sanitizeDimension(value: number): number {
   if (!Number.isFinite(value) || value <= 0) return 0;
   return Math.floor(value);
+}
+
+function sanitizeCellAspectRatio(value: number | undefined): number {
+  if (value === undefined) return DEFAULT_CELL_ASPECT_RATIO;
+  if (!Number.isFinite(value) || value <= 0) return DEFAULT_CELL_ASPECT_RATIO;
+  return value;
 }
 
 function byteAt(data: Uint8ClampedArray | readonly number[], index: number): number {

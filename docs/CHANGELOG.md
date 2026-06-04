@@ -16,10 +16,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Raster-to-glyph DOGFOOD title art** —
   `@flyingrobots/bijou-tui` now exposes a deterministic raw-RGBA-to-`Surface`
   renderer with charset, Braille, and quad modes, including custom density
-  character sets and centered `fit` crop semantics. DOGFOOD decodes the
-  committed V7 title PNG into RGBA at runtime and renders it as terminal glyph
-  art for the `V7 Launch Wake` landing screen while preserving the existing
-  landing quality buckets and lower-mode release facts. This closes issue #303.
+  character sets, centered `fit` crop semantics, and optional terminal
+  cell-aspect correction. DOGFOOD decodes the committed V7 title PNG into RGBA
+  at runtime, renders it as terminal glyph art, and overlays the committed
+  `Bijou.svg` wordmark in complementary title-art colors for the `V7 Launch
+  Wake` landing screen while preserving the existing landing quality buckets
+  and lower-mode release facts. This closes issue #303.
 
 ## [7.0.0] - 2026-06-03
 

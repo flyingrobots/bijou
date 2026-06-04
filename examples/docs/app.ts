@@ -135,6 +135,7 @@ import {
   renderDogfoodReleaseTitleText,
 } from './release-title.js';
 import { decodePngRgba } from './png-rgba.js';
+import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from './svg-raster.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
@@ -148,11 +149,6 @@ import {
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 
-const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
-const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
-const LOGO_WIDTH = Math.max(1, ...LOGO_LINES.map((lineText) => lineText.length));
-const LOGO_HEIGHT = LOGO_LINES.length;
-const LOGO_PADDED_LINES = LOGO_LINES.map((lineText) => lineText.padEnd(LOGO_WIDTH));
 const FLYING_ROBOTS_WIDE_LARGE_TEXT = readFileSync(
   new URL('../../assets/flyingrobots-wide-large.txt', import.meta.url),
   'utf8',
@@ -168,6 +164,7 @@ const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
 const LANDING_TITLE_IMAGE_FRAME = decodePngRgba(
   readFileSync(new URL('../../assets/title.png', import.meta.url)),
 );
+const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
 const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
 ) as { readonly version: string };
@@ -637,8 +634,11 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
 const LANDING_TITLE_IMAGE_CHARSET = '░▒▓█';
+const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
+const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
+const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
@@ -650,6 +650,14 @@ interface LandingFrameCache {
   front?: Surface;
   back?: Surface;
 }
+
+interface BijouSvgOverlayMetrics {
+  readonly left: number;
+  readonly top: number;
+  readonly columns: number;
+  readonly rows: number;
+}
+
 const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   {
     id: 'blocklab-workstation',
@@ -2527,6 +2535,7 @@ function paintV7RasterTitleArt(
     columns: width,
     rows: height,
     fit: 'fit',
+    cellAspectRatio: LANDING_TITLE_CELL_ASPECT_RATIO,
     colorMode: 'none',
     renderer: {
       kind: 'charset',
@@ -2553,6 +2562,99 @@ function paintV7RasterTitleArt(
       });
     }
   }
+
+  paintBijouSvgOverlay(surface, titleArt, timeMs, tokens);
+}
+
+function paintBijouSvgOverlay(
+  surface: Surface,
+  titleArt: Surface,
+  timeMs: number,
+  tokens: LandingThemeTokens,
+): void {
+  const metrics = bijouSvgOverlayMetrics(surface.width, surface.height);
+  if (metrics == null) return;
+
+  const mark = getBijouSvgOverlaySurface(metrics.columns, metrics.rows);
+
+  for (let y = 0; y < mark.height; y++) {
+    for (let x = 0; x < mark.width; x++) {
+      const markChar = mark.get(x, y).char ?? ' ';
+      if (markChar === ' ') continue;
+
+      const targetX = metrics.left + x;
+      const targetY = metrics.top + y;
+      const underChar = titleArt.get(targetX, targetY).char ?? '░';
+      const underColor = landingTitleImageColor(
+        underChar,
+        targetX,
+        targetY,
+        surface.width,
+        surface.height,
+        timeMs,
+        tokens,
+      );
+
+      surface.set(targetX, targetY, {
+        char: markChar,
+        bg: tokens.background,
+        fg: oppositeHexColor(underColor),
+        modifiers: BOLD_MODIFIERS as string[],
+        empty: false,
+        opacity: 1,
+      });
+    }
+  }
+}
+
+function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayMetrics | undefined {
+  if (width < 40 || height < 14) return undefined;
+
+  const maxColumns = Math.max(1, width - 4);
+  const targetColumns = Math.max(20, Math.min(maxColumns, Math.floor(width * 0.84)));
+  const maxRows = Math.max(3, Math.floor(height * 0.32));
+  const rows = Math.max(
+    3,
+    Math.min(maxRows, Math.round((targetColumns * LANDING_TITLE_CELL_ASPECT_RATIO) / LANDING_BIJOU_SVG_ASPECT_RATIO)),
+  );
+  const columns = Math.max(
+    12,
+    Math.min(maxColumns, Math.round((rows * LANDING_BIJOU_SVG_ASPECT_RATIO) / LANDING_TITLE_CELL_ASPECT_RATIO)),
+  );
+  const centerY = Math.floor(height * 0.29);
+  const topLimit = Math.max(0, height - rows - 2);
+
+  return {
+    columns,
+    rows,
+    left: Math.max(0, Math.floor((width - columns) / 2)),
+    top: Math.max(1, Math.min(topLimit, centerY - Math.floor(rows / 2))),
+  };
+}
+
+function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
+  const key = `${columns}:${rows}`;
+  const cached = LANDING_BIJOU_SVG_OVERLAY_CACHE.get(key);
+  if (cached != null) return cached;
+
+  const frame = rasterizeSvgToRgba(LANDING_BIJOU_SVG_TEXT, {
+    width: Math.max(1, columns * 2),
+    height: Math.max(1, rows * 4),
+  });
+  const surface = rasterToGlyphSurface(frame, {
+    columns,
+    rows,
+    fit: 'stretch',
+    colorMode: 'none',
+    renderer: {
+      kind: 'charset',
+      chars: LANDING_TITLE_IMAGE_CHARSET,
+      order: 'light-to-dark',
+    },
+  });
+
+  LANDING_BIJOU_SVG_OVERLAY_CACHE.set(key, surface);
+  return surface;
 }
 
 function landingTitleImageColor(
@@ -2570,80 +2672,6 @@ function landingTitleImageColor(
   const shimmer = 0.06 * Math.sin((timeMs / 1000) + (u * 5.7) - (v * 3.2));
   const ramp = darkness >= 0.6 ? tokens.logoRamp : tokens.waveRamp;
   return sampleColorRamp(ramp, clamp01((u * 0.64) + (darkness * 0.22) + 0.1 + shimmer));
-}
-
-function paintLogoInto(
-  target: Surface,
-  dx: number,
-  dy: number,
-  width: number,
-  height: number,
-  timeMs: number,
-  tokens: LandingThemeTokens,
-  quality: LandingQualityProfile,
-): void {
-  const srcX = LOGO_WIDTH > width
-    ? Math.floor((LOGO_WIDTH - width) / 2)
-    : 0;
-  const srcY = LOGO_HEIGHT > height
-    ? Math.floor((LOGO_HEIGHT - height) / 2)
-    : 0;
-  const drawWidth = Math.min(width, LOGO_WIDTH);
-  const drawHeight = Math.min(height, LOGO_HEIGHT);
-  const destX = dx + (LOGO_WIDTH < width ? Math.floor((width - LOGO_WIDTH) / 2) : 0);
-  const destY = dy + (LOGO_HEIGHT < height ? Math.floor((height - LOGO_HEIGHT) / 2) : 0);
-  const time = timeMs / 1000;
-  const widthDenominator = LOGO_WIDTH - 1 || 1;
-  const heightDenominator = LOGO_HEIGHT - 1 || 1;
-
-  const cells = target.cells;
-  const tile = quality.logoTile;
-
-  for (let tileY = 0; tileY < drawHeight; tileY += tile) {
-    const sourceY = srcY + Math.min(drawHeight - 1, tileY + Math.floor(tile / 2));
-    const lineText = LOGO_PADDED_LINES[sourceY]!;
-    const v = sourceY / heightDenominator;
-    const maxY = Math.min(drawHeight, tileY + tile);
-    for (let tileX = 0; tileX < drawWidth; tileX += tile) {
-      const sourceX = srcX + Math.min(drawWidth - 1, tileX + Math.floor(tile / 2));
-      const sourceChar = lineText[sourceX]!;
-      if (sourceChar === ' ') continue;
-
-      const u = sourceX / widthDenominator;
-      const shimmer = 0.46
-        + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
-        + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
-        + (Math.sin((u * 18.0) + (time * 5.5)) * 0.12);
-      const level = clamp01(shimmer);
-      const shaderChar = densityGlyph(level, { airy: false });
-      const colorT = clamp01(
-        (u * 0.78)
-        + ((1 - v) * 0.14)
-        + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
-      );
-      const glyph = reinforceGlyph(sourceChar, shaderChar);
-      const fg = sampleColorRamp(tokens.logoRamp, colorT);
-      const modifiers = level > 0.7 ? BOLD_MODIFIERS : undefined;
-      const maxX = Math.min(drawWidth, tileX + tile);
-
-      for (let y = tileY; y < maxY; y++) {
-        const targetY = destY + y;
-        if (targetY < 0 || targetY >= target.height) continue;
-        for (let x = tileX; x < maxX; x++) {
-          const targetX = destX + x;
-          if (targetX < 0 || targetX >= target.width) continue;
-          target.set(targetX, targetY, {
-            char: glyph,
-            bg: tokens.background,
-            fg,
-            modifiers: modifiers as string[] | undefined,
-            empty: false,
-            opacity: 1,
-          });
-        }
-      }
-    }
-  }
 }
 
 function createWordmarkSurface(
@@ -2699,12 +2727,6 @@ function densityGlyph(level: number, options: { readonly airy: boolean }): strin
   if (level > 0.66) return '▓';
   if (level > 0.44) return '▒';
   return '░';
-}
-
-function reinforceGlyph(source: string, shaderChar: string): string {
-  const sourceDensity = densityFromChar(source);
-  const shaderDensity = densityFromChar(shaderChar);
-  return shaderDensity >= sourceDensity ? shaderChar : densityGlyph(sourceDensity, { airy: false });
 }
 
 function clamp01(value: number): number {
@@ -3174,6 +3196,11 @@ function hexToRgb(hex: string): [number, number, number] {
 
 function rgbHex(r: number, g: number, b: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function oppositeHexColor(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbHex(255 - r, 255 - g, 255 - b);
 }
 
 function srgbChannelToLinear(channel: number): number {

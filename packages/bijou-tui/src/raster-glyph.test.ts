@@ -194,4 +194,51 @@ describe('rasterToGlyphSurface()', () => {
 
     expect(surface.get(0, 0).char).toBe('#');
   });
+
+  it('fit mode accounts for terminal cell aspect ratio when choosing the centered crop', () => {
+    const surface = rasterToGlyphSurface(
+      frame(3, 1, [
+        [0, 0, 0, 255],
+        [255, 255, 255, 255],
+        [0, 0, 0, 255],
+      ]),
+      {
+        columns: 2,
+        rows: 1,
+        fit: 'fit',
+        cellAspectRatio: 0.5,
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe(' ');
+    expect(surface.get(1, 0).char).toBe(' ');
+  });
+
+  it('contain mode uses terminal cell aspect ratio for letterboxing', () => {
+    const surface = rasterToGlyphSurface(
+      frame(1, 1, [[0, 0, 0, 255]]),
+      {
+        columns: 5,
+        rows: 1,
+        fit: 'contain',
+        cellAspectRatio: 0.5,
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe(' ');
+    expect(surface.get(1, 0).char).toBe('#');
+    expect(surface.get(2, 0).char).toBe('#');
+    expect(surface.get(3, 0).char).toBe('#');
+    expect(surface.get(4, 0).char).toBe(' ');
+  });
 });

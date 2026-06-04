@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { colorHex, type ColorRef } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { parseKey } from '@flyingrobots/bijou-tui';
+import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
@@ -12,6 +12,7 @@ import {
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';
+import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from '../examples/docs/svg-raster.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import {
   DOGFOOD_NON_INTERACTIVE_MESSAGE,
@@ -37,6 +38,8 @@ const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
 const KEY_NEXT_TAB = ']';
 const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
+const V7_TITLE_CELL_ASPECT_RATIO = 0.5;
+const V7_BIJOU_SVG_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'Bijou.svg'), 'utf8');
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -72,6 +75,75 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 
 function rasterTitleGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
+}
+
+function bijouSvgOverlayMetrics(width: number, height: number) {
+  const aspectRatio = svgViewBoxAspectRatio(V7_BIJOU_SVG_TEXT);
+  const maxColumns = Math.max(1, width - 4);
+  const targetColumns = Math.max(20, Math.min(maxColumns, Math.floor(width * 0.84)));
+  const maxRows = Math.max(3, Math.floor(height * 0.32));
+  const rows = Math.max(
+    3,
+    Math.min(maxRows, Math.round((targetColumns * V7_TITLE_CELL_ASPECT_RATIO) / aspectRatio)),
+  );
+  const columns = Math.max(
+    12,
+    Math.min(maxColumns, Math.round((rows * aspectRatio) / V7_TITLE_CELL_ASPECT_RATIO)),
+  );
+  const centerY = Math.floor(height * 0.29);
+  const topLimit = Math.max(0, height - rows - 2);
+
+  return {
+    columns,
+    rows,
+    left: Math.max(0, Math.floor((width - columns) / 2)),
+    top: Math.max(1, Math.min(topLimit, centerY - Math.floor(rows / 2))),
+  };
+}
+
+function expectedBijouSvgOverlay(width: number, height: number) {
+  const metrics = bijouSvgOverlayMetrics(width, height);
+  const frame = rasterizeSvgToRgba(V7_BIJOU_SVG_TEXT, {
+    width: Math.max(1, metrics.columns * 2),
+    height: Math.max(1, metrics.rows * 4),
+  });
+  const mask = rasterToGlyphSurface(frame, {
+    columns: metrics.columns,
+    rows: metrics.rows,
+    fit: 'stretch',
+    renderer: {
+      kind: 'charset',
+      chars: ' ░▒▓█',
+      order: 'light-to-dark',
+    },
+  });
+
+  return { ...metrics, mask };
+}
+
+function matchingBijouSvgOverlayGlyphCount(frame: {
+  width: number;
+  height: number;
+  get(x: number, y: number): { char?: string; fg?: ColorRef };
+}): { readonly expected: number; readonly matched: number } {
+  const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
+  let expected = 0;
+  let matched = 0;
+
+  for (let y = 0; y < overlay.mask.height; y++) {
+    for (let x = 0; x < overlay.mask.width; x++) {
+      const expectedChar = overlay.mask.get(x, y).char ?? ' ';
+      if (expectedChar === ' ') continue;
+      expected++;
+
+      const actual = frame.get(overlay.left + x, overlay.top + y);
+      if (actual.char === expectedChar && colorHex(actual.fg) != null) {
+        matched++;
+      }
+    }
+  }
+
+  return { expected, matched };
 }
 
 function cellsWithoutBackground(frame: {
@@ -238,7 +310,6 @@ describe('docs preview app', () => {
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
     expect(text).toContain('V7 Launch Wake');
-    expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
     // Gradient background chars (█▓▒░·) require pulse-driven animation;
@@ -379,6 +450,9 @@ describe('docs preview app', () => {
 
     expect(rasterTitleGlyphCount(initialText)).toBeGreaterThan(1000);
     expect(rasterTitleGlyphCount(pulsedText)).toBeGreaterThan(1000);
+    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
+    expect(overlay.expected).toBeGreaterThan(450);
+    expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 

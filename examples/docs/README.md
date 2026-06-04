@@ -24,7 +24,13 @@ For a text-first BlockLab index and capture matrix over the same DOGFOOD story c
 npm run blocklab:index
 ```
 
-You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
+You now land on a dedicated full-screen title screen first: the app decodes
+[assets/title.png](../../assets/title.png) into RGBA at runtime, renders it
+through the raster-to-glyph filter, then overlays the
+[assets/Bijou.svg](../../assets/Bijou.svg) wordmark in complementary foreground
+colors. The landing screen keeps the treatment sparse: the V7 title art, a
+centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved
+last-line footer for quit/continue guidance plus the Bijou version.
 
 On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs shell.
 
