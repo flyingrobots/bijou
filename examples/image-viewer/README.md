@@ -17,13 +17,21 @@ npm run image-viewer -- assets/Bijou.svg
 The sidebar marks the focused row with `>` and the image currently rendered in
 the preview with `*`.
 
-- `j` / `Down`: focus next file-picker entry
-- `k` / `Up`: focus previous file-picker entry
+- `j`: focus next file-picker entry
+- `k`: focus previous file-picker entry
 - `Enter`: open a directory or select an image
-- `Left` / `Backspace`: move to the parent directory
+- `Backspace`: move to the parent directory
+- `Arrow keys`: pan the image viewport
+- `+` / `=`: zoom in
+- `-`: zoom out
+- `0`: reset to fit
 - `m` / `Tab`: switch between Braille and ASCII rendering
 - `r`: refresh the current directory
 - `q` / `Ctrl+C`: quit
+
+The preview gutter reports the current zoom percentage and pan offset. Loading
+a new image resets the viewport to fit mode at `100%`, centered horizontally
+and vertically.
 
 ## Formats
 

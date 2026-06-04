@@ -33,12 +33,19 @@ import { decodeImageRgba, type DecodedImageFormat } from './image-codecs.js';
 
 export type ImageRenderMode = 'braille' | 'ascii';
 
+export interface ImageViewportModel {
+  readonly zoomPercent: number;
+  readonly panX: number;
+  readonly panY: number;
+}
+
 export interface ImageViewerModel {
   readonly columns: number;
   readonly rows: number;
   readonly picker: FilePickerState;
   readonly selectedPath: string | undefined;
   readonly mode: ImageRenderMode;
+  readonly viewport: ImageViewportModel;
   readonly lastError: string | undefined;
 }
 
@@ -73,6 +80,16 @@ interface LoadedImage {
 
 const DEFAULT_ASSET_ROOT = fileURLToPath(new URL('../../assets', import.meta.url));
 const SUPPORTED_IMAGE_EXTENSIONS = new Set(['.png', '.svg', '.ppm', '.pnm']);
+const DEFAULT_IMAGE_VIEWPORT: ImageViewportModel = {
+  zoomPercent: 100,
+  panX: 0,
+  panY: 0,
+};
+const ZOOM_FACTOR = 1.25;
+const MIN_ZOOM_PERCENT = 25;
+const MAX_ZOOM_PERCENT = 800;
+const PAN_STEP_COLUMNS = 4;
+const PAN_STEP_ROWS = 2;
 const pickerKeys = filePickerKeyMap<ImageViewerMsg>({
   focusNext: { type: 'focus-next' },
   focusPrev: { type: 'focus-prev' },
@@ -100,6 +117,7 @@ export function createImageViewerApp(
         picker: focusSelectedEntry(picker, selectedPath, io),
         selectedPath,
         mode: 'braille',
+        viewport: DEFAULT_IMAGE_VIEWPORT,
         lastError: undefined,
       }, []];
     },
@@ -157,6 +175,27 @@ function updateKey(
 ): [ImageViewerModel, Cmd<ImageViewerMsg>[]] | [ImageViewerModel, []] {
   if (msg.key === 'm' || msg.key === 'tab') {
     return [{ ...model, mode: nextMode(model.mode), lastError: undefined }, []];
+  }
+  if (msg.key === '+' || msg.key === '=') {
+    return [{ ...model, viewport: zoomViewport(model.viewport, ZOOM_FACTOR), lastError: undefined }, []];
+  }
+  if (msg.key === '-') {
+    return [{ ...model, viewport: zoomViewport(model.viewport, 1 / ZOOM_FACTOR), lastError: undefined }, []];
+  }
+  if (msg.key === '0') {
+    return [{ ...model, viewport: DEFAULT_IMAGE_VIEWPORT, lastError: undefined }, []];
+  }
+  if (msg.key === 'left') {
+    return [{ ...model, viewport: panViewport(model.viewport, -PAN_STEP_COLUMNS, 0), lastError: undefined }, []];
+  }
+  if (msg.key === 'right') {
+    return [{ ...model, viewport: panViewport(model.viewport, PAN_STEP_COLUMNS, 0), lastError: undefined }, []];
+  }
+  if (msg.key === 'up') {
+    return [{ ...model, viewport: panViewport(model.viewport, 0, -PAN_STEP_ROWS), lastError: undefined }, []];
+  }
+  if (msg.key === 'down') {
+    return [{ ...model, viewport: panViewport(model.viewport, 0, PAN_STEP_ROWS), lastError: undefined }, []];
   }
   if (msg.key === 'r') {
     return [refreshModel(model, io), []];
@@ -305,6 +344,7 @@ function enterFocusedEntry(model: ImageViewerModel, io: ScopedNodeIO): ImageView
   return {
     ...model,
     selectedPath: nextPath,
+    viewport: DEFAULT_IMAGE_VIEWPORT,
     lastError: undefined,
   };
 }
@@ -426,7 +466,7 @@ function renderPreview(
   ctx: BijouContext,
   io: ScopedNodeIO,
 ): Surface {
-  const footer = `q quit  Enter open/select  <- parent  m mode:${model.mode}  r refresh`;
+  const footer = `Explorer: j/k focus  Enter select/open  Backspace parent  Preview: arrows pan  +/- zoom  0 fit  m ${model.mode}`;
   const previewHeight = Math.max(1, height - 5);
   const previewWidth = Math.max(1, width - 2);
   let title = 'Preview';
@@ -437,12 +477,25 @@ function renderPreview(
     body = stringToSurface('No supported image selected.', previewWidth, previewHeight);
   } else {
     title = basename(model.selectedPath);
-    const loaded = loadImagePreview(model.selectedPath, previewWidth, previewHeight, model.mode, io);
+    const loaded = loadImagePreview(
+      model.selectedPath,
+      previewWidth,
+      previewHeight,
+      model.mode,
+      model.viewport,
+      io,
+    );
     if (loaded instanceof Error) {
       status = loaded.message;
       body = stringToSurface(status, previewWidth, previewHeight);
     } else {
-      status = `Mode: ${model.mode}  Format: ${loaded.format.toUpperCase()}  Source: ${loaded.width}x${loaded.height}`;
+      status = [
+        `Mode: ${model.mode}`,
+        `Zoom: ${model.viewport.zoomPercent}%`,
+        `Pan: ${formatPan(model.viewport.panX)},${formatPan(model.viewport.panY)}`,
+        `Format: ${loaded.format.toUpperCase()}`,
+        `Source: ${loaded.width}x${loaded.height}`,
+      ].join('  ');
       body = loaded.surface;
     }
   }
@@ -471,6 +524,7 @@ function loadImagePreview(
   columns: number,
   rows: number,
   mode: ImageRenderMode,
+  viewport: ImageViewportModel,
   io: ScopedNodeIO,
 ): LoadedImage | Error {
   try {
@@ -495,6 +549,9 @@ function loadImagePreview(
         rows,
         fit: 'contain',
         cellAspectRatio: 0.5,
+        zoom: viewport.zoomPercent / 100,
+        panX: -viewport.panX,
+        panY: -viewport.panY,
         colorMode: 'none',
         renderer: mode === 'braille'
           ? { kind: 'braille', threshold: 0.45 }
@@ -508,6 +565,36 @@ function loadImagePreview(
 
 function nextMode(mode: ImageRenderMode): ImageRenderMode {
   return mode === 'braille' ? 'ascii' : 'braille';
+}
+
+function zoomViewport(viewport: ImageViewportModel, factor: number): ImageViewportModel {
+  return {
+    ...viewport,
+    zoomPercent: clampZoomPercent(Math.round(viewport.zoomPercent * factor)),
+  };
+}
+
+function panViewport(viewport: ImageViewportModel, deltaX: number, deltaY: number): ImageViewportModel {
+  return {
+    ...viewport,
+    panX: sanitizePanValue(viewport.panX + deltaX),
+    panY: sanitizePanValue(viewport.panY + deltaY),
+  };
+}
+
+function clampZoomPercent(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_IMAGE_VIEWPORT.zoomPercent;
+  return Math.max(MIN_ZOOM_PERCENT, Math.min(MAX_ZOOM_PERCENT, value));
+}
+
+function sanitizePanValue(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(-9999, Math.min(9999, value));
+}
+
+function formatPan(value: number): string {
+  if (value > 0) return `+${value}`;
+  return String(value);
 }
 
 function pickerHeight(rows: number): number {

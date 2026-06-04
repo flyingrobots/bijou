@@ -241,4 +241,51 @@ describe('rasterToGlyphSurface()', () => {
     expect(surface.get(3, 0).char).toBe('#');
     expect(surface.get(4, 0).char).toBe(' ');
   });
+
+  it('zooms contained frames around the viewport center', () => {
+    const surface = rasterToGlyphSurface(
+      frame(3, 1, [
+        [255, 255, 255, 255],
+        [0, 0, 0, 255],
+        [255, 255, 255, 255],
+      ]),
+      {
+        columns: 1,
+        rows: 1,
+        fit: 'contain',
+        zoom: 3,
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe('#');
+  });
+
+  it('pans zoomed contained frames horizontally', () => {
+    const surface = rasterToGlyphSurface(
+      frame(3, 1, [
+        [0, 0, 0, 255],
+        [255, 255, 255, 255],
+        [255, 255, 255, 255],
+      ]),
+      {
+        columns: 1,
+        rows: 1,
+        fit: 'contain',
+        zoom: 3,
+        panX: 1,
+        renderer: {
+          kind: 'charset',
+          chars: ' #',
+          order: 'light-to-dark',
+        },
+      },
+    );
+
+    expect(surface.get(0, 0).char).toBe('#');
+  });
 });

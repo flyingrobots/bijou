@@ -36,6 +36,9 @@ export interface RasterToGlyphSurfaceOptions {
   readonly rows: number;
   readonly fit?: RasterGlyphFit;
   readonly cellAspectRatio?: number;
+  readonly zoom?: number;
+  readonly panX?: number;
+  readonly panY?: number;
   readonly colorMode?: RasterGlyphColorMode;
   readonly renderer?: RasterGlyphRenderer;
 }
@@ -129,9 +132,12 @@ export function rasterToGlyphSurface(frame: RgbaFrame, options: RasterToGlyphSur
 
   const fit = options.fit ?? 'stretch';
   const cellAspectRatio = sanitizeCellAspectRatio(options.cellAspectRatio);
+  const zoom = sanitizeZoom(options.zoom);
+  const panX = sanitizePan(options.panX);
+  const panY = sanitizePan(options.panY);
   const colorMode = options.colorMode ?? 'none';
   const renderer = options.renderer ?? DEFAULT_RENDERER;
-  const transform = createFitTransform(frame, columns, rows, fit, cellAspectRatio);
+  const transform = createFitTransform(frame, columns, rows, fit, cellAspectRatio, zoom, panX, panY);
 
   switch (renderer.kind) {
     case 'charset':
@@ -261,35 +267,46 @@ function createFitTransform(
   rows: number,
   fit: RasterGlyphFit,
   cellAspectRatio: number,
+  zoom: number,
+  panX: number,
+  panY: number,
 ): FitTransform {
   if (fit === 'stretch') {
+    const drawWidth = columns * zoom;
+    const drawHeight = rows * zoom;
     return {
-      scaleX: columns / frame.width,
-      scaleY: rows / frame.height,
-      offsetX: 0,
-      offsetY: 0,
-      drawWidth: columns,
-      drawHeight: rows,
+      scaleX: drawWidth / frame.width,
+      scaleY: drawHeight / frame.height,
+      offsetX: clampDrawOffset(((columns - drawWidth) / 2) + panX, columns, drawWidth),
+      offsetY: clampDrawOffset(((rows - drawHeight) / 2) + panY, rows, drawHeight),
+      drawWidth,
+      drawHeight,
     };
   }
 
   const visualTargetWidth = columns * cellAspectRatio;
   const scaleX = visualTargetWidth / frame.width;
   const scaleY = rows / frame.height;
-  const scale = fit === 'contain'
+  const baseScale = fit === 'contain'
     ? Math.min(scaleX, scaleY)
     : Math.max(scaleX, scaleY);
+  const scale = baseScale * zoom;
   const drawWidth = (frame.width * scale) / cellAspectRatio;
   const drawHeight = frame.height * scale;
 
   return {
     scaleX: scale / cellAspectRatio,
     scaleY: scale,
-    offsetX: (columns - drawWidth) / 2,
-    offsetY: (rows - drawHeight) / 2,
+    offsetX: clampDrawOffset(((columns - drawWidth) / 2) + panX, columns, drawWidth),
+    offsetY: clampDrawOffset(((rows - drawHeight) / 2) + panY, rows, drawHeight),
     drawWidth,
     drawHeight,
   };
+}
+
+function clampDrawOffset(offset: number, targetSize: number, drawSize: number): number {
+  if (drawSize <= targetSize) return (targetSize - drawSize) / 2;
+  return clampRange(offset, targetSize - drawSize, 0);
 }
 
 function sampleTargetRect(
@@ -491,6 +508,17 @@ function sanitizeDimension(value: number): number {
 function sanitizeCellAspectRatio(value: number | undefined): number {
   if (value === undefined) return DEFAULT_CELL_ASPECT_RATIO;
   if (!Number.isFinite(value) || value <= 0) return DEFAULT_CELL_ASPECT_RATIO;
+  return value;
+}
+
+function sanitizeZoom(value: number | undefined): number {
+  if (value === undefined) return 1;
+  if (!Number.isFinite(value) || value <= 0) return 1;
+  return value;
+}
+
+function sanitizePan(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 0;
   return value;
 }
 

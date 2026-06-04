@@ -190,6 +190,8 @@ describe('image viewer app', () => {
     expect(text).toContain('Images');
     expect(text).toContain('> * - sample.ppm');
     expect(text).toContain('Mode: braille');
+    expect(text).toContain('Zoom: 100%');
+    expect(text).toContain('Pan: 0,0');
     expect(text).toContain('Format: PPM');
   });
 
@@ -226,7 +228,7 @@ describe('image viewer app', () => {
     const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
     const app = createImageViewerApp(ctx, { root });
     const [model] = app.init();
-    const [focused] = app.update(keyMsg('down'), model);
+    const [focused] = app.update(keyMsg('j'), model);
     const [selected] = app.update(keyMsg('enter'), focused);
 
     expect(selected.selectedPath).toBe(realpathSync.native(join(root, 'b.ppm')));
@@ -242,11 +244,76 @@ describe('image viewer app', () => {
     const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
     const app = createImageViewerApp(ctx, { root });
     const [model] = app.init();
-    const [focused] = app.update(keyMsg('down'), model);
+    const [focused] = app.update(keyMsg('j'), model);
     const text = frameText(app.view(focused) as Surface);
 
     expect(text).toContain('  * - a.ppm');
     expect(text).toContain('>   - b.ppm');
+  });
+
+  it('uses arrow keys to pan the image viewport without moving file focus', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'a.ppm'), 'P3\n2 1\n255\n255 0 0 0 0 255\n');
+    writeFileSync(join(root, 'b.ppm'), 'P3\n2 1\n255\n0 0 255 255 0 0\n');
+    const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [pannedRight] = app.update(keyMsg('right'), model);
+    const [pannedDown] = app.update(keyMsg('down'), pannedRight);
+
+    expect(pannedDown.picker.focusIndex).toBe(model.picker.focusIndex);
+    expect(pannedDown.viewport).toEqual({
+      zoomPercent: 100,
+      panX: 4,
+      panY: 2,
+    });
+    const text = frameText(app.view(pannedDown) as Surface);
+    expect(text).toContain('Pan: +4,+2');
+  });
+
+  it('zooms the image viewport and resets to fit', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'sample.ppm'), 'P3\n2 1\n255\n255 0 0 0 0 255\n');
+    const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [zoomedIn] = app.update(keyMsg('+'), model);
+    const [zoomedOut] = app.update(keyMsg('-'), zoomedIn);
+    const [zoomedOutAgain] = app.update(keyMsg('-'), zoomedOut);
+    const [reset] = app.update(keyMsg('0'), zoomedOutAgain);
+
+    expect(zoomedIn.viewport.zoomPercent).toBe(125);
+    expect(zoomedOut.viewport.zoomPercent).toBe(100);
+    expect(zoomedOutAgain.viewport.zoomPercent).toBe(80);
+    expect(reset.viewport).toEqual({
+      zoomPercent: 100,
+      panX: 0,
+      panY: 0,
+    });
+    expect(frameText(app.view(zoomedIn) as Surface)).toContain('Zoom: 125%');
+  });
+
+  it('resets zoom and pan when a new image is selected', () => {
+    const root = createTempDir();
+    writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');
+    writeFileSync(join(root, 'b.ppm'), 'P3\n1 1\n255\n0 0 255\n');
+    const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });
+    const app = createImageViewerApp(ctx, { root });
+    const [model] = app.init();
+    const [zoomed] = app.update(keyMsg('+'), model);
+    const [panned] = app.update(keyMsg('right'), zoomed);
+    const [focused] = app.update(keyMsg('j'), panned);
+    const [selected] = app.update(keyMsg('enter'), focused);
+
+    expect(selected.selectedPath).toBe(realpathSync.native(join(root, 'b.ppm')));
+    expect(selected.viewport).toEqual({
+      zoomPercent: 100,
+      panX: 0,
+      panY: 0,
+    });
+    const text = frameText(app.view(selected) as Surface);
+    expect(text).toContain('Zoom: 100%');
+    expect(text).toContain('Pan: 0,0');
   });
 
   it('renders SVG preview glyphs with the terminal default foreground', () => {

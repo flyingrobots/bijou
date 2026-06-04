@@ -47,7 +47,9 @@ deterministically.
 
 A user can launch the image viewer, browse supported image files in a sidebar,
 select an image, and see the main pane render that image as Braille or ASCII
-glyphs. Pressing `m` swaps the render mode immediately.
+glyphs. Pressing `m` swaps the render mode immediately. The preview pane also
+supports pan and zoom so a user can inspect image details without leaving the
+side app.
 
 ## Product Shape
 
@@ -90,6 +92,22 @@ Supported input formats:
 - SVG: rasterized into a transparent RGBA frame at preview resolution.
 - PNG: 8-bit, non-interlaced RGB/RGBA.
 - PPM/PNM: `P3` and `P6` RGB Netpbm data.
+
+Navigation contract:
+
+- `j` / `k`: move file-picker focus.
+- `Enter`: select focused image or open focused directory.
+- `Backspace`: move the file picker to its parent directory.
+- Arrow keys: pan the image viewport.
+- `+` / `=`: zoom in.
+- `-`: zoom out.
+- `0`: reset to fit.
+- `m` / `Tab`: switch Braille and ASCII rendering.
+
+The file picker marks focus with `>` and the rendered image with `*`. The
+preview gutter reports zoom percentage and pan offset. The initial image and
+every newly selected image start at `100%` fit, centered horizontally and
+vertically.
 
 ## Lower Modes
 
