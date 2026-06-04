@@ -67,8 +67,8 @@ facts and remains bounded by the current landing quality profiles.
 |       ~~~~----....    ~~~~----....    ~~~~----....                           |
 |     ~~~~----....    ~~~~----....    ~~~~----....                             |
 |                                                                              |
-|  + DOGFOOD ----------------------------------------------------------------+ |
-|  | V7 Launch Wake / Documentation Of Good Foundational Onboarding...       | |
+|  + DOGFOOD / V7 Launch Wake ----------------------------------------------+ |
+|  | Documentation Of Good Foundational Onboarding and Discovery             | |
 |  +-------------------------------------------------------------------------+ |
 |                                                                              |
 |                              Press [Enter]                                  |

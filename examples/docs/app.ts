@@ -2977,8 +2977,8 @@ function getLandingDogfoodPanel(
   );
   const renderedTitle = titleScreenBlock.render({
     config: {
-      title,
-      subtitle: `${releaseTitle} / ${expansion}`,
+      title: `${title} / ${releaseTitle}`,
+      subtitle: expansion,
     },
     mode: 'interactive',
   });
