@@ -30,6 +30,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   distinguish file-picker focus from the rendered image through `>` and `*`
   row markers. This closes issue #305.
 
+### 🛠 Maintenance
+
+- **CI runner cost trim** — The focused Node 22 portable-unit lane now runs on
+  Ubuntu and Windows instead of macOS and Windows, keeping non-POSIX coverage
+  while avoiding the higher-cost macOS GitHub runner.
+
 ## [7.0.0] - 2026-06-03
 
 ### 🐛 Fixes

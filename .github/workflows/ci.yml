@@ -113,12 +113,16 @@ jobs:
         run: npm run smoke:canaries -- --skip-build
 
   unit_cross_platform:
-    name: Unit Tests (${{ matrix.os }}, Node 22)
+    name: Focused Unit Tests (${{ matrix.label }}, Node 22)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        include:
+          - label: ubuntu
+            os: ubuntu-latest
+          - label: windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
