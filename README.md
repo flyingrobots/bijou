@@ -22,8 +22,10 @@ Core build and unit-test coverage runs on Ubuntu for Node 20/22, with focused
 Ubuntu and Windows Node 22 lanes for portable path and bootstrap checks.
 Contributor-facing root scripts such as `npm run clean` and
 `npm run version` are Node scripts so they do not require a Unix shell.
-Release, publish, and benchmark workflows may still use Linux-hosted Bash where
-the workflow itself is intentionally platform-specific.
+macOS validation is expected to run locally on maintainer development machines
+instead of on higher-cost GitHub-hosted macOS runners. Release, publish, and
+benchmark workflows may still use Linux-hosted Bash where the workflow itself is
+intentionally platform-specific.
 
 The repo's primary human-facing guide is [DOGFOOD](./docs/DOGFOOD.md).
 The `examples/` tree is for runnable examples and is intentionally maintained as secondary/internal reference material.

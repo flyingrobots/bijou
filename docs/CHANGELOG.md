@@ -34,7 +34,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **CI runner cost trim** — The focused Node 22 portable-unit lane now runs on
   Ubuntu and Windows instead of macOS and Windows, keeping non-POSIX coverage
-  while avoiding the higher-cost macOS GitHub runner.
+  while avoiding the higher-cost macOS GitHub runner. macOS validation remains
+  a local maintainer-machine responsibility through the same root scripts.
 
 ## [7.0.0] - 2026-06-03
 
