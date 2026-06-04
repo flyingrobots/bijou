@@ -58,6 +58,21 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(inventory.entries.map((entry) => entry.value)).toEqual(['production']);
   });
 
+  it('ignores raster-renderer option literals without dropping visible copy', () => {
+    const inventory = collectDogfoodI18nDebt({
+      sources: [{
+        surface: 'fixture',
+        path: 'examples/docs/fixture.ts',
+        text: [
+          "const renderer = { kind: 'charset', fit: 'stretch', colorMode: 'fg' };",
+          "const visible = 'Visible renderer label';",
+        ].join('\n'),
+      }],
+    });
+
+    expect(inventory.entries.map((entry) => entry.value)).toEqual(['Visible renderer label']);
+  });
+
   it('freezes nested inventory entries and surface counts', () => {
     const inventory = collectDogfoodI18nDebt({
       sources: [{
