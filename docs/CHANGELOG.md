@@ -22,10 +22,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   wordmark as a background-transparent glyph mask in complementary colors, and
   renders the lower FlyingRobots wordmark from `assets/flyingrobotslogo.txt`
   while treating the asset's Braille blank cells as transparent and painting
-  visible wordmark cells with the underlying wake color as the cell background
-  plus the opposite foreground color for the `V7 Launch Wake` landing screen.
-  Existing landing quality buckets and lower-mode release facts are preserved.
-  This closes issue #303.
+  visible wordmark cells with the same opposite-foreground overlay treatment as
+  the Bijou mark. FlyingRobots Braille cells also fill their background from the
+  visible wake underneath so dot holes do not fall back to terminal dark. Existing
+  landing quality buckets and lower-mode release facts are preserved. This closes
+  issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.

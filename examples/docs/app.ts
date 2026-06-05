@@ -641,7 +641,8 @@ const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_T
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
-const LANDING_WORDMARK_MASK = { char: true, fg: true, bg: true, modifiers: true } as const;
+const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
+const LANDING_BRAILLE_LOGO_OVERLAY_MASK = { char: true, fg: true, bg: true, modifiers: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -2565,29 +2566,7 @@ function paintBijouSvgOverlay(
   if (metrics == null) return;
 
   const mark = getBijouSvgOverlaySurface(metrics.columns, metrics.rows);
-
-  for (let y = 0; y < mark.height; y++) {
-    for (let x = 0; x < mark.width; x++) {
-      const markChar = mark.get(x, y).char ?? ' ';
-      if (markChar === ' ') continue;
-
-      const targetX = metrics.left + x;
-      const targetY = metrics.top + y;
-      const underColor = landingBackgroundCellColor(surface.get(targetX, targetY), tokens);
-
-      surface.set(targetX, targetY, {
-        char: markChar,
-        fg: oppositeHexColor(underColor),
-        modifiers: BOLD_MODIFIERS as string[],
-        empty: false,
-        opacity: 1,
-      }, {
-        char: true,
-        fg: true,
-        modifiers: true,
-      });
-    }
-  }
+  paintLandingLogoOverlay(surface, mark, metrics.left, metrics.top, tokens);
 }
 
 function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayMetrics | undefined {
@@ -2656,6 +2635,47 @@ function landingVisibleCellColor(cell: Cell, tokens: LandingThemeTokens): string
   return colorHex(cell.fg) ?? colorHex(cell.bg) ?? tokens.background;
 }
 
+function paintLandingLogoOverlay(
+  surface: Surface,
+  mark: Surface,
+  left: number,
+  top: number,
+  tokens: LandingThemeTokens,
+  options: { readonly fillBackgroundFromVisibleCell?: boolean } = {},
+): void {
+  const mask = options.fillBackgroundFromVisibleCell
+    ? LANDING_BRAILLE_LOGO_OVERLAY_MASK
+    : LANDING_LOGO_OVERLAY_MASK;
+
+  for (let y = 0; y < mark.height; y++) {
+    for (let x = 0; x < mark.width; x++) {
+      const markChar = mark.get(x, y).char ?? ' ';
+      if (markChar === ' ') continue;
+
+      const targetX = left + x;
+      const targetY = top + y;
+      if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
+        continue;
+      }
+
+      const targetCell = surface.get(targetX, targetY);
+      const foregroundSample = landingBackgroundCellColor(targetCell, tokens);
+      const backgroundSample = options.fillBackgroundFromVisibleCell
+        ? landingVisibleCellColor(targetCell, tokens)
+        : undefined;
+
+      surface.set(targetX, targetY, {
+        char: markChar,
+        fg: oppositeHexColor(foregroundSample),
+        bg: backgroundSample,
+        modifiers: BOLD_MODIFIERS as string[],
+        empty: false,
+        opacity: 1,
+      }, mask);
+    }
+  }
+}
+
 function createWordmarkSurface(
   lines: readonly (readonly string[])[],
 ): Surface {
@@ -2671,28 +2691,9 @@ function paintFlyingRobotsLogoOverlay(
   tokens: LandingThemeTokens,
 ): void {
   const left = Math.floor((surface.width - mark.width) / 2);
-  for (let y = 0; y < mark.height; y++) {
-    for (let x = 0; x < mark.width; x++) {
-      const markChar = mark.get(x, y).char ?? ' ';
-      if (markChar === ' ') continue;
-
-      const targetX = left + x;
-      const targetY = top + y;
-      if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
-        continue;
-      }
-
-      const underColor = landingVisibleCellColor(surface.get(targetX, targetY), tokens);
-      surface.set(targetX, targetY, {
-        char: markChar,
-        fg: oppositeHexColor(underColor),
-        bg: underColor,
-        modifiers: BOLD_MODIFIERS as string[],
-        empty: false,
-        opacity: 1,
-      }, LANDING_WORDMARK_MASK);
-    }
-  }
+  paintLandingLogoOverlay(surface, mark, left, top, tokens, {
+    fillBackgroundFromVisibleCell: true,
+  });
 }
 
 function renderLandingPerfHudOverlay(
