@@ -84,10 +84,11 @@ content still wins. The visible Bijou wordmark is rasterized from
 background-transparent mask that writes SVG glyphs without replacing existing
 backgrounds. The lower FlyingRobots wordmark is read from
 `assets/flyingrobotslogo.txt`, treats Braille blank cells as transparent holes,
-fits the visible logo glyphs to the available landing width, and uses the same
-opposite-foreground overlay treatment as the Bijou mark. Visible FlyingRobots
-Braille cells also fill their background from the wake underneath so Braille dot
-holes remain wake-colored instead of falling back to terminal dark.
+fits the visible logo glyphs to the available landing width, preserves the
+underlying cell background, and paints visible Braille glyphs with the opposite
+foreground color of that preserved background. This keeps the mark transparent
+through modal dimming because the logo does not own a rectangular background
+fill.
 
 ```text
 +------------------------------------------------------------------------------+

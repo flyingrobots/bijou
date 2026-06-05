@@ -642,7 +642,6 @@ const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
 const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
-const LANDING_BRAILLE_LOGO_OVERLAY_MASK = { char: true, fg: true, bg: true, modifiers: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -2627,12 +2626,12 @@ function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): str
   return colorHex(cell.fg) ?? sampleColorRamp(tokens.waveRamp, 0.58);
 }
 
-function landingVisibleCellColor(cell: Cell, tokens: LandingThemeTokens): string {
-  if (cell.fgRGB != null) {
-    return rgbHex(cell.fgRGB[0], cell.fgRGB[1], cell.fgRGB[2]);
+function landingCellBackgroundColor(cell: Cell, tokens: LandingThemeTokens): string {
+  if (cell.bgRGB != null) {
+    return rgbHex(cell.bgRGB[0], cell.bgRGB[1], cell.bgRGB[2]);
   }
 
-  return colorHex(cell.fg) ?? colorHex(cell.bg) ?? tokens.background;
+  return colorHex(cell.bg) ?? tokens.background;
 }
 
 function paintLandingLogoOverlay(
@@ -2641,12 +2640,8 @@ function paintLandingLogoOverlay(
   left: number,
   top: number,
   tokens: LandingThemeTokens,
-  options: { readonly fillBackgroundFromVisibleCell?: boolean } = {},
+  options: { readonly foregroundSample?: 'visible-cell' | 'background-cell' } = {},
 ): void {
-  const mask = options.fillBackgroundFromVisibleCell
-    ? LANDING_BRAILLE_LOGO_OVERLAY_MASK
-    : LANDING_LOGO_OVERLAY_MASK;
-
   for (let y = 0; y < mark.height; y++) {
     for (let x = 0; x < mark.width; x++) {
       const markChar = mark.get(x, y).char ?? ' ';
@@ -2659,19 +2654,17 @@ function paintLandingLogoOverlay(
       }
 
       const targetCell = surface.get(targetX, targetY);
-      const foregroundSample = landingBackgroundCellColor(targetCell, tokens);
-      const backgroundSample = options.fillBackgroundFromVisibleCell
-        ? landingVisibleCellColor(targetCell, tokens)
-        : undefined;
+      const foregroundSample = options.foregroundSample === 'background-cell'
+        ? landingCellBackgroundColor(targetCell, tokens)
+        : landingBackgroundCellColor(targetCell, tokens);
 
       surface.set(targetX, targetY, {
         char: markChar,
         fg: oppositeHexColor(foregroundSample),
-        bg: backgroundSample,
         modifiers: BOLD_MODIFIERS as string[],
         empty: false,
         opacity: 1,
-      }, mask);
+      }, LANDING_LOGO_OVERLAY_MASK);
     }
   }
 }
@@ -2692,7 +2685,7 @@ function paintFlyingRobotsLogoOverlay(
 ): void {
   const left = Math.floor((surface.width - mark.width) / 2);
   paintLandingLogoOverlay(surface, mark, left, top, tokens, {
-    fillBackgroundFromVisibleCell: true,
+    foregroundSample: 'background-cell',
   });
 }
 

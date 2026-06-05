@@ -31,10 +31,11 @@ mask in complementary colors. The landing screen keeps the treatment sparse:
 the V7 title art, a centered `Press [Enter]` cue, the
 [assets/flyingrobotslogo.txt](../../assets/flyingrobotslogo.txt) wordmark, and a
 reserved last-line footer for quit/continue guidance plus the Bijou version. The
-Bijou and FlyingRobots title marks share the same opposite-foreground overlay
-treatment. The FlyingRobots Braille wordmark keeps blank asset cells transparent,
-and visible Braille cells also use the visible wake color as their background so
-dot holes do not fall back to terminal dark.
+Bijou mark preserves the existing cell background while deriving complementary
+foreground from the visible wake. The FlyingRobots Braille wordmark keeps blank
+asset cells transparent, preserves the underlying cell background for visible
+glyphs, and paints those glyphs with the opposite color of that preserved
+background.
 
 On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. Backtick toggles the shared shell perf HUD in place, `Esc` or `q` quit immediately there, and any other unmodified key enters the docs shell.
 

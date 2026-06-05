@@ -143,29 +143,6 @@ function expectedLandingWakeColorAt(x: number, y: number, width: number, height:
   return sampleDefaultWaveRamp(colorT);
 }
 
-function expectedLandingLogoForegroundSampleAt(x: number, y: number, width: number, height: number): string {
-  const tile = width * height <= 14_000 ? 1 : width * height <= 28_000 ? 2 : 3;
-  const tileX = Math.floor(x / tile) * tile;
-  const tileY = Math.floor(y / tile) * tile;
-  const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
-  const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
-  const widthDenominator = width - 1 || 1;
-  const heightDenominator = height - 1 || 1;
-  const u = sampleX / widthDenominator;
-  const v = sampleY / heightDenominator;
-  const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
-  const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
-  if (char === ' ') return sampleDefaultWaveRamp(0.58);
-  const colorT = clamp01(
-    0.1
-    + (layer * 0.16)
-    + (u * 0.26)
-    + (0.18 * (0.5 + (Math.sin(v * 5.2) * 0.5)))
-    + (0.06 * Math.sin(sampleX * 0.035)),
-  );
-  return sampleDefaultWaveRamp(colorT);
-}
-
 function titleBackgroundGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
 }
@@ -492,8 +469,8 @@ describe('docs preview app', () => {
     const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
     const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
     const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
-    let wakeBackedLogoCell: { readonly x: number; readonly y: number; readonly bg: string } | undefined;
-    let backgroundBackedLogoCell: { readonly x: number; readonly y: number; readonly fgSample: string } | undefined;
+    let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
+    let backgroundBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
 
     expect(transparentOffset).toBeGreaterThan(0);
     expect(visiblePrefix.length).toBeGreaterThan(8);
@@ -507,11 +484,10 @@ describe('docs preview app', () => {
         const targetX = logoX + x;
         const targetY = logoY + y;
         const bg = expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height);
-        const fgSample = expectedLandingLogoForegroundSampleAt(targetX, targetY, frame.width, frame.height);
         if (bg !== V7_DEFAULT_BACKGROUND) {
-          wakeBackedLogoCell = { x: targetX, y: targetY, bg };
+          wakeBackedLogoCell = { x: targetX, y: targetY };
         } else {
-          backgroundBackedLogoCell = { x: targetX, y: targetY, fgSample };
+          backgroundBackedLogoCell = { x: targetX, y: targetY };
         }
         if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) {
           break;
@@ -520,18 +496,59 @@ describe('docs preview app', () => {
       if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) break;
     }
     expect(wakeBackedLogoCell).toBeDefined();
-    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(wakeBackedLogoCell!.bg);
-    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(oppositeHexColor(
-      expectedLandingLogoForegroundSampleAt(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y, frame.width, frame.height),
-    ));
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(
+      oppositeHexColor(V7_DEFAULT_BACKGROUND),
+    );
     expect(backgroundBackedLogoCell).toBeDefined();
     expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
-    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).fg)).toBe(oppositeHexColor(
-      backgroundBackedLogoCell!.fgSample,
-    ));
+    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).fg)).toBe(
+      oppositeHexColor(V7_DEFAULT_BACKGROUND),
+    );
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
     expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
     expect(text).not.toContain('8""""');
+  });
+
+  it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal dims the title', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ESCAPE }], { ctx });
+    const frame = opened.frames.at(-1)!;
+    const text = frameText(frame);
+    const lines = text.split('\n');
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
+    const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
+    const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
+    const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
+    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
+
+    expect(text).toContain('Quit?');
+    expect(logoY).toBeGreaterThanOrEqual(0);
+    expect(logoX).toBeGreaterThanOrEqual(0);
+    for (let y = 0; y < logoLines.length; y++) {
+      const logoLine = Array.from(logoLines[y] ?? '');
+      for (let x = 0; x < logoLine.length; x++) {
+        const char = logoLine[x];
+        if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
+        const targetX = logoX + x;
+        const targetY = logoY + y;
+        if (expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height) !== V7_DEFAULT_BACKGROUND) {
+          wakeBackedLogoCell = { x: targetX, y: targetY };
+          break;
+        }
+      }
+      if (wakeBackedLogoCell != null) break;
+    }
+
+    expect(wakeBackedLogoCell).toBeDefined();
+    const cell = frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y);
+    expect(colorHex(cell.bg)).toBe(V7_DEFAULT_BACKGROUND);
+    expect(colorHex(cell.fg)).toBe(oppositeHexColor(V7_DEFAULT_BACKGROUND));
+    expect(cell.modifiers ?? []).toContain('dim');
   });
 
   it('keeps every landing title cell on a Bijou-owned background', async () => {
