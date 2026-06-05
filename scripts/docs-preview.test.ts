@@ -132,7 +132,7 @@ function expectedLandingWakeColorAt(x: number, y: number, width: number, height:
   const v = sampleY / heightDenominator;
   const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
   const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
-  if (char === ' ') return sampleDefaultWaveRamp(0.58);
+  if (char === ' ') return V7_DEFAULT_BACKGROUND;
   const colorT = clamp01(
     0.1
     + (layer * 0.16)
@@ -463,20 +463,36 @@ describe('docs preview app', () => {
     const frame = initial.frames[0]!;
     const text = frameText(frame);
     const lines = text.split('\n');
-    const [firstLogoLine = ''] = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
     const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
     const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
     const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
     const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    let wakeBackedLogoCell: { readonly x: number; readonly y: number; readonly bg: string } | undefined;
 
     expect(transparentOffset).toBeGreaterThan(0);
     expect(visiblePrefix.length).toBeGreaterThan(8);
     expect(logoY).toBeGreaterThanOrEqual(0);
     expect(logoX).toBeGreaterThanOrEqual(0);
-    expect(colorHex(frame.get(logoX, logoY).fg)).toBe(oppositeHexColor(
-      expectedLandingWakeColorAt(logoX, logoY, frame.width, frame.height),
-    ));
-    expect(colorHex(frame.get(logoX, logoY).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    for (let y = 0; y < logoLines.length; y++) {
+      const logoLine = Array.from(logoLines[y] ?? '');
+      for (let x = 0; x < logoLine.length; x++) {
+        const char = logoLine[x];
+        if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
+        const targetX = logoX + x;
+        const targetY = logoY + y;
+        const bg = expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height);
+        if (bg !== V7_DEFAULT_BACKGROUND) {
+          wakeBackedLogoCell = { x: targetX, y: targetY, bg };
+          break;
+        }
+      }
+      if (wakeBackedLogoCell != null) break;
+    }
+    expect(wakeBackedLogoCell).toBeDefined();
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(wakeBackedLogoCell!.bg);
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(oppositeHexColor(wakeBackedLogoCell!.bg));
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
     expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
     expect(text).not.toContain('8""""');

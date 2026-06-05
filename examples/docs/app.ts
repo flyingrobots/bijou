@@ -641,7 +641,7 @@ const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_T
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
-const LANDING_WORDMARK_MASK = { char: true, fg: true, modifiers: true } as const;
+const LANDING_WORDMARK_MASK = { char: true, fg: true, bg: true, modifiers: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -2648,6 +2648,14 @@ function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): str
   return colorHex(cell.fg) ?? sampleColorRamp(tokens.waveRamp, 0.58);
 }
 
+function landingVisibleCellColor(cell: Cell, tokens: LandingThemeTokens): string {
+  if (cell.fgRGB != null) {
+    return rgbHex(cell.fgRGB[0], cell.fgRGB[1], cell.fgRGB[2]);
+  }
+
+  return colorHex(cell.fg) ?? colorHex(cell.bg) ?? tokens.background;
+}
+
 function createWordmarkSurface(
   lines: readonly (readonly string[])[],
 ): Surface {
@@ -2674,10 +2682,11 @@ function paintFlyingRobotsLogoOverlay(
         continue;
       }
 
-      const underColor = landingBackgroundCellColor(surface.get(targetX, targetY), tokens);
+      const underColor = landingVisibleCellColor(surface.get(targetX, targetY), tokens);
       surface.set(targetX, targetY, {
         char: markChar,
         fg: oppositeHexColor(underColor),
+        bg: underColor,
         modifiers: BOLD_MODIFIERS as string[],
         empty: false,
         opacity: 1,
