@@ -83,13 +83,25 @@ are written into cell backgrounds while the density glyphs keep the surface
 geometry stable with matching foreground colors. The visible Bijou wordmark is
 rasterized from `assets/Bijou.svg`, fit to the terminal cell aspect, and used as
 a background-transparent mask that writes SVG glyphs without replacing existing
-backgrounds. The lower FlyingRobots wordmark is read from
+backgrounds. The wordmark letters ride a staggered sine wave and tint their
+foreground fill from the landing ramps, so the logo can animate without owning a
+rectangular background. The lower FlyingRobots wordmark is read from
 `assets/flyingrobotslogo.txt`, treats Braille blank cells as transparent holes,
 fits the visible logo glyphs to the available landing width, preserves the
 underlying cell background, and paints visible Braille glyphs with the opposite
 foreground color of that preserved background. This keeps the mark transparent
 through modal dimming because the logo does not own a rectangular background
-fill.
+fill. FlyingRobots fades away after the first three seconds, leaving the Bijou
+wordmark, wake, release panel, prompt, footer, and version marker as the stable
+title composition.
+
+The title screen owns only title-screen controls. `Enter` is the only key that
+continues into the DOGFOOD documentation shell; backtick toggles the perf HUD in
+place, `Esc` / `q` use the shell quit policy, arrows and number keys adjust
+landing presentation, and other keys do not secretly route into docs. Pressing
+`Enter` switches the model to the docs route immediately, then a short
+foreground-safe wake transition overlays only truly empty docs regions while the
+first docs frames settle.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -107,6 +119,9 @@ fill.
 | Esc/q quit ...                                      60 fps - auto/full v7.0.0 |
 +------------------------------------------------------------------------------+
 ```
+
+The prompt keeps the localized `Press [Enter]` text while using a stronger
+foreground gradient over the `Enter` letters than over the surrounding line.
 
 ### Small Landing Screen
 
@@ -210,6 +225,10 @@ instead of looking vertically stretched.
 - DOGFOOD reads `assets/Bijou.svg` once, rasterizes the wordmark into a cached
   mask per terminal size, and uses the mask to write foreground glyphs without
   replacing the underlying backgrounds.
+- DOGFOOD derives the Bijou logo row offsets, fill colors, FlyingRobots fade,
+  and prompt gradient from quantized landing pulse time.
+- DOGFOOD starts the docs transition from explicit Enter input and advances it
+  through deterministic pulse deltas.
 - Target dimensions are bounded by landing quality profiles before rendering.
 - Cache keys include viewport, theme, quality, quantized time, and FPS badge
   state, preserving the existing landing frame cache behavior.
@@ -256,6 +275,14 @@ Agents should be able to prove the slice by checking:
   telemetry.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
   wake field.
+- RED: non-Enter keys route from the title screen into the docs shell.
+- RED: the lower FlyingRobots wordmark stays visible after the three-second
+  fade window.
+- RED: the Bijou SVG title mask is static instead of moving each letter through
+  a staggered sine-wave row offset and animated fill color.
+- RED: the `Press [Enter]` prompt does not draw attention to `Enter` with a
+  gradient foreground.
+- RED: pressing Enter hard-cuts to docs with no title-to-docs transition state.
 
 ## Validation
 

@@ -53,6 +53,8 @@ const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
   { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
 ] as const;
+const V7_BIJOU_LOGO_LETTER_COUNT = 5;
+const V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -223,6 +225,16 @@ function expectedStackedWakeChar(x: number, y: number, width: number): string {
   return V7_LANDING_WAKE_CHARS[layer] ?? ' ';
 }
 
+function expectedBijouLogoLetterIndex(x: number, width: number): number {
+  const letterWidth = Math.max(1, width / V7_BIJOU_LOGO_LETTER_COUNT);
+  return Math.max(0, Math.min(V7_BIJOU_LOGO_LETTER_COUNT - 1, Math.floor(x / letterWidth)));
+}
+
+function expectedBijouLogoYOffset(x: number, width: number, timeMs: number): number {
+  const letterIndex = expectedBijouLogoLetterIndex(x, width);
+  return Math.round(Math.sin((timeMs * 0.004) + (letterIndex * 0.82)) * V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS);
+}
+
 function landingWakeLayer(
   x: number,
   y: number,
@@ -262,7 +274,7 @@ function matchingBijouSvgOverlayGlyphCount(frame: {
   width: number;
   height: number;
   get(x: number, y: number): { char?: string; fg?: ColorRef };
-}): { readonly expected: number; readonly matched: number } {
+}, timeMs: number): { readonly expected: number; readonly matched: number } {
   const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
   let expected = 0;
   let matched = 0;
@@ -273,7 +285,7 @@ function matchingBijouSvgOverlayGlyphCount(frame: {
       if (expectedChar === ' ') continue;
       expected++;
 
-      const actual = frame.get(overlay.left + x, overlay.top + y);
+      const actual = frame.get(overlay.left + x, overlay.top + y + expectedBijouLogoYOffset(x, overlay.mask.width, timeMs));
       if (actual.char === expectedChar && colorHex(actual.fg) != null) {
         matched++;
       }
@@ -414,8 +426,17 @@ describe('docs preview app', () => {
     const initial = await runScript(app, [], { ctx });
     expect((initial.model as any).route).toBe('landing');
 
+    const ignored = await runScript(app, [{ key: 'a' }], { ctx });
+    expect((ignored.model as any).route).toBe('landing');
+    expect((ignored.model as any).landingTransitionMs).toBeUndefined();
+
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     expect((entered.model as any).route).toBe('docs');
+    expect((entered.model as any).landingTransitionMs).toBe(0);
+
+    const transitioned = await runScript(app, [{ key: KEY_ENTER }, { pulse: { dt: 0.6 } }], { ctx });
+    expect((transitioned.model as any).route).toBe('docs');
+    expect((transitioned.model as any).landingTransitionMs).toBeUndefined();
   });
 
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
@@ -514,6 +535,45 @@ describe('docs preview app', () => {
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
     expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
     expect(text).not.toContain('8""""');
+  });
+
+  it('fades the FlyingRobots logo after the first three seconds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
+    const visiblePrefix = firstLogoLine.slice(0, firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL));
+
+    const initial = await runScript(app, [], { ctx });
+    const faded = await runScript(app, [{ pulse: { dt: 4.2 } }], { ctx });
+
+    expect(visiblePrefix.length).toBeGreaterThan(8);
+    expect(frameText(initial.frames[0]!)).toContain(visiblePrefix);
+    expect(frameText(faded.frames.at(-1)!)).not.toContain(visiblePrefix);
+  });
+
+  it('uses a foreground gradient across the Enter prompt letters', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 48, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const lines = frameText(frame).split('\n');
+    const promptY = lines.findIndex((line) => line.includes('Press [Enter]'));
+    const promptX = promptY >= 0 ? lines[promptY]!.indexOf('Press [Enter]') : -1;
+    const prompt = 'Press [Enter]';
+    const enterStart = prompt.indexOf('Enter');
+
+    expect(promptY).toBeGreaterThanOrEqual(0);
+    expect(promptX).toBeGreaterThanOrEqual(0);
+
+    const enterColors = Array.from('Enter').map((_char, offset) => (
+      colorHex(frame.get(promptX + enterStart + offset, promptY).fg)
+    ));
+    const bodyColor = colorHex(frame.get(promptX, promptY).fg);
+
+    expect(new Set(enterColors).size).toBeGreaterThan(1);
+    expect(enterColors).not.toContain(bodyColor);
   });
 
   it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal dims the title', async () => {
@@ -698,7 +758,7 @@ describe('docs preview app', () => {
     expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
     expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
     expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
-    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
+    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!, 0);
     expect(overlay.expected).toBeGreaterThan(450);
     expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
     const metrics = bijouSvgOverlayMetrics(initial.frames[0]!.width, initial.frames[0]!.height);
@@ -716,7 +776,7 @@ describe('docs preview app', () => {
         const cell = initial.frames[0]!.get(x, y);
         if (!V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')) continue;
         if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
-        expect(colorHex(cell.fg)).toBe(colorHex(cell.bg));
+        if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
         sameColorWakeCells++;
       }
     }
@@ -742,6 +802,31 @@ describe('docs preview app', () => {
     );
     expect(colorHex(frame.get(paintedPathCell.x, paintedPathCell.y).fg)).not.toBeNull();
     expect(colorHex(frame.get(transparentMaskCell.x, transparentMaskCell.y).fg)).not.toBeNull();
+  });
+
+  it('animates the Bijou SVG title mask with staggered row and fill waves', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+    const pulseMs = 352;
+
+    const initial = await runScript(app, [], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: pulseMs / 1000 } }], { ctx });
+    const initialFrame = initial.frames[0]!;
+    const pulsedFrame = pulsed.frames.at(-1)!;
+    const overlay = expectedBijouSvgOverlay(initialFrame.width, initialFrame.height);
+    const sampleX = 0;
+    const sampleY = 0;
+    const expectedChar = overlay.mask.get(sampleX, sampleY).char;
+    const initialY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, 0);
+    const pulsedY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, pulseMs);
+
+    expect(expectedChar).not.toBe(' ');
+    expect(initialY).not.toBe(pulsedY);
+    expect(initialFrame.get(overlay.left + sampleX, initialY).char).toBe(expectedChar);
+    expect(pulsedFrame.get(overlay.left + sampleX, pulsedY).char).toBe(expectedChar);
+    expect(colorHex(initialFrame.get(overlay.left + sampleX, initialY).fg)).not.toBe(
+      colorHex(pulsedFrame.get(overlay.left + sampleX, pulsedY).fg),
+    );
   });
 
   it('reuses giant landing frames across small pulses within the same quality bucket', async () => {
@@ -1493,19 +1578,19 @@ describe('docs preview app', () => {
     expect(frameText(landingFrame)).toContain('60 fps • quality');
   });
 
-  it('routes landing F2 into the shell settings layer and lets escape dismiss it without quitting', () => {
+  it('keeps landing F2 on the title screen because only Enter continues', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
     let [model] = app.init();
     [model] = app.update(parseKey(KEY_F2) as any, model);
-    expect((model as any).route).toBe('docs');
-    expect((model as any).docsModel.settingsOpen).toBe(true);
+    expect((model as any).route).toBe('landing');
+    expect((model as any).docsModel.settingsOpen).toBe(false);
     expect((model as any).docsModel.quitConfirmOpen).toBe(false);
 
-    [model] = app.update(parseKey(KEY_ESCAPE) as any, model);
+    [model] = app.update(parseKey(KEY_ENTER) as any, model);
     expect((model as any).route).toBe('docs');
-    expect((model as any).docsModel.settingsOpen).toBe(false);
+    expect((model as any).landingTransitionMs).toBe(0);
     expect((model as any).docsModel.quitConfirmOpen).toBe(false);
   });
 

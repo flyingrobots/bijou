@@ -74,6 +74,7 @@ import {
   type RunOptions,
 } from '../../packages/bijou-tui/src/index.js';
 import { runWithLifecycleHooks } from '../../packages/bijou-tui/src/runtime.js';
+import { normalizeViewOutput } from '../../packages/bijou-tui/src/view-output.js';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
@@ -340,6 +341,7 @@ interface RootModel {
   readonly rows: number;
   readonly landingTimeMs: number;
   readonly landingFps: number;
+  readonly landingTransitionMs?: number;
   readonly landingThemeIndex: number;
   readonly landingToast?: LandingToastState;
   readonly landingQuitConfirmOpen: boolean;
@@ -638,6 +640,11 @@ const LANDING_WAKE_WAVES = [
 const LANDING_BIJOU_SVG_CHARSET = ' ░▒▓█';
 const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
 const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
+const LANDING_FLYING_ROBOTS_FADE_DELAY_MS = 3000;
+const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
+const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
+const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
+const LANDING_ROUTE_TRANSITION_DURATION_MS = 520;
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
@@ -660,6 +667,26 @@ interface BijouSvgOverlayMetrics {
   readonly top: number;
   readonly columns: number;
   readonly rows: number;
+}
+
+interface LandingLogoOverlayOptions {
+  readonly foregroundSample?: 'visible-cell' | 'background-cell';
+  readonly opacity?: number;
+  readonly yOffset?: (x: number, y: number, char: string, width: number, height: number) => number;
+  readonly foreground?: (input: LandingLogoForegroundInput) => string;
+}
+
+interface LandingLogoForegroundInput {
+  readonly x: number;
+  readonly y: number;
+  readonly targetX: number;
+  readonly targetY: number;
+  readonly char: string;
+  readonly width: number;
+  readonly height: number;
+  readonly targetCell: Cell;
+  readonly baseForeground: string;
+  readonly sampledColor: string;
 }
 
 const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
@@ -956,20 +983,12 @@ function dogfoodLocaleSettingDescription(currentLocale: string, localization?: L
   );
 }
 
-function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
-  if (msg.alt) return false;
-  if (msg.ctrl) {
-    return msg.key === ',' || msg.key === 'p';
-  }
-  return msg.key === 'f2'
-    || msg.key === '?'
-    || msg.key === '/'
-    || msg.key === ':'
-    || (msg.key === 'n' && msg.shift);
-}
-
 function shouldToggleLandingPerfHud(msg: KeyMsg): boolean {
   return !msg.ctrl && !msg.alt && msg.key === '`';
+}
+
+function shouldContinueFromLanding(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'enter';
 }
 
 function readMarkdownDoc(path: string): string {
@@ -2359,7 +2378,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-    paintV7TitleArt(surface, tokens);
+    paintV7TitleArt(surface, tokens, quantizedTimeMs);
 
     const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
     const wordmark = createWordmarkSurface(wordmarkGlyphs);
@@ -2390,6 +2409,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
         wordmark,
         startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap,
         tokens,
+        quantizedTimeMs,
       );
     } else if (availableHeight >= compactClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
@@ -2550,23 +2570,28 @@ function stackedWakeWave(
 function paintV7TitleArt(
   surface: Surface,
   tokens: LandingThemeTokens,
+  timeMs: number,
 ): void {
   const width = surface.width;
   const height = surface.height;
   if (width < 40 || height < 14) return;
 
-  paintBijouSvgOverlay(surface, tokens);
+  paintBijouSvgOverlay(surface, tokens, timeMs);
 }
 
 function paintBijouSvgOverlay(
   surface: Surface,
   tokens: LandingThemeTokens,
+  timeMs: number,
 ): void {
   const metrics = bijouSvgOverlayMetrics(surface.width, surface.height);
   if (metrics == null) return;
 
   const mark = getBijouSvgOverlaySurface(metrics.columns, metrics.rows);
-  paintLandingLogoOverlay(surface, mark, metrics.left, metrics.top, tokens);
+  paintLandingLogoOverlay(surface, mark, metrics.left, metrics.top, tokens, {
+    yOffset: (x, _y, _char, width) => landingBijouLogoYOffset(x, width, timeMs),
+    foreground: ({ x, width, baseForeground }) => landingBijouLogoFillColor(baseForeground, tokens, x, width, timeMs),
+  });
 }
 
 function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayMetrics | undefined {
@@ -2641,15 +2666,18 @@ function paintLandingLogoOverlay(
   left: number,
   top: number,
   tokens: LandingThemeTokens,
-  options: { readonly foregroundSample?: 'visible-cell' | 'background-cell' } = {},
+  options: LandingLogoOverlayOptions = {},
 ): void {
+  const opacity = options.opacity ?? 1;
+  if (opacity <= 0.02) return;
+
   for (let y = 0; y < mark.height; y++) {
     for (let x = 0; x < mark.width; x++) {
       const markChar = mark.get(x, y).char ?? ' ';
       if (markChar === ' ') continue;
 
       const targetX = left + x;
-      const targetY = top + y;
+      const targetY = top + y + Math.round(options.yOffset?.(x, y, markChar, mark.width, mark.height) ?? 0);
       if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
         continue;
       }
@@ -2659,15 +2687,69 @@ function paintLandingLogoOverlay(
         ? landingCellBackgroundColor(targetCell, tokens)
         : landingBackgroundCellColor(targetCell, tokens);
 
+      const baseForeground = oppositeHexColor(foregroundSample);
+      const animatedForeground = options.foreground?.({
+        x,
+        y,
+        targetX,
+        targetY,
+        char: markChar,
+        width: mark.width,
+        height: mark.height,
+        targetCell,
+        baseForeground,
+        sampledColor: foregroundSample,
+      }) ?? baseForeground;
+      const fg = opacity >= 0.995
+        ? animatedForeground
+        : mixHexColor(landingCellBackgroundColor(targetCell, tokens), animatedForeground, opacity);
+
       surface.set(targetX, targetY, {
         char: markChar,
-        fg: oppositeHexColor(foregroundSample),
-        modifiers: BOLD_MODIFIERS as string[],
+        fg,
+        modifiers: opacity < 0.38
+          ? DIM_MODIFIERS as string[]
+          : BOLD_MODIFIERS as string[],
         empty: false,
         opacity: 1,
       }, LANDING_LOGO_OVERLAY_MASK);
     }
   }
+}
+
+function landingFlyingRobotsOpacity(timeMs: number): number {
+  if (timeMs <= LANDING_FLYING_ROBOTS_FADE_DELAY_MS) return 1;
+  return 1 - clamp01((timeMs - LANDING_FLYING_ROBOTS_FADE_DELAY_MS) / LANDING_FLYING_ROBOTS_FADE_DURATION_MS);
+}
+
+function landingBijouLogoLetterIndex(x: number, width: number): number {
+  const letterWidth = Math.max(1, width / LANDING_BIJOU_LOGO_LETTER_COUNT);
+  return Math.max(0, Math.min(LANDING_BIJOU_LOGO_LETTER_COUNT - 1, Math.floor(x / letterWidth)));
+}
+
+function landingBijouLogoWavePhase(timeMs: number, letterIndex: number): number {
+  return (timeMs * 0.004) + (letterIndex * 0.82);
+}
+
+function landingBijouLogoYOffset(x: number, width: number, timeMs: number): number {
+  const phase = landingBijouLogoWavePhase(timeMs, landingBijouLogoLetterIndex(x, width));
+  return Math.round(Math.sin(phase) * LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS);
+}
+
+function landingBijouLogoFillColor(
+  baseForeground: string,
+  tokens: LandingThemeTokens,
+  x: number,
+  width: number,
+  timeMs: number,
+): string {
+  const letterIndex = landingBijouLogoLetterIndex(x, width);
+  const phase = landingBijouLogoWavePhase(timeMs, letterIndex);
+  const local = width <= 1 ? 0 : x / (width - 1);
+  const wave = 0.5 + (Math.sin(phase + (local * Math.PI * 1.4)) * 0.5);
+  const logo = sampleColorRamp(tokens.logoRamp, clamp01(0.34 + (wave * 0.62)));
+  const wake = sampleColorRamp(tokens.waveRamp, clamp01(0.42 + ((1 - wave) * 0.36)));
+  return mixHexColor(baseForeground, mixHexColor(logo, wake, 0.22), 0.64);
 }
 
 function createWordmarkSurface(
@@ -2683,11 +2765,71 @@ function paintFlyingRobotsLogoOverlay(
   mark: Surface,
   top: number,
   tokens: LandingThemeTokens,
+  timeMs: number,
 ): void {
   const left = Math.floor((surface.width - mark.width) / 2);
   paintLandingLogoOverlay(surface, mark, left, top, tokens, {
     foregroundSample: 'background-cell',
+    opacity: landingFlyingRobotsOpacity(timeMs),
   });
+}
+
+function renderLandingExitTransition(landing: Surface, docs: Surface, transitionMs: number): Surface {
+  const progress = clamp01(transitionMs / LANDING_ROUTE_TRANSITION_DURATION_MS);
+  if (progress >= 1) return docs;
+
+  const output = createSurface(docs.width, docs.height);
+  output.blit(docs, 0, 0);
+  const eased = easeOutCubic(progress);
+  const width = Math.min(landing.width, docs.width);
+  const height = Math.min(landing.height, docs.height);
+  const widthDenominator = width - 1 || 1;
+  const heightDenominator = height - 1 || 1;
+  const threshold = 1.08 - (eased * 1.22);
+
+  for (let y = 0; y < height; y++) {
+    const row = y / heightDenominator;
+    const ripple = 0.06 * Math.sin((y * 0.38) + (progress * Math.PI * 4));
+    for (let x = 0; x < width; x++) {
+      const docsCell = output.get(x, y);
+      if ((docsCell.char ?? ' ') !== ' ') continue;
+      if (!isDocsTransitionBlank(output, x, y)) continue;
+
+      const landingCell = landing.get(x, y);
+      if (!isLandingWakeTransitionCell(landingCell)) continue;
+
+      const col = x / widthDenominator;
+      const reveal = (col * 0.72) + (row * 0.28) + ripple;
+      if (reveal > threshold) continue;
+
+      output.set(x, y, {
+        ...landingCell,
+        modifiers: progress > 0.52
+          ? Array.from(new Set([...(landingCell.modifiers ?? []), 'dim']))
+          : landingCell.modifiers,
+      });
+    }
+  }
+
+  return output;
+}
+
+function isDocsTransitionBlank(surface: Surface, x: number, y: number): boolean {
+  for (let row = Math.max(0, y - 1); row <= Math.min(surface.height - 1, y + 1); row++) {
+    for (let col = Math.max(0, x - 3); col <= Math.min(surface.width - 1, x + 3); col++) {
+      if (col === x && row === y) continue;
+      if ((surface.get(col, row).char ?? ' ') !== ' ') return false;
+    }
+  }
+  return true;
+}
+
+function isLandingWakeTransitionCell(cell: Cell): boolean {
+  const char = cell.char ?? ' ';
+  if (char === ' ' || !(LANDING_WAKE_CHARS as readonly string[]).includes(char)) return false;
+  const fg = colorHex(cell.fg);
+  const bg = colorHex(cell.bg);
+  return fg != null && bg != null && fg === bg;
 }
 
 function renderLandingPerfHudOverlay(
@@ -2715,6 +2857,35 @@ function paragraphSurface(text: string, width: number): Surface {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+function easeOutCubic(value: number): number {
+  const t = clamp01(value);
+  return 1 - ((1 - t) ** 3);
+}
+
+function advanceLandingTransition(model: RootModel, dt: number): RootModel {
+  if (model.landingTransitionMs == null) return model;
+  const nextTransitionMs = model.landingTransitionMs + Math.max(0, Math.round(dt * 1000));
+  if (nextTransitionMs >= LANDING_ROUTE_TRANSITION_DURATION_MS) {
+    return {
+      ...model,
+      landingTransitionMs: undefined,
+    };
+  }
+  return {
+    ...model,
+    landingTransitionMs: nextTransitionMs,
+  };
+}
+
+function clearLandingTransition(model: RootModel): RootModel {
+  return model.landingTransitionMs == null
+    ? model
+    : {
+        ...model,
+        landingTransitionMs: undefined,
+      };
 }
 
 function resolveLandingQuality(width: number, height: number, mode: LandingQualityMode = 'auto'): LandingQualityProfile {
@@ -2920,24 +3091,31 @@ function createLandingPromptSurface(
   const promptText = dogfoodText(localization, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
   const highlightStart = promptText.indexOf('[');
   const highlightEnd = promptText.indexOf(']');
+  const enterStart = highlightStart >= 0 && highlightEnd > highlightStart ? highlightStart + 1 : -1;
+  const enterEnd = highlightEnd > enterStart ? highlightEnd - 1 : -1;
   const time = timeMs / 1000;
 
   return createTransparentTextSurface(promptText, {
     bg: tokens.background,
     transparentSpaces: false,
     fg: (x) => {
-      const inHighlight = highlightStart >= 0
-        && highlightEnd >= highlightStart
-        && x >= highlightStart
-        && x <= highlightEnd;
-      if (!inHighlight) {
+      const inEnter = enterStart >= 0 && enterEnd >= enterStart && x >= enterStart && x <= enterEnd;
+      if (inEnter) {
+        const span = Math.max(1, enterEnd - enterStart);
+        const local = (x - enterStart) / span;
+        const sweep = 0.5 + (Math.sin((time * 5.2) + (local * Math.PI * 2.6)) * 0.5);
+        return sampleColorRamp(tokens.logoRamp, clamp01(0.42 + (local * 0.34) + (sweep * 0.22)));
+      }
+
+      if (x === highlightStart || x === highlightEnd) {
+        return sampleColorRamp(tokens.waveRamp, 0.76);
+      }
+
+      if (highlightStart < 0 || highlightEnd < highlightStart || x < highlightStart || x > highlightEnd) {
         return tokens.promptBodyColor;
       }
 
-      const span = Math.max(1, highlightEnd - highlightStart);
-      const local = (x - highlightStart) / span;
-      const shimmer = 0.5 + (Math.sin((time * 4.2) + (local * Math.PI * 2.2)) * 0.5);
-      return sampleColorRamp(tokens.logoRamp, clamp01(0.56 + (shimmer * 0.38)));
+      return tokens.promptAccentColor;
     },
     modifiers: (x) => {
       const inHighlight = highlightStart >= 0
@@ -3180,6 +3358,17 @@ function hexToRgb(hex: string): [number, number, number] {
 
 function rgbHex(r: number, g: number, b: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function mixHexColor(from: string, to: string, t: number): string {
+  const [fromR, fromG, fromB] = hexToRgb(from);
+  const [toR, toG, toB] = hexToRgb(to);
+  const mixT = clamp01(t);
+  return rgbHex(
+    Math.round(fromR + ((toR - fromR) * mixT)),
+    Math.round(fromG + ((toG - fromG) * mixT)),
+    Math.round(fromB + ((toB - fromB) * mixT)),
+  );
 }
 
 function oppositeHexColor(hex: string): string {
@@ -4871,6 +5060,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
+        landingTransitionMs: undefined,
         landingThemeIndex: resolveLandingThemeIndexForShellThemeId(syncedDocsModel.activeShellThemeId),
         landingToast: undefined,
         landingQuitConfirmOpen: false,
@@ -4932,12 +5122,6 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           if (shouldToggleLandingPerfHud(msg)) {
             return updateExplorer(msg, model);
           }
-          if (shouldRouteLandingKeyIntoShell(msg)) {
-            return updateExplorer(msg, {
-              ...model,
-              route: 'docs',
-            });
-          }
           if (msg.key === 'left') {
             return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
           }
@@ -4956,15 +5140,22 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
               return [applyLandingThemeSelection(syncShellThemeContext, model, themeIndex), []];
             }
           }
-          if (!msg.ctrl && !msg.alt) {
-            return [{ ...model, route: 'docs' }, []];
+          if (shouldContinueFromLanding(msg)) {
+            return [{
+              ...model,
+              route: 'docs',
+              landingTransitionMs: 0,
+            }, []];
           }
         }
         return [model, []];
       }
 
       if (isKeyMsg(msg) || isMouseMsg(msg) || msg.type === 'pulse') {
-        return updateExplorer(msg, model);
+        const [nextModel, cmds] = updateExplorer(msg, model);
+        return msg.type === 'pulse'
+          ? [advanceLandingTransition(nextModel, msg.dt), cmds]
+          : [clearLandingTransition(nextModel), cmds];
       }
 
       return [model, []];
@@ -4981,7 +5172,19 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           ? landing
           : compositeSurface(landing, overlays, { dim: model.landingQuitConfirmOpen });
       }
-      return explorer.view(model.docsModel);
+      const docs = explorer.view(model.docsModel);
+      if (model.landingTransitionMs != null) {
+        const docsSurface = normalizeViewOutput(docs, {
+          width: model.columns,
+          height: model.rows,
+        }).surface;
+        return renderLandingExitTransition(renderLanding({
+          ...model,
+          route: 'landing',
+          landingQuitConfirmOpen: false,
+        }), docsSurface, model.landingTransitionMs);
+      }
+      return docs;
     },
 
     routeRuntimeIssue(issue) {

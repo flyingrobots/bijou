@@ -25,8 +25,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   while treating the asset's Braille blank cells as transparent. Visible
   FlyingRobots cells now preserve the underlying cell background and paint their
   foreground as the opposite of that preserved background, so modal dimming does
-  not leave colored logo-background patches behind. Existing landing quality
-  buckets and lower-mode release facts are preserved. This closes issue #303.
+  not leave colored logo-background patches behind; the FlyingRobots mark now
+  fades away after the first three seconds, the Bijou SVG letters ride a
+  staggered sine wave with animated fill color, the `Press [Enter]` prompt
+  emphasizes `Enter` with a foreground gradient, and pressing Enter starts a
+  short wake-to-docs transition while all other non-title keys stay on the title
+  screen. Existing landing quality buckets and lower-mode release facts are
+  preserved. This closes issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.
