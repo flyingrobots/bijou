@@ -22,7 +22,8 @@ Issue #303 asks the current DOGFOOD landing screen to carry a unique
 `V7 Launch Wake` release identity. The first prototype used a textual wake
 ribbon; the current direction is stronger: render a deterministic stacked
 sine-wave wake as the animated title background and use the committed
-`Bijou.svg` wordmark as a transparent foreground mask in complementary colors.
+`Bijou.svg` wordmark as a background-transparent glyph mask in complementary
+colors.
 
 The design follows a Design Thinking loop: observe that terminal title art is
 most useful when it can be generated, inspected, tested, and lowered; frame the
@@ -79,8 +80,11 @@ The stacked sine-wave wake occupies the first-viewport title surface. It uses
 the existing landing pulse shader and quality buckets, so the field stays
 animated without adding a new image decode path or GPU dependency. Foreground
 content still wins. The visible Bijou wordmark is rasterized from
-`assets/Bijou.svg`, fit to the terminal cell aspect, and used as a transparent
-mask that recolors only the foreground glyphs beneath each mark cell.
+`assets/Bijou.svg`, fit to the terminal cell aspect, and used as a
+background-transparent mask that writes SVG glyphs without replacing existing
+backgrounds. The lower FlyingRobots wordmark is read from
+`assets/flyingrobotslogo.txt`, treats Braille blank cells as transparent holes,
+and fits the visible logo glyphs to the available landing width.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -238,6 +242,10 @@ Agents should be able to prove the slice by checking:
   landing frame.
 - RED: the committed `Bijou.svg` wordmark replaces backgrounds or paints
   transparent SVG pixels instead of acting as a background-transparent mask.
+- RED: the lower FlyingRobots wordmark is generated from the old wide text
+  assets instead of `assets/flyingrobotslogo.txt`.
+- RED: pressing backtick on the landing title enters the docs instead of
+  toggling the shell perf HUD in place.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
   wake field.
 

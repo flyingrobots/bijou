@@ -26,13 +26,13 @@ npm run blocklab:index
 
 You now land on a dedicated full-screen title screen first: the app renders a
 procedural stacked sine-wave wake through the landing background shader, then
-uses [assets/Bijou.svg](../../assets/Bijou.svg) as a transparent foreground mask
-in complementary colors. The landing screen keeps the treatment sparse:
-the V7 title art, a centered `Press [Enter]` cue, the FlyingRobots wordmark,
-and a reserved last-line footer for quit/continue guidance plus the Bijou
-version.
+uses [assets/Bijou.svg](../../assets/Bijou.svg) as a background-transparent glyph
+mask in complementary colors. The landing screen keeps the treatment sparse:
+the V7 title art, a centered `Press [Enter]` cue, the
+[assets/flyingrobotslogo.txt](../../assets/flyingrobotslogo.txt) wordmark, and a
+reserved last-line footer for quit/continue guidance plus the Bijou version.
 
-On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs shell.
+On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. Backtick toggles the perf HUD in place, `Esc` or `q` quit immediately there, and any other unmodified key enters the docs shell.
 
 Mouse is enabled for this preview. In the docs shell, click a pane to
 focus it and use the wheel to scroll long docs or help content.

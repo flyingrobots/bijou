@@ -10,6 +10,7 @@ import {
   inspectorPanelBlock,
   lerp3,
   markdown,
+  perfOverlaySurface,
   progressBar,
   readerSurfaceBlock,
   separatorSurface,
@@ -150,12 +151,8 @@ import {
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 
-const FLYING_ROBOTS_WIDE_LARGE_TEXT = readFileSync(
-  new URL('../../assets/flyingrobots-wide-large.txt', import.meta.url),
-  'utf8',
-).trimEnd();
-const FLYING_ROBOTS_WIDE_SMALL_TEXT = readFileSync(
-  new URL('../../assets/flyingrobots-wide-small.txt', import.meta.url),
+const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
+  new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
   'utf8',
 ).trimEnd();
 const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
@@ -192,8 +189,7 @@ const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
-const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
-const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
+const FLYING_ROBOTS_LOGO_LINES = splitGlyphLines(FLYING_ROBOTS_LOGO_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
 const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
@@ -639,6 +635,8 @@ const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
 const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
+const BRAILLE_BLANK = '\u2800';
+const LANDING_WORDMARK_MASK = { char: true, fg: true, modifiers: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -960,10 +958,13 @@ function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
   }
   return msg.key === 'f2'
     || msg.key === '?'
-    || msg.key === '`'
     || msg.key === '/'
     || msg.key === ':'
     || (msg.key === 'n' && msg.shift);
+}
+
+function shouldToggleLandingPerfHud(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && msg.key === '`';
 }
 
 function readMarkdownDoc(path: string): string {
@@ -2355,9 +2356,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
     paintV7TitleArt(surface, tokens);
 
-    const wordmarkGlyphs = width >= 110 && height >= 30
-      ? FLYING_ROBOTS_LARGE_LINES
-      : FLYING_ROBOTS_SMALL_LINES;
+    const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens, localization);
     const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, localization);
@@ -2381,7 +2380,12 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
       blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
-      blitCentered(surface, wordmark, startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap);
+      blitCentered(
+        surface,
+        wordmark,
+        startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap,
+        LANDING_WORDMARK_MASK,
+      );
     } else if (availableHeight >= compactClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
@@ -2645,7 +2649,6 @@ function createWordmarkSurface(
   tokens: LandingThemeTokens,
 ): Surface {
   return createTransparentTextSurface(lines, {
-    bg: tokens.background,
     fg: (x, y, char, totalWidth) => {
       if (char === ' ') return undefined;
       const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
@@ -2655,6 +2658,36 @@ function createWordmarkSurface(
     },
     modifiers: (_x, _y, char) => char === ' ' ? undefined : BOLD_MODIFIERS,
   });
+}
+
+function renderLandingPerfHudOverlay(
+  model: RootModel,
+  ctx: BijouContext,
+  localization?: LocalizationPort,
+) {
+  const refreshRate = ctx.runtime.refreshRate ?? 60;
+  const fps = model.docsModel.frameTimeMs > 0
+    ? Math.min(refreshRate, 1000 / model.docsModel.frameTimeMs)
+    : refreshRate;
+  const width = Math.max(12, Math.min(40, model.columns - 2));
+  const surface = perfOverlaySurface({
+    fps,
+    frameTimeMs: model.docsModel.frameTimeMs,
+    width: model.columns,
+    height: model.rows,
+  }, {
+    title: shellText(localization, 'perfHud.title', 'Perf HUD'),
+    width,
+    showChart: false,
+    ctx,
+  });
+
+  return {
+    content: '',
+    surface,
+    row: 1,
+    col: Math.max(0, model.columns - surface.width - 1),
+  };
 }
 
 function paragraphSurface(text: string, width: number): Surface {
@@ -3185,6 +3218,28 @@ function splitGlyphLines(text: string): readonly (readonly string[])[] {
   return text.split(/\r?\n/).map((lineText) => Array.from(lineText));
 }
 
+function fitGlyphLinesToWidth(
+  lines: readonly (readonly string[])[],
+  maxWidth: number,
+): readonly (readonly string[])[] {
+  const width = Math.max(0, ...lines.map((lineText) => lineText.length));
+  const targetWidth = Math.max(1, Math.min(width, Math.floor(maxWidth)));
+  if (width <= targetWidth) return lines;
+
+  return lines.map((lineText) => {
+    const fitted: string[] = [];
+    for (let x = 0; x < targetWidth; x++) {
+      const sourceX = Math.min(width - 1, Math.floor((x / targetWidth) * width));
+      fitted.push(lineText[sourceX] ?? ' ');
+    }
+    return fitted;
+  });
+}
+
+function transparentLogoGlyphs(lines: readonly (readonly string[])[]): readonly (readonly string[])[] {
+  return lines.map((lineText) => lineText.map((char) => char === BRAILLE_BLANK ? ' ' : char));
+}
+
 function createTransparentTextSurface(
   text: string | readonly (readonly string[])[],
   options: {
@@ -3504,8 +3559,22 @@ function insetPaneSurface(content: Surface, width: number): Surface {
   return result;
 }
 
-function blitCentered(surface: Surface, content: Surface, y: number): void {
-  surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
+function blitCentered(
+  surface: Surface,
+  content: Surface,
+  y: number,
+  mask?: Parameters<Surface['blit']>[7],
+): void {
+  surface.blit(
+    content,
+    Math.floor((surface.width - content.width) / 2),
+    y,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    mask,
+  );
 }
 
 function renderFamiliesPane(
@@ -4842,6 +4911,9 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
               landingQuitConfirmOpen: true,
             }, []];
           }
+          if (shouldToggleLandingPerfHud(msg)) {
+            return updateExplorer(msg, model);
+          }
           if (shouldRouteLandingKeyIntoShell(msg)) {
             return updateExplorer(msg, {
               ...model,
@@ -4883,9 +4955,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     view(model) {
       if (model.route === 'landing') {
         const landing = renderLanding(model);
-        return model.landingQuitConfirmOpen
-          ? compositeSurface(landing, [renderShellQuitOverlay(model.columns, model.rows)])
-          : landing;
+        const overlays = [
+          ...(model.landingQuitConfirmOpen ? [renderShellQuitOverlay(model.columns, model.rows)] : []),
+          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, currentCtx, localization)] : []),
+        ];
+        return overlays.length === 0
+          ? landing
+          : compositeSurface(landing, overlays, { dim: model.landingQuitConfirmOpen });
       }
       return explorer.view(model.docsModel);
     },

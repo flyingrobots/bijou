@@ -37,9 +37,12 @@ const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
 const KEY_NEXT_TAB = ']';
+const KEY_BACKTICK = '`';
 const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
 const V7_TITLE_CELL_ASPECT_RATIO = 0.5;
 const V7_BIJOU_SVG_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'Bijou.svg'), 'utf8');
+const FLYING_ROBOTS_LOGO_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'flyingrobotslogo.txt'), 'utf8').trimEnd();
+const FLYING_ROBOTS_TRANSPARENT_CELL = '\u2800';
 const V7_LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
 const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
@@ -380,6 +383,29 @@ describe('docs preview app', () => {
     // test below ('animates the landing title screen on pulse') covers this.
   });
 
+  it('uses the checked-in FlyingRobots logo asset on roomy landing screens', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const text = frameText(frame);
+    const lines = text.split('\n');
+    const [firstLogoLine = ''] = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
+    const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
+    const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
+    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+
+    expect(transparentOffset).toBeGreaterThan(0);
+    expect(visiblePrefix.length).toBeGreaterThan(8);
+    expect(logoY).toBeGreaterThanOrEqual(0);
+    expect(logoX).toBeGreaterThanOrEqual(0);
+    expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
+    expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
+    expect(text).not.toContain('8""""');
+  });
+
   it('keeps every landing title cell on a Bijou-owned background', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
@@ -564,6 +590,21 @@ describe('docs preview app', () => {
     expect((pulsed.model as any).landingFps).toBe(54);
     const footer = frameText(pulsed.frames[pulsed.frames.length - 1]!).split('\n')[pulsed.frames[pulsed.frames.length - 1]!.height - 1] ?? '';
     expect(footer).toContain('54 fps • auto/full');
+  });
+
+  it('toggles the perf HUD on the landing title without entering docs', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_BACKTICK }], { ctx });
+    expect((opened.model as any).route).toBe('landing');
+    expect((opened.model as any).docsModel.perfHudOpen).toBe(true);
+    expect(frameText(opened.frames.at(-1)!)).toContain('Perf HUD');
+
+    const closed = await runScript(app, [{ key: KEY_BACKTICK }, { key: KEY_BACKTICK }], { ctx });
+    expect((closed.model as any).route).toBe('landing');
+    expect((closed.model as any).docsModel.perfHudOpen).toBe(false);
+    expect(frameText(closed.frames.at(-1)!)).not.toContain('Perf HUD');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {

@@ -18,10 +18,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   renderer with charset, Braille, and quad modes, including custom density
   character sets, centered `fit` crop semantics, and optional terminal
   cell-aspect correction. DOGFOOD now paints a procedural stacked sine-wave
-  wake as the V7 landing background and applies the committed `Bijou.svg`
-  wordmark as a transparent foreground mask in complementary colors for the
-  `V7 Launch Wake` landing screen while preserving the existing landing quality
-  buckets and lower-mode release facts. This closes issue #303.
+  wake as the V7 landing background, applies the committed `Bijou.svg`
+  wordmark as a background-transparent glyph mask in complementary colors, and
+  renders the lower FlyingRobots wordmark from `assets/flyingrobotslogo.txt`
+  while treating the asset's Braille blank cells as transparent for the `V7
+  Launch Wake` landing screen. Existing landing quality buckets and lower-mode
+  release facts are preserved. This closes issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.
@@ -32,6 +34,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   light samples as cell backgrounds instead of terminal-default bleed-through,
   adjust Braille threshold and contrast, and enable deterministic ordered
   dithering from the keyboard. This closes issue #305.
+
+### 🐛 Fixes
+
+- **DOGFOOD title perf HUD key ownership** — Pressing backtick on the DOGFOOD
+  landing title screen now toggles the shell perf HUD in place instead of
+  entering the documentation shell. A second backtick dismisses the HUD while
+  staying on the title screen.
 
 ### 🛠 Maintenance
 
