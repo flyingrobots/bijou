@@ -433,6 +433,25 @@ describe('docs preview app', () => {
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     expect((entered.model as any).route).toBe('docs');
     expect((entered.model as any).landingTransitionMs).toBe(0);
+    const enteredFrame = entered.frames.at(-1)!;
+    let edgeWakeCells = 0;
+    let interiorWakeCells = 0;
+    for (let y = 0; y < enteredFrame.height; y++) {
+      for (let x = 0; x < enteredFrame.width; x++) {
+        const cell = enteredFrame.get(x, y);
+        const isWake = V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')
+          && colorHex(cell.fg) === colorHex(cell.bg);
+        if (!isWake) continue;
+        const edgeDistance = Math.min(x, y, enteredFrame.width - 1 - x, enteredFrame.height - 1 - y);
+        if (edgeDistance < 6) {
+          edgeWakeCells++;
+        } else {
+          interiorWakeCells++;
+        }
+      }
+    }
+    expect(edgeWakeCells).toBeGreaterThan(0);
+    expect(interiorWakeCells).toBe(0);
 
     const transitioned = await runScript(app, [{ key: KEY_ENTER }, { pulse: { dt: 0.6 } }], { ctx });
     expect((transitioned.model as any).route).toBe('docs');

@@ -2783,28 +2783,23 @@ function renderLandingExitTransition(landing: Surface, docs: Surface, transition
   const eased = easeOutCubic(progress);
   const width = Math.min(landing.width, docs.width);
   const height = Math.min(landing.height, docs.height);
-  const widthDenominator = width - 1 || 1;
-  const heightDenominator = height - 1 || 1;
-  const threshold = 1.08 - (eased * 1.22);
+  const maxBand = Math.max(1, Math.min(6, Math.floor(Math.min(width, height) * 0.08)));
+  const band = Math.max(0, Math.ceil(maxBand * (1 - eased)));
+  if (band <= 0) return docs;
 
   for (let y = 0; y < height; y++) {
-    const row = y / heightDenominator;
-    const ripple = 0.06 * Math.sin((y * 0.38) + (progress * Math.PI * 4));
     for (let x = 0; x < width; x++) {
-      const docsCell = output.get(x, y);
-      if ((docsCell.char ?? ' ') !== ' ') continue;
+      const edgeDistance = Math.min(x, y, width - 1 - x, height - 1 - y);
+      if (edgeDistance >= band) continue;
+      if ((output.get(x, y).char ?? ' ') !== ' ') continue;
       if (!isDocsTransitionBlank(output, x, y)) continue;
 
       const landingCell = landing.get(x, y);
       if (!isLandingWakeTransitionCell(landingCell)) continue;
 
-      const col = x / widthDenominator;
-      const reveal = (col * 0.72) + (row * 0.28) + ripple;
-      if (reveal > threshold) continue;
-
       output.set(x, y, {
         ...landingCell,
-        modifiers: progress > 0.52
+        modifiers: progress > 0.4
           ? Array.from(new Set([...(landingCell.modifiers ?? []), 'dim']))
           : landingCell.modifiers,
       });
