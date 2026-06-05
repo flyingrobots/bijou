@@ -10,7 +10,6 @@ import {
   inspectorPanelBlock,
   lerp3,
   markdown,
-  perfOverlaySurface,
   progressBar,
   readerSurfaceBlock,
   separatorSurface,
@@ -51,11 +50,14 @@ import {
   quit,
   rasterToGlyphSurface,
   renderShellQuitOverlay,
+  renderFramePerfHudOverlay,
   shouldUseShellQuitConfirm,
+  summarizeFrameTimings,
   toast,
   viewportSurface,
   type App,
   type Cmd,
+  type FrameTimingSnapshot,
   type FrameCommandItem,
   type FramePageMsg,
   type FrameInputArea,
@@ -67,8 +69,11 @@ import {
   type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
+  type RenderStageTiming,
   type ResizeMsg,
+  type RunOptions,
 } from '../../packages/bijou-tui/src/index.js';
+import { runWithLifecycleHooks } from '../../packages/bijou-tui/src/runtime.js';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
@@ -2357,7 +2362,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     paintV7TitleArt(surface, tokens);
 
     const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
-    const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
+    const wordmark = createWordmarkSurface(wordmarkGlyphs);
     const staticSurfaces = getLandingStaticSurfaces(tokens, localization);
     const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, localization);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, localization);
@@ -2380,11 +2385,11 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
       blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
-      blitCentered(
+      paintFlyingRobotsLogoOverlay(
         surface,
         wordmark,
         startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap,
-        LANDING_WORDMARK_MASK,
+        tokens,
       );
     } else if (availableHeight >= compactClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
@@ -2645,49 +2650,58 @@ function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): str
 
 function createWordmarkSurface(
   lines: readonly (readonly string[])[],
-  timeMs: number,
-  tokens: LandingThemeTokens,
 ): Surface {
   return createTransparentTextSurface(lines, {
-    fg: (x, y, char, totalWidth) => {
-      if (char === ' ') return undefined;
-      const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
-      const shimmer = 0.08 * Math.sin((timeMs / 1000) * 1.4 + (y * 0.55) + (x * 0.12));
-      const colorT = clamp01((xRatio * 0.82) + 0.1 + shimmer);
-      return sampleColorRamp(tokens.logoRamp, colorT);
-    },
     modifiers: (_x, _y, char) => char === ' ' ? undefined : BOLD_MODIFIERS,
   });
+}
+
+function paintFlyingRobotsLogoOverlay(
+  surface: Surface,
+  mark: Surface,
+  top: number,
+  tokens: LandingThemeTokens,
+): void {
+  const left = Math.floor((surface.width - mark.width) / 2);
+  for (let y = 0; y < mark.height; y++) {
+    for (let x = 0; x < mark.width; x++) {
+      const markChar = mark.get(x, y).char ?? ' ';
+      if (markChar === ' ') continue;
+
+      const targetX = left + x;
+      const targetY = top + y;
+      if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
+        continue;
+      }
+
+      const underColor = landingBackgroundCellColor(surface.get(targetX, targetY), tokens);
+      surface.set(targetX, targetY, {
+        char: markChar,
+        fg: oppositeHexColor(underColor),
+        modifiers: BOLD_MODIFIERS as string[],
+        empty: false,
+        opacity: 1,
+      }, LANDING_WORDMARK_MASK);
+    }
+  }
 }
 
 function renderLandingPerfHudOverlay(
   model: RootModel,
   ctx: BijouContext,
-  localization?: LocalizationPort,
+  i18n?: I18nRuntime,
 ) {
-  const refreshRate = ctx.runtime.refreshRate ?? 60;
-  const fps = model.docsModel.frameTimeMs > 0
-    ? Math.min(refreshRate, 1000 / model.docsModel.frameTimeMs)
-    : refreshRate;
-  const width = Math.max(12, Math.min(40, model.columns - 2));
-  const surface = perfOverlaySurface({
-    fps,
+  return renderFramePerfHudOverlay({
+    columns: model.columns,
+    rows: model.rows,
     frameTimeMs: model.docsModel.frameTimeMs,
-    width: model.columns,
-    height: model.rows,
+    viewTimeMs: model.docsModel.viewTimeMs,
+    diffTimeMs: model.docsModel.diffTimeMs,
+    refreshRate: ctx.runtime.refreshRate,
   }, {
-    title: shellText(localization, 'perfHud.title', 'Perf HUD'),
-    width,
-    showChart: false,
+    i18n,
     ctx,
   });
-
-  return {
-    content: '',
-    surface,
-    row: 1,
-    col: Math.max(0, model.columns - surface.width - 1),
-  };
 }
 
 function paragraphSurface(text: string, width: number): Surface {
@@ -4957,7 +4971,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         const landing = renderLanding(model);
         const overlays = [
           ...(model.landingQuitConfirmOpen ? [renderShellQuitOverlay(model.columns, model.rows)] : []),
-          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, currentCtx, localization)] : []),
+          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, currentCtx, i18n)] : []),
         ];
         return overlays.length === 0
           ? landing
@@ -4971,6 +4985,68 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
       return routed === undefined ? undefined : { type: 'docs', msg: routed as ExplorerMsg };
     },
   };
+}
+
+function applyRootFrameTimingSnapshot(
+  model: RootModel,
+  snapshot: FrameTimingSnapshot,
+): RootModel {
+  const docsModel = model.docsModel;
+  if (
+    docsModel.frameTimeMs === snapshot.frameTimeMs
+    && docsModel.viewTimeMs === snapshot.viewTimeMs
+    && docsModel.diffTimeMs === snapshot.diffTimeMs
+    && docsModel.frameBudgetMs === snapshot.frameBudgetMs
+    && docsModel.frameOverBudget === snapshot.frameOverBudget
+  ) {
+    return model;
+  }
+
+  return {
+    ...model,
+    docsModel: {
+      ...docsModel,
+      frameTimeMs: snapshot.frameTimeMs,
+      viewTimeMs: snapshot.viewTimeMs,
+      diffTimeMs: snapshot.diffTimeMs,
+      frameBudgetMs: snapshot.frameBudgetMs,
+      frameOverBudget: snapshot.frameOverBudget,
+    },
+  };
+}
+
+function resolveRootFrameBudgetMs(ctx: BijouContext): number | undefined {
+  const refreshRate = ctx.runtime.refreshRate;
+  if (!Number.isFinite(refreshRate) || refreshRate <= 0) return undefined;
+  return 1_000 / refreshRate;
+}
+
+export async function runDocsApp(
+  ctx: BijouContext,
+  options: DocsAppOptions = {},
+  runOptions: RunOptions<RootMsg> = {},
+): Promise<void> {
+  const app = createDocsApp(ctx, options);
+  const runtimeCtx = runOptions.ctx ?? ctx;
+  const frameBudgetMs = resolveRootFrameBudgetMs(runtimeCtx);
+  let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
+  let needsTimingHydrationRender = true;
+
+  await runWithLifecycleHooks(app, {
+    ...runOptions,
+    ctx: runtimeCtx,
+  }, {
+    beforeRender(model) {
+      if (pendingTimingSnapshot == null) return model;
+      return applyRootFrameTimingSnapshot(model, pendingTimingSnapshot);
+    },
+    afterRender({ timings }: { timings: readonly RenderStageTiming[] }) {
+      pendingTimingSnapshot = summarizeFrameTimings(timings, frameBudgetMs);
+      if (!needsTimingHydrationRender) return;
+      needsTimingHydrationRender = false;
+      return { requestRender: true };
+    },
+  });
 }
 
 function slugify(value: string): string {

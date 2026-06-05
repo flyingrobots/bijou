@@ -21,9 +21,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   wake as the V7 landing background, applies the committed `Bijou.svg`
   wordmark as a background-transparent glyph mask in complementary colors, and
   renders the lower FlyingRobots wordmark from `assets/flyingrobotslogo.txt`
-  while treating the asset's Braille blank cells as transparent for the `V7
-  Launch Wake` landing screen. Existing landing quality buckets and lower-mode
-  release facts are preserved. This closes issue #303.
+  while treating the asset's Braille blank cells as transparent and painting
+  visible wordmark cells with the opposite foreground color of the underlying
+  wake for the `V7 Launch Wake` landing screen. Existing landing quality buckets
+  and lower-mode release facts are preserved. This closes issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.
@@ -40,7 +41,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **DOGFOOD title perf HUD key ownership** — Pressing backtick on the DOGFOOD
   landing title screen now toggles the shell perf HUD in place instead of
   entering the documentation shell. A second backtick dismisses the HUD while
-  staying on the title screen.
+  staying on the title screen. The title screen now uses the same shell perf HUD
+  renderer as the documentation shell and hydrates root render timings so the
+  frame-time row reports the latest measured frame instead of staying at `0`.
 
 ### 🛠 Maintenance
 

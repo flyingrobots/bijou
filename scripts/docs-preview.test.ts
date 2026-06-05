@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, type ColorRef } from '@flyingrobots/bijou';
+import { colorHex, lerp3, type ColorRef } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
@@ -43,6 +43,9 @@ const V7_TITLE_CELL_ASPECT_RATIO = 0.5;
 const V7_BIJOU_SVG_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'Bijou.svg'), 'utf8');
 const FLYING_ROBOTS_LOGO_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'flyingrobotslogo.txt'), 'utf8').trimEnd();
 const FLYING_ROBOTS_TRANSPARENT_CELL = '\u2800';
+const V7_DEFAULT_BACKGROUND = '#18172b';
+const V7_DEFAULT_WAVE_GRADIENT = ['#2f3f66', '#5f87c8', '#f2c96b'] as const;
+const V7_LANDING_COLOR_RAMP_SIZE = 256;
 const V7_LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
 const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
@@ -81,6 +84,63 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
     text += '\n';
   }
   return text;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const normalized = hex.replace(/^#/, '');
+  return [
+    parseInt(normalized.slice(0, 2), 16),
+    parseInt(normalized.slice(2, 4), 16),
+    parseInt(normalized.slice(4, 6), 16),
+  ];
+}
+
+function rgbHex(r: number, g: number, b: number): string {
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function oppositeHexColor(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbHex(255 - r, 255 - g, 255 - b);
+}
+
+function sampleDefaultWaveRamp(t: number): string {
+  const index = Math.max(0, Math.min(
+    V7_LANDING_COLOR_RAMP_SIZE - 1,
+    Math.round(clamp01(t) * (V7_LANDING_COLOR_RAMP_SIZE - 1)),
+  ));
+  const stops = V7_DEFAULT_WAVE_GRADIENT.map((color, stopIndex) => ({
+    pos: stopIndex / (V7_DEFAULT_WAVE_GRADIENT.length - 1),
+    color: hexToRgb(color),
+  }));
+  return rgbHex(...lerp3(stops, index / (V7_LANDING_COLOR_RAMP_SIZE - 1)));
+}
+
+function expectedLandingWakeColorAt(x: number, y: number, width: number, height: number): string {
+  const tile = width * height <= 14_000 ? 1 : width * height <= 28_000 ? 2 : 3;
+  const tileX = Math.floor(x / tile) * tile;
+  const tileY = Math.floor(y / tile) * tile;
+  const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
+  const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
+  const widthDenominator = width - 1 || 1;
+  const heightDenominator = height - 1 || 1;
+  const u = sampleX / widthDenominator;
+  const v = sampleY / heightDenominator;
+  const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
+  const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
+  if (char === ' ') return sampleDefaultWaveRamp(0.58);
+  const colorT = clamp01(
+    0.1
+    + (layer * 0.16)
+    + (u * 0.26)
+    + (0.18 * (0.5 + (Math.sin(v * 5.2) * 0.5)))
+    + (0.06 * Math.sin(sampleX * 0.035)),
+  );
+  return sampleDefaultWaveRamp(colorT);
 }
 
 function titleBackgroundGlyphCount(text: string): number {
@@ -159,19 +219,30 @@ function expectedBijouSvgOverlay(width: number, height: number) {
 
 function expectedStackedWakeChar(x: number, y: number, width: number): string {
   const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
+  const layer = landingWakeLayer(x, y, width, 0, amplitudeScale);
+  return V7_LANDING_WAKE_CHARS[layer] ?? ' ';
+}
+
+function landingWakeLayer(
+  x: number,
+  y: number,
+  width: number,
+  time: number,
+  amplitudeScale: number,
+): number {
   let edge = width / 4;
   const edges: number[] = [];
 
   for (const spec of V7_LANDING_WAKE_WAVES) {
-    edge += stackedWakeWave(0, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
+    edge += stackedWakeWave(time, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
     edges.push(edge);
   }
 
   for (let index = edges.length - 1; index >= 0; index--) {
-    if (x > edges[index]!) return V7_LANDING_WAKE_CHARS[index + 1] ?? ' ';
+    if (x > edges[index]!) return index + 1;
   }
 
-  return V7_LANDING_WAKE_CHARS[0];
+  return 0;
 }
 
 function stackedWakeWave(
@@ -276,11 +347,12 @@ describe('docs preview app', () => {
 
   it('uses the live local runtime entrypoint instead of the packaged build', () => {
     const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');
+    const nodeSource = readFileSync(new URL('../examples/docs/node-app.ts', import.meta.url), 'utf8');
 
     expect(source).toContain("../../packages/bijou-node/src/index.js");
-    expect(source).toContain("../../packages/bijou-tui/src/index.js");
-    expect(source).toContain("import { createNodeDocsApp } from './node-app.js';");
-    expect(source).toContain('createNodeDocsApp(ctx)');
+    expect(nodeSource).toContain("../../packages/bijou-tui/src/index.js");
+    expect(source).toContain("import { runNodeDocsApp } from './node-app.js';");
+    expect(source).toContain('runNodeDocsApp(ctx');
     expect(source).toContain('dogfoodTerminalReadiness(ctx)');
     expect(source).toContain('DOGFOOD_TERMINAL_NOTICE');
   });
@@ -401,6 +473,10 @@ describe('docs preview app', () => {
     expect(visiblePrefix.length).toBeGreaterThan(8);
     expect(logoY).toBeGreaterThanOrEqual(0);
     expect(logoX).toBeGreaterThanOrEqual(0);
+    expect(colorHex(frame.get(logoX, logoY).fg)).toBe(oppositeHexColor(
+      expectedLandingWakeColorAt(logoX, logoY, frame.width, frame.height),
+    ));
+    expect(colorHex(frame.get(logoX, logoY).bg)).toBe(V7_DEFAULT_BACKGROUND);
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
     expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
     expect(text).not.toContain('8""""');
@@ -599,7 +675,26 @@ describe('docs preview app', () => {
     const opened = await runScript(app, [{ key: KEY_BACKTICK }], { ctx });
     expect((opened.model as any).route).toBe('landing');
     expect((opened.model as any).docsModel.perfHudOpen).toBe(true);
-    expect(frameText(opened.frames.at(-1)!)).toContain('Perf HUD');
+    const openedText = frameText(opened.frames.at(-1)!);
+    expect(openedText).toContain('Perf HUD');
+    expect(openedText).toContain('view');
+    expect(openedText).toContain('diff');
+
+    const timedModel = opened.model as any;
+    const timedFrame = normalizeViewOutput(app.view({
+      ...timedModel,
+      docsModel: {
+        ...timedModel.docsModel,
+        frameTimeMs: 12.34,
+        viewTimeMs: 4.56,
+        diffTimeMs: 7.89,
+      },
+    }), { width: ctx.runtime.columns, height: ctx.runtime.rows }).surface;
+    const timedText = frameText(timedFrame);
+    expect(timedText).toContain('frame 12.34 ms');
+    expect(timedText).toContain('view  4.56 ms');
+    expect(timedText).toContain('diff  7.89 ms');
+    expect(timedText).not.toContain('frame 0.00 ms');
 
     const closed = await runScript(app, [{ key: KEY_BACKTICK }, { key: KEY_BACKTICK }], { ctx });
     expect((closed.model as any).route).toBe('landing');

@@ -399,6 +399,9 @@ export {
   type FramedAppUpdateResult,
   type FrameScopedMsg,
   type PageScopedMsg,
+  type FrameTimingSnapshot,
+  type FramePerfHudTelemetry,
+  type FramePerfHudOverlayOptions,
   activeFrameLayer,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
@@ -406,7 +409,9 @@ export {
   emitFrameAction,
   notify,
   projectFrameControls,
+  renderFramePerfHudOverlay,
   runFramedApp,
+  summarizeFrameTimings,
   underlyingFrameLayer,
 } from './app-frame.js';
 

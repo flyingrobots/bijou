@@ -30,9 +30,11 @@ uses [assets/Bijou.svg](../../assets/Bijou.svg) as a background-transparent glyp
 mask in complementary colors. The landing screen keeps the treatment sparse:
 the V7 title art, a centered `Press [Enter]` cue, the
 [assets/flyingrobotslogo.txt](../../assets/flyingrobotslogo.txt) wordmark, and a
-reserved last-line footer for quit/continue guidance plus the Bijou version.
+reserved last-line footer for quit/continue guidance plus the Bijou version. The
+Bijou and FlyingRobots title marks both preserve the existing cell background
+and paint visible glyphs in the opposite foreground color of the wake underneath.
 
-On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. Backtick toggles the perf HUD in place, `Esc` or `q` quit immediately there, and any other unmodified key enters the docs shell.
+On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. Backtick toggles the shared shell perf HUD in place, `Esc` or `q` quit immediately there, and any other unmodified key enters the docs shell.
 
 Mouse is enabled for this preview. In the docs shell, click a pane to
 focus it and use the wheel to scroll long docs or help content.

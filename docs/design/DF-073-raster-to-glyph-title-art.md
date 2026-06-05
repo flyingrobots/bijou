@@ -84,7 +84,8 @@ content still wins. The visible Bijou wordmark is rasterized from
 background-transparent mask that writes SVG glyphs without replacing existing
 backgrounds. The lower FlyingRobots wordmark is read from
 `assets/flyingrobotslogo.txt`, treats Braille blank cells as transparent holes,
-and fits the visible logo glyphs to the available landing width.
+fits the visible logo glyphs to the available landing width, and uses the same
+opposite-foreground overlay treatment as the Bijou mark.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -246,6 +247,9 @@ Agents should be able to prove the slice by checking:
   assets instead of `assets/flyingrobotslogo.txt`.
 - RED: pressing backtick on the landing title enters the docs instead of
   toggling the shell perf HUD in place.
+- RED: the landing title perf HUD omits shell HUD rows or reports a permanently
+  zero frame time because the root DOGFOOD render loop is not hydrating timing
+  telemetry.
 - RED: DOGFOOD landing still paints the old procedural BIJOU title over the
   wake field.
 
