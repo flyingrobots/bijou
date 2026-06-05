@@ -97,7 +97,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
   });
 
-  it('routes the perf HUD toggle through the shell from the landing screen', async () => {
+  it('toggles the perf HUD from the landing screen without entering docs', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -108,7 +108,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     };
     const text = frameText(toggled.frames.at(-1)!);
 
-    expect(model.route).toBe('docs');
+    expect(model.route).toBe('landing');
     expect(model.docsModel.perfHudOpen).toBe(true);
     expect(text).toContain('Perf HUD');
   });
