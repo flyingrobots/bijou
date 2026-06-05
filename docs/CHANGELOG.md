@@ -18,9 +18,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   renderer with charset, Braille, and quad modes, including custom density
   character sets, centered `fit` crop semantics, and optional terminal
   cell-aspect correction. DOGFOOD now paints a procedural stacked sine-wave
-  wake as the V7 landing background, applies the committed `Bijou.svg`
-  wordmark as a background-transparent glyph mask in complementary colors, and
-  renders the lower FlyingRobots wordmark from `assets/flyingrobotslogo.txt`
+  wake as the V7 landing background with wake colors in the cell background
+  channel, applies the committed `Bijou.svg` wordmark as a background-transparent
+  glyph mask in complementary colors, and renders the lower FlyingRobots wordmark
+  from `assets/flyingrobotslogo.txt`
   while treating the asset's Braille blank cells as transparent. Visible
   FlyingRobots cells now preserve the underlying cell background and paint their
   foreground as the opposite of that preserved background, so modal dimming does

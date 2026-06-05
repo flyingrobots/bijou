@@ -78,10 +78,11 @@ and lowerable through existing release-title facts.
 
 The stacked sine-wave wake occupies the first-viewport title surface. It uses
 the existing landing pulse shader and quality buckets, so the field stays
-animated without adding a new image decode path or GPU dependency. Foreground
-content still wins. The visible Bijou wordmark is rasterized from
-`assets/Bijou.svg`, fit to the terminal cell aspect, and used as a
-background-transparent mask that writes SVG glyphs without replacing existing
+animated without adding a new image decode path or GPU dependency. Wake colors
+are written into cell backgrounds while the density glyphs keep the surface
+geometry stable with matching foreground colors. The visible Bijou wordmark is
+rasterized from `assets/Bijou.svg`, fit to the terminal cell aspect, and used as
+a background-transparent mask that writes SVG glyphs without replacing existing
 backgrounds. The lower FlyingRobots wordmark is read from
 `assets/flyingrobotslogo.txt`, treats Braille blank cells as transparent holes,
 fits the visible logo glyphs to the available landing width, preserves the

@@ -2490,7 +2490,8 @@ function paintLandingBackground(
         + (0.18 * (0.5 + (Math.sin((time * 0.9) + (v * 5.2)) * 0.5)))
         + (0.06 * Math.sin((time * 0.7) + (sampleX * 0.035))),
       );
-      const fg = sampleColorRamp(tokens.waveRamp, colorT);
+      const bg = sampleColorRamp(tokens.waveRamp, colorT);
+      const fg = bg;
       const modifiers = level < 0.55 ? DIM_MODIFIERS : undefined;
       const maxY = Math.min(height, tileY + tile);
       const maxX = Math.min(width, tileX + tile);
@@ -2499,7 +2500,7 @@ function paintLandingBackground(
         for (let x = tileX; x < maxX; x++) {
           surface.set(x, y, {
             char,
-            bg: tokens.background,
+            bg,
             fg,
             modifiers: modifiers as string[] | undefined,
             empty: false,

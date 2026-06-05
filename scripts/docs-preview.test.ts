@@ -496,9 +496,15 @@ describe('docs preview app', () => {
       if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) break;
     }
     expect(wakeBackedLogoCell).toBeDefined();
-    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    const wakeBackedBg = expectedLandingWakeColorAt(
+      wakeBackedLogoCell!.x,
+      wakeBackedLogoCell!.y,
+      frame.width,
+      frame.height,
+    );
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(wakeBackedBg);
     expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(
-      oppositeHexColor(V7_DEFAULT_BACKGROUND),
+      oppositeHexColor(wakeBackedBg),
     );
     expect(backgroundBackedLogoCell).toBeDefined();
     expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
@@ -546,8 +552,14 @@ describe('docs preview app', () => {
 
     expect(wakeBackedLogoCell).toBeDefined();
     const cell = frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y);
-    expect(colorHex(cell.bg)).toBe(V7_DEFAULT_BACKGROUND);
-    expect(colorHex(cell.fg)).toBe(oppositeHexColor(V7_DEFAULT_BACKGROUND));
+    const wakeBackedBg = expectedLandingWakeColorAt(
+      wakeBackedLogoCell!.x,
+      wakeBackedLogoCell!.y,
+      frame.width,
+      frame.height,
+    );
+    expect(colorHex(cell.bg)).toBe(wakeBackedBg);
+    expect(colorHex(cell.fg)).toBe(oppositeHexColor(wakeBackedBg));
     expect(cell.modifiers ?? []).toContain('dim');
   });
 
@@ -689,6 +701,26 @@ describe('docs preview app', () => {
     const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!);
     expect(overlay.expected).toBeGreaterThan(450);
     expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
+    const metrics = bijouSvgOverlayMetrics(initial.frames[0]!.width, initial.frames[0]!.height);
+    let sameColorWakeCells = 0;
+    for (let y = 0; y < initial.frames[0]!.height; y++) {
+      for (let x = 0; x < initial.frames[0]!.width; x++) {
+        if (
+          x >= metrics.left
+          && x < metrics.left + metrics.columns
+          && y >= metrics.top
+          && y < metrics.top + metrics.rows
+        ) {
+          continue;
+        }
+        const cell = initial.frames[0]!.get(x, y);
+        if (!V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')) continue;
+        if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
+        expect(colorHex(cell.fg)).toBe(colorHex(cell.bg));
+        sameColorWakeCells++;
+      }
+    }
+    expect(sameColorWakeCells).toBeGreaterThan(400);
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
