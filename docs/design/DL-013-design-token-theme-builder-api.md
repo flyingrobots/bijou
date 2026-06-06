@@ -14,6 +14,8 @@ keywords:
 
 # DL-013 Design token and theme builder API
 
+Legend: [DL - Design Language](../legends/DL-design-language.md)
+
 ## Decision Summary
 
 Tokens describe semantic color slots in a theme.
@@ -57,6 +59,13 @@ An agent auditing a Bijou app wants theme tokens and style use to be separable
 and inspectable so that it can explain whether a rendered cell came from a
 semantic theme slot, a raw color override, or a lower-mode fallback.
 
+## Hill
+
+A Bijou app author can define semantic color tokens once inside a theme,
+provide required dark and light mode values, and apply those tokens through a
+fluent style builder without allowing styles to become the owner of product
+theme truth.
+
 ## Problem
 
 Bijou has styleable surfaces, palettes, theme presets, and DOGFOOD chrome, but
@@ -71,6 +80,17 @@ builder can blur three different responsibilities:
 The user-facing syntax should be fluent, but the model should stay strict.
 Theme data is application and product identity. Style data is component
 presentation. Token references are the bridge.
+
+## Playback Questions
+
+1. Can a theme define the same token id with separate dark and light values?
+2. Does a style keep token references unresolved until render receives a theme
+   and mode?
+3. Can an inspector explain which theme, mode, token id, and lowering profile
+   produced a rendered cell color?
+4. Do unresolved tokens fail or fall back through an explicit policy instead of
+   silently degrading?
+5. Does the lower-mode path preserve meaning when truecolor is unavailable?
 
 ## Scope
 
@@ -359,7 +379,7 @@ const danger = style()
 Inheritance should copy only unset rules on the receiver, matching the useful
 part of Lip Gloss while keeping the resolved-token facts intact.
 
-## Inspectability
+## Agent Inspectability / Explainability Posture
 
 Every rendered token-backed style should be able to expose:
 
@@ -375,7 +395,7 @@ Every rendered token-backed style should be able to expose:
 This is a Bijou-specific requirement. The goal is not only nice terminal
 styling, but explainable rendering.
 
-## Accessibility
+## Accessibility / Assistive Reading Posture
 
 Token ids should be semantic enough that an accessible renderer can report
 meaning even when color is stripped.
@@ -384,12 +404,26 @@ For example, `color.status.danger.bg` gives better assistive context than
 `color.red.900`. The style resolver should preserve facts for accessible
 surfaces even when the final text has no color escape sequences.
 
-## Localization
+## Localization / Directionality Posture
 
 No localized strings are introduced by this design. Public docs and DOGFOOD
 examples introduced during implementation must follow the repository
 localization policy and provide all supported DOGFOOD locales when new
-localized copy is added.
+localized copy is added. Token ids are logical semantic identifiers and should
+not encode physical direction, locale, or translated prose.
+
+## Linked Invariants
+
+- [Runtime Truth Wins](../invariants/runtime-truth-wins.md): resolved cell
+  colors and resolver facts are stronger evidence than design prose.
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md):
+  color cannot be the only carrier of status, focus, or warning meaning.
+- [Tests Are The Spec](../invariants/tests-are-the-spec.md): the builder API
+  should land through focused runtime tests, not just examples.
+- [Buffer Holds Facts](../invariants/buffer-holds-facts.md): rendered cells
+  should preserve token-resolution facts for inspection and replay.
+- [Docs Are The Demo](../invariants/docs-are-the-demo.md): DOGFOOD examples
+  should exercise the same public builder API as consumers.
 
 ## Compatibility
 
@@ -423,7 +457,7 @@ Migration can be staged:
 - DOGFOOD includes one theme-builder example and one style-builder example
   once implementation lands.
 
-## Implementation Slices
+## Implementation Outline
 
 1. Token and theme type contracts with focused tests.
 2. `defineTheme()` builder with dark/light validation.
