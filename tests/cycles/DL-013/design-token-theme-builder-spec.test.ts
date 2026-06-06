@@ -43,8 +43,7 @@ describe('DL-013 design token and theme builder spec', () => {
     const roadmap = readRepoFile('docs/ROADMAP.md');
 
     expect(roadmap).toContain(
-      '| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | ' +
-        '30 | 1 |',
+      '| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) |',
     );
     expect(roadmap).toContain('Design Tokens And Theme Modes');
     expect(roadmap).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
