@@ -58,6 +58,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🛠 Maintenance
 
+- **Roadmap goalpost policy** — `docs/method/releases/README.md` now defines
+  Bijou release packets, versioned releases, goalposts, umbrella issues,
+  user-story issues, slice budgets, release gates, proof policy, and authority
+  order. `docs/ROADMAP.md` is refreshed from the live GitHub milestone counts
+  as of 2026-06-06 and groups the open Beyond backlog into candidate goalposts.
+  The Method issue template now captures roadmap role, linkage, slice budget,
+  and release-gate impact; GitHub now has `roadmap`, `goalpost`, and
+  `user-story` query labels; and cycle-start docs are aligned back to non-draft
+  pull requests.
 - **Node 26 tsx deprecation cleanup** — The workspace now uses `tsx` 4.22.4
   so `node --import tsx` prefers Node's `module.registerHooks()` path when
   available instead of emitting the Node 26 `DEP0205` `module.register()`

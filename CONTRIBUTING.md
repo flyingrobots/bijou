@@ -26,11 +26,10 @@ points for contributors:
   files as the source of live queue state.
 - **Branch naming**: `cycle/<cycle-name>` for cycle work, or a
   descriptive branch name for smaller changes.
-- **Open a draft PR at cycle start**: After syncing the merge target, branch,
+- **Open a non-draft PR at cycle start**: After syncing the merge target, branch,
   create or update the GitHub Issue, and commit the design artifact, push the
-  branch and open a draft PR against `main`. Link the issue, design doc, and
-  draft PR, then mark it ready for review only after validation and self-review
-  pass.
+  branch and open a non-draft PR against `main`. Link the issue, design doc,
+  and PR, then request final review only after validation and self-review pass.
 - **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
 - **Tests first**: Write failing tests before implementing. Never
@@ -62,9 +61,8 @@ wrappers, or registry workflow behavior.
 
 ## Pull Requests
 
-- Open draft PRs against `main` at cycle start for visibility.
-- Mark draft PRs ready for review only after local validation and self-review
-  pass.
+- Open non-draft PRs against `main` at cycle start for visibility.
+- Request final review only after local validation and self-review pass.
 - Use `--body-file` for Markdown-heavy GitHub comments. Inline `--body "..."`
   is only safe for short literal comments that do not contain backticks,
   `$()` text, command examples, or Markdown tables.

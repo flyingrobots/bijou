@@ -26,12 +26,12 @@ describe('WF-001 workflow adoption', () => {
     expect(workflow).toContain('tests/cycles/<cycle>/');
     expect(workflow).toContain('docs/specs/');
     expect(workflow).toContain('cycle/<cycle_name>');
-    expect(normalizedWorkflow).toContain('open a draft pull request to `main`');
+    expect(normalizedWorkflow).toContain('open a non-draft pull request to `main`');
     expect(method).toContain('cycle/<cycle_name>');
-    expect(normalizedMethod).toContain('open a draft pull request to `main`');
+    expect(normalizedMethod).toContain('open a non-draft pull request to `main`');
   });
 
-  it('starts cycles with a synced branch, design issue, and draft PR', () => {
+  it('starts cycles with a synced branch, design issue, and non-draft PR', () => {
     const agents = read('AGENTS.md');
     const contributing = read('CONTRIBUTING.md');
     const workflow = read('docs/WORKFLOW.md');
@@ -45,22 +45,22 @@ describe('WF-001 workflow adoption', () => {
     expect(normalizedMethod).toContain('git fetch');
     expect(normalizedMethod).toContain('Sync to the merge target branch');
     expect(normalizedMethod).toContain('Create `cycle/<cycle_name>` from the synced merge target');
-    expect(normalizedMethod).toContain('open a draft pull request to `main`');
+    expect(normalizedMethod).toContain('open a non-draft pull request to `main`');
     expect(normalizedMethod).toContain('apply `work-in-progress` to the GitHub Issue');
 
     expect(normalizedWorkflow).toContain('Sync to the merge target branch after `git fetch`.');
-    expect(normalizedWorkflow).toContain('open a draft pull request to `main` before implementation work starts.');
+    expect(normalizedWorkflow).toContain('open a non-draft pull request to `main` before implementation work starts.');
     expect(normalizedWorkflow).toContain('Apply `work-in-progress` to the GitHub Issue.');
 
-    expect(normalizedContributing).toContain('Open a draft PR at cycle start');
-    expect(normalizedContributing).toContain('mark it ready for review only after validation and self-review pass');
+    expect(normalizedContributing).toContain('Open a non-draft PR at cycle start');
+    expect(normalizedContributing).toContain('request final review only after validation and self-review pass');
 
     expect(normalizedAgents).toContain('Start cycles from a synced merge target branch.');
-    expect(normalizedAgents).toContain('Draft PRs are expected at cycle start.');
-    expect(normalizedAgents).toContain('link the issue, design doc, and draft PR');
-    expect(normalizedMethod).toContain('link the issue, design doc, and draft PR');
+    expect(normalizedAgents).toContain('PRs are non-draft at cycle start.');
+    expect(normalizedAgents).toContain('link the issue, design doc, and PR');
+    expect(normalizedMethod).toContain('link the issue, design doc, and PR');
 
-    expect(issueTemplate).toContain('Issue, design doc, and draft PR are linked correctly.');
+    expect(issueTemplate).toContain('Issue, design doc, and non-draft PR are linked correctly.');
   });
 
   it('adds explicit legend and invariant docs', () => {
