@@ -399,6 +399,9 @@ export {
   type FramedAppUpdateResult,
   type FrameScopedMsg,
   type PageScopedMsg,
+  type FrameTimingSnapshot,
+  type FramePerfHudTelemetry,
+  type FramePerfHudOverlayOptions,
   activeFrameLayer,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
@@ -406,7 +409,9 @@ export {
   emitFrameAction,
   notify,
   projectFrameControls,
+  renderFramePerfHudOverlay,
   runFramedApp,
+  summarizeFrameTimings,
   underlyingFrameLayer,
 } from './app-frame.js';
 
@@ -803,6 +808,23 @@ export {
   type CanvasOptions,
   canvas,
 } from './canvas.js';
+
+// Raster glyph rendering — decoded/generated RGBA frames to terminal surfaces
+export {
+  type RasterGlyphCharsetOrder,
+  type RasterGlyphRenderer,
+  type RasterGlyphCharsetRenderer,
+  type RasterGlyphBrailleRenderer,
+  type RasterGlyphQuadRenderer,
+  type RasterGlyphFit,
+  type RasterGlyphColorMode,
+  type RasterGlyphDitherMode,
+  type RasterToGlyphSurfaceOptions,
+  type RgbaFrame,
+  RASTER_GLYPH_CHARSETS,
+  rasterToGlyphSurface,
+  validateRasterGlyphCharset,
+} from './raster-glyph.js';
 
 // Command palette
 export {

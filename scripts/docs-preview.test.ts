@@ -2,16 +2,22 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, type ColorRef } from '@flyingrobots/bijou';
+import { colorHex, lerp3, type ColorRef } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { parseKey } from '@flyingrobots/bijou-tui';
+import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
 } from '../tests/helpers/scripted.js';
-import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
+import {
+  createDocsApp,
+  DOGFOOD_I18N_CATALOG,
+  FRAME_I18N_CATALOG,
+  stripMarkdownFrontmatter,
+} from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';
+import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from '../examples/docs/svg-raster.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import {
   DOGFOOD_NON_INTERACTIVE_MESSAGE,
@@ -36,6 +42,24 @@ const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
 const KEY_NEXT_TAB = ']';
+const KEY_BACKTICK = '`';
+const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
+const V7_TITLE_CELL_ASPECT_RATIO = 0.5;
+const V7_BIJOU_SVG_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'Bijou.svg'), 'utf8');
+const FLYING_ROBOTS_LOGO_TEXT = readFileSync(resolve(import.meta.dirname, '..', 'assets', 'flyingrobotslogo.txt'), 'utf8').trimEnd();
+const FLYING_ROBOTS_TRANSPARENT_CELL = '\u2800';
+const V7_DEFAULT_BACKGROUND = '#18172b';
+const V7_DEFAULT_WAVE_GRADIENT = ['#2f3f66', '#5f87c8', '#f2c96b'] as const;
+const V7_LANDING_COLOR_RAMP_SIZE = 256;
+const V7_LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
+const V7_LANDING_WAKE_WAVES = [
+  { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
+  { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
+  { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
+  { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
+] as const;
+const V7_BIJOU_LOGO_LETTER_COUNT = 5;
+const V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -67,6 +91,213 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
     text += '\n';
   }
   return text;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const normalized = hex.replace(/^#/, '');
+  return [
+    parseInt(normalized.slice(0, 2), 16),
+    parseInt(normalized.slice(2, 4), 16),
+    parseInt(normalized.slice(4, 6), 16),
+  ];
+}
+
+function rgbHex(r: number, g: number, b: number): string {
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function oppositeHexColor(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbHex(255 - r, 255 - g, 255 - b);
+}
+
+function sampleDefaultWaveRamp(t: number): string {
+  const index = Math.max(0, Math.min(
+    V7_LANDING_COLOR_RAMP_SIZE - 1,
+    Math.round(clamp01(t) * (V7_LANDING_COLOR_RAMP_SIZE - 1)),
+  ));
+  const stops = V7_DEFAULT_WAVE_GRADIENT.map((color, stopIndex) => ({
+    pos: stopIndex / (V7_DEFAULT_WAVE_GRADIENT.length - 1),
+    color: hexToRgb(color),
+  }));
+  return rgbHex(...lerp3(stops, index / (V7_LANDING_COLOR_RAMP_SIZE - 1)));
+}
+
+function expectedLandingWakeColorAt(x: number, y: number, width: number, height: number): string {
+  const tile = width * height <= 14_000 ? 1 : width * height <= 28_000 ? 2 : 3;
+  const tileX = Math.floor(x / tile) * tile;
+  const tileY = Math.floor(y / tile) * tile;
+  const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
+  const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
+  const widthDenominator = width - 1 || 1;
+  const heightDenominator = height - 1 || 1;
+  const u = sampleX / widthDenominator;
+  const v = sampleY / heightDenominator;
+  const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
+  const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
+  if (char === ' ') return V7_DEFAULT_BACKGROUND;
+  const colorT = clamp01(
+    0.1
+    + (layer * 0.16)
+    + (u * 0.26)
+    + (0.18 * (0.5 + (Math.sin(v * 5.2) * 0.5)))
+    + (0.06 * Math.sin(sampleX * 0.035)),
+  );
+  return sampleDefaultWaveRamp(colorT);
+}
+
+function titleBackgroundGlyphCount(text: string): number {
+  return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
+}
+
+function stackedWakeRowCount(frame: {
+  width: number;
+  height: number;
+  get(x: number, y: number): { char?: string };
+}): number {
+  let rows = 0;
+  const maxY = Math.max(1, Math.floor(frame.height * 0.58));
+
+  for (let y = 1; y < maxY; y++) {
+    let line = '';
+    for (let x = 0; x < frame.width; x++) {
+      line += frame.get(x, y).char ?? ' ';
+    }
+
+    const full = line.indexOf('█');
+    const dark = full < 0 ? -1 : line.indexOf('▓', full + 1);
+    const mid = dark < 0 ? -1 : line.indexOf('▒', dark + 1);
+    const light = mid < 0 ? -1 : line.indexOf('░', mid + 1);
+    if (full >= 0 && dark > full && mid > dark && light > mid) {
+      rows++;
+    }
+  }
+
+  return rows;
+}
+
+function bijouSvgOverlayMetrics(width: number, height: number) {
+  const aspectRatio = svgViewBoxAspectRatio(V7_BIJOU_SVG_TEXT);
+  const maxColumns = Math.max(1, width - 4);
+  const targetColumns = Math.max(20, Math.min(maxColumns, Math.floor(width * 0.84)));
+  const maxRows = Math.max(3, Math.floor(height * 0.32));
+  const rows = Math.max(
+    3,
+    Math.min(maxRows, Math.round((targetColumns * V7_TITLE_CELL_ASPECT_RATIO) / aspectRatio)),
+  );
+  const columns = Math.max(
+    12,
+    Math.min(maxColumns, Math.round((rows * aspectRatio) / V7_TITLE_CELL_ASPECT_RATIO)),
+  );
+  const centerY = Math.floor(height * 0.29);
+  const topLimit = Math.max(0, height - rows - 2);
+
+  return {
+    columns,
+    rows,
+    left: Math.max(0, Math.floor((width - columns) / 2)),
+    top: Math.max(1, Math.min(topLimit, centerY - Math.floor(rows / 2))),
+  };
+}
+
+function expectedBijouSvgOverlay(width: number, height: number) {
+  const metrics = bijouSvgOverlayMetrics(width, height);
+  const frame = rasterizeSvgToRgba(V7_BIJOU_SVG_TEXT, {
+    width: Math.max(1, metrics.columns * 2),
+    height: Math.max(1, metrics.rows * 4),
+  });
+  const mask = rasterToGlyphSurface(frame, {
+    columns: metrics.columns,
+    rows: metrics.rows,
+    fit: 'stretch',
+    renderer: {
+      kind: 'charset',
+      chars: ' ░▒▓█',
+      order: 'light-to-dark',
+    },
+  });
+
+  return { ...metrics, mask };
+}
+
+function expectedStackedWakeChar(x: number, y: number, width: number): string {
+  const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
+  const layer = landingWakeLayer(x, y, width, 0, amplitudeScale);
+  return V7_LANDING_WAKE_CHARS[layer] ?? ' ';
+}
+
+function expectedBijouLogoLetterIndex(x: number, width: number): number {
+  const letterWidth = Math.max(1, width / V7_BIJOU_LOGO_LETTER_COUNT);
+  return Math.max(0, Math.min(V7_BIJOU_LOGO_LETTER_COUNT - 1, Math.floor(x / letterWidth)));
+}
+
+function expectedBijouLogoYOffset(x: number, width: number, timeMs: number): number {
+  const letterIndex = expectedBijouLogoLetterIndex(x, width);
+  return Math.round(Math.sin((timeMs * 0.004) + (letterIndex * 0.82)) * V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS);
+}
+
+function landingWakeLayer(
+  x: number,
+  y: number,
+  width: number,
+  time: number,
+  amplitudeScale: number,
+): number {
+  let edge = width / 4;
+  const edges: number[] = [];
+
+  for (const spec of V7_LANDING_WAKE_WAVES) {
+    edge += stackedWakeWave(time, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
+    edges.push(edge);
+  }
+
+  for (let index = edges.length - 1; index >= 0; index--) {
+    if (x > edges[index]!) return index + 1;
+  }
+
+  return 0;
+}
+
+function stackedWakeWave(
+  time: number,
+  y: number,
+  seeds: readonly [number, number, number],
+  amps: readonly [number, number, number],
+): number {
+  return (
+    ((Math.sin(time + (y * seeds[0])) + 1) * amps[0])
+    + ((Math.sin(time + (y * seeds[1])) + 1) * amps[1])
+    + (Math.sin(time + (y * seeds[2])) * amps[2])
+  );
+}
+
+function matchingBijouSvgOverlayGlyphCount(frame: {
+  width: number;
+  height: number;
+  get(x: number, y: number): { char?: string; fg?: ColorRef };
+}, timeMs: number): { readonly expected: number; readonly matched: number } {
+  const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
+  let expected = 0;
+  let matched = 0;
+
+  for (let y = 0; y < overlay.mask.height; y++) {
+    for (let x = 0; x < overlay.mask.width; x++) {
+      const expectedChar = overlay.mask.get(x, y).char ?? ' ';
+      if (expectedChar === ' ') continue;
+      expected++;
+
+      const actual = frame.get(overlay.left + x, overlay.top + y + expectedBijouLogoYOffset(x, overlay.mask.width, timeMs));
+      if (actual.char === expectedChar && colorHex(actual.fg) != null) {
+        matched++;
+      }
+    }
+  }
+
+  return { expected, matched };
 }
 
 function cellsWithoutBackground(frame: {
@@ -133,11 +364,12 @@ describe('docs preview app', () => {
 
   it('uses the live local runtime entrypoint instead of the packaged build', () => {
     const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');
+    const nodeSource = readFileSync(new URL('../examples/docs/node-app.ts', import.meta.url), 'utf8');
 
     expect(source).toContain("../../packages/bijou-node/src/index.js");
-    expect(source).toContain("../../packages/bijou-tui/src/index.js");
-    expect(source).toContain("import { createNodeDocsApp } from './node-app.js';");
-    expect(source).toContain('createNodeDocsApp(ctx)');
+    expect(nodeSource).toContain("../../packages/bijou-tui/src/index.js");
+    expect(source).toContain("import { runNodeDocsApp } from './node-app.js';");
+    expect(source).toContain('runNodeDocsApp(ctx');
     expect(source).toContain('dogfoodTerminalReadiness(ctx)');
     expect(source).toContain('DOGFOOD_TERMINAL_NOTICE');
   });
@@ -183,6 +415,24 @@ describe('docs preview app', () => {
     );
   });
 
+  it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
+    expect(stripMarkdownFrontmatter([
+      '---',
+      'dogfood:',
+      '  localization:',
+      '    sourceLocale: en',
+      '---',
+      '# Start Here',
+      '',
+      'Visible guide body.',
+    ].join('\n'))).toBe([
+      '# Start Here',
+      '',
+      'Visible guide body.',
+    ].join('\n'));
+    expect(stripMarkdownFrontmatter('# Plain guide')).toBe('# Plain guide');
+  });
+
   it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {
     _resetDefaultContextForTesting();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -199,8 +449,19 @@ describe('docs preview app', () => {
     const initial = await runScript(app, [], { ctx });
     expect((initial.model as any).route).toBe('landing');
 
+    const ignored = await runScript(app, [{ key: 'a' }], { ctx });
+    expect((ignored.model as any).route).toBe('landing');
+    expect((ignored.model as any).landingTransitionMs).toBeUndefined();
+
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     expect((entered.model as any).route).toBe('docs');
+    expect((entered.model as any).landingTransitionMs).toBeUndefined();
+    const enteredFrame = entered.frames.at(-1)!;
+    const enteredText = frameText(enteredFrame);
+    expect(enteredText).toContain('Bijou Docs');
+    expect(enteredText).toContain('Start Here');
+    expect(enteredText).not.toContain('Press [Enter]');
+    expect(enteredText).not.toContain('V7 Launch Wake');
   });
 
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
@@ -232,12 +493,159 @@ describe('docs preview app', () => {
     expect(text).not.toContain('Documentation coverage');
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
-    expect(text).toContain('8""""');
+    expect(text).toContain('V7 Launch Wake');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
     // Gradient background chars (█▓▒░·) require pulse-driven animation;
     // the initial frame without pulses may not contain them. The pulse
     // test below ('animates the landing title screen on pulse') covers this.
+  });
+
+  it('uses the checked-in FlyingRobots logo asset on roomy landing screens', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const text = frameText(frame);
+    const lines = text.split('\n');
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
+    const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
+    const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
+    const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
+    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
+    let backgroundBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
+
+    expect(transparentOffset).toBeGreaterThan(0);
+    expect(visiblePrefix.length).toBeGreaterThan(8);
+    expect(logoY).toBeGreaterThanOrEqual(0);
+    expect(logoX).toBeGreaterThanOrEqual(0);
+    for (let y = 0; y < logoLines.length; y++) {
+      const logoLine = Array.from(logoLines[y] ?? '');
+      for (let x = 0; x < logoLine.length; x++) {
+        const char = logoLine[x];
+        if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
+        const targetX = logoX + x;
+        const targetY = logoY + y;
+        const bg = expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height);
+        if (bg !== V7_DEFAULT_BACKGROUND) {
+          wakeBackedLogoCell = { x: targetX, y: targetY };
+        } else {
+          backgroundBackedLogoCell = { x: targetX, y: targetY };
+        }
+        if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) {
+          break;
+        }
+      }
+      if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) break;
+    }
+    expect(wakeBackedLogoCell).toBeDefined();
+    const wakeBackedBg = expectedLandingWakeColorAt(
+      wakeBackedLogoCell!.x,
+      wakeBackedLogoCell!.y,
+      frame.width,
+      frame.height,
+    );
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(wakeBackedBg);
+    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(
+      oppositeHexColor(wakeBackedBg),
+    );
+    expect(backgroundBackedLogoCell).toBeDefined();
+    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).fg)).toBe(
+      oppositeHexColor(V7_DEFAULT_BACKGROUND),
+    );
+    expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
+    expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');
+    expect(text).not.toContain('8""""');
+  });
+
+  it('fades the FlyingRobots logo after the first three seconds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
+    const visiblePrefix = firstLogoLine.slice(0, firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL));
+
+    const initial = await runScript(app, [], { ctx });
+    const faded = await runScript(app, [{ pulse: { dt: 4.2 } }], { ctx });
+
+    expect(visiblePrefix.length).toBeGreaterThan(8);
+    expect(frameText(initial.frames[0]!)).toContain(visiblePrefix);
+    expect(frameText(faded.frames.at(-1)!)).not.toContain(visiblePrefix);
+  });
+
+  it('uses a foreground gradient across the Enter prompt letters', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 48, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const lines = frameText(frame).split('\n');
+    const promptY = lines.findIndex((line) => line.includes('Press [Enter]'));
+    const promptX = promptY >= 0 ? lines[promptY]!.indexOf('Press [Enter]') : -1;
+    const prompt = 'Press [Enter]';
+    const enterStart = prompt.indexOf('Enter');
+
+    expect(promptY).toBeGreaterThanOrEqual(0);
+    expect(promptX).toBeGreaterThanOrEqual(0);
+
+    const enterColors = Array.from('Enter').map((_char, offset) => (
+      colorHex(frame.get(promptX + enterStart + offset, promptY).fg)
+    ));
+    const bodyColor = colorHex(frame.get(promptX, promptY).fg);
+
+    expect(new Set(enterColors).size).toBeGreaterThan(1);
+    expect(enterColors).not.toContain(bodyColor);
+  });
+
+  it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal dims the title', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ESCAPE }], { ctx });
+    const frame = opened.frames.at(-1)!;
+    const text = frameText(frame);
+    const lines = text.split('\n');
+    const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
+    const [firstLogoLine = ''] = logoLines;
+    const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
+    const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
+    const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
+    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
+
+    expect(text).toContain('Quit?');
+    expect(logoY).toBeGreaterThanOrEqual(0);
+    expect(logoX).toBeGreaterThanOrEqual(0);
+    for (let y = 0; y < logoLines.length; y++) {
+      const logoLine = Array.from(logoLines[y] ?? '');
+      for (let x = 0; x < logoLine.length; x++) {
+        const char = logoLine[x];
+        if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
+        const targetX = logoX + x;
+        const targetY = logoY + y;
+        if (expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height) !== V7_DEFAULT_BACKGROUND) {
+          wakeBackedLogoCell = { x: targetX, y: targetY };
+          break;
+        }
+      }
+      if (wakeBackedLogoCell != null) break;
+    }
+
+    expect(wakeBackedLogoCell).toBeDefined();
+    const cell = frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y);
+    const wakeBackedBg = expectedLandingWakeColorAt(
+      wakeBackedLogoCell!.x,
+      wakeBackedLogoCell!.y,
+      frame.width,
+      frame.height,
+    );
+    expect(colorHex(cell.bg)).toBe(wakeBackedBg);
+    expect(colorHex(cell.fg)).toBe(oppositeHexColor(wakeBackedBg));
+    expect(cell.modifiers ?? []).toContain('dim');
   });
 
   it('keeps every landing title cell on a Bijou-owned background', async () => {
@@ -361,6 +769,91 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
+  it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
+
+    const initialText = frameText(initial.frames[0]!);
+    const pulsedText = frameText(pulsed.frames[pulsed.frames.length - 1]!);
+
+    expect(titleBackgroundGlyphCount(initialText)).toBeGreaterThan(1000);
+    expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
+    expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
+    expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
+    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!, 0);
+    expect(overlay.expected).toBeGreaterThan(450);
+    expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
+    const metrics = bijouSvgOverlayMetrics(initial.frames[0]!.width, initial.frames[0]!.height);
+    let sameColorWakeCells = 0;
+    for (let y = 0; y < initial.frames[0]!.height; y++) {
+      for (let x = 0; x < initial.frames[0]!.width; x++) {
+        if (
+          x >= metrics.left
+          && x < metrics.left + metrics.columns
+          && y >= metrics.top
+          && y < metrics.top + metrics.rows
+        ) {
+          continue;
+        }
+        const cell = initial.frames[0]!.get(x, y);
+        if (!V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')) continue;
+        if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
+        if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
+        sameColorWakeCells++;
+      }
+    }
+    expect(sameColorWakeCells).toBeGreaterThan(400);
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+  });
+
+  it('uses the Bijou SVG as a transparent-background title mask', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+    const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
+    const paintedPathCell = { x: overlay.left, y: overlay.top };
+    const transparentMaskCell = { x: overlay.left + 15, y: overlay.top };
+
+    expect(overlay.mask.get(0, 0).char).toBe('▓');
+    expect(overlay.mask.get(15, 0).char).toBe(' ');
+    expect(frame.get(paintedPathCell.x, paintedPathCell.y).char).toBe(overlay.mask.get(0, 0).char);
+    expect(frame.get(transparentMaskCell.x, transparentMaskCell.y).char).toBe(
+      expectedStackedWakeChar(transparentMaskCell.x, transparentMaskCell.y, frame.width),
+    );
+    expect(colorHex(frame.get(paintedPathCell.x, paintedPathCell.y).fg)).not.toBeNull();
+    expect(colorHex(frame.get(transparentMaskCell.x, transparentMaskCell.y).fg)).not.toBeNull();
+  });
+
+  it('animates the Bijou SVG title mask with staggered row and fill waves', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+    const pulseMs = 352;
+
+    const initial = await runScript(app, [], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: pulseMs / 1000 } }], { ctx });
+    const initialFrame = initial.frames[0]!;
+    const pulsedFrame = pulsed.frames.at(-1)!;
+    const overlay = expectedBijouSvgOverlay(initialFrame.width, initialFrame.height);
+    const sampleX = 0;
+    const sampleY = 0;
+    const expectedChar = overlay.mask.get(sampleX, sampleY).char;
+    const initialY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, 0);
+    const pulsedY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, pulseMs);
+
+    expect(expectedChar).not.toBe(' ');
+    expect(initialY).not.toBe(pulsedY);
+    expect(initialFrame.get(overlay.left + sampleX, initialY).char).toBe(expectedChar);
+    expect(pulsedFrame.get(overlay.left + sampleX, pulsedY).char).toBe(expectedChar);
+    expect(colorHex(initialFrame.get(overlay.left + sampleX, initialY).fg)).not.toBe(
+      colorHex(pulsedFrame.get(overlay.left + sampleX, pulsedY).fg),
+    );
+  });
+
   it('reuses giant landing frames across small pulses within the same quality bucket', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 400, rows: 120, refreshRate: 60 } });
     const app = createDocsApp(ctx);
@@ -384,6 +877,40 @@ describe('docs preview app', () => {
     expect((pulsed.model as any).landingFps).toBe(54);
     const footer = frameText(pulsed.frames[pulsed.frames.length - 1]!).split('\n')[pulsed.frames[pulsed.frames.length - 1]!.height - 1] ?? '';
     expect(footer).toContain('54 fps • auto/full');
+  });
+
+  it('toggles the perf HUD on the landing title without entering docs', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_BACKTICK }], { ctx });
+    expect((opened.model as any).route).toBe('landing');
+    expect((opened.model as any).docsModel.perfHudOpen).toBe(true);
+    const openedText = frameText(opened.frames.at(-1)!);
+    expect(openedText).toContain('Perf HUD');
+    expect(openedText).toContain('view');
+    expect(openedText).toContain('diff');
+
+    const timedModel = opened.model as any;
+    const timedFrame = normalizeViewOutput(app.view({
+      ...timedModel,
+      docsModel: {
+        ...timedModel.docsModel,
+        frameTimeMs: 12.34,
+        viewTimeMs: 4.56,
+        diffTimeMs: 7.89,
+      },
+    }), { width: ctx.runtime.columns, height: ctx.runtime.rows }).surface;
+    const timedText = frameText(timedFrame);
+    expect(timedText).toContain('frame 12.34 ms');
+    expect(timedText).toContain('view  4.56 ms');
+    expect(timedText).toContain('diff  7.89 ms');
+    expect(timedText).not.toContain('frame 0.00 ms');
+
+    const closed = await runScript(app, [{ key: KEY_BACKTICK }, { key: KEY_BACKTICK }], { ctx });
+    expect((closed.model as any).route).toBe('landing');
+    expect((closed.model as any).docsModel.perfHudOpen).toBe(false);
+    expect(frameText(closed.frames.at(-1)!)).not.toContain('Perf HUD');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {
@@ -1076,19 +1603,19 @@ describe('docs preview app', () => {
     expect(frameText(landingFrame)).toContain('60 fps • quality');
   });
 
-  it('routes landing F2 into the shell settings layer and lets escape dismiss it without quitting', () => {
+  it('keeps landing F2 on the title screen because only Enter continues', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
     let [model] = app.init();
     [model] = app.update(parseKey(KEY_F2) as any, model);
-    expect((model as any).route).toBe('docs');
-    expect((model as any).docsModel.settingsOpen).toBe(true);
+    expect((model as any).route).toBe('landing');
+    expect((model as any).docsModel.settingsOpen).toBe(false);
     expect((model as any).docsModel.quitConfirmOpen).toBe(false);
 
-    [model] = app.update(parseKey(KEY_ESCAPE) as any, model);
+    [model] = app.update(parseKey(KEY_ENTER) as any, model);
     expect((model as any).route).toBe('docs');
-    expect((model as any).docsModel.settingsOpen).toBe(false);
+    expect((model as any).landingTransitionMs).toBeUndefined();
     expect((model as any).docsModel.quitConfirmOpen).toBe(false);
   });
 

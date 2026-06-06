@@ -24,9 +24,22 @@ For a text-first BlockLab index and capture matrix over the same DOGFOOD story c
 npm run blocklab:index
 ```
 
-You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
+You now land on a dedicated full-screen title screen first: the app renders a
+procedural stacked sine-wave wake through the landing background shader, writing
+wake colors into cell backgrounds while density glyphs use matching foreground
+colors. It then uses [assets/Bijou.svg](../../assets/Bijou.svg) as a
+background-transparent glyph mask in complementary colors. The landing screen
+keeps the treatment sparse:
+the V7 title art, a centered `Press [Enter]` cue, the
+[assets/flyingrobotslogo.txt](../../assets/flyingrobotslogo.txt) wordmark, and a
+reserved last-line footer for quit/continue guidance plus the Bijou version. The
+Bijou mark preserves the existing cell background while deriving complementary
+foreground from the visible wake. The FlyingRobots Braille wordmark keeps blank
+asset cells transparent, preserves the underlying cell background for visible
+glyphs, and paints those glyphs with the opposite color of that preserved
+background.
 
-On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs shell.
+On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. Backtick toggles the shared shell perf HUD in place, `Esc` or `q` quit immediately there, and any other unmodified key enters the docs shell.
 
 Mouse is enabled for this preview. In the docs shell, click a pane to
 focus it and use the wheel to scroll long docs or help content.

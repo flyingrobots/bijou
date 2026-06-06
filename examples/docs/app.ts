@@ -5,6 +5,7 @@ import {
   cloneContextWithTheme,
   createSurface,
   CYAN_MAGENTA,
+  colorHex,
   inspector,
   inspectorPanelBlock,
   lerp3,
@@ -19,6 +20,7 @@ import {
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
+  type Cell,
   type OutputMode,
   type PreferenceListTheme,
   type Surface,
@@ -46,12 +48,16 @@ import {
   mapCmds,
   placeSurface,
   quit,
+  rasterToGlyphSurface,
   renderShellQuitOverlay,
+  renderFramePerfHudOverlay,
   shouldUseShellQuitConfirm,
+  summarizeFrameTimings,
   toast,
   viewportSurface,
   type App,
   type Cmd,
+  type FrameTimingSnapshot,
   type FrameCommandItem,
   type FramePageMsg,
   type FrameInputArea,
@@ -63,8 +69,11 @@ import {
   type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
+  type RenderStageTiming,
   type ResizeMsg,
+  type RunOptions,
 } from '../../packages/bijou-tui/src/index.js';
+import { runWithLifecycleHooks } from '../../packages/bijou-tui/src/runtime.js';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
@@ -127,11 +136,13 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import {
+  CURRENT_DOGFOOD_RELEASE_TITLE,
   DOGFOOD_RELEASE_TITLE_GALLERY,
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
   renderDogfoodReleaseTitleText,
 } from './release-title.js';
+import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from './svg-raster.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
@@ -145,23 +156,11 @@ import {
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 
-const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
-const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
-const LOGO_WIDTH = Math.max(1, ...LOGO_LINES.map((lineText) => lineText.length));
-const LOGO_HEIGHT = LOGO_LINES.length;
-const LOGO_PADDED_LINES = LOGO_LINES.map((lineText) => lineText.padEnd(LOGO_WIDTH));
-const FLYING_ROBOTS_WIDE_LARGE_TEXT = readFileSync(
-  new URL('../../assets/flyingrobots-wide-large.txt', import.meta.url),
+const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
+  new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
   'utf8',
 ).trimEnd();
-const FLYING_ROBOTS_WIDE_SMALL_TEXT = readFileSync(
-  new URL('../../assets/flyingrobots-wide-small.txt', import.meta.url),
-  'utf8',
-).trimEnd();
-const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', import.meta.url), 'utf8').trimEnd();
-const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
-const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
-const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
+const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
 const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
 ) as { readonly version: string };
@@ -195,8 +194,7 @@ const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
-const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
-const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
+const FLYING_ROBOTS_LOGO_LINES = splitGlyphLines(FLYING_ROBOTS_LOGO_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
 const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
@@ -630,8 +628,25 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
 ]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
+const LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
+const LANDING_WAKE_WAVES = [
+  { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
+  { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
+  { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
+  { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
+] as const;
+const LANDING_BIJOU_SVG_CHARSET = ' ░▒▓█';
+const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
+const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
+const LANDING_FLYING_ROBOTS_FADE_DELAY_MS = 3000;
+const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
+const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
+const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
+const BRAILLE_BLANK = '\u2800';
+const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
+const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
@@ -643,6 +658,34 @@ interface LandingFrameCache {
   front?: Surface;
   back?: Surface;
 }
+
+interface BijouSvgOverlayMetrics {
+  readonly left: number;
+  readonly top: number;
+  readonly columns: number;
+  readonly rows: number;
+}
+
+interface LandingLogoOverlayOptions {
+  readonly foregroundSample?: 'visible-cell' | 'background-cell';
+  readonly opacity?: number;
+  readonly yOffset?: (x: number, y: number, char: string, width: number, height: number) => number;
+  readonly foreground?: (input: LandingLogoForegroundInput) => string;
+}
+
+interface LandingLogoForegroundInput {
+  readonly x: number;
+  readonly y: number;
+  readonly targetX: number;
+  readonly targetY: number;
+  readonly char: string;
+  readonly width: number;
+  readonly height: number;
+  readonly targetCell: Cell;
+  readonly baseForeground: string;
+  readonly sampledColor: string;
+}
+
 const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   {
     id: 'blocklab-workstation',
@@ -783,14 +826,6 @@ const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = LANDING_THEMES.map((theme)
     : landingTokensToShellTheme(theme),
 }));
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
-const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
-  const row = new Float32Array(BACKGROUND_WIDTH);
-  for (let x = 0; x < BACKGROUND_WIDTH; x++) {
-    row[x] = densityFromChar(lineText[x] ?? ' ');
-  }
-  return row;
-});
-
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -945,21 +980,16 @@ function dogfoodLocaleSettingDescription(currentLocale: string, localization?: L
   );
 }
 
-function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
-  if (msg.alt) return false;
-  if (msg.ctrl) {
-    return msg.key === ',' || msg.key === 'p';
-  }
-  return msg.key === 'f2'
-    || msg.key === '?'
-    || msg.key === '`'
-    || msg.key === '/'
-    || msg.key === ':'
-    || (msg.key === 'n' && msg.shift);
+function shouldToggleLandingPerfHud(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && msg.key === '`';
+}
+
+function shouldContinueFromLanding(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'enter';
 }
 
 function readMarkdownDoc(path: string): string {
-  return readFileSync(new URL(path, import.meta.url), 'utf8').trim();
+  return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
 }
 
 function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
@@ -967,6 +997,17 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
   const lines = content.split('\n');
   const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
+}
+
+export function stripMarkdownFrontmatter(markdownText: string): string {
+  const withoutBom = markdownText.replace(/^\uFEFF/, '');
+  const opening = withoutBom.match(/^---\r?\n/);
+  if (opening == null) return markdownText;
+  const bodyStart = opening[0].length;
+  const body = withoutBom.slice(bodyStart);
+  const closingMatch = body.match(/\r?\n---[ \t]*(?:\r?\n|$)/);
+  if (closingMatch == null || closingMatch.index == null) return markdownText;
+  return body.slice(closingMatch.index + closingMatch[0].length);
 }
 
 function countMarkdownHeadings(markdownText: string): number {
@@ -2345,17 +2386,10 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
+    paintV7TitleArt(surface, tokens, quantizedTimeMs);
 
-    const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
-    const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
-    const logoX = Math.floor((width - logoWidth) / 2);
-    const logoY = Math.floor((height - logoHeight) / 2);
-    paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, quantizedTimeMs, tokens, quality);
-
-    const wordmarkGlyphs = width >= 110 && height >= 30
-      ? FLYING_ROBOTS_LARGE_LINES
-      : FLYING_ROBOTS_SMALL_LINES;
-    const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
+    const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
+    const wordmark = createWordmarkSurface(wordmarkGlyphs);
     const staticSurfaces = getLandingStaticSurfaces(tokens, localization);
     const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, localization);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, localization);
@@ -2368,7 +2402,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     const panelPromptGap = 1;
     const promptWordmarkGap = 1;
     const footerY = Math.max(0, height - 1);
-    const contentTop = Math.min(height - 1, logoY + logoHeight + 1);
+    const contentTop = Math.min(height - 1, Math.max(1, Math.floor(height * 0.68)));
     const contentBottom = Math.max(contentTop, footerY - 2);
     const availableHeight = Math.max(0, contentBottom - contentTop + 1);
     const fullClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap + wordmark.height;
@@ -2378,7 +2412,13 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
       blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
-      blitCentered(surface, wordmark, startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap);
+      paintFlyingRobotsLogoOverlay(
+        surface,
+        wordmark,
+        startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap,
+        tokens,
+        quantizedTimeMs,
+      );
     } else if (availableHeight >= compactClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
@@ -2450,49 +2490,37 @@ function paintLandingBackground(
 ): void {
   const width = surface.width;
   const height = surface.height;
-  const time = timeMs / 1000;
-  const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
-  const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
+  const time = timeMs * 0.002;
   const widthDenominator = width - 1 || 1;
   const heightDenominator = height - 1 || 1;
 
   const cells = surface.cells;
   const tile = quality.backgroundTile;
+  const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
 
   for (let tileY = 0; tileY < height; tileY += tile) {
     const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
     const v = sampleY / heightDenominator;
-    const rowShift = Math.round(
-      (Math.sin((sampleY * 0.075) + (time * 0.7)) * 18)
-      + (Math.cos((sampleY * 0.03) - (time * 0.35)) * 7),
-    );
     for (let tileX = 0; tileX < width; tileX += tile) {
       const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
       const u = sampleX / widthDenominator;
-      const columnShift = Math.round(Math.sin((sampleX * 0.028) + (time * 0.42)) * 2);
-      const sourceX = mod(baseX + sampleX + rowShift, BACKGROUND_WIDTH);
-      const sourceY = mod(baseY + sampleY + columnShift, BACKGROUND_HEIGHT);
-      const density = BACKGROUND_DENSITY_ROWS[sourceY]?.[sourceX] ?? 0;
-      if (density === 0) {
-        continue;
-      }
-
-      const wave = 0.54
-        + (Math.sin((sampleX * 0.042) + (sampleY * 0.016) + (time * 1.45)) * 0.24)
-        + (Math.cos((sampleX * 0.012) - (sampleY * 0.085) + (time * 0.95)) * 0.22);
-      const level = clamp01(density * wave);
-      const char = densityGlyph(level, { airy: true });
+      const layer = landingWakeLayer(sampleX, sampleY, width, time, amplitudeScale);
+      const char = LANDING_WAKE_CHARS[layer] ?? ' ';
       if (char === ' ') {
         continue;
       }
 
+      const level = 1 - (layer / (LANDING_WAKE_CHARS.length - 1));
       const colorT = clamp01(
-        (u * 0.66)
-        + (0.22 * (0.5 + (Math.sin((time * 0.3) + (v * 5.2)) * 0.5)))
-        + (0.08 * Math.sin((time * 0.55) + (sampleX * 0.02))),
+        0.1
+        + (layer * 0.16)
+        + (u * 0.26)
+        + (0.18 * (0.5 + (Math.sin((time * 0.9) + (v * 5.2)) * 0.5)))
+        + (0.06 * Math.sin((time * 0.7) + (sampleX * 0.035))),
       );
-      const fg = sampleColorRamp(tokens.waveRamp, colorT);
-      const modifiers = level < 0.52 ? DIM_MODIFIERS : undefined;
+      const bg = sampleColorRamp(tokens.waveRamp, colorT);
+      const fg = bg;
+      const modifiers = level < 0.55 ? DIM_MODIFIERS : undefined;
       const maxY = Math.min(height, tileY + tile);
       const maxX = Math.min(width, tileX + tile);
 
@@ -2500,7 +2528,7 @@ function paintLandingBackground(
         for (let x = tileX; x < maxX; x++) {
           surface.set(x, y, {
             char,
-            bg: tokens.background,
+            bg,
             fg,
             modifiers: modifiers as string[] | undefined,
             empty: false,
@@ -2512,139 +2540,269 @@ function paintLandingBackground(
   }
 }
 
-function paintLogoInto(
-  target: Surface,
-  dx: number,
-  dy: number,
+function landingWakeLayer(
+  x: number,
+  y: number,
   width: number,
-  height: number,
-  timeMs: number,
+  time: number,
+  amplitudeScale: number,
+): number {
+  const edges: number[] = [];
+  let edge = width / 4;
+
+  for (const spec of LANDING_WAKE_WAVES) {
+    edge += stackedWakeWave(time, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
+    edges.push(edge);
+  }
+
+  for (let index = edges.length - 1; index >= 0; index--) {
+    if (x > edges[index]!) return index + 1;
+  }
+
+  return 0;
+}
+
+function stackedWakeWave(
+  time: number,
+  y: number,
+  seeds: readonly [number, number, number],
+  amps: readonly [number, number, number],
+): number {
+  return (
+    ((Math.sin(time + (y * seeds[0])) + 1) * amps[0])
+    + ((Math.sin(time + (y * seeds[1])) + 1) * amps[1])
+    + (Math.sin(time + (y * seeds[2])) * amps[2])
+  );
+}
+
+function paintV7TitleArt(
+  surface: Surface,
   tokens: LandingThemeTokens,
-  quality: LandingQualityProfile,
+  timeMs: number,
 ): void {
-  const srcX = LOGO_WIDTH > width
-    ? Math.floor((LOGO_WIDTH - width) / 2)
-    : 0;
-  const srcY = LOGO_HEIGHT > height
-    ? Math.floor((LOGO_HEIGHT - height) / 2)
-    : 0;
-  const drawWidth = Math.min(width, LOGO_WIDTH);
-  const drawHeight = Math.min(height, LOGO_HEIGHT);
-  const destX = dx + (LOGO_WIDTH < width ? Math.floor((width - LOGO_WIDTH) / 2) : 0);
-  const destY = dy + (LOGO_HEIGHT < height ? Math.floor((height - LOGO_HEIGHT) / 2) : 0);
-  const time = timeMs / 1000;
-  const widthDenominator = LOGO_WIDTH - 1 || 1;
-  const heightDenominator = LOGO_HEIGHT - 1 || 1;
+  const width = surface.width;
+  const height = surface.height;
+  if (width < 40 || height < 14) return;
 
-  const cells = target.cells;
-  const tile = quality.logoTile;
+  paintBijouSvgOverlay(surface, tokens, timeMs);
+}
 
-  for (let tileY = 0; tileY < drawHeight; tileY += tile) {
-    const sourceY = srcY + Math.min(drawHeight - 1, tileY + Math.floor(tile / 2));
-    const lineText = LOGO_PADDED_LINES[sourceY]!;
-    const v = sourceY / heightDenominator;
-    const maxY = Math.min(drawHeight, tileY + tile);
-    for (let tileX = 0; tileX < drawWidth; tileX += tile) {
-      const sourceX = srcX + Math.min(drawWidth - 1, tileX + Math.floor(tile / 2));
-      const sourceChar = lineText[sourceX]!;
-      if (sourceChar === ' ') continue;
+function paintBijouSvgOverlay(
+  surface: Surface,
+  tokens: LandingThemeTokens,
+  timeMs: number,
+): void {
+  const metrics = bijouSvgOverlayMetrics(surface.width, surface.height);
+  if (metrics == null) return;
 
-      const u = sourceX / widthDenominator;
-      const shimmer = 0.46
-        + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
-        + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
-        + (Math.sin((u * 18.0) + (time * 5.5)) * 0.12);
-      const level = clamp01(shimmer);
-      const shaderChar = densityGlyph(level, { airy: false });
-      const colorT = clamp01(
-        (u * 0.78)
-        + ((1 - v) * 0.14)
-        + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
-      );
-      const glyph = reinforceGlyph(sourceChar, shaderChar);
-      const fg = sampleColorRamp(tokens.logoRamp, colorT);
-      const modifiers = level > 0.7 ? BOLD_MODIFIERS : undefined;
-      const maxX = Math.min(drawWidth, tileX + tile);
+  const mark = getBijouSvgOverlaySurface(metrics.columns, metrics.rows);
+  paintLandingLogoOverlay(surface, mark, metrics.left, metrics.top, tokens, {
+    yOffset: (x, _y, _char, width) => landingBijouLogoYOffset(x, width, timeMs),
+    foreground: ({ x, width, baseForeground }) => landingBijouLogoFillColor(baseForeground, tokens, x, width, timeMs),
+  });
+}
 
-      for (let y = tileY; y < maxY; y++) {
-        const targetY = destY + y;
-        if (targetY < 0 || targetY >= target.height) continue;
-        for (let x = tileX; x < maxX; x++) {
-          const targetX = destX + x;
-          if (targetX < 0 || targetX >= target.width) continue;
-          target.set(targetX, targetY, {
-            char: glyph,
-            bg: tokens.background,
-            fg,
-            modifiers: modifiers as string[] | undefined,
-            empty: false,
-            opacity: 1,
-          });
-        }
+function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayMetrics | undefined {
+  if (width < 40 || height < 14) return undefined;
+
+  const maxColumns = Math.max(1, width - 4);
+  const targetColumns = Math.max(20, Math.min(maxColumns, Math.floor(width * 0.84)));
+  const maxRows = Math.max(3, Math.floor(height * 0.32));
+  const rows = Math.max(
+    3,
+    Math.min(maxRows, Math.round((targetColumns * LANDING_TITLE_CELL_ASPECT_RATIO) / LANDING_BIJOU_SVG_ASPECT_RATIO)),
+  );
+  const columns = Math.max(
+    12,
+    Math.min(maxColumns, Math.round((rows * LANDING_BIJOU_SVG_ASPECT_RATIO) / LANDING_TITLE_CELL_ASPECT_RATIO)),
+  );
+  const centerY = Math.floor(height * 0.29);
+  const topLimit = Math.max(0, height - rows - 2);
+
+  return {
+    columns,
+    rows,
+    left: Math.max(0, Math.floor((width - columns) / 2)),
+    top: Math.max(1, Math.min(topLimit, centerY - Math.floor(rows / 2))),
+  };
+}
+
+function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
+  const key = `${columns}:${rows}`;
+  const cached = LANDING_BIJOU_SVG_OVERLAY_CACHE.get(key);
+  if (cached != null) return cached;
+
+  const frame = rasterizeSvgToRgba(LANDING_BIJOU_SVG_TEXT, {
+    width: Math.max(1, columns * 2),
+    height: Math.max(1, rows * 4),
+  });
+  const surface = rasterToGlyphSurface(frame, {
+    columns,
+    rows,
+    fit: 'stretch',
+    colorMode: 'none',
+    renderer: {
+      kind: 'charset',
+      chars: LANDING_BIJOU_SVG_CHARSET,
+      order: 'light-to-dark',
+    },
+  });
+
+  LANDING_BIJOU_SVG_OVERLAY_CACHE.set(key, surface);
+  return surface;
+}
+
+function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): string {
+  if (cell.fgRGB != null) {
+    return rgbHex(cell.fgRGB[0], cell.fgRGB[1], cell.fgRGB[2]);
+  }
+
+  return colorHex(cell.fg) ?? sampleColorRamp(tokens.waveRamp, 0.58);
+}
+
+function landingCellBackgroundColor(cell: Cell, tokens: LandingThemeTokens): string {
+  if (cell.bgRGB != null) {
+    return rgbHex(cell.bgRGB[0], cell.bgRGB[1], cell.bgRGB[2]);
+  }
+
+  return colorHex(cell.bg) ?? tokens.background;
+}
+
+function paintLandingLogoOverlay(
+  surface: Surface,
+  mark: Surface,
+  left: number,
+  top: number,
+  tokens: LandingThemeTokens,
+  options: LandingLogoOverlayOptions = {},
+): void {
+  const opacity = options.opacity ?? 1;
+  if (opacity <= 0.02) return;
+
+  for (let y = 0; y < mark.height; y++) {
+    for (let x = 0; x < mark.width; x++) {
+      const markChar = mark.get(x, y).char ?? ' ';
+      if (markChar === ' ') continue;
+
+      const targetX = left + x;
+      const targetY = top + y + Math.round(options.yOffset?.(x, y, markChar, mark.width, mark.height) ?? 0);
+      if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
+        continue;
       }
+
+      const targetCell = surface.get(targetX, targetY);
+      const foregroundSample = options.foregroundSample === 'background-cell'
+        ? landingCellBackgroundColor(targetCell, tokens)
+        : landingBackgroundCellColor(targetCell, tokens);
+
+      const baseForeground = oppositeHexColor(foregroundSample);
+      const animatedForeground = options.foreground?.({
+        x,
+        y,
+        targetX,
+        targetY,
+        char: markChar,
+        width: mark.width,
+        height: mark.height,
+        targetCell,
+        baseForeground,
+        sampledColor: foregroundSample,
+      }) ?? baseForeground;
+      const fg = opacity >= 0.995
+        ? animatedForeground
+        : mixHexColor(landingCellBackgroundColor(targetCell, tokens), animatedForeground, opacity);
+
+      surface.set(targetX, targetY, {
+        char: markChar,
+        fg,
+        modifiers: opacity < 0.38
+          ? DIM_MODIFIERS as string[]
+          : BOLD_MODIFIERS as string[],
+        empty: false,
+        opacity: 1,
+      }, LANDING_LOGO_OVERLAY_MASK);
     }
   }
+}
+
+function landingFlyingRobotsOpacity(timeMs: number): number {
+  if (timeMs <= LANDING_FLYING_ROBOTS_FADE_DELAY_MS) return 1;
+  return 1 - clamp01((timeMs - LANDING_FLYING_ROBOTS_FADE_DELAY_MS) / LANDING_FLYING_ROBOTS_FADE_DURATION_MS);
+}
+
+function landingBijouLogoLetterIndex(x: number, width: number): number {
+  const letterWidth = Math.max(1, width / LANDING_BIJOU_LOGO_LETTER_COUNT);
+  return Math.max(0, Math.min(LANDING_BIJOU_LOGO_LETTER_COUNT - 1, Math.floor(x / letterWidth)));
+}
+
+function landingBijouLogoWavePhase(timeMs: number, letterIndex: number): number {
+  return (timeMs * 0.004) + (letterIndex * 0.82);
+}
+
+function landingBijouLogoYOffset(x: number, width: number, timeMs: number): number {
+  const phase = landingBijouLogoWavePhase(timeMs, landingBijouLogoLetterIndex(x, width));
+  return Math.round(Math.sin(phase) * LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS);
+}
+
+function landingBijouLogoFillColor(
+  baseForeground: string,
+  tokens: LandingThemeTokens,
+  x: number,
+  width: number,
+  timeMs: number,
+): string {
+  const letterIndex = landingBijouLogoLetterIndex(x, width);
+  const phase = landingBijouLogoWavePhase(timeMs, letterIndex);
+  const local = width <= 1 ? 0 : x / (width - 1);
+  const wave = 0.5 + (Math.sin(phase + (local * Math.PI * 1.4)) * 0.5);
+  const logo = sampleColorRamp(tokens.logoRamp, clamp01(0.34 + (wave * 0.62)));
+  const wake = sampleColorRamp(tokens.waveRamp, clamp01(0.42 + ((1 - wave) * 0.36)));
+  return mixHexColor(baseForeground, mixHexColor(logo, wake, 0.22), 0.64);
 }
 
 function createWordmarkSurface(
   lines: readonly (readonly string[])[],
-  timeMs: number,
-  tokens: LandingThemeTokens,
 ): Surface {
   return createTransparentTextSurface(lines, {
-    bg: tokens.background,
-    fg: (x, y, char, totalWidth) => {
-      if (char === ' ') return undefined;
-      const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
-      const shimmer = 0.08 * Math.sin((timeMs / 1000) * 1.4 + (y * 0.55) + (x * 0.12));
-      const colorT = clamp01((xRatio * 0.82) + 0.1 + shimmer);
-      return sampleColorRamp(tokens.logoRamp, colorT);
-    },
     modifiers: (_x, _y, char) => char === ' ' ? undefined : BOLD_MODIFIERS,
+  });
+}
+
+function paintFlyingRobotsLogoOverlay(
+  surface: Surface,
+  mark: Surface,
+  top: number,
+  tokens: LandingThemeTokens,
+  timeMs: number,
+): void {
+  const left = Math.floor((surface.width - mark.width) / 2);
+  paintLandingLogoOverlay(surface, mark, left, top, tokens, {
+    foregroundSample: 'background-cell',
+    opacity: landingFlyingRobotsOpacity(timeMs),
+  });
+}
+
+function renderLandingPerfHudOverlay(
+  model: RootModel,
+  ctx: BijouContext,
+  i18n?: I18nRuntime,
+) {
+  return renderFramePerfHudOverlay({
+    columns: model.columns,
+    rows: model.rows,
+    frameTimeMs: model.docsModel.frameTimeMs,
+    viewTimeMs: model.docsModel.viewTimeMs,
+    diffTimeMs: model.docsModel.diffTimeMs,
+    refreshRate: ctx.runtime.refreshRate,
+  }, {
+    i18n,
+    ctx,
   });
 }
 
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
-}
-
-function densityFromChar(char: string): number {
-  switch (char) {
-    case '█':
-      return 1;
-    case '▓':
-      return 0.78;
-    case '▒':
-      return 0.56;
-    case '░':
-      return 0.32;
-    case '·':
-    case '.':
-      return 0.14;
-    default:
-      return 0;
-  }
-}
-
-function densityGlyph(level: number, options: { readonly airy: boolean }): string {
-  if (level <= 0.08) return ' ';
-  if (options.airy) {
-    if (level > 0.82) return '▓';
-    if (level > 0.58) return '▒';
-    if (level > 0.34) return '░';
-    return '·';
-  }
-  if (level > 0.84) return '█';
-  if (level > 0.66) return '▓';
-  if (level > 0.44) return '▒';
-  return '░';
-}
-
-function reinforceGlyph(source: string, shaderChar: string): string {
-  const sourceDensity = densityFromChar(source);
-  const shaderDensity = densityFromChar(shaderChar);
-  return shaderDensity >= sourceDensity ? shaderChar : densityGlyph(sourceDensity, { airy: false });
 }
 
 function clamp01(value: number): number {
@@ -2854,24 +3012,31 @@ function createLandingPromptSurface(
   const promptText = dogfoodText(localization, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
   const highlightStart = promptText.indexOf('[');
   const highlightEnd = promptText.indexOf(']');
+  const enterStart = highlightStart >= 0 && highlightEnd > highlightStart ? highlightStart + 1 : -1;
+  const enterEnd = highlightEnd > enterStart ? highlightEnd - 1 : -1;
   const time = timeMs / 1000;
 
   return createTransparentTextSurface(promptText, {
     bg: tokens.background,
     transparentSpaces: false,
     fg: (x) => {
-      const inHighlight = highlightStart >= 0
-        && highlightEnd >= highlightStart
-        && x >= highlightStart
-        && x <= highlightEnd;
-      if (!inHighlight) {
+      const inEnter = enterStart >= 0 && enterEnd >= enterStart && x >= enterStart && x <= enterEnd;
+      if (inEnter) {
+        const span = Math.max(1, enterEnd - enterStart);
+        const local = (x - enterStart) / span;
+        const sweep = 0.5 + (Math.sin((time * 5.2) + (local * Math.PI * 2.6)) * 0.5);
+        return sampleColorRamp(tokens.logoRamp, clamp01(0.42 + (local * 0.34) + (sweep * 0.22)));
+      }
+
+      if (x === highlightStart || x === highlightEnd) {
+        return sampleColorRamp(tokens.waveRamp, 0.76);
+      }
+
+      if (highlightStart < 0 || highlightEnd < highlightStart || x < highlightStart || x > highlightEnd) {
         return tokens.promptBodyColor;
       }
 
-      const span = Math.max(1, highlightEnd - highlightStart);
-      const local = (x - highlightStart) / span;
-      const shimmer = 0.5 + (Math.sin((time * 4.2) + (local * Math.PI * 2.2)) * 0.5);
-      return sampleColorRamp(tokens.logoRamp, clamp01(0.56 + (shimmer * 0.38)));
+      return tokens.promptAccentColor;
     },
     modifiers: (x) => {
       const inHighlight = highlightStart >= 0
@@ -2917,9 +3082,14 @@ function getLandingDogfoodPanel(
     'landing.dogfood.expansion',
     'Documentation Of Good Foundational Onboarding and Discovery',
   );
+  const releaseTitle = dogfoodText(
+    localization,
+    CURRENT_DOGFOOD_RELEASE_TITLE.titleKey,
+    CURRENT_DOGFOOD_RELEASE_TITLE.title,
+  );
   const renderedTitle = titleScreenBlock.render({
     config: {
-      title,
+      title: `${title} / ${releaseTitle}`,
       subtitle: expansion,
     },
     mode: 'interactive',
@@ -3111,6 +3281,22 @@ function rgbHex(r: number, g: number, b: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
+function mixHexColor(from: string, to: string, t: number): string {
+  const [fromR, fromG, fromB] = hexToRgb(from);
+  const [toR, toG, toB] = hexToRgb(to);
+  const mixT = clamp01(t);
+  return rgbHex(
+    Math.round(fromR + ((toR - fromR) * mixT)),
+    Math.round(fromG + ((toG - fromG) * mixT)),
+    Math.round(fromB + ((toB - fromB) * mixT)),
+  );
+}
+
+function oppositeHexColor(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  return rgbHex(255 - r, 255 - g, 255 - b);
+}
+
 function srgbChannelToLinear(channel: number): number {
   const normalized = channel / 255;
   return normalized <= 0.03928
@@ -3158,6 +3344,28 @@ function mod(value: number, divisor: number): number {
 
 function splitGlyphLines(text: string): readonly (readonly string[])[] {
   return text.split(/\r?\n/).map((lineText) => Array.from(lineText));
+}
+
+function fitGlyphLinesToWidth(
+  lines: readonly (readonly string[])[],
+  maxWidth: number,
+): readonly (readonly string[])[] {
+  const width = Math.max(0, ...lines.map((lineText) => lineText.length));
+  const targetWidth = Math.max(1, Math.min(width, Math.floor(maxWidth)));
+  if (width <= targetWidth) return lines;
+
+  return lines.map((lineText) => {
+    const fitted: string[] = [];
+    for (let x = 0; x < targetWidth; x++) {
+      const sourceX = Math.min(width - 1, Math.floor((x / targetWidth) * width));
+      fitted.push(lineText[sourceX] ?? ' ');
+    }
+    return fitted;
+  });
+}
+
+function transparentLogoGlyphs(lines: readonly (readonly string[])[]): readonly (readonly string[])[] {
+  return lines.map((lineText) => lineText.map((char) => char === BRAILLE_BLANK ? ' ' : char));
 }
 
 function createTransparentTextSurface(
@@ -3479,8 +3687,22 @@ function insetPaneSurface(content: Surface, width: number): Surface {
   return result;
 }
 
-function blitCentered(surface: Surface, content: Surface, y: number): void {
-  surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
+function blitCentered(
+  surface: Surface,
+  content: Surface,
+  y: number,
+  mask?: Parameters<Surface['blit']>[7],
+): void {
+  surface.blit(
+    content,
+    Math.floor((surface.width - content.width) / 2),
+    y,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    mask,
+  );
 }
 
 function renderFamiliesPane(
@@ -4817,11 +5039,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
               landingQuitConfirmOpen: true,
             }, []];
           }
-          if (shouldRouteLandingKeyIntoShell(msg)) {
-            return updateExplorer(msg, {
-              ...model,
-              route: 'docs',
-            });
+          if (shouldToggleLandingPerfHud(msg)) {
+            return updateExplorer(msg, model);
           }
           if (msg.key === 'left') {
             return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
@@ -4841,15 +5060,19 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
               return [applyLandingThemeSelection(syncShellThemeContext, model, themeIndex), []];
             }
           }
-          if (!msg.ctrl && !msg.alt) {
-            return [{ ...model, route: 'docs' }, []];
+          if (shouldContinueFromLanding(msg)) {
+            return [{
+              ...model,
+              route: 'docs',
+            }, []];
           }
         }
         return [model, []];
       }
 
       if (isKeyMsg(msg) || isMouseMsg(msg) || msg.type === 'pulse') {
-        return updateExplorer(msg, model);
+        const [nextModel, cmds] = updateExplorer(msg, model);
+        return [nextModel, cmds];
       }
 
       return [model, []];
@@ -4858,9 +5081,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     view(model) {
       if (model.route === 'landing') {
         const landing = renderLanding(model);
-        return model.landingQuitConfirmOpen
-          ? compositeSurface(landing, [renderShellQuitOverlay(model.columns, model.rows)])
-          : landing;
+        const overlays = [
+          ...(model.landingQuitConfirmOpen ? [renderShellQuitOverlay(model.columns, model.rows)] : []),
+          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, currentCtx, i18n)] : []),
+        ];
+        return overlays.length === 0
+          ? landing
+          : compositeSurface(landing, overlays, { dim: model.landingQuitConfirmOpen });
       }
       return explorer.view(model.docsModel);
     },
@@ -4870,6 +5097,68 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
       return routed === undefined ? undefined : { type: 'docs', msg: routed as ExplorerMsg };
     },
   };
+}
+
+function applyRootFrameTimingSnapshot(
+  model: RootModel,
+  snapshot: FrameTimingSnapshot,
+): RootModel {
+  const docsModel = model.docsModel;
+  if (
+    docsModel.frameTimeMs === snapshot.frameTimeMs
+    && docsModel.viewTimeMs === snapshot.viewTimeMs
+    && docsModel.diffTimeMs === snapshot.diffTimeMs
+    && docsModel.frameBudgetMs === snapshot.frameBudgetMs
+    && docsModel.frameOverBudget === snapshot.frameOverBudget
+  ) {
+    return model;
+  }
+
+  return {
+    ...model,
+    docsModel: {
+      ...docsModel,
+      frameTimeMs: snapshot.frameTimeMs,
+      viewTimeMs: snapshot.viewTimeMs,
+      diffTimeMs: snapshot.diffTimeMs,
+      frameBudgetMs: snapshot.frameBudgetMs,
+      frameOverBudget: snapshot.frameOverBudget,
+    },
+  };
+}
+
+function resolveRootFrameBudgetMs(ctx: BijouContext): number | undefined {
+  const refreshRate = ctx.runtime.refreshRate;
+  if (!Number.isFinite(refreshRate) || refreshRate <= 0) return undefined;
+  return 1_000 / refreshRate;
+}
+
+export async function runDocsApp(
+  ctx: BijouContext,
+  options: DocsAppOptions = {},
+  runOptions: RunOptions<RootMsg> = {},
+): Promise<void> {
+  const app = createDocsApp(ctx, options);
+  const runtimeCtx = runOptions.ctx ?? ctx;
+  const frameBudgetMs = resolveRootFrameBudgetMs(runtimeCtx);
+  let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
+  let needsTimingHydrationRender = true;
+
+  await runWithLifecycleHooks(app, {
+    ...runOptions,
+    ctx: runtimeCtx,
+  }, {
+    beforeRender(model) {
+      if (pendingTimingSnapshot == null) return model;
+      return applyRootFrameTimingSnapshot(model, pendingTimingSnapshot);
+    },
+    afterRender({ timings }: { timings: readonly RenderStageTiming[] }) {
+      pendingTimingSnapshot = summarizeFrameTimings(timings, frameBudgetMs);
+      if (!needsTimingHydrationRender) return;
+      needsTimingHydrationRender = false;
+      return { requestRender: true };
+    },
+  });
 }
 
 function slugify(value: string): string {

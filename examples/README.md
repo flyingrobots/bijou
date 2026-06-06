@@ -158,6 +158,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 | [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |
 | [`file-picker`](./file-picker/) | `filePickerSurface()`, `filePickerKeyMap()` | Directory browser with fixed header and viewport-backed entry list |
+| [`image-viewer`](./image-viewer/) | `filePickerSurface()`, `rasterToGlyphSurface()` | Browse supported image files and render them as Braille or ASCII glyph art |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |

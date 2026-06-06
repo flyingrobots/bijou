@@ -269,6 +269,26 @@ describe('render', () => {
     expect(output).toContain('F package.json');
   });
 
+  it('shows an app-selected entry marker when selectedIndex is provided', () => {
+    const io = createMockIO();
+    const state = createFilePickerState({ cwd: '/project', io });
+    const output = filePicker(state, { selectedIndex: 1 });
+
+    expect(output).toContain('\u25b8   d src/');
+    expect(output).toContain('  * - package.json');
+  });
+
+  it('uses a custom selected entry marker', () => {
+    const io = createMockIO();
+    const state = createFilePickerState({ cwd: '/project', io });
+    const output = filePicker(state, {
+      selectedIndex: 0,
+      selectedIndicator: '@',
+    });
+
+    expect(output).toContain('\u25b8 @ d src/');
+  });
+
   it('renders a surface with a fixed header and viewport body', () => {
     const io = createMockIO();
     const state = createFilePickerState({ cwd: '/project', io, height: 2 });

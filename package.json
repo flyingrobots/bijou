@@ -46,6 +46,8 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "img": "node --import tsx examples/image-viewer/main.ts",
+    "image-viewer": "node --import tsx examples/image-viewer/main.ts",
     "blocklab": "node --import tsx examples/docs/storybook.ts",
     "blocklab:index": "tsx examples/docs/storybook-workstation.ts",
     "storybook": "node --import tsx examples/docs/storybook.ts",
@@ -65,7 +67,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.8",
     "yaml": "^2.9.0"

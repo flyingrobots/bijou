@@ -13,6 +13,67 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the
   original `V7 Product Truth` treatment as historical release identity. This
   closes issue #289.
+- **Raster-to-glyph DOGFOOD title art** —
+  `@flyingrobots/bijou-tui` now exposes a deterministic raw-RGBA-to-`Surface`
+  renderer with charset, Braille, and quad modes, including custom density
+  character sets, centered `fit` crop semantics, and optional terminal
+  cell-aspect correction. DOGFOOD now paints a procedural stacked sine-wave
+  wake as the V7 landing background with wake colors in the cell background
+  channel, applies the committed `Bijou.svg` wordmark as a background-transparent
+  glyph mask in complementary colors, and renders the lower FlyingRobots wordmark
+  from `assets/flyingrobotslogo.txt`
+  while treating the asset's Braille blank cells as transparent. Visible
+  FlyingRobots cells now preserve the underlying cell background and paint their
+  foreground as the opposite of that preserved background, so modal dimming does
+  not leave colored logo-background patches behind; the FlyingRobots mark now
+  fades away after the first three seconds, the Bijou SVG letters ride a
+  staggered sine wave with animated fill color, the `Press [Enter]` prompt
+  emphasizes `Enter` with a foreground gradient, and pressing Enter hard-cuts
+  directly into the DOGFOOD docs while all other non-title keys stay on the title
+  screen. Existing landing quality buckets and lower-mode release facts are
+  preserved. This closes issue #303.
+- **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
+  side app with a `filePickerSurface()` sidebar and a main preview that renders
+  selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.
+  Users can hot-swap between Braille and ASCII glyph rendering with `m` or
+  `Tab`, pan the preview viewport with arrow keys, zoom with `+` / `-`, and
+  distinguish file-picker focus from the rendered image through `>` and `*`
+  row markers. The preview can now preserve sampled image colors, including
+  light samples as cell backgrounds instead of terminal-default bleed-through,
+  adjust Braille threshold and contrast, and enable deterministic ordered
+  dithering from the keyboard. This closes issue #305.
+
+### 🐛 Fixes
+
+- **Shell quit confirmation copy** — The shell quit confirmation modal now
+  renders `Y quit • N stay` only once by keeping the question in the modal body
+  and the controls in the modal hint/footer instead of duplicating the same
+  controls in both places.
+- **DOGFOOD title perf HUD key ownership** — Pressing backtick on the DOGFOOD
+  landing title screen now toggles the shell perf HUD in place instead of
+  entering the documentation shell. A second backtick dismisses the HUD while
+  staying on the title screen. The title screen now uses the same shell perf HUD
+  renderer as the documentation shell and hydrates root render timings so the
+  frame-time row reports the latest measured frame instead of staying at `0`.
+
+### 🛠 Maintenance
+
+- **Node 26 tsx deprecation cleanup** — The workspace now uses `tsx` 4.22.4
+  so `node --import tsx` prefers Node's `module.registerHooks()` path when
+  available instead of emitting the Node 26 `DEP0205` `module.register()`
+  deprecation warning. A toolchain regression test runs both the loader and CLI
+  paths with runtime deprecations promoted to failures.
+- **DOGFOOD Markdown localization ratchet** —
+  `npm run dogfood:i18n:debt` now counts missing localizations for Markdown
+  files read by DOGFOOD, honors optional `dogfood.localization` YAML
+  frontmatter for source locale, required locale scope, and explicit translated
+  file paths, and runs in both pre-push and CI beside the existing DOGFOOD i18n
+  completeness checks. DOGFOOD now strips Markdown frontmatter before rendering
+  prose so metadata does not leak into the reader.
+- **CI runner cost trim** — The focused Node 22 portable-unit lane now runs on
+  Ubuntu and Windows instead of macOS and Windows, keeping non-POSIX coverage
+  while avoiding the higher-cost macOS GitHub runner. macOS validation remains
+  a local maintainer-machine responsibility through the same root scripts.
 
 ## [7.0.0] - 2026-06-03
 

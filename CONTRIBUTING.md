@@ -52,8 +52,10 @@ local commands. `npm run clean`, `npm run build`, `npm test`, and
 `npm run typecheck:test` are expected to work on macOS, Linux, and Windows with
 a supported Node.js version.
 
-CI keeps the full Node-version matrix on Ubuntu and adds a focused Node 22
-build/typecheck/unit-test lane on macOS and Windows. Interactive terminal
+CI keeps the full Node-version matrix on Ubuntu and adds focused Node 22
+build/typecheck/unit-test lanes on Ubuntu and Windows. Maintainers with macOS
+development machines cover macOS locally through the same root scripts before
+push or merge when host-specific behavior matters. Interactive terminal
 smokes, release publishing, and benchmark artifact jobs can remain
 Linux-hosted when they depend on terminal capture tooling, trusted shell
 wrappers, or registry workflow behavior.
