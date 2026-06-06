@@ -41,10 +41,11 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
     expect(roadmap).toContain('`Beyond`');
-    expect(roadmap).toContain('29 | 1');
+    expect(roadmap).toContain('30 | 1');
     expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
+    expect(roadmap).toContain('Design Tokens And Theme Modes');
     expect(roadmap).toContain('Workflow And CI Determinism');
     expect(roadmap).toContain('Localization And Documentation Operations');
     expect(roadmap).toContain('[#306]');
