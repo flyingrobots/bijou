@@ -58,6 +58,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🛠 Maintenance
 
+- **Node 26 tsx deprecation cleanup** — The workspace now uses `tsx` 4.22.4
+  so `node --import tsx` prefers Node's `module.registerHooks()` path when
+  available instead of emitting the Node 26 `DEP0205` `module.register()`
+  deprecation warning. A toolchain regression test runs both the loader and CLI
+  paths with runtime deprecations promoted to failures.
 - **DOGFOOD Markdown localization ratchet** —
   `npm run dogfood:i18n:debt` now counts missing localizations for Markdown
   files read by DOGFOOD, honors optional `dogfood.localization` YAML
