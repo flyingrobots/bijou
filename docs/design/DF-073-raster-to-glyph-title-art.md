@@ -100,9 +100,9 @@ continues into the DOGFOOD documentation shell; backtick toggles the perf HUD in
 place, `Esc` / `q` use the shell quit policy, arrows and number keys adjust
 landing presentation, and other keys do not secretly route into docs. Pressing
 `Enter` switches the model to the docs route immediately, then a short
-foreground-safe wake transition recedes along the frame edges while the first
-docs frames settle. The transition never paints wake residue into the interior
-docs body because that reads as corrupted document content.
+foreground-only density-ramp transition recedes along the frame edges while the
+first docs frames settle. The transition never paints raster residue into the
+interior docs body because that reads as corrupted document content.
 
 ```text
 +------------------------------------------------------------------------------+

@@ -645,10 +645,12 @@ const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
 const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
 const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 const LANDING_ROUTE_TRANSITION_DURATION_MS = 520;
+const LANDING_ROUTE_TRANSITION_DENSITY = 'Ñ@#W$9876543210?!abc;:+=-,._ ';
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
 const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
+const LANDING_TRANSITION_TEXT_MASK = { char: true, fg: true, modifiers: true, alpha: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -2794,19 +2796,33 @@ function renderLandingExitTransition(landing: Surface, docs: Surface, transition
       if ((output.get(x, y).char ?? ' ') !== ' ') continue;
       if (!isDocsTransitionBlank(output, x, y)) continue;
 
-      const landingCell = landing.get(x, y);
-      if (!isLandingWakeTransitionCell(landingCell)) continue;
+      const char = landingTransitionDensityChar(x, y, width, Math.floor(transitionMs / 33));
+      if (char === ' ') continue;
 
+      const landingCell = landing.get(x, y);
+      const docsCell = output.get(x, y);
+      const sourceColor = colorHex(landingCell.fg) ?? colorHex(landingCell.bg) ?? '#5f87c8';
+      const targetColor = colorHex(docsCell.bg) ?? '#18172b';
       output.set(x, y, {
-        ...landingCell,
+        char,
+        fg: mixHexColor(sourceColor, targetColor, Math.min(0.7, eased * 0.75)),
         modifiers: progress > 0.4
-          ? Array.from(new Set([...(landingCell.modifiers ?? []), 'dim']))
+          ? DIM_MODIFIERS as string[]
           : landingCell.modifiers,
-      });
+        empty: false,
+        opacity: 1,
+      }, LANDING_TRANSITION_TEXT_MASK);
     }
   }
 
   return output;
+}
+
+function landingTransitionDensityChar(x: number, y: number, width: number, frame: number): string {
+  const chars = Array.from(LANDING_ROUTE_TRANSITION_DENSITY);
+  const sign = (y % 2) * 2 - 1;
+  const index = positiveModulo(width + y + (x * sign) + frame, chars.length);
+  return chars[index] ?? ' ';
 }
 
 function isDocsTransitionBlank(surface: Surface, x: number, y: number): boolean {
@@ -2817,14 +2833,6 @@ function isDocsTransitionBlank(surface: Surface, x: number, y: number): boolean 
     }
   }
   return true;
-}
-
-function isLandingWakeTransitionCell(cell: Cell): boolean {
-  const char = cell.char ?? ' ';
-  if (char === ' ' || !(LANDING_WAKE_CHARS as readonly string[]).includes(char)) return false;
-  const fg = colorHex(cell.fg);
-  const bg = colorHex(cell.bg);
-  return fg != null && bg != null && fg === bg;
 }
 
 function renderLandingPerfHudOverlay(
@@ -2852,6 +2860,10 @@ function paragraphSurface(text: string, width: number): Surface {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+function positiveModulo(value: number, divisor: number): number {
+  return ((value % divisor) + divisor) % divisor;
 }
 
 function easeOutCubic(value: number): number {
