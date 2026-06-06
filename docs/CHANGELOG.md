@@ -45,6 +45,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Shell quit confirmation copy** — The shell quit confirmation modal now
+  renders `Y quit • N stay` only once by keeping the question in the modal body
+  and the controls in the modal hint/footer instead of duplicating the same
+  controls in both places.
 - **DOGFOOD title perf HUD key ownership** — Pressing backtick on the DOGFOOD
   landing title screen now toggles the shell perf HUD in place instead of
   entering the documentation shell. A second backtick dismisses the HUD while

@@ -39,7 +39,7 @@ export function renderShellQuitOverlay(
   ctx?: BijouContext,
 ): Overlay {
   const title = frameMessage(i18n, 'quit.title', 'Quit?');
-  const bodyText = frameMessage(i18n, 'quit.body', 'Quit this app?\n\nY quit • N stay');
+  const bodyText = frameMessage(i18n, 'quit.body', 'Quit this app?');
   const hint = frameMessage(i18n, 'quit.footer', 'Y quit • N stay');
   return modal({
     title,
