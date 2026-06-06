@@ -12,6 +12,7 @@ body:
 
         Labels are canonical tracker metadata. If you want a lane or legend other than inbox triage,
         request it below; a maintainer or agent must apply the actual label.
+        Goalpost and user-story roles also have query labels for roadmap planning.
 
         Implementation work must name software behavior proof. Documentation-only proof is
         acceptable only for documentation or process work.
@@ -24,6 +25,51 @@ body:
         Suggested lane:
         Suggested legend:
         Suggested priority:
+    validations:
+      required: false
+  - type: dropdown
+    id: roadmap-role
+    attributes:
+      label: Roadmap role
+      description: Classify this card in the roadmap hierarchy.
+      options:
+        - Ordinary work item
+        - Goalpost umbrella
+        - User story
+        - Release gate
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: roadmap-linkage
+    attributes:
+      label: Roadmap linkage
+      description: Link the release packet, goalpost, umbrella issue, or child user-story issues when applicable.
+      placeholder: |
+        Versioned release:
+        Goalpost:
+        Umbrella issue:
+        Child user-story issues:
+    validations:
+      required: false
+  - type: input
+    id: slice-budget
+    attributes:
+      label: Slice budget
+      description: Estimate the smallest useful reviewable increments for this card. Use 1 for tiny one-slice work.
+      placeholder: "6"
+    validations:
+      required: false
+  - type: textarea
+    id: release-gate
+    attributes:
+      label: Release gate impact
+      description: State the release gate this work creates, changes, satisfies, or does not affect.
+      placeholder: |
+        This work affects the release gate by ...
+
+        If not applicable:
+        This work is not release-gated because ...
     validations:
       required: false
   - type: textarea
@@ -280,7 +326,7 @@ body:
         - [ ] Lower modes are covered, if relevant.
         - [ ] New visible strings include supported translations, if relevant.
         - [ ] DOGFOOD/docs/changelog are updated, if behavior or direction changed.
-        - [ ] Issue, design doc, and draft PR are linked correctly.
+        - [ ] Issue, design doc, and non-draft PR are linked correctly.
         - [ ] CI and local validation are green.
     validations:
       required: true

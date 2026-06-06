@@ -19,10 +19,10 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 - Create a new `cycle/<cycle_name>` branch for the cycle.
 - Create or update the GitHub Issue and write the cycle design document before
   implementation. Stage and commit the shaping artifact, push the branch, open
-  a draft pull request to `main`, link the issue, design doc, and draft PR, and
+  a non-draft pull request to `main`, link the issue, design doc, and PR, and
   apply `work-in-progress` to the GitHub Issue.
-- Draft PRs are expected at cycle start. Mark the PR ready for review only
-  after implementation, validation, and self-review are complete.
+- PRs are non-draft at cycle start. Request final review only after
+  implementation, validation, and self-review are complete.
 
 ## Documentation & Planning Map
 

@@ -23,7 +23,7 @@ describe('WF-126 v7 closeout tracker sync', () => {
     const completedLineage = sectionBetween(v7, '### Completed Lineage', '### Component-Family Audits');
 
     expect(roadmap).toContain('| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 |');
-    expect(openWork).toContain('No open v7 tracker issues remain as of 2026-06-03.');
+    expect(openWork).toContain('No open v7 tracker issues remain as of 2026-06-06.');
     expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
     expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/246');
     expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/281');
