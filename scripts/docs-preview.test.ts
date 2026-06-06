@@ -47,8 +47,6 @@ const V7_DEFAULT_BACKGROUND = '#18172b';
 const V7_DEFAULT_WAVE_GRADIENT = ['#2f3f66', '#5f87c8', '#f2c96b'] as const;
 const V7_LANDING_COLOR_RAMP_SIZE = 256;
 const V7_LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
-const V7_LANDING_TRANSITION_DENSITY = 'Ñ@#W$9876543210?!abc;:+=-,._ ';
-const V7_LANDING_TRANSITION_DENSITY_GLYPHS = new Set(Array.from(V7_LANDING_TRANSITION_DENSITY.trimEnd()));
 const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
   { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
@@ -149,20 +147,6 @@ function expectedLandingWakeColorAt(x: number, y: number, width: number, height:
 
 function titleBackgroundGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
-}
-
-function isTransitionNeighborhoodBlank(
-  frame: { width: number; height: number; get(x: number, y: number): { char?: string } },
-  x: number,
-  y: number,
-): boolean {
-  for (let row = Math.max(0, y - 1); row <= Math.min(frame.height - 1, y + 1); row++) {
-    for (let col = Math.max(0, x - 3); col <= Math.min(frame.width - 1, x + 3); col++) {
-      if (col === x && row === y) continue;
-      if ((frame.get(col, row).char ?? ' ') !== ' ') return false;
-    }
-  }
-  return true;
 }
 
 function stackedWakeRowCount(frame: {
@@ -448,44 +432,13 @@ describe('docs preview app', () => {
 
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     expect((entered.model as any).route).toBe('docs');
-    expect((entered.model as any).landingTransitionMs).toBe(0);
+    expect((entered.model as any).landingTransitionMs).toBeUndefined();
     const enteredFrame = entered.frames.at(-1)!;
-    const pulsed = await runScript(app, [{ key: KEY_ENTER }, { pulse: { dt: 0.12 } }], { ctx });
-    const pulsedFrame = pulsed.frames.at(-1)!;
-    let edgeDensityCells = 0;
-    let interiorDensityCells = 0;
-    let edgeWakeCells = 0;
-    for (const frame of [enteredFrame, pulsedFrame]) {
-      for (let y = 0; y < frame.height; y++) {
-        for (let x = 0; x < frame.width; x++) {
-          const cell = frame.get(x, y);
-          const char = cell.char ?? ' ';
-          const edgeDistance = Math.min(x, y, frame.width - 1 - x, frame.height - 1 - y);
-          if (
-            V7_RASTER_TITLE_GLYPHS.has(char)
-            && colorHex(cell.fg) === colorHex(cell.bg)
-            && isTransitionNeighborhoodBlank(frame, x, y)
-          ) {
-            edgeWakeCells++;
-          }
-          if (!V7_LANDING_TRANSITION_DENSITY_GLYPHS.has(char)) continue;
-          if (!isTransitionNeighborhoodBlank(frame, x, y)) continue;
-          if (edgeDistance < 6) {
-            edgeDensityCells++;
-          } else {
-            interiorDensityCells++;
-          }
-        }
-      }
-    }
-    expect(edgeDensityCells).toBeGreaterThan(0);
-    expect(interiorDensityCells).toBe(0);
-    expect(edgeWakeCells).toBe(0);
-    expect(serializeFrame(enteredFrame)).not.toEqual(serializeFrame(pulsedFrame));
-
-    const transitioned = await runScript(app, [{ key: KEY_ENTER }, { pulse: { dt: 0.6 } }], { ctx });
-    expect((transitioned.model as any).route).toBe('docs');
-    expect((transitioned.model as any).landingTransitionMs).toBeUndefined();
+    const enteredText = frameText(enteredFrame);
+    expect(enteredText).toContain('Bijou Docs');
+    expect(enteredText).toContain('Start Here');
+    expect(enteredText).not.toContain('Press [Enter]');
+    expect(enteredText).not.toContain('V7 Launch Wake');
   });
 
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
@@ -1639,7 +1592,7 @@ describe('docs preview app', () => {
 
     [model] = app.update(parseKey(KEY_ENTER) as any, model);
     expect((model as any).route).toBe('docs');
-    expect((model as any).landingTransitionMs).toBe(0);
+    expect((model as any).landingTransitionMs).toBeUndefined();
     expect((model as any).docsModel.quitConfirmOpen).toBe(false);
   });
 

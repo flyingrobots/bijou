@@ -28,10 +28,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   not leave colored logo-background patches behind; the FlyingRobots mark now
   fades away after the first three seconds, the Bijou SVG letters ride a
   staggered sine wave with animated fill color, the `Press [Enter]` prompt
-  emphasizes `Enter` with a foreground gradient, and pressing Enter starts a
-  short edge-only density-ramp transition while all other non-title keys stay on
-  the title screen. Existing landing quality buckets and lower-mode release facts
-  are preserved. This closes issue #303.
+  emphasizes `Enter` with a foreground gradient, and pressing Enter hard-cuts
+  directly into the DOGFOOD docs while all other non-title keys stay on the title
+  screen. Existing landing quality buckets and lower-mode release facts are
+  preserved. This closes issue #303.
 - **Image-to-glyph side app** — `npm run img` / `npm run image-viewer` opens a runnable
   side app with a `filePickerSurface()` sidebar and a main preview that renders
   selected SVG, PNG, and PPM/PNM image files through `rasterToGlyphSurface()`.

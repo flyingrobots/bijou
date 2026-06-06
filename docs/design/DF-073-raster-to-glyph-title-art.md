@@ -99,10 +99,9 @@ The title screen owns only title-screen controls. `Enter` is the only key that
 continues into the DOGFOOD documentation shell; backtick toggles the perf HUD in
 place, `Esc` / `q` use the shell quit policy, arrows and number keys adjust
 landing presentation, and other keys do not secretly route into docs. Pressing
-`Enter` switches the model to the docs route immediately, then a short
-foreground-only density-ramp transition recedes along the frame edges while the
-first docs frames settle. The transition never paints raster residue into the
-interior docs body because that reads as corrupted document content.
+`Enter` switches the model directly to the docs route without a title-to-docs
+transition. That hard cut keeps the first documentation frame legible instead of
+briefly painting decorative raster residue over product content.
 
 ```text
 +------------------------------------------------------------------------------+
@@ -228,8 +227,6 @@ instead of looking vertically stretched.
   replacing the underlying backgrounds.
 - DOGFOOD derives the Bijou logo row offsets, fill colors, FlyingRobots fade,
   and prompt gradient from quantized landing pulse time.
-- DOGFOOD starts the docs transition from explicit Enter input and advances it
-  through deterministic pulse deltas.
 - Target dimensions are bounded by landing quality profiles before rendering.
 - Cache keys include viewport, theme, quality, quantized time, and FPS badge
   state, preserving the existing landing frame cache behavior.
@@ -283,7 +280,8 @@ Agents should be able to prove the slice by checking:
   a staggered sine-wave row offset and animated fill color.
 - RED: the `Press [Enter]` prompt does not draw attention to `Enter` with a
   gradient foreground.
-- RED: pressing Enter hard-cuts to docs with no title-to-docs transition state.
+- RED: pressing Enter leaves any title-to-docs transition state or decorative
+  transition artifact instead of hard-cutting to docs.
 
 ## Validation
 

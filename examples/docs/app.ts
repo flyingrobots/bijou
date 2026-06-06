@@ -74,7 +74,6 @@ import {
   type RunOptions,
 } from '../../packages/bijou-tui/src/index.js';
 import { runWithLifecycleHooks } from '../../packages/bijou-tui/src/runtime.js';
-import { normalizeViewOutput } from '../../packages/bijou-tui/src/view-output.js';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
@@ -341,7 +340,6 @@ interface RootModel {
   readonly rows: number;
   readonly landingTimeMs: number;
   readonly landingFps: number;
-  readonly landingTransitionMs?: number;
   readonly landingThemeIndex: number;
   readonly landingToast?: LandingToastState;
   readonly landingQuitConfirmOpen: boolean;
@@ -644,13 +642,10 @@ const LANDING_FLYING_ROBOTS_FADE_DELAY_MS = 3000;
 const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
 const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
 const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
-const LANDING_ROUTE_TRANSITION_DURATION_MS = 520;
-const LANDING_ROUTE_TRANSITION_DENSITY = 'Ñ@#W$9876543210?!abc;:+=-,._ ';
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const BRAILLE_BLANK = '\u2800';
 const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
-const LANDING_TRANSITION_TEXT_MASK = { char: true, fg: true, modifiers: true, alpha: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerControls: Surface;
@@ -2776,65 +2771,6 @@ function paintFlyingRobotsLogoOverlay(
   });
 }
 
-function renderLandingExitTransition(landing: Surface, docs: Surface, transitionMs: number): Surface {
-  const progress = clamp01(transitionMs / LANDING_ROUTE_TRANSITION_DURATION_MS);
-  if (progress >= 1) return docs;
-
-  const output = createSurface(docs.width, docs.height);
-  output.blit(docs, 0, 0);
-  const eased = easeOutCubic(progress);
-  const width = Math.min(landing.width, docs.width);
-  const height = Math.min(landing.height, docs.height);
-  const maxBand = Math.max(1, Math.min(6, Math.floor(Math.min(width, height) * 0.08)));
-  const band = Math.max(0, Math.ceil(maxBand * (1 - eased)));
-  if (band <= 0) return docs;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const edgeDistance = Math.min(x, y, width - 1 - x, height - 1 - y);
-      if (edgeDistance >= band) continue;
-      if ((output.get(x, y).char ?? ' ') !== ' ') continue;
-      if (!isDocsTransitionBlank(output, x, y)) continue;
-
-      const char = landingTransitionDensityChar(x, y, width, Math.floor(transitionMs / 33));
-      if (char === ' ') continue;
-
-      const landingCell = landing.get(x, y);
-      const docsCell = output.get(x, y);
-      const sourceColor = colorHex(landingCell.fg) ?? colorHex(landingCell.bg) ?? '#5f87c8';
-      const targetColor = colorHex(docsCell.bg) ?? '#18172b';
-      output.set(x, y, {
-        char,
-        fg: mixHexColor(sourceColor, targetColor, Math.min(0.7, eased * 0.75)),
-        modifiers: progress > 0.4
-          ? DIM_MODIFIERS as string[]
-          : landingCell.modifiers,
-        empty: false,
-        opacity: 1,
-      }, LANDING_TRANSITION_TEXT_MASK);
-    }
-  }
-
-  return output;
-}
-
-function landingTransitionDensityChar(x: number, y: number, width: number, frame: number): string {
-  const chars = Array.from(LANDING_ROUTE_TRANSITION_DENSITY);
-  const sign = (y % 2) * 2 - 1;
-  const index = positiveModulo(width + y + (x * sign) + frame, chars.length);
-  return chars[index] ?? ' ';
-}
-
-function isDocsTransitionBlank(surface: Surface, x: number, y: number): boolean {
-  for (let row = Math.max(0, y - 1); row <= Math.min(surface.height - 1, y + 1); row++) {
-    for (let col = Math.max(0, x - 3); col <= Math.min(surface.width - 1, x + 3); col++) {
-      if (col === x && row === y) continue;
-      if ((surface.get(col, row).char ?? ' ') !== ' ') return false;
-    }
-  }
-  return true;
-}
-
 function renderLandingPerfHudOverlay(
   model: RootModel,
   ctx: BijouContext,
@@ -2860,39 +2796,6 @@ function paragraphSurface(text: string, width: number): Surface {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
-}
-
-function positiveModulo(value: number, divisor: number): number {
-  return ((value % divisor) + divisor) % divisor;
-}
-
-function easeOutCubic(value: number): number {
-  const t = clamp01(value);
-  return 1 - ((1 - t) ** 3);
-}
-
-function advanceLandingTransition(model: RootModel, dt: number): RootModel {
-  if (model.landingTransitionMs == null) return model;
-  const nextTransitionMs = model.landingTransitionMs + Math.max(0, Math.round(dt * 1000));
-  if (nextTransitionMs >= LANDING_ROUTE_TRANSITION_DURATION_MS) {
-    return {
-      ...model,
-      landingTransitionMs: undefined,
-    };
-  }
-  return {
-    ...model,
-    landingTransitionMs: nextTransitionMs,
-  };
-}
-
-function clearLandingTransition(model: RootModel): RootModel {
-  return model.landingTransitionMs == null
-    ? model
-    : {
-        ...model,
-        landingTransitionMs: undefined,
-      };
 }
 
 function resolveLandingQuality(width: number, height: number, mode: LandingQualityMode = 'auto'): LandingQualityProfile {
@@ -5067,7 +4970,6 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
-        landingTransitionMs: undefined,
         landingThemeIndex: resolveLandingThemeIndexForShellThemeId(syncedDocsModel.activeShellThemeId),
         landingToast: undefined,
         landingQuitConfirmOpen: false,
@@ -5151,7 +5053,6 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
             return [{
               ...model,
               route: 'docs',
-              landingTransitionMs: 0,
             }, []];
           }
         }
@@ -5160,9 +5061,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
 
       if (isKeyMsg(msg) || isMouseMsg(msg) || msg.type === 'pulse') {
         const [nextModel, cmds] = updateExplorer(msg, model);
-        return msg.type === 'pulse'
-          ? [advanceLandingTransition(nextModel, msg.dt), cmds]
-          : [clearLandingTransition(nextModel), cmds];
+        return [nextModel, cmds];
       }
 
       return [model, []];
@@ -5179,19 +5078,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           ? landing
           : compositeSurface(landing, overlays, { dim: model.landingQuitConfirmOpen });
       }
-      const docs = explorer.view(model.docsModel);
-      if (model.landingTransitionMs != null) {
-        const docsSurface = normalizeViewOutput(docs, {
-          width: model.columns,
-          height: model.rows,
-        }).surface;
-        return renderLandingExitTransition(renderLanding({
-          ...model,
-          route: 'landing',
-          landingQuitConfirmOpen: false,
-        }), docsSurface, model.landingTransitionMs);
-      }
-      return docs;
+      return explorer.view(model.docsModel);
     },
 
     routeRuntimeIssue(issue) {
