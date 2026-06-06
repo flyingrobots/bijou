@@ -58,6 +58,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🛠 Maintenance
 
+- **Design token and theme builder planning** —
+  `docs/design/DL-013-design-token-theme-builder-api.md` now specifies the
+  first official fluent-builder shape for semantic color tokens, dark/light
+  theme modes, token-backed style rendering, lower-mode color resolution, and
+  inspectability facts. `docs/ROADMAP.md` now tracks issue #308 as the Beyond
+  candidate goalpost for Design Tokens And Theme Modes.
 - **Roadmap goalpost policy** — `docs/method/releases/README.md` now defines
   Bijou release packets, versioned releases, goalposts, umbrella issues,
   user-story issues, slice budgets, release gates, proof policy, and authority
