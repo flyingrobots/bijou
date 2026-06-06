@@ -11,13 +11,15 @@ describe('git hooks', () => {
     const hook = readFileSync(resolve(ROOT, 'scripts/hooks/pre-push'), 'utf8');
     const i18nCompleteIndex = hook.indexOf('npm run dogfood:i18n:complete');
     const i18nCheckIndex = hook.indexOf('npm run dogfood:i18n:check');
+    const i18nDebtIndex = hook.indexOf('npm run dogfood:i18n:debt');
     const typecheckIndex = hook.indexOf('npm run typecheck:test');
     const testIndex = hook.indexOf('npm test');
     const interactiveSmokeIndex = hook.indexOf('npm run verify:interactive-examples');
 
     expect(i18nCompleteIndex).toBeGreaterThanOrEqual(0);
     expect(i18nCheckIndex).toBeGreaterThan(i18nCompleteIndex);
-    expect(typecheckIndex).toBeGreaterThan(i18nCheckIndex);
+    expect(i18nDebtIndex).toBeGreaterThan(i18nCheckIndex);
+    expect(typecheckIndex).toBeGreaterThan(i18nDebtIndex);
     expect(typecheckIndex).toBeGreaterThanOrEqual(0);
     expect(testIndex).toBeGreaterThan(typecheckIndex);
     expect(interactiveSmokeIndex).toBeGreaterThan(testIndex);
@@ -32,5 +34,6 @@ describe('git hooks', () => {
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base FETCH_HEAD');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
+    expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:debt');
   });
 });

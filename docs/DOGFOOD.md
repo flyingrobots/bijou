@@ -21,9 +21,33 @@ To inspect and enforce the current source-level localization debt:
 npm run dogfood:i18n:debt
 ```
 
-That report counts remaining localizable DOGFOOD UI strings by source surface.
-It is a source inventory, not a rendered-output scraper, so ids, paths, and
-catalog-backed fallback calls stay separate from visible raw copy.
+That report counts remaining localizable DOGFOOD UI strings by source surface
+and missing DOGFOOD Markdown localizations by locale. It is a source inventory,
+not a rendered-output scraper, so ids, paths, and catalog-backed fallback calls
+stay separate from visible raw copy.
+
+DOGFOOD Markdown files can declare localization metadata in YAML frontmatter:
+
+```yaml
+---
+dogfood:
+  localization:
+    sourceLocale: en
+    locales: [fr, es, de]
+    localized:
+      fr: ./guide.fr.md
+      es:
+        path: ./es/guide.md
+---
+```
+
+If a DOGFOOD Markdown file omits that frontmatter, the ratchet assumes the
+source locale is English and expects every supported non-English locale. It
+looks for conventional sibling files such as `guide.fr.md` and locale-directory
+files such as `fr/guide.md`. `localized.<locale>` paths are resolved relative
+to the source Markdown file before those conventional fallbacks are checked.
+The DOGFOOD Markdown loader strips frontmatter before rendering prose, so
+metadata can live beside the source document without leaking into the reader.
 
 DOGFOOD's catalog source is a committed CSV string table:
 
@@ -115,8 +139,8 @@ reconstructing product truth from adjacent rendering code.
 - **Locale Preference**: The Settings drawer can switch DOGFOOD's preferred
   language after startup, while startup itself uses the host locale adapter.
 - **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining
-  localizable source strings by DOGFOOD surface and fails when the baseline
-  increases.
+  localizable source strings by DOGFOOD surface plus missing Markdown
+  localizations by locale, and fails when either baseline increases.
 - **Localization Completeness Gate**: `npm run dogfood:i18n:complete` requires
   every newly added or source-changed DOGFOOD string to carry current values for
   all supported locales before pre-push or CI can pass.

@@ -9,7 +9,12 @@ import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
 } from '../tests/helpers/scripted.js';
-import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
+import {
+  createDocsApp,
+  DOGFOOD_I18N_CATALOG,
+  FRAME_I18N_CATALOG,
+  stripMarkdownFrontmatter,
+} from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';
 import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from '../examples/docs/svg-raster.js';
@@ -408,6 +413,24 @@ describe('docs preview app', () => {
         stdio: 'pipe',
       },
     );
+  });
+
+  it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
+    expect(stripMarkdownFrontmatter([
+      '---',
+      'dogfood:',
+      '  localization:',
+      '    sourceLocale: en',
+      '---',
+      '# Start Here',
+      '',
+      'Visible guide body.',
+    ].join('\n'))).toBe([
+      '# Start Here',
+      '',
+      'Visible guide body.',
+    ].join('\n'));
+    expect(stripMarkdownFrontmatter('# Plain guide')).toBe('# Plain guide');
   });
 
   it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {

@@ -101,6 +101,7 @@ jobs:
             npm run dogfood:i18n:complete -- --base HEAD^
           fi
           npm run dogfood:i18n:check
+          npm run dogfood:i18n:debt
       - run: npm test
       - name: Smoke interactive examples
         if: matrix.node-version == 22

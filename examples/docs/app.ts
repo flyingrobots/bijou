@@ -989,7 +989,7 @@ function shouldContinueFromLanding(msg: KeyMsg): boolean {
 }
 
 function readMarkdownDoc(path: string): string {
-  return readFileSync(new URL(path, import.meta.url), 'utf8').trim();
+  return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
 }
 
 function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
@@ -997,6 +997,17 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
   const lines = content.split('\n');
   const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
+}
+
+export function stripMarkdownFrontmatter(markdownText: string): string {
+  const withoutBom = markdownText.replace(/^\uFEFF/, '');
+  const opening = withoutBom.match(/^---\r?\n/);
+  if (opening == null) return markdownText;
+  const bodyStart = opening[0].length;
+  const body = withoutBom.slice(bodyStart);
+  const closingMatch = body.match(/\r?\n---[ \t]*(?:\r?\n|$)/);
+  if (closingMatch == null || closingMatch.index == null) return markdownText;
+  return body.slice(closingMatch.index + closingMatch[0].length);
 }
 
 function countMarkdownHeadings(markdownText: string): number {

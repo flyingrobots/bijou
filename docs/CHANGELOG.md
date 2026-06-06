@@ -58,6 +58,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🛠 Maintenance
 
+- **DOGFOOD Markdown localization ratchet** —
+  `npm run dogfood:i18n:debt` now counts missing localizations for Markdown
+  files read by DOGFOOD, honors optional `dogfood.localization` YAML
+  frontmatter for source locale, required locale scope, and explicit translated
+  file paths, and runs in both pre-push and CI beside the existing DOGFOOD i18n
+  completeness checks. DOGFOOD now strips Markdown frontmatter before rendering
+  prose so metadata does not leak into the reader.
 - **CI runner cost trim** — The focused Node 22 portable-unit lane now runs on
   Ubuntu and Windows instead of macOS and Windows, keeping non-POSIX coverage
   while avoiding the higher-cost macOS GitHub runner. macOS validation remains

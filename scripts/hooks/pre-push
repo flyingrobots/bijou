@@ -35,6 +35,9 @@ npm run dogfood:i18n:complete
 echo "pre-push: checking generated DOGFOOD i18n catalogs"
 npm run dogfood:i18n:check
 
+echo "pre-push: running DOGFOOD i18n debt ratchet"
+npm run dogfood:i18n:debt
+
 # ---------------------------------------------------------------------------
 # Typecheck gate
 # ---------------------------------------------------------------------------

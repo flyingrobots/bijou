@@ -1,5 +1,8 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { posix as posixPath } from 'node:path';
 import ts from 'typescript';
+import { parse as parseYaml } from 'yaml';
+import { DEFAULT_LOCALE, DOGFOOD_LOCALE_OPTIONS } from './locale.js';
 
 export interface DogfoodI18nDebtSource {
   readonly surface: string;
@@ -38,6 +41,55 @@ export interface DogfoodI18nDebtRatchetResult {
   readonly violations: readonly string[];
 }
 
+export interface DogfoodMarkdownLocalizationDocument {
+  readonly surface: string;
+  readonly path: string;
+  readonly line: number;
+  readonly column: number;
+  readonly reader: 'readMarkdownDoc' | 'readMarkdownDocExcerpt';
+}
+
+export interface DogfoodMarkdownLocalizationEntry {
+  readonly surface: string;
+  readonly path: string;
+  readonly locale: string;
+  readonly line: number;
+  readonly column: number;
+  readonly candidates: readonly string[];
+}
+
+export interface DogfoodMarkdownLocalizationLocaleCount {
+  readonly locale: string;
+  readonly count: number;
+}
+
+export interface DogfoodMarkdownLocalizationInventory {
+  readonly documents: readonly DogfoodMarkdownLocalizationDocument[];
+  readonly entries: readonly DogfoodMarkdownLocalizationEntry[];
+  readonly byLocale: readonly DogfoodMarkdownLocalizationLocaleCount[];
+  readonly total: number;
+}
+
+export interface DogfoodMarkdownLocalizationBaseline {
+  readonly total: number;
+  readonly byLocale: Readonly<Record<string, number>>;
+}
+
+export interface DogfoodMarkdownLocalizationRatchetResult {
+  readonly ok: boolean;
+  readonly total: number;
+  readonly baseline: DogfoodMarkdownLocalizationBaseline;
+  readonly violations: readonly string[];
+}
+
+interface DogfoodMarkdownLocalizationSpec {
+  readonly sourceLocale?: string;
+  readonly locales?: readonly string[];
+  readonly localizedPaths: Readonly<Record<string, string>>;
+}
+
+type DogfoodMarkdownFileReader = (path: string) => string;
+
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = Object.freeze([
   { surface: 'docs-app', path: 'examples/docs/app.ts' },
   { surface: 'dogfood-locale', path: 'examples/docs/locale.ts' },
@@ -55,6 +107,15 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'dogfood-locale': 12,
     'storybook-app': 37,
     'storybook-workstation': 7,
+  }),
+});
+
+export const DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE: DogfoodMarkdownLocalizationBaseline = Object.freeze({
+  total: 78,
+  byLocale: Object.freeze({
+    fr: 26,
+    es: 26,
+    de: 26,
   }),
 });
 
@@ -149,6 +210,97 @@ export function assertDogfoodI18nDebtRatchet(
   return result;
 }
 
+export function collectDogfoodMarkdownLocalizationDebt(
+  options: {
+    readonly sources?: readonly DogfoodI18nDebtSource[];
+    readonly locales?: readonly string[];
+    readonly defaultLocale?: string;
+    readonly fileExists?: (path: string) => boolean;
+    readonly readFile?: DogfoodMarkdownFileReader;
+    readonly templateValues?: Readonly<Record<string, string>>;
+  } = {},
+): DogfoodMarkdownLocalizationInventory {
+  const sources = options.sources ?? [{ surface: 'docs-app', path: 'examples/docs/app.ts' }];
+  const locales = options.locales ?? DOGFOOD_LOCALE_OPTIONS.map((option) => option.id);
+  const defaultLocale = options.defaultLocale ?? DEFAULT_LOCALE.id;
+  const targetLocales = locales.filter((locale) => locale !== defaultLocale);
+  const fileExists = options.fileExists ?? repoFileExists;
+  const readFile = options.readFile ?? readRepoFile;
+  const templateValues = options.templateValues ?? defaultMarkdownTemplateValues();
+  const documents = uniqueMarkdownDocuments(sources.flatMap((source) => (
+    collectDogfoodMarkdownDocuments(source, templateValues, readFile)
+  )));
+  const entries: DogfoodMarkdownLocalizationEntry[] = [];
+
+  for (const document of documents) {
+    const localization = readDogfoodMarkdownLocalizationSpec(document.path, readFile);
+    const sourceLocale = localization?.sourceLocale ?? defaultLocale;
+    const documentLocales = uniqueStringList(localization?.locales ?? locales).filter((locale) => locale !== sourceLocale);
+    for (const locale of documentLocales) {
+      const candidates = localizedMarkdownCandidatePaths(document.path, locale, localization?.localizedPaths[locale]);
+      if (candidates.some((candidate) => fileExists(candidate))) continue;
+      entries.push(Object.freeze({
+        surface: document.surface,
+        path: document.path,
+        locale,
+        line: document.line,
+        column: document.column,
+        candidates: Object.freeze(candidates),
+      }));
+    }
+  }
+
+  const localeOrder = uniqueStringList([...targetLocales, ...entries.map((entry) => entry.locale)]);
+  const byLocale = localeOrder
+    .map((locale) => ({
+      locale,
+      count: entries.filter((entry) => entry.locale === locale).length,
+    }))
+    .filter((entry) => entry.count > 0);
+
+  return freezeMarkdownLocalizationInventory({
+    documents,
+    entries,
+    byLocale,
+    total: entries.length,
+  });
+}
+
+export function evaluateDogfoodMarkdownLocalizationRatchet(
+  inventory: DogfoodMarkdownLocalizationInventory,
+  baseline: DogfoodMarkdownLocalizationBaseline = DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE,
+): DogfoodMarkdownLocalizationRatchetResult {
+  const violations: string[] = [];
+  if (inventory.total > baseline.total) {
+    violations.push(`markdown total ${inventory.total} exceeds baseline ${baseline.total}`);
+  }
+
+  for (const locale of inventory.byLocale) {
+    const baselineCount = baseline.byLocale[locale.locale] ?? 0;
+    if (locale.count > baselineCount) {
+      violations.push(`markdown ${locale.locale} ${locale.count} exceeds baseline ${baselineCount}`);
+    }
+  }
+
+  return Object.freeze({
+    ok: violations.length === 0,
+    total: inventory.total,
+    baseline,
+    violations: Object.freeze(violations),
+  });
+}
+
+export function assertDogfoodMarkdownLocalizationRatchet(
+  inventory: DogfoodMarkdownLocalizationInventory,
+  baseline: DogfoodMarkdownLocalizationBaseline = DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE,
+): DogfoodMarkdownLocalizationRatchetResult {
+  const result = evaluateDogfoodMarkdownLocalizationRatchet(inventory, baseline);
+  if (!result.ok) {
+    throw new Error(`DOGFOOD Markdown localization ratchet failed: ${result.violations.join('; ')}`);
+  }
+  return result;
+}
+
 function collectDogfoodSourceDebt(source: DogfoodI18nDebtSource): readonly DogfoodI18nDebtEntry[] {
   const text = source.text ?? readRepoFile(source.path);
   const sourceFile = ts.createSourceFile(source.path, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
@@ -178,6 +330,171 @@ function collectDogfoodSourceDebt(source: DogfoodI18nDebtSource): readonly Dogfo
     || left.column - right.column
     || left.value.localeCompare(right.value)
   ));
+}
+
+function collectDogfoodMarkdownDocuments(
+  source: DogfoodI18nDebtSource,
+  templateValues: Readonly<Record<string, string>>,
+  readFile: DogfoodMarkdownFileReader,
+): readonly DogfoodMarkdownLocalizationDocument[] {
+  const text = source.text ?? readFile(source.path);
+  const sourceFile = ts.createSourceFile(source.path, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const documents: DogfoodMarkdownLocalizationDocument[] = [];
+
+  function visit(node: ts.Node): void {
+    if (ts.isCallExpression(node)) {
+      const callName = callExpressionName(node, sourceFile);
+      if (callName === 'readMarkdownDoc' || callName === 'readMarkdownDocExcerpt') {
+        const rawPath = markdownPathArgumentText(node.arguments[0], sourceFile, templateValues);
+        if (rawPath != null && rawPath.endsWith('.md')) {
+          const position = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+          documents.push(Object.freeze({
+            surface: source.surface,
+            path: resolveRepoRelativeMarkdownPath(source.path, rawPath),
+            line: position.line + 1,
+            column: position.character + 1,
+            reader: callName,
+          }));
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return documents;
+}
+
+function markdownPathArgumentText(
+  node: ts.Node | undefined,
+  sourceFile: ts.SourceFile,
+  templateValues: Readonly<Record<string, string>>,
+): string | undefined {
+  if (node == null) return undefined;
+  if (ts.isStringLiteralLike(node)) return node.text;
+  if (ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
+  if (!ts.isTemplateExpression(node)) return undefined;
+
+  let value = node.head.text;
+  for (const span of node.templateSpans) {
+    const key = span.expression.getText(sourceFile);
+    const replacement = templateValues[key];
+    if (replacement == null) return undefined;
+    value += replacement;
+    value += span.literal.text;
+  }
+  return value;
+}
+
+function uniqueMarkdownDocuments(
+  documents: readonly DogfoodMarkdownLocalizationDocument[],
+): readonly DogfoodMarkdownLocalizationDocument[] {
+  const seen = new Map<string, DogfoodMarkdownLocalizationDocument>();
+  for (const document of documents) {
+    const key = `${document.surface}:${document.path}`;
+    if (seen.has(key)) continue;
+    seen.set(key, document);
+  }
+  return Object.freeze([...seen.values()].sort((left, right) => (
+    left.surface.localeCompare(right.surface)
+    || left.path.localeCompare(right.path)
+    || left.line - right.line
+    || left.column - right.column
+  )));
+}
+
+function resolveRepoRelativeMarkdownPath(sourcePath: string, rawPath: string): string {
+  return posixPath.normalize(posixPath.join(posixPath.dirname(sourcePath), rawPath));
+}
+
+function localizedMarkdownCandidatePaths(
+  sourcePath: string,
+  locale: string,
+  explicitPath?: string,
+): readonly string[] {
+  const parsed = posixPath.parse(sourcePath);
+  return uniqueStringList([
+    ...(explicitPath == null ? [] : [resolveRepoRelativeMarkdownPath(sourcePath, explicitPath)]),
+    posixPath.join(parsed.dir, `${parsed.name}.${locale}${parsed.ext}`),
+    posixPath.join(parsed.dir, locale, parsed.base),
+  ]);
+}
+
+function readDogfoodMarkdownLocalizationSpec(
+  sourcePath: string,
+  readFile: DogfoodMarkdownFileReader,
+): DogfoodMarkdownLocalizationSpec | undefined {
+  let text: string;
+  try {
+    text = readFile(sourcePath);
+  } catch {
+    return undefined;
+  }
+
+  const yaml = markdownFrontmatterYaml(text);
+  if (yaml == null) return undefined;
+  const root = objectValue(parseYaml(yaml));
+  const dogfood = objectValue(root?.dogfood);
+  const localization = objectValue(dogfood?.localization);
+  if (localization == null) return undefined;
+
+  return Object.freeze({
+    sourceLocale: stringValue(localization.sourceLocale),
+    locales: stringListValue(localization.locales),
+    localizedPaths: Object.freeze(localizedPathMapValue(localization.localized)),
+  });
+}
+
+function markdownFrontmatterYaml(text: string): string | undefined {
+  const withoutBom = text.replace(/^\uFEFF/, '');
+  const opening = withoutBom.match(/^---\r?\n/);
+  if (opening == null) return undefined;
+  const bodyStart = opening[0].length;
+  const body = withoutBom.slice(bodyStart);
+  const closingIndex = body.search(/\r?\n---[ \t]*(?:\r?\n|$)/);
+  if (closingIndex === -1) return undefined;
+  return body.slice(0, closingIndex);
+}
+
+function localizedPathMapValue(value: unknown): Record<string, string> {
+  const paths: Record<string, string> = {};
+  const localized = objectValue(value);
+  if (localized == null) return paths;
+
+  for (const [locale, rawPath] of Object.entries(localized)) {
+    const path = localizedPathValue(rawPath);
+    if (path == null) continue;
+    paths[locale] = path;
+  }
+
+  return paths;
+}
+
+function localizedPathValue(value: unknown): string | undefined {
+  const direct = stringValue(value);
+  if (direct != null) return direct;
+  return stringValue(objectValue(value)?.path);
+}
+
+function stringListValue(value: unknown): readonly string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const strings = value.map((entry) => stringValue(entry)).filter((entry): entry is string => entry != null);
+  return strings.length === 0 ? undefined : uniqueStringList(strings);
+}
+
+function stringValue(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const text = value.trim();
+  return text === '' ? undefined : text;
+}
+
+function objectValue(value: unknown): Record<string, unknown> | undefined {
+  if (typeof value !== 'object' || value == null || Array.isArray(value)) return undefined;
+  return value as Record<string, unknown>;
+}
+
+function uniqueStringList(values: readonly string[]): readonly string[] {
+  return Object.freeze([...new Set(values)]);
 }
 
 function maybeAddEntry(
@@ -350,10 +667,35 @@ function readRepoFile(path: string): string {
   return readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 }
 
+function repoFileExists(path: string): boolean {
+  return existsSync(new URL(`../../${path}`, import.meta.url));
+}
+
+function defaultMarkdownTemplateValues(): Readonly<Record<string, string>> {
+  const packageJson = JSON.parse(readRepoFile('packages/bijou/package.json')) as { readonly version?: string };
+  return Object.freeze({
+    BIJOU_VERSION: packageJson.version ?? '',
+  });
+}
+
 function freezeInventory(inventory: DogfoodI18nDebtInventory): DogfoodI18nDebtInventory {
   return Object.freeze({
     entries: Object.freeze(inventory.entries.map((entry) => Object.freeze({ ...entry }))),
     bySurface: Object.freeze(inventory.bySurface.map((entry) => Object.freeze({ ...entry }))),
+    total: inventory.total,
+  });
+}
+
+function freezeMarkdownLocalizationInventory(
+  inventory: DogfoodMarkdownLocalizationInventory,
+): DogfoodMarkdownLocalizationInventory {
+  return Object.freeze({
+    documents: Object.freeze(inventory.documents.map((document) => Object.freeze({ ...document }))),
+    entries: Object.freeze(inventory.entries.map((entry) => Object.freeze({
+      ...entry,
+      candidates: Object.freeze([...entry.candidates]),
+    }))),
+    byLocale: Object.freeze(inventory.byLocale.map((entry) => Object.freeze({ ...entry }))),
     total: inventory.total,
   });
 }
