@@ -479,8 +479,25 @@ Slices 1 through 3 are the first runtime landing target for issue
 - `tokenRef()` and `resolveThemeColorRef()` preserve resolution facts for
   selected theme mode, token id, raw colors, and explicit fallback colors.
 
+Slice 4 intentionally tightens the current token vocabulary before adding more
+syntax:
+
+- `docs/design-system/theme-tokens.md` now gives every built-in token a
+  per-token "use when / do not use when" contract.
+- DOGFOOD now uses explicit dark and light shell themes instead of deriving its
+  docs chrome from one title-screen color ramp.
+- Focused DogFood preview tests prove that the shell themes keep readable
+  surface text and common semantic roles above the contrast floor in both dark
+  and light postures.
+- The next inspectability UX is
+  [#311](https://github.com/flyingrobots/bijou/issues/311), the Theme
+  Inspector drawer: an opt-in `F10` shell drawer that shows token swatches,
+  dark/light values, contrast facts, and future renderer provenance when
+  cell-level token facts exist.
+
 The remaining implementation work is the `style()` builder, lower-mode
-resolution proof, and DOGFOOD/package example coverage.
+resolution proof, package example coverage, and the optional Theme Inspector
+UX slice.
 
 ## Tests To Write First
 

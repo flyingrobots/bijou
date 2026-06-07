@@ -40,7 +40,7 @@ describe('RE-017 framed shell theme demo', () => {
     expect(frame.get(frame.width - 2, 2).bg).toBe('#043015');
   });
 
-  it('uses the stock frame shell-theme row as the single theme control inside docs', async () => {
+  it('cycles the stock frame shell-theme row through DogFood shell themes before landing palettes', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const originalBg = ctx.surface('primary').bg;
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
@@ -56,10 +56,10 @@ describe('RE-017 framed shell theme demo', () => {
       docsModel: { activeShellThemeId?: string; pageModels: Record<string, { landingThemeIndex: number }> };
     };
     const frame = result.frames.at(-1)!;
-    expect(model.landingThemeIndex).toBe(1);
-    expect(model.docsModel.activeShellThemeId).toBe('cabinet-of-curiosities');
-    expect(Object.values(model.docsModel.pageModels).every((pageModel) => pageModel.landingThemeIndex === 1)).toBe(true);
+    expect(model.landingThemeIndex).toBe(0);
+    expect(model.docsModel.activeShellThemeId).toBe('dogfood-light');
+    expect(Object.values(model.docsModel.pageModels).every((pageModel) => pageModel.landingThemeIndex === 0)).toBe(true);
     expect(ctx.surface('primary').bg).toBe(originalBg);
-    expect(frame.get(frame.width - 2, 2).bg).toBe('#1d1720');
+    expect(frame.get(frame.width - 2, 2).bg).toBe('#f8fafc');
   });
 });

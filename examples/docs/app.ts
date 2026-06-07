@@ -155,6 +155,7 @@ import {
   titleScreenBlock,
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
+import { DOGFOOD_SHELL_THEMES } from './dogfood-shell-themes.js';
 
 const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
   new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
@@ -757,74 +758,20 @@ const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
     logoTile: 1,
   },
 ] as const;
-const VERDANT_PLUM_COLORS = ['#043015', '#265408', '#968425', '#b96862', '#c281af'] as const;
-const VERDANT_PLUM_THEME: Theme = {
-  ...CYAN_MAGENTA,
-  name: 'dogfood-verdant-plum',
-  status: {
-    ...CYAN_MAGENTA.status,
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    info: tv(VERDANT_PLUM_COLORS[4]),
-    active: tv(VERDANT_PLUM_COLORS[4]),
-    muted: tv(VERDANT_PLUM_COLORS[1], ['dim', 'strikethrough']),
-  },
-  semantic: {
-    ...CYAN_MAGENTA.semantic,
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    info: tv(VERDANT_PLUM_COLORS[2]),
-    accent: tv(VERDANT_PLUM_COLORS[3]),
-    muted: tv(VERDANT_PLUM_COLORS[2], ['dim']),
-    primary: tv(VERDANT_PLUM_COLORS[4], ['bold']),
-  },
-  gradient: {
-    ...CYAN_MAGENTA.gradient,
-    brand: gradientStopsFromHexes(VERDANT_PLUM_COLORS),
-    progress: gradientStopsFromHexes([
-      VERDANT_PLUM_COLORS[1],
-      VERDANT_PLUM_COLORS[2],
-      VERDANT_PLUM_COLORS[3],
-      VERDANT_PLUM_COLORS[4],
-    ]),
-  },
-  border: {
-    ...CYAN_MAGENTA.border,
-    primary: tv(VERDANT_PLUM_COLORS[2]),
-    secondary: tv(VERDANT_PLUM_COLORS[3]),
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    muted: tv(VERDANT_PLUM_COLORS[1]),
-  },
-  ui: {
-    ...CYAN_MAGENTA.ui,
-    cursor: tv(VERDANT_PLUM_COLORS[4]),
-    focusGutter: { hex: VERDANT_PLUM_COLORS[3], bg: VERDANT_PLUM_COLORS[0], modifiers: ['bold'] },
-    scrollThumb: tv(VERDANT_PLUM_COLORS[4]),
-    scrollTrack: tv(VERDANT_PLUM_COLORS[1]),
-    sectionHeader: tv(VERDANT_PLUM_COLORS[2], ['bold']),
-    logo: tv(VERDANT_PLUM_COLORS[4]),
-    tableHeader: tv(VERDANT_PLUM_COLORS[4]),
-    trackEmpty: tv(VERDANT_PLUM_COLORS[1]),
-  },
-  surface: {
-    primary: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
-    secondary: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[1] },
-    elevated: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[1] },
-    overlay: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
-    muted: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[0] },
-  },
-};
-const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = LANDING_THEMES.map((theme) => ({
+
+const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = [
+  ...DOGFOOD_SHELL_THEMES,
+  ...LANDING_THEMES.map((theme) => ({
   id: theme.id,
   label: theme.label,
-  theme: theme.id === 'verdant-plum'
-    ? VERDANT_PLUM_THEME
-    : landingTokensToShellTheme(theme),
-}));
+  theme: landingTokensToShellTheme(theme),
+})),
+];
+
+export function docsShellThemesForTesting(): readonly FrameShellTheme[] {
+  return DOCS_SHELL_THEMES;
+}
+
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group

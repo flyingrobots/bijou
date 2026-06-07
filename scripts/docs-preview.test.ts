@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, lerp3, type ColorRef } from '@flyingrobots/bijou';
+import { colorHex, lerp3, themeContrastRatio, type ColorRef, type Theme } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
@@ -11,6 +11,7 @@ import {
 } from '../tests/helpers/scripted.js';
 import {
   createDocsApp,
+  docsShellThemesForTesting,
   DOGFOOD_I18N_CATALOG,
   FRAME_I18N_CATALOG,
   stripMarkdownFrontmatter,
@@ -58,6 +59,66 @@ const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
   { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
 ] as const;
+const TOKEN_DOCTRINE_PATH = resolve(import.meta.dirname, '..', 'docs', 'design-system', 'theme-tokens.md');
+
+const DOGFOOD_READABLE_FOREGROUNDS = [
+  'semantic.primary',
+  'semantic.muted',
+  'semantic.accent',
+  'semantic.info',
+  'semantic.success',
+  'semantic.warning',
+  'semantic.error',
+  'status.active',
+  'status.pending',
+  'ui.cursor',
+] as const;
+
+function themeToken(theme: Theme, path: string) {
+  const [section, key] = path.split('.') as [keyof Theme, string];
+  const tokens = theme[section];
+  const token = tokens != null && typeof tokens === 'object'
+    ? (tokens as Record<string, unknown>)[key]
+    : undefined;
+  if (token == null || typeof token !== 'object' || !('hex' in token)) {
+    throw new Error(`Missing theme token ${path}`);
+  }
+  return token as { readonly hex: string; readonly bg?: string };
+}
+
+function assertContrast(
+  theme: Theme,
+  foreground: string,
+  background: string,
+  label: string,
+  minRatio = 4.5,
+): void {
+  const ratio = themeContrastRatio(foreground, background);
+  expect(ratio, `${theme.name} ${label}`).toBeDefined();
+  expect(ratio!, `${theme.name} ${label}`).toBeGreaterThanOrEqual(minRatio);
+}
+
+function assertReadableDogfoodTheme(theme: Theme): void {
+  const surfaceBackgrounds = Object.entries(theme.surface).map(([name, token]) => {
+    expect(token.bg, `${theme.name} surface.${name}.bg`).toBeDefined();
+    assertContrast(theme, token.hex, token.bg!, `surface.${name} text on fill`);
+    return token.bg!;
+  });
+
+  expect(new Set(surfaceBackgrounds).size, `${theme.name} surface backgrounds`).toBeGreaterThanOrEqual(4);
+
+  for (const foregroundPath of DOGFOOD_READABLE_FOREGROUNDS) {
+    const foreground = themeToken(theme, foregroundPath);
+    for (const [surfaceName, surface] of Object.entries(theme.surface)) {
+      assertContrast(
+        theme,
+        foreground.hex,
+        surface.bg!,
+        `${foregroundPath} on surface.${surfaceName}.bg`,
+      );
+    }
+  }
+}
 const V7_BIJOU_LOGO_LETTER_COUNT = 5;
 const V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 
@@ -934,6 +995,76 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
   });
 
+  it('ships intentional DogFood dark and light shell themes with readable token roles', () => {
+    const shellThemes = docsShellThemesForTesting();
+    const dark = shellThemes.find((theme) => theme.id === 'dogfood-dark');
+    const light = shellThemes.find((theme) => theme.id === 'dogfood-light');
+
+    expect(shellThemes.map((theme) => theme.id).slice(0, 2)).toEqual(['dogfood-dark', 'dogfood-light']);
+    expect(dark?.label).toBe('DOGFOOD Dark');
+    expect(light?.label).toBe('DOGFOOD Light');
+    expect(dark?.theme.name).toBe('dogfood-dark');
+    expect(light?.theme.name).toBe('dogfood-light');
+
+    assertReadableDogfoodTheme(dark!.theme);
+    assertReadableDogfoodTheme(light!.theme);
+
+    expect(dark!.theme.semantic.primary.hex).not.toBe(dark!.theme.semantic.accent.hex);
+    expect(dark!.theme.ui.cursor.hex).not.toBe(dark!.theme.status.info.hex);
+    expect(light!.theme.semantic.primary.hex).not.toBe(light!.theme.semantic.accent.hex);
+    expect(light!.theme.ui.cursor.hex).not.toBe(light!.theme.status.info.hex);
+  });
+
+  it('documents every built-in token with usage guidance and dark/light UX posture', () => {
+    const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
+    const requiredRows = [
+      'semantic.primary',
+      'semantic.muted',
+      'semantic.accent',
+      'semantic.success',
+      'semantic.error',
+      'semantic.warning',
+      'semantic.info',
+      'surface.primary',
+      'surface.secondary',
+      'surface.elevated',
+      'surface.overlay',
+      'surface.muted',
+      'border.primary',
+      'border.secondary',
+      'border.success',
+      'border.warning',
+      'border.error',
+      'border.muted',
+      'ui.cursor',
+      'ui.focusGutter',
+      'ui.scrollThumb',
+      'ui.scrollTrack',
+      'ui.sectionHeader',
+      'ui.logo',
+      'ui.tableHeader',
+      'ui.trackEmpty',
+      'status.success',
+      'status.error',
+      'status.warning',
+      'status.info',
+      'status.pending',
+      'status.active',
+      'status.muted',
+      'gradient.brand',
+      'gradient.progress',
+    ];
+
+    expect(doctrine).toContain('## Per-Token Library Reference');
+    expect(doctrine).toContain('## Default Dark/Light UX Audit');
+    expect(doctrine).toContain('## Theme Debugger Direction');
+    expect(doctrine).toContain('Use when');
+    expect(doctrine).toContain('Do not use when');
+    for (const token of requiredRows) {
+      expect(doctrine).toContain(`| \`${token}\` |`);
+    }
+  });
+
   it('carries the selected landing theme into docs through the shared shell theme setting', async () => {
     const defaultCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const defaultApp = createDocsApp(defaultCtx);
@@ -1531,7 +1662,7 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Show active-pane control');
     expect(frameText(settingsFrame)).toContain('cues in the footer');
     expect(frameText(settingsFrame)).toContain('↻ Shell theme');
-    expect(frameText(settingsFrame)).toContain('BlockLab Workstation');
+    expect(frameText(settingsFrame)).toContain('DOGFOOD Dark');
     expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Localization');
     expect(frameText(settingsFrame)).toContain('Preferred language');

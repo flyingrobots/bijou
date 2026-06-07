@@ -35,13 +35,13 @@ describe('WF-130 roadmap goalpost policy', () => {
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
 
-    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-06.');
+    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-07.');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
     expect(roadmap).toContain('`Beyond`');
-    expect(roadmap).toContain('30 | 1');
+    expect(roadmap).toContain('31 | 1');
     expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');

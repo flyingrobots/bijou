@@ -197,6 +197,128 @@ House rules:
   progress fill or similar continuous range
 - keep logos and brand treatments rare
 
+## Per-Token Library Reference
+
+Every token below is a role, not a paint name. The examples are intentionally
+strict so components remain readable when a theme changes.
+
+### Semantic Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `semantic.primary` | Main readable text, selected document body text, and deliberate foreground emphasis. | The text is supporting metadata, a status label, or decorative brand copy. |
+| `semantic.muted` | Secondary copy, timestamps, helper copy, inactive labels, and low-emphasis hints that must still be readable. | The content is disabled, destructive, or critical to the task. |
+| `semantic.accent` | Local emphasis inside a component, selected inline text, command affordances, and non-status callouts. | The meaning is focus owned by the shell, a process status, or a brand logo. |
+| `semantic.success` | Human-readable success copy, positive validation messages, and resolved inline facts. | The UI is only drawing a status dot, badge, or border. Use `status.success` or `border.success`. |
+| `semantic.error` | Error copy, destructive inline warning text, and validation failure prose. | The role is merely an error-colored frame or status chip. |
+| `semantic.warning` | Cautionary copy where a user may need to slow down before acting. | Ordinary emphasis, progress, or decorative warm color. |
+| `semantic.info` | Informational copy, neutral notices, and non-blocking explanatory text. | Active selection, focus, or branded chrome. |
+
+### Surface Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `surface.primary` | The default document, editor, or main content background. | Sidebars, modal interruption, disabled wells, or one-off accent fills. |
+| `surface.secondary` | Navigation rails, sidebars, metadata panes, and secondary work regions. | Main reading surfaces or raised controls that need elevation. |
+| `surface.elevated` | Cards, popovers, field groups, panels, and bounded objects that sit above the base surface. | Full-screen content regions or modal scrims. |
+| `surface.overlay` | Modal dialogs, drawers, command palettes, and interruption surfaces. | Decorative tinting, status meaning, or ordinary sidebars. |
+| `surface.muted` | Disabled regions, inset wells, skeleton tracks, and deliberately de-emphasized containers. | Muted foreground text. Use `semantic.muted`. |
+
+### Border Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `border.primary` | Strong structural grouping, active panel outlines, and primary separators. | Local text emphasis or generic accent foreground. |
+| `border.secondary` | Secondary grouping, alternate section outlines, and non-primary divider emphasis. | Warning, error, or selected state. |
+| `border.success` | A boundary itself communicates a successful state. | A success badge or success prose would be clearer. |
+| `border.warning` | A boundary itself communicates caution or review-needed state. | Decorative warm framing or hover/focus styling. |
+| `border.error` | A boundary itself communicates invalid, destructive, or failed state. | Non-error emphasis or ordinary grouping. |
+| `border.muted` | Default boxes, separators, table rules, and low-emphasis structure. | Disabled text or muted copy. |
+
+### UI Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `ui.cursor` | Runtime cursor, selected shell row chrome, and reusable selection affordances. | Business-domain active state or selected text inside one component. |
+| `ui.focusGutter` | Focus indicators owned by the app frame, pane gutter, or reusable shell. | Inline focus styling inside a component. |
+| `ui.scrollThumb` | Scrollbar thumbs and viewport-position indicators. | General progress bars or sliders. |
+| `ui.scrollTrack` | Scrollbar tracks and scroll wells. | Disabled containers or progress-empty tracks. |
+| `ui.sectionHeader` | Reusable shell headers, section rails, and framework-level headings. | Document body headings with product semantics. |
+| `ui.logo` | Product mark, brand lockup, title-screen brand treatment, or recurring shell identity mark. | Generic accent text or status emphasis. |
+| `ui.tableHeader` | Reusable table header chrome that is part of the framework. | Arbitrary table cell foreground or selected row styling. |
+| `ui.trackEmpty` | Empty progress tracks, meters, and fixed scaffold tracks. | Scroll tracks, disabled fills, or muted text. |
+
+### Status Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `status.success` | A badge, chip, timeline item, or indicator says the object succeeded. | Success prose or border-only success. |
+| `status.error` | A badge, chip, timeline item, or indicator says the object failed or is invalid. | Error prose or destructive button text. |
+| `status.warning` | A badge, chip, timeline item, or indicator says caution or review is required. | Warm decorative emphasis. |
+| `status.info` | A badge, chip, timeline item, or indicator says informational or neutral status. | General informational prose. |
+| `status.pending` | A state indicator says queued, waiting, loading, or not yet resolved. | Disabled content or muted metadata. |
+| `status.active` | A state indicator says running, live, current, or in progress. | Keyboard focus, selected row, or cursor chrome. |
+| `status.muted` | A state indicator says archived, inactive, skipped, or intentionally quiet. | Ordinary secondary copy. |
+
+### Gradient Tokens
+
+| Token | Use when | Do not use when |
+| --- | --- | --- |
+| `gradient.brand` | A rare brand treatment, title art, or identity moment benefits from multi-stop color. | The user must infer meaning from it. |
+| `gradient.progress` | A meter, progress fill, or continuous range benefits from directional color. | Static decoration, status badges, or body text. |
+
+## Default Dark/Light UX Audit
+
+The legacy `CYAN_MAGENTA` preset is useful as a vivid terminal-native default,
+but it is not ideal as the model for dense product surfaces. It uses saturated
+terminal colors for many unrelated jobs: cyan appears as info, active state,
+cursor, scrollbar, logo, and primary border; magenta appears as accent,
+secondary border, and focus gutter. That makes the app energetic, but it also
+makes many regions compete at the same visual priority.
+
+DogFood should use a calmer shell posture:
+
+- neutral surfaces carry most of the screen
+- one accent family carries local emphasis and shell selection
+- status colors remain distinct from focus and brand
+- muted text remains contrast-safe instead of merely dim
+- dark and light themes both satisfy readable foreground/background pairs
+
+The current DogFood dark shell uses dark neutral surfaces, readable cool/warm
+accents, and separate success/warning/error/info colors. The current DogFood
+light shell uses light neutral surfaces with darker semantic colors instead of
+pastel foregrounds. Both modes target at least 4.5:1 contrast for surface text
+and common semantic foregrounds on every shell surface.
+
+Compared with large design systems, Bijou is intentionally compact today. The
+runtime vocabulary has about thirty direct color-bearing slots plus two
+gradient roles. Material-style systems expose more paired foreground/background
+roles. Carbon and Atlassian-style systems go further with text hierarchy,
+interaction states, icon roles, and component-specific aliases. Bijou should
+grow only when a missing role causes repeated ambiguity in real components.
+
+## Theme Debugger Direction
+
+The next inspectability step should be a Theme Inspector drawer.
+
+Recommended UX:
+
+- `F10` opens a shell drawer from any app frame that opts in.
+- The drawer shows token swatches grouped by `semantic`, `surface`, `border`,
+  `ui`, `status`, and `gradient`.
+- Each swatch renders the token name and uses the token value as the swatch
+  fill or foreground, depending on token family.
+- The drawer can toggle dark and light modes without permanently changing the
+  app until the user applies the selection.
+- Each swatch displays contrast facts for its documented safe pair when one is
+  known.
+- Future renderer provenance can let an inspected cell report whether it came
+  from a token, a raw color, or a lowered/no-color fallback.
+
+The first implementation should inspect theme tokens only. Element-level token
+overlays should wait until renderer provenance is available, because guessing
+token ownership from final RGB values would be misleading.
+
 ## First-Party Defaults
 
 When first-party components need a default token and do not have stronger

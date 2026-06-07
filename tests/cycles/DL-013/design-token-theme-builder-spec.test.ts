@@ -47,6 +47,7 @@ describe('DL-013 design token and theme builder spec', () => {
     );
     expect(roadmap).toContain('Design Tokens And Theme Modes');
     expect(roadmap).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
+    expect(roadmap).toContain('[#311](https://github.com/flyingrobots/bijou/issues/311)');
     expect(roadmap).toContain('DL-013 design token and theme builder API');
   });
 });

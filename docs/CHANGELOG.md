@@ -14,6 +14,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   theme-scoped token registration rejects duplicate and missing mode values,
   and `tokenRef()` / `resolveThemeColorRef()` resolve semantic color slots
   through the selected theme mode while preserving raw-color and fallback facts.
+- **DOGFOOD token library retuning** — DOGFOOD now uses explicit high-contrast
+  dark and light shell themes for the docs surface instead of relying on the
+  landing-screen palette ramp as the default shell theme. The theme-token
+  doctrine now documents every built-in token with "use when / do not use when"
+  guidance, audits the default dark/light UX posture, and records the proposed
+  Theme Inspector drawer for future token debugging.
 - **DOGFOOD release-title gallery** — DOGFOOD now keeps release-title
   treatments as a latest-first artifact gallery, adds a unique post-release
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the
