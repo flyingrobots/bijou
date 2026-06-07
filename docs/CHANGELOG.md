@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
+  first runtime slices for the DL-013 design token builder: `defineTheme()`
+  creates immutable theme definitions with required dark/light token maps,
+  theme-scoped token registration rejects duplicate and missing mode values,
+  and `tokenRef()` / `resolveThemeColorRef()` resolve semantic color slots
+  through the selected theme mode while preserving raw-color and fallback facts.
 - **DOGFOOD release-title gallery** — DOGFOOD now keeps release-title
   treatments as a latest-first artifact gallery, adds a unique post-release
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the

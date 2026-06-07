@@ -19,6 +19,32 @@ export type {
   Theme,
 } from './tokens.js';
 
+export {
+  defineTheme,
+  isTokenRef,
+  resolveThemeColorRef,
+  tokenRef,
+} from './builder.js';
+export type {
+  ResolveThemeColorRefOptions,
+  ThemeBuilder,
+  ThemeBuilderModeId,
+  ThemeBuilderRequiredMode,
+  ThemeColorInput,
+  ThemeColorRef,
+  ThemeColorResolution,
+  ThemeColorTokenValue,
+  ThemeModeBuilder,
+  ThemeModeTokenColorBuilder,
+  ThemeModeTokenDraftBuilder,
+  ThemeModeTokenIdBuilder,
+  ThemeModeTokenRegistrationBuilder,
+  ThemeRgbObject,
+  ThemeTokenRef,
+  TokenTheme,
+  TokenThemeMode,
+} from './builder.js';
+
 // Presets
 export { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
 

@@ -467,6 +467,21 @@ Migration can be staged:
 5. Lower-mode resolver facts and fallback behavior.
 6. DOGFOOD docs, examples, and package exports.
 
+## Implementation Progress
+
+Slices 1 through 3 are the first runtime landing target for issue
+[#308](https://github.com/flyingrobots/bijou/issues/308):
+
+- `defineTheme()` creates immutable token-theme definitions with required
+  `dark` and `light` mode maps.
+- Theme-scoped token registration rejects duplicate token ids within one mode
+  and rejects required modes that omit a declared token.
+- `tokenRef()` and `resolveThemeColorRef()` preserve resolution facts for
+  selected theme mode, token id, raw colors, and explicit fallback colors.
+
+The remaining implementation work is the `style()` builder, lower-mode
+resolution proof, and DOGFOOD/package example coverage.
+
 ## Tests To Write First
 
 - Theme builder rejects missing `dark` or `light` modes.
