@@ -55,7 +55,7 @@ export { styled, styledStatus } from './styled.js';
 export { extendTheme } from './extend.js';
 
 // Theme doctor
-export { doctorTheme, themeContrastRatio } from './doctor.js';
+export { defineThemeSafePairs, doctorTheme, themeContrastRatio } from './doctor.js';
 export type {
   ThemeContrastPair,
   ThemeDoctorIssue,
@@ -63,6 +63,10 @@ export type {
   ThemeDoctorOptions,
   ThemeDoctorReport,
   ThemeDoctorSeverity,
+  ThemeSafePair,
+  ThemeSafePairBuilder,
+  ThemeSafePairKind,
+  ThemeSafePairOptions,
 } from './doctor.js';
 
 // Gradient

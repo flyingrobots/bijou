@@ -15,6 +15,24 @@ export interface ThemeContrastPair {
   readonly label?: string;
 }
 
+export type ThemeSafePairKind = 'readable' | 'status' | 'chrome';
+
+export interface ThemeSafePair extends ThemeContrastPair {
+  readonly kind: ThemeSafePairKind;
+}
+
+export interface ThemeSafePairOptions {
+  readonly minRatio?: number;
+  readonly label?: string;
+}
+
+export interface ThemeSafePairBuilder {
+  readable(foreground: string, background: string, options?: ThemeSafePairOptions): ThemeSafePairBuilder;
+  status(foreground: string, background: string, options?: ThemeSafePairOptions): ThemeSafePairBuilder;
+  chrome(foreground: string, background: string, options?: ThemeSafePairOptions): ThemeSafePairBuilder;
+  build(): readonly ThemeSafePair[];
+}
+
 export interface ThemeDoctorOptions {
   readonly contrastPairs?: readonly ThemeContrastPair[];
   readonly minContrastRatio?: number;
@@ -53,6 +71,11 @@ interface ColorUse {
   readonly color: string;
 }
 
+interface ThemeColorEntry {
+  readonly path: string;
+  readonly color: string;
+}
+
 const DEFAULT_MIN_CONTRAST_RATIO = 4.5;
 const RATIO_PRECISION = 100;
 const RGB_MAX = 255;
@@ -67,9 +90,13 @@ const RELATIVE_LUMINANCE_BLUE = 0.0722;
 const CONTRAST_LUMINANCE_OFFSET = 0.05;
 const MIN_REUSE_LIMIT = 1;
 
+export function defineThemeSafePairs(): ThemeSafePairBuilder {
+  return new MutableThemeSafePairBuilder();
+}
+
 export function doctorTheme(theme: Theme, options: ThemeDoctorOptions = {}): ThemeDoctorReport {
   const entries = collectThemeTokens(theme);
-  const tokenByPath = new Map(entries.map((entry) => [entry.path, entry.token]));
+  const colorByPath = new Map(collectThemeColorEntries(entries).map((entry) => [entry.path, entry.color]));
   const issues: ThemeDoctorIssue[] = [];
   const colorUses: ColorUse[] = [];
 
@@ -78,7 +105,7 @@ export function doctorTheme(theme: Theme, options: ThemeDoctorOptions = {}): The
   }
 
   for (const pair of options.contrastPairs ?? []) {
-    inspectContrastPair(pair, tokenByPath, options.minContrastRatio ?? DEFAULT_MIN_CONTRAST_RATIO, issues);
+    inspectContrastPair(pair, colorByPath, options.minContrastRatio ?? DEFAULT_MIN_CONTRAST_RATIO, issues);
   }
 
   inspectColorReuse(colorUses, options.maxColorReuse, issues);
@@ -103,6 +130,48 @@ export function themeContrastRatio(foreground: string, background: string): numb
   return roundRatio((lighter + CONTRAST_LUMINANCE_OFFSET) / (darker + CONTRAST_LUMINANCE_OFFSET));
 }
 
+class MutableThemeSafePairBuilder implements ThemeSafePairBuilder {
+  private readonly pairs: ThemeSafePair[] = [];
+
+  readable(foreground: string, background: string, options: ThemeSafePairOptions = {}): ThemeSafePairBuilder {
+    return this.add('readable', foreground, background, options);
+  }
+
+  status(foreground: string, background: string, options: ThemeSafePairOptions = {}): ThemeSafePairBuilder {
+    return this.add('status', foreground, background, options);
+  }
+
+  chrome(foreground: string, background: string, options: ThemeSafePairOptions = {}): ThemeSafePairBuilder {
+    return this.add('chrome', foreground, background, options);
+  }
+
+  build(): readonly ThemeSafePair[] {
+    return Object.freeze(this.pairs.map(pair => Object.freeze({ ...pair })));
+  }
+
+  private add(
+    kind: ThemeSafePairKind,
+    foreground: string,
+    background: string,
+    options: ThemeSafePairOptions,
+  ): ThemeSafePairBuilder {
+    assertNonEmpty(foreground, 'Foreground token path');
+    assertNonEmpty(background, 'Background token path');
+    const duplicate = this.pairs.some(pair => pair.foreground === foreground && pair.background === background);
+    if (duplicate) {
+      throw new Error(`Duplicate theme safe pair ${foreground} on ${background}.`);
+    }
+    this.pairs.push({
+      kind,
+      foreground,
+      background,
+      ...(options.minRatio === undefined ? {} : { minRatio: options.minRatio }),
+      ...(options.label === undefined ? {} : { label: options.label }),
+    });
+    return this;
+  }
+}
+
 function collectThemeTokens(theme: Theme): readonly ThemeTokenEntry[] {
   const entries: ThemeTokenEntry[] = [];
   collectSectionTokens(entries, 'status', theme.status);
@@ -121,6 +190,17 @@ function collectSectionTokens(
   for (const [name, token] of Object.entries(tokens)) {
     entries.push({ path: `${section}.${name}`, token });
   }
+}
+
+function collectThemeColorEntries(entries: readonly ThemeTokenEntry[]): readonly ThemeColorEntry[] {
+  const colors: ThemeColorEntry[] = [];
+  for (const entry of entries) {
+    colors.push({ path: entry.path, color: entry.token.hex });
+    if (entry.token.bg !== undefined) {
+      colors.push({ path: `${entry.path}.bg`, color: entry.token.bg });
+    }
+  }
+  return colors;
 }
 
 function inspectToken(
@@ -151,12 +231,12 @@ function inspectToken(
 
 function inspectContrastPair(
   pair: ThemeContrastPair,
-  tokenByPath: ReadonlyMap<string, TokenValue>,
+  colorByPath: ReadonlyMap<string, string>,
   fallbackMinRatio: number,
   issues: ThemeDoctorIssue[],
 ): void {
-  const foreground = tokenByPath.get(pair.foreground);
-  const background = tokenByPath.get(pair.background);
+  const foreground = colorByPath.get(pair.foreground);
+  const background = colorByPath.get(pair.background);
   if (foreground === undefined) {
     issues.push(missingTokenIssue(pair.foreground));
     return;
@@ -169,8 +249,8 @@ function inspectContrastPair(
   inspectResolvedContrast(
     pair.foreground,
     pair.background,
-    foreground.hex,
-    background.hex,
+    foreground,
+    background,
     pair.minRatio ?? fallbackMinRatio,
     issues,
   );
@@ -250,6 +330,12 @@ function missingTokenIssue(path: string): ThemeDoctorIssue {
     path,
     message: `${path} is missing`,
   };
+}
+
+function assertNonEmpty(value: string, label: string): void {
+  if (value.trim().length === 0) {
+    throw new Error(`${label} must not be empty.`);
+  }
 }
 
 function isValidHexColor(color: string): boolean {

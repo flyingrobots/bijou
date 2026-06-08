@@ -20,6 +20,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   doctrine now documents every built-in token with "use when / do not use when"
   guidance, audits the default dark/light UX posture, and records the proposed
   Theme Inspector drawer for future token debugging.
+- **Theme safe-pair contracts** — `@flyingrobots/bijou` now exports
+  `defineThemeSafePairs()` so theme authors can declare reusable
+  foreground/background contrast matrices grouped as readable, status, or
+  chrome pairs. `doctorTheme()` now validates contrast paths that target token
+  background slots such as `surface.primary.bg`, and DOGFOOD exports its dark
+  and light shell safe-pair matrix for docs tests and future Theme Inspector
+  UX. This closes issue #314.
 - **DOGFOOD release-title gallery** — DOGFOOD now keeps release-title
   treatments as a latest-first artifact gallery, adds a unique post-release
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the

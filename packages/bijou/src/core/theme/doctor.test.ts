@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { doctorTheme, themeContrastRatio } from './doctor.js';
+import { defineThemeSafePairs, doctorTheme, themeContrastRatio } from './doctor.js';
 import { CYAN_MAGENTA } from './presets.js';
 import type { Theme } from './tokens.js';
 
@@ -72,5 +72,36 @@ describe('theme contrast doctor', () => {
         limit: 2,
       }),
     ]));
+  });
+
+  it('validates safe pairs against background color slots', () => {
+    const pairs = defineThemeSafePairs()
+      .readable('semantic.primary', 'surface.primary.bg', { label: 'body copy' })
+      .status('status.error', 'surface.overlay.bg')
+      .build();
+
+    const report = doctorTheme(CYAN_MAGENTA, { contrastPairs: pairs });
+
+    expect(pairs).toEqual([
+      {
+        kind: 'readable',
+        foreground: 'semantic.primary',
+        background: 'surface.primary.bg',
+        label: 'body copy',
+      },
+      {
+        kind: 'status',
+        foreground: 'status.error',
+        background: 'surface.overlay.bg',
+      },
+    ]);
+    expect(report.issues.filter((issue) => issue.kind === 'missing-token')).toEqual([]);
+  });
+
+  it('rejects duplicate safe-pair declarations', () => {
+    expect(() => defineThemeSafePairs()
+      .readable('semantic.primary', 'surface.primary.bg')
+      .readable('semantic.primary', 'surface.primary.bg')
+      .build()).toThrow('Duplicate theme safe pair semantic.primary on surface.primary.bg.');
   });
 });

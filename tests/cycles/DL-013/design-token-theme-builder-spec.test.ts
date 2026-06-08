@@ -48,6 +48,22 @@ describe('DL-013 design token and theme builder spec', () => {
     expect(roadmap).toContain('Design Tokens And Theme Modes');
     expect(roadmap).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
     expect(roadmap).toContain('[#311](https://github.com/flyingrobots/bijou/issues/311)');
+    expect(roadmap).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
     expect(roadmap).toContain('DL-013 design token and theme builder API');
+    expect(roadmap).toContain('safe-pair contrast matrices');
+  });
+
+  it('locks the safe-pair contrast matrix follow-up into the design trail', () => {
+    expect(existsRepoPath('docs/design/DL-014-theme-safe-pairs-and-contrast-matrices.md')).toBe(true);
+
+    const design = readRepoFile('docs/design/DL-014-theme-safe-pairs-and-contrast-matrices.md');
+    const umbrella = readRepoFile('docs/design/DL-013-design-token-theme-builder-api.md');
+
+    expect(design).toContain('github_issue: 314');
+    expect(design).toContain('defineThemeSafePairs()');
+    expect(design).toContain("surface.primary.bg");
+    expect(design).toContain('DOGFOOD_THEME_SAFE_PAIRS');
+    expect(umbrella).toContain('[DL-014](DL-014-theme-safe-pairs-and-contrast-matrices.md)');
+    expect(umbrella).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
   });
 });

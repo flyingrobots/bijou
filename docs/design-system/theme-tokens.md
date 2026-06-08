@@ -297,6 +297,48 @@ roles. Carbon and Atlassian-style systems go further with text hierarchy,
 interaction states, icon roles, and component-specific aliases. Bijou should
 grow only when a missing role causes repeated ambiguity in real components.
 
+## Safe-Pair Contrast Contract
+
+Theme contrast is declared through safe pairs rather than buried inside one-off
+test loops. A safe pair names a foreground token path and a background token
+path that a theme promises will remain readable.
+
+Safe-pair background paths may target token background slots:
+
+```text
+semantic.primary on surface.primary.bg
+semantic.muted on surface.secondary.bg
+status.active on surface.overlay.bg
+ui.cursor on surface.elevated.bg
+```
+
+Use the `defineThemeSafePairs()` builder when a first-party app or component
+needs a reusable contrast matrix:
+
+```ts
+const pairs = defineThemeSafePairs()
+  .readable('semantic.primary', 'surface.primary.bg')
+  .status('status.error', 'surface.overlay.bg')
+  .chrome('ui.cursor', 'surface.secondary.bg')
+  .build();
+```
+
+Then pass those pairs to `doctorTheme()`:
+
+```ts
+const report = doctorTheme(theme, { contrastPairs: pairs });
+```
+
+Safe-pair kinds communicate intent:
+
+- `readable`: ordinary text or component foregrounds that must stay legible
+- `status`: process, health, timeline, or object-state colors
+- `chrome`: shell/runtime affordances such as cursor and selection chrome
+
+Do not use safe pairs as a way to bless every possible token combination.
+Declare pairs only when a component or product surface expects that
+combination to work.
+
 ## Theme Debugger Direction
 
 The next inspectability step should be a Theme Inspector drawer.

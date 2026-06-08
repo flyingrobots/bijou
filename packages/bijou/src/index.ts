@@ -535,6 +535,7 @@ export {
   // Theme extension
   extendTheme,
   // Theme doctor
+  defineThemeSafePairs,
   doctorTheme,
   themeContrastRatio,
   type ThemeContrastPair,
@@ -543,6 +544,10 @@ export {
   type ThemeDoctorOptions,
   type ThemeDoctorReport,
   type ThemeDoctorSeverity,
+  type ThemeSafePair,
+  type ThemeSafePairBuilder,
+  type ThemeSafePairKind,
+  type ThemeSafePairOptions,
   // Gradient
   lerp3,
   gradientText,

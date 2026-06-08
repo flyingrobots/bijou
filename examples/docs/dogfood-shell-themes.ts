@@ -1,5 +1,6 @@
 import {
   CYAN_MAGENTA,
+  defineThemeSafePairs,
   tv,
   type RGB,
   type Theme,
@@ -145,6 +146,49 @@ const DOGFOOD_LIGHT_THEME: Theme = {
     muted: { hex: '#5f6f83', bg: '#edf2f7' },
   },
 };
+
+const DOGFOOD_READABLE_FOREGROUNDS = [
+  'semantic.primary',
+  'semantic.muted',
+  'semantic.accent',
+  'semantic.info',
+  'semantic.success',
+  'semantic.warning',
+  'semantic.error',
+] as const;
+
+const DOGFOOD_STATUS_FOREGROUNDS = [
+  'status.active',
+  'status.pending',
+] as const;
+
+const DOGFOOD_SURFACE_BACKGROUNDS = [
+  'surface.primary.bg',
+  'surface.secondary.bg',
+  'surface.elevated.bg',
+  'surface.overlay.bg',
+  'surface.muted.bg',
+] as const;
+
+const dogfoodPairs = defineThemeSafePairs();
+
+for (const foreground of DOGFOOD_READABLE_FOREGROUNDS) {
+  for (const background of DOGFOOD_SURFACE_BACKGROUNDS) {
+    dogfoodPairs.readable(foreground, background);
+  }
+}
+
+for (const foreground of DOGFOOD_STATUS_FOREGROUNDS) {
+  for (const background of DOGFOOD_SURFACE_BACKGROUNDS) {
+    dogfoodPairs.status(foreground, background);
+  }
+}
+
+for (const background of DOGFOOD_SURFACE_BACKGROUNDS) {
+  dogfoodPairs.chrome('ui.cursor', background);
+}
+
+export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 
 export const DOGFOOD_SHELL_THEMES: readonly FrameShellTheme[] = Object.freeze([
   {

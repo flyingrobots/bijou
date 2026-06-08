@@ -78,6 +78,8 @@ fake duplication rather than a real second API.
 
 ### Theme Authoring
 - **`extendTheme()`**: Build a custom theme from a known-good preset.
+- **`defineThemeSafePairs()`**: Declare reusable foreground/background
+  contrast matrices for `doctorTheme()` and inspector surfaces.
 - **`doctorTheme()`**: Structured checks for invalid colors, weak contrast,
   and suspicious token reuse.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast

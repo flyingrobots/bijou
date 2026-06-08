@@ -495,6 +495,20 @@ syntax:
   dark/light values, contrast facts, and future renderer provenance when
   cell-level token facts exist.
 
+Slice 5 promotes contrast from ad hoc tests into a reusable safe-pair
+contract:
+
+- [DL-014](DL-014-theme-safe-pairs-and-contrast-matrices.md) defines
+  foreground/background safe pairs as design-system data.
+- `defineThemeSafePairs()` builds immutable `readable`, `status`, and `chrome`
+  pair matrices.
+- `doctorTheme()` can validate pair paths that target token background slots,
+  such as `surface.primary.bg`.
+- DOGFOOD exports `DOGFOOD_THEME_SAFE_PAIRS` so docs preview tests and the
+  future Theme Inspector drawer consume the same pair contract.
+- This slice closes the implementation path for
+  [#314](https://github.com/flyingrobots/bijou/issues/314).
+
 The remaining implementation work is the `style()` builder, lower-mode
 resolution proof, package example coverage, and the optional Theme Inspector
 UX slice.

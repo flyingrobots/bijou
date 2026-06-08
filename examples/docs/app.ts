@@ -156,6 +156,7 @@ import {
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 import { DOGFOOD_SHELL_THEMES } from './dogfood-shell-themes.js';
+export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 
 const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
   new URL('../../assets/flyingrobotslogo.txt', import.meta.url),

@@ -361,6 +361,9 @@ Bad examples:
 
 - Start from a built-in preset and edit semantically, not from a blank page.
 - Keep foreground/background contrast honest on every `surface.*` token.
+- Use `defineThemeSafePairs()` plus `doctorTheme()` when an app or component
+  needs a reusable contrast contract across multiple foreground/background
+  roles.
 - Test the theme in `interactive`, `static`, `pipe`, and `accessible` modes.
 - Do not rely on color alone; labels and structure still need to make sense in
   `noColor`, `pipe`, and `accessible` lowering.

@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, lerp3, themeContrastRatio, type ColorRef, type Theme } from '@flyingrobots/bijou';
+import { colorHex, doctorTheme, lerp3, themeContrastRatio, type ColorRef, type Theme } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
@@ -10,6 +10,7 @@ import {
   runScriptDeterministic as runScript,
 } from '../tests/helpers/scripted.js';
 import {
+  DOGFOOD_THEME_SAFE_PAIRS,
   createDocsApp,
   docsShellThemesForTesting,
   DOGFOOD_I18N_CATALOG,
@@ -61,31 +62,6 @@ const V7_LANDING_WAKE_WAVES = [
 ] as const;
 const TOKEN_DOCTRINE_PATH = resolve(import.meta.dirname, '..', 'docs', 'design-system', 'theme-tokens.md');
 
-const DOGFOOD_READABLE_FOREGROUNDS = [
-  'semantic.primary',
-  'semantic.muted',
-  'semantic.accent',
-  'semantic.info',
-  'semantic.success',
-  'semantic.warning',
-  'semantic.error',
-  'status.active',
-  'status.pending',
-  'ui.cursor',
-] as const;
-
-function themeToken(theme: Theme, path: string) {
-  const [section, key] = path.split('.') as [keyof Theme, string];
-  const tokens = theme[section];
-  const token = tokens != null && typeof tokens === 'object'
-    ? (tokens as Record<string, unknown>)[key]
-    : undefined;
-  if (token == null || typeof token !== 'object' || !('hex' in token)) {
-    throw new Error(`Missing theme token ${path}`);
-  }
-  return token as { readonly hex: string; readonly bg?: string };
-}
-
 function assertContrast(
   theme: Theme,
   foreground: string,
@@ -107,17 +83,8 @@ function assertReadableDogfoodTheme(theme: Theme): void {
 
   expect(new Set(surfaceBackgrounds).size, `${theme.name} surface backgrounds`).toBeGreaterThanOrEqual(4);
 
-  for (const foregroundPath of DOGFOOD_READABLE_FOREGROUNDS) {
-    const foreground = themeToken(theme, foregroundPath);
-    for (const [surfaceName, surface] of Object.entries(theme.surface)) {
-      assertContrast(
-        theme,
-        foreground.hex,
-        surface.bg!,
-        `${foregroundPath} on surface.${surfaceName}.bg`,
-      );
-    }
-  }
+  const report = doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
+  expect(report.issues, `${theme.name} safe pairs`).toEqual([]);
 }
 const V7_BIJOU_LOGO_LETTER_COUNT = 5;
 const V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
