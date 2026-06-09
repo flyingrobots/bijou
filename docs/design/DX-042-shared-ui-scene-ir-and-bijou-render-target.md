@@ -3,6 +3,8 @@ title: DX-042 Shared UI Scene IR And Bijou Render Target
 legend: DX
 lane: cool-ideas
 priority: medium
+github_issue: 302
+status: proposed
 keywords:
   - developer-experience
   - ir
@@ -15,6 +17,14 @@ keywords:
 # DX-042 Shared UI Scene IR And Bijou Render Target
 
 Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
+
+## Linked Work
+
+- User story: [#302](https://github.com/flyingrobots/bijou/issues/302)
+- Roadmap candidate: Runtime Graph And Scene IR
+- This document is a planning artifact only. It records the shared IR boundary
+  for the #302 idea; it does not claim implementation of the IR, a compiler, or
+  a renderer integration in this PR.
 
 ## Decision Summary
 

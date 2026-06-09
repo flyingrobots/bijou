@@ -1002,6 +1002,12 @@ function clampThemeInspectorScroll(model: RootModel, scrollY: number): number {
   return Math.max(0, Math.min(Math.floor(scrollY), themeInspectorMaxScroll(model)));
 }
 
+function themeInspectorDrawerWidth(columns: number): number {
+  const availableWidth = Math.max(1, columns - 2);
+  const preferredWidth = Math.min(64, Math.max(34, Math.floor(columns * 0.42)));
+  return Math.max(1, Math.min(availableWidth, preferredWidth));
+}
+
 function themeInspectorScrollTarget(msg: KeyMsg, viewportHeight: number): number | 'top' | 'bottom' | undefined {
   if (msg.ctrl || msg.alt) return undefined;
   if (!msg.shift && (msg.key === 'down' || msg.key === 'j')) return 1;
@@ -3929,9 +3935,9 @@ function renderThemeInspectorDrawer(
   localization: LocalizationPort | undefined,
 ) {
   const activeTheme = resolveDocsShellThemeById(model.docsModel.activeShellThemeId);
-  const drawerWidth = Math.max(34, Math.min(64, model.columns - 2, Math.floor(model.columns * 0.42)));
+  const drawerWidth = themeInspectorDrawerWidth(model.columns);
   const drawerHeight = Math.max(8, model.rows - 4);
-  const bodyWidth = Math.max(22, drawerWidth - 4);
+  const bodyWidth = Math.max(1, drawerWidth - 4);
   const viewportHeight = Math.max(1, drawerHeight - 2);
   const body = column([
     line(dogfoodText(localization, 'themeInspector.active', 'Active: {label}', {

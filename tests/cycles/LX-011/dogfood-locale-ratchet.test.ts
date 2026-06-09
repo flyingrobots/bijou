@@ -156,6 +156,16 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(entries.get('guide.info.posture.blocks')?.values.en).toContain('Block authoring');
   });
 
+  it('ratchets Theme Lab and Theme Inspector French labels into the DOGFOOD string table', () => {
+    const frEntries = new Map(
+      dogfoodI18nCatalogsForLocale('fr')[0]?.entries.map((entry) => [entry.key.id, entry]),
+    );
+
+    expect(frEntries.get('docs.page.themes')?.values.fr).toBe('Thèmes');
+    expect(frEntries.get('themeInspector.title')?.values.fr).toBe('Inspecteur de thèmes');
+    expect(frEntries.get('themeLab.title')?.values.fr).toBe('Laboratoire de thèmes');
+  });
+
   it('initializes DOGFOOD pages from the injected locale preference', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, {

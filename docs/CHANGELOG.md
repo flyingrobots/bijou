@@ -69,6 +69,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   adjust Braille threshold and contrast, and enable deterministic ordered
   dithering from the keyboard. This closes issue #305.
 
+### 🧭 Planning
+
+- **Shared UI scene IR boundary** —
+  `docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md` now links
+  the #302 GraphQL-authored scene idea to the Runtime Graph And Scene IR
+  roadmap candidate. The document records that Bijou `Surface` is the terminal
+  render target for a future portable UI scene IR and does not claim compiler or
+  renderer implementation in this release slice.
+
 ### 🐛 Fixes
 
 - **Shell quit confirmation copy** — The shell quit confirmation modal now

@@ -1740,7 +1740,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Themes"
+        "fr": "Thèmes"
       }
     },
     {
@@ -2449,7 +2449,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Theme : {name}"
+        "fr": "Thème : {name}"
       }
     },
     {
@@ -2460,7 +2460,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Inspecteur de themes"
+        "fr": "Inspecteur de thèmes"
       }
     },
     {
@@ -2471,7 +2471,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Appuyez sur F10 dans le shell docs pour ouvrir le tiroir rapide de l’inspecteur de themes."
+        "fr": "Appuyez sur F10 dans le shell docs pour ouvrir le tiroir rapide de l’inspecteur de thèmes."
       }
     },
     {
@@ -2482,7 +2482,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Le laboratoire de themes compare les presets internes aux themes de shell DOGFOOD et montre comment se résolvent les tokens sémantiques, de surface, de bordure, d’état, d’UI et de dégradé."
+        "fr": "Le laboratoire de thèmes compare les presets internes aux thèmes de shell DOGFOOD et montre comment se résolvent les tokens sémantiques, de surface, de bordure, d’état, d’UI et de dégradé."
       }
     },
     {
@@ -2537,7 +2537,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "F10 ouvre le tiroir de l’inspecteur de themes depuis le shell docs."
+        "fr": "F10 ouvre le tiroir de l’inspecteur de thèmes depuis le shell docs."
       }
     },
     {
@@ -2570,7 +2570,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "posture du theme"
+        "fr": "posture du thème"
       }
     },
     {
@@ -2581,7 +2581,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "docs • Laboratoire de themes"
+        "fr": "docs • Laboratoire de thèmes"
       }
     },
     {
@@ -2592,7 +2592,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Presets de theme par défaut, palettes du shell DOGFOOD et nuanciers de tokens."
+        "fr": "Presets de thème par défaut, palettes du shell DOGFOOD et nuanciers de tokens."
       }
     },
     {
@@ -2614,7 +2614,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Laboratoire de themes"
+        "fr": "Laboratoire de thèmes"
       }
     },
     {

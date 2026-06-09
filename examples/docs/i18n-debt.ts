@@ -547,7 +547,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
   if (isDiscriminantComparison(node)) return true;
   if (isErrorConstructorArgument(node)) return true;
   if (hasAncestor(node, (ancestor) => isOutputModeDeclaration(ancestor, sourceFile))) return true;
-  if (isThemeTokenFamilyIdentifier(node, sourceFile)) return true;
+  if (isThemeTokenFamilyIdentifier(node)) return true;
 
   const propertyName = nearestPropertyName(node);
   if (propertyName != null && NONLOCALIZABLE_PROPERTY_NAMES.has(propertyName)) return true;
@@ -570,7 +570,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
   return false;
 }
 
-function isThemeTokenFamilyIdentifier(node: ts.Node, sourceFile: ts.SourceFile): boolean {
+function isThemeTokenFamilyIdentifier(node: ts.Node): boolean {
   if (!ts.isStringLiteralLike(node)) return false;
   if (!['semantic', 'surface', 'border', 'ui', 'status', 'gradient'].includes(node.text)) return false;
 
@@ -579,9 +579,24 @@ function isThemeTokenFamilyIdentifier(node: ts.Node, sourceFile: ts.SourceFile):
     const expression = expressionUsedByParent(current);
     return ts.isForOfStatement(expression.parent)
       && expression.parent.expression === expression
-      && expression.parent.statement.getText(sourceFile).includes('themePaletteRows');
+      && isInsideNamedFunction(expression.parent, 'themePaletteRows');
   }
 
+  return false;
+}
+
+function isInsideNamedFunction(node: ts.Node, name: string): boolean {
+  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+    if (ts.isFunctionDeclaration(current) && current.name?.text === name) return true;
+    if (
+      (ts.isFunctionExpression(current) || ts.isArrowFunction(current))
+      && ts.isVariableDeclaration(current.parent)
+      && ts.isIdentifier(current.parent.name)
+      && current.parent.name.text === name
+    ) {
+      return true;
+    }
+  }
   return false;
 }
 

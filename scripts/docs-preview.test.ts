@@ -1017,6 +1017,19 @@ describe('docs preview app', () => {
     expect(frameText(closed.frames.at(-1)!)).not.toContain('Theme Inspector');
   });
 
+  it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30, rows: 18 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
+    const frame = opened.frames.at(-1)!;
+
+    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect(frame.width).toBe(30);
+    expect(frame.height).toBe(18);
+    expect(frameText(frame)).toContain('Theme Inspector');
+  });
+
   it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
     const app = createDocsApp(ctx);

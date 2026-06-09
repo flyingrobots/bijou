@@ -75,6 +75,27 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(inventory.entries.map((entry) => entry.value)).toEqual(['Visible renderer label']);
   });
 
+  it('ignores theme palette family identifiers only in the theme palette loop', () => {
+    const inventory = collectDogfoodI18nDebt({
+      sources: [{
+        surface: 'fixture',
+        path: 'examples/docs/fixture.ts',
+        text: [
+          "function themePaletteRows(theme: unknown) {",
+          "  const rows: unknown[] = [];",
+          "  for (const family of ['semantic', 'surface', 'border', 'ui', 'status', 'gradient'] as const) {",
+          "    rows.push({ kind: 'group', label: family });",
+          "  }",
+          "  return rows;",
+          "}",
+          "const visible = 'semantic';",
+        ].join('\n'),
+      }],
+    });
+
+    expect(inventory.entries.map((entry) => entry.value)).toEqual(['semantic']);
+  });
+
   it('freezes nested inventory entries and surface counts', () => {
     const inventory = collectDogfoodI18nDebt({
       sources: [{
