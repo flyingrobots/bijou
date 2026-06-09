@@ -525,6 +525,8 @@ export {
   type TokenTheme,
   type TokenThemeMode,
   // Presets
+  BIJOU_DARK,
+  BIJOU_LIGHT,
   CYAN_MAGENTA,
   TEAL_ORANGE_PINK,
   PRESETS,

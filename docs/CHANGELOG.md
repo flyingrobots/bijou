@@ -18,8 +18,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   dark and light shell themes for the docs surface instead of relying on the
   landing-screen palette ramp as the default shell theme. The theme-token
   doctrine now documents every built-in token with "use when / do not use when"
-  guidance, audits the default dark/light UX posture, and records the proposed
-  Theme Inspector drawer for future token debugging.
+  guidance, audits the default dark/light UX posture, and records the bounded
+  Theme Inspector / Theme Lab debugging path.
+- **First-party theme defaults and inspector** — `@flyingrobots/bijou` now
+  exports `BIJOU_DARK` and `BIJOU_LIGHT` and registers them as the
+  `bijou-dark` and `bijou-light` presets. DOGFOOD Dark and DOGFOOD Light now
+  consume those presets directly, the docs shell adds a `Themes` / Theme Lab
+  page with token swatches, color-reuse diagnostics, and safe-pair diagnostics,
+  and `F10` opens a bounded Theme Inspector drawer for the active DOGFOOD shell
+  theme. This addresses the Theme Lab direction in #315 and advances #311.
 - **Theme safe-pair contracts** — `@flyingrobots/bijou` now exports
   `defineThemeSafePairs()` so theme authors can declare reusable
   foreground/background contrast matrices grouped as readable, status, or

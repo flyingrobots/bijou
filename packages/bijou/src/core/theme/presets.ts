@@ -38,8 +38,24 @@ export function populateTokenRGB(token: TokenValue): TokenValue {
   return token;
 }
 
+function rgb(hex: string): [number, number, number] {
+  return [
+    Number.parseInt(hex.slice(1, 3), 16),
+    Number.parseInt(hex.slice(3, 5), 16),
+    Number.parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+function gradient(hexes: readonly string[]): { readonly pos: number; readonly color: [number, number, number] }[] {
+  const max = Math.max(1, hexes.length - 1);
+  return hexes.map((hex, index) => ({
+    pos: index / max,
+    color: rgb(hex),
+  }));
+}
+
 /**
- * CYAN_MAGENTA — the default theme.
+ * CYAN_MAGENTA — the legacy vivid terminal-native preset.
  *
  * Named ANSI → hex mapping used here:
  *   green   = #00ff00    cyan    = #00ffff    magenta = #ff00ff
@@ -106,6 +122,134 @@ export const CYAN_MAGENTA: Theme<BaseStatusKey> = {
     elevated:  { hex: '#ffffff', bg: '#0f3460' },
     overlay:   { hex: '#ffffff', bg: '#1a1a2e' },
     muted:     { hex: '#808080', bg: '#0a0a14' },
+  },
+};
+
+/**
+ * BIJOU_DARK — the calm first-party dark theme.
+ *
+ * This preset is intentionally less saturated than the legacy cyan/magenta
+ * palette. It keeps neutral surfaces dominant, separates focus/brand/status
+ * roles, and preserves readable foregrounds across dense product surfaces.
+ */
+export const BIJOU_DARK: Theme<BaseStatusKey> = {
+  name: 'bijou-dark',
+
+  status: {
+    success: tv('#8bd67d'),
+    error:   tv('#ff8a80'),
+    warning: tv('#f2c45d'),
+    info:    tv('#8fbaff'),
+    pending: tv('#a8b1c7', ['dim']),
+    active:  tv('#f2c45d'),
+    muted:   tv('#a8b1c7', ['dim', 'strikethrough']),
+  },
+
+  semantic: {
+    success: tv('#8bd67d'),
+    error:   tv('#ff8a80'),
+    warning: tv('#f2c45d'),
+    info:    tv('#8fbaff'),
+    accent:  tv('#f2c45d'),
+    muted:   tv('#a8b1c7', ['dim']),
+    primary: tv('#f4e8bf', ['bold']),
+  },
+
+  gradient: {
+    brand: gradient(['#7aa7e8', '#f2c45d', '#ff8a80']),
+    progress: gradient(['#7aa7e8', '#8bd67d', '#f2c45d', '#ff8a80']),
+  },
+
+  border: {
+    primary:   tv('#7aa7e8'),
+    secondary: tv('#f2c45d'),
+    success:   tv('#8bd67d'),
+    warning:   tv('#f2c45d'),
+    error:     tv('#ff8a80'),
+    muted:     tv('#5f6b86'),
+  },
+
+  ui: {
+    cursor:        tv('#f2c45d'),
+    focusGutter:   { hex: '#f2c45d', bg: '#171827', modifiers: ['bold'] },
+    scrollThumb:   tv('#7aa7e8'),
+    scrollTrack:   tv('#5f6b86'),
+    sectionHeader: tv('#f2c45d', ['bold']),
+    logo:          tv('#f2c45d'),
+    tableHeader:   tv('#f4e8bf', ['bold']),
+    trackEmpty:    tv('#2a3150'),
+  },
+
+  surface: {
+    primary:   { hex: '#f4e8bf', bg: '#171827' },
+    secondary: { hex: '#d8def0', bg: '#20243a' },
+    elevated:  { hex: '#f8f0d0', bg: '#29304d' },
+    overlay:   { hex: '#f8f0d0', bg: '#10121f' },
+    muted:     { hex: '#a8b1c7', bg: '#131625' },
+  },
+};
+
+/**
+ * BIJOU_LIGHT — the calm first-party light theme.
+ *
+ * The light preset mirrors the dark theme's roles while using ink-forward
+ * foregrounds instead of pastel text, so dense terminal surfaces remain
+ * scannable on bright backgrounds.
+ */
+export const BIJOU_LIGHT: Theme<BaseStatusKey> = {
+  name: 'bijou-light',
+
+  status: {
+    success: tv('#246a3d'),
+    error:   tv('#a33a3a'),
+    warning: tv('#7a5200'),
+    info:    tv('#285c9e'),
+    pending: tv('#5e6778', ['dim']),
+    active:  tv('#7a5200'),
+    muted:   tv('#5e6778', ['dim', 'strikethrough']),
+  },
+
+  semantic: {
+    success: tv('#246a3d'),
+    error:   tv('#a33a3a'),
+    warning: tv('#7a5200'),
+    info:    tv('#285c9e'),
+    accent:  tv('#7a5200'),
+    muted:   tv('#5e6778', ['dim']),
+    primary: tv('#1e2433', ['bold']),
+  },
+
+  gradient: {
+    brand: gradient(['#285c9e', '#7a5200', '#a33a3a']),
+    progress: gradient(['#285c9e', '#246a3d', '#7a5200', '#a33a3a']),
+  },
+
+  border: {
+    primary:   tv('#285c9e'),
+    secondary: tv('#7a5200'),
+    success:   tv('#246a3d'),
+    warning:   tv('#7a5200'),
+    error:     tv('#a33a3a'),
+    muted:     tv('#8a93a2'),
+  },
+
+  ui: {
+    cursor:        tv('#7a5200'),
+    focusGutter:   { hex: '#7a5200', bg: '#fbf7ea', modifiers: ['bold'] },
+    scrollThumb:   tv('#285c9e'),
+    scrollTrack:   tv('#cdd5e2'),
+    sectionHeader: tv('#7a5200', ['bold']),
+    logo:          tv('#7a5200'),
+    tableHeader:   tv('#1e2433', ['bold']),
+    trackEmpty:    tv('#ded6c3'),
+  },
+
+  surface: {
+    primary:   { hex: '#1e2433', bg: '#fbf7ea' },
+    secondary: { hex: '#252b38', bg: '#efe7d2' },
+    elevated:  { hex: '#1e2433', bg: '#fffdf6' },
+    overlay:   { hex: '#1e2433', bg: '#f5eddb' },
+    muted:     { hex: '#5e6778', bg: '#ece4d1' },
   },
 };
 
@@ -182,6 +326,8 @@ export const TEAL_ORANGE_PINK: Theme<BaseStatusKey> = {
 
 /** Registry of all built-in presets, keyed by theme name. */
 export const PRESETS: Record<string, Theme> = {
+  'bijou-dark': BIJOU_DARK,
+  'bijou-light': BIJOU_LIGHT,
   'cyan-magenta': CYAN_MAGENTA,
   'teal-orange-pink': TEAL_ORANGE_PINK,
   'nord': {

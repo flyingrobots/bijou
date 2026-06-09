@@ -2,7 +2,16 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, doctorTheme, lerp3, themeContrastRatio, type ColorRef, type Theme } from '@flyingrobots/bijou';
+import {
+  BIJOU_DARK,
+  BIJOU_LIGHT,
+  colorHex,
+  doctorTheme,
+  lerp3,
+  themeContrastRatio,
+  type ColorRef,
+  type Theme,
+} from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
@@ -36,6 +45,7 @@ const BIJOU_VERSION: string = JSON.parse(
 ).version;
 
 const KEY_ENTER = '\r';
+const KEY_UP = '\x1b[A';
 const KEY_DOWN = '\x1b[B';
 const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
@@ -43,6 +53,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
+const KEY_F10 = '\x1b[21~';
 const KEY_NEXT_TAB = ']';
 const KEY_BACKTICK = '`';
 const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
@@ -976,10 +987,93 @@ describe('docs preview app', () => {
     assertReadableDogfoodTheme(dark!.theme);
     assertReadableDogfoodTheme(light!.theme);
 
+    expect(dark!.theme.semantic.primary.hex).toBe(BIJOU_DARK.semantic.primary.hex);
+    expect(dark!.theme.surface.primary.bg).toBe(BIJOU_DARK.surface.primary.bg);
+    expect(light!.theme.semantic.primary.hex).toBe(BIJOU_LIGHT.semantic.primary.hex);
+    expect(light!.theme.surface.primary.bg).toBe(BIJOU_LIGHT.surface.primary.bg);
     expect(dark!.theme.semantic.primary.hex).not.toBe(dark!.theme.semantic.accent.hex);
     expect(dark!.theme.ui.cursor.hex).not.toBe(dark!.theme.status.info.hex);
     expect(light!.theme.semantic.primary.hex).not.toBe(light!.theme.semantic.accent.hex);
     expect(light!.theme.ui.cursor.hex).not.toBe(light!.theme.status.info.hex);
+  });
+
+  it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
+    const openedText = frameText(opened.frames.at(-1)!);
+
+    expect((opened.model as any).route).toBe('docs');
+    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect(openedText).toContain('Theme Inspector');
+    expect(openedText).toContain('Active: DOGFOOD Dark');
+    expect(openedText).toContain('semantic.primary');
+    expect(openedText).toContain('surface.primary');
+    expect(openedText).toContain('safe pairs pass');
+
+    const closed = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: KEY_F10 }], { ctx });
+    expect((closed.model as any).themeInspectorOpen).toBe(false);
+    expect(frameText(closed.frames.at(-1)!)).not.toContain('Theme Inspector');
+  });
+
+  it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: 'q' }], { ctx });
+
+    expect((opened.model as any).themeInspectorOpen).toBe(false);
+    expect((opened.model as any).docsModel.quitConfirmOpen).toBe(true);
+    expect(frameText(opened.frames.at(-1)!)).toContain('Quit?');
+  });
+
+  it('scrolls the Theme Inspector drawer without closing it', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 118, rows: 20 } });
+    const app = createDocsApp(ctx);
+
+    const scrolled = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_F10 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+    ], { ctx });
+
+    expect((scrolled.model as any).themeInspectorOpen).toBe(true);
+    expect((scrolled.model as any).themeInspectorScrollY).toBeGreaterThan(0);
+    expect(frameText(scrolled.frames.at(-1)!)).toContain('Theme Inspector');
+
+    const restored = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_F10 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_UP },
+    ], { ctx });
+
+    expect((restored.model as any).themeInspectorOpen).toBe(true);
+    expect((restored.model as any).themeInspectorScrollY).toBeLessThan((scrolled.model as any).themeInspectorScrollY);
+  });
+
+  it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 44 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const result = await runScript(app, [], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+
+    expect((result.model as any).docsModel.activePageId).toBe('themes');
+    expect(text).toContain('Theme Lab');
+    expect(text).toContain('Default dark preset: bijou-dark');
+    expect(text).toContain('Default light preset: bijou-light');
+    expect(text).toContain('Color reuse: dark');
+    expect(text).toContain('DOGFOOD Dark -> dogfood-dark');
+    expect(text).toContain('bijou-dark token swatches');
+    expect(text).toContain('semantic.primary');
+    expect(text).toContain('gradient.brand');
   });
 
   it('documents every built-in token with usage guidance and dark/light UX posture', () => {
@@ -1024,7 +1118,7 @@ describe('docs preview app', () => {
 
     expect(doctrine).toContain('## Per-Token Library Reference');
     expect(doctrine).toContain('## Default Dark/Light UX Audit');
-    expect(doctrine).toContain('## Theme Debugger Direction');
+    expect(doctrine).toContain('## Theme Debugger And Lab');
     expect(doctrine).toContain('Use when');
     expect(doctrine).toContain('Do not use when');
     for (const token of requiredRows) {
@@ -1552,13 +1646,15 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
       { key: KEY_NEXT_TAB },
       { key: '/' },
-      { key: 'p' },
       { key: 'a' },
+      { key: 'p' },
+      { key: 'p' },
+      { key: '-' },
+      { key: 's' },
+      { key: 'h' },
+      { key: 'e' },
       { key: 'l' },
-      { key: 'e' },
-      { key: 't' },
-      { key: 't' },
-      { key: 'e' },
+      { key: 'l' },
       { key: KEY_ENTER },
       { key: '.' },
     ], { ctx });

@@ -269,14 +269,14 @@ strict so components remain readable when a theme changes.
 
 ## Default Dark/Light UX Audit
 
-The legacy `CYAN_MAGENTA` preset is useful as a vivid terminal-native default,
+The legacy `CYAN_MAGENTA` preset is useful as a vivid terminal-native preset,
 but it is not ideal as the model for dense product surfaces. It uses saturated
 terminal colors for many unrelated jobs: cyan appears as info, active state,
 cursor, scrollbar, logo, and primary border; magenta appears as accent,
 secondary border, and focus gutter. That makes the app energetic, but it also
 makes many regions compete at the same visual priority.
 
-DogFood should use a calmer shell posture:
+Bijou's first-party defaults now use a calmer shell posture:
 
 - neutral surfaces carry most of the screen
 - one accent family carries local emphasis and shell selection
@@ -284,11 +284,14 @@ DogFood should use a calmer shell posture:
 - muted text remains contrast-safe instead of merely dim
 - dark and light themes both satisfy readable foreground/background pairs
 
-The current DogFood dark shell uses dark neutral surfaces, readable cool/warm
-accents, and separate success/warning/error/info colors. The current DogFood
-light shell uses light neutral surfaces with darker semantic colors instead of
-pastel foregrounds. Both modes target at least 4.5:1 contrast for surface text
-and common semantic foregrounds on every shell surface.
+The `BIJOU_DARK` preset uses dark neutral surfaces, readable cool/warm accents,
+and separate success/warning/error/info colors. The `BIJOU_LIGHT` preset uses
+light neutral surfaces with darker semantic colors instead of pastel
+foregrounds. DOGFOOD consumes those defaults directly as `DOGFOOD Dark` and
+`DOGFOOD Light`, so the docs app proves the same palette family that first-party
+components should treat as the baseline. Both modes target at least 4.5:1
+contrast for surface text and common semantic foregrounds on every shell
+surface.
 
 Compared with large design systems, Bijou is intentionally compact today. The
 runtime vocabulary has about thirty direct color-bearing slots plus two
@@ -339,25 +342,34 @@ Do not use safe pairs as a way to bless every possible token combination.
 Declare pairs only when a component or product surface expects that
 combination to work.
 
-## Theme Debugger Direction
+## Theme Debugger And Lab
 
-The next inspectability step should be a Theme Inspector drawer.
+DOGFOOD now has two inspectability surfaces:
 
-Recommended UX:
+- `F10` opens a bounded Theme Inspector drawer in the docs shell.
+- The `Themes` page publishes a Theme Lab with default palettes, shell-gallery
+  facts, token swatches, and safe-pair diagnostics.
 
-- `F10` opens a shell drawer from any app frame that opts in.
+Current UX:
+
+- `F10` opens the drawer on the active DOGFOOD shell theme.
+- `F10` or `Esc` closes the drawer.
 - The drawer shows token swatches grouped by `semantic`, `surface`, `border`,
   `ui`, `status`, and `gradient`.
-- Each swatch renders the token name and uses the token value as the swatch
-  fill or foreground, depending on token family.
-- The drawer can toggle dark and light modes without permanently changing the
-  app until the user applies the selection.
-- Each swatch displays contrast facts for its documented safe pair when one is
-  known.
-- Future renderer provenance can let an inspected cell report whether it came
-  from a token, a raw color, or a lowered/no-color fallback.
+- Each swatch renders the token path and uses the token value as the swatch
+  fill or foreground depending on token family.
+- The drawer reports the safe-pair pass count for the active theme.
+- The Theme Lab page lists the first-party dark/light defaults, DOGFOOD shell
+  themes, landing palette themes, and token swatches.
 
-The first implementation should inspect theme tokens only. Element-level token
+Still deferred:
+
+- dark/light preview without committing the app theme
+- element-level token overlays
+- renderer provenance that can report whether a cell came from a token, raw
+  color, or lowered/no-color fallback
+
+The current implementation inspects theme tokens only. Element-level token
 overlays should wait until renderer provenance is available, because guessing
 token ownership from final RGB values would be misleading.
 

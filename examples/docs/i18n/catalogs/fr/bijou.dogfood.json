@@ -1735,6 +1735,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.page.themes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.search.title"
       },
       "kind": "message",
@@ -2385,6 +2396,248 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeDiagnostics.colorReuse"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "{count} couleurs réutilisées sur {total} valeurs uniques"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeDiagnostics.safePairs"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "{passed}/{total} paires sûres passent"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.active"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Actif : {label}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.close"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "F10/Esc fermer • ↑/↓ défiler • q quitter"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.theme"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Theme : {name}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Inspecteur de themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.body.inspectorHint"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Appuyez sur F10 dans le shell docs pour ouvrir le tiroir rapide de l’inspecteur de themes."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.body.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le laboratoire de themes compare les presets internes aux themes de shell DOGFOOD et montre comment se résolvent les tokens sémantiques, de surface, de bordure, d’état, d’UI et de dégradé."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.colorReuseLine"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Réutilisation des couleurs : sombre {dark}; clair {light}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.darkSwatchesTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "nuanciers de tokens bijou-dark"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.defaultDark"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Preset sombre par défaut : {name} ({summary})"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.defaultLight"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Preset clair par défaut : {name} ({summary})"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.f10Hint"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "F10 ouvre le tiroir de l’inspecteur de themes depuis le shell docs."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.galleryTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "galerie du shell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.lightSwatchesTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "nuanciers de tokens bijou-light"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.postureTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "posture du theme"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "docs • Laboratoire de themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Presets de theme par défaut, palettes du shell DOGFOOD et nuanciers de tokens."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.swatchCoverage"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Les nuanciers incluent les lignes semantic.primary, surface.primary et gradient.brand."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Laboratoire de themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themePalette.moreTokens"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "... {count} tokens de plus"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themePalette.tokenWithBackground"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "{foreground} sur {background}"
+      }
     }
   ]
 }

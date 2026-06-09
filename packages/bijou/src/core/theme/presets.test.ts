@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PRESETS, CYAN_MAGENTA, TEAL_ORANGE_PINK } from './presets.js';
+import { BIJOU_DARK, BIJOU_LIGHT, PRESETS, CYAN_MAGENTA, TEAL_ORANGE_PINK } from './presets.js';
 import type { BaseStatusKey, Theme } from './tokens.js';
 
 const ALL_STATUS_KEYS: readonly BaseStatusKey[] = [
@@ -66,16 +66,25 @@ function validateTheme(theme: Theme): void {
 }
 
 describe('presets', () => {
+  validateTheme(BIJOU_DARK);
+  validateTheme(BIJOU_LIGHT);
   validateTheme(CYAN_MAGENTA);
   validateTheme(TEAL_ORANGE_PINK);
 
   for (const [name, preset] of Object.entries(PRESETS)) {
-    if (preset !== CYAN_MAGENTA && preset !== TEAL_ORANGE_PINK) {
+    if (
+      preset !== BIJOU_DARK
+      && preset !== BIJOU_LIGHT
+      && preset !== CYAN_MAGENTA
+      && preset !== TEAL_ORANGE_PINK
+    ) {
       validateTheme(preset);
     }
   }
 
-  it('PRESETS registry includes both themes', () => {
+  it('PRESETS registry includes the first-party defaults and legacy vivid themes', () => {
+    expect(PRESETS['bijou-dark']).toBe(BIJOU_DARK);
+    expect(PRESETS['bijou-light']).toBe(BIJOU_LIGHT);
     expect(PRESETS['cyan-magenta']).toBe(CYAN_MAGENTA);
     expect(PRESETS['teal-orange-pink']).toBe(TEAL_ORANGE_PINK);
   });
