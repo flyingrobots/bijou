@@ -132,6 +132,11 @@ export function resolveThemeColorRef(
   ref: ThemeColorRef,
   options: ResolveThemeColorRefOptions,
 ): ThemeColorResolution {
+  const mode = options.theme.modes[options.mode];
+  if (mode === undefined) {
+    throw new Error(`Unknown theme mode "${options.mode}" for theme "${options.theme.id}".`);
+  }
+
   if (!isTokenRef(ref)) {
     const color = normalizeColorInput(ref);
     return Object.freeze({
@@ -142,11 +147,6 @@ export function resolveThemeColorRef(
       rgb: copyRgb(color.rgb),
       fallback: false as const,
     });
-  }
-
-  const mode = options.theme.modes[options.mode];
-  if (mode === undefined) {
-    throw new Error(`Unknown theme mode "${options.mode}" for theme "${options.theme.id}".`);
   }
 
   const token = mode.tokens[ref.id];

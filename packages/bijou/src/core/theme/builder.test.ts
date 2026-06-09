@@ -156,6 +156,13 @@ describe('theme builder API', () => {
     });
   });
 
+  it('rejects unknown modes before resolving raw colors', () => {
+    expect(() => resolveThemeColorRef('#abc', {
+      theme: exampleTheme(),
+      mode: 'ligth',
+    })).toThrow(/Unknown theme mode "ligth" for theme "bijou\.test"/);
+  });
+
   it('fails unresolved token refs by default and can use an explicit fallback', () => {
     const theme = exampleTheme();
 
