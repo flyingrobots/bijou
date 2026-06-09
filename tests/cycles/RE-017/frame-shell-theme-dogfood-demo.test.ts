@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { BIJOU_LIGHT } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import {
   createScriptTestContext as createTestContext,
@@ -60,6 +61,6 @@ describe('RE-017 framed shell theme demo', () => {
     expect(model.docsModel.activeShellThemeId).toBe('dogfood-light');
     expect(Object.values(model.docsModel.pageModels).every((pageModel) => pageModel.landingThemeIndex === 0)).toBe(true);
     expect(ctx.surface('primary').bg).toBe(originalBg);
-    expect(frame.get(frame.width - 2, 2).bg).toBe('#f8fafc');
+    expect(frame.get(frame.width - 2, 2).bg).toBe(BIJOU_LIGHT.surface.primary.bg);
   });
 });
