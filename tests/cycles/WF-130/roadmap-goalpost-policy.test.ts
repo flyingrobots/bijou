@@ -13,6 +13,14 @@ function normalizeWhitespace(source: string): string {
   return source.replace(/\s+/g, ' ').trim();
 }
 
+function sectionBetween(source: string, startHeading: string, endHeading: string): string {
+  const start = source.indexOf(startHeading);
+  if (start === -1) throw new Error(`Missing start heading ${startHeading}`);
+  const end = source.indexOf(endHeading, start + startHeading.length);
+  if (end === -1) throw new Error(`Missing end heading ${endHeading}`);
+  return source.slice(start, end);
+}
+
 describe('WF-130 roadmap goalpost policy', () => {
   it('documents release packets, goalposts, stories, slices, gates, and proof', () => {
     expect(existsSync(resolve(ROOT, 'docs/method/releases/README.md'))).toBe(true);
@@ -35,13 +43,13 @@ describe('WF-130 roadmap goalpost policy', () => {
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
 
-    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-06.');
+    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-09.');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
     expect(roadmap).toContain('`Beyond`');
-    expect(roadmap).toContain('30 | 1');
+    expect(roadmap).toContain('35 | 1');
     expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
@@ -82,5 +90,22 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(issueTemplate).toContain('id: slice-budget');
     expect(issueTemplate).toContain('id: release-gate');
     expect(issueTemplate).toContain('Issue, design doc, and non-draft PR are linked correctly.');
+  });
+
+  it('keeps the Beyond open snapshot count aligned with the Open Beyond Issues table', () => {
+    const roadmap = read('docs/ROADMAP.md');
+    const beyondRow = roadmap.match(/\| `Beyond` \| \[Beyond\]\([^)]+\) \| (?<open>\d+) \| (?<closed>\d+) \|/);
+    expect(beyondRow?.groups?.closed).toBe('1');
+
+    const openBeyondIssues = sectionBetween(
+      roadmap,
+      '### Open Beyond Issues',
+      '### Closed Beyond Lineage',
+    );
+    const openIssueRows = openBeyondIssues
+      .split('\n')
+      .filter(line => /^\| \[#\d+\]\(https:\/\/github\.com\/flyingrobots\/bijou\/issues\/\d+\)/.test(line));
+
+    expect(Number(beyondRow?.groups?.open)).toBe(openIssueRows.length);
   });
 });

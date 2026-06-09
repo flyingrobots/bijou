@@ -134,6 +134,9 @@ const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
   'family',
   'familyId',
   'fit',
+  'bg',
+  'fg',
+  'hex',
   'id',
   'ids',
   'importPath',
@@ -141,6 +144,7 @@ const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
   'kind',
   'align',
   'mode',
+  'modifiers',
   'namespace',
   'overflowX',
   'packageName',
@@ -148,6 +152,7 @@ const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
   'pipeFormat',
   'renderer',
   'sourceLocale',
+  'scrollbarMode',
   'supportsModes',
   'tags',
   'tone',
@@ -525,6 +530,7 @@ function normalizeLocalizableText(rawValue: string): string | undefined {
   if (/^--[a-z0-9-]+$/i.test(value)) return undefined;
   if (value.startsWith('.') || value.startsWith('/')) return undefined;
   if (value.startsWith('@')) return undefined;
+  if (/^#[0-9a-f]{3,8}$/i.test(value)) return undefined;
   if (/\.(gif|js|json|md|tape|ts|txt)$/i.test(value)) return undefined;
   if (/^[a-z0-9._:/-]+$/i.test(value) && /[._:/-]/.test(value)) return undefined;
   return value;
@@ -541,6 +547,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
   if (isDiscriminantComparison(node)) return true;
   if (isErrorConstructorArgument(node)) return true;
   if (hasAncestor(node, (ancestor) => isOutputModeDeclaration(ancestor, sourceFile))) return true;
+  if (isThemeTokenFamilyIdentifier(node)) return true;
 
   const propertyName = nearestPropertyName(node);
   if (propertyName != null && NONLOCALIZABLE_PROPERTY_NAMES.has(propertyName)) return true;
@@ -555,11 +562,53 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
       return true;
     }
     if (callName === 'bind' && argumentIndex === 0) return true;
+    if (callName === 'themeTokenRecordEntries' && argumentIndex === 0) return true;
     if (callName != null && PATH_FUNCTIONS.has(callName)) return true;
     if (call.expression.kind === ts.SyntaxKind.ImportKeyword) return true;
   }
 
   return false;
+}
+
+function isThemeTokenFamilyIdentifier(node: ts.Node): boolean {
+  if (!ts.isStringLiteralLike(node)) return false;
+  if (!['semantic', 'surface', 'border', 'ui', 'status', 'gradient'].includes(node.text)) return false;
+
+  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+    if (!ts.isArrayLiteralExpression(current)) continue;
+    const expression = expressionUsedByParent(current);
+    return ts.isForOfStatement(expression.parent)
+      && expression.parent.expression === expression
+      && isInsideNamedFunction(expression.parent, 'themePaletteRows');
+  }
+
+  return false;
+}
+
+function isInsideNamedFunction(node: ts.Node, name: string): boolean {
+  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+    if (ts.isFunctionDeclaration(current) && current.name?.text === name) return true;
+    if (
+      (ts.isFunctionExpression(current) || ts.isArrowFunction(current))
+      && ts.isVariableDeclaration(current.parent)
+      && ts.isIdentifier(current.parent.name)
+      && current.parent.name.text === name
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function expressionUsedByParent(node: ts.Expression): ts.Expression {
+  let current = node;
+  while (
+    (ts.isAsExpression(current.parent) || ts.isTypeAssertionExpression(current.parent))
+    && current.parent.expression === current
+  ) {
+    current = current.parent;
+  }
+  return current;
 }
 
 function nearestPropertyName(node: ts.Node): string | undefined {

@@ -1951,6 +1951,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.page.themes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.search.title"
       },
       "kind": "message",
@@ -2672,6 +2683,248 @@
       "sourceLocale": "en",
       "values": {
         "en": "On"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeDiagnostics.colorReuse"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{count} reused colors across {total} unique values"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeDiagnostics.safePairs"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{passed}/{total} safe pairs pass"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.active"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Active: {label}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.close"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "F10/Esc close • ↑/↓ scroll • q quit"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.theme"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Theme: {name}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Theme Inspector"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.body.inspectorHint"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Press F10 from the docs shell for the quick Theme Inspector drawer."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.body.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The Theme Lab compares first-party presets against DOGFOOD shell themes and shows how semantic, surface, border, status, UI, and gradient tokens resolve."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.colorReuseLine"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Color reuse: dark {dark}; light {light}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.darkSwatchesTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "bijou-dark token swatches"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.defaultDark"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Default dark preset: {name} ({summary})"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.defaultLight"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Default light preset: {name} ({summary})"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.f10Hint"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "F10 opens the Theme Inspector drawer from the docs shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.galleryTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "shell gallery"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.lightSwatchesTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "bijou-light token swatches"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.postureTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "theme posture"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "docs • Theme Lab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Default theme presets, DOGFOOD shell palettes, and token swatches."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.swatchCoverage"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Swatches include semantic.primary, surface.primary, and gradient.brand rows."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Theme Lab"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themePalette.moreTokens"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "... {count} more tokens"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themePalette.tokenWithBackground"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{foreground} on {background}"
       }
     }
   ]

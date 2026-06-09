@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs';
 import {
+  BIJOU_DARK,
+  BIJOU_LIGHT,
   boxSurface,
   blockRenderNode,
   cloneContextWithTheme,
   createSurface,
   CYAN_MAGENTA,
   colorHex,
+  doctorTheme,
   inspector,
   inspectorPanelBlock,
   lerp3,
@@ -26,6 +29,7 @@ import {
   type Surface,
   type StandardBlockStory,
   type Theme,
+  type TextModifier,
   type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import {
@@ -74,6 +78,7 @@ import {
   type RunOptions,
 } from '../../packages/bijou-tui/src/index.js';
 import { runWithLifecycleHooks } from '../../packages/bijou-tui/src/runtime.js';
+import { normalizeViewOutput } from '../../packages/bijou-tui/src/view-output.js';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
@@ -155,6 +160,8 @@ import {
   titleScreenBlock,
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
+import { DOGFOOD_SHELL_THEMES, DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
+export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 
 const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
   new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
@@ -203,13 +210,15 @@ const COMPONENTS_PAGE_ID = 'components';
 const BLOCKS_PAGE_ID = 'blocks';
 const PACKAGES_PAGE_ID = 'packages';
 const PHILOSOPHY_PAGE_ID = 'philosophy';
+const THEME_LAB_PAGE_ID = 'themes';
 const RELEASE_PAGE_ID = 'release';
 const BLOCK_PREVIEW_GUIDE_ID = 'blocks-preview';
 const COUNTER_DEMO_BLOCK_GUIDE_ID = `${BLOCK_PREVIEW_GUIDE_ID}-counterdemoblock`;
+const THEME_LAB_GUIDE_ID = 'theme-lab';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_STANDARD_NAV_WIDTH = 28;
 const DOCS_NARROW_NAV_WIDTH = 26;
-const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
+const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • F10 Theme Inspector • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
 const DOCS_FRAME_CHROME_ROWS = 2;
 const DOCS_LAYOUT_VERTICAL_MARGIN_ROWS = 2;
@@ -240,6 +249,7 @@ type DocsPageId =
   | typeof BLOCKS_PAGE_ID
   | typeof PACKAGES_PAGE_ID
   | typeof PHILOSOPHY_PAGE_ID
+  | typeof THEME_LAB_PAGE_ID
   | typeof RELEASE_PAGE_ID;
 
 type GuideDocsPageId = Exclude<DocsPageId, typeof COMPONENTS_PAGE_ID>;
@@ -303,6 +313,7 @@ interface DocsExplorerModel {
   readonly showHints: boolean;
   readonly locale: string;
   readonly landingThemeIndex: number;
+  readonly activeShellThemeId?: string;
   readonly landingQualityMode: LandingQualityMode;
   readonly counterBlockDemo: CounterDemoModel;
 }
@@ -343,6 +354,8 @@ interface RootModel {
   readonly landingThemeIndex: number;
   readonly landingToast?: LandingToastState;
   readonly landingQuitConfirmOpen: boolean;
+  readonly themeInspectorOpen: boolean;
+  readonly themeInspectorScrollY: number;
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
@@ -396,6 +409,7 @@ const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
   { id: BLOCKS_PAGE_ID, title: 'Blocks' },
   { id: PACKAGES_PAGE_ID, title: 'Packages' },
   { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
+  { id: THEME_LAB_PAGE_ID, title: THEME_LAB_PAGE_ID },
   { id: RELEASE_PAGE_ID, title: 'Release' },
 ]);
 const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
@@ -603,6 +617,34 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     summary: 'The foundations, patterns, blocks, and component-family doctrine behind Bijou UI.',
     body: PHILOSOPHY_DESIGN_SYSTEM_TEXT,
   },
+  {
+    id: THEME_LAB_GUIDE_ID,
+    pageId: THEME_LAB_PAGE_ID,
+    title: THEME_LAB_GUIDE_ID,
+    summary: '',
+    body: '',
+    localizedTitle: (localization) => dogfoodText(localization, 'themeLab.title', 'Theme Lab'),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'themeLab.summary',
+      'Inspect first-party default themes, DOGFOOD shell palettes, token roles, and safe-pair diagnostics.',
+    ),
+    localizedBody: (localization) => [
+      `# ${dogfoodText(localization, 'themeLab.title', 'Theme Lab')}`,
+      '',
+      dogfoodText(
+        localization,
+        'themeLab.body.summary',
+        'DOGFOOD exposes Bijou theme facts as a runnable product surface: default dark/light presets, shell theme gallery, token swatches, and contrast diagnostics.',
+      ),
+      '',
+      dogfoodText(
+        localization,
+        'themeLab.body.inspectorHint',
+        'Press F10 from the docs shell for the quick Theme Inspector drawer.',
+      ),
+    ].join('\n'),
+  },
   ...RELEASE_TITLE_GUIDES,
   {
     id: 'release-overview',
@@ -642,8 +684,8 @@ const LANDING_FLYING_ROBOTS_FADE_DELAY_MS = 3000;
 const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
 const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
 const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
-const DIM_MODIFIERS = ['dim'];
-const BOLD_MODIFIERS = ['bold'];
+const DIM_MODIFIERS: TextModifier[] = ['dim'];
+const BOLD_MODIFIERS: TextModifier[] = ['bold'];
 const BRAILLE_BLANK = '\u2800';
 const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
 const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
@@ -757,75 +799,25 @@ const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
     logoTile: 1,
   },
 ] as const;
-const VERDANT_PLUM_COLORS = ['#043015', '#265408', '#968425', '#b96862', '#c281af'] as const;
-const VERDANT_PLUM_THEME: Theme = {
-  ...CYAN_MAGENTA,
-  name: 'dogfood-verdant-plum',
-  status: {
-    ...CYAN_MAGENTA.status,
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    info: tv(VERDANT_PLUM_COLORS[4]),
-    active: tv(VERDANT_PLUM_COLORS[4]),
-    muted: tv(VERDANT_PLUM_COLORS[1], ['dim', 'strikethrough']),
-  },
-  semantic: {
-    ...CYAN_MAGENTA.semantic,
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    info: tv(VERDANT_PLUM_COLORS[2]),
-    accent: tv(VERDANT_PLUM_COLORS[3]),
-    muted: tv(VERDANT_PLUM_COLORS[2], ['dim']),
-    primary: tv(VERDANT_PLUM_COLORS[4], ['bold']),
-  },
-  gradient: {
-    ...CYAN_MAGENTA.gradient,
-    brand: gradientStopsFromHexes(VERDANT_PLUM_COLORS),
-    progress: gradientStopsFromHexes([
-      VERDANT_PLUM_COLORS[1],
-      VERDANT_PLUM_COLORS[2],
-      VERDANT_PLUM_COLORS[3],
-      VERDANT_PLUM_COLORS[4],
-    ]),
-  },
-  border: {
-    ...CYAN_MAGENTA.border,
-    primary: tv(VERDANT_PLUM_COLORS[2]),
-    secondary: tv(VERDANT_PLUM_COLORS[3]),
-    success: tv(VERDANT_PLUM_COLORS[2]),
-    warning: tv(VERDANT_PLUM_COLORS[4]),
-    error: tv(VERDANT_PLUM_COLORS[3]),
-    muted: tv(VERDANT_PLUM_COLORS[1]),
-  },
-  ui: {
-    ...CYAN_MAGENTA.ui,
-    cursor: tv(VERDANT_PLUM_COLORS[4]),
-    focusGutter: { hex: VERDANT_PLUM_COLORS[3], bg: VERDANT_PLUM_COLORS[0], modifiers: ['bold'] },
-    scrollThumb: tv(VERDANT_PLUM_COLORS[4]),
-    scrollTrack: tv(VERDANT_PLUM_COLORS[1]),
-    sectionHeader: tv(VERDANT_PLUM_COLORS[2], ['bold']),
-    logo: tv(VERDANT_PLUM_COLORS[4]),
-    tableHeader: tv(VERDANT_PLUM_COLORS[4]),
-    trackEmpty: tv(VERDANT_PLUM_COLORS[1]),
-  },
-  surface: {
-    primary: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
-    secondary: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[1] },
-    elevated: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[1] },
-    overlay: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
-    muted: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[0] },
-  },
-};
-const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = LANDING_THEMES.map((theme) => ({
+
+const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = [
+  ...DOGFOOD_SHELL_THEMES,
+  ...LANDING_THEMES.map((theme) => ({
   id: theme.id,
   label: theme.label,
-  theme: theme.id === 'verdant-plum'
-    ? VERDANT_PLUM_THEME
-    : landingTokensToShellTheme(theme),
-}));
+  theme: landingTokensToShellTheme(theme),
+})),
+];
+
+export function docsShellThemesForTesting(): readonly FrameShellTheme[] {
+  return DOCS_SHELL_THEMES;
+}
+
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
+const DOCS_VISUAL_THEME_BY_SHELL_ID = new Map<string, LandingThemeTokens>([
+  ...LANDING_THEMES.map((theme) => [theme.id, theme] as const),
+  ...DOGFOOD_SHELL_THEMES.map((theme) => [theme.id, docsVisualThemeFromShellTheme(theme)] as const),
+]);
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -986,6 +978,50 @@ function shouldToggleLandingPerfHud(msg: KeyMsg): boolean {
 
 function shouldContinueFromLanding(msg: KeyMsg): boolean {
   return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'enter';
+}
+
+function shouldToggleThemeInspector(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'f10';
+}
+
+function shouldCloseThemeInspector(msg: KeyMsg): boolean {
+  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape';
+}
+
+function themeInspectorViewportHeight(model: RootModel): number {
+  const drawerHeight = Math.max(8, model.rows - 4);
+  return Math.max(1, drawerHeight - 2);
+}
+
+function themeInspectorContentHeight(theme: Theme): number {
+  return themePaletteRows(theme).length + 6;
+}
+
+function themeInspectorMaxScroll(model: RootModel): number {
+  const activeTheme = resolveDocsShellThemeById(model.docsModel.activeShellThemeId);
+  return Math.max(0, themeInspectorContentHeight(activeTheme.theme) - themeInspectorViewportHeight(model));
+}
+
+function clampThemeInspectorScroll(model: RootModel, scrollY: number): number {
+  if (!Number.isFinite(scrollY)) return 0;
+  return Math.max(0, Math.min(Math.floor(scrollY), themeInspectorMaxScroll(model)));
+}
+
+function themeInspectorDrawerWidth(columns: number): number {
+  const availableWidth = Math.max(1, columns - 2);
+  const preferredWidth = Math.min(64, Math.max(34, Math.floor(columns * 0.42)));
+  return Math.max(1, Math.min(availableWidth, preferredWidth));
+}
+
+function themeInspectorScrollTarget(msg: KeyMsg, viewportHeight: number): number | 'top' | 'bottom' | undefined {
+  if (msg.ctrl || msg.alt) return undefined;
+  if (!msg.shift && (msg.key === 'down' || msg.key === 'j')) return 1;
+  if (!msg.shift && (msg.key === 'up' || msg.key === 'k')) return -1;
+  if (!msg.shift && (msg.key === 'pagedown' || msg.key === 'd')) return Math.max(1, viewportHeight - 2);
+  if (!msg.shift && (msg.key === 'pageup' || msg.key === 'u')) return -Math.max(1, viewportHeight - 2);
+  if (!msg.shift && msg.key === 'g') return 'top';
+  if (msg.key === 'G' || (msg.shift && msg.key === 'g')) return 'bottom';
+  return undefined;
 }
 
 function readMarkdownDoc(path: string): string {
@@ -1994,6 +2030,8 @@ function pageTitle(pageId: DocsPageId, localization?: LocalizationPort): string 
       return dogfoodText(localization, 'docs.page.packages', 'Packages');
     case PHILOSOPHY_PAGE_ID:
       return dogfoodText(localization, 'docs.page.philosophy', 'Philosophy');
+    case THEME_LAB_PAGE_ID:
+      return dogfoodText(localization, 'docs.page.themes', 'Themes');
     case RELEASE_PAGE_ID:
       return dogfoodText(localization, 'docs.page.release', 'Release');
   }
@@ -2042,6 +2080,7 @@ function createInitialExplorerModel(
     showHints: true,
     locale,
     landingThemeIndex: 0,
+    activeShellThemeId: DOCS_SHELL_THEMES[0]?.id,
     landingQualityMode: 'auto',
     counterBlockDemo: createCounterDemoModel(5),
   };
@@ -3150,11 +3189,13 @@ function syncDocsSharedSettings(
   const activePageModel = docsModel.pageModels[docsModel.activePageId];
   if (activePageModel == null) return docsModel;
   const landingThemeIndex = resolveLandingThemeIndexForShellThemeId(docsModel.activeShellThemeId);
+  const activeShellThemeId = resolveDocsShellThemeById(docsModel.activeShellThemeId).id;
   return mapDocsPageModels(docsModel, (pageModel) => {
     if (
       pageModel.showHints === activePageModel.showHints
       && pageModel.locale === activePageModel.locale
       && pageModel.landingThemeIndex === landingThemeIndex
+      && pageModel.activeShellThemeId === activeShellThemeId
       && pageModel.landingQualityMode === activePageModel.landingQualityMode
     ) {
       return pageModel;
@@ -3164,6 +3205,7 @@ function syncDocsSharedSettings(
       showHints: activePageModel.showHints,
       locale: activePageModel.locale,
       landingThemeIndex,
+      activeShellThemeId,
       landingQualityMode: activePageModel.landingQualityMode,
     };
   });
@@ -3233,6 +3275,34 @@ function compileLandingTheme(seed: LandingThemeSeed): LandingThemeTokens {
     footerStrongColor: sampleColorRamp(logoRamp, 0.88),
     fpsColor: sampleColorRamp(waveRamp, 0.62),
   };
+}
+
+function themeTokenHex(token: TokenValue | undefined, fallback: string): string {
+  return token?.hex ?? fallback;
+}
+
+function themeTokenBg(token: TokenValue | undefined, fallback: string): string {
+  return token?.bg ?? fallback;
+}
+
+function docsVisualThemeFromShellTheme(shellTheme: FrameShellTheme): LandingThemeTokens {
+  const theme = shellTheme.theme;
+  const background = themeTokenBg(theme.surface.primary, '#10131a');
+  return compileLandingTheme({
+    id: shellTheme.id,
+    label: shellTheme.label,
+    background,
+    waveGradient: [
+      themeTokenBg(theme.surface.muted, background),
+      themeTokenBg(theme.surface.secondary, background),
+      themeTokenHex(theme.border.primary, themeTokenHex(theme.semantic.info, '#6aa6ff')),
+    ],
+    logoGradient: [
+      themeTokenHex(theme.semantic.info, '#6aa6ff'),
+      themeTokenHex(theme.semantic.accent, '#d7a84f'),
+      themeTokenHex(theme.semantic.primary, '#f5f2e8'),
+    ],
+  });
 }
 
 function createGradientStops(gradient: readonly [string, string, string]): Array<{ pos: number; color: Rgb }> {
@@ -3583,7 +3653,7 @@ function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
       focusGutter: docsThemeFocusedGutterToken(theme),
       scrollThumb: tv(sampleColorRamp(theme.logoRamp, 0.88)),
       scrollTrack: tv(sampleColorRamp(theme.waveRamp, 0.18)),
-      sectionHeader: tv(sampleColorRamp(theme.waveRamp, 0.8), ['bold']),
+      sectionHeader: tv(sampleColorRamp(theme.waveRamp, 0.8), BOLD_MODIFIERS),
       logo: tv(sampleColorRamp(theme.logoRamp, 0.94)),
       tableHeader: tv(sampleColorRamp(theme.logoRamp, 0.9)),
       trackEmpty: tv(sampleColorRamp(theme.waveRamp, 0.26)),
@@ -3606,9 +3676,359 @@ function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number
   return LANDING_THEME_INDEX_BY_ID.get(resolveDocsShellThemeById(id).id) ?? 0;
 }
 
+function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
+  const shellThemeId = resolveDocsShellThemeById(id).id;
+  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? DOCS_VISUAL_THEME_BY_SHELL_ID.get(DOCS_SHELL_THEMES[0]!.id)!;
+}
+
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
   const shellTheme = resolveDocsShellThemeById(themeId);
   return cloneContextWithTheme(ctx, shellTheme.theme);
+}
+
+type ThemeTokenFamily = 'semantic' | 'surface' | 'border' | 'ui' | 'status' | 'gradient';
+
+interface ThemeTokenEntry {
+  readonly family: ThemeTokenFamily;
+  readonly path: string;
+  readonly token?: TokenValue;
+  readonly stops?: readonly string[];
+}
+
+type ThemePaletteRow =
+  | { readonly kind: 'group'; readonly label: string }
+  | { readonly kind: 'token'; readonly entry: ThemeTokenEntry };
+
+function hexFromRgb([red, green, blue]: Rgb): string {
+  return `#${[red, green, blue]
+    .map((channel) => channel.toString(16).padStart(2, '0'))
+    .join('')}`;
+}
+
+function themeTokenRecordEntries(
+  family: Exclude<ThemeTokenFamily, 'gradient'>,
+  tokens: Record<string, TokenValue>,
+): readonly ThemeTokenEntry[] {
+  return Object.entries(tokens).map(([key, token]) => ({
+    family,
+    path: `${family}.${key}`,
+    token,
+  }));
+}
+
+function themeTokenEntries(theme: Theme): readonly ThemeTokenEntry[] {
+  return [
+    ...themeTokenRecordEntries('semantic', theme.semantic),
+    ...themeTokenRecordEntries('surface', theme.surface),
+    ...themeTokenRecordEntries('border', theme.border),
+    ...themeTokenRecordEntries('ui', theme.ui),
+    ...themeTokenRecordEntries('status', theme.status),
+    ...Object.entries(theme.gradient).map(([key, stops]) => ({
+      family: 'gradient' as const,
+      path: `gradient.${key}`,
+      stops: stops.map((stop) => hexFromRgb(stop.color)),
+    })),
+  ];
+}
+
+function themePaletteRows(theme: Theme): readonly ThemePaletteRow[] {
+  const entries = themeTokenEntries(theme);
+  const rows: ThemePaletteRow[] = [];
+  for (const family of ['semantic', 'surface', 'border', 'ui', 'status', 'gradient'] as const) {
+    rows.push({ kind: 'group', label: family });
+    rows.push(...entries
+      .filter((entry) => entry.family === family)
+      .map((entry) => ({ kind: 'token' as const, entry })));
+  }
+  return rows;
+}
+
+function readableSwatchForeground(background: string): string {
+  return relativeLuminance(background) > 0.46 ? '#111827' : '#f8fafc';
+}
+
+function writeSurfaceText(
+  surface: Surface,
+  x: number,
+  y: number,
+  text: string,
+  token: TokenValue = { hex: '#f8fafc' },
+): void {
+  for (let index = 0; index < text.length && x + index < surface.width; index++) {
+    surface.set(x + index, y, {
+      char: text[index]!,
+      fg: token.hex,
+      bg: token.bg,
+      modifiers: token.modifiers,
+    });
+  }
+}
+
+function renderSwatch(
+  surface: Surface,
+  entry: ThemeTokenEntry,
+  x: number,
+  y: number,
+  width: number,
+): void {
+  if (entry.token !== undefined) {
+    const background = entry.family === 'surface' && entry.token.bg !== undefined
+      ? entry.token.bg
+      : entry.token.hex;
+    const foreground = entry.family === 'surface'
+      ? entry.token.hex
+      : readableSwatchForeground(background);
+    for (let offset = 0; offset < width; offset++) {
+      surface.set(x + offset, y, {
+        char: ' ',
+        fg: foreground,
+        bg: background,
+      });
+    }
+    return;
+  }
+
+  const stops = entry.stops ?? ['#808080'];
+  for (let offset = 0; offset < width; offset++) {
+    const stopIndex = Math.min(
+      stops.length - 1,
+      Math.floor((offset / Math.max(1, width)) * stops.length),
+    );
+    const background = stops[stopIndex] ?? '#808080';
+    surface.set(x + offset, y, {
+      char: ' ',
+      fg: readableSwatchForeground(background),
+      bg: background,
+    });
+  }
+}
+
+function describeThemeToken(entry: ThemeTokenEntry, localization: LocalizationPort | undefined): string {
+  if (entry.token !== undefined) {
+    return entry.token.bg === undefined
+      ? entry.token.hex
+      : dogfoodText(localization, 'themePalette.tokenWithBackground', '{foreground} on {background}', {
+        foreground: entry.token.hex,
+        background: entry.token.bg,
+      });
+  }
+  return (entry.stops ?? []).join(' -> ');
+}
+
+function renderThemeTokenPalette(
+  theme: Theme,
+  width: number,
+  localization: LocalizationPort | undefined,
+  options: { readonly maxRows?: number } = {},
+): Surface {
+  const safeWidth = Math.max(24, width);
+  const rows = themePaletteRows(theme);
+  const visibleRows = options.maxRows === undefined
+    ? rows
+    : rows.slice(0, Math.max(1, options.maxRows));
+  const truncatedCount = Math.max(0, rows.length - visibleRows.length);
+  const surface = createSurface(safeWidth, Math.max(1, visibleRows.length + (truncatedCount > 0 ? 1 : 0)));
+  const swatchWidth = Math.min(8, Math.max(4, Math.floor(safeWidth / 8)));
+  const labelX = swatchWidth + 2;
+
+  visibleRows.forEach((row, y) => {
+    if (row.kind === 'group') {
+      writeSurfaceText(surface, 0, y, row.label.toUpperCase(), { hex: '#f2c45d', modifiers: ['bold'] });
+      return;
+    }
+    renderSwatch(surface, row.entry, 0, y, swatchWidth);
+    writeSurfaceText(surface, labelX, y, row.entry.path, { hex: '#f4e8bf' });
+    writeSurfaceText(
+      surface,
+      Math.min(safeWidth - 1, labelX + 26),
+      y,
+      describeThemeToken(row.entry, localization),
+      { hex: '#a8b1c7', modifiers: ['dim'] },
+    );
+  });
+
+  if (truncatedCount > 0) {
+    writeSurfaceText(
+      surface,
+      0,
+      surface.height - 1,
+      dogfoodText(localization, 'themePalette.moreTokens', '... {count} more tokens', {
+        count: truncatedCount,
+      }),
+      { hex: '#a8b1c7', modifiers: ['dim'] },
+    );
+  }
+
+  return surface;
+}
+
+function dogfoodSafePairSummary(theme: Theme, localization: LocalizationPort | undefined): string {
+  const report = doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
+  const passed = Math.max(0, DOGFOOD_THEME_SAFE_PAIRS.length - report.issues.length);
+  return dogfoodText(localization, 'themeDiagnostics.safePairs', '{passed}/{total} safe pairs pass', {
+    passed,
+    total: DOGFOOD_THEME_SAFE_PAIRS.length,
+  });
+}
+
+function themeColorReuseSummary(theme: Theme, localization: LocalizationPort | undefined): string {
+  const uses = new Map<string, string[]>();
+  for (const entry of themeTokenEntries(theme)) {
+    if (entry.token !== undefined) {
+      const values = entry.token.bg === undefined
+        ? [entry.token.hex]
+        : [entry.token.hex, entry.token.bg];
+      for (const value of values) {
+        uses.set(value, [...(uses.get(value) ?? []), entry.path]);
+      }
+      continue;
+    }
+    for (const stop of entry.stops ?? []) {
+      uses.set(stop, [...(uses.get(stop) ?? []), entry.path]);
+    }
+  }
+  const repeated = Array.from(uses.values()).filter((paths) => new Set(paths).size > 1);
+  return dogfoodText(localization, 'themeDiagnostics.colorReuse', '{count} reused colors across {total} unique values', {
+    count: repeated.length,
+    total: uses.size,
+  });
+}
+
+function renderThemeLabPane(
+  width: number,
+  ctx: BijouContext,
+  landingTheme: LandingThemeTokens,
+  localization: LocalizationPort | undefined,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyWidth = Math.max(24, paneWidth - 2);
+  const shellGallery = DOCS_SHELL_THEMES
+    .map((shellTheme, index) => `${index + 1}. ${shellTheme.label} -> ${shellTheme.theme.name}`)
+    .join('\n');
+  const defaultSummary = [
+    dogfoodText(localization, 'themeLab.defaultDark', 'Default dark preset: {name} ({summary})', {
+      name: BIJOU_DARK.name,
+      summary: dogfoodSafePairSummary(BIJOU_DARK, localization),
+    }),
+    dogfoodText(localization, 'themeLab.defaultLight', 'Default light preset: {name} ({summary})', {
+      name: BIJOU_LIGHT.name,
+      summary: dogfoodSafePairSummary(BIJOU_LIGHT, localization),
+    }),
+    dogfoodText(localization, 'themeLab.colorReuseLine', 'Color reuse: dark {dark}; light {light}.', {
+      dark: themeColorReuseSummary(BIJOU_DARK, localization),
+      light: themeColorReuseSummary(BIJOU_LIGHT, localization),
+    }),
+    dogfoodText(
+      localization,
+      'themeLab.swatchCoverage',
+      'Swatches include semantic.primary, surface.primary, and gradient.brand rows.',
+    ),
+    dogfoodText(
+      localization,
+      'themeLab.f10Hint',
+      'F10 opens the Theme Inspector drawer from the docs shell.',
+    ),
+  ].join('\n');
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(dogfoodText(localization, 'themeLab.separator', 'docs • Theme Lab'), paneWidth, ctx, landingTheme),
+    spacer(1, 1),
+    boxSurface(proseSurface(defaultSummary, bodyWidth), {
+      title: dogfoodText(localization, 'themeLab.postureTitle', 'theme posture'),
+      width: Math.max(28, paneWidth),
+      borderToken: docsThemeBorderToken(landingTheme),
+      bgToken: docsThemeSurfaceToken(landingTheme),
+      padding: { left: 1, right: 1 },
+      ctx,
+    }),
+    spacer(1, 1),
+    boxSurface(proseSurface(shellGallery, bodyWidth), {
+      title: dogfoodText(localization, 'themeLab.galleryTitle', 'shell gallery'),
+      width: Math.max(28, paneWidth),
+      borderToken: docsThemeMutedBorderToken(landingTheme),
+      bgToken: docsThemeSurfaceToken(landingTheme),
+      padding: { left: 1, right: 1 },
+      ctx,
+    }),
+    spacer(1, 1),
+    boxSurface(renderThemeTokenPalette(BIJOU_DARK, bodyWidth, localization, { maxRows: 28 }), {
+      title: dogfoodText(localization, 'themeLab.darkSwatchesTitle', 'bijou-dark token swatches'),
+      width: Math.max(28, paneWidth),
+      borderToken: docsThemeMutedBorderToken(landingTheme),
+      bgToken: docsThemeSurfaceToken(landingTheme),
+      padding: { left: 1, right: 1 },
+      ctx,
+    }),
+    spacer(1, 1),
+    boxSurface(renderThemeTokenPalette(BIJOU_LIGHT, bodyWidth, localization, { maxRows: 28 }), {
+      title: dogfoodText(localization, 'themeLab.lightSwatchesTitle', 'bijou-light token swatches'),
+      width: Math.max(28, paneWidth),
+      borderToken: docsThemeMutedBorderToken(landingTheme),
+      bgToken: docsThemeSurfaceToken(landingTheme),
+      padding: { left: 1, right: 1 },
+      ctx,
+    }),
+  ]), width);
+}
+
+function renderThemeInspectorDrawer(
+  model: RootModel,
+  ctx: BijouContext,
+  localization: LocalizationPort | undefined,
+) {
+  const activeTheme = resolveDocsShellThemeById(model.docsModel.activeShellThemeId);
+  const drawerWidth = themeInspectorDrawerWidth(model.columns);
+  const drawerHeight = Math.max(8, model.rows - 4);
+  const bodyWidth = Math.max(1, drawerWidth - 4);
+  const viewportHeight = Math.max(1, drawerHeight - 2);
+  const body = column([
+    line(dogfoodText(localization, 'themeInspector.active', 'Active: {label}', {
+      label: activeTheme.label,
+    })),
+    line(dogfoodText(localization, 'themeInspector.theme', 'Theme: {name}', {
+      name: activeTheme.theme.name,
+    })),
+    line(dogfoodSafePairSummary(activeTheme.theme, localization)),
+    spacer(1, 1),
+    renderThemeTokenPalette(activeTheme.theme, bodyWidth, localization),
+    spacer(1, 1),
+    line(dogfoodText(localization, 'themeInspector.close', 'F10/Esc close • ↑/↓ scroll • q quit')),
+  ]);
+  const viewport = viewportSurface({
+    width: bodyWidth,
+    height: viewportHeight,
+    content: body,
+    scrollY: clampThemeInspectorScroll(model, model.themeInspectorScrollY),
+    showScrollbar: true,
+    scrollbarMode: 'overlay',
+    scrollbarTrackCell: {
+      char: '│',
+      fg: activeTheme.theme.ui.scrollTrack.hex,
+      bg: activeTheme.theme.surface.overlay.bg,
+      modifiers: activeTheme.theme.ui.scrollTrack.modifiers,
+    },
+    scrollbarThumbCell: {
+      char: '█',
+      fg: activeTheme.theme.ui.scrollThumb.hex,
+      bg: activeTheme.theme.surface.overlay.bg,
+      modifiers: activeTheme.theme.ui.scrollThumb.modifiers,
+    },
+  });
+  const surface = boxSurface(viewport, {
+    title: dogfoodText(localization, 'themeInspector.title', 'Theme Inspector'),
+    width: drawerWidth,
+    borderToken: activeTheme.theme.border.primary,
+    bgToken: activeTheme.theme.surface.overlay,
+    padding: { left: 1, right: 1 },
+    ctx,
+  });
+
+  return {
+    content: '',
+    surface,
+    row: 1,
+    col: Math.max(0, model.columns - drawerWidth - 1),
+  };
 }
 
 function themedSeparatorSurface(
@@ -4041,6 +4461,9 @@ function renderGuideReaderPane(
   if (doc.id === COUNTER_DEMO_BLOCK_GUIDE_ID) {
     return renderCounterDemoPreviewPane(model, width, ctx, theme, localization);
   }
+  if (doc.id === THEME_LAB_GUIDE_ID) {
+    return renderThemeLabPane(width, ctx, theme, localization);
+  }
 
   const docsWidth = Math.max(24, paneWidth - 2);
   const docTitle = guideDocTitle(doc, localization);
@@ -4105,6 +4528,12 @@ function renderGuideInfoPane(
           localization,
           'guide.info.posture.philosophy',
           'Key doctrine architecture invariants and design-system guidance published inside DOGFOOD.',
+        );
+      case THEME_LAB_PAGE_ID:
+        return dogfoodText(
+          localization,
+          'guide.info.posture.themes',
+          'Theme palettes, safe-pair diagnostics, and runtime token swatches published inside DOGFOOD.',
         );
       case RELEASE_PAGE_ID:
         return dogfoodText(
@@ -4528,7 +4957,7 @@ function createDocsExplorerApp(
     title: 'Bijou Docs',
     defaultPageId: options.initialPageId ?? GUIDES_PAGE_ID,
     headerStyle: ({ pageModel }) => ({
-      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
+      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveDocsVisualThemeByShellThemeId(pageModel.activeShellThemeId)),
     }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
@@ -4615,7 +5044,7 @@ function createDocsExplorerApp(
             return documentationSearchItems(localization);
           },
           layout(model) {
-            const theme = resolveLandingTheme(model.landingThemeIndex);
+            const theme = resolveDocsVisualThemeByShellThemeId(model.activeShellThemeId);
             return createComponentsPageLayout(model, theme, getCtx, localization);
           },
         };
@@ -4720,7 +5149,7 @@ function createDocsExplorerApp(
           return documentationSearchItems(localization);
         },
         layout(model) {
-          const theme = resolveLandingTheme(model.landingThemeIndex);
+          const theme = resolveDocsVisualThemeByShellThemeId(model.activeShellThemeId);
           return createGuidePageLayout(spec.id, model, theme, getCtx, localization);
         },
       };
@@ -4730,7 +5159,7 @@ function createDocsExplorerApp(
       onShellThemeChange(nextCtx);
     },
     settings: ({ model, pageModel }) => {
-      const theme = resolveLandingTheme(pageModel.landingThemeIndex);
+      const theme = resolveDocsVisualThemeByShellThemeId(pageModel.activeShellThemeId);
       const nextLocale = nextDogfoodLocale(pageModel.locale);
       return {
         borderToken: docsThemeBorderToken(theme),
@@ -4984,6 +5413,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         landingThemeIndex: resolveLandingThemeIndexForShellThemeId(syncedDocsModel.activeShellThemeId),
         landingToast: undefined,
         landingQuitConfirmOpen: false,
+        themeInspectorOpen: false,
+        themeInspectorScrollY: 0,
         docsModel: syncedDocsModel,
       }, mapExplorer(cmds)];
     },
@@ -4999,7 +5430,10 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           columns: msg.columns,
           rows: msg.rows,
         };
-        return updateExplorer(msg, resizedModel);
+        return updateExplorer(msg, {
+          ...resizedModel,
+          themeInspectorScrollY: clampThemeInspectorScroll(resizedModel, resizedModel.themeInspectorScrollY),
+        });
       }
 
       if (model.route === 'landing') {
@@ -5070,6 +5504,33 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         return [model, []];
       }
 
+      if (isKeyMsg(msg)) {
+        if (model.themeInspectorOpen) {
+          if (shouldToggleThemeInspector(msg) || shouldCloseThemeInspector(msg)) {
+            return [{ ...model, themeInspectorOpen: false, themeInspectorScrollY: 0 }, []];
+          }
+          const scrollTarget = themeInspectorScrollTarget(msg, themeInspectorViewportHeight(model));
+          if (scrollTarget !== undefined) {
+            const nextScrollY = scrollTarget === 'top'
+              ? 0
+              : scrollTarget === 'bottom'
+                ? themeInspectorMaxScroll(model)
+                : model.themeInspectorScrollY + scrollTarget;
+            return [{
+              ...model,
+              themeInspectorScrollY: clampThemeInspectorScroll(model, nextScrollY),
+            }, []];
+          }
+          if (isShellQuitRequest(msg)) {
+            return updateExplorer(msg, { ...model, themeInspectorOpen: false, themeInspectorScrollY: 0 });
+          }
+          return [model, []];
+        }
+        if (shouldToggleThemeInspector(msg)) {
+          return [{ ...model, themeInspectorOpen: true, themeInspectorScrollY: 0 }, []];
+        }
+      }
+
       if (isKeyMsg(msg) || isMouseMsg(msg) || msg.type === 'pulse') {
         const [nextModel, cmds] = updateExplorer(msg, model);
         return [nextModel, cmds];
@@ -5089,7 +5550,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           ? landing
           : compositeSurface(landing, overlays, { dim: model.landingQuitConfirmOpen });
       }
-      return explorer.view(model.docsModel);
+      const docs = explorer.view(model.docsModel);
+      if (!model.themeInspectorOpen) return docs;
+      const docsSurface = normalizeViewOutput(docs, {
+        width: model.columns,
+        height: model.rows,
+      }).surface;
+      return compositeSurface(docsSurface, [renderThemeInspectorDrawer(model, currentCtx, localization)]);
     },
 
     routeRuntimeIssue(issue) {

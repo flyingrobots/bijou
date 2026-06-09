@@ -19,8 +19,34 @@ export type {
   Theme,
 } from './tokens.js';
 
+export {
+  defineTheme,
+  isTokenRef,
+  resolveThemeColorRef,
+  tokenRef,
+} from './builder.js';
+export type {
+  ResolveThemeColorRefOptions,
+  ThemeBuilder,
+  ThemeBuilderModeId,
+  ThemeBuilderRequiredMode,
+  ThemeColorInput,
+  ThemeColorRef,
+  ThemeColorResolution,
+  ThemeColorTokenValue,
+  ThemeModeBuilder,
+  ThemeModeTokenColorBuilder,
+  ThemeModeTokenDraftBuilder,
+  ThemeModeTokenIdBuilder,
+  ThemeModeTokenRegistrationBuilder,
+  ThemeRgbObject,
+  ThemeTokenRef,
+  TokenTheme,
+  TokenThemeMode,
+} from './builder.js';
+
 // Presets
-export { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
+export { BIJOU_DARK, BIJOU_LIGHT, CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
 
 // Freestanding styled helpers
 export { styled, styledStatus } from './styled.js';
@@ -29,7 +55,7 @@ export { styled, styledStatus } from './styled.js';
 export { extendTheme } from './extend.js';
 
 // Theme doctor
-export { doctorTheme, themeContrastRatio } from './doctor.js';
+export { defineThemeSafePairs, doctorTheme, themeContrastRatio } from './doctor.js';
 export type {
   ThemeContrastPair,
   ThemeDoctorIssue,
@@ -37,6 +63,10 @@ export type {
   ThemeDoctorOptions,
   ThemeDoctorReport,
   ThemeDoctorSeverity,
+  ThemeSafePair,
+  ThemeSafePairBuilder,
+  ThemeSafePairKind,
+  ThemeSafePairOptions,
 } from './doctor.js';
 
 // Gradient

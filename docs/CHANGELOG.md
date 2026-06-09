@@ -8,6 +8,32 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
+  first runtime slices for the DL-013 design token builder: `defineTheme()`
+  creates immutable theme definitions with required dark/light token maps,
+  theme-scoped token registration rejects duplicate and missing mode values,
+  and `tokenRef()` / `resolveThemeColorRef()` resolve semantic color slots
+  through the selected theme mode while preserving raw-color and fallback facts.
+- **DOGFOOD token library retuning** — DOGFOOD now uses explicit high-contrast
+  dark and light shell themes for the docs surface instead of relying on the
+  landing-screen palette ramp as the default shell theme. The theme-token
+  doctrine now documents every built-in token with "use when / do not use when"
+  guidance, audits the default dark/light UX posture, and records the bounded
+  Theme Inspector / Theme Lab debugging path.
+- **First-party theme defaults and inspector** — `@flyingrobots/bijou` now
+  exports `BIJOU_DARK` and `BIJOU_LIGHT` and registers them as the
+  `bijou-dark` and `bijou-light` presets. DOGFOOD Dark and DOGFOOD Light now
+  consume those presets directly, the docs shell adds a `Themes` / Theme Lab
+  page with token swatches, color-reuse diagnostics, and safe-pair diagnostics,
+  and `F10` opens a bounded Theme Inspector drawer for the active DOGFOOD shell
+  theme. This addresses the Theme Lab direction in #315 and advances #311.
+- **Theme safe-pair contracts** — `@flyingrobots/bijou` now exports
+  `defineThemeSafePairs()` so theme authors can declare reusable
+  foreground/background contrast matrices grouped as readable, status, or
+  chrome pairs. `doctorTheme()` now validates contrast paths that target token
+  background slots such as `surface.primary.bg`, and DOGFOOD exports its dark
+  and light shell safe-pair matrix for docs tests and future Theme Inspector
+  UX. This closes issue #314.
 - **DOGFOOD release-title gallery** — DOGFOOD now keeps release-title
   treatments as a latest-first artifact gallery, adds a unique post-release
   `V7 Launch Wake` title screen with lower-mode motif facts, and preserves the
@@ -42,6 +68,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   light samples as cell backgrounds instead of terminal-default bleed-through,
   adjust Braille threshold and contrast, and enable deterministic ordered
   dithering from the keyboard. This closes issue #305.
+
+### 🧭 Planning
+
+- **Shared UI scene IR boundary** —
+  `docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md` now links
+  the #302 GraphQL-authored scene idea to the Runtime Graph And Scene IR
+  roadmap candidate. The document records that Bijou `Surface` is the terminal
+  render target for a future portable UI scene IR and does not claim compiler or
+  renderer implementation in this release slice.
 
 ### 🐛 Fixes
 

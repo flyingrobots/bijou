@@ -467,6 +467,52 @@ Migration can be staged:
 5. Lower-mode resolver facts and fallback behavior.
 6. DOGFOOD docs, examples, and package exports.
 
+## Implementation Progress
+
+Slices 1 through 3 are the first runtime landing target for issue
+[#308](https://github.com/flyingrobots/bijou/issues/308):
+
+- `defineTheme()` creates immutable token-theme definitions with required
+  `dark` and `light` mode maps.
+- Theme-scoped token registration rejects duplicate token ids within one mode
+  and rejects required modes that omit a declared token.
+- `tokenRef()` and `resolveThemeColorRef()` preserve resolution facts for
+  selected theme mode, token id, raw colors, and explicit fallback colors.
+
+Slice 4 intentionally tightens the current token vocabulary before adding more
+syntax:
+
+- `docs/design-system/theme-tokens.md` now gives every built-in token a
+  per-token "use when / do not use when" contract.
+- DOGFOOD now uses explicit dark and light shell themes instead of deriving its
+  docs chrome from one title-screen color ramp.
+- Focused DogFood preview tests prove that the shell themes keep readable
+  surface text and common semantic roles above the contrast floor in both dark
+  and light postures.
+- The next inspectability UX is
+  [#311](https://github.com/flyingrobots/bijou/issues/311), the Theme
+  Inspector drawer: an opt-in `F10` shell drawer that shows token swatches,
+  dark/light values, contrast facts, and future renderer provenance when
+  cell-level token facts exist.
+
+Slice 5 promotes contrast from ad hoc tests into a reusable safe-pair
+contract:
+
+- [DL-015](DL-015-theme-safe-pairs-and-contrast-matrices.md) defines
+  foreground/background safe pairs as design-system data.
+- `defineThemeSafePairs()` builds immutable `readable`, `status`, and `chrome`
+  pair matrices.
+- `doctorTheme()` can validate pair paths that target token background slots,
+  such as `surface.primary.bg`.
+- DOGFOOD exports `DOGFOOD_THEME_SAFE_PAIRS` so docs preview tests and the
+  future Theme Inspector drawer consume the same pair contract.
+- This slice closes the implementation path for
+  [#314](https://github.com/flyingrobots/bijou/issues/314).
+
+The remaining implementation work is the `style()` builder, lower-mode
+resolution proof, package example coverage, and the optional Theme Inspector
+UX slice.
+
 ## Tests To Write First
 
 - Theme builder rejects missing `dark` or `light` modes.

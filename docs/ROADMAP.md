@@ -13,7 +13,7 @@ lineage includes milestone PR rows when those PRs contribute to the totals. Do
 not compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items: 2026-06-06.
+Last synced from GitHub milestone items: 2026-06-09.
 
 ## Release Snapshot
 
@@ -21,7 +21,7 @@ Last synced from GitHub milestone items: 2026-06-06.
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Issue-complete V7 Product Truth, BlockLab naming, and release-facing proof. |
-| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 30 | 1 | Uncommitted future work, cool ideas, and raw follow-ups. |
+| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 35 | 1 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
@@ -133,16 +133,16 @@ user-story issues.
 ### Candidate Goalposts From Open GitHub Issues
 
 These groupings are planning recommendations from the open tracker state as of
-2026-06-06. They are not commitments until moved into a versioned release
+2026-06-09. They are not commitments until moved into a versioned release
 packet and assigned umbrella issues.
 
 | Candidate Goalpost | Open Issues | Why It Exists | Proof Direction |
 | :--- | :--- | :--- | :--- |
-| Runtime Graph And Scene IR | [#202](https://github.com/flyingrobots/bijou/issues/202), [#209](https://github.com/flyingrobots/bijou/issues/209), [#210](https://github.com/flyingrobots/bijou/issues/210), [#211](https://github.com/flyingrobots/bijou/issues/211), [#212](https://github.com/flyingrobots/bijou/issues/212), [#213](https://github.com/flyingrobots/bijou/issues/213), [#216](https://github.com/flyingrobots/bijou/issues/216), [#219](https://github.com/flyingrobots/bijou/issues/219), [#302](https://github.com/flyingrobots/bijou/issues/302) | Bijou keeps accumulating DAG, Mermaid, MCP, and GraphQL-authored scene ideas. These should become one runtime/IR goalpost instead of drifting as unrelated ideas. | Schema fixtures, lowering tests, DOGFOOD graph examples, lower-mode rendering, and failure-mode contracts. |
+| Runtime Graph And Scene IR | [#202](https://github.com/flyingrobots/bijou/issues/202), [#209](https://github.com/flyingrobots/bijou/issues/209), [#210](https://github.com/flyingrobots/bijou/issues/210), [#211](https://github.com/flyingrobots/bijou/issues/211), [#212](https://github.com/flyingrobots/bijou/issues/212), [#213](https://github.com/flyingrobots/bijou/issues/213), [#216](https://github.com/flyingrobots/bijou/issues/216), [#219](https://github.com/flyingrobots/bijou/issues/219), [#302](https://github.com/flyingrobots/bijou/issues/302) | Bijou keeps accumulating DAG, Mermaid, MCP, and GraphQL-authored scene ideas. These should become one runtime/IR goalpost instead of drifting as unrelated ideas. DX-042 anchors #302 as shared UI scene IR planning only. | Schema fixtures, lowering tests, DOGFOOD graph examples, lower-mode rendering, and failure-mode contracts. |
 | DOGFOOD And BlockLab Product Surface | [#204](https://github.com/flyingrobots/bijou/issues/204), [#205](https://github.com/flyingrobots/bijou/issues/205), [#214](https://github.com/flyingrobots/bijou/issues/214), [#215](https://github.com/flyingrobots/bijou/issues/215), [#217](https://github.com/flyingrobots/bijou/issues/217), [#218](https://github.com/flyingrobots/bijou/issues/218), [#248](https://github.com/flyingrobots/bijou/issues/248), [#272](https://github.com/flyingrobots/bijou/issues/272) | DOGFOOD, BlockLab, file exploration, semantic lists, terminal shaders, and artifact matrices all point at a stronger product-facing component lab. | Scripted DOGFOOD flows, BlockLab story fixtures, image/capture witnesses, keyboard/focus proof, and localized docs. |
-| Design Tokens And Theme Modes | [#308](https://github.com/flyingrobots/bijou/issues/308) | Lip Gloss-like styling is valuable only if Bijou preserves its own theme truth: tokens describe semantic color slots, themes own dark/light values, and styles consume resolved colors at render time. | Builder API tests, theme validation fixtures, style-render resolution tests, lower-mode color proof, DOGFOOD examples, and inspectability facts. |
+| Design Tokens And Theme Modes | [#308](https://github.com/flyingrobots/bijou/issues/308), [#311](https://github.com/flyingrobots/bijou/issues/311), [#313](https://github.com/flyingrobots/bijou/issues/313), [#314](https://github.com/flyingrobots/bijou/issues/314), [#315](https://github.com/flyingrobots/bijou/issues/315) | Lip Gloss-like styling is valuable only if Bijou preserves its own theme truth: tokens describe semantic color slots, themes own dark/light values, and styles consume resolved colors at render time. | Builder API tests, theme validation fixtures, style-render resolution tests, safe-pair contrast matrices, lower-mode color proof, DOGFOOD examples, theme-inspector and theme-lab UX, and inspectability facts. |
 | Workflow And CI Determinism | [#203](https://github.com/flyingrobots/bijou/issues/203), [#268](https://github.com/flyingrobots/bijou/issues/268), [#269](https://github.com/flyingrobots/bijou/issues/269), [#270](https://github.com/flyingrobots/bijou/issues/270), [#290](https://github.com/flyingrobots/bijou/issues/290), [#298](https://github.com/flyingrobots/bijou/issues/298), [#299](https://github.com/flyingrobots/bijou/issues/299), [#300](https://github.com/flyingrobots/bijou/issues/300), [#301](https://github.com/flyingrobots/bijou/issues/301) | The open bad-code and Method ideas share a dependency-injection, fake-clock, replay, and tracker-sync theme. They should become one proof and determinism goalpost. | Fake clocks, injected git/GitHub clients, fixture-backed DOGFOOD harnesses, path-gated CI proof, and merge-gate tests. |
-| Localization And Documentation Operations | [#206](https://github.com/flyingrobots/bijou/issues/206), [#207](https://github.com/flyingrobots/bijou/issues/207), [#208](https://github.com/flyingrobots/bijou/issues/208) | DOGFOOD Markdown localization now has a debt ratchet; the next shaped step is an operator-facing translation and preference workflow. | Localization debt tests, preference persistence fixtures, DOGFOOD dashboards, and all-supported-locale proof. |
+| Localization And Documentation Operations | [#206](https://github.com/flyingrobots/bijou/issues/206), [#207](https://github.com/flyingrobots/bijou/issues/207), [#208](https://github.com/flyingrobots/bijou/issues/208), [#312](https://github.com/flyingrobots/bijou/issues/312) | DOGFOOD Markdown localization now has a debt ratchet; the next shaped step is an operator-facing translation and preference workflow. | Localization debt tests, preference persistence fixtures, DOGFOOD dashboards, full docs-module scanner coverage, and all-supported-locale proof. |
 
 ### Open Beyond Issues
 
@@ -178,6 +178,11 @@ packet and assigned umbrella issues.
 | [#301](https://github.com/flyingrobots/bijou/issues/301) | `lane:cool-ideas` | `type:enhancement` / `type:maintenance` | Native Bijou frame-capture format |
 | [#302](https://github.com/flyingrobots/bijou/issues/302) | `lane:cool-ideas` | `type:enhancement` / `type:spike` | Compile GraphQL-authored UI scenes into Bijou Blocks |
 | [#308](https://github.com/flyingrobots/bijou/issues/308) | `lane:cool-ideas` | `type:enhancement` / `type:docs` | DL-013 design token and theme builder API |
+| [#311](https://github.com/flyingrobots/bijou/issues/311) | `lane:cool-ideas` | `type:enhancement` | DL-014 theme inspector drawer |
+| [#312](https://github.com/flyingrobots/bijou/issues/312) | `lane:bad-code` | `type:maintenance` | DOGFOOD i18n debt scanner misses new docs modules |
+| [#313](https://github.com/flyingrobots/bijou/issues/313) | `lane:bad-code` | `type:maintenance` | Legacy Theme remains single-mode beside DL-013 mode-aware themes |
+| [#314](https://github.com/flyingrobots/bijou/issues/314) | `lane:cool-ideas` | `type:enhancement` | DL-015 theme safe-pair contracts and contrast matrices |
+| [#315](https://github.com/flyingrobots/bijou/issues/315) | `lane:cool-ideas` | `type:enhancement` / `type:docs` | DOGFOOD theme lab and preset gallery |
 
 ### Closed Beyond Lineage
 

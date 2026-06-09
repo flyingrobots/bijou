@@ -2,7 +2,16 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, lerp3, type ColorRef } from '@flyingrobots/bijou';
+import {
+  BIJOU_DARK,
+  BIJOU_LIGHT,
+  colorHex,
+  doctorTheme,
+  lerp3,
+  themeContrastRatio,
+  type ColorRef,
+  type Theme,
+} from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 import {
@@ -10,7 +19,9 @@ import {
   runScriptDeterministic as runScript,
 } from '../tests/helpers/scripted.js';
 import {
+  DOGFOOD_THEME_SAFE_PAIRS,
   createDocsApp,
+  docsShellThemesForTesting,
   DOGFOOD_I18N_CATALOG,
   FRAME_I18N_CATALOG,
   stripMarkdownFrontmatter,
@@ -34,6 +45,7 @@ const BIJOU_VERSION: string = JSON.parse(
 ).version;
 
 const KEY_ENTER = '\r';
+const KEY_UP = '\x1b[A';
 const KEY_DOWN = '\x1b[B';
 const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
@@ -41,6 +53,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
+const KEY_F10 = '\x1b[21~';
 const KEY_NEXT_TAB = ']';
 const KEY_BACKTICK = '`';
 const V7_RASTER_TITLE_GLYPHS = new Set(['░', '▒', '▓', '█']);
@@ -58,6 +71,32 @@ const V7_LANDING_WAKE_WAVES = [
   { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
   { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
 ] as const;
+const TOKEN_DOCTRINE_PATH = resolve(import.meta.dirname, '..', 'docs', 'design-system', 'theme-tokens.md');
+
+function assertContrast(
+  theme: Theme,
+  foreground: string,
+  background: string,
+  label: string,
+  minRatio = 4.5,
+): void {
+  const ratio = themeContrastRatio(foreground, background);
+  expect(ratio, `${theme.name} ${label}`).toBeDefined();
+  expect(ratio!, `${theme.name} ${label}`).toBeGreaterThanOrEqual(minRatio);
+}
+
+function assertReadableDogfoodTheme(theme: Theme): void {
+  const surfaceBackgrounds = Object.entries(theme.surface).map(([name, token]) => {
+    expect(token.bg, `${theme.name} surface.${name}.bg`).toBeDefined();
+    assertContrast(theme, token.hex, token.bg!, `surface.${name} text on fill`);
+    return token.bg!;
+  });
+
+  expect(new Set(surfaceBackgrounds).size, `${theme.name} surface backgrounds`).toBeGreaterThanOrEqual(4);
+
+  const report = doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
+  expect(report.issues, `${theme.name} safe pairs`).toEqual([]);
+}
 const V7_BIJOU_LOGO_LETTER_COUNT = 5;
 const V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 
@@ -934,6 +973,172 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
   });
 
+  it('ships intentional DogFood dark and light shell themes with readable token roles', () => {
+    const shellThemes = docsShellThemesForTesting();
+    const dark = shellThemes.find((theme) => theme.id === 'dogfood-dark');
+    const light = shellThemes.find((theme) => theme.id === 'dogfood-light');
+
+    expect(shellThemes.map((theme) => theme.id).slice(0, 2)).toEqual(['dogfood-dark', 'dogfood-light']);
+    expect(dark?.label).toBe('DOGFOOD Dark');
+    expect(light?.label).toBe('DOGFOOD Light');
+    expect(dark?.theme.name).toBe('dogfood-dark');
+    expect(light?.theme.name).toBe('dogfood-light');
+
+    assertReadableDogfoodTheme(dark!.theme);
+    assertReadableDogfoodTheme(light!.theme);
+
+    expect(dark!.theme.semantic.primary.hex).toBe(BIJOU_DARK.semantic.primary.hex);
+    expect(dark!.theme.surface.primary.bg).toBe(BIJOU_DARK.surface.primary.bg);
+    expect(light!.theme.semantic.primary.hex).toBe(BIJOU_LIGHT.semantic.primary.hex);
+    expect(light!.theme.surface.primary.bg).toBe(BIJOU_LIGHT.surface.primary.bg);
+    expect(dark!.theme.semantic.primary.hex).not.toBe(dark!.theme.semantic.accent.hex);
+    expect(dark!.theme.ui.cursor.hex).not.toBe(dark!.theme.status.info.hex);
+    expect(light!.theme.semantic.primary.hex).not.toBe(light!.theme.semantic.accent.hex);
+    expect(light!.theme.ui.cursor.hex).not.toBe(light!.theme.status.info.hex);
+  });
+
+  it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
+    const openedText = frameText(opened.frames.at(-1)!);
+
+    expect((opened.model as any).route).toBe('docs');
+    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect(openedText).toContain('Theme Inspector');
+    expect(openedText).toContain('Active: DOGFOOD Dark');
+    expect(openedText).toContain('semantic.primary');
+    expect(openedText).toContain('surface.primary');
+    expect(openedText).toContain('safe pairs pass');
+
+    const closed = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: KEY_F10 }], { ctx });
+    expect((closed.model as any).themeInspectorOpen).toBe(false);
+    expect(frameText(closed.frames.at(-1)!)).not.toContain('Theme Inspector');
+  });
+
+  it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30, rows: 18 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
+    const frame = opened.frames.at(-1)!;
+
+    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect(frame.width).toBe(30);
+    expect(frame.height).toBe(18);
+    expect(frameText(frame)).toContain('Theme Inspector');
+  });
+
+  it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: 'q' }], { ctx });
+
+    expect((opened.model as any).themeInspectorOpen).toBe(false);
+    expect((opened.model as any).docsModel.quitConfirmOpen).toBe(true);
+    expect(frameText(opened.frames.at(-1)!)).toContain('Quit?');
+  });
+
+  it('scrolls the Theme Inspector drawer without closing it', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 118, rows: 20 } });
+    const app = createDocsApp(ctx);
+
+    const scrolled = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_F10 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+    ], { ctx });
+
+    expect((scrolled.model as any).themeInspectorOpen).toBe(true);
+    expect((scrolled.model as any).themeInspectorScrollY).toBeGreaterThan(0);
+    expect(frameText(scrolled.frames.at(-1)!)).toContain('Theme Inspector');
+
+    const restored = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_F10 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_UP },
+    ], { ctx });
+
+    expect((restored.model as any).themeInspectorOpen).toBe(true);
+    expect((restored.model as any).themeInspectorScrollY).toBeLessThan((scrolled.model as any).themeInspectorScrollY);
+  });
+
+  it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 44 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const result = await runScript(app, [], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+
+    expect((result.model as any).docsModel.activePageId).toBe('themes');
+    expect(text).toContain('Theme Lab');
+    expect(text).toContain('Default dark preset: bijou-dark');
+    expect(text).toContain('Default light preset: bijou-light');
+    expect(text).toContain('Color reuse: dark');
+    expect(text).toContain('DOGFOOD Dark -> dogfood-dark');
+    expect(text).toContain('bijou-dark token swatches');
+    expect(text).toContain('semantic.primary');
+    expect(text).toContain('gradient.brand');
+  });
+
+  it('documents every built-in token with usage guidance and dark/light UX posture', () => {
+    const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
+    const requiredRows = [
+      'semantic.primary',
+      'semantic.muted',
+      'semantic.accent',
+      'semantic.success',
+      'semantic.error',
+      'semantic.warning',
+      'semantic.info',
+      'surface.primary',
+      'surface.secondary',
+      'surface.elevated',
+      'surface.overlay',
+      'surface.muted',
+      'border.primary',
+      'border.secondary',
+      'border.success',
+      'border.warning',
+      'border.error',
+      'border.muted',
+      'ui.cursor',
+      'ui.focusGutter',
+      'ui.scrollThumb',
+      'ui.scrollTrack',
+      'ui.sectionHeader',
+      'ui.logo',
+      'ui.tableHeader',
+      'ui.trackEmpty',
+      'status.success',
+      'status.error',
+      'status.warning',
+      'status.info',
+      'status.pending',
+      'status.active',
+      'status.muted',
+      'gradient.brand',
+      'gradient.progress',
+    ];
+
+    expect(doctrine).toContain('## Per-Token Library Reference');
+    expect(doctrine).toContain('## Default Dark/Light UX Audit');
+    expect(doctrine).toContain('## Theme Debugger And Lab');
+    expect(doctrine).toContain('Use when');
+    expect(doctrine).toContain('Do not use when');
+    for (const token of requiredRows) {
+      expect(doctrine).toContain(`| \`${token}\` |`);
+    }
+  });
+
   it('carries the selected landing theme into docs through the shared shell theme setting', async () => {
     const defaultCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const defaultApp = createDocsApp(defaultCtx);
@@ -1454,13 +1659,15 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
       { key: KEY_NEXT_TAB },
       { key: '/' },
-      { key: 'p' },
       { key: 'a' },
+      { key: 'p' },
+      { key: 'p' },
+      { key: '-' },
+      { key: 's' },
+      { key: 'h' },
+      { key: 'e' },
       { key: 'l' },
-      { key: 'e' },
-      { key: 't' },
-      { key: 't' },
-      { key: 'e' },
+      { key: 'l' },
       { key: KEY_ENTER },
       { key: '.' },
     ], { ctx });
@@ -1531,7 +1738,7 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Show active-pane control');
     expect(frameText(settingsFrame)).toContain('cues in the footer');
     expect(frameText(settingsFrame)).toContain('↻ Shell theme');
-    expect(frameText(settingsFrame)).toContain('BlockLab Workstation');
+    expect(frameText(settingsFrame)).toContain('DOGFOOD Dark');
     expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Localization');
     expect(frameText(settingsFrame)).toContain('Preferred language');
