@@ -133,7 +133,7 @@ user-story issues.
 ### Candidate Goalposts From Open GitHub Issues
 
 These groupings are planning recommendations from the open tracker state as of
-2026-06-06. They are not commitments until moved into a versioned release
+2026-06-07. They are not commitments until moved into a versioned release
 packet and assigned umbrella issues.
 
 | Candidate Goalpost | Open Issues | Why It Exists | Proof Direction |
@@ -181,7 +181,7 @@ packet and assigned umbrella issues.
 | [#311](https://github.com/flyingrobots/bijou/issues/311) | `lane:cool-ideas` | `type:enhancement` | DL-014 theme inspector drawer |
 | [#312](https://github.com/flyingrobots/bijou/issues/312) | `lane:bad-code` | `type:maintenance` | DOGFOOD i18n debt scanner misses new docs modules |
 | [#313](https://github.com/flyingrobots/bijou/issues/313) | `lane:bad-code` | `type:maintenance` | Legacy Theme remains single-mode beside DL-013 mode-aware themes |
-| [#314](https://github.com/flyingrobots/bijou/issues/314) | `lane:cool-ideas` | `type:enhancement` | Theme token safe-pair contracts and contrast matrices |
+| [#314](https://github.com/flyingrobots/bijou/issues/314) | `lane:cool-ideas` | `type:enhancement` | DL-015 theme safe-pair contracts and contrast matrices |
 | [#315](https://github.com/flyingrobots/bijou/issues/315) | `lane:cool-ideas` | `type:enhancement` / `type:docs` | DOGFOOD theme lab and preset gallery |
 
 ### Closed Beyond Lineage

@@ -498,7 +498,7 @@ syntax:
 Slice 5 promotes contrast from ad hoc tests into a reusable safe-pair
 contract:
 
-- [DL-014](DL-014-theme-safe-pairs-and-contrast-matrices.md) defines
+- [DL-015](DL-015-theme-safe-pairs-and-contrast-matrices.md) defines
   foreground/background safe pairs as design-system data.
 - `defineThemeSafePairs()` builds immutable `readable`, `status`, and `chrome`
   pair matrices.

@@ -1,5 +1,5 @@
 ---
-title: DL-014 Theme safe pairs and contrast matrices
+title: DL-015 Theme safe pairs and contrast matrices
 legend: DL
 lane: cool-ideas
 priority: medium
@@ -12,7 +12,7 @@ keywords:
   - accessibility
 ---
 
-# DL-014 Theme safe pairs and contrast matrices
+# DL-015 Theme safe pairs and contrast matrices
 
 Legend: [DL - Design Language](../legends/DL-design-language.md)
 
@@ -197,6 +197,17 @@ physical direction.
   and DogFood matrix land through focused runtime tests.
 - [Docs Are The Demo](../invariants/docs-are-the-demo.md): DOGFOOD consumes
   the same pair contract the docs describe.
+
+## Implementation Outline
+
+1. Add `defineThemeSafePairs()` as a public builder that emits immutable
+   `readable`, `status`, and `chrome` pair declarations.
+2. Extend `doctorTheme()` so contrast pair paths can resolve token foreground
+   colors and token background slots such as `surface.primary.bg`.
+3. Export DOGFOOD's dark/light safe-pair matrix beside its shell themes.
+4. Move DOGFOOD contrast tests to consume the exported pair matrix.
+5. Update design-system docs, roadmap tests, and release notes so future Theme
+   Inspector work can reuse the same pair contract.
 
 ## Acceptance Criteria
 
