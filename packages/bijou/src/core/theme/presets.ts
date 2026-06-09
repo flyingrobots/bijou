@@ -1,6 +1,8 @@
 import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
 import { tryHexToRgb } from './color.js';
 
+const FULL_HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
 /**
  * Shorthand helper to create a TokenValue with less boilerplate.
  * Automatically pre-parses hex into numeric fgRGB for hot rendering paths.
@@ -39,6 +41,9 @@ export function populateTokenRGB(token: TokenValue): TokenValue {
 }
 
 function rgb(hex: string): [number, number, number] {
+  if (!FULL_HEX_RE.test(hex)) {
+    throw new Error(`rgb() expects a 7-character #rrggbb hex color, got "${hex}".`);
+  }
   return [
     Number.parseInt(hex.slice(1, 3), 16),
     Number.parseInt(hex.slice(3, 5), 16),

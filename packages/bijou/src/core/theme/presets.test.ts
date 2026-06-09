@@ -54,6 +54,18 @@ function validateTheme(theme: Theme): void {
       }
     });
 
+    it('has finite byte RGB gradient stop components', () => {
+      for (const [name, stops] of Object.entries(theme.gradient)) {
+        for (const [index, stop] of stops.entries()) {
+          for (const component of stop.color) {
+            expect(Number.isInteger(component), `gradient.${name}[${index}] component`).toBe(true);
+            expect(component, `gradient.${name}[${index}] component`).toBeGreaterThanOrEqual(0);
+            expect(component, `gradient.${name}[${index}] component`).toBeLessThanOrEqual(255);
+          }
+        }
+      }
+    });
+
     it('has valid surface tokens with hex and bg', () => {
       for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const) {
         const token = theme.surface[key];
