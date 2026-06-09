@@ -313,6 +313,7 @@ interface DocsExplorerModel {
   readonly showHints: boolean;
   readonly locale: string;
   readonly landingThemeIndex: number;
+  readonly activeShellThemeId?: string;
   readonly landingQualityMode: LandingQualityMode;
   readonly counterBlockDemo: CounterDemoModel;
 }
@@ -813,6 +814,10 @@ export function docsShellThemesForTesting(): readonly FrameShellTheme[] {
 }
 
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
+const DOCS_VISUAL_THEME_BY_SHELL_ID = new Map<string, LandingThemeTokens>([
+  ...LANDING_THEMES.map((theme) => [theme.id, theme] as const),
+  ...DOGFOOD_SHELL_THEMES.map((theme) => [theme.id, docsVisualThemeFromShellTheme(theme)] as const),
+]);
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -2075,6 +2080,7 @@ function createInitialExplorerModel(
     showHints: true,
     locale,
     landingThemeIndex: 0,
+    activeShellThemeId: DOCS_SHELL_THEMES[0]?.id,
     landingQualityMode: 'auto',
     counterBlockDemo: createCounterDemoModel(5),
   };
@@ -3183,11 +3189,13 @@ function syncDocsSharedSettings(
   const activePageModel = docsModel.pageModels[docsModel.activePageId];
   if (activePageModel == null) return docsModel;
   const landingThemeIndex = resolveLandingThemeIndexForShellThemeId(docsModel.activeShellThemeId);
+  const activeShellThemeId = resolveDocsShellThemeById(docsModel.activeShellThemeId).id;
   return mapDocsPageModels(docsModel, (pageModel) => {
     if (
       pageModel.showHints === activePageModel.showHints
       && pageModel.locale === activePageModel.locale
       && pageModel.landingThemeIndex === landingThemeIndex
+      && pageModel.activeShellThemeId === activeShellThemeId
       && pageModel.landingQualityMode === activePageModel.landingQualityMode
     ) {
       return pageModel;
@@ -3197,6 +3205,7 @@ function syncDocsSharedSettings(
       showHints: activePageModel.showHints,
       locale: activePageModel.locale,
       landingThemeIndex,
+      activeShellThemeId,
       landingQualityMode: activePageModel.landingQualityMode,
     };
   });
@@ -3266,6 +3275,34 @@ function compileLandingTheme(seed: LandingThemeSeed): LandingThemeTokens {
     footerStrongColor: sampleColorRamp(logoRamp, 0.88),
     fpsColor: sampleColorRamp(waveRamp, 0.62),
   };
+}
+
+function themeTokenHex(token: TokenValue | undefined, fallback: string): string {
+  return token?.hex ?? fallback;
+}
+
+function themeTokenBg(token: TokenValue | undefined, fallback: string): string {
+  return token?.bg ?? fallback;
+}
+
+function docsVisualThemeFromShellTheme(shellTheme: FrameShellTheme): LandingThemeTokens {
+  const theme = shellTheme.theme;
+  const background = themeTokenBg(theme.surface.primary, '#10131a');
+  return compileLandingTheme({
+    id: shellTheme.id,
+    label: shellTheme.label,
+    background,
+    waveGradient: [
+      themeTokenBg(theme.surface.muted, background),
+      themeTokenBg(theme.surface.secondary, background),
+      themeTokenHex(theme.border.primary, themeTokenHex(theme.semantic.info, '#6aa6ff')),
+    ],
+    logoGradient: [
+      themeTokenHex(theme.semantic.info, '#6aa6ff'),
+      themeTokenHex(theme.semantic.accent, '#d7a84f'),
+      themeTokenHex(theme.semantic.primary, '#f5f2e8'),
+    ],
+  });
 }
 
 function createGradientStops(gradient: readonly [string, string, string]): Array<{ pos: number; color: Rgb }> {
@@ -3637,6 +3674,11 @@ function resolveDocsShellThemeById(id: string | undefined): FrameShellTheme {
 
 function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
   return LANDING_THEME_INDEX_BY_ID.get(resolveDocsShellThemeById(id).id) ?? 0;
+}
+
+function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
+  const shellThemeId = resolveDocsShellThemeById(id).id;
+  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? DOCS_VISUAL_THEME_BY_SHELL_ID.get(DOCS_SHELL_THEMES[0]!.id)!;
 }
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
@@ -4915,7 +4957,7 @@ function createDocsExplorerApp(
     title: 'Bijou Docs',
     defaultPageId: options.initialPageId ?? GUIDES_PAGE_ID,
     headerStyle: ({ pageModel }) => ({
-      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
+      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveDocsVisualThemeByShellThemeId(pageModel.activeShellThemeId)),
     }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
@@ -5002,7 +5044,7 @@ function createDocsExplorerApp(
             return documentationSearchItems(localization);
           },
           layout(model) {
-            const theme = resolveLandingTheme(model.landingThemeIndex);
+            const theme = resolveDocsVisualThemeByShellThemeId(model.activeShellThemeId);
             return createComponentsPageLayout(model, theme, getCtx, localization);
           },
         };
@@ -5107,7 +5149,7 @@ function createDocsExplorerApp(
           return documentationSearchItems(localization);
         },
         layout(model) {
-          const theme = resolveLandingTheme(model.landingThemeIndex);
+          const theme = resolveDocsVisualThemeByShellThemeId(model.activeShellThemeId);
           return createGuidePageLayout(spec.id, model, theme, getCtx, localization);
         },
       };
@@ -5117,7 +5159,7 @@ function createDocsExplorerApp(
       onShellThemeChange(nextCtx);
     },
     settings: ({ model, pageModel }) => {
-      const theme = resolveLandingTheme(pageModel.landingThemeIndex);
+      const theme = resolveDocsVisualThemeByShellThemeId(pageModel.activeShellThemeId);
       const nextLocale = nextDogfoodLocale(pageModel.locale);
       return {
         borderToken: docsThemeBorderToken(theme),

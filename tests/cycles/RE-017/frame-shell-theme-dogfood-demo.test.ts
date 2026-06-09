@@ -54,12 +54,16 @@ describe('RE-017 framed shell theme demo', () => {
 
     const model = result.model as {
       landingThemeIndex: number;
-      docsModel: { activeShellThemeId?: string; pageModels: Record<string, { landingThemeIndex: number }> };
+      docsModel: {
+        activeShellThemeId?: string;
+        pageModels: Record<string, { landingThemeIndex: number; activeShellThemeId?: string }>;
+      };
     };
     const frame = result.frames.at(-1)!;
     expect(model.landingThemeIndex).toBe(0);
     expect(model.docsModel.activeShellThemeId).toBe('dogfood-light');
     expect(Object.values(model.docsModel.pageModels).every((pageModel) => pageModel.landingThemeIndex === 0)).toBe(true);
+    expect(Object.values(model.docsModel.pageModels).every((pageModel) => pageModel.activeShellThemeId === 'dogfood-light')).toBe(true);
     expect(ctx.surface('primary').bg).toBe(originalBg);
     expect(frame.get(frame.width - 2, 2).bg).toBe(BIJOU_LIGHT.surface.primary.bg);
   });
