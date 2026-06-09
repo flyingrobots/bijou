@@ -221,11 +221,10 @@ class MutableThemeBuilder implements ThemeBuilder {
     }
 
     const tokenIds = sortedTokenIds(this.modes);
-    for (const requiredMode of REQUIRED_MODES) {
-      const mode = this.modes.get(requiredMode)!;
+    for (const [modeId, mode] of this.modes) {
       for (const tokenId of tokenIds) {
         if (!mode.hasToken(tokenId)) {
-          throw new Error(`Mode "${requiredMode}" is missing token "${tokenId}".`);
+          throw new Error(`Mode "${modeId}" is missing token "${tokenId}".`);
         }
       }
     }

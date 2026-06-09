@@ -109,6 +109,26 @@ describe('theme builder API', () => {
       .toThrow(/Mode "light" is missing token "color\.text\.muted"/);
   });
 
+  it('rejects custom modes missing values for declared tokens', () => {
+    expect(() => defineTheme()
+      .id('bijou.missing-custom-token')
+      .mode('dark', mode => mode
+        .token('color.text.primary')
+        .color('#ffffff')
+        .token('color.text.muted')
+        .color('#999999'))
+      .mode('light', mode => mode
+        .token('color.text.primary')
+        .color('#000000')
+        .token('color.text.muted')
+        .color('#555555'))
+      .mode('high-contrast', mode => mode
+        .token('color.text.primary')
+        .color('#ffffff'))
+      .build())
+      .toThrow(/Mode "high-contrast" is missing token "color\.text\.muted"/);
+  });
+
   it('rejects RGB channels outside the byte range', () => {
     expect(() => defineTheme()
       .id('bijou.invalid-rgb')
