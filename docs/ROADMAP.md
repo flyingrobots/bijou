@@ -13,7 +13,7 @@ lineage includes milestone PR rows when those PRs contribute to the totals. Do
 not compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items: 2026-06-07.
+Last synced from GitHub milestone items: 2026-06-09.
 
 ## Release Snapshot
 
@@ -21,7 +21,7 @@ Last synced from GitHub milestone items: 2026-06-07.
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Issue-complete V7 Product Truth, BlockLab naming, and release-facing proof. |
-| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 31 | 1 | Uncommitted future work, cool ideas, and raw follow-ups. |
+| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 35 | 1 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
@@ -133,7 +133,7 @@ user-story issues.
 ### Candidate Goalposts From Open GitHub Issues
 
 These groupings are planning recommendations from the open tracker state as of
-2026-06-07. They are not commitments until moved into a versioned release
+2026-06-09. They are not commitments until moved into a versioned release
 packet and assigned umbrella issues.
 
 | Candidate Goalpost | Open Issues | Why It Exists | Proof Direction |
