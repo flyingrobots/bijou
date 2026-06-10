@@ -472,12 +472,15 @@ git fetch origin main --tags --prune
 git switch main
 git merge --ff-only origin/main
 git status --porcelain=v1
+git rev-parse HEAD origin/main
+test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
 npm run release:preflight
 npm run docs:inventory
 ```
 
-Abort if the worktree is dirty or local `main` does not exactly match
-`origin/main`.
+Abort if the worktree is dirty, if the two printed SHAs differ, or if the
+`test` command fails. Local `main` must exactly match `origin/main`; being ahead
+of `origin/main` is also release-blocking.
 
 Create the tag from that exact commit:
 
