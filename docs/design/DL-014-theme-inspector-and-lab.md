@@ -94,7 +94,7 @@ The quick inspector is a right-side drawer:
 
 ```text
                          +-- Theme Inspector --------------+
-                         | Active: DOGFOOD Dark            |
+                         | Active: DOGFOOD / Dark          |
                          | Theme:  dogfood-dark            |
                          | 32/32 safe pairs pass           |
                          |                                  |
@@ -118,9 +118,10 @@ the token name and diagnostics remain visible without color.
 
 - `BIJOU_DARK` and `BIJOU_LIGHT` are exported from `@flyingrobots/bijou`.
 - The presets are registered in `PRESETS` as `bijou-dark` and `bijou-light`.
-- DOGFOOD shell themes keep their current app-facing ids:
-  - `dogfood-dark`
-  - `dogfood-light`
+- DOGFOOD shell themes keep concrete mode theme names:
+  - family id: `dogfood`
+  - dark choice id: `dogfood:dark`, concrete theme name: `dogfood-dark`
+  - light choice id: `dogfood:light`, concrete theme name: `dogfood-light`
 - DOGFOOD clones the default preset values into those shell themes so mutating
   runtime RGB caches cannot accidentally alias future app-level overrides.
 - `F10` toggles the DOGFOOD-only Theme Inspector drawer after the title screen.

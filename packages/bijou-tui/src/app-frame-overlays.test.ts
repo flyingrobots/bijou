@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved } from '@flyingrobots/bijou';
+import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved, type Theme } from '@flyingrobots/bijou';
+import type { FrameShellTheme, FrameShellThemeChange, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
 import { createKeyMap } from './keybindings.js';
 import {
   mergeShellThemeSettings,
   renderHelpOverlay,
+  resolveFrameShellThemeChoices,
   resolveCurrentShellTheme,
   resolveNextShellTheme,
   type ResolvedFrameShellTheme,
@@ -22,8 +24,23 @@ function shellTheme(
       label,
       theme: resolvedTheme.theme,
     },
+    shellThemeSpec: {
+      id,
+      label,
+      theme: resolvedTheme.theme,
+    },
+    shellThemeId: id,
+    shellThemeLabel: label,
     resolvedTheme,
   };
+}
+
+function requireConcreteShellThemeTheme(shellTheme: FrameShellTheme): Theme {
+  return shellTheme.theme;
+}
+
+function requireConcreteShellThemeChange(change: FrameShellThemeChange): Theme {
+  return change.shellTheme.theme;
 }
 
 describe('app-frame-overlays', () => {
@@ -37,6 +54,75 @@ describe('app-frame-overlays', () => {
     expect(resolveCurrentShellTheme(themes, 'missing')?.label).toBe('Default');
     expect(resolveNextShellTheme(themes, 'default')?.id).toBe('citrus');
     expect(resolveNextShellTheme(themes, 'citrus')?.id).toBe('default');
+  });
+
+  it('flattens mode-aware shell themes into stable family and mode choices', () => {
+    const ctx = {
+      theme: {
+        noColor: false,
+        colorScheme: 'dark',
+      },
+    } as Parameters<typeof resolveFrameShellThemeChoices>[1];
+
+    const choices = resolveFrameShellThemeChoices([
+      {
+        id: 'dogfood',
+        label: 'DOGFOOD',
+        modes: [
+          { id: 'dark', label: 'Dark', theme: CYAN_MAGENTA },
+          { id: 'light', label: 'Light', theme: TEAL_ORANGE_PINK },
+        ],
+      },
+    ], ctx);
+
+    expect(choices.map((choice) => choice.id)).toEqual(['dogfood:dark', 'dogfood:light']);
+    expect(choices[0]).toMatchObject({
+      id: 'dogfood:dark',
+      label: 'DOGFOOD / Dark',
+      shellThemeId: 'dogfood',
+      shellThemeLabel: 'DOGFOOD',
+      modeId: 'dark',
+      modeLabel: 'Dark',
+    });
+    expect(choices[0]?.shellTheme.id).toBe('dogfood:dark');
+    expect(choices[0]?.shellTheme.theme).toBe(CYAN_MAGENTA);
+    expect(choices[0]?.shellThemeSpec.id).toBe('dogfood');
+    expect(choices[0]?.resolvedTheme.theme).toBe(CYAN_MAGENTA);
+    expect(choices[1]?.resolvedTheme.theme).toBe(TEAL_ORANGE_PINK);
+  });
+
+  it('keeps concrete shell theme specs source-compatible while accepting mode families', () => {
+    const concrete = {
+      id: 'default',
+      label: 'Default',
+      theme: CYAN_MAGENTA,
+    } satisfies FrameShellTheme;
+    const family = {
+      id: 'dogfood',
+      label: 'DOGFOOD',
+      modes: [
+        { id: 'dark', label: 'Dark', theme: CYAN_MAGENTA },
+        { id: 'light', label: 'Light', theme: TEAL_ORANGE_PINK },
+      ],
+    } satisfies FrameShellThemeFamily;
+    const specs: readonly FrameShellThemeSpec[] = [concrete, family];
+    const change = {
+      shellTheme: {
+        id: 'dogfood:dark',
+        label: 'DOGFOOD / Dark',
+        theme: CYAN_MAGENTA,
+      },
+      shellThemeSpec: family,
+      shellThemeId: 'dogfood',
+      shellThemeLabel: 'DOGFOOD',
+      modeId: 'dark',
+      modeLabel: 'Dark',
+      ctx: {} as FrameShellThemeChange['ctx'],
+    } satisfies FrameShellThemeChange;
+
+    expect(requireConcreteShellThemeTheme(concrete)).toBe(CYAN_MAGENTA);
+    expect(requireConcreteShellThemeChange(change)).toBe(CYAN_MAGENTA);
+    expect(specs.map((spec) => spec.id)).toEqual(['default', 'dogfood']);
   });
 
   it('merges a stock shell-theme row into the shell settings section', () => {

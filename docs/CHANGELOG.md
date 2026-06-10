@@ -14,19 +14,31 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   theme-scoped token registration rejects duplicate and missing mode values,
   and `tokenRef()` / `resolveThemeColorRef()` resolve semantic color slots
   through the selected theme mode while preserving raw-color and fallback facts.
-- **DOGFOOD token library retuning** — DOGFOOD now uses explicit high-contrast
-  dark and light shell themes for the docs surface instead of relying on the
-  landing-screen palette ramp as the default shell theme. The theme-token
+- **DOGFOOD token library retuning** — DOGFOOD now uses an explicit
+  high-contrast shell theme family with dark and light modes for the docs
+  surface instead of relying on the landing-screen palette ramp as the default
+  shell theme. The theme-token
   doctrine now documents every built-in token with "use when / do not use when"
   guidance, audits the default dark/light UX posture, and records the bounded
   Theme Inspector / Theme Lab debugging path.
 - **First-party theme defaults and inspector** — `@flyingrobots/bijou` now
   exports `BIJOU_DARK` and `BIJOU_LIGHT` and registers them as the
-  `bijou-dark` and `bijou-light` presets. DOGFOOD Dark and DOGFOOD Light now
-  consume those presets directly, the docs shell adds a `Themes` / Theme Lab
-  page with token swatches, color-reuse diagnostics, and safe-pair diagnostics,
-  and `F10` opens a bounded Theme Inspector drawer for the active DOGFOOD shell
-  theme. This addresses the Theme Lab direction in #315 and advances #311.
+  `bijou-dark` and `bijou-light` presets. The DOGFOOD shell family now consumes
+  those presets directly through `dark` and `light` modes, the docs shell adds
+  a `Themes` / Theme Lab page with token swatches, color-reuse diagnostics, and
+  safe-pair diagnostics, and `F10` opens a bounded Theme Inspector drawer for
+  the active DOGFOOD shell choice. This addresses the Theme Lab direction in
+  #315 and advances #311.
+- **Mode-aware app-frame shell themes** — `@flyingrobots/bijou-tui` now exports
+  `FrameShellThemeFamily` and `FrameShellThemeSpec` so concrete
+  `FrameShellTheme` entries keep their single-`theme` contract while shell
+  families can expose concrete `modes`. The frame resolves mode-aware families
+  into stable choice ids such as `dogfood:dark`, settings can cycle those
+  choices, and `FrameShellThemeChange` keeps `shellTheme` as the concrete
+  selected theme while reporting the original `shellThemeSpec`, shell-family
+  ids, and mode facts alongside the fresh context. DOGFOOD now presents one
+  `dogfood` family instead of peer `dogfood-dark` and `dogfood-light` shell
+  themes. This closes issue #313.
 - **Theme safe-pair contracts** — `@flyingrobots/bijou` now exports
   `defineThemeSafePairs()` so theme authors can declare reusable
   foreground/background contrast matrices grouped as readable, status, or

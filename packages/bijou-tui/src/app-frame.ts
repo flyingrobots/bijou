@@ -7,7 +7,6 @@
 
 import {
   cloneContextWithResolvedTheme,
-  createResolved,
   createSurface,
   perfOverlaySurface,
   setDefaultContext,
@@ -104,6 +103,7 @@ import type {
 import {
   renderHelpOverlay,
   isHelpScrollAction,
+  resolveFrameShellThemeChoices,
   resolveCurrentShellTheme,
   resolveNextShellTheme,
   resolveShellThemeForContext,
@@ -283,7 +283,19 @@ export interface FrameHeaderStyle {
   readonly activeTabToken?: TokenValue;
 }
 
-/** A stock shell-theme option that the frame can surface in its settings drawer. */
+/** One concrete mode inside a mode-aware shell theme family. */
+export interface FrameShellThemeMode {
+  /** Stable mode id within the shell theme family. */
+  readonly id: string;
+  /** Visible mode label shown in the settings drawer. */
+  readonly label: string;
+  /** Concrete theme payload applied when this mode is selected. */
+  readonly theme: Theme;
+  /** Optional helper copy shown beneath the row when active. */
+  readonly description?: string;
+}
+
+/** A stock concrete shell-theme option that the frame can surface in its settings drawer. */
 export interface FrameShellTheme {
   /** Stable option id. */
   readonly id: string;
@@ -291,14 +303,43 @@ export interface FrameShellTheme {
   readonly label: string;
   /** Theme payload applied when this option is selected. */
   readonly theme: Theme;
+  /** Mode-aware shell theme families use FrameShellThemeFamily instead. */
+  readonly modes?: never;
   /** Optional helper copy shown beneath the row when active. */
   readonly description?: string;
 }
 
+/** A stock shell-theme family with concrete selectable modes. */
+export interface FrameShellThemeFamily {
+  /** Stable shell theme family id. */
+  readonly id: string;
+  /** Visible family label shown in the settings drawer. */
+  readonly label: string;
+  /** Concrete modes exposed as settings choices. */
+  readonly modes: readonly FrameShellThemeMode[];
+  /** Concrete single-theme entries use FrameShellTheme instead. */
+  readonly theme?: never;
+  /** Optional helper copy shown beneath the row when active. */
+  readonly description?: string;
+}
+
+/** A stock shell-theme spec, either one concrete theme or one mode-aware family. */
+export type FrameShellThemeSpec = FrameShellTheme | FrameShellThemeFamily;
+
 /** Notification payload emitted when the stock frame shell theme changes. */
 export interface FrameShellThemeChange {
-  /** Selected stock shell theme definition. */
+  /** Selected concrete shell theme choice. */
   readonly shellTheme: FrameShellTheme;
+  /** Original stock shell theme spec that produced the selected choice. */
+  readonly shellThemeSpec: FrameShellThemeSpec;
+  /** Selected shell theme family id. */
+  readonly shellThemeId: string;
+  /** Selected shell theme family label. */
+  readonly shellThemeLabel: string;
+  /** Selected shell theme mode id, when the family is mode-aware. */
+  readonly modeId?: string;
+  /** Selected shell theme mode label, when the family is mode-aware. */
+  readonly modeLabel?: string;
   /** Fresh context cloned with the selected theme. */
   readonly ctx: BijouContext;
 }
@@ -411,7 +452,7 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
   /** Optional stock shell-theme choices surfaced by the frame settings drawer. */
-  readonly shellThemes?: readonly FrameShellTheme[];
+  readonly shellThemes?: readonly FrameShellThemeSpec[];
   /** Optional callback for syncing app-owned rendering with the stock shell theme. */
   readonly onShellThemeChange?: (change: FrameShellThemeChange) => void;
   /** Optional shell-owned settings drawer content. */
@@ -794,7 +835,8 @@ export function createFramedApp<PageModel, Msg>(
   const shellThemeSpecs = options.shellThemes ?? [];
   let defaultFrameCtx = options.ctx ?? resolveSafeCtx();
   let resolvedShellThemes: readonly ResolvedFrameShellTheme[] = [];
-  const enableShellThemeSettings = shellThemeSpecs.length > 1;
+  const enableShellThemeSettings = shellThemeSpecs.length > 1
+    || shellThemeSpecs.some((theme) => (theme.modes?.length ?? 0) > 1);
   const usesAmbientDefaultContext = options.ctx == null && defaultFrameCtx != null;
   let frameCtx = options.ctx;
   let frameCtxShellThemeId: string | undefined;
@@ -809,17 +851,7 @@ export function createFramedApp<PageModel, Msg>(
       );
     }
     defaultFrameCtx ??= baseCtx;
-    resolvedShellThemes = shellThemeSpecs.map((theme) => ({
-      id: theme.id,
-      label: theme.label,
-      description: theme.description,
-      shellTheme: theme,
-      resolvedTheme: createResolved(
-        theme.theme,
-        defaultFrameCtx!.theme.noColor,
-        defaultFrameCtx!.theme.colorScheme,
-      ),
-    }));
+    resolvedShellThemes = resolveFrameShellThemeChoices(shellThemeSpecs, defaultFrameCtx!);
   }
 
   if (frameCtx != null) {
@@ -856,6 +888,11 @@ export function createFramedApp<PageModel, Msg>(
     }
     options.onShellThemeChange?.({
       shellTheme: nextTheme.shellTheme,
+      shellThemeSpec: nextTheme.shellThemeSpec,
+      shellThemeId: nextTheme.shellThemeId,
+      shellThemeLabel: nextTheme.shellThemeLabel,
+      modeId: nextTheme.modeId,
+      modeLabel: nextTheme.modeLabel,
       ctx: frameCtx,
     });
     return frameCtx;
