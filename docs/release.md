@@ -558,8 +558,10 @@ npm view @flyingrobots/bijou-mcp version dist-tags --json
 
 Abort immediately if any of these are true:
 
-- release prep starts from a dirty worktree
-- release prep starts from a branch other than `main`
+- Phase 1 preflight starts from a dirty worktree
+- Phase 1 preflight starts with the operator checked out to a branch other than
+  `main`; after Phase 1 passes, Phase 2 step 2 creates the `release/vX.Y.Z`
+  branch where prep work continues
 - final tag prep is not on `main`
 - final tag prep is not exactly synced to `origin/main`
 - version bump not reflected cleanly across the workspace
