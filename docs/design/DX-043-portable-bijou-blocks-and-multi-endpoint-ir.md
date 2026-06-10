@@ -22,14 +22,14 @@ Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
 
 - Prior Bijou design:
   [DX-042 Shared UI Scene IR And Bijou Render Target](./DX-042-shared-ui-scene-ir-and-bijou-render-target.md)
-- Geordi doctrine:
-  `/Users/james/git/geordi/docs/render-everywhere.md`
-- Geordi pipeline:
-  `/Users/james/git/geordi/docs/end-to-end.md`
+- Geordi doctrine: `docs/render-everywhere.md` in the Geordi repository.
+- Geordi pipeline: `docs/end-to-end.md` in the Geordi repository.
 - Jedit/Geordi packed-cell seed:
-  `/Users/james/git/jedit/docs/design/0107-geordi-raytraced-title-render-pipeline.md`
+  `docs/design/0107-geordi-raytraced-title-render-pipeline.md` in the jedit
+  repository.
 - Geordi-side companion design:
-  `/Users/james/git/geordi/docs/design/2026-06-portable-bijou-ui-render-endpoints.md`
+  `docs/design/2026-06-portable-bijou-ui-render-endpoints.md` in the Geordi
+  repository.
 
 This document is a planning artifact. It does not claim a GraphQL compiler,
 portable Bijou IR runtime, browser Dogfood endpoint, Geordi packed-cell target,
