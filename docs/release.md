@@ -69,8 +69,13 @@ package directory so npm has a package record:
 
 ```bash
 npm login
-npm publish --access public
+NPM_CONFIG_PROVENANCE=false npm publish --access public
 ```
+
+The seed publish is deliberately non-provenance because it runs outside the
+trusted GitHub Actions OIDC environment. After the trusted publisher is
+configured, automated releases should publish with provenance through
+`publish.yml`.
 
 Then configure the npm package trusted publisher:
 
