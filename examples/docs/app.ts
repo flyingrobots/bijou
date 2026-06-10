@@ -69,7 +69,7 @@ import {
   type FrameLayoutNode,
   type FramedApp,
   type FramedAppMsg,
-  type FrameShellTheme,
+  type FrameShellThemeSpec,
   type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
@@ -800,7 +800,7 @@ const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
   },
 ] as const;
 
-const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = [
+const DOCS_SHELL_THEMES: readonly FrameShellThemeSpec[] = [
   ...DOGFOOD_SHELL_THEMES,
   ...LANDING_THEMES.map((theme) => ({
     id: theme.id,
@@ -809,7 +809,7 @@ const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = [
   })),
 ];
 
-export function docsShellThemesForTesting(): readonly FrameShellTheme[] {
+export function docsShellThemesForTesting(): readonly FrameShellThemeSpec[] {
   return DOCS_SHELL_THEMES;
 }
 
@@ -827,7 +827,7 @@ function docsShellThemeChoiceId(shellThemeId: string, modeId?: string): string {
   return modeId === undefined ? shellThemeId : `${shellThemeId}:${modeId}`;
 }
 
-function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellTheme[]): readonly DocsShellThemeChoice[] {
+function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellThemeSpec[]): readonly DocsShellThemeChoice[] {
   return shellThemes.flatMap((shellTheme) => {
     if (shellTheme.theme !== undefined) {
       return [{

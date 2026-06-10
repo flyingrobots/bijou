@@ -25,7 +25,7 @@ The existing runtime `Theme` object is a concrete palette. That stays true for
 compatibility. The new shape is an adapter around that concrete palette:
 
 ```text
-FrameShellTheme
+FrameShellThemeFamily
   id: "dogfood"
   modes:
     dark  -> Theme("dogfood-dark")
@@ -96,7 +96,8 @@ That representation works mechanically, but it teaches the wrong model:
 This slice adds the first runtime adapter, not a full replacement for
 `Theme`.
 
-- Add optional mode entries to `FrameShellTheme`.
+- Add a mode-aware `FrameShellThemeFamily` path beside concrete
+  `FrameShellTheme`.
 - Resolve shell theme specs into flattened runtime choices.
 - Preserve old single-theme specs unchanged.
 - Include selected mode facts in `FrameShellThemeChange`.
@@ -115,8 +116,8 @@ This slice adds the first runtime adapter, not a full replacement for
 
 ## Runtime Contract
 
-`FrameShellTheme` accepts either a concrete `theme` or a non-empty `modes`
-array.
+`FrameShellThemeSpec` accepts either a concrete `FrameShellTheme` with `theme`
+or a mode-aware `FrameShellThemeFamily` with a non-empty `modes` array.
 
 ```ts
 const theme = {
@@ -126,7 +127,7 @@ const theme = {
     { id: 'dark', label: 'Dark', theme: dogfoodDark },
     { id: 'light', label: 'Light', theme: dogfoodLight },
   ],
-} satisfies FrameShellTheme;
+} satisfies FrameShellThemeSpec;
 ```
 
 A mode-aware entry resolves into choices:
@@ -203,7 +204,8 @@ The slice is complete when tests prove:
 
 ## Acceptance Criteria
 
-- [ ] `FrameShellTheme` supports either `theme` or `modes`.
+- [ ] `FrameShellThemeSpec` supports concrete `FrameShellTheme` entries and
+      mode-aware `FrameShellThemeFamily` entries.
 - [ ] Runtime choice ids distinguish family and mode.
 - [ ] `FrameShellThemeChange` includes optional mode facts.
 - [ ] DOGFOOD presents one DogFood shell theme family with dark/light modes.

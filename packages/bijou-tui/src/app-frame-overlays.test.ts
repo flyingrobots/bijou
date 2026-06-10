@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved } from '@flyingrobots/bijou';
+import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved, type Theme } from '@flyingrobots/bijou';
+import type { FrameShellTheme, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
 import { createKeyMap } from './keybindings.js';
 import {
   mergeShellThemeSettings,
@@ -27,6 +28,10 @@ function shellTheme(
     shellThemeLabel: label,
     resolvedTheme,
   };
+}
+
+function requireConcreteShellThemeTheme(shellTheme: FrameShellTheme): Theme {
+  return shellTheme.theme;
 }
 
 describe('app-frame-overlays', () => {
@@ -73,6 +78,26 @@ describe('app-frame-overlays', () => {
     expect(choices[0]?.shellTheme.id).toBe('dogfood');
     expect(choices[0]?.resolvedTheme.theme).toBe(CYAN_MAGENTA);
     expect(choices[1]?.resolvedTheme.theme).toBe(TEAL_ORANGE_PINK);
+  });
+
+  it('keeps concrete shell theme specs source-compatible while accepting mode families', () => {
+    const concrete = {
+      id: 'default',
+      label: 'Default',
+      theme: CYAN_MAGENTA,
+    } satisfies FrameShellTheme;
+    const family = {
+      id: 'dogfood',
+      label: 'DOGFOOD',
+      modes: [
+        { id: 'dark', label: 'Dark', theme: CYAN_MAGENTA },
+        { id: 'light', label: 'Light', theme: TEAL_ORANGE_PINK },
+      ],
+    } satisfies FrameShellThemeFamily;
+    const specs: readonly FrameShellThemeSpec[] = [concrete, family];
+
+    expect(requireConcreteShellThemeTheme(concrete)).toBe(CYAN_MAGENTA);
+    expect(specs.map((spec) => spec.id)).toEqual(['default', 'dogfood']);
   });
 
   it('merges a stock shell-theme row into the shell settings section', () => {

@@ -295,24 +295,41 @@ export interface FrameShellThemeMode {
   readonly description?: string;
 }
 
-/** A stock shell-theme option that the frame can surface in its settings drawer. */
+/** A stock concrete shell-theme option that the frame can surface in its settings drawer. */
 export interface FrameShellTheme {
-  /** Stable shell theme family id. */
+  /** Stable option id. */
   readonly id: string;
-  /** Visible family label shown in the settings drawer. */
+  /** Visible label shown in the settings drawer. */
   readonly label: string;
-  /** Legacy concrete theme payload applied when this option is selected. */
-  readonly theme?: Theme;
-  /** Optional concrete modes for one shell theme family. */
-  readonly modes?: readonly FrameShellThemeMode[];
+  /** Theme payload applied when this option is selected. */
+  readonly theme: Theme;
+  /** Mode-aware shell theme families use FrameShellThemeFamily instead. */
+  readonly modes?: never;
   /** Optional helper copy shown beneath the row when active. */
   readonly description?: string;
 }
 
+/** A stock shell-theme family with concrete selectable modes. */
+export interface FrameShellThemeFamily {
+  /** Stable shell theme family id. */
+  readonly id: string;
+  /** Visible family label shown in the settings drawer. */
+  readonly label: string;
+  /** Concrete modes exposed as settings choices. */
+  readonly modes: readonly FrameShellThemeMode[];
+  /** Concrete single-theme entries use FrameShellTheme instead. */
+  readonly theme?: never;
+  /** Optional helper copy shown beneath the row when active. */
+  readonly description?: string;
+}
+
+/** A stock shell-theme spec, either one concrete theme or one mode-aware family. */
+export type FrameShellThemeSpec = FrameShellTheme | FrameShellThemeFamily;
+
 /** Notification payload emitted when the stock frame shell theme changes. */
 export interface FrameShellThemeChange {
   /** Selected stock shell theme family definition. */
-  readonly shellTheme: FrameShellTheme;
+  readonly shellTheme: FrameShellThemeSpec;
   /** Selected shell theme family id. */
   readonly shellThemeId: string;
   /** Selected shell theme family label. */
@@ -433,7 +450,7 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
   /** Optional stock shell-theme choices surfaced by the frame settings drawer. */
-  readonly shellThemes?: readonly FrameShellTheme[];
+  readonly shellThemes?: readonly FrameShellThemeSpec[];
   /** Optional callback for syncing app-owned rendering with the stock shell theme. */
   readonly onShellThemeChange?: (change: FrameShellThemeChange) => void;
   /** Optional shell-owned settings drawer content. */

@@ -6,7 +6,7 @@ import {
   type Theme,
   type TokenValue,
 } from '../../packages/bijou/src/index.js';
-import type { FrameShellTheme } from '../../packages/bijou-tui/src/index.js';
+import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
 
 function cloneToken(token: TokenValue): TokenValue {
   return {
@@ -90,7 +90,7 @@ for (const background of DOGFOOD_SURFACE_BACKGROUNDS) {
 
 export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 
-export const DOGFOOD_SHELL_THEMES: readonly FrameShellTheme[] = Object.freeze([
+export const DOGFOOD_SHELL_THEMES: readonly FrameShellThemeSpec[] = Object.freeze([
   {
     id: 'dogfood',
     label: 'DOGFOOD',

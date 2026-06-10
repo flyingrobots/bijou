@@ -20,7 +20,7 @@ import type {
   FrameSettingRow,
   FrameSettingSection,
   FrameSettings,
-  FrameShellTheme,
+  FrameShellThemeSpec,
 } from './app-frame.js';
 import {
   frameEndAnchor,
@@ -56,7 +56,7 @@ export interface ResolvedFrameShellTheme {
   readonly label: string;
   readonly description?: string;
   /** Original shell theme family definition. */
-  readonly shellTheme: FrameShellTheme;
+  readonly shellTheme: FrameShellThemeSpec;
   /** Stable shell theme family id. */
   readonly shellThemeId: string;
   /** Visible shell theme family label. */
@@ -175,7 +175,7 @@ export function frameShellThemeChoiceId(shellThemeId: string, modeId?: string): 
 }
 
 export function resolveFrameShellThemeChoices(
-  shellThemes: readonly FrameShellTheme[],
+  shellThemes: readonly FrameShellThemeSpec[],
   ctx: Pick<BijouContext, 'theme'>,
 ): readonly ResolvedFrameShellTheme[] {
   const choices: ResolvedFrameShellTheme[] = [];

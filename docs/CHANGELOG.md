@@ -29,9 +29,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   safe-pair diagnostics, and `F10` opens a bounded Theme Inspector drawer for
   the active DOGFOOD shell choice. This addresses the Theme Lab direction in
   #315 and advances #311.
-- **Mode-aware app-frame shell themes** — `@flyingrobots/bijou-tui` now lets a
-  `FrameShellTheme` expose concrete `modes` while preserving the old
-  single-`theme` compatibility path. The frame resolves mode-aware families
+- **Mode-aware app-frame shell themes** — `@flyingrobots/bijou-tui` now exports
+  `FrameShellThemeFamily` and `FrameShellThemeSpec` so concrete
+  `FrameShellTheme` entries keep their single-`theme` contract while shell
+  families can expose concrete `modes`. The frame resolves mode-aware families
   into stable choice ids such as `dogfood:dark`, settings can cycle those
   choices, and `FrameShellThemeChange` now reports shell-family and mode facts
   alongside the fresh context. DOGFOOD now presents one `dogfood` family instead
