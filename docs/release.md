@@ -121,7 +121,7 @@ still relies on operator verification:
 | `REL-GH-PRIOR-RELEASE-ZERO` | Lower `v*` milestones have zero open issues or PRs. | operator |
 | `REL-META-VERSION-LOCKSTEP` | Every workspace package version and internal Bijou dependency version matches `X.Y.Z`. | `release:preflight` |
 | `REL-GIT-CLEAN` | The worktree is clean before release prep starts, before the release PR is opened, and before final tagging. | operator |
-| `REL-GIT-ORIGIN-MAIN` | The final tag commit is exactly `origin/main`. | operator, workflows |
+| `REL-GIT-ORIGIN-MAIN` | The final tag commit is exactly `origin/main`. | operator |
 | `REL-DOC-CHANGELOG-DATED` | `docs/CHANGELOG.md` has a dated `[X.Y.Z] - YYYY-MM-DD` entry. | operator |
 | `REL-DOC-EVIDENCE` | `docs/releases/X.Y.Z/README.md` records release evidence, review disposition, replay commands, and residual risk. | operator |
 | `REL-DOC-DOGFOOD-I18N` | DOGFOOD markdown and visible strings satisfy supported-locale checks and the i18n debt ratchet. | `release:readiness` |
@@ -136,7 +136,7 @@ The stage model is:
 | `operator-preflight` | maintainer before release prep | Clean local `main` exactly matches `origin/main`. | Optional visibility check. |
 | `prep-pr` | release-prep branch | Branch-local validation after version/docs changes; does not require `HEAD == origin/main`. | Report target milestone state in the PR. |
 | `final-local` | maintainer after merge | Local `main` exactly matches `origin/main`; final tag target is fixed. | Enforced live. |
-| `tag-workflow` | tag push workflow | Tag commit must be the release commit on `origin/main`. | Enforced when workflow has GitHub access. |
+| `tag-workflow` | tag push workflow | Tag commit must be the release commit on `origin/main`. | Policy target; current workflows do not enforce ancestry. |
 | `rerun-workflow` | manual workflow dispatch for an existing tag | Existing tag must remain reachable from `origin/main`. | Skipped for registry recovery; do not move the tag. |
 
 ### Human Review Gates
@@ -583,8 +583,9 @@ Abort immediately if any of these are true:
 - clean-worktree is an operator preflight check, not a `release:readiness`
   concern, because Phase 2 intentionally dirties the worktree
 - branch-sync, latest-tag, tag-collision, live GitHub issue gates, changelog
-  dating, release evidence shape, and human review disposition are documented
-  here, but they do not yet have a single dedicated repo-native guard
+  dating, release tag ancestry, release evidence shape, and human review
+  disposition are documented here, but they do not yet have a single dedicated
+  repo-native guard
 - `docs:inventory` and runtime `npm audit` are release policy gates but are not
   currently part of `release:readiness`
 - JSR publishing is not currently part of Bijou's release surface
