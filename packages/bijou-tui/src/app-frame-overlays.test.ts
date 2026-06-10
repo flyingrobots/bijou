@@ -4,6 +4,7 @@ import { createKeyMap } from './keybindings.js';
 import {
   mergeShellThemeSettings,
   renderHelpOverlay,
+  resolveFrameShellThemeChoices,
   resolveCurrentShellTheme,
   resolveNextShellTheme,
   type ResolvedFrameShellTheme,
@@ -22,6 +23,8 @@ function shellTheme(
       label,
       theme: resolvedTheme.theme,
     },
+    shellThemeId: id,
+    shellThemeLabel: label,
     resolvedTheme,
   };
 }
@@ -37,6 +40,39 @@ describe('app-frame-overlays', () => {
     expect(resolveCurrentShellTheme(themes, 'missing')?.label).toBe('Default');
     expect(resolveNextShellTheme(themes, 'default')?.id).toBe('citrus');
     expect(resolveNextShellTheme(themes, 'citrus')?.id).toBe('default');
+  });
+
+  it('flattens mode-aware shell themes into stable family and mode choices', () => {
+    const ctx = {
+      theme: {
+        noColor: false,
+        colorScheme: 'dark',
+      },
+    } as Parameters<typeof resolveFrameShellThemeChoices>[1];
+
+    const choices = resolveFrameShellThemeChoices([
+      {
+        id: 'dogfood',
+        label: 'DOGFOOD',
+        modes: [
+          { id: 'dark', label: 'Dark', theme: CYAN_MAGENTA },
+          { id: 'light', label: 'Light', theme: TEAL_ORANGE_PINK },
+        ],
+      },
+    ], ctx);
+
+    expect(choices.map((choice) => choice.id)).toEqual(['dogfood:dark', 'dogfood:light']);
+    expect(choices[0]).toMatchObject({
+      id: 'dogfood:dark',
+      label: 'DOGFOOD / Dark',
+      shellThemeId: 'dogfood',
+      shellThemeLabel: 'DOGFOOD',
+      modeId: 'dark',
+      modeLabel: 'Dark',
+    });
+    expect(choices[0]?.shellTheme.id).toBe('dogfood');
+    expect(choices[0]?.resolvedTheme.theme).toBe(CYAN_MAGENTA);
+    expect(choices[1]?.resolvedTheme.theme).toBe(TEAL_ORANGE_PINK);
   });
 
   it('merges a stock shell-theme row into the shell settings section', () => {

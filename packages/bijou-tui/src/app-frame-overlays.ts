@@ -1,4 +1,5 @@
 import {
+  createResolved,
   createSurface,
   preparePreferenceSections,
   preferenceListSurface,
@@ -49,10 +50,21 @@ export const FRAME_SHELL_THEME_ROW_ID = '__frame-shell-theme__';
 type SettingsRowBehavior = 'cycle-shell-theme';
 
 export interface ResolvedFrameShellTheme {
+  /** Stable concrete choice id. Mode-aware entries use `familyId:modeId`. */
   readonly id: string;
+  /** Visible concrete choice label. */
   readonly label: string;
   readonly description?: string;
+  /** Original shell theme family definition. */
   readonly shellTheme: FrameShellTheme;
+  /** Stable shell theme family id. */
+  readonly shellThemeId: string;
+  /** Visible shell theme family label. */
+  readonly shellThemeLabel: string;
+  /** Stable mode id, when this choice resolves a mode-aware shell theme. */
+  readonly modeId?: string;
+  /** Visible mode label, when this choice resolves a mode-aware shell theme. */
+  readonly modeLabel?: string;
   readonly resolvedTheme: ResolvedTheme;
 }
 
@@ -156,6 +168,76 @@ export function resolveShellThemeOptionsText(
   if (labels.length === 0) return '';
   if (i18n == null) return labels.join(', ');
   return i18n.formatList(labels, i18n.locale);
+}
+
+export function frameShellThemeChoiceId(shellThemeId: string, modeId?: string): string {
+  return modeId === undefined ? shellThemeId : `${shellThemeId}:${modeId}`;
+}
+
+export function resolveFrameShellThemeChoices(
+  shellThemes: readonly FrameShellTheme[],
+  ctx: Pick<BijouContext, 'theme'>,
+): readonly ResolvedFrameShellTheme[] {
+  const choices: ResolvedFrameShellTheme[] = [];
+  const seen = new Set<string>();
+
+  for (const shellTheme of shellThemes) {
+    const modes = shellTheme.modes ?? [];
+    const hasLegacyTheme = shellTheme.theme !== undefined;
+    if (hasLegacyTheme && modes.length > 0) {
+      throw new Error(`createFramedApp: shellTheme "${shellTheme.id}" cannot define both theme and modes`);
+    }
+    if (!hasLegacyTheme && modes.length === 0) {
+      throw new Error(`createFramedApp: shellTheme "${shellTheme.id}" requires theme or modes`);
+    }
+
+    if (hasLegacyTheme) {
+      const id = frameShellThemeChoiceId(shellTheme.id);
+      if (seen.has(id)) {
+        throw new Error(`createFramedApp: duplicate shell theme choice id "${id}"`);
+      }
+      seen.add(id);
+      choices.push({
+        id,
+        label: shellTheme.label,
+        description: shellTheme.description,
+        shellTheme,
+        shellThemeId: shellTheme.id,
+        shellThemeLabel: shellTheme.label,
+        resolvedTheme: createResolved(
+          shellTheme.theme!,
+          ctx.theme.noColor,
+          ctx.theme.colorScheme,
+        ),
+      });
+      continue;
+    }
+
+    for (const mode of modes) {
+      const id = frameShellThemeChoiceId(shellTheme.id, mode.id);
+      if (seen.has(id)) {
+        throw new Error(`createFramedApp: duplicate shell theme choice id "${id}"`);
+      }
+      seen.add(id);
+      choices.push({
+        id,
+        label: `${shellTheme.label} / ${mode.label}`,
+        description: mode.description ?? shellTheme.description,
+        shellTheme,
+        shellThemeId: shellTheme.id,
+        shellThemeLabel: shellTheme.label,
+        modeId: mode.id,
+        modeLabel: mode.label,
+        resolvedTheme: createResolved(
+          mode.theme,
+          ctx.theme.noColor,
+          ctx.theme.colorScheme,
+        ),
+      });
+    }
+  }
+
+  return Object.freeze(choices);
 }
 
 export function resolveCurrentShellTheme(

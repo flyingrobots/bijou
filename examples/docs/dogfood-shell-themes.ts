@@ -92,15 +92,22 @@ export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 
 export const DOGFOOD_SHELL_THEMES: readonly FrameShellTheme[] = Object.freeze([
   {
-    id: 'dogfood-dark',
-    label: 'DOGFOOD Dark',
-    description: 'High-contrast neutral docs shell for dark terminals.',
-    theme: DOGFOOD_DARK_THEME,
-  },
-  {
-    id: 'dogfood-light',
-    label: 'DOGFOOD Light',
-    description: 'High-contrast neutral docs shell for light terminals.',
-    theme: DOGFOOD_LIGHT_THEME,
+    id: 'dogfood',
+    label: 'DOGFOOD',
+    description: 'High-contrast neutral docs shell with dark and light modes.',
+    modes: [
+      {
+        id: 'dark',
+        label: 'Dark',
+        description: 'High-contrast neutral docs shell for dark terminals.',
+        theme: DOGFOOD_DARK_THEME,
+      },
+      {
+        id: 'light',
+        label: 'Light',
+        description: 'High-contrast neutral docs shell for light terminals.',
+        theme: DOGFOOD_LIGHT_THEME,
+      },
+    ],
   },
 ]);

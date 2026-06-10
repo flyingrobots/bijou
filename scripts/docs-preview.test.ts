@@ -973,14 +973,16 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
   });
 
-  it('ships intentional DogFood dark and light shell themes with readable token roles', () => {
+  it('ships one DogFood shell theme family with readable dark and light modes', () => {
     const shellThemes = docsShellThemesForTesting();
-    const dark = shellThemes.find((theme) => theme.id === 'dogfood-dark');
-    const light = shellThemes.find((theme) => theme.id === 'dogfood-light');
+    const dogfood = shellThemes.find((theme) => theme.id === 'dogfood');
+    const dark = dogfood?.modes?.find((mode) => mode.id === 'dark');
+    const light = dogfood?.modes?.find((mode) => mode.id === 'light');
 
-    expect(shellThemes.map((theme) => theme.id).slice(0, 2)).toEqual(['dogfood-dark', 'dogfood-light']);
-    expect(dark?.label).toBe('DOGFOOD Dark');
-    expect(light?.label).toBe('DOGFOOD Light');
+    expect(shellThemes[0]?.id).toBe('dogfood');
+    expect(dogfood?.label).toBe('DOGFOOD');
+    expect(dark?.label).toBe('Dark');
+    expect(light?.label).toBe('Light');
     expect(dark?.theme.name).toBe('dogfood-dark');
     expect(light?.theme.name).toBe('dogfood-light');
 
@@ -1007,7 +1009,7 @@ describe('docs preview app', () => {
     expect((opened.model as any).route).toBe('docs');
     expect((opened.model as any).themeInspectorOpen).toBe(true);
     expect(openedText).toContain('Theme Inspector');
-    expect(openedText).toContain('Active: DOGFOOD Dark');
+    expect(openedText).toContain('Active: DOGFOOD / Dark');
     expect(openedText).toContain('semantic.primary');
     expect(openedText).toContain('surface.primary');
     expect(openedText).toContain('safe pairs pass');
@@ -1083,7 +1085,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Default dark preset: bijou-dark');
     expect(text).toContain('Default light preset: bijou-light');
     expect(text).toContain('Color reuse: dark');
-    expect(text).toContain('DOGFOOD Dark -> dogfood-dark');
+    expect(text).toContain('DOGFOOD / Dark -> dogfood-dark');
     expect(text).toContain('bijou-dark token swatches');
     expect(text).toContain('semantic.primary');
     expect(text).toContain('gradient.brand');
@@ -1738,7 +1740,7 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Show active-pane control');
     expect(frameText(settingsFrame)).toContain('cues in the footer');
     expect(frameText(settingsFrame)).toContain('↻ Shell theme');
-    expect(frameText(settingsFrame)).toContain('DOGFOOD Dark');
+    expect(frameText(settingsFrame)).toContain('DOGFOOD / Dark');
     expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Localization');
     expect(frameText(settingsFrame)).toContain('Preferred language');

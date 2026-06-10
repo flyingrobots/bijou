@@ -90,7 +90,9 @@ export function applyFrameAction<PageModel, Msg>(
         activePage,
         pageModel: model.pageModels[model.activePageId]!,
       });
-      const hasStockShellThemeSettings = (options.shellThemes?.length ?? 0) > 1;
+      const shellThemes = options.shellThemes ?? [];
+      const hasStockShellThemeSettings = shellThemes.length > 1
+        || shellThemes.some((theme) => (theme.modes?.length ?? 0) > 1);
       if (
         !hasStockShellThemeSettings
         && (settings == null || settings.sections.every((section) => section.rows.length === 0))

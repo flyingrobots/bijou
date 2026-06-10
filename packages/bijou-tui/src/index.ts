@@ -380,6 +380,7 @@ export {
   type DescribeFrameLayerStackOptions,
   type FrameHeaderStyle,
   type FrameShellTheme,
+  type FrameShellThemeMode,
   type FrameShellThemeChange,
   type FramePage,
   type FramePageMsg,

@@ -803,20 +803,60 @@ const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
 const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = [
   ...DOGFOOD_SHELL_THEMES,
   ...LANDING_THEMES.map((theme) => ({
-  id: theme.id,
-  label: theme.label,
-  theme: landingTokensToShellTheme(theme),
-})),
+    id: theme.id,
+    label: theme.label,
+    theme: landingTokensToShellTheme(theme),
+  })),
 ];
 
 export function docsShellThemesForTesting(): readonly FrameShellTheme[] {
   return DOCS_SHELL_THEMES;
 }
 
+interface DocsShellThemeChoice {
+  readonly id: string;
+  readonly label: string;
+  readonly shellThemeId: string;
+  readonly shellThemeLabel: string;
+  readonly modeId?: string;
+  readonly modeLabel?: string;
+  readonly theme: Theme;
+}
+
+function docsShellThemeChoiceId(shellThemeId: string, modeId?: string): string {
+  return modeId === undefined ? shellThemeId : `${shellThemeId}:${modeId}`;
+}
+
+function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellTheme[]): readonly DocsShellThemeChoice[] {
+  return shellThemes.flatMap((shellTheme) => {
+    if (shellTheme.theme !== undefined) {
+      return [{
+        id: docsShellThemeChoiceId(shellTheme.id),
+        label: shellTheme.label,
+        shellThemeId: shellTheme.id,
+        shellThemeLabel: shellTheme.label,
+        theme: shellTheme.theme,
+      }];
+    }
+    return (shellTheme.modes ?? []).map((mode) => ({
+      id: docsShellThemeChoiceId(shellTheme.id, mode.id),
+      label: `${shellTheme.label} / ${mode.label}`,
+      shellThemeId: shellTheme.id,
+      shellThemeLabel: shellTheme.label,
+      modeId: mode.id,
+      modeLabel: mode.label,
+      theme: mode.theme,
+    }));
+  });
+}
+
+const DOCS_SHELL_THEME_CHOICES = flattenDocsShellThemeChoices(DOCS_SHELL_THEMES);
 const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
 const DOCS_VISUAL_THEME_BY_SHELL_ID = new Map<string, LandingThemeTokens>([
   ...LANDING_THEMES.map((theme) => [theme.id, theme] as const),
-  ...DOGFOOD_SHELL_THEMES.map((theme) => [theme.id, docsVisualThemeFromShellTheme(theme)] as const),
+  ...DOCS_SHELL_THEME_CHOICES
+    .filter((choice) => !LANDING_THEME_INDEX_BY_ID.has(choice.id))
+    .map((choice) => [choice.id, docsVisualThemeFromShellThemeChoice(choice)] as const),
 ]);
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
@@ -2080,7 +2120,7 @@ function createInitialExplorerModel(
     showHints: true,
     locale,
     landingThemeIndex: 0,
-    activeShellThemeId: DOCS_SHELL_THEMES[0]?.id,
+    activeShellThemeId: DOCS_SHELL_THEME_CHOICES[0]?.id,
     landingQualityMode: 'auto',
     counterBlockDemo: createCounterDemoModel(5),
   };
@@ -3285,7 +3325,7 @@ function themeTokenBg(token: TokenValue | undefined, fallback: string): string {
   return token?.bg ?? fallback;
 }
 
-function docsVisualThemeFromShellTheme(shellTheme: FrameShellTheme): LandingThemeTokens {
+function docsVisualThemeFromShellThemeChoice(shellTheme: DocsShellThemeChoice): LandingThemeTokens {
   const theme = shellTheme.theme;
   const background = themeTokenBg(theme.surface.primary, '#10131a');
   return compileLandingTheme({
@@ -3668,8 +3708,8 @@ function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
   };
 }
 
-function resolveDocsShellThemeById(id: string | undefined): FrameShellTheme {
-  return DOCS_SHELL_THEMES.find((theme) => theme.id === id) ?? DOCS_SHELL_THEMES[0]!;
+function resolveDocsShellThemeById(id: string | undefined): DocsShellThemeChoice {
+  return DOCS_SHELL_THEME_CHOICES.find((theme) => theme.id === id) ?? DOCS_SHELL_THEME_CHOICES[0]!;
 }
 
 function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
@@ -3678,7 +3718,7 @@ function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number
 
 function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
   const shellThemeId = resolveDocsShellThemeById(id).id;
-  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? DOCS_VISUAL_THEME_BY_SHELL_ID.get(DOCS_SHELL_THEMES[0]!.id)!;
+  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? DOCS_VISUAL_THEME_BY_SHELL_ID.get(DOCS_SHELL_THEME_CHOICES[0]!.id)!;
 }
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
@@ -3902,7 +3942,7 @@ function renderThemeLabPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(24, paneWidth - 2);
-  const shellGallery = DOCS_SHELL_THEMES
+  const shellGallery = DOCS_SHELL_THEME_CHOICES
     .map((shellTheme, index) => `${index + 1}. ${shellTheme.label} -> ${shellTheme.theme.name}`)
     .join('\n');
   const defaultSummary = [

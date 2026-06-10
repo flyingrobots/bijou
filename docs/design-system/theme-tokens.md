@@ -287,9 +287,10 @@ Bijou's first-party defaults now use a calmer shell posture:
 The `BIJOU_DARK` preset uses dark neutral surfaces, readable cool/warm accents,
 and separate success/warning/error/info colors. The `BIJOU_LIGHT` preset uses
 light neutral surfaces with darker semantic colors instead of pastel
-foregrounds. DOGFOOD consumes those defaults directly as `DOGFOOD Dark` and
-`DOGFOOD Light`, so the docs app proves the same palette family that first-party
-components should treat as the baseline. Both modes target at least 4.5:1
+foregrounds. DOGFOOD consumes those defaults directly as one `DOGFOOD` shell
+theme family with `Dark` and `Light` modes, so the docs app proves the same
+palette family that first-party components should treat as the baseline. Both
+modes target at least 4.5:1
 contrast for surface text and common semantic foregrounds on every shell
 surface.
 
