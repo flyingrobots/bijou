@@ -216,8 +216,10 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 No next public release version is selected in this file.
 
-`v6.0.0` and `v7.0.0` are both issue-complete GitHub milestone lanes. The next
-release target should be selected from the live tracker and reflected in
+The latest shipped package release is `7.0.0`. The older `v6.0.0` milestone
+and the `v7.0.0` milestone are both issue-complete tracker lanes retained as
+release lineage, not as the next target. The next release target should be
+selected from the live tracker and reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), and the
 versioned release packet before release prep begins.
 
