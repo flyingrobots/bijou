@@ -21,7 +21,7 @@ Last synced from GitHub milestone items: 2026-06-09.
 | :--- | :--- | ---: | ---: | :--- |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Issue-complete layout truth, standard blocks, and status/feedback Block lane. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Issue-complete V7 Product Truth, BlockLab naming, and release-facing proof. |
-| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 35 | 1 | Uncommitted future work, cool ideas, and raw follow-ups. |
+| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 34 | 3 | Uncommitted future work, cool ideas, and raw follow-ups. |
 
 ## v6.0.0
 
@@ -188,6 +188,8 @@ packet and assigned umbrella issues.
 | Issue | Lane | Type | Work |
 | :--- | :--- | :--- | :--- |
 | [#289](https://github.com/flyingrobots/bijou/issues/289) | `lane:cool-ideas` / `lane:release` | `type:enhancement` / `type:docs` | Release title screens as first-class artifact gallery |
+| [#308](https://github.com/flyingrobots/bijou/issues/308) | `lane:cool-ideas` | `type:enhancement` / `type:docs` | DL-013 design token and theme builder API |
+| [#314](https://github.com/flyingrobots/bijou/issues/314) | `lane:cool-ideas` | `type:enhancement` | DL-015 theme safe-pair contracts and contrast matrices |
 
 ### Open Unmilestoned Triage
 
