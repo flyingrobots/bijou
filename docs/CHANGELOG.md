@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Documentation
+
+- **Release policy evidence gates** — `docs/release.md` now adapts the
+  release-runbook pattern to Bijou's npm-only workspace publishing model,
+  requires branch-first release prep, release evidence packets, human review
+  dispositions, deterministic replay records, GitHub milestone gates, and
+  final tagging from the exact merged `origin/main` commit.
+
 ### ✨ Features
 
 - **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
@@ -2103,7 +2111,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v7.0.0...HEAD
+[7.0.0]: https://github.com/flyingrobots/bijou/compare/v5.0.0...v7.0.0
 [5.0.0]: https://github.com/flyingrobots/bijou/compare/v4.4.1...v5.0.0
 [4.4.1]: https://github.com/flyingrobots/bijou/compare/v4.4.0...v4.4.1
 [4.4.0]: https://github.com/flyingrobots/bijou/compare/v4.3.0...v4.4.0
