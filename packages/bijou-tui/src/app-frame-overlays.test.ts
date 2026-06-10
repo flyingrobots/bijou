@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved, type Theme } from '@flyingrobots/bijou';
-import type { FrameShellTheme, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
+import type { FrameShellTheme, FrameShellThemeChange, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
 import { createKeyMap } from './keybindings.js';
 import {
   mergeShellThemeSettings,
@@ -24,6 +24,11 @@ function shellTheme(
       label,
       theme: resolvedTheme.theme,
     },
+    shellThemeSpec: {
+      id,
+      label,
+      theme: resolvedTheme.theme,
+    },
     shellThemeId: id,
     shellThemeLabel: label,
     resolvedTheme,
@@ -32,6 +37,10 @@ function shellTheme(
 
 function requireConcreteShellThemeTheme(shellTheme: FrameShellTheme): Theme {
   return shellTheme.theme;
+}
+
+function requireConcreteShellThemeChange(change: FrameShellThemeChange): Theme {
+  return change.shellTheme.theme;
 }
 
 describe('app-frame-overlays', () => {
@@ -75,7 +84,9 @@ describe('app-frame-overlays', () => {
       modeId: 'dark',
       modeLabel: 'Dark',
     });
-    expect(choices[0]?.shellTheme.id).toBe('dogfood');
+    expect(choices[0]?.shellTheme.id).toBe('dogfood:dark');
+    expect(choices[0]?.shellTheme.theme).toBe(CYAN_MAGENTA);
+    expect(choices[0]?.shellThemeSpec.id).toBe('dogfood');
     expect(choices[0]?.resolvedTheme.theme).toBe(CYAN_MAGENTA);
     expect(choices[1]?.resolvedTheme.theme).toBe(TEAL_ORANGE_PINK);
   });
@@ -95,8 +106,22 @@ describe('app-frame-overlays', () => {
       ],
     } satisfies FrameShellThemeFamily;
     const specs: readonly FrameShellThemeSpec[] = [concrete, family];
+    const change = {
+      shellTheme: {
+        id: 'dogfood:dark',
+        label: 'DOGFOOD / Dark',
+        theme: CYAN_MAGENTA,
+      },
+      shellThemeSpec: family,
+      shellThemeId: 'dogfood',
+      shellThemeLabel: 'DOGFOOD',
+      modeId: 'dark',
+      modeLabel: 'Dark',
+      ctx: {} as FrameShellThemeChange['ctx'],
+    } satisfies FrameShellThemeChange;
 
     expect(requireConcreteShellThemeTheme(concrete)).toBe(CYAN_MAGENTA);
+    expect(requireConcreteShellThemeChange(change)).toBe(CYAN_MAGENTA);
     expect(specs.map((spec) => spec.id)).toEqual(['default', 'dogfood']);
   });
 

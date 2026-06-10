@@ -20,6 +20,7 @@ import type {
   FrameSettingRow,
   FrameSettingSection,
   FrameSettings,
+  FrameShellTheme,
   FrameShellThemeSpec,
 } from './app-frame.js';
 import {
@@ -55,8 +56,10 @@ export interface ResolvedFrameShellTheme {
   /** Visible concrete choice label. */
   readonly label: string;
   readonly description?: string;
-  /** Original shell theme family definition. */
-  readonly shellTheme: FrameShellThemeSpec;
+  /** Selected concrete shell theme choice. */
+  readonly shellTheme: FrameShellTheme;
+  /** Original shell theme spec that produced this choice. */
+  readonly shellThemeSpec: FrameShellThemeSpec;
   /** Stable shell theme family id. */
   readonly shellThemeId: string;
   /** Visible shell theme family label. */
@@ -202,6 +205,7 @@ export function resolveFrameShellThemeChoices(
         label: shellTheme.label,
         description: shellTheme.description,
         shellTheme,
+        shellThemeSpec: shellTheme,
         shellThemeId: shellTheme.id,
         shellThemeLabel: shellTheme.label,
         resolvedTheme: createResolved(
@@ -215,15 +219,23 @@ export function resolveFrameShellThemeChoices(
 
     for (const mode of modes) {
       const id = frameShellThemeChoiceId(shellTheme.id, mode.id);
+      const label = `${shellTheme.label} / ${mode.label}`;
+      const description = mode.description ?? shellTheme.description;
       if (seen.has(id)) {
         throw new Error(`createFramedApp: duplicate shell theme choice id "${id}"`);
       }
       seen.add(id);
       choices.push({
         id,
-        label: `${shellTheme.label} / ${mode.label}`,
-        description: mode.description ?? shellTheme.description,
-        shellTheme,
+        label,
+        description,
+        shellTheme: {
+          id,
+          label,
+          description,
+          theme: mode.theme,
+        },
+        shellThemeSpec: shellTheme,
         shellThemeId: shellTheme.id,
         shellThemeLabel: shellTheme.label,
         modeId: mode.id,

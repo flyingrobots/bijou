@@ -328,8 +328,10 @@ export type FrameShellThemeSpec = FrameShellTheme | FrameShellThemeFamily;
 
 /** Notification payload emitted when the stock frame shell theme changes. */
 export interface FrameShellThemeChange {
-  /** Selected stock shell theme family definition. */
-  readonly shellTheme: FrameShellThemeSpec;
+  /** Selected concrete shell theme choice. */
+  readonly shellTheme: FrameShellTheme;
+  /** Original stock shell theme spec that produced the selected choice. */
+  readonly shellThemeSpec: FrameShellThemeSpec;
   /** Selected shell theme family id. */
   readonly shellThemeId: string;
   /** Selected shell theme family label. */
@@ -886,6 +888,7 @@ export function createFramedApp<PageModel, Msg>(
     }
     options.onShellThemeChange?.({
       shellTheme: nextTheme.shellTheme,
+      shellThemeSpec: nextTheme.shellThemeSpec,
       shellThemeId: nextTheme.shellThemeId,
       shellThemeLabel: nextTheme.shellThemeLabel,
       modeId: nextTheme.modeId,

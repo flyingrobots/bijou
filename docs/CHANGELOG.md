@@ -34,10 +34,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `FrameShellTheme` entries keep their single-`theme` contract while shell
   families can expose concrete `modes`. The frame resolves mode-aware families
   into stable choice ids such as `dogfood:dark`, settings can cycle those
-  choices, and `FrameShellThemeChange` now reports shell-family and mode facts
-  alongside the fresh context. DOGFOOD now presents one `dogfood` family instead
-  of peer `dogfood-dark` and `dogfood-light` shell themes. This closes issue
-  #313.
+  choices, and `FrameShellThemeChange` keeps `shellTheme` as the concrete
+  selected theme while reporting the original `shellThemeSpec`, shell-family
+  ids, and mode facts alongside the fresh context. DOGFOOD now presents one
+  `dogfood` family instead of peer `dogfood-dark` and `dogfood-light` shell
+  themes. This closes issue #313.
 - **Theme safe-pair contracts** — `@flyingrobots/bijou` now exports
   `defineThemeSafePairs()` so theme authors can declare reusable
   foreground/background contrast matrices grouped as readable, status, or

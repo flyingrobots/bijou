@@ -2527,6 +2527,8 @@ describe('createFramedApp', () => {
       readonly shellThemeId: string | undefined;
       readonly modeId: string | undefined;
       readonly id: string;
+      readonly shellThemeSpecId: string;
+      readonly themeName: string;
       readonly ctx: BijouContext;
     }> = [];
 
@@ -2550,6 +2552,8 @@ describe('createFramedApp', () => {
             shellThemeId: change.shellThemeId,
             modeId: change.modeId,
             id: change.shellTheme.id,
+            shellThemeSpecId: change.shellThemeSpec.id,
+            themeName: change.shellTheme.theme.name,
             ctx: change.ctx,
           });
         },
@@ -2558,7 +2562,13 @@ describe('createFramedApp', () => {
       let [model] = app.init();
       expect(model.activeShellThemeId).toBe('dogfood:dark');
       expect(emitted).toHaveLength(1);
-      expect(emitted[0]).toMatchObject({ id: 'dogfood', shellThemeId: 'dogfood', modeId: 'dark' });
+      expect(emitted[0]).toMatchObject({
+        id: 'dogfood:dark',
+        shellThemeSpecId: 'dogfood',
+        shellThemeId: 'dogfood',
+        modeId: 'dark',
+        themeName: explicitCtx.theme.theme.name,
+      });
       expect(emitted[0]?.ctx).not.toBe(explicitCtx);
       expect(explicitCtx.theme).toBe(originalTheme);
       expect(explicitCtx.tokenGraph).toBe(originalTokenGraph);
@@ -2568,7 +2578,13 @@ describe('createFramedApp', () => {
 
       expect(model.activeShellThemeId).toBe('dogfood:light');
       expect(emitted).toHaveLength(2);
-      expect(emitted[1]).toMatchObject({ id: 'dogfood', shellThemeId: 'dogfood', modeId: 'light' });
+      expect(emitted[1]).toMatchObject({
+        id: 'dogfood:light',
+        shellThemeSpecId: 'dogfood',
+        shellThemeId: 'dogfood',
+        modeId: 'light',
+        themeName: 'alternate-shell',
+      });
       expect(emitted[1]?.ctx).not.toBe(explicitCtx);
       expect(emitted[1]?.ctx.theme).not.toBe(originalTheme);
       expect(emitted[1]?.ctx.tokenGraph).not.toBe(originalTokenGraph);

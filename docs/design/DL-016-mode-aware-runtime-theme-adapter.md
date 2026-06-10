@@ -155,7 +155,12 @@ choice id. Consumers that inspect `FrameShellThemeChange` get the richer facts:
 
 ```ts
 {
-  shellTheme,
+  shellTheme: {
+    id: 'dogfood:dark',
+    label: 'DOGFOOD / Dark',
+    theme: dogfoodDark,
+  },
+  shellThemeSpec: dogfoodFamily,
   shellThemeId: 'dogfood',
   modeId: 'dark',
   modeLabel: 'Dark',
@@ -186,8 +191,10 @@ to render that well.
 Compatibility is a hard requirement:
 
 - Existing `FrameShellTheme` entries with `theme` still compile.
-- Existing apps that read `change.shellTheme` still receive the original shell
-  theme family object.
+- Existing apps that read `change.shellTheme.theme` still receive a concrete
+  selected shell theme.
+- Mode-aware apps can inspect `change.shellThemeSpec`, `change.shellThemeId`,
+  and optional mode facts for family identity.
 - Existing app-frame tests for simple theme cycling keep passing.
 - `cloneShellThemeContext()` still receives one concrete resolved theme.
 
