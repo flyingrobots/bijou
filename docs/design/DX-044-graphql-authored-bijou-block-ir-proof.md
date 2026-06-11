@@ -69,6 +69,35 @@ produce a stable `bijou-block/1` artifact, lower it into `ui-scene-ir/1`, render
 it to a terminal `Surface`, and emit a receipt whose source maps, tokens, i18n
 keys, actions, bindings, and hashes are deterministic.
 
+## Playback Questions
+
+This design is successful only if the committed proof lets a maintainer or
+agent answer the following questions from repository facts:
+
+- Can a reader trace one SDL field through `bijou-block/1`, `ui-scene-ir/1`,
+  terminal cells, and receipt dependencies?
+- Can whitespace-only SDL edits preserve the block artifact hash and scene
+  hash?
+- Can unsupported or duplicate identities fail before terminal lowering
+  produces a misleading witness?
+- Can an agent inspect source-map, token, i18n, action, and binding facts
+  without scraping a screenshot?
+
+## Linked Invariants
+
+- [Schemas Live At Boundaries](../invariants/schemas-live-at-boundaries.md):
+  the SDL reader rejects unsupported or malformed authoring input before the
+  runtime treats the block artifact as trusted.
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md):
+  `bijou-block/1` preserves semantic text, token, i18n, action, binding, and
+  source-map meaning when it lowers to terminal cells.
+- [The Buffer Holds Facts](../invariants/buffer-holds-facts.md): generated
+  artifacts, receipts, and source maps remain inspectable fact records instead
+  of executable behavior.
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md): the first slice is
+  complete only when focused tests prove the hash, validation, lowering, and
+  receipt contract.
+
 ## Scope
 
 - A constrained SDL reader for one block type.
@@ -114,13 +143,37 @@ type ReleaseTitle
 The subset allows only:
 
 - one `type`
-- type directives on the same type declaration
+- type directives on the type declaration or following indented lines before
+  `{`
 - scalar fields
 - field directives on following indented lines
 - string and integer directive arguments
 
 That is small enough to parse deterministically without pretending to be a
 general GraphQL compiler.
+
+## Binding Directive Shape
+
+Bindings use field directives because they attach authoring source to one
+renderable field:
+
+```graphql
+status: String
+  @bijouText(id: "status", x: 2, y: 3)
+  @bijouBind(
+    id: "release.status.value",
+    kind: "state",
+    path: "release.status",
+    targetProperty: "text",
+    when: "release.visible"
+  )
+```
+
+The first slice treats binding directives as fact records, not live dataflow.
+`kind` is intentionally constrained to source categories such as `state`,
+`query`, and `computed`. `path` identifies the external source fact.
+`targetProperty` defaults to `text` when omitted. `when` is optional and records
+the gating condition that a later runtime or endpoint may evaluate.
 
 ## Artifact Contract
 
