@@ -97,6 +97,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **Fluid triangle title-screen direction** —
+  `docs/design/DF-074-fluid-triangle-title-screen.md` now records a future
+  DOGFOOD title-screen concept inspired by ASCII fluid rendering: a
+  deterministic Bijou CPU glyph renderer first, with Geordi-backed GPU
+  rendering as the high-quality endpoint once packed-cell or image witnesses are
+  ready. This starts issue #321.
 - **Shared UI scene IR boundary** —
   `docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md` now links
   the #302 GraphQL-authored scene idea to the Runtime Graph And Scene IR
