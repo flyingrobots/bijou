@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { BIJOU_LIGHT } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import type { KeyMsg } from '@flyingrobots/bijou-tui';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
@@ -46,9 +47,9 @@ describe('RE-017 framed shell theme demo', () => {
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
     let [model] = app.init();
-    [model] = app.update(keyMsg('f2') as never, model);
-    [model] = app.update(keyMsg('down') as never, model);
-    [model] = app.update(keyMsg('enter') as never, model);
+    [model] = app.update(keyMsg('f2'), model);
+    [model] = app.update(keyMsg('down'), model);
+    [model] = app.update(keyMsg('enter'), model);
 
     const resultModel = model as {
       landingThemeIndex: number;
@@ -70,7 +71,7 @@ describe('RE-017 framed shell theme demo', () => {
   });
 });
 
-function keyMsg(key: string) {
+function keyMsg(key: string): KeyMsg {
   return {
     type: 'key' as const,
     key,

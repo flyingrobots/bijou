@@ -90,7 +90,7 @@ const DEFAULT_SOURCE_NAME = 'inline.graphql';
 const IDENTIFIER_PATTERN = '[A-Za-z_][A-Za-z0-9_]*';
 const FIELD_PATTERN = new RegExp(`^(${IDENTIFIER_PATTERN})\\s*:\\s*([A-Za-z0-9_!\\[\\]]+)(.*)$`);
 const TYPE_PATTERN = new RegExp(`^type\\s+(${IDENTIFIER_PATTERN})\\b(.*)$`);
-const DIRECTIVE_PATTERN = new RegExp(`@(${IDENTIFIER_PATTERN})\\s*\\(([^)]*)\\)`, 'g');
+const DIRECTIVE_PATTERN = new RegExp(`@(${IDENTIFIER_PATTERN})\\s*\\(((?:[^()"\\\\]|"(?:[^"\\\\]|\\\\.)*")*)\\)`, 'g');
 const ARG_PATTERN = new RegExp(`(${IDENTIFIER_PATTERN})\\s*:\\s*("(?:[^"\\\\]|\\\\.)*"|-?\\d+)`, 'g');
 
 export function compileGraphqlBijouBlock(
@@ -128,6 +128,7 @@ export function compileGraphqlBijouBlock(
 }
 
 export function lowerBijouBlockToUiScene(artifact: BijouBlockArtifact): UiSceneIr {
+  assertUniqueBlockIdentities(artifact.fields, artifact.rootNodeId);
   const nodes: UiNode[] = [
     {
       id: artifact.rootNodeId,
@@ -533,7 +534,13 @@ function normalizeSourceName(sourceName: string): string {
   if (trimmed.length === 0) {
     throw new Error('GraphQL Bijou block sourceName cannot be empty.');
   }
-  if (trimmed.startsWith('/') || /^[A-Za-z]:[\\/]/.test(trimmed) || trimmed.includes('\0')) {
+  if (
+    trimmed.startsWith('/')
+    || trimmed.startsWith('\\\\')
+    || trimmed.startsWith('//')
+    || /^[A-Za-z]:[\\/]/.test(trimmed)
+    || trimmed.includes('\0')
+  ) {
     throw new Error('GraphQL Bijou block sourceName must be a relative or logical name.');
   }
   return trimmed;

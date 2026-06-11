@@ -157,6 +157,26 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     expect(hashUiSceneValue(lowerBijouBlockToUiScene(one))).toBe(hashUiSceneValue(lowerBijouBlockToUiScene(two)));
   });
 
+  it('parses quoted directive arguments containing closing parentheses', () => {
+    const artifact = compileGraphqlBijouBlock(`
+      type ParenText
+        @bijouBlock(id: "paren.text", component: "ParenTextBlock")
+        @bijouTarget(kind: "bijou-terminal", cols: 30, rows: 3) {
+        heading: String
+          @bijouText(id: "heading", x: 0, y: 0)
+          @bijouI18n(key: "heading", fallback: "Open (beta)")
+      }
+    `);
+
+    expect(artifact.fields[0]?.text).toEqual({
+      kind: 'i18n',
+      key: 'heading',
+      fallback: 'Open (beta)',
+    });
+    expect(rowText(lowerUiSceneToTerminalProof(lowerBijouBlockToUiScene(artifact)).lowering.surface, 0))
+      .toContain('Open (beta)');
+  });
+
   it('fails loudly when the SDL omits the block directive', () => {
     expect(() => compileGraphqlBijouBlock(`
       type MissingBlock {
@@ -165,6 +185,18 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouI18n(key: "heading", fallback: "Heading")
       }
     `)).toThrow('GraphQL Bijou block source must include @bijouBlock(id:, component:).');
+  });
+
+  it('rejects absolute and UNC source names', () => {
+    for (const sourceName of [
+      '/tmp/release-title.graphql',
+      'C:\\tmp\\release-title.graphql',
+      '\\\\server\\share\\release-title.graphql',
+      '//server/share/release-title.graphql',
+    ]) {
+      expect(() => compileGraphqlBijouBlock(releaseTitleSdl, { sourceName }))
+        .toThrow('GraphQL Bijou block sourceName must be a relative or logical name.');
+    }
   });
 
   it('rejects duplicate scene identities before lowering', () => {
@@ -210,6 +242,22 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouBind(id: "same.binding", kind: "state", path: "two")
       }
     `)).toThrow('Duplicate GraphQL Bijou block binding id: same.binding');
+
+    const validArtifact = compileGraphqlBijouBlock(releaseTitleSdl, {
+      sourceName: 'release-title.graphql',
+    });
+    const invalidArtifact = {
+      ...validArtifact,
+      fields: [
+        ...validArtifact.fields,
+        {
+          ...validArtifact.fields[0]!,
+          fieldName: 'duplicateHeading',
+        },
+      ],
+    };
+    expect(() => lowerBijouBlockToUiScene(invalidArtifact))
+      .toThrow('Duplicate GraphQL Bijou block node id: heading');
   });
 });
 
