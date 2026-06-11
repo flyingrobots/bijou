@@ -141,6 +141,17 @@ export {
   type ModeMap,
 } from './core/mode-render.js';
 export {
+  BIJOU_BLOCK_ARTIFACT_VERSION,
+  compileGraphqlBijouBlock,
+  lowerBijouBlockToUiScene,
+  type BijouBlockArtifact,
+  type BijouBlockArtifactVersion,
+  type BijouBlockField,
+  type BijouBlockFieldAction,
+  type BijouBlockFieldBinding,
+  type CompileGraphqlBijouBlockOptions,
+} from './core/graphql-bijou-block.js';
+export {
   UI_SCENE_IR_VERSION,
   UI_SCENE_RECEIPT_VERSION,
   createUiSceneTerminalReceipt,

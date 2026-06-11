@@ -156,7 +156,7 @@ not the same thing as a final `Surface`.
 - token references
 - action ids, commands, keybindings, and targets
 - binding facts when present
-- source-map facts from SDL lines to IR nodes
+- source-map facts from SDL field anchors to IR nodes
 - target profile facts
 
 If the source asks for unsupported target facts, the compiler must fail before
@@ -164,10 +164,12 @@ lowering.
 
 ## Source Map Posture
 
-Source strings should be stable and local to the input:
+Source strings should be stable and local to the input. The first slice uses
+semantic anchors instead of line and column positions so formatting-only SDL
+edits do not change the artifact or scene hash:
 
 ```text
-release-title.graphql:7:3
+release-title.graphql#type.ReleaseTitle.field.heading
 ```
 
 Absolute paths are not allowed in emitted artifacts. The caller may provide a
