@@ -99,6 +99,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **GraphQL-authored Bijou block IR proof** —
+  `docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md` now defines the
+  first implementation slice after the portable `ui-scene-ir/1` runtime seed:
+  constrained GraphQL SDL authoring into a `bijou-block/1` artifact, lowering
+  into `ui-scene-ir/1`, terminal `Surface` proof, deterministic receipts, and
+  source-map facts. This advances issue #302.
 - **Fluid triangle title-screen direction** —
   `docs/design/DF-074-fluid-triangle-title-screen.md` now records a future
   DOGFOOD title-screen concept inspired by ASCII fluid rendering: a
