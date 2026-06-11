@@ -98,7 +98,12 @@ export type UiTargetProfile =
       readonly claims?: readonly string[];
     }
   | {
-      readonly kind: 'geordi-unity' | 'external-visual-import' | string;
+      readonly kind: 'geordi-unity' | 'external-visual-import';
+      readonly requires?: readonly string[];
+      readonly claims?: readonly string[];
+    }
+  | {
+      readonly kind: `custom:${string}`;
       readonly requires?: readonly string[];
       readonly claims?: readonly string[];
     };
@@ -129,6 +134,8 @@ export type UiSceneIssueCode =
   | 'unsupported-ir-version'
   | 'root-node-missing'
   | 'duplicate-node-id'
+  | 'duplicate-action-id'
+  | 'duplicate-binding-id'
   | 'child-node-missing'
   | 'parent-node-missing'
   | 'node-action-missing'
@@ -137,7 +144,8 @@ export type UiSceneIssueCode =
   | 'token-node-missing'
   | 'i18n-node-missing'
   | 'i18n-action-missing'
-  | 'source-map-node-missing';
+  | 'source-map-node-missing'
+  | 'invalid-target-profile';
 
 export interface UiSceneValidationIssue {
   readonly code: UiSceneIssueCode;
@@ -266,7 +274,40 @@ export function validateUiSceneIr(scene: UiSceneIr): UiSceneValidationResult {
     });
   }
 
-  const actionIds = new Set(scene.actions.map((action) => action.id));
+  const actionIds = new Set<string>();
+  const duplicateActionIds = new Set<string>();
+  for (const action of scene.actions) {
+    if (actionIds.has(action.id)) {
+      duplicateActionIds.add(action.id);
+      continue;
+    }
+    actionIds.add(action.id);
+  }
+  for (const id of duplicateActionIds) {
+    issues.push({
+      code: 'duplicate-action-id',
+      message: `Duplicate action id: ${id}`,
+      id,
+    });
+  }
+
+  const bindingIds = new Set<string>();
+  const duplicateBindingIds = new Set<string>();
+  for (const binding of scene.bindings) {
+    if (bindingIds.has(binding.id)) {
+      duplicateBindingIds.add(binding.id);
+      continue;
+    }
+    bindingIds.add(binding.id);
+  }
+  for (const id of duplicateBindingIds) {
+    issues.push({
+      code: 'duplicate-binding-id',
+      message: `Duplicate binding id: ${id}`,
+      id,
+    });
+  }
+
   for (const node of scene.nodes) {
     if (node.parentId != null && !nodeIds.has(node.parentId)) {
       issues.push({
@@ -352,6 +393,14 @@ export function validateUiSceneIr(scene: UiSceneIr): UiSceneValidationResult {
     }
   }
 
+  for (let index = 0; index < scene.targetProfiles.length; index++) {
+    const profile = scene.targetProfiles[index]!;
+    const issue = validateTargetProfile(profile, index);
+    if (issue != null) {
+      issues.push(issue);
+    }
+  }
+
   return {
     ok: issues.length === 0,
     issues,
@@ -408,8 +457,12 @@ export function lowerUiSceneToSurface(
     const x = sanitizeLayoutCoordinate(node.layout?.x);
     const y = sanitizeLayoutCoordinate(node.layout?.y);
     const style = cellStyleForNode(node, options.tokenColors);
+    const visibleSpan = visibleTextSpan(x, y, graphemes.length, targetProfile);
+    if (visibleSpan == null) {
+      continue;
+    }
 
-    for (let offset = 0; offset < graphemes.length; offset++) {
+    for (let offset = visibleSpan.startOffset; offset < visibleSpan.endOffset; offset++) {
       surface.set(x + offset, y, {
         char: graphemes[offset]!,
         ...style,
@@ -417,7 +470,7 @@ export function lowerUiSceneToSurface(
       });
     }
 
-    cellSourceMap.push(cellSourceMapEntryForNode(node, x, y, graphemes.length));
+    cellSourceMap.push(cellSourceMapEntryForNode(node, visibleSpan.x, y, visibleSpan.width));
   }
 
   return {
@@ -544,13 +597,22 @@ function cellSourceMapEntryForNode(node: UiNode, x: number, y: number, width: nu
 }
 
 function hashSurface(surface: Surface): string {
-  const cells = surface.cells.map((cell) => ({
-    bg: cell.bg,
-    char: cell.char,
-    empty: cell.empty,
-    fg: cell.fg,
-    modifiers: cell.modifiers,
-  }));
+  const cells = [];
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      const cell = surface.get(x, y);
+      cells.push({
+        bg: cell.bg,
+        bgRGB: cell.bgRGB,
+        char: cell.char,
+        empty: cell.empty,
+        fg: cell.fg,
+        fgRGB: cell.fgRGB,
+        modifiers: cell.modifiers,
+        opacity: cell.opacity,
+      });
+    }
+  }
   return hashUiSceneValue({
     cells,
     height: surface.height,
@@ -563,7 +625,71 @@ function sanitizeLayoutCoordinate(value: number | undefined): number {
 }
 
 function sortedUnique(values: readonly string[]): readonly string[] {
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+  return [...new Set(values)].sort(compareCodeUnits);
+}
+
+function visibleTextSpan(
+  x: number,
+  y: number,
+  width: number,
+  targetProfile: Extract<UiTargetProfile, { kind: 'bijou-terminal' }>,
+): { readonly x: number; readonly startOffset: number; readonly endOffset: number; readonly width: number } | null {
+  if (width <= 0 || y < 0 || y >= targetProfile.rows) {
+    return null;
+  }
+  const startOffset = Math.max(0, -x);
+  const endOffset = Math.min(width, targetProfile.cols - x);
+  const visibleWidth = endOffset - startOffset;
+  if (visibleWidth <= 0) {
+    return null;
+  }
+  return {
+    x: x + startOffset,
+    startOffset,
+    endOffset,
+    width: visibleWidth,
+  };
+}
+
+function validateTargetProfile(profile: UiTargetProfile, index: number): UiSceneValidationIssue | null {
+  switch (profile.kind) {
+    case 'bijou-terminal':
+      return validPositiveDimension(profile.cols) && validPositiveDimension(profile.rows)
+        ? null
+        : invalidTargetProfile(profile.kind, index, 'bijou-terminal target profiles require positive integer cols and rows');
+    case 'geordi-browser':
+    case 'geordi-image':
+      return validPositiveDimension(profile.width) && validPositiveDimension(profile.height)
+        ? null
+        : invalidTargetProfile(profile.kind, index, `${profile.kind} target profiles require positive integer width and height`);
+    case 'geordi-packed-bijou-cells':
+      return validPositiveDimension(profile.cols) && validPositiveDimension(profile.rows)
+        ? null
+        : invalidTargetProfile(profile.kind, index, 'geordi-packed-bijou-cells target profiles require positive integer cols and rows');
+    case 'geordi-unity':
+    case 'external-visual-import':
+      return null;
+    default:
+      return profile.kind.startsWith('custom:')
+        ? null
+        : invalidTargetProfile(profile.kind, index, `Unknown target profile kind: ${profile.kind}`);
+  }
+}
+
+function invalidTargetProfile(kind: string, index: number, reason: string): UiSceneValidationIssue {
+  return {
+    code: 'invalid-target-profile',
+    message: `Invalid target profile ${kind} at index ${index}: ${reason}`,
+    id: `${kind}:${index}`,
+  };
+}
+
+function validPositiveDimension(value: number): boolean {
+  return Number.isInteger(value) && value > 0;
+}
+
+function compareCodeUnits(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 function normalizeStableJson(value: unknown): unknown {
@@ -585,7 +711,7 @@ function normalizeStableJson(value: unknown): unknown {
   if (typeof value === 'object') {
     const input = value as Record<string, unknown>;
     const output: Record<string, unknown> = {};
-    for (const key of Object.keys(input).sort((a, b) => a.localeCompare(b))) {
+    for (const key of Object.keys(input).sort(compareCodeUnits)) {
       const normalized = normalizeStableJson(input[key]);
       if (normalized !== undefined) {
         output[key] = normalized;

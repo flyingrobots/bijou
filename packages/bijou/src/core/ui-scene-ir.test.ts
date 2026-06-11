@@ -8,6 +8,7 @@ import {
   stableUiSceneStringify,
   validateUiSceneIr,
   type UiSceneIr,
+  type UiTargetProfile,
 } from './ui-scene-ir.js';
 
 const fixtureScene: UiSceneIr = {
@@ -92,6 +93,7 @@ describe('ui-scene-ir/1', () => {
     };
 
     expect(stableUiSceneStringify(withDifferentObjectKeyOrder)).toBe('{"a":{"c":3,"d":4},"b":2}');
+    expect(stableUiSceneStringify({ a: 1, Z: 2, _: 3 })).toBe('{"Z":2,"_":3,"a":1}');
     expect(hashUiSceneValue(fixtureScene)).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
     expect(hashUiSceneValue(fixtureScene)).toBe(hashUiSceneValue(JSON.parse(stableUiSceneStringify(fixtureScene))));
   });
@@ -133,6 +135,56 @@ describe('ui-scene-ir/1', () => {
       'token-node-missing',
       'i18n-node-missing',
     ]);
+  });
+
+  it('validates duplicate action and binding ids', () => {
+    const broken: UiSceneIr = {
+      ...fixtureScene,
+      actions: [
+        ...fixtureScene.actions,
+        {
+          id: 'dogfood.openDoc',
+          command: 'dogfood.openDuplicate',
+        },
+      ],
+      bindings: [
+        ...fixtureScene.bindings,
+        {
+          id: 'docs.currentPage.title',
+          targetNodeId: 'nav.start',
+          targetProperty: 'text',
+          source: { kind: 'state', path: 'docs.currentPage.duplicate' },
+        },
+      ],
+    };
+
+    expect(validateUiSceneIr(broken).issues.map((issue) => issue.code)).toEqual([
+      'duplicate-action-id',
+      'duplicate-binding-id',
+    ]);
+  });
+
+  it('validates terminal target profile dimensions', () => {
+    const broken: UiSceneIr = {
+      ...fixtureScene,
+      targetProfiles: [
+        { kind: 'bijou-terminal', cols: 0, rows: 4 },
+        { kind: 'geordi-browser', width: Number.NaN, height: 360 },
+        { kind: 'geordi-packed-bijou-cells', cols: 80, rows: -1 },
+      ],
+    };
+
+    expect(validateUiSceneIr(broken).issues.map((issue) => issue.code)).toEqual([
+      'invalid-target-profile',
+      'invalid-target-profile',
+      'invalid-target-profile',
+    ]);
+  });
+
+  it('requires known terminal target profiles to include dimensions at compile time', () => {
+    // @ts-expect-error Known terminal targets must include cols and rows.
+    const invalidKnownProfile: UiTargetProfile = { kind: 'bijou-terminal' };
+    expect(invalidKnownProfile.kind).toBe('bijou-terminal');
   });
 
   it('creates a structural receipt from portable scene facts', () => {
@@ -183,6 +235,96 @@ describe('ui-scene-ir/1', () => {
       bgToken: 'semantic.nav.item.active.bg',
     });
     expect(lowered.surfaceHash).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
+  });
+
+  it('hashes actual rendered Surface cell state', () => {
+    const one = lowerUiSceneToSurface({
+      ...fixtureScene,
+      nodes: [
+        {
+          ...fixtureScene.nodes[0]!,
+          children: ['text'],
+        },
+        {
+          ...fixtureScene.nodes[1]!,
+          id: 'text',
+          parentId: 'root',
+          text: { kind: 'literal', value: 'A' },
+        },
+      ],
+      bindings: [],
+      actions: [],
+      tokenUses: [],
+      i18nUses: [],
+      sourceMap: [],
+    });
+    const two = lowerUiSceneToSurface({
+      ...fixtureScene,
+      nodes: [
+        {
+          ...fixtureScene.nodes[0]!,
+          children: ['text'],
+        },
+        {
+          ...fixtureScene.nodes[1]!,
+          id: 'text',
+          parentId: 'root',
+          text: { kind: 'literal', value: 'B' },
+        },
+      ],
+      bindings: [],
+      actions: [],
+      tokenUses: [],
+      i18nUses: [],
+      sourceMap: [],
+    });
+
+    expect(one.surface.get(0, 0).char).toBe('A');
+    expect(two.surface.get(0, 0).char).toBe('B');
+    expect(one.surfaceHash).not.toBe(two.surfaceHash);
+  });
+
+  it('records source-map facts only for visible rendered cells', () => {
+    const lowered = lowerUiSceneToSurface({
+      ...fixtureScene,
+      nodes: [
+        {
+          ...fixtureScene.nodes[0]!,
+          children: ['partial', 'offscreen'],
+        },
+        {
+          id: 'partial',
+          kind: 'text',
+          parentId: 'root',
+          layout: { x: 30, y: 0 },
+          text: { kind: 'literal', value: 'abcd' },
+        },
+        {
+          id: 'offscreen',
+          kind: 'text',
+          parentId: 'root',
+          layout: { x: 40, y: 0 },
+          text: { kind: 'literal', value: 'hidden' },
+        },
+      ],
+      bindings: [],
+      actions: [],
+      tokenUses: [],
+      i18nUses: [],
+      sourceMap: [],
+    });
+
+    expect(lowered.surface.get(30, 0).char).toBe('a');
+    expect(lowered.surface.get(31, 0).char).toBe('b');
+    expect(lowered.cellSourceMap).toEqual([
+      {
+        nodeId: 'partial',
+        x: 30,
+        y: 0,
+        width: 2,
+        height: 1,
+      },
+    ]);
   });
 
   it('creates a terminal receipt from lowered Surface output', () => {
