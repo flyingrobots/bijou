@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createUiSceneTerminalReceipt,
   createUiSceneReceipt,
   hashUiSceneValue,
+  lowerUiSceneToTerminalProof,
   lowerUiSceneToSurface,
   stableUiSceneStringify,
   validateUiSceneIr,
@@ -181,6 +183,26 @@ describe('ui-scene-ir/1', () => {
       bgToken: 'semantic.nav.item.active.bg',
     });
     expect(lowered.surfaceHash).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
+  });
+
+  it('creates a terminal receipt from lowered Surface output', () => {
+    const proof = lowerUiSceneToTerminalProof(fixtureScene, {
+      tokenColors: {
+        'semantic.nav.title.fg': '#f7d774',
+        'semantic.nav.item.active.fg': '#111827',
+        'semantic.nav.item.active.bg': '#a7c7ff',
+      },
+    });
+    const directReceipt = createUiSceneTerminalReceipt(fixtureScene, proof.lowering);
+
+    expect(proof.receipt).toEqual(directReceipt);
+    expect(proof.receipt.outputs.terminal).toEqual({
+      layoutHash: hashUiSceneValue({
+        cellSourceMap: proof.lowering.cellSourceMap,
+        targetProfile: proof.lowering.targetProfile,
+      }),
+      surfaceHash: proof.lowering.surfaceHash,
+    });
   });
 
   it('renders deterministic lower modes for agent inspection', () => {

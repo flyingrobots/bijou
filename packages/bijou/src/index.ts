@@ -143,8 +143,10 @@ export {
 export {
   UI_SCENE_IR_VERSION,
   UI_SCENE_RECEIPT_VERSION,
+  createUiSceneTerminalReceipt,
   createUiSceneReceipt,
   hashUiSceneValue,
+  lowerUiSceneToTerminalProof,
   lowerUiSceneToSurface,
   stableUiSceneStringify,
   validateUiSceneIr,
@@ -165,6 +167,7 @@ export {
   type UiSceneReceipt,
   type UiSceneReceiptVersion,
   type UiSceneSurfaceLowering,
+  type UiSceneTerminalProof,
   type UiSceneValidationIssue,
   type UiSceneValidationResult,
   type UiSourceMapEntry,

@@ -202,6 +202,11 @@ export interface UiSceneSurfaceLowering {
   readonly surfaceHash: string;
 }
 
+export interface UiSceneTerminalProof {
+  readonly lowering: UiSceneSurfaceLowering;
+  readonly receipt: UiSceneReceipt;
+}
+
 const DEFAULT_SUPPORTED_BIJOU_REQUIREMENTS = new Set([
   'ui-scene/core/1',
   'ui-scene/text/1',
@@ -420,6 +425,32 @@ export function lowerUiSceneToSurface(
     targetProfile,
     cellSourceMap,
     surfaceHash: hashSurface(surface),
+  };
+}
+
+export function createUiSceneTerminalReceipt(
+  scene: UiSceneIr,
+  lowering: UiSceneSurfaceLowering,
+): UiSceneReceipt {
+  return createUiSceneReceipt(scene, {
+    terminal: {
+      layoutHash: hashUiSceneValue({
+        cellSourceMap: lowering.cellSourceMap,
+        targetProfile: lowering.targetProfile,
+      }),
+      surfaceHash: lowering.surfaceHash,
+    },
+  });
+}
+
+export function lowerUiSceneToTerminalProof(
+  scene: UiSceneIr,
+  options: UiSceneLoweringOptions = {},
+): UiSceneTerminalProof {
+  const lowering = lowerUiSceneToSurface(scene, options);
+  return {
+    lowering,
+    receipt: createUiSceneTerminalReceipt(scene, lowering),
   };
 }
 

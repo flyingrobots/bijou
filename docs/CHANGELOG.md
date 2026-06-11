@@ -20,8 +20,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `ui-scene-ir/1` runtime contract for portable Bijou block and component
   proof: deterministic scene hashing, structural receipts, validation of node,
   action, binding, token, and i18n references, text-only `Surface` lowering with
-  source-map facts, lower modes for node, i18n, and token inspection, and
-  fail-loud target requirement checks. This starts issue #302.
+  source-map facts, terminal lowering receipts that bind layout and surface
+  hashes back to `ui-scene-receipt/1`, lower modes for node, i18n, and token
+  inspection, and fail-loud target requirement checks. This starts issue #302.
 - **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
   first runtime slices for the DL-013 design token builder: `defineTheme()`
   creates immutable theme definitions with required dark/light token maps,
