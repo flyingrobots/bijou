@@ -344,6 +344,7 @@ describe('ui-scene-ir/1', () => {
     });
     const directReceipt = createUiSceneTerminalReceipt(fixtureScene, proof.lowering);
 
+    expect(proof.lowering.sceneHash).toBe(hashUiSceneValue(fixtureScene));
     expect(proof.receipt).toEqual(directReceipt);
     expect(proof.receipt.outputs.terminal).toEqual({
       layoutHash: hashUiSceneValue({
@@ -352,6 +353,15 @@ describe('ui-scene-ir/1', () => {
       }),
       surfaceHash: proof.lowering.surfaceHash,
     });
+
+    const unrelatedLowering = lowerUiSceneToSurface({
+      ...fixtureScene,
+      id: 'other.scene',
+    });
+
+    expect(() => createUiSceneTerminalReceipt(fixtureScene, unrelatedLowering)).toThrow(
+      'Terminal lowering was created for a different ui-scene-ir/1 scene.',
+    );
   });
 
   it('renders deterministic lower modes for agent inspection', () => {

@@ -208,6 +208,7 @@ export interface UiSceneSurfaceLowering {
   readonly surface: Surface;
   readonly targetProfile: Extract<UiTargetProfile, { kind: 'bijou-terminal' }>;
   readonly cellSourceMap: readonly UiCellSourceMapEntry[];
+  readonly sceneHash: string;
   readonly surfaceHash: string;
 }
 
@@ -483,6 +484,7 @@ export function lowerUiSceneToSurface(
     surface,
     targetProfile,
     cellSourceMap,
+    sceneHash: hashUiSceneValue(scene),
     surfaceHash: hashSurface(surface),
   };
 }
@@ -491,6 +493,10 @@ export function createUiSceneTerminalReceipt(
   scene: UiSceneIr,
   lowering: UiSceneSurfaceLowering,
 ): UiSceneReceipt {
+  const sceneHash = hashUiSceneValue(scene);
+  if (lowering.sceneHash !== sceneHash) {
+    throw new Error('Terminal lowering was created for a different ui-scene-ir/1 scene.');
+  }
   return createUiSceneReceipt(scene, {
     terminal: {
       layoutHash: hashUiSceneValue({
