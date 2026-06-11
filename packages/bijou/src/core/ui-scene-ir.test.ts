@@ -236,6 +236,7 @@ describe('ui-scene-ir/1', () => {
       y: 2,
       width: 10,
       height: 1,
+      source: 'fixture.graphql:13:3',
       textKey: 'dogfood.nav.startHere',
       fgToken: 'semantic.nav.item.active.fg',
       bgToken: 'semantic.nav.item.active.bg',

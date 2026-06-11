@@ -198,6 +198,7 @@ export interface UiCellSourceMapEntry {
   readonly y: number;
   readonly width: number;
   readonly height: number;
+  readonly source?: string;
   readonly textKey?: string;
   readonly fgToken?: string;
   readonly bgToken?: string;
@@ -450,6 +451,7 @@ export function lowerUiSceneToSurface(
   const surface = createSurface(targetProfile.cols, targetProfile.rows);
   const cellSourceMap: UiCellSourceMapEntry[] = [];
   const lowerMode = options.lowerMode ?? 'normal';
+  const sourceByNodeId = new Map(scene.sourceMap.map((entry) => [entry.nodeId, entry.source]));
 
   for (const node of scene.nodes) {
     if (node.kind !== 'text') {
@@ -474,7 +476,7 @@ export function lowerUiSceneToSurface(
       });
     }
 
-    cellSourceMap.push(cellSourceMapEntryForNode(node, visibleSpan.x, y, visibleSpan.width));
+    cellSourceMap.push(cellSourceMapEntryForNode(node, visibleSpan.x, y, visibleSpan.width, sourceByNodeId.get(node.id)));
   }
 
   return {
@@ -571,13 +573,20 @@ function cellStyleForNode(
   return style;
 }
 
-function cellSourceMapEntryForNode(node: UiNode, x: number, y: number, width: number): UiCellSourceMapEntry {
+function cellSourceMapEntryForNode(
+  node: UiNode,
+  x: number,
+  y: number,
+  width: number,
+  source: string | undefined,
+): UiCellSourceMapEntry {
   const entry: {
     nodeId: string;
     x: number;
     y: number;
     width: number;
     height: number;
+    source?: string;
     textKey?: string;
     fgToken?: string;
     bgToken?: string;
@@ -588,6 +597,9 @@ function cellSourceMapEntryForNode(node: UiNode, x: number, y: number, width: nu
     width,
     height: 1,
   };
+  if (source != null) {
+    entry.source = source;
+  }
   if (node.text?.kind === 'i18n') {
     entry.textKey = node.text.key;
   }
