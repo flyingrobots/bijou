@@ -166,6 +166,51 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       }
     `)).toThrow('GraphQL Bijou block source must include @bijouBlock(id:, component:).');
   });
+
+  it('rejects duplicate scene identities before lowering', () => {
+    expect(() => compileGraphqlBijouBlock(`
+      type DuplicateNode
+        @bijouBlock(id: "duplicate.node", component: "DuplicateNodeBlock")
+        @bijouTarget(kind: "bijou-terminal", cols: 20, rows: 4) {
+        one: String
+          @bijouText(id: "same-node", x: 0, y: 0)
+          @bijouI18n(key: "one", fallback: "One")
+        two: String
+          @bijouText(id: "same-node", x: 0, y: 1)
+          @bijouI18n(key: "two", fallback: "Two")
+      }
+    `)).toThrow('Duplicate GraphQL Bijou block node id: same-node');
+
+    expect(() => compileGraphqlBijouBlock(`
+      type DuplicateAction
+        @bijouBlock(id: "duplicate.action", component: "DuplicateActionBlock")
+        @bijouTarget(kind: "bijou-terminal", cols: 20, rows: 4) {
+        one: String
+          @bijouText(id: "one", x: 0, y: 0)
+          @bijouI18n(key: "one", fallback: "One")
+          @bijouAction(id: "same.action", command: "one")
+        two: String
+          @bijouText(id: "two", x: 0, y: 1)
+          @bijouI18n(key: "two", fallback: "Two")
+          @bijouAction(id: "same.action", command: "two")
+      }
+    `)).toThrow('Duplicate GraphQL Bijou block action id: same.action');
+
+    expect(() => compileGraphqlBijouBlock(`
+      type DuplicateBinding
+        @bijouBlock(id: "duplicate.binding", component: "DuplicateBindingBlock")
+        @bijouTarget(kind: "bijou-terminal", cols: 20, rows: 4) {
+        one: String
+          @bijouText(id: "one", x: 0, y: 0)
+          @bijouI18n(key: "one", fallback: "One")
+          @bijouBind(id: "same.binding", kind: "state", path: "one")
+        two: String
+          @bijouText(id: "two", x: 0, y: 1)
+          @bijouI18n(key: "two", fallback: "Two")
+          @bijouBind(id: "same.binding", kind: "state", path: "two")
+      }
+    `)).toThrow('Duplicate GraphQL Bijou block binding id: same.binding');
+  });
 });
 
 function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean }; width: number }, y: number): string {

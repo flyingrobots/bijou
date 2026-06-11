@@ -108,13 +108,15 @@ export function compileGraphqlBijouBlock(
 
   const targetProfiles = targetProfilesFor(parsed.typeDirectives);
   const fields = parsed.fields.map((field) => bijouBlockFieldFor(field, parsed.typeName, sourceName));
+  const rootNodeId = `${blockId}.root`;
+  assertUniqueBlockIdentities(fields, rootNodeId);
   const artifactBody = {
     artifactVersion: BIJOU_BLOCK_ARTIFACT_VERSION,
     id: blockId,
     component,
     sourceTypeName: parsed.typeName,
     sourceName,
-    rootNodeId: `${blockId}.root`,
+    rootNodeId,
     fields,
     targetProfiles,
   } satisfies Omit<BijouBlockArtifact, 'sourceHash'>;
@@ -495,6 +497,35 @@ function appendI18nUse(i18nUses: UiI18nUse[], id: string, text: UiTextRef, kind:
   i18nUses.push(kind === 'node'
     ? { nodeId: id, key: text.key }
     : { actionId: id, key: text.key });
+}
+
+function assertUniqueBlockIdentities(fields: readonly BijouBlockField[], rootNodeId: string): void {
+  assertUniqueValues(
+    fields.map((field) => field.fieldName),
+    'field name',
+  );
+  assertUniqueValues(
+    [rootNodeId, ...fields.map((field) => field.nodeId)],
+    'node id',
+  );
+  assertUniqueValues(
+    fields.flatMap((field) => field.action == null ? [] : [field.action.id]),
+    'action id',
+  );
+  assertUniqueValues(
+    fields.flatMap((field) => field.binding == null ? [] : [field.binding.id]),
+    'binding id',
+  );
+}
+
+function assertUniqueValues(values: readonly string[], label: string): void {
+  const seen = new Set<string>();
+  for (const value of values) {
+    if (seen.has(value)) {
+      throw new Error(`Duplicate GraphQL Bijou block ${label}: ${value}`);
+    }
+    seen.add(value);
+  }
 }
 
 function normalizeSourceName(sourceName: string): string {
