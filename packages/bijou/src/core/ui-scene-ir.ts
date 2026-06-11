@@ -448,6 +448,7 @@ export function lowerUiSceneToSurface(
   }
 
   assertSupportedBijouRequirements(targetProfile, options.supportedRequirements);
+  assertTextOnlyBijouNodes(scene);
 
   const surface = createSurface(targetProfile.cols, targetProfile.rows);
   const cellSourceMap: UiCellSourceMapEntry[] = [];
@@ -517,6 +518,15 @@ export function lowerUiSceneToTerminalProof(
     lowering,
     receipt: createUiSceneTerminalReceipt(scene, lowering),
   };
+}
+
+function assertTextOnlyBijouNodes(scene: UiSceneIr): void {
+  for (const node of scene.nodes) {
+    if (node.kind === 'group' || node.kind === 'text') {
+      continue;
+    }
+    throw new Error(`Cannot lower ui-scene-ir/1 node ${node.id} (${node.kind}) to bijou-terminal text Surface.`);
+  }
 }
 
 function assertSupportedBijouRequirements(

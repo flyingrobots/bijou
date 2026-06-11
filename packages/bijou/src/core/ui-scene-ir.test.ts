@@ -291,6 +291,34 @@ describe('ui-scene-ir/1', () => {
     expect(one.surfaceHash).not.toBe(two.surfaceHash);
   });
 
+  it('fails loudly before drawing unsupported visible node kinds', () => {
+    const unsupported: UiSceneIr = {
+      ...fixtureScene,
+      nodes: [
+        {
+          ...fixtureScene.nodes[0]!,
+          children: ['markdown-doc'],
+        },
+        {
+          id: 'markdown-doc',
+          kind: 'markdown',
+          parentId: 'root',
+          layout: { x: 0, y: 0, width: 12, height: 4 },
+          text: { kind: 'literal', value: '# Start' },
+        },
+      ],
+      bindings: [],
+      actions: [],
+      tokenUses: [],
+      i18nUses: [],
+      sourceMap: [],
+    };
+
+    expect(() => lowerUiSceneToSurface(unsupported)).toThrow(
+      'Cannot lower ui-scene-ir/1 node markdown-doc (markdown) to bijou-terminal text Surface.',
+    );
+  });
+
   it('records source-map facts only for visible rendered cells', () => {
     const lowered = lowerUiSceneToSurface({
       ...fixtureScene,
