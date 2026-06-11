@@ -225,7 +225,11 @@ const DEFAULT_SUPPORTED_BIJOU_REQUIREMENTS = new Set([
 ]);
 
 export function stableUiSceneStringify(value: unknown): string {
-  return JSON.stringify(normalizeStableJson(value));
+  const normalized = normalizeStableJson(value);
+  if (normalized === undefined) {
+    throw new Error('ui-scene-ir/1 JSON value cannot be top-level undefined');
+  }
+  return JSON.stringify(normalized);
 }
 
 export function hashUiSceneValue(value: unknown): string {

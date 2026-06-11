@@ -96,6 +96,12 @@ describe('ui-scene-ir/1', () => {
     expect(stableUiSceneStringify({ a: 1, Z: 2, _: 3 })).toBe('{"Z":2,"_":3,"a":1}');
     expect(hashUiSceneValue(fixtureScene)).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
     expect(hashUiSceneValue(fixtureScene)).toBe(hashUiSceneValue(JSON.parse(stableUiSceneStringify(fixtureScene))));
+    expect(() => stableUiSceneStringify(undefined)).toThrow(
+      'ui-scene-ir/1 JSON value cannot be top-level undefined',
+    );
+    expect(() => hashUiSceneValue(undefined)).toThrow(
+      'ui-scene-ir/1 JSON value cannot be top-level undefined',
+    );
   });
 
   it('validates node, action, binding, token, i18n, and root references', () => {
