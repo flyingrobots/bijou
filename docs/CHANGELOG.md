@@ -24,6 +24,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   rendered full-cell surface hashes back to `ui-scene-receipt/1`, lower modes
   for node, i18n, and token inspection, and fail-loud target requirement
   checks. This starts issue #302.
+- **GraphQL-authored Bijou block artifact proof** — `@flyingrobots/bijou` now
+  exports `compileGraphqlBijouBlock()` and `lowerBijouBlockToUiScene()` for the
+  first constrained GraphQL SDL authoring slice. The compiler emits a stable
+  `bijou-block/1` artifact with semantic source anchors, i18n fallbacks, token
+  refs, action commands, target-profile facts, and a whitespace-stable source
+  hash, then lowers the artifact into `ui-scene-ir/1` for terminal proof and
+  receipt generation. This advances issue #302.
 - **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
   first runtime slices for the DL-013 design token builder: `defineTheme()`
   creates immutable theme definitions with required dark/light token maps,
@@ -99,6 +106,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **GraphQL-authored Bijou block IR proof** —
+  `docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md` now defines the
+  first implementation slice after the portable `ui-scene-ir/1` runtime seed:
+  constrained GraphQL SDL authoring into a `bijou-block/1` artifact, lowering
+  into `ui-scene-ir/1`, terminal `Surface` proof, deterministic receipts, and
+  source-map facts. This advances issue #302.
 - **Fluid triangle title-screen direction** —
   `docs/design/DF-074-fluid-triangle-title-screen.md` now records a future
   DOGFOOD title-screen concept inspired by ASCII fluid rendering: a
