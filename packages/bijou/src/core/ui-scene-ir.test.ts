@@ -212,6 +212,25 @@ describe('ui-scene-ir/1', () => {
     });
   });
 
+  it('derives receipt dependency refs from inline token and i18n facts', () => {
+    const receipt = createUiSceneReceipt({
+      ...fixtureScene,
+      tokenUses: [],
+      i18nUses: [],
+    });
+
+    expect(receipt.i18nKeys).toEqual([
+      'dogfood.action.openDoc',
+      'dogfood.nav.startHere',
+      'dogfood.nav.title',
+    ]);
+    expect(receipt.tokenRefs).toEqual([
+      'semantic.nav.item.active.bg',
+      'semantic.nav.item.active.fg',
+      'semantic.nav.title.fg',
+    ]);
+  });
+
   it('lowers a text-only scene to a Bijou Surface with source-map facts', () => {
     const lowered = lowerUiSceneToSurface(fixtureScene, {
       tokenColors: {
