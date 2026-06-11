@@ -362,6 +362,42 @@ describe('ui-scene-ir/1', () => {
     ]);
   });
 
+  it('clips negative text layouts without shifting hidden graphemes on screen', () => {
+    const lowered = lowerUiSceneToSurface({
+      ...fixtureScene,
+      nodes: [
+        {
+          ...fixtureScene.nodes[0]!,
+          children: ['partial'],
+        },
+        {
+          id: 'partial',
+          kind: 'text',
+          parentId: 'root',
+          layout: { x: -2, y: 0 },
+          text: { kind: 'literal', value: 'abcd' },
+        },
+      ],
+      bindings: [],
+      actions: [],
+      tokenUses: [],
+      i18nUses: [],
+      sourceMap: [],
+    });
+
+    expect(lowered.surface.get(0, 0).char).toBe('c');
+    expect(lowered.surface.get(1, 0).char).toBe('d');
+    expect(lowered.cellSourceMap).toEqual([
+      {
+        nodeId: 'partial',
+        x: 0,
+        y: 0,
+        width: 2,
+        height: 1,
+      },
+    ]);
+  });
+
   it('creates a terminal receipt from lowered Surface output', () => {
     const proof = lowerUiSceneToTerminalProof(fixtureScene, {
       tokenColors: {

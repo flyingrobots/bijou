@@ -653,7 +653,7 @@ function hashSurface(surface: Surface): string {
 }
 
 function sanitizeLayoutCoordinate(value: number | undefined): number {
-  return Number.isFinite(value) ? Math.max(0, Math.trunc(value as number)) : 0;
+  return Number.isFinite(value) ? Math.trunc(value as number) : 0;
 }
 
 function sortedUnique(values: readonly string[]): readonly string[] {
