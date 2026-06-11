@@ -94,7 +94,10 @@ describe('ui-scene-ir/1', () => {
 
     expect(stableUiSceneStringify(withDifferentObjectKeyOrder)).toBe('{"a":{"c":3,"d":4},"b":2}');
     expect(stableUiSceneStringify({ a: 1, Z: 2, _: 3 })).toBe('{"Z":2,"_":3,"a":1}');
-    expect(hashUiSceneValue(fixtureScene)).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
+    expect(hashUiSceneValue({ a: 1 })).toBe(
+      'sha256:015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862',
+    );
+    expect(hashUiSceneValue(fixtureScene)).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(hashUiSceneValue(fixtureScene)).toBe(hashUiSceneValue(JSON.parse(stableUiSceneStringify(fixtureScene))));
     expect(() => stableUiSceneStringify(undefined)).toThrow(
       'ui-scene-ir/1 JSON value cannot be top-level undefined',
@@ -260,7 +263,7 @@ describe('ui-scene-ir/1', () => {
       fgToken: 'semantic.nav.item.active.fg',
       bgToken: 'semantic.nav.item.active.bg',
     });
-    expect(lowered.surfaceHash).toMatch(/^fnv1a32:[0-9a-f]{8}$/);
+    expect(lowered.surfaceHash).toMatch(/^sha256:[0-9a-f]{64}$/);
   });
 
   it('hashes actual rendered Surface cell state', () => {
