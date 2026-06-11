@@ -188,10 +188,11 @@ describe('GraphQL-authored Bijou block artifacts', () => {
   });
 
   it('rejects absolute and UNC source names', () => {
+    const backslash = String.fromCharCode(92);
     for (const sourceName of [
       '/tmp/release-title.graphql',
-      'C:\\tmp\\release-title.graphql',
-      '\\\\server\\share\\release-title.graphql',
+      `C:${backslash}tmp${backslash}release-title.graphql`,
+      `${backslash}${backslash}server${backslash}share${backslash}release-title.graphql`,
       '//server/share/release-title.graphql',
     ]) {
       expect(() => compileGraphqlBijouBlock(releaseTitleSdl, { sourceName }))
