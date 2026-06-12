@@ -106,6 +106,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **GraphQL block groups and debug facts** —
+  `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` now defines the
+  next #302 slice after the GraphQL-authored block proof: explicit SDL-authored
+  group nodes, grouped `bijou-block/1` lowering into `ui-scene-ir/1`,
+  deterministic debug summary facts, lower-mode witnesses, and duplicate/missing
+  group validation.
 - **GraphQL-authored Bijou block IR proof** —
   `docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md` now defines the
   first implementation slice after the portable `ui-scene-ir/1` runtime seed:
