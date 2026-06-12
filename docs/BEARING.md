@@ -65,6 +65,23 @@ Current direction and active tensions. Historical ship data is in
 
 ## Active Gravity
 
+### 0. Advance Runtime Graph And Scene IR From Proof To Pipeline
+
+- `DX-043` and `DX-044` landed the portable `ui-scene-ir/1` seed and the first
+  GraphQL-authored `bijou-block/1` proof for #302.
+- The next active pull is `DX-045`: grouped GraphQL block authoring and
+  deterministic debug facts. This keeps the work inside Bijou before crossing
+  into Geordi endpoint implementation.
+- The useful proof path is now:
+
+  ```text
+  GraphQL SDL
+    -> bijou-block/1 grouped artifact
+      -> ui-scene-ir/1
+        -> terminal Surface proof
+          -> debug summary facts
+  ```
+
 ### 1. Keep The `v6.0.0` Release Boundary Closed
 
 - The live `v6.0.0` milestone has zero open tracker items and twenty-eight
@@ -123,10 +140,21 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate focus is V7 release-readiness validation now that the Product
-Truth tracker is issue-complete.
+The immediate feature focus is the `DX-045` grouped GraphQL block pipeline for
+#302. Release-readiness validation remains the release-boundary focus for the
+closed V6 and V7 lanes, but the next implementation branch should avoid
+reopening those issue-complete milestones.
 
-The validation pass must prove:
+The `DX-045` validation pass must prove:
+
+- grouped SDL compiles into deterministic `bijou-block/1` group facts
+- grouped block artifacts lower into valid `ui-scene-ir/1`
+- terminal proof preserves source maps, tokens, i18n keys, actions, bindings,
+  lower modes, and receipt hashes
+- debug summary facts are inspectable without screenshots or host-specific
+  paths
+
+The release-readiness validation pass must prove:
 
 - release-readiness checks pass against the closed V6 and V7 lanes
 - BEARING and ROADMAP mirror the live V7 tracker
@@ -135,7 +163,7 @@ The validation pass must prove:
 
 Recommended pull order:
 
-1. Finish this tracker-sync cleanup branch.
+1. Land `DX-045` grouped GraphQL block authoring and debug facts for #302.
 2. Run release-readiness validation against the now-closed V6 and V7 lanes.
 3. Cut release title treatment variants for the next release boundary only
    after the tracker, docs, and CI proof are green.

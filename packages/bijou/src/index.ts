@@ -142,14 +142,22 @@ export {
 } from './core/mode-render.js';
 export {
   BIJOU_BLOCK_ARTIFACT_VERSION,
+  GRAPHQL_BIJOU_BLOCK_DEBUG_SUMMARY_VERSION,
   compileGraphqlBijouBlock,
+  createGraphqlBijouBlockDebugSummary,
   lowerBijouBlockToUiScene,
   type BijouBlockArtifact,
   type BijouBlockArtifactVersion,
   type BijouBlockField,
   type BijouBlockFieldAction,
   type BijouBlockFieldBinding,
+  type BijouBlockGroup,
   type CompileGraphqlBijouBlockOptions,
+  type GraphqlBijouBlockDebugFieldFact,
+  type GraphqlBijouBlockDebugGroupFact,
+  type GraphqlBijouBlockDebugLowerModeFact,
+  type GraphqlBijouBlockDebugSummary,
+  type GraphqlBijouBlockDebugSummaryVersion,
 } from './core/graphql-bijou-block.js';
 export {
   UI_SCENE_IR_VERSION,

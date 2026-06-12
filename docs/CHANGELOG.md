@@ -31,6 +31,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   refs, action commands, target-profile facts, and a whitespace-stable source
   hash, then lowers the artifact into `ui-scene-ir/1` for terminal proof and
   receipt generation. This advances issue #302.
+- **GraphQL-authored Bijou block groups and debug facts** —
+  `compileGraphqlBijouBlock()` now supports repeated `@bijouGroup(...)` type
+  directives and `@bijouText(group:)` field membership, preserving grouped
+  hierarchy when lowering into `ui-scene-ir/1`. The public
+  `createGraphqlBijouBlockDebugSummary()` helper emits deterministic
+  `graphql-bijou-block-debug/1` artifact, scene, group, field, source-map,
+  token, i18n, action, binding, and lower-mode facts so agents can inspect a
+  grouped GraphQL block without scraping terminal screenshots. This advances
+  issue #302.
 - **Theme token builder API slices** — `@flyingrobots/bijou` now exports the
   first runtime slices for the DL-013 design token builder: `defineTheme()`
   creates immutable theme definitions with required dark/light token maps,
@@ -106,6 +115,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **GraphQL block groups and debug facts** —
+  `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` now defines the
+  next #302 slice after the GraphQL-authored block proof: explicit SDL-authored
+  group nodes, grouped `bijou-block/1` lowering into `ui-scene-ir/1`,
+  deterministic debug summary facts, lower-mode witnesses, and duplicate/missing
+  group validation.
 - **GraphQL-authored Bijou block IR proof** —
   `docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md` now defines the
   first implementation slice after the portable `ui-scene-ir/1` runtime seed:
