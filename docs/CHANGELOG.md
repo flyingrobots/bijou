@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Documentation
 
+- **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
+  now mark DX-045 as landed, set DX-046 as the next #302 pull for a real
+  GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone counts
+  from GitHub, and move the closed legacy-theme cleanup issue into closed
+  Beyond lineage.
 - **Release policy evidence gates** — `docs/release.md` now adapts the
   release-runbook pattern to Bijou's npm-only workspace publishing model,
   requires branch-first release prep, release evidence packets, human review
@@ -116,11 +121,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🧭 Planning
 
 - **GraphQL block groups and debug facts** —
-  `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` now defines the
-  next #302 slice after the GraphQL-authored block proof: explicit SDL-authored
-  group nodes, grouped `bijou-block/1` lowering into `ui-scene-ir/1`,
-  deterministic debug summary facts, lower-mode witnesses, and duplicate/missing
-  group validation.
+  `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` recorded the
+  grouped #302 slice after the GraphQL-authored block proof: explicit
+  SDL-authored group nodes, grouped `bijou-block/1` lowering into
+  `ui-scene-ir/1`, deterministic debug summary facts, lower-mode witnesses, and
+  duplicate/missing group validation.
 - **GraphQL-authored Bijou block IR proof** —
   `docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md` now defines the
   first implementation slice after the portable `ui-scene-ir/1` runtime seed:

@@ -56,6 +56,10 @@ Current direction and active tensions. Historical ship data is in
   six-pack landed as standard Block contracts for brand emphasis, mode-aware
   primitives, dense comparisons, hierarchies, exploration lists, and
   temporal/dependency views.
+- `DX-043` through `DX-045` — the Runtime Graph and Scene IR lane now has a
+  portable `ui-scene-ir/1` seed, a constrained GraphQL-authored
+  `bijou-block/1` proof, grouped block authoring, and deterministic
+  `graphql-bijou-block-debug/1` facts for #302.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -65,21 +69,24 @@ Current direction and active tensions. Historical ship data is in
 
 ## Active Gravity
 
-### 0. Advance Runtime Graph And Scene IR From Proof To Pipeline
+### 0. Advance Runtime Graph And Scene IR From Proof To Product Fixture
 
-- `DX-043` and `DX-044` landed the portable `ui-scene-ir/1` seed and the first
-  GraphQL-authored `bijou-block/1` proof for #302.
-- The next active pull is `DX-045`: grouped GraphQL block authoring and
-  deterministic debug facts. This keeps the work inside Bijou before crossing
-  into Geordi endpoint implementation.
+- `DX-043`, `DX-044`, and `DX-045` landed the portable `ui-scene-ir/1` seed,
+  the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
+  and deterministic debug facts for #302.
+- The next active pull is `DX-046`: one real DOGFOOD block or panel authored as
+  GraphQL SDL, compiled to `bijou-block/1`, lowered to `ui-scene-ir/1`, and
+  proven through terminal output plus debug facts. This keeps the work inside
+  Bijou one more slice before Wesley or Geordi integration.
 - The useful proof path is now:
 
   ```text
-  GraphQL SDL
+  GraphQL SDL fixture
     -> bijou-block/1 grouped artifact
       -> ui-scene-ir/1
         -> terminal Surface proof
-          -> debug summary facts
+          -> graphql-bijou-block-debug/1 facts
+            -> DOGFOOD product facts
   ```
 
 ### 1. Keep The `v6.0.0` Release Boundary Closed
@@ -140,19 +147,20 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate feature focus is the `DX-045` grouped GraphQL block pipeline for
-#302. Release-readiness validation remains the release-boundary focus for the
-closed V6 and V7 lanes, but the next implementation branch should avoid
-reopening those issue-complete milestones.
+The immediate feature focus is `DX-046`: a GraphQL-authored DOGFOOD block
+fixture for #302. Release-readiness validation remains the release-boundary
+focus for the closed V6 and V7 lanes, but the next implementation branch should
+avoid reopening those issue-complete milestones.
 
-The `DX-045` validation pass must prove:
+The `DX-046` validation pass must prove:
 
-- grouped SDL compiles into deterministic `bijou-block/1` group facts
-- grouped block artifacts lower into valid `ui-scene-ir/1`
+- one existing DOGFOOD block or panel has a checked-in GraphQL SDL source
+- that SDL compiles into a deterministic grouped `bijou-block/1` artifact
+- the artifact lowers into valid `ui-scene-ir/1`
 - terminal proof preserves source maps, tokens, i18n keys, actions, bindings,
-  lower modes, and receipt hashes
-- debug summary facts are inspectable without screenshots or host-specific
-  paths
+  lower modes, receipt hashes, and `graphql-bijou-block-debug/1` facts
+- failure tests catch missing product facts such as invalid token refs,
+  missing localization posture, duplicate ids, or broken group references
 
 The release-readiness validation pass must prove:
 
@@ -163,9 +171,12 @@ The release-readiness validation pass must prove:
 
 Recommended pull order:
 
-1. Land `DX-045` grouped GraphQL block authoring and debug facts for #302.
-2. Run release-readiness validation against the now-closed V6 and V7 lanes.
-3. Cut release title treatment variants for the next release boundary only
+1. Land this post-DX-045 signpost refresh.
+2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #302.
+3. Harden the compiler boundary so Wesley can replace the bootstrap parser
+   without changing Bijou artifact semantics.
+4. Run release-readiness validation against the now-closed V6 and V7 lanes.
+5. Cut release title treatment variants for the next release boundary only
    after the tracker, docs, and CI proof are green.
 
 Non-goals for the next cycle:
@@ -176,3 +187,5 @@ Non-goals for the next cycle:
 - no conversion of every leaf component into a Block
 - no hidden global block registry
 - no localization runtime rewrite
+- no Wesley or Geordi repository changes before the DOGFOOD fixture proves the
+  Bijou-side source, artifact, IR, and debug contracts

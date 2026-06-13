@@ -4,7 +4,7 @@ legend: DX
 lane: cool-ideas
 priority: medium
 github_issue: 302
-status: active
+status: landed
 keywords:
   - developer-experience
   - graphql
