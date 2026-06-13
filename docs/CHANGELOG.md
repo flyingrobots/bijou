@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Documentation
 
+- _Nothing yet._
+
+## [7.1.0] - 2026-06-13
+
+### Documentation
+
 - **Forward-looking roadmap refresh** — `docs/ROADMAP.md`, `docs/BEARING.md`,
   and `docs/release.md` now treat `v7.0.0` as the latest shipped public release,
   record that `v6.0.0` was skipped as a public package release, move complete
@@ -2208,7 +2214,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v7.1.0...HEAD
+[7.1.0]: https://github.com/flyingrobots/bijou/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/flyingrobots/bijou/compare/v5.0.0...v7.0.0
 [5.0.0]: https://github.com/flyingrobots/bijou/compare/v4.4.1...v5.0.0
 [4.4.1]: https://github.com/flyingrobots/bijou/compare/v4.4.0...v4.4.1

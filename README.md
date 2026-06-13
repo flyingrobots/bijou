@@ -331,18 +331,30 @@ npm run blocklab:index
 API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
 script names remain as compatibility aliases during the rename window.
 
-## What's New in v5.0.0
+## What's New in v7.1.0
 
-Bijou `v5.0.0` made the hosted shell, Node host bootstrapping, localization runtime, and release-proof DOGFOOD surface more coherent as a product line.
+Bijou `v7.1.0` is a focused post-V7 minor release for portable UI proof and
+release-readiness hardening.
 
-- `createFramedApp()`, `runFramedApp(...)`, and `startApp(app)` now share a cleaner hosted runtime path.
-- `@flyingrobots/bijou-node` supports easier theme selection through hosted app options.
-- DOGFOOD is the preferred docs and proof surface for release smoke, Blocks previews, i18n workflow checks, and interactive examples.
-- The i18n packages now separate runtime lookup from CSV/TSV/JSON catalog workflow tools.
+- `@flyingrobots/bijou` now exposes the first `ui-scene-ir/1` proof contract
+  with deterministic receipts, source maps, terminal lowering, and lower-mode
+  facts.
+- GraphQL-authored Bijou Blocks can compile into `bijou-block/1`, lower into
+  `ui-scene-ir/1`, and emit deterministic debug facts; DOGFOOD now includes a
+  real NavigationListBlock fixture through that path.
+- Theme tokens gained first-party dark/light presets, safe-pair contracts, and
+  DOGFOOD Theme Lab / Theme Inspector proof surfaces.
+- Terminal and DOGFOOD fixes cover resize repaint recovery, scoped ANSI color
+  resets, Blocks preview navigation, title perf HUD ownership, and quit-copy
+  cleanup.
+- Release prep is more auditable with milestone-aware
+  `release:readiness -- --milestone vX.Y.Z` and source-complete DOGFOOD i18n
+  debt discovery.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/5.0.0/whats-new.md), and the
-[migration guide](./docs/releases/5.0.0/migration-guide.md).
+[What's New guide](./docs/releases/7.1.0/whats-new.md), the
+[migration guide](./docs/releases/7.1.0/migration-guide.md), and the
+[release evidence packet](./docs/releases/7.1.0/README.md).
 
 ## Tests, Soak, and Performance
 

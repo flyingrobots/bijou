@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-tui-app",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "Batteries-included TUI app skeleton built on bijou-tui createFramedApp().",
   "type": "module",
   "sideEffects": false,
@@ -24,8 +24,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou": "7.0.0",
-    "@flyingrobots/bijou-tui": "7.0.0"
+    "@flyingrobots/bijou": "7.1.0",
+    "@flyingrobots/bijou-tui": "7.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

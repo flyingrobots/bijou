@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-mcp",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "MCP server exposing Bijou terminal components as rendering tools.",
   "type": "module",
   "sideEffects": false,
@@ -32,7 +32,7 @@
     "zod": "^3.24.0"
   },
   "peerDependencies": {
-    "@flyingrobots/bijou": "7.0.0"
+    "@flyingrobots/bijou": "7.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -25,11 +25,14 @@ docs/releases/next/
 
 ## Current Shaped Release Docs
 
-- [What's New (v7.0.0)](./7.0.0/whats-new.md)
-- [Migration Guide (v7.0.0)](./7.0.0/migration-guide.md)
+- [What's New (v7.1.0)](./7.1.0/whats-new.md)
+- [Migration Guide (v7.1.0)](./7.1.0/migration-guide.md)
+- [Release Evidence (v7.1.0)](./7.1.0/README.md)
 
 ## Previous Release Docs
 
+- [What's New (v7.0.0)](./7.0.0/whats-new.md)
+- [Migration Guide (v7.0.0)](./7.0.0/migration-guide.md)
 - [What's New (v5.0.0)](./5.0.0/whats-new.md)
 - [Migration Guide (v5.0.0)](./5.0.0/migration-guide.md)
 - [What's New (v4.4.1)](./4.4.1/whats-new.md)
