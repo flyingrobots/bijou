@@ -5,7 +5,7 @@ lane: asap
 priority: high
 github_issue: 329
 parent_issue: 302
-status: proposed
+status: landed
 keywords:
   - developer-experience
   - dogfood
@@ -132,7 +132,7 @@ Expected SDL shape:
 ```graphql
 type DogfoodNavigationList
   @bijouBlock(id: "dogfood.navigation", component: "NavigationListBlock")
-  @bijouTarget(kind: "bijou-terminal", cols: 48, rows: 8)
+  @bijouTarget(kind: "bijou-terminal", cols: 80, rows: 8)
   @bijouGroup(id: "dogfood.navigation.header", label: "Header", x: 1, y: 0, width: 46, height: 2)
   @bijouGroup(id: "dogfood.navigation.items", label: "Items", x: 1, y: 2, width: 46, height: 5) {
   title: String!
@@ -254,3 +254,12 @@ The cycle is landed when:
   tests, and the relevant full validation are green
 - `docs/CHANGELOG.md` records the real DOGFOOD GraphQL fixture under
   `Unreleased`
+
+## Implementation Notes
+
+This cycle adds `examples/docs/fixtures/graphql/navigation-list.graphql` as the
+first checked-in DOGFOOD GraphQL SDL fixture. Focused tests compile it into the
+`dogfood.navigation` `bijou-block/1` artifact, prove that it matches the
+existing `docs.navigation` registry entry and `NavigationListBlock`, lower it
+to `ui-scene-ir/1`, render terminal proof, assert debug facts, and reject
+malformed fixture variants before terminal proof.

@@ -35,6 +35,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD GraphQL navigation fixture** —
+  `examples/docs/fixtures/graphql/navigation-list.graphql` now checks in the
+  first real DOGFOOD GraphQL SDL fixture for `NavigationListBlock`. Focused
+  DX-046 tests compile it into `bijou-block/1`, lower it into `ui-scene-ir/1`,
+  prove terminal output, assert `graphql-bijou-block-debug/1` facts for groups,
+  fields, source maps, i18n keys, token refs, actions, bindings, lower modes,
+  and hashes, and reject malformed fixture facts before terminal proof. This
+  advances issue #329 and keeps parent issue #302 as the broad V8 tracker.
 - **Portable UI scene IR seed** — `@flyingrobots/bijou` now exports the first
   `ui-scene-ir/1` runtime contract for portable Bijou block and component
   proof: deterministic SHA-256 scene hashing, structural receipts, validation of node,
