@@ -119,6 +119,21 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(maintenanceRule).not.toContain('gh pr list --repo flyingrobots/bijou --state open');
   });
 
+  it('keeps the broad issue 302 tracker on the v8 side of the release train', () => {
+    const roadmap = read('docs/ROADMAP.md');
+    const normalizedRoadmap = normalizeWhitespace(roadmap);
+    const goalposts = sectionBetween(roadmap, '## Forward Goalposts', '## Decision Points');
+    const v71Row = goalposts.split('\n').find(line => line.startsWith('| `v7.1.0` |')) ?? '';
+    const v8Row = goalposts.split('\n').find(line => line.startsWith('| `v8.0.0` |')) ?? '';
+
+    expect(v71Row).toContain('DX-046 implementation PR or release-packet item');
+    expect(v71Row).not.toContain('https://github.com/flyingrobots/bijou/issues/302');
+    expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
+    expect(normalizedRoadmap).toContain(
+      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns only the DX-046 implementation PR or release-packet item.',
+    );
+  });
+
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
     const agents = normalizeWhitespace(read('AGENTS.md'));
     const contributing = normalizeWhitespace(read('CONTRIBUTING.md'));
