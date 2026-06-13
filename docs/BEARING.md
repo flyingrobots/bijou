@@ -74,10 +74,11 @@ Current direction and active tensions. Historical ship data is in
 - `DX-043`, `DX-044`, and `DX-045` landed the portable `ui-scene-ir/1` seed,
   the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
   and deterministic debug facts for #302.
-- The next active pull is `DX-046`: one real DOGFOOD block or panel authored as
-  GraphQL SDL, compiled to `bijou-block/1`, lowered to `ui-scene-ir/1`, and
-  proven through terminal output plus debug facts. This keeps the work inside
-  Bijou one more slice before Wesley or Geordi integration.
+- The next active pull is `DX-046` / #329: one real DOGFOOD block or panel
+  authored as GraphQL SDL, compiled to `bijou-block/1`, lowered to
+  `ui-scene-ir/1`, and proven through terminal output plus debug facts. This
+  keeps the work inside Bijou one more slice before Wesley or Geordi
+  integration while #302 remains the broad V8/Beyond tracker.
 - The useful proof path is now:
 
   ```text
@@ -153,8 +154,8 @@ Current direction and active tensions. Historical ship data is in
 ## Next Target
 
 The immediate feature focus is `DX-046`: a GraphQL-authored DOGFOOD block
-fixture for #302. This is a post-v7 proof slice, not a `v6.0.0` or `v7.0.0`
-release-readiness task.
+fixture for #329, the release-scoped child of #302. This is a post-v7 proof
+slice, not a `v6.0.0` or `v7.0.0` release-readiness task.
 
 DX-046 is also the final planned implementation pull for `v7.1.0`. After it
 lands, the repo should move into release prep unless the open dependency PR is
@@ -173,7 +174,7 @@ The `DX-046` validation pass must prove:
 Recommended pull order:
 
 1. Land this release-train roadmap decision.
-2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #302.
+2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #329.
 3. Include dependency PR #326 only if it is green, low-risk, and still useful
    before release prep.
 4. Create or update the `v7.1.0` release packet, move only selected tracker

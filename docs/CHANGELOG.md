@@ -134,6 +134,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **DX-046 DOGFOOD GraphQL fixture shaping** —
+  `docs/design/DX-046-graphql-authored-dogfood-block-fixture.md` now scopes
+  the `v7.1.0` implementation item to issue #329, a child of the broad #302
+  tracker, and selects `NavigationListBlock` as the first real DOGFOOD surface
+  to prove GraphQL SDL -> `bijou-block/1` -> `ui-scene-ir/1` -> terminal proof
+  -> `graphql-bijou-block-debug/1` facts.
 - **GraphQL block groups and debug facts** —
   `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` recorded the
   grouped #302 slice after the GraphQL-authored block proof: explicit
