@@ -1,0 +1,29 @@
+type DogfoodNavigationList
+  @bijouBlock(id: "dogfood.navigation", component: "NavigationListBlock")
+  @bijouTarget(kind: "bijou-terminal", cols: 80, rows: 8)
+  @bijouGroup(id: "dogfood.navigation.header", label: "Header", x: 1, y: 0, width: 46, height: 2)
+  @bijouGroup(id: "dogfood.navigation.items", label: "Items", x: 1, y: 2, width: 46, height: 5) {
+  title: String!
+    @bijouText(id: "dogfood.navigation.title", group: "dogfood.navigation.header", x: 2, y: 0)
+    @bijouI18n(key: "dogfood.navigation.title", fallback: "Documentation")
+    @bijouToken(fg: "semantic.nav.title.fg")
+
+  activeItem: String!
+    @bijouText(id: "dogfood.navigation.active", group: "dogfood.navigation.items", x: 2, y: 2)
+    @bijouAction(id: "navigation.selectItem", command: "navigation.selectItem", key: "Enter")
+    @bijouBind(id: "navigation.selection.activeLabel", kind: "state", path: "navigation.selection.activeLabel")
+    @bijouI18n(key: "dogfood.navigation.active", fallback: "Active: Blocks")
+    @bijouToken(fg: "semantic.nav.item.active.fg", bg: "semantic.nav.item.active.bg")
+
+  itemCount: String!
+    @bijouText(id: "dogfood.navigation.itemCount", group: "dogfood.navigation.items", x: 2, y: 3)
+    @bijouBind(id: "navigation.items.count", kind: "computed", path: "navigation.items.count")
+    @bijouI18n(key: "dogfood.navigation.itemCount", fallback: "Items: 7")
+    @bijouToken(fg: "semantic.nav.item.fg")
+
+  expandHint: String
+    @bijouText(id: "dogfood.navigation.expandHint", group: "dogfood.navigation.items", x: 2, y: 4)
+    @bijouAction(id: "navigation.expandGroup", command: "navigation.expandGroup", key: "ArrowRight")
+    @bijouI18n(key: "dogfood.navigation.expandHint", fallback: "Expand group")
+    @bijouToken(fg: "semantic.nav.hint.fg")
+}

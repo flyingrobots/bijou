@@ -219,14 +219,15 @@ The next selected public release target is **`7.1.0`**.
 The latest shipped package release is `7.0.0`. The older `v6.0.0` milestone
 and the `v7.0.0` milestone are both zero-open tracker lanes retained as release
 lineage, not as the next target. `7.1.0` should stay a small post-V7 minor:
-ship the accumulated `Unreleased` work, include DX-046 if it lands cleanly, and
-then move into release prep.
+ship the accumulated `Unreleased` work, include DX-046 issue #329 if it lands
+cleanly, and then move into release prep.
 
 There is no planned feature `7.2.0` train. After `7.1.0`, new feature work
 should shape toward `8.0.0` unless a bug, security, dependency, or
 release-process reason justifies a narrow maintenance release.
 
-Before release prep begins, reflect the selected scope in
+The `v7.1.0` GitHub milestone is the selected release packet. Before release
+prep begins, keep the selected scope reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live
 tracker, and the versioned release packet.
 

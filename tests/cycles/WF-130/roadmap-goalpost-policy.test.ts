@@ -44,6 +44,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
     const bearing = normalizeWhitespace(read('docs/BEARING.md'));
     const releaseRunbook = normalizeWhitespace(read('docs/release.md'));
+    const dx046Design = normalizeWhitespace(read('docs/design/DX-046-graphql-authored-dogfood-block-fixture.md'));
 
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
     expect(roadmap).toContain('The latest shipped public release is');
@@ -57,6 +58,8 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
+    expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 1 | 0 |');
+    expect(roadmap).toContain('Selected next release packet.');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
     expect(roadmap).toContain('Skipped public release lane.');
@@ -66,7 +69,8 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('33 | 4');
     expect(roadmap).toContain('Next Pull');
-    expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture for #302');
+    expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture');
+    expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/329');
     expect(roadmap).toContain('Forward Goalposts');
     expect(roadmap).toContain('Decision Points');
     expect(roadmap).toContain('Runtime Graph And Scene IR Product Contract');
@@ -84,6 +88,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#326]');
     expect(roadmap).toContain('candidate-only [#326]');
     expect(roadmap).toContain('it is not selected for `v7.1.0` until');
+    expect(roadmap).toContain('The `v7.1.0` GitHub milestone is the selected release packet.');
     expect(roadmap).toContain('Closed Lineage');
     expect(roadmap).toContain('Skipped public release; complete lineage');
 
@@ -95,13 +100,20 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
     expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
     expect(bearing).toContain('The next selected public release target is `v7.1.0`');
+    expect(bearing).toContain('The next active pull is `DX-046` / #329');
     expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
     expect(bearing).toContain('Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 
     expect(releaseRunbook).toContain('The next selected public release target is **`7.1.0`**');
+    expect(releaseRunbook).toContain('include DX-046 issue #329');
     expect(releaseRunbook).toContain('There is no planned feature `7.2.0` train.');
     expect(releaseRunbook).not.toContain('No next public release version is selected');
+
+    expect(dx046Design).toContain('User story: [#329](https://github.com/flyingrobots/bijou/issues/329)');
+    expect(dx046Design).toContain('Parent tracker: [#302](https://github.com/flyingrobots/bijou/issues/302)');
+    expect(dx046Design).toContain('NavigationListBlock');
+    expect(dx046Design).toContain('Tests To Write First');
   });
 
   it('disables Markdown line-length linting for project docs', () => {
@@ -126,11 +138,11 @@ describe('WF-130 roadmap goalpost policy', () => {
     const v71Row = goalposts.split('\n').find(line => line.startsWith('| `v7.1.0` |')) ?? '';
     const v8Row = goalposts.split('\n').find(line => line.startsWith('| `v8.0.0` |')) ?? '';
 
-    expect(v71Row).toContain('DX-046 implementation PR or release-packet item');
+    expect(v71Row).toContain('https://github.com/flyingrobots/bijou/issues/329');
     expect(v71Row).not.toContain('https://github.com/flyingrobots/bijou/issues/302');
     expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
     expect(normalizedRoadmap).toContain(
-      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns only the DX-046 implementation PR or release-packet item.',
+      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns #329 as the release-scoped DX-046 implementation item.',
     );
   });
 

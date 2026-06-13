@@ -93,7 +93,12 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
         let i = 0;
         while (i < parts.length) {
           const code = parts[i]!;
-          if (code === '1') currentMods.add('bold');
+          if (code === '0') {
+            currentFg = undefined;
+            currentBg = undefined;
+            currentMods.clear();
+          }
+          else if (code === '1') currentMods.add('bold');
           else if (code === '2') currentMods.add('dim');
           else if (code === '3') currentMods.add('italic');
           else if (code === '4') currentMods.add('underline');
@@ -104,6 +109,8 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
           else if (code === '24') currentMods.delete('underline');
           else if (code === '27') currentMods.delete('inverse');
           else if (code === '29') currentMods.delete('strike');
+          else if (code === '39') currentFg = undefined;
+          else if (code === '49') currentBg = undefined;
           else if (code === '38' && parts[i+1] === '2') {
             // Truecolor FG: 38;2;R;G;B
             const r = parseInt(parts[i+2]!, 10).toString(16).padStart(2, '0');

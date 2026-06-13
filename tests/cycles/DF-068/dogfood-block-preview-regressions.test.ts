@@ -4,6 +4,7 @@ import {
   stripAnsi,
   surfaceToString,
 } from '@flyingrobots/bijou';
+import { chalkStyle } from '@flyingrobots/bijou-node';
 import {
   _resetDefaultContextForTesting,
 } from '@flyingrobots/bijou/adapters/test';
@@ -32,7 +33,19 @@ function blockPreviewGuideId(blockName: string): string {
   return `blocks-preview-${slug || 'family'}`;
 }
 
-function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+type FrameCell = {
+  readonly char?: string;
+  readonly fg?: string | { readonly hex?: string };
+  readonly modifiers?: readonly string[];
+};
+
+type FrameLike = {
+  readonly width: number;
+  readonly height: number;
+  get(x: number, y: number): FrameCell;
+};
+
+function frameText(frame: FrameLike) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
@@ -63,6 +76,58 @@ async function renderBlocksGuide(guideId: string, columns = 150, rows = 43) {
     result,
     text: frameText(result.frames.at(-1)!),
   };
+}
+
+async function renderBlocksGuideWithRealAnsi(guideId: string, columns = 150, rows = 43) {
+  const ctx = createTestContext({
+    mode: 'interactive',
+    runtime: { columns, rows },
+    style: chalkStyle({ level: 3 }),
+  });
+  const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+  const result = await runScript(app, [{
+    msg: {
+      type: 'docs',
+      msg: { type: 'select-guide', guideId },
+    },
+  }], { ctx });
+  expect(result.frames.length).toBeGreaterThan(0);
+
+  return {
+    ctx,
+    result,
+    frame: result.frames.at(-1)!,
+    text: frameText(result.frames.at(-1)!),
+  };
+}
+
+function colorHex(value: FrameCell['fg']): string | undefined {
+  if (typeof value === 'string') return value;
+  return value?.hex;
+}
+
+function findTextStart(frame: FrameLike, text: string): { readonly x: number; readonly y: number } {
+  for (let y = 0; y < frame.height; y++) {
+    let row = '';
+    for (let x = 0; x < frame.width; x++) {
+      row += frame.get(x, y).char || ' ';
+    }
+    const x = row.indexOf(text);
+    if (x >= 0) return { x, y };
+  }
+  throw new Error(`text not found in frame: ${text}`);
+}
+
+function findCharBefore(
+  frame: FrameLike,
+  y: number,
+  beforeX: number,
+  char: string,
+): { readonly x: number; readonly y: number } {
+  for (let x = beforeX - 1; x >= 0; x--) {
+    if (frame.get(x, y).char === char) return { x, y };
+  }
+  throw new Error(`character ${char} not found before column ${beforeX}`);
 }
 
 function textBefore(text: string, marker: string): string {
@@ -163,6 +228,18 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
     expect(loweringRegion).not.toContain('surface output:');
     expect(loweringRegion).not.toContain('┌─ ReaderSurface');
     expect(loweringRegion).not.toContain('┌─ Navigation');
+  });
+
+  it('keeps unselected Blocks navigation titles readable when marker styling uses real ANSI', async () => {
+    const { ctx, frame } = await renderBlocksGuideWithRealAnsi(blockPreviewGuideId('ReaderSurface'), 150, 43);
+    const title = findTextStart(frame, 'ReaderSurface');
+    const marker = findCharBefore(frame, title.y, title.x, '•');
+    const titleCell = frame.get(title.x, title.y);
+    const markerCell = frame.get(marker.x, marker.y);
+
+    expect(colorHex(markerCell.fg)).not.toBe(colorHex(titleCell.fg));
+    expect(colorHex(titleCell.fg)).toBe(ctx.surface('primary').hex);
+    expect(titleCell.modifiers ?? []).not.toContain('dim');
   });
 
   it('keeps the CounterDemoBlock fixture box bounded when style output contains ANSI codes', () => {

@@ -169,4 +169,24 @@ describe('surface text bridges', () => {
     expect(surface.get(1, 0).char).toBe('B');
     expect(surface.get(1, 0).fg).toBeUndefined();
   });
+
+  it('parseAnsiToSurface respects scoped SGR foreground and background resets', () => {
+    const surface = parseAnsiToSurface(
+      '\x1b[38;2;255;0;0m•\x1b[39m label\n\x1b[48;2;0;0;255mX\x1b[49mY',
+      8,
+      2,
+    );
+
+    expect(surface.get(0, 0).char).toBe('•');
+    expect(surface.get(0, 0).fg).toBe('#ff0000');
+    expect(surface.get(1, 0).char).toBe(' ');
+    expect(surface.get(1, 0).fg).toBeUndefined();
+    expect(surface.get(2, 0).char).toBe('l');
+    expect(surface.get(2, 0).fg).toBeUndefined();
+
+    expect(surface.get(0, 1).char).toBe('X');
+    expect(surface.get(0, 1).bg).toBe('#0000ff');
+    expect(surface.get(1, 1).char).toBe('Y');
+    expect(surface.get(1, 1).bg).toBeUndefined();
+  });
 });

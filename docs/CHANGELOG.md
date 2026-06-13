@@ -23,10 +23,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selection, and the project markdownlint config disables the Markdown
   line-length rule so links and tables are not wrapped by policy.
 - **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
-  now mark DX-045 as landed, set DX-046 as the next #302 pull for a real
-  GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone counts
-  from GitHub, and move the closed legacy-theme cleanup issue into closed
-  Beyond lineage.
+  now mark DX-045 as landed, set DX-046 as the next #302-derived pull for a
+  real GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone
+  counts from GitHub, and move the closed legacy-theme cleanup issue into
+  closed Beyond lineage.
 - **Release policy evidence gates** — `docs/release.md` now adapts the
   release-runbook pattern to Bijou's npm-only workspace publishing model,
   requires branch-first release prep, release evidence packets, human review
@@ -35,6 +35,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD GraphQL navigation fixture** —
+  `examples/docs/fixtures/graphql/navigation-list.graphql` now checks in the
+  first real DOGFOOD GraphQL SDL fixture for `NavigationListBlock`. Focused
+  DX-046 tests compile it into `bijou-block/1`, lower it into `ui-scene-ir/1`,
+  prove terminal output, assert `graphql-bijou-block-debug/1` facts for groups,
+  fields, source maps, i18n keys, token refs, actions, bindings, lower modes,
+  and hashes, and reject malformed fixture facts before terminal proof. This
+  closes issue #329 and keeps parent issue #302 as the broad V8 tracker.
 - **Portable UI scene IR seed** — `@flyingrobots/bijou` now exports the first
   `ui-scene-ir/1` runtime contract for portable Bijou block and component
   proof: deterministic SHA-256 scene hashing, structural receipts, validation of node,
@@ -134,6 +142,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **DX-046 DOGFOOD GraphQL fixture shaping** —
+  `docs/design/DX-046-graphql-authored-dogfood-block-fixture.md` now scopes
+  the `v7.1.0` implementation item to issue #329, a child of the broad #302
+  tracker, and selects `NavigationListBlock` as the first real DOGFOOD surface
+  to prove GraphQL SDL -> `bijou-block/1` -> `ui-scene-ir/1` -> terminal proof
+  -> `graphql-bijou-block-debug/1` facts.
 - **GraphQL block groups and debug facts** —
   `docs/design/DX-045-graphql-block-groups-and-debug-facts.md` recorded the
   grouped #302 slice after the GraphQL-authored block proof: explicit
@@ -161,6 +175,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Surface ANSI reset handling** — `parseAnsiToSurface()` now honors scoped
+  SGR foreground/background resets (`39`/`49`) so styled list markers no longer
+  leak muted or accent colors into following DOGFOOD navigation labels.
 - **Shell quit confirmation copy** — The shell quit confirmation modal now
   renders `Y quit • N stay` only once by keeping the question in the modal body
   and the controls in the modal hint/footer instead of duplicating the same
