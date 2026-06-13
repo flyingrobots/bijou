@@ -175,6 +175,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Surface ANSI reset handling** — `parseAnsiToSurface()` now honors scoped
+  SGR foreground/background resets (`39`/`49`) so styled list markers no longer
+  leak muted or accent colors into following DOGFOOD navigation labels.
 - **Shell quit confirmation copy** — The shell quit confirmation modal now
   renders `Y quit • N stay` only once by keeping the question in the modal body
   and the controls in the modal hint/footer instead of duplicating the same
