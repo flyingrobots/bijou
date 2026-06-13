@@ -2425,9 +2425,16 @@ function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerM
   if (pageId !== BLOCKS_PAGE_ID) return model;
   const doc = focusedGuideDoc(pageId, model);
   if (doc == null) return model;
+  if (doc.id === BLOCK_PREVIEW_GUIDE_ID) {
+    const firstBlock = standardBlocks[0];
+    if (firstBlock == null) return model;
+    return {
+      ...model,
+      selectedGuideId: blockPreviewGuideId(firstBlock),
+    };
+  }
   if (
-    doc.id !== BLOCK_PREVIEW_GUIDE_ID
-    && doc.id !== COUNTER_DEMO_BLOCK_GUIDE_ID
+    doc.id !== COUNTER_DEMO_BLOCK_GUIDE_ID
     && standardBlockForPreviewGuide(doc) === undefined
   ) {
     return model;
