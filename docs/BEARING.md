@@ -92,11 +92,14 @@ Current direction and active tensions. Historical ship data is in
 ### 1. Keep The Release Posture Honest
 
 - The latest shipped public release is `v7.0.0`, published on 2026-06-03.
-- The `v6.0.0` and `v7.0.0` GitHub milestones are closed release lineage, not
-  the next implementation target.
-- No next public release version is selected. The next release target should be
-  chosen only after a post-v7 candidate goalpost is shaped into a versioned
-  release packet.
+- The `v6.0.0` and `v7.0.0` GitHub milestone lanes are complete release
+  lineage with zero open items, not the next implementation target.
+- The next selected public release target is `v7.1.0`: a small post-V7 minor
+  release for accumulated `Unreleased` work plus DX-046 as the final planned
+  implementation pull.
+- There is no planned `v7.2.0` feature train. After `v7.1.0`, new feature work
+  should shape toward `v8.0.0` unless maintenance pressure requires a narrow
+  patch or stabilization release.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
   the release process lives in [release.md](./release.md).
 
@@ -109,22 +112,27 @@ Current direction and active tensions. Historical ship data is in
 - Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
   comment and a matching roadmap update.
 
-### 3. Shape Beyond Before Naming A Release
+### 3. Shape V8 And V9 From Beyond
 
 - The `Beyond` milestone is the current post-v7 backlog: 33 open and 4 closed
   milestone items as of the latest roadmap sync.
-- The useful candidate goalposts are Runtime Graph And Scene IR, DOGFOOD And
-  BlockLab Product Surface, Design Tokens And Theme Modes, Workflow/Capture/CI
-  Determinism, Localization And Documentation Operations, and Terminal Input
-  And Host Controls.
+- `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
+  versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
+  modes, debug facts, DOGFOOD round-trip fixtures, and capture evidence.
+- `v9.0.0` should organize the Product Workbench and operator surfaces:
+  BlockLab, Theme Lab and Theme Inspector provenance, localization operations,
+  artifact matrices, and terminal input controls if #316 becomes product scope.
 - Unmilestoned work such as the fluid-triangle title direction, Theme Inspector
   pointer provenance, keyboard transport, playback harness, and technical
   teardown gate should be shaped before being treated as release work.
 
 ## Tensions
 
-- **Closed Release Gravity**: `v6.0.0` and `v7.0.0` are closed lineage. Do not
-  reopen either milestone for new feature work.
+- **Closed Release Gravity**: `v6.0.0` and `v7.0.0` are complete release
+  lineage. Do not use either lane for new feature work.
+- **Minor-Release Temptation**: `v7.1.0` should stay small. Adding a full
+  workbench, theme lab, localization suite, Wesley path, or Geordi path turns it
+  into V8/V9 work.
 - **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
   New product-facing work should consume geometry contracts, not bypass them
   with bespoke string/surface measurement.
@@ -147,6 +155,10 @@ The immediate feature focus is `DX-046`: a GraphQL-authored DOGFOOD block
 fixture for #302. This is a post-v7 proof slice, not a `v6.0.0` or `v7.0.0`
 release-readiness task.
 
+DX-046 is also the final planned implementation pull for `v7.1.0`. After it
+lands, the repo should move into release prep unless the open dependency PR is
+green and low-risk enough to include.
+
 The `DX-046` validation pass must prove:
 
 - one existing DOGFOOD block or panel has a checked-in GraphQL SDL source
@@ -159,17 +171,19 @@ The `DX-046` validation pass must prove:
 
 Recommended pull order:
 
-1. Land this forward-looking roadmap refresh.
+1. Land this release-train roadmap decision.
 2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #302.
-3. Harden the compiler boundary so Wesley can replace the bootstrap parser
-   without changing Bijou artifact semantics.
-4. Decide whether Runtime Graph And Scene IR is ready to become a versioned
-   release goalpost, or keep pulling smaller Beyond slices.
-5. Select the next public release version only after the tracker, docs, release
-   packet, and CI proof identify a real boundary.
+3. Include dependency PR #326 only if it is green, low-risk, and still useful
+   before release prep.
+4. Create or update the `v7.1.0` release packet, move only selected tracker
+   items into it, and cut `v7.1.0` from a clean release branch.
+5. Shape `v8.0.0` around the Runtime Graph And Scene IR product contract.
+6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+   the source/artifact/IR contract.
 
 Non-goals for the next cycle:
 
+- no feature-train `v7.2.0`
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
 - no full visual redesign of DOGFOOD while DX-046 is still the active proof

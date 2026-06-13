@@ -8,11 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Documentation
 
-- **Forward-looking roadmap refresh** — `docs/ROADMAP.md` now treats `v7.0.0`
-  as the latest shipped public release, records that `v6.0.0` was skipped as a
-  public package release, moves closed milestone history into lineage, and
-  foregrounds the next DX-046 pull, forward candidate goalposts, decision
-  points, current unmilestoned triage, and open dependency PR outside release
+- **Forward-looking roadmap refresh** — `docs/ROADMAP.md`, `docs/BEARING.md`,
+  and `docs/release.md` now treat `v7.0.0` as the latest shipped public release,
+  record that `v6.0.0` was skipped as a public package release, move complete
+  milestone-lane history into lineage, select `v7.1.0` as the next small
+  post-V7 minor release, declare that there is no planned feature `v7.2.0`,
+  reserve `v8.0.0` for the Runtime Graph and Scene IR product contract, reserve
+  `v9.0.0` for Product Workbench and operator surfaces, and foreground DX-046,
+  current unmilestoned triage, and the open dependency PR outside release
   horizons.
 - **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
   now mark DX-045 as landed, set DX-046 as the next #302 pull for a real

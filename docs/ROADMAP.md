@@ -4,8 +4,9 @@ This roadmap is the forward-looking release horizon for Bijou.
 
 GitHub milestones, issues, pull requests, and labels are the live tracker. This
 file is the human-readable planning surface: it names the current release
-posture, the next active pull, candidate goalposts, open tracker queues, and the
-decision points that turn `Beyond` work into a versioned release.
+posture, the selected forward release train, the next active pull, candidate
+goalposts, open tracker queues, and the decision points that turn `Beyond` work
+into a versioned release.
 
 Release snapshot counts are GitHub milestone item totals: issues and pull
 requests assigned to each milestone. They are not issue-only totals. Do not
@@ -21,18 +22,145 @@ The latest shipped public release is
 published on 2026-06-03.
 
 `v6.0.0` was never published as a public package release. Its GitHub milestone
-is closed tracker lineage whose work was absorbed before Bijou shipped
-`v7.0.0`.
+is complete tracker lineage whose work was absorbed before Bijou shipped
+`v7.0.0`; do not use that lane for new release work.
 
-No next public release version is selected. Pick a version only after one of the
-forward candidate goalposts below is shaped into a release packet with an
-umbrella issue, user-story slices, proof gates, and a release evidence plan.
+The next selected public release target is **`v7.1.0`**. It is a small post-V7
+minor release, not a new product epoch: ship the accumulated `Unreleased` work
+since `v7.0.0`, take DX-046 as the final planned implementation pull if it lands
+cleanly, and then move into release prep.
+
+There is no planned `v7.2.0` feature train. After `v7.1.0`, new feature work
+should shape directly toward `v8.0.0` unless a bug, security, dependency, or
+release-process reason justifies a narrow `v7.1.x` patch or emergency
+`v7.2.x` stabilization release.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
-| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Latest shipped release lineage. Closed; do not reopen for new feature work. |
+| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Latest shipped release lineage. Complete; do not reopen for new feature work. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 33 | 4 | Active forward backlog. Promote shaped work from here into a versioned release. |
-| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Skipped public release milestone. Closed lineage retained for issue history. |
+| `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Skipped public release lane. Complete lineage retained for issue history. |
+
+## Release Train Decision
+
+### `v7.1.0`: Post-V7 Minor
+
+`v7.1.0` is the next public release target.
+
+Scope:
+
+- already-landed `Unreleased` work after `v7.0.0`, including the portable
+  `ui-scene-ir/1` seed, GraphQL-authored `bijou-block/1` compiler slices,
+  grouped block authoring, `graphql-bijou-block-debug/1` facts, theme-token and
+  mode-aware shell-theme foundations, raster/image glyph work, release-policy
+  hardening, and roadmap truth updates
+- DX-046: one real DOGFOOD block or panel authored as GraphQL SDL, compiled to
+  `bijou-block/1`, lowered to `ui-scene-ir/1`, proven in terminal output, and
+  summarized through debug facts
+- dependency PR [#326](https://github.com/flyingrobots/bijou/pull/326) only if
+  it is green, low-risk, and still open before release prep
+
+Non-scope:
+
+- no broad DOGFOOD runtime rewrite
+- no Wesley or Geordi repository dependency on the critical path
+- no full Theme Lab, BlockLab, localization workbench, or terminal-input product
+  surface
+- no new major API churn beyond what is already represented in `Unreleased`
+
+Before release prep starts, create a `v7.1.0` GitHub milestone or release packet
+and move only the selected issues and pull requests into it.
+
+### After `v7.1.0`: Skip Feature `v7.2.0`
+
+Plan to go directly from `v7.1.0` to `v8.0.0` for new feature development.
+Use `v7.1.x` or, if semver requires it, `v7.2.x` only for bounded maintenance:
+bug fixes, security fixes, dependency fixes, release-process corrections, or a
+small stabilization release if `v8.0.0` slips and users need a narrow shipped
+boundary.
+
+### `v8.0.0`: Runtime Graph And Scene IR Product Contract
+
+`v8.0.0` should be the next major release. Its job is to turn the portable scene
+and GraphQL block proof into a product contract, not just a compiler demo.
+
+Primary tracker:
+
+- [#302](https://github.com/flyingrobots/bijou/issues/302) for GraphQL-authored
+  UI scenes into Bijou Blocks
+- [#202](https://github.com/flyingrobots/bijou/issues/202),
+  [#209](https://github.com/flyingrobots/bijou/issues/209),
+  [#210](https://github.com/flyingrobots/bijou/issues/210),
+  [#211](https://github.com/flyingrobots/bijou/issues/211),
+  [#212](https://github.com/flyingrobots/bijou/issues/212),
+  [#213](https://github.com/flyingrobots/bijou/issues/213),
+  [#216](https://github.com/flyingrobots/bijou/issues/216), and
+  [#219](https://github.com/flyingrobots/bijou/issues/219) for runtime graph,
+  DAG, generation, and lowering pressure
+- [#301](https://github.com/flyingrobots/bijou/issues/301) for native frame
+  capture evidence
+- triage [#306](https://github.com/flyingrobots/bijou/issues/306) into this
+  release only if a playback harness becomes necessary for deterministic proof
+- triage [#321](https://github.com/flyingrobots/bijou/issues/321) only if the
+  fluid-triangle title screen stays Bijou-side and proves CPU/terminal
+  scene-contract behavior; keep Geordi-heavy work out of the critical path
+
+Release gate:
+
+- versioned artifact semantics for `bijou-block/1`, `ui-scene-ir/1`, receipts,
+  source maps, lower modes, and debug facts
+- one or more DOGFOOD fixtures that round-trip from source to artifact to IR to
+  terminal proof with stable hashes
+- deterministic frame-capture or playback evidence reviewers can inspect
+- failure tests for invalid references, duplicate identities, missing product
+  facts, and broken lowering assumptions
+- an explicit Wesley/Geordi boundary note, without requiring those repositories
+  to ship first
+
+### `v9.0.0`: Product Workbench And Operator Surfaces
+
+`v9.0.0` should be the major release after the V8 contract exists. Its job is to
+make Bijou authoring, inspection, localization, and product review feel like a
+real workbench instead of scattered fixtures.
+
+Primary tracker:
+
+- DOGFOOD and BlockLab: [#204](https://github.com/flyingrobots/bijou/issues/204),
+  [#205](https://github.com/flyingrobots/bijou/issues/205),
+  [#214](https://github.com/flyingrobots/bijou/issues/214),
+  [#215](https://github.com/flyingrobots/bijou/issues/215),
+  [#217](https://github.com/flyingrobots/bijou/issues/217),
+  [#218](https://github.com/flyingrobots/bijou/issues/218),
+  [#248](https://github.com/flyingrobots/bijou/issues/248), and
+  [#272](https://github.com/flyingrobots/bijou/issues/272)
+- theme and design-token workbench:
+  [#311](https://github.com/flyingrobots/bijou/issues/311),
+  [#315](https://github.com/flyingrobots/bijou/issues/315),
+  [#317](https://github.com/flyingrobots/bijou/issues/317), and
+  [#318](https://github.com/flyingrobots/bijou/issues/318)
+- localization and docs operations:
+  [#206](https://github.com/flyingrobots/bijou/issues/206),
+  [#207](https://github.com/flyingrobots/bijou/issues/207),
+  [#208](https://github.com/flyingrobots/bijou/issues/208), and
+  [#312](https://github.com/flyingrobots/bijou/issues/312)
+- terminal input and host controls:
+  [#316](https://github.com/flyingrobots/bijou/issues/316), if the transport
+  contract becomes a product-control requirement rather than a standalone
+  host-compatibility spike
+
+Release gate:
+
+- Storybook-grade BlockLab or equivalent DOGFOOD fixture workflows
+- artifact matrices and capture proof that make product review reproducible
+- Theme Lab and Theme Inspector provenance surfaces backed by token facts
+- localization workbench and scanner coverage that make translation debt visible
+- terminal input controls with playback fixtures if #316 joins the release
+
+### `v10.0.0+`: Ecosystem Integration
+
+Do not make Wesley, Geordi, or host-integration work the immediate post-V7
+critical path. Keep those as `v10.0.0+` candidates unless the V8 contract proves
+that a cross-repository release is the next smallest honest boundary.
 
 ## Next Pull
 
@@ -54,33 +182,41 @@ DX-046 should stay inside Bijou. Do not pull Wesley or Geordi into the critical
 path until one real DOGFOOD block or panel proves the source, artifact, IR,
 terminal, and debug contracts.
 
-## Forward Candidate Goalposts
+## Forward Goalposts
 
 These are planning recommendations from the open tracker state as of
-2026-06-13. They are not release commitments until a maintainer moves them into
-a versioned release packet.
+2026-06-13. `v7.1.0`, `v8.0.0`, and `v9.0.0` are the intended train, but a
+maintainer still needs to create or update GitHub milestones and move issues
+before those scopes become tracker-enforced release packets.
 
-| Candidate Goalpost | Tracker | Why It Matters Next | Promotion Gate |
-| :--- | :--- | :--- | :--- |
-| Runtime Graph And Scene IR | Beyond: [#202](https://github.com/flyingrobots/bijou/issues/202), [#209](https://github.com/flyingrobots/bijou/issues/209), [#210](https://github.com/flyingrobots/bijou/issues/210), [#211](https://github.com/flyingrobots/bijou/issues/211), [#212](https://github.com/flyingrobots/bijou/issues/212), [#213](https://github.com/flyingrobots/bijou/issues/213), [#216](https://github.com/flyingrobots/bijou/issues/216), [#219](https://github.com/flyingrobots/bijou/issues/219), [#302](https://github.com/flyingrobots/bijou/issues/302). Triage: [#321](https://github.com/flyingrobots/bijou/issues/321). | This is the current product direction. DX-043 through DX-045 landed `ui-scene-ir/1`, GraphQL-authored `bijou-block/1`, grouped block authoring, and debug facts. DX-046 should prove those contracts against real DOGFOOD product surface. | Promote when a real DOGFOOD fixture has stable GraphQL source, deterministic artifact and IR hashes, terminal receipt proof, source maps, lower modes, and failure tests. |
-| DOGFOOD And BlockLab Product Surface | Beyond: [#204](https://github.com/flyingrobots/bijou/issues/204), [#205](https://github.com/flyingrobots/bijou/issues/205), [#214](https://github.com/flyingrobots/bijou/issues/214), [#215](https://github.com/flyingrobots/bijou/issues/215), [#217](https://github.com/flyingrobots/bijou/issues/217), [#218](https://github.com/flyingrobots/bijou/issues/218), [#248](https://github.com/flyingrobots/bijou/issues/248), [#272](https://github.com/flyingrobots/bijou/issues/272). | After IR proof starts touching real DOGFOOD panels, the next pressure is product workflow: better BlockLab stories, file exploration, semantic lists, artifact capture, and docs-as-proof. | Promote when the goalpost has concrete DOGFOOD journeys, BlockLab story fixtures, keyboard/focus proof, localized docs, and capture artifacts that reviewers can inspect without running the whole app. |
-| Design Tokens And Theme Modes | Beyond: [#311](https://github.com/flyingrobots/bijou/issues/311), [#315](https://github.com/flyingrobots/bijou/issues/315), [#318](https://github.com/flyingrobots/bijou/issues/318). Triage: [#317](https://github.com/flyingrobots/bijou/issues/317). | DL-013, DL-015, and DL-016 landed the builder, safe-pair, and runtime-mode foundations. Remaining work should turn that foundation into usable inspector, lab, pointer-provenance, and generator workflows. | Promote when the inspector/lab scope has fixture-backed token provenance, safe-pair diagnostics, mode switching proof, and a bounded generator story. |
-| Workflow, Capture, And CI Determinism | Beyond: [#203](https://github.com/flyingrobots/bijou/issues/203), [#268](https://github.com/flyingrobots/bijou/issues/268), [#269](https://github.com/flyingrobots/bijou/issues/269), [#270](https://github.com/flyingrobots/bijou/issues/270), [#290](https://github.com/flyingrobots/bijou/issues/290), [#298](https://github.com/flyingrobots/bijou/issues/298), [#299](https://github.com/flyingrobots/bijou/issues/299), [#300](https://github.com/flyingrobots/bijou/issues/300), [#301](https://github.com/flyingrobots/bijou/issues/301). Triage: [#306](https://github.com/flyingrobots/bijou/issues/306), [#249](https://github.com/flyingrobots/bijou/issues/249). | The open Method, replay, policy-script, frame-capture, and CI debt items all point at repeatable proof. #268 remains the right home for an automated tracker-sync sentinel. | Promote when the slice has fake clocks or injected clients, fixture-backed DOGFOOD harnesses, frame-capture artifacts, and CI/merge gates that fail deterministically. |
-| Localization And Documentation Operations | Beyond: [#206](https://github.com/flyingrobots/bijou/issues/206), [#207](https://github.com/flyingrobots/bijou/issues/207), [#208](https://github.com/flyingrobots/bijou/issues/208), [#312](https://github.com/flyingrobots/bijou/issues/312). | DOGFOOD Markdown localization now has a debt ratchet, but the operator workflow for translation, preference portability, and scanner coverage is still raw. | Promote when there are docs-module scanner fixtures, preference persistence tests, a DOGFOOD burndown surface, and all-supported-locale proof. |
-| Terminal Input And Host Controls | Triage: [#316](https://github.com/flyingrobots/bijou/issues/316). | Real key-state transport matters for game-like controls, but it is unmilestoned and needs design/playback review before release work starts. | Promote only after the transport contract has key-state playback fixtures, focus fallback proof, and compatibility checks for existing command handling. |
+| Target | Goalpost | Tracker | Why It Belongs There | Release Gate |
+| :--- | :--- | :--- | :--- | :--- |
+| `v7.1.0` | Post-V7 Minor | DX-046 for [#302](https://github.com/flyingrobots/bijou/issues/302), optional [#326](https://github.com/flyingrobots/bijou/pull/326), and `Unreleased` changelog work | The repo already has a meaningful post-V7 batch. One more Bijou-side DOGFOOD fixture makes the GraphQL/IR story release-worthy without turning this into a major. | DX-046 green, release evidence packet written, selected tracker items moved to a `v7.1.0` milestone or release packet, and no broad scope creep. |
+| `v8.0.0` | Runtime Graph And Scene IR Product Contract | Beyond: [#202](https://github.com/flyingrobots/bijou/issues/202), [#209](https://github.com/flyingrobots/bijou/issues/209), [#210](https://github.com/flyingrobots/bijou/issues/210), [#211](https://github.com/flyingrobots/bijou/issues/211), [#212](https://github.com/flyingrobots/bijou/issues/212), [#213](https://github.com/flyingrobots/bijou/issues/213), [#216](https://github.com/flyingrobots/bijou/issues/216), [#219](https://github.com/flyingrobots/bijou/issues/219), [#301](https://github.com/flyingrobots/bijou/issues/301), [#302](https://github.com/flyingrobots/bijou/issues/302). Triage: [#306](https://github.com/flyingrobots/bijou/issues/306), [#321](https://github.com/flyingrobots/bijou/issues/321). | This is the current product direction after DX-043 through DX-046: portable scenes, GraphQL blocks, deterministic debug facts, and product fixtures need to become a stable contract. | Stable artifact semantics, DOGFOOD round-trip fixtures, terminal/frame-capture proof, lower-mode and source-map receipts, and failure tests. |
+| `v9.0.0` | Product Workbench And Operator Surfaces | Beyond: [#204](https://github.com/flyingrobots/bijou/issues/204), [#205](https://github.com/flyingrobots/bijou/issues/205), [#206](https://github.com/flyingrobots/bijou/issues/206), [#207](https://github.com/flyingrobots/bijou/issues/207), [#208](https://github.com/flyingrobots/bijou/issues/208), [#214](https://github.com/flyingrobots/bijou/issues/214), [#215](https://github.com/flyingrobots/bijou/issues/215), [#217](https://github.com/flyingrobots/bijou/issues/217), [#218](https://github.com/flyingrobots/bijou/issues/218), [#248](https://github.com/flyingrobots/bijou/issues/248), [#272](https://github.com/flyingrobots/bijou/issues/272), [#311](https://github.com/flyingrobots/bijou/issues/311), [#312](https://github.com/flyingrobots/bijou/issues/312), [#315](https://github.com/flyingrobots/bijou/issues/315), [#318](https://github.com/flyingrobots/bijou/issues/318). Triage: [#317](https://github.com/flyingrobots/bijou/issues/317), [#316](https://github.com/flyingrobots/bijou/issues/316). | Once V8 stabilizes the artifact contract, the next value is authoring and inspecting real product surfaces: BlockLab, Theme Lab, localization operations, artifact matrices, and host controls. | Storybook-grade BlockLab workflows, Theme Inspector/Lab provenance, localization workbench proof, artifact matrices, and playback-backed terminal input where applicable. |
+| `v10.0.0+` | Ecosystem Integration | Wesley, Geordi, and host integration follow-on work after V8/V9 shape the contracts | Cross-repository integration should consume proven Bijou contracts rather than define them under release pressure. | A cross-repo release packet with explicit dependency ordering, proof artifacts, and rollback boundaries. |
 
 ## Decision Points
 
-- **Next version**: unnamed. Decide only after the active Runtime Graph And
-  Scene IR work either becomes a release goalpost or deliberately stays as
-  smaller `Beyond` slices.
+- **Next version**: `v7.1.0`. It is a small post-V7 minor release whose final
+  planned implementation pull is DX-046.
+- **No feature `v7.2.0`**: after `v7.1.0`, go directly to `v8.0.0` for new
+  feature development unless maintenance pressure forces a narrow patch or
+  stabilization release.
+- **V8 boundary**: Runtime Graph And Scene IR becomes the next major only when
+  the artifact, IR, receipt, source-map, lower-mode, debug, and capture
+  contracts are product-grade.
+- **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
+  makes the source/artifact/IR contract stable enough to inspect and author
+  against.
 - **DX-046 boundary**: Bijou-side only. Wesley and Geordi remain out of the
   critical path until DOGFOOD proves the artifact contracts.
 - **Tracker hygiene**: unmilestoned issues with `roadmap`, `work-in-progress`,
   `needs-design`, or `needs-playback` labels should be explicitly triaged before
   agents treat them as release work.
-- **Release evidence**: a candidate goalpost needs a release packet before any
-  package version is chosen.
+- **Release evidence**: each version still needs a release packet, GitHub
+  milestone or equivalent tracker grouping, proof gates, and release evidence
+  before tagging.
 
 ## Open Beyond Issues
 
@@ -147,7 +283,7 @@ horizon until GitHub metadata says so.
 | Horizon | Status | Notes |
 | :--- | :--- | :--- |
 | `v7.0.0` | Shipped public release | DOGFOOD truth, BlockLab naming, release-facing proof, scoped Node I/O documentation, release title proof, and component-family Block contracts. Full lineage lives in the [v7.0.0 milestone](https://github.com/flyingrobots/bijou/milestone/2). |
-| `v6.0.0` | Skipped public release; closed milestone | Layout truth, standard Blocks, data binding, selection/copy, and status/feedback Blocks. Full lineage lives in the [v6.0.0 milestone](https://github.com/flyingrobots/bijou/milestone/1). |
+| `v6.0.0` | Skipped public release; complete lineage | Layout truth, standard Blocks, data binding, selection/copy, and status/feedback Blocks. Full lineage lives in the [v6.0.0 milestone](https://github.com/flyingrobots/bijou/milestone/1). |
 | `Beyond closed items` | Closed backlog lineage | [#289](https://github.com/flyingrobots/bijou/issues/289), [#308](https://github.com/flyingrobots/bijou/issues/308), [#313](https://github.com/flyingrobots/bijou/issues/313), and [#314](https://github.com/flyingrobots/bijou/issues/314) are closed milestone items whose work has already landed or been resolved. |
 
 ## Maintenance Rule

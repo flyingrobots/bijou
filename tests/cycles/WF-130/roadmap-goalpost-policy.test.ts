@@ -43,16 +43,23 @@ describe('WF-130 roadmap goalpost policy', () => {
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
     const bearing = normalizeWhitespace(read('docs/BEARING.md'));
+    const releaseRunbook = normalizeWhitespace(read('docs/release.md'));
 
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
     expect(roadmap).toContain('The latest shipped public release is');
     expect(roadmap).toContain('v7.0.0');
     expect(roadmap).toContain('This roadmap is the forward-looking release horizon for Bijou.');
-    expect(roadmap).toContain('No next public release version is selected.');
+    expect(roadmap).toContain('The next selected public release target is **`v7.1.0`**');
+    expect(roadmap).toContain('There is no planned `v7.2.0` feature train.');
+    expect(roadmap).toContain('Release Train Decision');
+    expect(roadmap).toContain('`v7.1.0`: Post-V7 Minor');
+    expect(roadmap).toContain('`v8.0.0`: Runtime Graph And Scene IR Product Contract');
+    expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
-    expect(roadmap).toContain('Skipped public release milestone.');
+    expect(roadmap).toContain('Skipped public release lane.');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
     expect(roadmap).toContain('Latest shipped release lineage.');
@@ -60,14 +67,13 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('33 | 4');
     expect(roadmap).toContain('Next Pull');
     expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture for #302');
-    expect(roadmap).toContain('Forward Candidate Goalposts');
+    expect(roadmap).toContain('Forward Goalposts');
     expect(roadmap).toContain('Decision Points');
-    expect(roadmap).toContain('Runtime Graph And Scene IR');
-    expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
-    expect(roadmap).toContain('Design Tokens And Theme Modes');
-    expect(roadmap).toContain('Workflow, Capture, And CI Determinism');
-    expect(roadmap).toContain('Localization And Documentation Operations');
-    expect(roadmap).toContain('Terminal Input And Host Controls');
+    expect(roadmap).toContain('Runtime Graph And Scene IR Product Contract');
+    expect(roadmap).toContain('Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('Theme Lab and Theme Inspector provenance');
+    expect(roadmap).toContain('localization workbench proof');
+    expect(roadmap).toContain('terminal input controls');
     expect(roadmap).toContain('Open Unmilestoned Triage');
     expect(roadmap).toContain('[#321]');
     expect(roadmap).toContain('[#317]');
@@ -77,13 +83,20 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
     expect(roadmap).toContain('[#326]');
     expect(roadmap).toContain('Closed Lineage');
-    expect(roadmap).toContain('Skipped public release; closed milestone');
+    expect(roadmap).toContain('Skipped public release; complete lineage');
 
+    expect(roadmap).not.toContain('No next public release version is selected.');
     expect(roadmap).not.toContain('release-readiness validation before tagging');
     expect(roadmap).not.toContain('should not tag until release-readiness validation');
     expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
-    expect(bearing).toContain('No next public release version is selected.');
+    expect(bearing).toContain('The next selected public release target is `v7.1.0`');
+    expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
+    expect(bearing).toContain('Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
+
+    expect(releaseRunbook).toContain('The next selected public release target is **`7.1.0`**');
+    expect(releaseRunbook).toContain('There is no planned feature `7.2.0` train.');
+    expect(releaseRunbook).not.toContain('No next public release version is selected');
   });
 
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
