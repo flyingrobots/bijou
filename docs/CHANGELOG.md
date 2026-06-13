@@ -175,6 +175,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **DOGFOOD Blocks preview navigation** — The Blocks guide navigation now lets
+  Up move focus from the first `Block Preview` child back to the `Block Preview`
+  parent row instead of snapping focus back to `AppShell`.
 - **Surface ANSI reset handling** — `parseAnsiToSurface()` now honors scoped
   SGR foreground/background resets (`39`/`49`) so styled list markers no longer
   leak muted or accent colors into following DOGFOOD navigation labels.

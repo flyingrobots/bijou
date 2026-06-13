@@ -166,6 +166,28 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).not.toContain('Available Blocks');
   });
 
+  it('moves focus back to the Block Preview parent row from the first preview child', async () => {
+    const firstBlock = standardBlocks[0];
+    expect(firstBlock).toBeDefined();
+
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const result = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock!.metadata.blockName) },
+        },
+      },
+      { msg: { type: 'docs', msg: { type: 'guide-prev' } } },
+    ], { ctx });
+    const blocksModel = docsPageModel(result.model as any, 'blocks');
+    const focusedItem = blocksModel.guideState.items[blocksModel.guideState.focusIndex];
+
+    expect(blocksModel.selectedGuideId).toBe(blockPreviewGuideId(firstBlock!.metadata.blockName));
+    expect(focusedItem.value).toBe('blocks-preview');
+  });
+
   it('renders the pre-made block catalog without raw contract dumps', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
