@@ -679,8 +679,8 @@ function allocOutBuf(columns: number, rows: number): Uint8Array {
 }
 
 function createInvalidatedFrontBuffer(columns: number, rows: number): Surface {
-  const surface = createSurface(columns, rows, { char: '\0', empty: false });
-  surface.markAllDirty();
+  const surface = createSurface(columns, rows);
+  surface.fill({ char: '\0', empty: false });
   return surface;
 }
 
