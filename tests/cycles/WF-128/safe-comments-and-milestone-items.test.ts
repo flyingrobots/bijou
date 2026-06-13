@@ -30,7 +30,7 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const normalizedRoadmap = normalizeWhitespace(roadmap);
 
-    expect(roadmap).toContain('| Horizon | Milestone | Open Items | Closed Items | Intent |');
+    expect(roadmap).toContain('| Horizon | Milestone | Open Items | Closed Items | Current Posture |');
     expect(roadmap).toMatch(/Release snapshot counts are GitHub milestone item totals:[\s\S]+issues[\s\S]+pull requests/);
     expect(normalizedRoadmap).toContain(
       'Do not compare release snapshot item totals to issue-only `gh issue list` output',
@@ -39,7 +39,8 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
     const milestonePrLinks = Array.from(
       roadmap.matchAll(/\[#\d+\]\(https:\/\/github\.com\/flyingrobots\/bijou\/pull\/\d+\)/g),
     );
-    expect(milestonePrLinks.length).toBeGreaterThanOrEqual(2);
+    expect(milestonePrLinks.length).toBeGreaterThanOrEqual(1);
+    expect(roadmap).toContain('[#326](https://github.com/flyingrobots/bijou/pull/326)');
     expect(roadmap).not.toContain('| Horizon | Milestone | Open | Closed | Intent |');
   });
 

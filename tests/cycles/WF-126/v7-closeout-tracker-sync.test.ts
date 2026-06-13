@@ -4,10 +4,12 @@ import { readRepoFile } from '../repo.js';
 describe('WF-126 v7 closeout tracker sync', () => {
   it('keeps BEARING on the live issue-complete v7 tracker state', () => {
     const bearing = readRepoFile('docs/BEARING.md');
+    const normalizedBearing = bearing.replace(/\s+/g, ' ').trim();
 
-    expect(bearing).toContain('V7 Product Truth');
-    expect(bearing).toMatch(/zero open milestone\s+items and twenty-seven closed milestone\s+items/);
-    expect(bearing).toContain('release-readiness validation');
+    expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
+    expect(normalizedBearing).toContain('complete release lineage with zero open items');
+    expect(bearing).toContain('The next selected public release target is `v7.1.0`');
+    expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
     expect(bearing).not.toContain('Its current open count is three');
     expect(bearing).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
     expect(bearing).not.toContain('https://github.com/flyingrobots/bijou/issues/246');
@@ -18,20 +20,16 @@ describe('WF-126 v7 closeout tracker sync', () => {
 
   it('keeps ROADMAP v7 counts and open-work rows aligned with the current tracker', () => {
     const roadmap = readRepoFile('docs/ROADMAP.md');
-    const v7 = sectionBetween(roadmap, '## v7.0.0', '## Beyond');
-    const openWork = sectionBetween(v7, '### Open Work', '### Completed Lineage');
-    const completedLineage = sectionBetween(v7, '### Completed Lineage', '### Component-Family Audits');
+    const closedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
 
     expect(roadmap).toContain('| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 |');
-    expect(openWork).toContain('No open v7 tracker issues remain as of 2026-06-06.');
-    expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
-    expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/246');
-    expect(openWork).not.toContain('https://github.com/flyingrobots/bijou/issues/281');
-    expect(completedLineage).toContain('[#245](https://github.com/flyingrobots/bijou/issues/245)');
-    expect(completedLineage).toContain('[#246](https://github.com/flyingrobots/bijou/issues/246)');
-    expect(completedLineage).toContain('[#281](https://github.com/flyingrobots/bijou/issues/281)');
-    expect(completedLineage).toContain('[#283](https://github.com/flyingrobots/bijou/issues/283)');
-    expect(completedLineage).toContain('[#285](https://github.com/flyingrobots/bijou/issues/285)');
+    expect(closedLineage).toContain('`v7.0.0`');
+    expect(closedLineage).toContain('Shipped public release');
+    expect(closedLineage).toContain('Full lineage lives in the [v7.0.0 milestone]');
+    expect(roadmap).not.toContain('### Open Work');
+    expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
+    expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/246');
+    expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/281');
   });
 });
 

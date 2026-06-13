@@ -41,16 +41,19 @@ describe('DL-013 design token and theme builder spec', () => {
 
   it('puts DL-013 onto the GitHub-backed roadmap', () => {
     const roadmap = readRepoFile('docs/ROADMAP.md');
+    const closedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
 
     expect(roadmap).toContain(
       '| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) |',
     );
-    expect(roadmap).toContain('Design Tokens And Theme Modes');
-    expect(roadmap).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
+    expect(roadmap).toContain('Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('Theme Lab and Theme Inspector provenance surfaces backed by token facts');
     expect(roadmap).toContain('[#311](https://github.com/flyingrobots/bijou/issues/311)');
-    expect(roadmap).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
-    expect(roadmap).toContain('DL-013 design token and theme builder API');
-    expect(roadmap).toContain('safe-pair contrast matrices');
+    expect(roadmap).toContain('[#315](https://github.com/flyingrobots/bijou/issues/315)');
+    expect(roadmap).toContain('[#317](https://github.com/flyingrobots/bijou/issues/317)');
+    expect(roadmap).toContain('[#318](https://github.com/flyingrobots/bijou/issues/318)');
+    expect(closedLineage).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
+    expect(closedLineage).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
   });
 
   it('locks the safe-pair contrast matrix follow-up into the design trail', () => {
@@ -69,3 +72,13 @@ describe('DL-013 design token and theme builder spec', () => {
     expect(umbrella).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
   });
 });
+
+function sectionBetween(source: string, start: string, end: string): string {
+  const startIndex = source.indexOf(start);
+  const endIndex = source.indexOf(end, startIndex + start.length);
+
+  expect(startIndex).toBeGreaterThanOrEqual(0);
+  expect(endIndex).toBeGreaterThan(startIndex);
+
+  return source.slice(startIndex, endIndex);
+}

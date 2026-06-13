@@ -55,15 +55,15 @@ describe('DX-030 boundary-aware pointer selection and copy', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const roadmapOpenWork = sectionBetween(roadmap, '### Open Work', '### Completed Lineage');
-    const roadmapCompletedLineage = sectionBetween(roadmap, '### Completed Lineage', '## v7.0.0');
+    const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
 
     expect(design).toContain('DX-030 is landed for the `v6.0.0` release boundary.');
     expect(design).toContain('pure selection coordinator');
     expect(changelog).toContain('DX-030 boundary-aware selection and copy');
     expect(bearing).not.toContain('[#186](https://github.com/flyingrobots/bijou/issues/186) — `DX-030`');
-    expect(roadmapOpenWork).not.toContain('[#186](https://github.com/flyingrobots/bijou/issues/186)');
-    expect(roadmapCompletedLineage).toContain('| [#186](https://github.com/flyingrobots/bijou/issues/186) | `lane:release` | `type:enhancement` | DX-030 boundary-aware pointer selection and copy |');
+    expect(roadmapClosedLineage).toContain('`v6.0.0`');
+    expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
+    expect(roadmap).not.toContain('[#186](https://github.com/flyingrobots/bijou/issues/186)');
     expect(backlog).toContain('## Landed Selection And Copy Anchor');
     expect(backlog).toContain('issue #186');
   });
