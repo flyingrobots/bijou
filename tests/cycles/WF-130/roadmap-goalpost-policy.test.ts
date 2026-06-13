@@ -43,13 +43,13 @@ describe('WF-130 roadmap goalpost policy', () => {
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
 
-    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-09.');
+    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
     expect(roadmap).toContain('`Beyond`');
-    expect(roadmap).toContain('34 | 3');
+    expect(roadmap).toContain('33 | 4');
     expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
@@ -95,7 +95,7 @@ describe('WF-130 roadmap goalpost policy', () => {
   it('keeps the Beyond open snapshot count aligned with the Open Beyond Issues table', () => {
     const roadmap = read('docs/ROADMAP.md');
     const beyondRow = roadmap.match(/\| `Beyond` \| \[Beyond\]\([^)]+\) \| (?<open>\d+) \| (?<closed>\d+) \|/);
-    expect(beyondRow?.groups?.closed).toBe('3');
+    expect(beyondRow?.groups?.closed).toBe('4');
 
     const openBeyondIssues = sectionBetween(
       roadmap,
