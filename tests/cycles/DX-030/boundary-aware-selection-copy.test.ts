@@ -49,7 +49,7 @@ describe('DX-030 boundary-aware pointer selection and copy', () => {
     expect(result.effect.kind).toBe('clipboard.write');
   });
 
-  it('keeps selection and copy evidence aligned with v6 closeout', () => {
+  it('keeps compressed v6 lineage pointing to issue 186 evidence', () => {
     const design = readRepoFile('docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
     const bearing = readRepoFile('docs/BEARING.md');
@@ -64,6 +64,7 @@ describe('DX-030 boundary-aware pointer selection and copy', () => {
     expect(roadmapClosedLineage).toContain('`v6.0.0`');
     expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
     expect(roadmap).not.toContain('[#186](https://github.com/flyingrobots/bijou/issues/186)');
+    expect(design).toContain('issue #186 closes through implementation');
     expect(backlog).toContain('## Landed Selection And Copy Anchor');
     expect(backlog).toContain('issue #186');
   });

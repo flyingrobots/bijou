@@ -21,8 +21,8 @@ it to reflect current reality.
 ## Sponsor Agent
 
 An agent needs the roadmap to distinguish live tracker truth from historical
-release lineage so it can select the next slice without reopening already
-closed release lanes.
+release lineage so it can select the next slice without treating already
+complete zero-open release lanes as active release targets.
 
 ## Hill
 
@@ -38,8 +38,8 @@ preserves deterministic tests for the GitHub-backed counts.
 Verified against GitHub on 2026-06-13.
 
 - Latest public release tag: `v7.0.0`.
-- `v6.0.0` was skipped as a public package release; its milestone is closed
-  tracker lineage.
+- `v6.0.0` was skipped as a public package release; its zero-open milestone lane
+  is complete tracker lineage.
 - GitHub milestone `v6.0.0`: 0 open, 30 closed milestone items.
 - GitHub milestone `v7.0.0`: 0 open, 27 closed milestone items.
 - GitHub milestone `Beyond`: 33 open, 4 closed milestone items.

@@ -36,11 +36,8 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
       'Do not compare release snapshot item totals to issue-only `gh issue list` output',
     );
     expect(roadmap).toContain('gh pr list --state all --search');
-    const milestonePrLinks = Array.from(
-      roadmap.matchAll(/\[#\d+\]\(https:\/\/github\.com\/flyingrobots\/bijou\/pull\/\d+\)/g),
-    );
-    expect(milestonePrLinks.length).toBeGreaterThanOrEqual(1);
-    expect(roadmap).toContain('[#326](https://github.com/flyingrobots/bijou/pull/326)');
+    expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
+    expect(roadmap).toContain('These pull requests are open and unmilestoned.');
     expect(roadmap).not.toContain('| Horizon | Milestone | Open | Closed | Intent |');
   });
 

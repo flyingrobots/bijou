@@ -18,8 +18,11 @@ describe('WF-126 v7 closeout tracker sync', () => {
     expect(bearing).not.toContain('After this PR merges');
   });
 
-  it('keeps ROADMAP v7 counts and open-work rows aligned with the current tracker', () => {
+  it('keeps compressed ROADMAP v7 lineage aligned with issue-specific evidence', () => {
     const roadmap = readRepoFile('docs/ROADMAP.md');
+    const releaseTitleDesign = readRepoFile('docs/design/DF-060-v7-dogfood-release-title-screen.md');
+    const reviewFixDesign = readRepoFile('docs/design/DX-040-v7-review-regression-fixes.md');
+    const trackerSyncDesign = readRepoFile('docs/design/WF-127-v7-issue-complete-tracker-sync.md');
     const closedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
 
     expect(roadmap).toContain('| `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 |');
@@ -30,6 +33,11 @@ describe('WF-126 v7 closeout tracker sync', () => {
     expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
     expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/246');
     expect(roadmap).not.toContain('https://github.com/flyingrobots/bijou/issues/281');
+    expect(releaseTitleDesign).toContain('[#245](https://github.com/flyingrobots/bijou/issues/245)');
+    expect(releaseTitleDesign).toContain('[#246](https://github.com/flyingrobots/bijou/issues/246)');
+    expect(releaseTitleDesign).toContain('[#281](https://github.com/flyingrobots/bijou/issues/281)');
+    expect(reviewFixDesign).toContain('Issue #283 is closed by the follow-up PR.');
+    expect(trackerSyncDesign).toContain('Issue #285 is closed by the PR.');
   });
 });
 

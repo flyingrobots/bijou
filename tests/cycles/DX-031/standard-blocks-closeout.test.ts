@@ -153,7 +153,7 @@ describe('DX-031 standard blocks closeout', () => {
     expect(changelog).toContain('TemporalDependencyBlock');
   });
 
-  it('keeps v6 tracker docs aligned after closing issue 181', () => {
+  it('keeps compressed v6 lineage pointing to issue 181 evidence', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');

@@ -17,6 +17,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `v9.0.0` for Product Workbench and operator surfaces, and foreground DX-046,
   current unmilestoned triage, and the open dependency PR outside release
   horizons.
+- **Roadmap review follow-up** — `docs/ROADMAP.md` now routes unmilestoned
+  issues only toward the selected `v7.1.0` / `v8.0.0` / `v9.0.0` / `v10.0.0+`
+  train, marks dependency PR #326 as candidate-only until release-packet
+  selection, and the project markdownlint config disables the Markdown
+  line-length rule so links and tables are not wrapped by policy.
 - **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
   now mark DX-045 as landed, set DX-046 as the next #302 pull for a real
   GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone counts

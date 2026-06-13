@@ -188,8 +188,9 @@ describe('DX-034 data binding closeout', () => {
     expect(changelog).toContain('provider-bound AppShell');
   });
 
-  it('keeps v6 tracker docs aligned after closing issue 182', () => {
+  it('keeps compressed v6 lineage pointing to issue 182 evidence', () => {
     const bearing = readRepoFile('docs/BEARING.md');
+    const design = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
     const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
@@ -198,6 +199,7 @@ describe('DX-034 data binding closeout', () => {
     expect(roadmapClosedLineage).toContain('`v6.0.0`');
     expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
     expect(roadmap).not.toContain('[#182](https://github.com/flyingrobots/bijou/issues/182)');
+    expect(design).toContain('contract without keeping issue #182 open');
 
     expect(backlog).toContain('## Landed Data Binding Anchor');
     expect(backlog).toContain('issue #182');

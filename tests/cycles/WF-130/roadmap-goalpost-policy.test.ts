@@ -82,12 +82,17 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#249]');
     expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
     expect(roadmap).toContain('[#326]');
+    expect(roadmap).toContain('candidate-only [#326]');
+    expect(roadmap).toContain('it is not selected for `v7.1.0` until');
     expect(roadmap).toContain('Closed Lineage');
     expect(roadmap).toContain('Skipped public release; complete lineage');
 
     expect(roadmap).not.toContain('No next public release version is selected.');
     expect(roadmap).not.toContain('release-readiness validation before tagging');
     expect(roadmap).not.toContain('should not tag until release-readiness validation');
+    expect(roadmap).not.toContain('Design Tokens And Theme Modes');
+    expect(roadmap).not.toContain('Terminal Input And Host Controls');
+    expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
     expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
     expect(bearing).toContain('The next selected public release target is `v7.1.0`');
     expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
@@ -97,6 +102,13 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(releaseRunbook).toContain('The next selected public release target is **`7.1.0`**');
     expect(releaseRunbook).toContain('There is no planned feature `7.2.0` train.');
     expect(releaseRunbook).not.toContain('No next public release version is selected');
+  });
+
+  it('disables Markdown line-length linting for project docs', () => {
+    const markdownlintConfig = JSON.parse(read('.markdownlint.json')) as Record<string, unknown>;
+
+    expect(markdownlintConfig.MD013).toBe(false);
+    expect(markdownlintConfig['line-length']).toBe(false);
   });
 
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
