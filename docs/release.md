@@ -219,15 +219,18 @@ The next selected public release target is **`7.1.0`**.
 The latest shipped package release is `7.0.0`. The older `v6.0.0` milestone
 and the `v7.0.0` milestone are both zero-open tracker lanes retained as release
 lineage, not as the next target. `7.1.0` should stay a small post-V7 minor:
-ship the accumulated `Unreleased` work, include DX-046 issue #329 if it lands
-cleanly, and then move into release prep.
+ship the accumulated `Unreleased` work, carry landed DX-046 issue #329 as the
+final planned feature proof, and finish #270/#312 as release-prep guardrails
+before the release packet is cut.
 
 There is no planned feature `7.2.0` train. After `7.1.0`, new feature work
 should shape toward `8.0.0` unless a bug, security, dependency, or
 release-process reason justifies a narrow maintenance release.
 
-The `v7.1.0` GitHub milestone is the selected release packet. Before release
-prep begins, keep the selected scope reflected in
+The `v7.1.0` GitHub milestone is the selected release packet. DX-046 issue #329
+has landed; #270 and #312 are the selected release-prep guardrails before the
+release packet is cut. Before release prep begins, keep the selected scope
+reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live
 tracker, and the versioned release packet.
 
@@ -404,13 +407,24 @@ Run:
 
 ```bash
 npm run release:preflight
-npm run release:readiness
+npm run release:readiness -- --milestone vX.Y.Z
 npm run docs:inventory
 npm audit --omit=dev --audit-level=high
 ```
 
-`release:readiness` is the repo-native local gauntlet. It currently runs
-these gates in order:
+`release:readiness` is the repo-native local gauntlet. With `--milestone`, it
+first prints a release-readiness report and blocks before the gauntlet if:
+
+- the target GitHub milestone has open tracker issues
+- any milestone tracker issue still has `work-in-progress`
+- `ROADMAP.md` and `BEARING.md` do not mention the target milestone
+- `CHANGELOG.md` does not have an `Unreleased` or versioned release boundary
+- `docs/releases/X.Y.Z/README.md` release evidence packet is missing
+- the command plan no longer includes package smoke or the release guide no
+  longer documents the release dry-run package boundary
+
+Without `--milestone`, the command runs only the local gauntlet and does not
+require GitHub access. The gauntlet currently runs these gates in order:
 
 1. `build`
 2. `lint`
@@ -597,10 +611,10 @@ Abort immediately if any of these are true:
   `release:readiness` are the current repo-native commands.
 - clean-worktree is an operator preflight check, not a `release:readiness`
   concern, because Phase 2 intentionally dirties the worktree
-- branch-sync, latest-tag, tag-collision, live GitHub issue gates, changelog
-  dating, release tag ancestry, release evidence shape, and human review
-  disposition are documented here, but they do not yet have a single dedicated
-  repo-native guard
+- branch-sync, latest-tag, tag-collision, live GitHub pull-request milestone
+  gates, changelog dating, release tag ancestry, release evidence shape, and
+  human review disposition are documented here, but they do not yet have a
+  single dedicated repo-native guard
 - `docs:inventory` and runtime `npm audit` are release policy gates but are not
   currently part of `release:readiness`
 - JSR publishing is not currently part of Bijou's release surface
