@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Documentation
 
+- **Roadmap current-reality refresh** — `docs/ROADMAP.md` now treats
+  `v7.0.0` as the latest shipped public release, keeps the `v6.0.0` and
+  `v7.0.0` milestones as closed lineage instead of pending release targets,
+  surfaces the post-v7 DX-046 pull for #302, and lists current unmilestoned
+  issue triage plus the open dependency PR outside release horizons.
 - **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
   now mark DX-045 as landed, set DX-046 as the next #302 pull for a real
   GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone counts

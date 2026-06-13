@@ -89,17 +89,16 @@ Current direction and active tensions. Historical ship data is in
             -> DOGFOOD product facts
   ```
 
-### 1. Keep The `v6.0.0` Release Boundary Closed
+### 1. Keep The Release Posture Honest
 
-- The live `v6.0.0` milestone has zero open tracker items and twenty-eight
-  completed issue trackers. PR #257 closed the status/feedback Block slice:
-  #220, #221, #222, #223, #224, and #225.
-- The release thesis is still complete: frame owns geometry; Blocks prove it.
-  The shipped proof now includes layout, standard Blocks, data binding,
-  selection/copy, and status/feedback Blocks.
-- `v6.0.0` should not tag until release-readiness validation and packaging
-  checks are green.
-- The detailed issue list lives in [ROADMAP.md](./ROADMAP.md).
+- The latest shipped public release is `v7.0.0`, published on 2026-06-03.
+- The `v6.0.0` and `v7.0.0` GitHub milestones are closed release lineage, not
+  the next implementation target.
+- No next public release version is selected. The next release target should be
+  chosen only after a post-v7 candidate goalpost is shaped into a versioned
+  release packet.
+- The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
+  the release process lives in [release.md](./release.md).
 
 ### 2. GitHub Issues Are The Work Tracker
 
@@ -110,47 +109,43 @@ Current direction and active tensions. Historical ship data is in
 - Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
   comment and a matching roadmap update.
 
-### 3. `v7.0.0` Is Issue-Complete Product Truth
+### 3. Shape Beyond Before Naming A Release
 
-- `v7.0.0` now has zero open milestone items and twenty-seven closed milestone
-  items after the tracker-sync cleanup closes. The closed lineage includes
-  DOGFOOD docs truth, completed component-family audits, `tableSurface()`
-  responsive parity, scoped Node I/O documentation, BlockLab naming, workflow
-  evidence, the DOGFOOD release-title proof surface, and post-merge review
-  regression fixes.
-- The next release-facing action is release-readiness validation against the
-  issue-complete V7 Product Truth lane.
-- DF-030 is the first product-truth slice: DOGFOOD's docs surface became one
-  inspectable Block contract instead of adjacent docs rendering concepts. The
-  component-family six-packs extend the standard Block catalog across grouping,
-  explainability, document, navigation, structure, input, disclosure, and path
-  progress families. V7 Product Truth closes the release-facing gap: the docs
-  app now has a release identity that points at shipped proof lanes.
+- The `Beyond` milestone is the current post-v7 backlog: 33 open and 4 closed
+  milestone items as of the latest roadmap sync.
+- The useful candidate goalposts are Runtime Graph And Scene IR, DOGFOOD And
+  BlockLab Product Surface, Design Tokens And Theme Modes, Workflow/Capture/CI
+  Determinism, Localization And Documentation Operations, and Terminal Input
+  And Host Controls.
+- Unmilestoned work such as the fluid-triangle title direction, Theme Inspector
+  pointer provenance, keyboard transport, playback harness, and technical
+  teardown gate should be shaped before being treated as release work.
 
 ## Tensions
 
-- **Release Scope Creep**: `v6.0.0` is issue-complete. Do not reopen it for new
-  feature work unless release-readiness validation uncovers a true blocker.
-- **Geometry Before Product Chrome**: RE-035 has landed the release's
-  structural layout floor. Remaining product-facing v6 work should consume
-  geometry contracts, not bypass them with bespoke string/surface measurement.
+- **Closed Release Gravity**: `v6.0.0` and `v7.0.0` are closed lineage. Do not
+  reopen either milestone for new feature work.
+- **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
+  New product-facing work should consume geometry contracts, not bypass them
+  with bespoke string/surface measurement.
 - **Block Boundary Drift**: It is tempting to wrap every component in a Block.
   Blocks should own product semantics, data contracts, and lowering facts;
   Components should remain the leaf rendering vocabulary.
 - **Tracker / Docs Drift**: The issue tracker, `ROADMAP.md`, and Method
   evidence files can now disagree. GitHub wins; docs must be updated when
   milestone triage changes.
-- **DOGFOOD Truth Debt**: DF-030 converts the docs app into a named Block
-  contract. The current V7 DOGFOOD proof lane is issue-complete; any new
-  DOGFOOD truth work should be shaped as a new release lane or a Beyond issue
-  rather than reopening the closed V7 closeout queue.
+- **DOGFOOD Truth Debt**: DF-030 converted the docs app into a named Block
+  contract. New DOGFOOD truth work should be shaped as a post-v7 candidate
+  goalpost or a Beyond issue rather than reopening the closed V7 queue.
+- **Unmilestoned WIP**: Work with `work-in-progress`, `roadmap`, or
+  `needs-design` labels but no milestone must be made explicit in roadmap
+  triage before agents treat it as a release target.
 
 ## Next Target
 
 The immediate feature focus is `DX-046`: a GraphQL-authored DOGFOOD block
-fixture for #302. Release-readiness validation remains the release-boundary
-focus for the closed V6 and V7 lanes, but the next implementation branch should
-avoid reopening those issue-complete milestones.
+fixture for #302. This is a post-v7 proof slice, not a `v6.0.0` or `v7.0.0`
+release-readiness task.
 
 The `DX-046` validation pass must prove:
 
@@ -162,28 +157,22 @@ The `DX-046` validation pass must prove:
 - failure tests catch missing product facts such as invalid token refs,
   missing localization posture, duplicate ids, or broken group references
 
-The release-readiness validation pass must prove:
-
-- release-readiness checks pass against the closed V6 and V7 lanes
-- BEARING and ROADMAP mirror the live V7 tracker
-- no unresolved review comments or failed CI remain from the closeout PRs
-- package/version metadata is ready for the release boundary
-
 Recommended pull order:
 
-1. Land this post-DX-045 signpost refresh.
+1. Land this roadmap current-reality refresh.
 2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #302.
 3. Harden the compiler boundary so Wesley can replace the bootstrap parser
    without changing Bijou artifact semantics.
-4. Run release-readiness validation against the now-closed V6 and V7 lanes.
-5. Cut release title treatment variants for the next release boundary only
-   after the tracker, docs, and CI proof are green.
+4. Decide whether Runtime Graph And Scene IR is ready to become a versioned
+   release goalpost, or keep pulling smaller Beyond slices.
+5. Select the next public release version only after the tracker, docs, release
+   packet, and CI proof identify a real boundary.
 
 Non-goals for the next cycle:
 
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
-- no full visual redesign of DOGFOOD beyond the release-title guide
+- no full visual redesign of DOGFOOD while DX-046 is still the active proof
 - no conversion of every leaf component into a Block
 - no hidden global block registry
 - no localization runtime rewrite

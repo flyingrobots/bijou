@@ -1,0 +1,169 @@
+# WF-131 Roadmap Current Reality Refresh
+
+## Linked Legend
+
+WF - Workflow and Delivery
+
+## Decision Summary
+
+Refresh `docs/ROADMAP.md` and `docs/BEARING.md` so they describe the current
+post-`v7.0.0` reality instead of implying the closed `v6.0.0` and `v7.0.0`
+milestone lanes still need release-readiness work before tagging.
+
+## Sponsor Human
+
+A maintainer noticed that the roadmap felt significantly outdated and asked for
+it to reflect current reality.
+
+## Sponsor Agent
+
+An agent needs the roadmap to distinguish live tracker truth from historical
+release lineage so it can select the next slice without reopening already
+closed release lanes.
+
+## Hill
+
+By the end of this cycle, the roadmap names `v7.0.0` as the latest shipped
+public release, treats `v6.0.0` and `v7.0.0` milestones as closed lineage,
+keeps `Beyond` as the post-v7 backlog, surfaces unmilestoned triage and open
+pull requests, and preserves deterministic tests for the GitHub-backed counts.
+
+## Current Truth
+
+Verified against GitHub on 2026-06-13.
+
+- Latest public release tag: `v7.0.0`.
+- GitHub milestone `v6.0.0`: 0 open, 30 closed milestone items.
+- GitHub milestone `v7.0.0`: 0 open, 27 closed milestone items.
+- GitHub milestone `Beyond`: 33 open, 4 closed milestone items.
+- Open unmilestoned issues: #321, #317, #316, #306, and #249.
+- Open pull requests: dependency PR #326, unmilestoned.
+- Active implementation gravity: DX-046, a real GraphQL-authored DOGFOOD block
+  fixture for #302.
+
+## Problem
+
+The roadmap's numerical snapshot was recently synced, but the surrounding
+release narrative still read as if V7 had not shipped and as if v6/v7
+release-readiness validation remained the next release-facing action. That
+contradicts `docs/release.md`, which already names `7.0.0` as the latest
+shipped release and says the older v6/v7 milestones are retained as lineage.
+
+## Scope
+
+This cycle includes:
+
+- rewriting the roadmap introduction and release snapshot around the shipped
+  `v7.0.0` boundary
+- replacing pending-tag wording in v6/v7 sections with closed-lineage wording
+- making the post-v7 active pull explicit
+- preserving open Beyond issue accounting
+- adding current unmilestoned issue triage and the open dependency PR
+- aligning BEARING with the same release posture
+- updating WF-130 roadmap checks so stale release-readiness wording does not
+  return
+
+## Non-Goals
+
+This cycle does not:
+
+- move any GitHub issues between milestones
+- create a new versioned release milestone
+- select the next public release version
+- implement the tracker-sync sentinel from #268
+- implement DX-046 or any product feature
+
+## User Experience / Product Shape
+
+This is documentation and workflow truth work. There is no runtime or TUI
+surface change.
+
+The reviewer-facing shape is:
+
+```text
+docs/ROADMAP.md
+  How To Read This File
+  Release Snapshot
+  Latest Shipped Release
+  Closed Lineage
+  Active Post-v7 Pull
+  Post-v7 Candidate Goalposts
+  Open Beyond Issues
+  Open Unmilestoned Triage
+  Open Pull Requests Outside Release Horizons
+```
+
+## Lower Modes
+
+### Static Mode
+
+Markdown remains readable in plain text and in DOGFOOD's docs reader.
+
+### Pipe Mode
+
+The proof is deterministic CLI output from GitHub and local tests.
+
+### Accessible Mode
+
+Tables keep explicit headers and avoid relying on prose-only counts.
+
+## Runtime / API Contract
+
+No runtime API changes.
+
+## Data / State Model
+
+GitHub milestones, issue labels, and PR state remain live tracker truth.
+`docs/ROADMAP.md` mirrors that state for humans and records the sync date.
+
+## Accessibility Posture
+
+No interactive controls are added. Markdown tables and short prose summaries
+keep the roadmap navigable for screen readers and terminal readers.
+
+## Localization / Directionality Posture
+
+No app-visible localized strings are added.
+
+## Agent Inspectability / Explainability Posture
+
+Agents can inspect:
+
+- `docs/ROADMAP.md` for release horizon and candidate goalpost state
+- `docs/BEARING.md` for active gravity
+- `docs/release.md` for shipped-release posture
+- `tests/cycles/WF-130/roadmap-goalpost-policy.test.ts` for deterministic
+  roadmap expectations
+
+## Linked Invariants
+
+- Work Is Issue-Backed
+- Docs Are the Demo
+- Release Claims Need Proof
+- Runtime Truth Wins
+
+## Implementation Outline
+
+1. Capture live GitHub milestone, issue, and PR state.
+2. Comment on #268 to connect this manual refresh to the tracker-sync problem.
+3. Refresh `docs/ROADMAP.md`.
+4. Align `docs/BEARING.md`.
+5. Update changelog and WF-130 regression expectations.
+6. Run focused validation.
+
+## Tests To Write First
+
+- Update WF-130 expectations so stale text such as "release-readiness
+  validation before tagging" fails if it returns to `docs/ROADMAP.md`.
+- Keep the Beyond row count tied to the `Open Beyond Issues` table.
+- Assert the current unmilestoned triage and dependency PR are visible.
+
+## Validation Plan
+
+```bash
+npm test -- --run tests/cycles/WF-130/roadmap-goalpost-policy.test.ts
+npm run docs:inventory
+npm run typecheck:test
+npm run lint
+git diff --check
+```

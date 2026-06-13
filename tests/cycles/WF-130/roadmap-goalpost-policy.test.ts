@@ -42,22 +42,43 @@ describe('WF-130 roadmap goalpost policy', () => {
 
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
+    const bearing = normalizeWhitespace(read('docs/BEARING.md'));
 
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
+    expect(roadmap).toContain('The latest shipped public release is');
+    expect(roadmap).toContain('v7.0.0');
+    expect(roadmap).toContain('No next public release version is selected here.');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
+    expect(roadmap).toContain('Not a pending package tag.');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
+    expect(roadmap).toContain('Latest shipped public release lineage');
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('33 | 4');
-    expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
+    expect(roadmap).toContain('Active Post-v7 Pull');
+    expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture for #302');
+    expect(roadmap).toContain('Post-v7 Candidate Goalposts');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
     expect(roadmap).toContain('Design Tokens And Theme Modes');
-    expect(roadmap).toContain('Workflow And CI Determinism');
+    expect(roadmap).toContain('Workflow, Capture, And CI Determinism');
     expect(roadmap).toContain('Localization And Documentation Operations');
+    expect(roadmap).toContain('Terminal Input And Host Controls');
+    expect(roadmap).toContain('Open Unmilestoned Triage');
+    expect(roadmap).toContain('[#321]');
+    expect(roadmap).toContain('[#317]');
+    expect(roadmap).toContain('[#316]');
     expect(roadmap).toContain('[#306]');
     expect(roadmap).toContain('[#249]');
+    expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
+    expect(roadmap).toContain('[#326]');
+
+    expect(roadmap).not.toContain('release-readiness validation before tagging');
+    expect(roadmap).not.toContain('should not tag until release-readiness validation');
+    expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
+    expect(bearing).toContain('No next public release version is selected.');
+    expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
   });
 
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
@@ -99,8 +120,8 @@ describe('WF-130 roadmap goalpost policy', () => {
 
     const openBeyondIssues = sectionBetween(
       roadmap,
-      '### Open Beyond Issues',
-      '### Closed Beyond Lineage',
+      '## Open Beyond Issues',
+      '## Closed Beyond Lineage',
     );
     const openIssueRows = openBeyondIssues
       .split('\n')
