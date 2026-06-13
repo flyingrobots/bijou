@@ -153,17 +153,17 @@ describe('DX-031 standard blocks closeout', () => {
     expect(changelog).toContain('TemporalDependencyBlock');
   });
 
-  it('keeps v6 tracker docs aligned after closing issue 181', () => {
+  it('keeps compressed v6 lineage pointing to issue 181 evidence', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const roadmapOpenWork = sectionBetween(roadmap, '### Open Work', '### Completed Lineage');
-    const roadmapCompletedLineage = sectionBetween(roadmap, '### Completed Lineage', '## v7.0.0');
+    const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
 
     expect(bearing).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`');
 
-    expect(roadmapOpenWork).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181)');
-    expect(roadmapCompletedLineage).toContain('| [#181](https://github.com/flyingrobots/bijou/issues/181) | `lane:release` | `type:enhancement` | DX-031 standard Bijou blocks |');
+    expect(roadmapClosedLineage).toContain('`v6.0.0`');
+    expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
+    expect(roadmap).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181)');
 
     expect(backlog).toContain('## Landed Standard Blocks Anchor');
     expect(backlog).toContain('issue #181');

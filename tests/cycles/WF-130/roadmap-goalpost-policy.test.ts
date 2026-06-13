@@ -42,22 +42,104 @@ describe('WF-130 roadmap goalpost policy', () => {
 
   it('makes roadmap state GitHub-backed and groups current open tracker work', () => {
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
+    const bearing = normalizeWhitespace(read('docs/BEARING.md'));
+    const releaseRunbook = normalizeWhitespace(read('docs/release.md'));
 
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
+    expect(roadmap).toContain('The latest shipped public release is');
+    expect(roadmap).toContain('v7.0.0');
+    expect(roadmap).toContain('This roadmap is the forward-looking release horizon for Bijou.');
+    expect(roadmap).toContain('The next selected public release target is **`v7.1.0`**');
+    expect(roadmap).toContain('There is no planned `v7.2.0` feature train.');
+    expect(roadmap).toContain('Release Train Decision');
+    expect(roadmap).toContain('`v7.1.0`: Post-V7 Minor');
+    expect(roadmap).toContain('`v8.0.0`: Runtime Graph And Scene IR Product Contract');
+    expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
+    expect(roadmap).toContain('v6.0.0` was never published as a public package release');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
+    expect(roadmap).toContain('Skipped public release lane.');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
+    expect(roadmap).toContain('Latest shipped release lineage.');
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('33 | 4');
-    expect(roadmap).toContain('Candidate Goalposts From Open GitHub Issues');
-    expect(roadmap).toContain('Runtime Graph And Scene IR');
-    expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
-    expect(roadmap).toContain('Design Tokens And Theme Modes');
-    expect(roadmap).toContain('Workflow And CI Determinism');
-    expect(roadmap).toContain('Localization And Documentation Operations');
+    expect(roadmap).toContain('Next Pull');
+    expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture for #302');
+    expect(roadmap).toContain('Forward Goalposts');
+    expect(roadmap).toContain('Decision Points');
+    expect(roadmap).toContain('Runtime Graph And Scene IR Product Contract');
+    expect(roadmap).toContain('Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('Theme Lab and Theme Inspector provenance');
+    expect(roadmap).toContain('localization workbench proof');
+    expect(roadmap).toContain('terminal input controls');
+    expect(roadmap).toContain('Open Unmilestoned Triage');
+    expect(roadmap).toContain('[#321]');
+    expect(roadmap).toContain('[#317]');
+    expect(roadmap).toContain('[#316]');
     expect(roadmap).toContain('[#306]');
     expect(roadmap).toContain('[#249]');
+    expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
+    expect(roadmap).toContain('[#326]');
+    expect(roadmap).toContain('candidate-only [#326]');
+    expect(roadmap).toContain('it is not selected for `v7.1.0` until');
+    expect(roadmap).toContain('Closed Lineage');
+    expect(roadmap).toContain('Skipped public release; complete lineage');
+
+    expect(roadmap).not.toContain('No next public release version is selected.');
+    expect(roadmap).not.toContain('release-readiness validation before tagging');
+    expect(roadmap).not.toContain('should not tag until release-readiness validation');
+    expect(roadmap).not.toContain('Design Tokens And Theme Modes');
+    expect(roadmap).not.toContain('Terminal Input And Host Controls');
+    expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
+    expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
+    expect(bearing).toContain('The next selected public release target is `v7.1.0`');
+    expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
+    expect(bearing).toContain('Shape V8 And V9 From Beyond');
+    expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
+
+    expect(releaseRunbook).toContain('The next selected public release target is **`7.1.0`**');
+    expect(releaseRunbook).toContain('There is no planned feature `7.2.0` train.');
+    expect(releaseRunbook).not.toContain('No next public release version is selected');
+  });
+
+  it('disables Markdown line-length linting for project docs', () => {
+    const markdownlintConfig = JSON.parse(read('.markdownlint.json')) as Record<string, unknown>;
+
+    expect(markdownlintConfig.MD013).toBe(false);
+    expect(markdownlintConfig['line-length']).toBe(false);
+  });
+
+  it('keeps outside-release PR sync filtered to unmilestoned pull requests', () => {
+    const roadmap = read('docs/ROADMAP.md');
+    const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
+
+    expect(maintenanceRule).toContain('gh search prs --repo flyingrobots/bijou --state open --no-milestone');
+    expect(maintenanceRule).not.toContain('gh pr list --repo flyingrobots/bijou --state open');
+  });
+
+  it('keeps the broad issue 302 tracker on the v8 side of the release train', () => {
+    const roadmap = read('docs/ROADMAP.md');
+    const normalizedRoadmap = normalizeWhitespace(roadmap);
+    const goalposts = sectionBetween(roadmap, '## Forward Goalposts', '## Decision Points');
+    const v71Row = goalposts.split('\n').find(line => line.startsWith('| `v7.1.0` |')) ?? '';
+    const v8Row = goalposts.split('\n').find(line => line.startsWith('| `v8.0.0` |')) ?? '';
+
+    expect(v71Row).toContain('DX-046 implementation PR or release-packet item');
+    expect(v71Row).not.toContain('https://github.com/flyingrobots/bijou/issues/302');
+    expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
+    expect(normalizedRoadmap).toContain(
+      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns only the DX-046 implementation PR or release-packet item.',
+    );
+  });
+
+  it('requires audit comments for moves across all release horizons', () => {
+    const bearing = normalizeWhitespace(read('docs/BEARING.md'));
+
+    expect(bearing).toContain('Any issue or pull request moved between release horizons');
+    expect(bearing).toContain('`v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`');
+    expect(bearing).not.toContain('Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond`');
   });
 
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
@@ -99,8 +181,8 @@ describe('WF-130 roadmap goalpost policy', () => {
 
     const openBeyondIssues = sectionBetween(
       roadmap,
-      '### Open Beyond Issues',
-      '### Closed Beyond Lineage',
+      '## Open Beyond Issues',
+      '## Open Unmilestoned Triage',
     );
     const openIssueRows = openBeyondIssues
       .split('\n')
