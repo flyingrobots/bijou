@@ -111,6 +111,14 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(markdownlintConfig['line-length']).toBe(false);
   });
 
+  it('keeps outside-release PR sync filtered to unmilestoned pull requests', () => {
+    const roadmap = read('docs/ROADMAP.md');
+    const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
+
+    expect(maintenanceRule).toContain('gh search prs --repo flyingrobots/bijou --state open --no-milestone');
+    expect(maintenanceRule).not.toContain('gh pr list --repo flyingrobots/bijou --state open');
+  });
+
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
     const agents = normalizeWhitespace(read('AGENTS.md'));
     const contributing = normalizeWhitespace(read('CONTRIBUTING.md'));

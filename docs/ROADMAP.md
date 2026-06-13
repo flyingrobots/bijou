@@ -301,7 +301,7 @@ gh pr list --state all --search 'milestone:Beyond'
 gh issue list --state all --milestone v6.0.0
 gh pr list --state all --search 'milestone:"v6.0.0"'
 gh search issues --repo flyingrobots/bijou --state open --no-milestone
-gh pr list --repo flyingrobots/bijou --state open
+gh search prs --repo flyingrobots/bijou --state open --no-milestone
 ```
 
 When roadmap triage changes:
