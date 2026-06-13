@@ -23,10 +23,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selection, and the project markdownlint config disables the Markdown
   line-length rule so links and tables are not wrapped by policy.
 - **Post-DX-045 roadmap signposts** — `docs/BEARING.md` and `docs/ROADMAP.md`
-  now mark DX-045 as landed, set DX-046 as the next #302 pull for a real
-  GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone counts
-  from GitHub, and move the closed legacy-theme cleanup issue into closed
-  Beyond lineage.
+  now mark DX-045 as landed, set DX-046 as the next #302-derived pull for a
+  real GraphQL-authored DOGFOOD block fixture, refresh the Beyond milestone
+  counts from GitHub, and move the closed legacy-theme cleanup issue into
+  closed Beyond lineage.
 - **Release policy evidence gates** — `docs/release.md` now adapts the
   release-runbook pattern to Bijou's npm-only workspace publishing model,
   requires branch-first release prep, release evidence packets, human review
@@ -42,7 +42,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   prove terminal output, assert `graphql-bijou-block-debug/1` facts for groups,
   fields, source maps, i18n keys, token refs, actions, bindings, lower modes,
   and hashes, and reject malformed fixture facts before terminal proof. This
-  advances issue #329 and keeps parent issue #302 as the broad V8 tracker.
+  closes issue #329 and keeps parent issue #302 as the broad V8 tracker.
 - **Portable UI scene IR seed** — `@flyingrobots/bijou` now exports the first
   `ui-scene-ir/1` runtime contract for portable Bijou block and component
   proof: deterministic SHA-256 scene hashing, structural receipts, validation of node,
