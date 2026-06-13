@@ -1,13 +1,56 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS,
   collectDogfoodI18nDebt,
   collectDogfoodMarkdownLocalizationDebt,
+  discoverDogfoodI18nDebtSources,
   evaluateDogfoodI18nDebtRatchet,
   evaluateDogfoodMarkdownLocalizationRatchet,
 } from '../examples/docs/i18n-debt.js';
 import { runDogfoodI18nDebtInventory } from './dogfood-i18n-debt.js';
 
 describe('DOGFOOD i18n debt inventory', () => {
+  it('discovers new DOGFOOD docs modules while keeping tooling exclusions explicit', () => {
+    const sources = discoverDogfoodI18nDebtSources({
+      paths: [
+        'examples/docs/app.ts',
+        'examples/docs/dogfood-shell-themes.ts',
+        'examples/docs/i18n/new-docs-module.ts',
+        'examples/docs/i18n-debt.ts',
+        'examples/docs/content/guide.md',
+        'examples/hello/hello.ts',
+      ],
+    });
+
+    expect(sources).toEqual([
+      { surface: 'docs-app', path: 'examples/docs/app.ts' },
+      { surface: 'dogfood-shell-themes', path: 'examples/docs/dogfood-shell-themes.ts' },
+      { surface: 'i18n-new-docs-module', path: 'examples/docs/i18n/new-docs-module.ts' },
+    ]);
+    expect(DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS).toContainEqual({
+      path: 'examples/docs/i18n-debt.ts',
+      reason: 'localization debt scanner implementation, not a DOGFOOD product surface',
+    });
+  });
+
+  it('fails the ratchet when a newly discovered DOGFOOD module adds raw visible text', () => {
+    const sources = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/new-docs-module.ts'],
+    }).map((source) => ({
+      ...source,
+      text: "export const label = 'Fresh DOGFOOD Label';",
+    }));
+    const inventory = collectDogfoodI18nDebt({ sources });
+    const result = evaluateDogfoodI18nDebtRatchet(inventory, {
+      total: 0,
+      bySurface: {},
+    });
+
+    expect(inventory.bySurface).toEqual([{ surface: 'new-docs-module', count: 1 }]);
+    expect(result.ok).toBe(false);
+    expect(result.violations).toContain('new-docs-module 1 exceeds baseline 0');
+  });
+
   it('counts uncataloged visible strings while ignoring ids, paths, and catalog fallbacks', () => {
     const inventory = collectDogfoodI18nDebt({
       sources: [{

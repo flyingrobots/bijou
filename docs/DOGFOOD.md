@@ -139,7 +139,8 @@ reconstructing product truth from adjacent rendering code.
 - **Locale Preference**: The Settings drawer can switch DOGFOOD's preferred
   language after startup, while startup itself uses the host locale adapter.
 - **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining
-  localizable source strings by DOGFOOD surface plus missing Markdown
+  localizable source strings by DOGFOOD surface across `examples/docs/**/*.ts`
+  modules, keeps tooling-only exclusions documented, counts missing Markdown
   localizations by locale, and fails when either baseline increases.
 - **Localization Completeness Gate**: `npm run dogfood:i18n:complete` requires
   every newly added or source-changed DOGFOOD string to carry current values for

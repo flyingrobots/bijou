@@ -199,6 +199,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🛠 Maintenance
 
+- **Milestone-aware release readiness report** — `npm run release:readiness`
+  now accepts `-- --milestone vX.Y.Z`, prints a release-readiness report before
+  the local gauntlet, and blocks when the target milestone still has open
+  tracker issues, lingering `work-in-progress` labels, stale release docs, a
+  missing versioned release evidence packet, or missing package-smoke
+  coverage. This addresses issue #270.
+- **DOGFOOD i18n debt source discovery** — `npm run dogfood:i18n:debt` now
+  discovers DOGFOOD TypeScript modules under `examples/docs/**/*.ts` by
+  default, keeps tooling-only exclusions explicit, and updates the raw-string
+  baseline to cover newly scanned DOGFOOD block, shell-theme, guard, and helper
+  modules. This addresses issue #312.
 - **Design token and theme builder planning** —
   `docs/design/DL-013-design-token-theme-builder-api.md` now specifies the
   first official fluent-builder shape for semantic color tokens, dark/light

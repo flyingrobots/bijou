@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { posix as posixPath } from 'node:path';
 import ts from 'typescript';
 import { parse as parseYaml } from 'yaml';
@@ -21,6 +21,11 @@ export interface DogfoodI18nDebtEntry {
 export interface DogfoodI18nDebtSurfaceCount {
   readonly surface: string;
   readonly count: number;
+}
+
+export interface DogfoodI18nDebtSourceExclusion {
+  readonly path: string;
+  readonly reason: string;
 }
 
 export interface DogfoodI18nDebtInventory {
@@ -90,23 +95,67 @@ interface DogfoodMarkdownLocalizationSpec {
 
 type DogfoodMarkdownFileReader = (path: string) => string;
 
-export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = Object.freeze([
-  { surface: 'docs-app', path: 'examples/docs/app.ts' },
-  { surface: 'dogfood-locale', path: 'examples/docs/locale.ts' },
-  { surface: 'component-stories', path: 'examples/docs/stories.ts' },
-  { surface: 'storybook-app', path: 'examples/docs/storybook-app.ts' },
-  { surface: 'storybook-workstation', path: 'examples/docs/storybook-workstation.ts' },
-  { surface: 'storybook-entrypoint', path: 'examples/docs/storybook.ts' },
+const DOGFOOD_I18N_DEBT_ROOT = 'examples/docs';
+
+export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSourceExclusion[] = Object.freeze([
+  {
+    path: 'examples/docs/i18n-debt.ts',
+    reason: 'localization debt scanner implementation, not a DOGFOOD product surface',
+  },
 ]);
 
+const DOGFOOD_I18N_DEBT_SURFACE_NAMES: Readonly<Record<string, string>> = Object.freeze({
+  'examples/docs/app.ts': 'docs-app',
+  'examples/docs/locale.ts': 'dogfood-locale',
+  'examples/docs/stories.ts': 'component-stories',
+  'examples/docs/storybook-app.ts': 'storybook-app',
+  'examples/docs/storybook-workstation.ts': 'storybook-workstation',
+  'examples/docs/storybook.ts': 'storybook-entrypoint',
+});
+
+export function discoverDogfoodI18nDebtSources(
+  options: {
+    readonly rootPath?: string;
+    readonly paths?: readonly string[];
+  } = {},
+): readonly DogfoodI18nDebtSource[] {
+  const rootPath = options.rootPath ?? DOGFOOD_I18N_DEBT_ROOT;
+  const excludedPaths = new Set(DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS.map((entry) => entry.path));
+  const paths = options.paths ?? listRepoTypescriptFiles(rootPath);
+  return Object.freeze(paths
+    .filter((path) => path.startsWith(`${rootPath}/`))
+    .filter((path) => /\.tsx?$/.test(path) && !/\.d\.ts$/.test(path))
+    .filter((path) => !excludedPaths.has(path))
+    .sort()
+    .map((path) => Object.freeze({
+      surface: dogfoodI18nDebtSurface(path, rootPath),
+      path,
+    })));
+}
+
+export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
+
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 1993,
+  total: 2772,
   bySurface: Object.freeze({
-    'component-stories': 1638,
-    'docs-app': 299,
+    'capture-main': 17,
+    'component-stories': 1631,
+    'counter-block-demo': 56,
+    coverage: 1,
+    'docs-app': 258,
+    'dogfood-blocks': 681,
     'dogfood-locale': 12,
+    'dogfood-shell-themes': 6,
+    'i18n-dogfood-authoring': 1,
+    'i18n-dogfood-catalog': 3,
+    'i18n-missing-localization': 3,
+    localization: 1,
+    'node-locale': 7,
+    'release-title': 44,
     'storybook-app': 37,
     'storybook-workstation': 7,
+    'svg-raster': 2,
+    'terminal-guard': 5,
   }),
 });
 
@@ -225,7 +274,7 @@ export function collectDogfoodMarkdownLocalizationDebt(
     readonly templateValues?: Readonly<Record<string, string>>;
   } = {},
 ): DogfoodMarkdownLocalizationInventory {
-  const sources = options.sources ?? [{ surface: 'docs-app', path: 'examples/docs/app.ts' }];
+  const sources = options.sources ?? DOGFOOD_I18N_DEBT_SOURCES;
   const locales = options.locales ?? DOGFOOD_LOCALE_OPTIONS.map((option) => option.id);
   const defaultLocale = options.defaultLocale ?? DEFAULT_LOCALE.id;
   const targetLocales = locales.filter((locale) => locale !== defaultLocale);
@@ -269,6 +318,35 @@ export function collectDogfoodMarkdownLocalizationDebt(
     byLocale,
     total: entries.length,
   });
+}
+
+function listRepoTypescriptFiles(rootPath: string): readonly string[] {
+  const files: string[] = [];
+
+  function visit(repoPath: string): void {
+    for (const entry of readdirSync(repoUrl(repoPath), { withFileTypes: true })) {
+      const entryPath = posixPath.join(repoPath, entry.name);
+      if (entry.isDirectory()) {
+        visit(entryPath);
+        continue;
+      }
+      if (entry.isFile() && /\.tsx?$/.test(entry.name) && !/\.d\.ts$/.test(entry.name)) {
+        files.push(entryPath);
+      }
+    }
+  }
+
+  visit(rootPath);
+  return Object.freeze(files.sort());
+}
+
+function dogfoodI18nDebtSurface(path: string, rootPath: string): string {
+  const explicit = DOGFOOD_I18N_DEBT_SURFACE_NAMES[path];
+  if (explicit != null) return explicit;
+  return path
+    .slice(rootPath.length + 1)
+    .replace(/\.tsx?$/, '')
+    .replaceAll('/', '-');
 }
 
 export function evaluateDogfoodMarkdownLocalizationRatchet(
@@ -713,11 +791,15 @@ function isImportOrExportDeclaration(node: ts.Node): boolean {
 }
 
 function readRepoFile(path: string): string {
-  return readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+  return readFileSync(repoUrl(path), 'utf8');
 }
 
 function repoFileExists(path: string): boolean {
-  return existsSync(new URL(`../../${path}`, import.meta.url));
+  return existsSync(repoUrl(path));
+}
+
+function repoUrl(path: string): URL {
+  return new URL(`../../${path}`, import.meta.url);
 }
 
 function defaultMarkdownTemplateValues(): Readonly<Record<string, string>> {

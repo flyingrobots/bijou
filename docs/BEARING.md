@@ -71,15 +71,15 @@ Current direction and active tensions. Historical ship data is in
 
 ### 0. Advance Runtime Graph And Scene IR From Proof To Product Fixture
 
-- `DX-043`, `DX-044`, and `DX-045` landed the portable `ui-scene-ir/1` seed,
+- `DX-043`, `DX-044`, `DX-045`, and `DX-046` landed the portable
+  `ui-scene-ir/1` seed,
   the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
-  and deterministic debug facts for #302.
-- The next active pull is `DX-046` / #329: one real DOGFOOD block or panel
-  authored as GraphQL SDL, compiled to `bijou-block/1`, lowered to
-  `ui-scene-ir/1`, and proven through terminal output plus debug facts. This
-  keeps the work inside Bijou one more slice before Wesley or Geordi
-  integration while #302 remains the broad V8/Beyond tracker.
-- The useful proof path is now:
+  deterministic debug facts, and the first real GraphQL-authored DOGFOOD
+  NavigationListBlock fixture for #302.
+- The broad #302 tracker remains in `Beyond` for V8. The v7.1 feature proof is
+  complete; the active v7.1 pull is now release-prep guardrail work for #270
+  and #312.
+- The proof path that v7.1 now carries is:
 
   ```text
   GraphQL SDL fixture
@@ -96,8 +96,8 @@ Current direction and active tensions. Historical ship data is in
 - The `v6.0.0` and `v7.0.0` GitHub milestone lanes are complete release
   lineage with zero open items, not the next implementation target.
 - The next selected public release target is `v7.1.0`: a small post-V7 minor
-  release for accumulated `Unreleased` work plus DX-046 as the final planned
-  implementation pull.
+  release for accumulated `Unreleased` work plus DX-046 as closed feature
+  proof and #270/#312 as release-prep guardrails.
 - There is no planned `v7.2.0` feature train. After `v7.1.0`, new feature work
   should shape toward `v8.0.0` unless maintenance pressure requires a narrow
   patch or stabilization release.
@@ -116,7 +116,7 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Shape V8 And V9 From Beyond
 
-- The `Beyond` milestone is the current post-v7 backlog: 33 open and 4 closed
+- The `Beyond` milestone is the current post-v7 backlog: 30 open and 5 closed
   milestone items as of the latest roadmap sync.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
   versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
@@ -153,34 +153,28 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate feature focus is `DX-046`: a GraphQL-authored DOGFOOD block
-fixture for #329, the release-scoped child of #302. This is a post-v7 proof
-slice, not a `v6.0.0` or `v7.0.0` release-readiness task.
+The immediate release-prep focus is #270 and #312 for `v7.1.0`.
 
-DX-046 is also the final planned implementation pull for `v7.1.0`. After it
-lands, the repo should move into release prep unless the open dependency PR is
-green and low-risk enough to include.
+#270 must make release readiness issue-complete rather than vibe-complete:
+`npm run release:readiness -- --milestone vX.Y.Z` should print a concise
+milestone report, reject open tracker issues or lingering `work-in-progress`
+labels, confirm obvious roadmap/bearing/changelog posture, require the
+versioned release evidence packet, and preserve package-smoke coverage.
 
-The `DX-046` validation pass must prove:
-
-- one existing DOGFOOD block or panel has a checked-in GraphQL SDL source
-- that SDL compiles into a deterministic grouped `bijou-block/1` artifact
-- the artifact lowers into valid `ui-scene-ir/1`
-- terminal proof preserves source maps, tokens, i18n keys, actions, bindings,
-  lower modes, receipt hashes, and `graphql-bijou-block-debug/1` facts
-- failure tests catch missing product facts such as invalid token refs,
-  missing localization posture, duplicate ids, or broken group references
+#312 must make DOGFOOD i18n debt coverage source-complete rather than
+list-complete: new `examples/docs/**/*.ts` modules should participate in the
+debt ratchet by default unless explicitly excluded as tooling-only, and the
+ratchet should keep reporting counts by source surface.
 
 Recommended pull order:
 
-1. Land this release-train roadmap decision.
-2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #329.
-3. Include dependency PR #326 only if it is green, low-risk, and still useful
+1. Land the #270/#312 release-prep guardrail pull.
+2. Include dependency PR #326 only if it is green, low-risk, and still useful
    before release prep.
-4. Create or update the `v7.1.0` release packet, move only selected tracker
+3. Create or update the `v7.1.0` release packet, move only selected tracker
    items into it, and cut `v7.1.0` from a clean release branch.
-5. Shape `v8.0.0` around the Runtime Graph And Scene IR product contract.
-6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+4. Shape `v8.0.0` around the Runtime Graph And Scene IR product contract.
+5. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
 
 Non-goals for the next cycle:
@@ -188,7 +182,8 @@ Non-goals for the next cycle:
 - no feature-train `v7.2.0`
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
-- no full visual redesign of DOGFOOD while DX-046 is still the active proof
+- no full visual redesign of DOGFOOD during the v7.1 release-prep guardrail
+  pull
 - no conversion of every leaf component into a Block
 - no hidden global block registry
 - no localization runtime rewrite
