@@ -47,18 +47,21 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
     expect(roadmap).toContain('The latest shipped public release is');
     expect(roadmap).toContain('v7.0.0');
-    expect(roadmap).toContain('No next public release version is selected here.');
+    expect(roadmap).toContain('This roadmap is the forward-looking release horizon for Bijou.');
+    expect(roadmap).toContain('No next public release version is selected.');
+    expect(roadmap).toContain('v6.0.0` was never published as a public package release');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
-    expect(roadmap).toContain('Not a pending package tag.');
+    expect(roadmap).toContain('Skipped public release milestone.');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
-    expect(roadmap).toContain('Latest shipped public release lineage');
+    expect(roadmap).toContain('Latest shipped release lineage.');
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('33 | 4');
-    expect(roadmap).toContain('Active Post-v7 Pull');
+    expect(roadmap).toContain('Next Pull');
     expect(roadmap).toContain('DX-046: GraphQL-authored DOGFOOD block fixture for #302');
-    expect(roadmap).toContain('Post-v7 Candidate Goalposts');
+    expect(roadmap).toContain('Forward Candidate Goalposts');
+    expect(roadmap).toContain('Decision Points');
     expect(roadmap).toContain('Runtime Graph And Scene IR');
     expect(roadmap).toContain('DOGFOOD And BlockLab Product Surface');
     expect(roadmap).toContain('Design Tokens And Theme Modes');
@@ -73,6 +76,8 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#249]');
     expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
     expect(roadmap).toContain('[#326]');
+    expect(roadmap).toContain('Closed Lineage');
+    expect(roadmap).toContain('Skipped public release; closed milestone');
 
     expect(roadmap).not.toContain('release-readiness validation before tagging');
     expect(roadmap).not.toContain('should not tag until release-readiness validation');
@@ -121,7 +126,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     const openBeyondIssues = sectionBetween(
       roadmap,
       '## Open Beyond Issues',
-      '## Closed Beyond Lineage',
+      '## Open Unmilestoned Triage',
     );
     const openIssueRows = openBeyondIssues
       .split('\n')

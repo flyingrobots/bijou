@@ -1,4 +1,4 @@
-# WF-131 Roadmap Current Reality Refresh
+# WF-131 Roadmap Forward-Looking Refresh
 
 ## Linked Legend
 
@@ -6,9 +6,9 @@ WF - Workflow and Delivery
 
 ## Decision Summary
 
-Refresh `docs/ROADMAP.md` and `docs/BEARING.md` so they describe the current
-post-`v7.0.0` reality instead of implying the closed `v6.0.0` and `v7.0.0`
-milestone lanes still need release-readiness work before tagging.
+Refresh `docs/ROADMAP.md` and `docs/BEARING.md` so they describe the forward
+post-`v7.0.0` release horizon instead of implying the closed `v6.0.0` and
+`v7.0.0` milestone lanes still need release-readiness work before tagging.
 
 ## Sponsor Human
 
@@ -24,15 +24,18 @@ closed release lanes.
 ## Hill
 
 By the end of this cycle, the roadmap names `v7.0.0` as the latest shipped
-public release, treats `v6.0.0` and `v7.0.0` milestones as closed lineage,
-keeps `Beyond` as the post-v7 backlog, surfaces unmilestoned triage and open
-pull requests, and preserves deterministic tests for the GitHub-backed counts.
+public release, records that `v6.0.0` was skipped as a public package release,
+treats closed milestones as lineage, foregrounds the next active pull and
+forward candidate goalposts, surfaces unmilestoned triage and open pull
+requests, and preserves deterministic tests for the GitHub-backed counts.
 
 ## Current Truth
 
 Verified against GitHub on 2026-06-13.
 
 - Latest public release tag: `v7.0.0`.
+- `v6.0.0` was skipped as a public package release; its milestone is closed
+  tracker lineage.
 - GitHub milestone `v6.0.0`: 0 open, 30 closed milestone items.
 - GitHub milestone `v7.0.0`: 0 open, 27 closed milestone items.
 - GitHub milestone `Beyond`: 33 open, 4 closed milestone items.
@@ -45,18 +48,22 @@ Verified against GitHub on 2026-06-13.
 
 The roadmap's numerical snapshot was recently synced, but the surrounding
 release narrative still read as if V7 had not shipped and as if v6/v7
-release-readiness validation remained the next release-facing action. That
-contradicts `docs/release.md`, which already names `7.0.0` as the latest
-shipped release and says the older v6/v7 milestones are retained as lineage.
+release-readiness validation remained the next release-facing action. It also
+spent too much space on past milestone inventory when the useful work now is
+choosing the next release candidate from `Beyond`. That contradicts
+`docs/release.md`, which already names `7.0.0` as the latest shipped release
+and says the older v6/v7 milestones are retained as lineage.
 
 ## Scope
 
 This cycle includes:
 
-- rewriting the roadmap introduction and release snapshot around the shipped
-  `v7.0.0` boundary
+- rewriting the roadmap around the shipped `v7.0.0` boundary and forward
+  candidate goalposts
+- recording that `v6.0.0` was skipped as a public package release
 - replacing pending-tag wording in v6/v7 sections with closed-lineage wording
 - making the post-v7 active pull explicit
+- adding explicit decision points for when `Beyond` work becomes a release
 - preserving open Beyond issue accounting
 - adding current unmilestoned issue triage and the open dependency PR
 - aligning BEARING with the same release posture
@@ -82,15 +89,14 @@ The reviewer-facing shape is:
 
 ```text
 docs/ROADMAP.md
-  How To Read This File
-  Release Snapshot
-  Latest Shipped Release
-  Closed Lineage
-  Active Post-v7 Pull
-  Post-v7 Candidate Goalposts
+  Current Release State
+  Next Pull
+  Forward Candidate Goalposts
+  Decision Points
   Open Beyond Issues
   Open Unmilestoned Triage
   Open Pull Requests Outside Release Horizons
+  Closed Lineage
 ```
 
 ## Lower Modes

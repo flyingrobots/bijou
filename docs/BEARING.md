@@ -159,7 +159,7 @@ The `DX-046` validation pass must prove:
 
 Recommended pull order:
 
-1. Land this roadmap current-reality refresh.
+1. Land this forward-looking roadmap refresh.
 2. Take `DX-046` GraphQL-authored DOGFOOD block fixture for #302.
 3. Harden the compiler boundary so Wesley can replace the bootstrap parser
    without changing Bijou artifact semantics.
