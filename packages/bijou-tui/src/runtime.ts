@@ -137,8 +137,10 @@ export async function runWithLifecycleHooks<Model, M>(
   // and resized in lockstep with the framebuffers on terminal resize.
   let outBuf: Uint8Array = allocOutBuf(initialViewport.columns, initialViewport.rows);
 
-  function resetFramebuffers(columns: number, rows: number): void {
-    currentSurface = createSurface(columns, rows);
+  function resetFramebuffers(columns: number, rows: number, invalidateFront = false): void {
+    currentSurface = invalidateFront
+      ? createInvalidatedFrontBuffer(columns, rows)
+      : createSurface(columns, rows);
     nextSurface = createSurface(columns, rows);
     outBuf = allocOutBuf(columns, rows);
   }
@@ -509,6 +511,7 @@ export async function runWithLifecycleHooks<Model, M>(
       resetFramebuffers(
         viewport.columns,
         viewport.rows,
+        true,
       );
       clearAndHome(ctx.io);
     }
@@ -673,6 +676,12 @@ const OUTBUF_SLACK = 8192;
  */
 function allocOutBuf(columns: number, rows: number): Uint8Array {
   return new Uint8Array(columns * rows * OUTBUF_BYTES_PER_CELL + OUTBUF_SLACK);
+}
+
+function createInvalidatedFrontBuffer(columns: number, rows: number): Surface {
+  const surface = createSurface(columns, rows, { char: '\0', empty: false });
+  surface.markAllDirty();
+  return surface;
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */

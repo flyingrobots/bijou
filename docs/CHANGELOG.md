@@ -175,6 +175,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Terminal resize repaint recovery** — Interactive resize now invalidates the
+  next front buffer so the first post-resize diff repaints blank cells as well
+  as visible content. DOGFOOD and other full-screen TUIs recover cleanly after
+  sleep, laptop-open, or external-display geometry changes instead of leaving
+  stale terminal cells until a later overlay or keypress touches them.
 - **DOGFOOD Blocks preview navigation** — The Blocks guide navigation now lets
   Up move focus from the first `Block Preview` child back to the `Block Preview`
   parent row instead of snapping focus back to `AppShell`.
