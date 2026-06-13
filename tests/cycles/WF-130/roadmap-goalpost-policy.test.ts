@@ -134,6 +134,14 @@ describe('WF-130 roadmap goalpost policy', () => {
     );
   });
 
+  it('requires audit comments for moves across all release horizons', () => {
+    const bearing = normalizeWhitespace(read('docs/BEARING.md'));
+
+    expect(bearing).toContain('Any issue or pull request moved between release horizons');
+    expect(bearing).toContain('`v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`');
+    expect(bearing).not.toContain('Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond`');
+  });
+
   it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
     const agents = normalizeWhitespace(read('AGENTS.md'));
     const contributing = normalizeWhitespace(read('CONTRIBUTING.md'));

@@ -109,8 +109,9 @@ Current direction and active tensions. Historical ship data is in
 - `docs/method/backlog/` is evidence and lineage, not the primary planning UI.
 - `ROADMAP.md` is the human-readable mirror of milestone triage, not an
   independent source of truth.
-- Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond` should get a GitHub
-  comment and a matching roadmap update.
+- Any issue or pull request moved between release horizons, including
+  `v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` / `v7.0.0`
+  lanes, should get a GitHub comment and a matching roadmap update.
 
 ### 3. Shape V8 And V9 From Beyond
 
