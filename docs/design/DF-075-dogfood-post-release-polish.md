@@ -15,7 +15,7 @@ keywords:
 
 # DF-075 DOGFOOD Post-Release Polish
 
-Legend: [DF - DOGFOOD](../legends/DF-dogfood.md)
+Legend: [DF - DOGFOOD](../legends/DF-dogfood-field-guide.md)
 
 ## Linked Work
 
@@ -104,7 +104,7 @@ navigation fix that lets focus move from the first preview child back to the
 
 1. Does pressing `Tab` repeatedly leave the footer visible and themed?
 2. Does the quit confirmation render with compact themed geometry and readable
-   `Yes` / `No` actions?
+   `Y Quit` / `N Stay` actions?
 3. Does opening Blocks, or activating `Block Preview`, show
    `CounterDemoBlock` first?
 4. Does arrow navigation still allow the `Block Preview` parent row to receive
