@@ -348,7 +348,7 @@ release-readiness hardening.
   resets, Blocks preview navigation, title perf HUD ownership, and quit-copy
   cleanup.
 - Release prep is more auditable with milestone-aware
-  `release:readiness -- --milestone vX.Y.Z` and source-complete DOGFOOD i18n
+  `release:readiness -- --milestone v7.1.0` and source-complete DOGFOOD i18n
   debt discovery.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form

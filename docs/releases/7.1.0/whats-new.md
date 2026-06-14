@@ -84,7 +84,7 @@ Several release-review fixes landed in the same release window:
 
 The release process is stricter and more replayable:
 
-- `npm run release:readiness -- --milestone vX.Y.Z` prints a milestone report
+- `npm run release:readiness -- --milestone v7.1.0` prints a milestone report
   and blocks incomplete release prep before running the full local gauntlet
 - DOGFOOD i18n debt discovery now scans `examples/docs/**/*.ts` modules by
   default, with explicit tooling-only exclusions

@@ -6,7 +6,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Documentation
+### Notes
 
 - _Nothing yet._
 
@@ -15,14 +15,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### Documentation
 
 - **Forward-looking roadmap refresh** — `docs/ROADMAP.md`, `docs/BEARING.md`,
-  and `docs/release.md` now treat `v7.0.0` as the latest shipped public release,
-  record that `v6.0.0` was skipped as a public package release, move complete
-  milestone-lane history into lineage, select `v7.1.0` as the next small
-  post-V7 minor release, declare that there is no planned feature `v7.2.0`,
-  reserve `v8.0.0` for the Runtime Graph and Scene IR product contract, reserve
-  `v9.0.0` for Product Workbench and operator surfaces, and foreground DX-046,
-  current unmilestoned triage, and the open dependency PR outside release
-  horizons.
+  and `docs/release.md` now treat `v7.1.0` as the current shipped public
+  release, record that `v6.0.0` was skipped as a public package release, move
+  complete milestone-lane history into lineage, declare that there is no planned
+  feature `v7.2.0`, reserve `v8.0.0` for the Runtime Graph and Scene IR product
+  contract, reserve `v9.0.0` for Product Workbench and operator surfaces, and
+  foreground DX-046, current unmilestoned triage, and the open dependency PR
+  outside release horizons.
 - **Roadmap review follow-up** — `docs/ROADMAP.md` now routes unmilestoned
   issues only toward the selected `v7.1.0` / `v8.0.0` / `v9.0.0` / `v10.0.0+`
   train, marks dependency PR #326 as candidate-only until release-packet
@@ -206,7 +205,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🛠 Maintenance
 
 - **Milestone-aware release readiness report** — `npm run release:readiness`
-  now accepts `-- --milestone vX.Y.Z`, prints a release-readiness report before
+  now accepts `-- --milestone v7.1.0`, prints a release-readiness report before
   the local gauntlet, and blocks when the target milestone still has open
   tracker issues, lingering `work-in-progress` labels, stale release docs, a
   missing versioned release evidence packet, or missing package-smoke

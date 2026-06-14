@@ -48,31 +48,32 @@ describe('WF-130 roadmap goalpost policy', () => {
 
     expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-13.');
     expect(roadmap).toContain('The latest shipped public release is');
+    expect(roadmap).toContain('v7.1.0');
     expect(roadmap).toContain('v7.0.0');
     expect(roadmap).toContain('This roadmap is the forward-looking release horizon for Bijou.');
-    expect(roadmap).toContain('The next selected public release target is **`v7.1.0`**');
+    expect(roadmap).toContain('`v7.1.0` is complete post-V7 minor release lineage');
     expect(roadmap).toContain('There is no planned `v7.2.0` feature train.');
     expect(roadmap).toContain('Release Train Decision');
-    expect(roadmap).toContain('`v7.1.0`: Post-V7 Minor');
+    expect(roadmap).toContain('`v7.1.0`: Shipped Post-V7 Minor');
     expect(roadmap).toContain('`v8.0.0`: Runtime Graph And Scene IR Product Contract');
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 2 | 1 |');
-    expect(roadmap).toContain('Selected next release packet.');
-    expect(roadmap).toContain('#270 and #312 are the release-prep guardrail items.');
+    expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
+    expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
+    expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
     expect(roadmap).toContain('`v6.0.0`');
     expect(roadmap).toContain('0 | 30');
     expect(roadmap).toContain('Skipped public release lane.');
     expect(roadmap).toContain('`v7.0.0`');
     expect(roadmap).toContain('0 | 27');
-    expect(roadmap).toContain('Latest shipped release lineage.');
+    expect(roadmap).toContain('Shipped release lineage.');
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('30 | 5');
     expect(roadmap).toContain('Next Pull');
-    expect(roadmap).toContain('#270/#312 release-prep guardrail cycle');
-    expect(roadmap).toContain('milestone-aware release readiness reporting');
-    expect(roadmap).toContain('DOGFOOD i18n debt scanner');
+    expect(roadmap).toContain('V8 Runtime Graph And Scene IR product contract');
+    expect(roadmap).toContain('versioned artifact semantics');
+    expect(roadmap).toContain('canonical DOGFOOD fixtures');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/270');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/312');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/329');
@@ -91,10 +92,11 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#249]');
     expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
     expect(roadmap).toContain('[#326]');
-    expect(roadmap).toContain('candidate-only [#326]');
-    expect(roadmap).toContain('it is not selected for `v7.1.0` until');
-    expect(roadmap).toContain('The `v7.1.0` GitHub milestone is the selected release packet.');
+    expect(roadmap).toContain('was not selected for `v7.1.0`');
+    expect(roadmap).toContain('until it is green, current, and deliberately selected');
+    expect(roadmap).toContain('The `v7.1.0` GitHub milestone is closed release lineage.');
     expect(roadmap).toContain('Closed Lineage');
+    expect(roadmap).toContain('Portable `ui-scene-ir/1` proof');
     expect(roadmap).toContain('Skipped public release; complete lineage');
 
     expect(roadmap).not.toContain('No next public release version is selected.');
@@ -103,16 +105,16 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).not.toContain('Design Tokens And Theme Modes');
     expect(roadmap).not.toContain('Terminal Input And Host Controls');
     expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
-    expect(bearing).toContain('The latest shipped public release is `v7.0.0`');
-    expect(bearing).toContain('The next selected public release target is `v7.1.0`');
-    expect(bearing).toContain('The immediate release-prep focus is #270 and #312 for `v7.1.0`');
+    expect(bearing).toContain('The latest shipped public release is `v7.1.0`');
+    expect(bearing).toContain('The next feature horizon is `v8.0.0`');
+    expect(bearing).toContain('the immediate planning focus is');
     expect(bearing).toContain('There is no planned `v7.2.0` feature train.');
     expect(bearing).toContain('Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 
-    expect(releaseRunbook).toContain('The next selected public release target is **`7.1.0`**');
-    expect(releaseRunbook).toContain('finish #270/#312 as release-prep guardrails');
-    expect(releaseRunbook).toContain('There is no planned feature `7.2.0` train.');
+    expect(releaseRunbook).toContain('The latest shipped release is **`7.1.0`**.');
+    expect(releaseRunbook).toContain('There is no selected feature `7.2.0` train.');
+    expect(releaseRunbook).toContain('New feature work should shape toward `8.0.0`');
     expect(releaseRunbook).not.toContain('No next public release version is selected');
 
     expect(dx046Design).toContain('User story: [#329](https://github.com/flyingrobots/bijou/issues/329)');
@@ -149,7 +151,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(v71Row).not.toContain('https://github.com/flyingrobots/bijou/issues/302');
     expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
     expect(normalizedRoadmap).toContain(
-      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` now owns #329 as closed DX-046 lineage plus #270 and #312 as release-prep guardrails.',
+      'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns #329 as closed DX-046 lineage plus #270 and #312 as release-prep guardrails.',
     );
   });
 

@@ -5,7 +5,7 @@ applications using documented public APIs.
 
 ## Recommended Upgrade
 
-Update all Bijou packages together:
+Update the runtime packages your app uses together:
 
 ```bash
 npm install \
@@ -23,6 +23,12 @@ npm install \
   @flyingrobots/bijou-i18n-tools@7.1.0 \
   @flyingrobots/bijou-i18n-tools-node@7.1.0 \
   @flyingrobots/bijou-i18n-tools-xlsx@7.1.0
+```
+
+If your app uses the Bijou MCP server, keep it lock-step too:
+
+```bash
+npm install @flyingrobots/bijou-mcp@7.1.0
 ```
 
 ## Runtime Behavior
@@ -61,7 +67,7 @@ themeable product surface.
 Maintainers preparing releases should use:
 
 ```bash
-npm run release:readiness -- --milestone vX.Y.Z
+npm run release:readiness -- --milestone v7.1.0
 ```
 
 The milestone-aware mode blocks missing release evidence packets, open target
