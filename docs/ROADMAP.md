@@ -19,7 +19,7 @@ Last synced from GitHub milestone items: 2026-06-13.
 
 The latest shipped public release is
 [`v7.1.0`](https://github.com/flyingrobots/bijou/releases/tag/v7.1.0),
-published from the post-V7 release packet on 2026-06-13.
+published from the post-V7 release packet on 2026-06-14.
 
 `v6.0.0` was never published as a public package release. Its GitHub milestone
 is complete tracker lineage whose work was absorbed before Bijou shipped

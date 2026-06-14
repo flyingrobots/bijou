@@ -19,7 +19,7 @@ prep branch by operator instruction.
 - Release type: stable minor
 - npm dist-tag after publish: `latest`
 - Release-prep branch: `release/v7.1.0`
-- Release date: 2026-06-13
+- Release date: 2026-06-14
 - Publish surface: npm workspace packages only
 
 ## Tracker And Goalpost Map
@@ -171,7 +171,7 @@ first proof slices and fixture evidence, not the full Runtime Graph product.
 
 | Surface | Review disposition |
 | :--- | :--- |
-| `docs/CHANGELOG.md` | Updated from `Unreleased` into `[7.1.0] - 2026-06-13`; content reflects the diff since `v7.0.0`. |
+| `docs/CHANGELOG.md` | Updated from `Unreleased` into `[7.1.0] - 2026-06-14`; content reflects the diff since `v7.0.0`. |
 | `README.md` | Updated with a concise `v7.1.0` user-facing What's New section and links to release docs. |
 | `ARCHITECTURE.md` | Reviewed; no change required for this minor release because package boundaries and port ownership remain unchanged. |
 | `docs/VISION.md` and `docs/METHOD.md` | Reviewed; no change required because project identity and work doctrine did not change. |
@@ -197,11 +197,18 @@ first proof slices and fixture evidence, not the full Runtime Graph product.
 After the release PR is merged and only after explicit operator approval to tag:
 
 1. Fast-forward local `main` to the exact `origin/main` release commit.
-2. Re-run `npm run release:preflight` and `npm run docs:inventory`.
-3. Create the annotated `v7.1.0` tag from clean synced `main`.
-4. Push only `v7.1.0`.
-5. Verify tag guard and publish workflows pass.
-6. Verify npm reports `7.1.0` and `latest` for each automated publish package:
+2. Re-run the live tracker gates:
+   `gh issue list --repo flyingrobots/bijou --milestone v7.1.0 --state open`,
+   `gh pr list --repo flyingrobots/bijou --state open --search 'milestone:v7.1.0'`,
+   and
+   `gh issue list --repo flyingrobots/bijou --state open --label priority:high`.
+   Abort before tagging if any release-blocking item appears without an explicit
+   packeted risk disposition.
+3. Re-run `npm run release:preflight` and `npm run docs:inventory`.
+4. Create the annotated `v7.1.0` tag from clean synced `main`.
+5. Push only `v7.1.0`.
+6. Verify tag guard and publish workflows pass.
+7. Verify npm reports `7.1.0` and `latest` for each automated publish package:
    `@flyingrobots/bijou`, `@flyingrobots/bijou-node`,
    `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`,
    `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`,
@@ -209,7 +216,7 @@ After the release PR is merged and only after explicit operator approval to tag:
    `@flyingrobots/bijou-i18n-tools-node`,
    `@flyingrobots/bijou-i18n-tools-xlsx`, and
    `@flyingrobots/bijou-mcp`.
-7. Verify the GitHub Release exists with generated notes.
+8. Verify the GitHub Release exists with generated notes.
 
 ## Residual Risk
 

@@ -97,7 +97,7 @@ Current direction and active tensions. Historical ship data is in
 ### 1. Keep The Release Posture Honest
 
 - The latest shipped public release is `v7.1.0`, published from the post-V7
-  release packet on 2026-06-13.
+  release packet on 2026-06-14.
 - The `v6.0.0`, `v7.0.0`, and `v7.1.0` GitHub milestone lanes are complete
   release lineage, not the next implementation target.
 - There is no planned `v7.2.0` feature train. New feature work should shape

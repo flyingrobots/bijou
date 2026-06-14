@@ -10,7 +10,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - _Nothing yet._
 
-## [7.1.0] - 2026-06-13
+## [7.1.0] - 2026-06-14
 
 ### Documentation
 
