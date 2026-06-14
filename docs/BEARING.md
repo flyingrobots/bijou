@@ -5,6 +5,10 @@ Current direction and active tensions. Historical ship data is in
 
 ## Recent Ships
 
+- `7.1.0` — post-V7 portable UI proof shipped: `ui-scene-ir/1`,
+  GraphQL-authored `bijou-block/1` artifacts, grouped block debug facts, a real
+  DOGFOOD NavigationListBlock fixture, terminal-rendering fixes, and
+  release-readiness / DOGFOOD i18n guardrails.
 - `RE-035` — mandatory layout envelope and constraint negotiation landed as a
   pure `@flyingrobots/bijou` layout floor: immutable constraints, preferences,
   assigned rectangles, stack/place proof helpers, content measurement seams,
@@ -76,9 +80,9 @@ Current direction and active tensions. Historical ship data is in
   the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
   deterministic debug facts, and the first real GraphQL-authored DOGFOOD
   NavigationListBlock fixture for #302.
-- The broad #302 tracker remains in `Beyond` for V8. The v7.1 feature proof is
-  complete; the active v7.1 pull is now release-prep guardrail work for #270
-  and #312.
+- The broad #302 tracker remains in `Beyond` for V8. The v7.1 feature proof and
+  release-prep guardrails are complete release lineage, not the full Runtime
+  Graph product.
 - The proof path that v7.1 now carries is:
 
   ```text
@@ -92,15 +96,15 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Keep The Release Posture Honest
 
-- The latest shipped public release is `v7.0.0`, published on 2026-06-03.
-- The `v6.0.0` and `v7.0.0` GitHub milestone lanes are complete release
-  lineage with zero open items, not the next implementation target.
-- The next selected public release target is `v7.1.0`: a small post-V7 minor
-  release for accumulated `Unreleased` work plus DX-046 as closed feature
-  proof and #270/#312 as release-prep guardrails.
-- There is no planned `v7.2.0` feature train. After `v7.1.0`, new feature work
-  should shape toward `v8.0.0` unless maintenance pressure requires a narrow
-  patch or stabilization release.
+- The latest shipped public release is `v7.1.0`, published from the post-V7
+  release packet on 2026-06-14.
+- The `v6.0.0`, `v7.0.0`, and `v7.1.0` GitHub milestone lanes are complete
+  release lineage, not the next implementation target.
+- There is no planned `v7.2.0` feature train. New feature work should shape
+  toward `v8.0.0` unless maintenance pressure requires a narrow `v7.1.x` patch
+  or stabilization release.
+- The next feature horizon is `v8.0.0`: the Runtime Graph and Scene IR product
+  contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
   the release process lives in [release.md](./release.md).
 
@@ -130,11 +134,11 @@ Current direction and active tensions. Historical ship data is in
 
 ## Tensions
 
-- **Closed Release Gravity**: `v6.0.0` and `v7.0.0` are complete release
-  lineage. Do not use either lane for new feature work.
-- **Minor-Release Temptation**: `v7.1.0` should stay small. Adding a full
-  workbench, theme lab, localization suite, Wesley path, or Geordi path turns it
-  into V8/V9 work.
+- **Closed Release Gravity**: `v6.0.0`, `v7.0.0`, and `v7.1.0` are complete
+  release lineage. Do not use those lanes for new feature work.
+- **Minor-Release Temptation**: Do not reopen v7.1.0 as a feature train. Adding
+  a full workbench, theme lab, localization suite, Wesley path, or Geordi path
+  turns the work into V8/V9 scope.
 - **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
   New product-facing work should consume geometry contracts, not bypass them
   with bespoke string/surface measurement.
@@ -153,37 +157,39 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate release-prep focus is #270 and #312 for `v7.1.0`.
+After the `v7.1.0` tag and publish verification, the immediate planning focus is
+`v8.0.0`.
 
-#270 must make release readiness issue-complete rather than vibe-complete:
-`npm run release:readiness -- --milestone vX.Y.Z` should print a concise
-milestone report, reject open tracker issues or lingering `work-in-progress`
-labels, confirm obvious roadmap/bearing/changelog posture, require the
-versioned release evidence packet, and preserve package-smoke coverage.
+V8 must turn the proof chain into product contract:
 
-#312 must make DOGFOOD i18n debt coverage source-complete rather than
-list-complete: new `examples/docs/**/*.ts` modules should participate in the
-debt ratchet by default unless explicitly excluded as tooling-only, and the
-ratchet should keep reporting counts by source surface.
+```text
+GraphQL SDL fixture
+  -> bijou-block/1 grouped artifact
+    -> ui-scene-ir/1
+      -> terminal Surface proof
+        -> graphql-bijou-block-debug/1 facts
+          -> DOGFOOD product facts
+```
 
 Recommended pull order:
 
-1. Land the #270/#312 release-prep guardrail pull.
-2. Include dependency PR #326 only if it is green, low-risk, and still useful
-   before release prep.
-3. Create or update the `v7.1.0` release packet, move only selected tracker
-   items into it, and cut `v7.1.0` from a clean release branch.
-4. Shape `v8.0.0` around the Runtime Graph And Scene IR product contract.
-5. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+1. Finish final `v7.1.0` tag, publish, npm, and GitHub Release verification from
+   the exact merged `origin/main` release commit.
+2. Shape #302 into a V8 design packet with artifact semantics, receipt
+   invariants, source-map ownership, lower-mode contracts, and failure cases.
+3. Promote only the Runtime Graph and Scene IR issues needed for that contract
+   out of `Beyond`.
+4. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
+5. Keep dependency PR #326 outside release horizons until it is green, current,
+   and deliberately selected.
 
 Non-goals for the next cycle:
 
 - no feature-train `v7.2.0`
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
-- no full visual redesign of DOGFOOD during the v7.1 release-prep guardrail
-  pull
+- no full visual redesign of DOGFOOD as a post-release cleanup for `v7.1.0`
 - no conversion of every leaf component into a Block
 - no hidden global block registry
 - no localization runtime rewrite

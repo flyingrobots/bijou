@@ -191,8 +191,12 @@ substitute for the command and immutable input that produced it.
 
 ### Latest Shipped Release
 
-The latest shipped release is **`7.0.0`**.
+The latest shipped release is **`7.1.0`**.
 
+- `7.1.0` - portable `ui-scene-ir/1` proof, GraphQL-authored
+  `bijou-block/1` artifacts, grouped debug facts, a real DOGFOOD
+  NavigationListBlock fixture, terminal-rendering fixes, release-readiness
+  guardrails, and DOGFOOD i18n debt coverage
 - `7.0.0` - DOGFOOD release identity, BlockLab naming, release-facing proof,
   theme/token work, image-to-glyph tooling, and V7 title-screen polish
 - `5.0.0` - frame-owned hosted runner, Node-host theme selection,
@@ -214,25 +218,20 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-The next selected public release target is **`7.1.0`**.
+There is no selected feature `7.2.0` train.
 
-The latest shipped package release is `7.0.0`. The older `v6.0.0` milestone
-and the `v7.0.0` milestone are both zero-open tracker lanes retained as release
-lineage, not as the next target. `7.1.0` should stay a small post-V7 minor:
-ship the accumulated `Unreleased` work, carry landed DX-046 issue #329 as the
-final planned feature proof, and finish #270/#312 as release-prep guardrails
-before the release packet is cut.
+The latest shipped package release is `7.1.0`. The older `v6.0.0`, `v7.0.0`,
+and `v7.1.0` milestones are zero-open tracker lanes retained as release lineage,
+not as the next target.
 
-There is no planned feature `7.2.0` train. After `7.1.0`, new feature work
-should shape toward `8.0.0` unless a bug, security, dependency, or
-release-process reason justifies a narrow maintenance release.
+New feature work should shape toward `8.0.0`: the Runtime Graph and Scene IR
+product contract built from the proof chain that `7.1.0` shipped. Use `7.1.x`
+or, if semver requires it, `7.2.x` only for bounded maintenance: bug fixes,
+security fixes, dependency fixes, or release-process corrections.
 
-The `v7.1.0` GitHub milestone is the selected release packet. DX-046 issue #329
-has landed; #270 and #312 are the selected release-prep guardrails before the
-release packet is cut. Before release prep begins, keep the selected scope
-reflected in
+Before the next release-prep cycle begins, keep the selected scope reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live
-tracker, and the versioned release packet.
+tracker, and the versioned release packet for that target.
 
 ### Lock-step Versioned Units
 
