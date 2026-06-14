@@ -82,7 +82,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('help.key.stay', 'Stay'),
     message('quit.title', 'Quit?'),
     message('quit.body', 'Quit this app?'),
-    message('quit.footer', 'Y quit • N stay'),
+    message('quit.footer', 'Y Quit • N Stay'),
     message('mode.normal', 'NORMAL'),
     message('mode.palette', 'PALETTE'),
     message('mode.help', 'HELP'),

@@ -2101,7 +2101,7 @@ function createInitialExplorerModel(
 ): DocsExplorerModel {
   const expandedFamilies = Object.fromEntries(STORY_FAMILIES.map((family) => [family.id, false]));
   const guideItems = guideItemsForPage(pageId);
-  return {
+  const model: DocsExplorerModel = {
     layoutVariant: resolveDocsLayoutVariant(ctx.runtime.columns, ctx.runtime.rows),
     familyState: createBrowsableListState({
       items: buildFamilyItems(expandedFamilies),
@@ -2124,6 +2124,9 @@ function createInitialExplorerModel(
     landingQualityMode: 'auto',
     counterBlockDemo: createCounterDemoModel(5),
   };
+  return pageId === BLOCKS_PAGE_ID
+    ? selectGuide(pageId, model, COUNTER_DEMO_BLOCK_GUIDE_ID)
+    : model;
 }
 
 function createInitialComponentsExplorerModel(
@@ -2388,8 +2391,7 @@ function selectedGuide(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc |
 
 function resolveSelectableGuideId(pageId: DocsPageId, guideId: string): string {
   if (pageId === BLOCKS_PAGE_ID && guideId === BLOCK_PREVIEW_GUIDE_ID) {
-    const firstBlock = standardBlocks[0];
-    return firstBlock == null ? guideId : blockPreviewGuideId(firstBlock);
+    return COUNTER_DEMO_BLOCK_GUIDE_ID;
   }
 
   return guideId;
@@ -2426,12 +2428,7 @@ function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerM
   const doc = focusedGuideDoc(pageId, model);
   if (doc == null) return model;
   if (doc.id === BLOCK_PREVIEW_GUIDE_ID) {
-    const firstBlock = standardBlocks[0];
-    if (firstBlock == null) return model;
-    return {
-      ...model,
-      selectedGuideId: blockPreviewGuideId(firstBlock),
-    };
+    return model;
   }
   if (
     doc.id !== COUNTER_DEMO_BLOCK_GUIDE_ID

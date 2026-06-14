@@ -303,10 +303,10 @@ import {
 } from '@flyingrobots/bijou-tui';
 
 const recognizer = createInputGestureRecognizer({ doubleTapMs: 300 });
-const actions = createInputActionMap<{ type: 'toggle-footer' }>()
-  .bind('footer.doubleTab', 'Toggle footer', [
-    { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
-  ], { type: 'toggle-footer' });
+const actions = createInputActionMap<{ type: 'open-jump-list' }>()
+  .bind('nav.doubleG', 'Open jump list', [
+    { deviceId: 'keyboard', featureId: 'key.g', type: 'double-tap' },
+  ], { type: 'open-jump-list' });
 
 const action = actions.handle(recognizer.observeKey(keyMsg, ctx.runtime.clock.now()));
 ```

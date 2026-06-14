@@ -233,10 +233,10 @@ import {
 } from '@flyingrobots/bijou-tui';
 
 const recognizer = createInputGestureRecognizer({ doubleTapMs: 300 });
-const actions = createInputActionMap<{ type: 'toggle-footer' }>()
-  .bind('footer.doubleTab', 'Toggle footer', [
-    { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
-  ], { type: 'toggle-footer' });
+const actions = createInputActionMap<{ type: 'open-jump-list' }>()
+  .bind('nav.doubleG', 'Open jump list', [
+    { deviceId: 'keyboard', featureId: 'key.g', type: 'double-tap' },
+  ], { type: 'open-jump-list' });
 
 const inputEvent = recognizer.observeKey(keyMsg, ctx.runtime.clock.now());
 const action = actions.handle(inputEvent);
@@ -245,10 +245,10 @@ const action = actions.handle(inputEvent);
 Feature-event patterns are arrays so compound inputs can stay declarative:
 
 ```typescript
-actions.bind('ctrlDoubleTab', 'Ctrl double-tap Tab', [
+actions.bind('ctrlDoubleG', 'Ctrl double-tap G', [
   { deviceId: 'keyboard', featureId: 'modifier.ctrl', type: 'held' },
-  { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
-], { type: 'toggle-footer' });
+  { deviceId: 'keyboard', featureId: 'key.g', type: 'double-tap' },
+], { type: 'open-jump-list' });
 ```
 
 The recognizer uses caller-provided timestamps instead of owning a timer. That

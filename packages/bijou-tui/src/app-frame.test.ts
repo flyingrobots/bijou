@@ -533,7 +533,7 @@ describe('createFramedApp', () => {
     expect(result.model.focusedPaneByPage.home).toBe('right');
   });
 
-  it('toggles the footer with a double Tab gesture while preserving single Tab pane focus', async () => {
+  it('keeps the footer visible while repeated Tab gestures traverse panes', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -553,7 +553,7 @@ describe('createFramedApp', () => {
     });
     const tab = { type: 'key' as const, key: 'tab', ctrl: false, alt: false, shift: false };
 
-    let [model] = app.init();
+    const [model] = app.init();
     const [afterSingleTab, singleTabCmds] = app.update(tab, model);
 
     expect(afterSingleTab.focusedPaneByPage.home).toBe('right');
@@ -561,38 +561,17 @@ describe('createFramedApp', () => {
     expect(afterSingleTab.footerTranslateY).toBe(0);
     expect(singleTabCmds).toHaveLength(0);
 
-    let footerCmds: Cmd<FramedAppMsg<Msg>>[];
-    [model, footerCmds] = app.update(tab, afterSingleTab);
+    const [afterRepeatedTab, repeatedTabCmds] = app.update(tab, afterSingleTab);
 
-    expect(model.focusedPaneByPage.home).toBe('right');
-    expect(model.footerVisible).toBe(false);
-    expect(footerCmds).toHaveLength(1);
-
-    const hideMessages = await collectCommandMessages(footerCmds[0]!, [0.1, 0.1]);
-    for (const message of hideMessages) {
-      [model] = app.update(message, model);
-    }
-
-    expect(model.footerVisible).toBe(false);
-    expect(model.footerTranslateY).toBe(1);
+    expect(afterRepeatedTab.focusedPaneByPage.home).toBe('left');
+    expect(afterRepeatedTab.footerVisible).toBe(true);
+    expect(afterRepeatedTab.footerTranslateY).toBe(0);
+    expect(repeatedTabCmds).toHaveLength(0);
     expect(surfaceToString(
-      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
-      testCtx.style,
-    )).not.toContain('[NORMAL]');
-
-    [model] = app.update(tab, model);
-    [model, footerCmds] = app.update(tab, model);
-    expect(model.footerVisible).toBe(true);
-
-    const showMessages = await collectCommandMessages(footerCmds[0]!, [0.1, 0.1]);
-    for (const message of showMessages) {
-      [model] = app.update(message, model);
-    }
-
-    expect(model.footerVisible).toBe(true);
-    expect(model.footerTranslateY).toBe(0);
-    expect(surfaceToString(
-      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      normalizeViewOutput(
+        app.view(afterRepeatedTab),
+        { width: afterRepeatedTab.columns, height: afterRepeatedTab.rows },
+      ).surface,
       testCtx.style,
     )).toContain('[NORMAL]');
   });
