@@ -111,6 +111,7 @@ export function createStorybookFrameApp(
     title,
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
+    keyPriority: 'page-first',
     helpLineSource: () => FOOTER_HINT,
     pages: [createStorybookPage(ctx, stories, title, options.initialStoryId)],
   });

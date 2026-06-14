@@ -14,8 +14,12 @@ import {
   renderDogfoodStorybookIndex,
 } from '../../../examples/docs/storybook-workstation.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
+import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { readRepoFile } from '../repo.js';
+
+const KEY_UP = '\x1b[A';
+const KEY_DOWN = '\x1b[B';
 
 describe('DF-027 BlockLab DOGFOOD workstation', () => {
   it('keeps the active cycle doc tied to the playback contract', () => {
@@ -127,5 +131,37 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     expect(text).toContain('Bijou BlockLab');
     expect(text).toContain('BlockLab');
     expect(text).toContain('notification-system');
+  });
+
+  it('lets framed BlockLab navigation keys move the selected story', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+
+    for (const key of [KEY_DOWN, 'j']) {
+      const app = createStorybookFrameApp(ctx);
+      const [initialModel] = app.init();
+      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const before = selectedStorybookStory(initialPageModel).id;
+      const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
+      const pageModel = (result.model as any).pageModels.storybook;
+      const after = selectedStorybookStory(pageModel).id;
+
+      expect(before).toBe('alert');
+      expect(after).not.toBe(before);
+      expect(after).toBe('badge');
+    }
+
+    for (const key of [KEY_UP, 'k']) {
+      const app = createStorybookFrameApp(ctx, { initialStoryId: 'badge' });
+      const [initialModel] = app.init();
+      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const before = selectedStorybookStory(initialPageModel).id;
+      const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
+      const pageModel = (result.model as any).pageModels.storybook;
+      const after = selectedStorybookStory(pageModel).id;
+
+      expect(before).toBe('badge');
+      expect(after).not.toBe(before);
+      expect(after).toBe('alert');
+    }
   });
 });
