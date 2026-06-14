@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **BlockLab navigation ownership** — `npm run blocklab` now lets the
+  workbench's `up` / `down` and `j` / `k` story navigation bindings win over
+  generic framed-shell scroll bindings, so the release-demo workbench moves the
+  selected story instead of surfacing key-shadowing behavior.
 - **DOGFOOD shell polish** — repeated `Tab` presses no longer trigger a hidden
   footer hide/show gesture, the quit confirmation now renders as a compact
   themed modal with readable action keys, and the Blocks section now opens the
