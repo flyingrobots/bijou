@@ -92,6 +92,64 @@ disposition.
 - Residual risk: only one real DOGFOOD fixture is shipped; additional product
   fixtures belong to V8.
 
+### Theme Tokens, Modes, And Inspector Work
+
+- Tracker: #315 for Theme Lab direction plus the V8-facing design-token lane
+  tracked through the release roadmap.
+- Design:
+  [`DL-013`](../../design/DL-013-design-token-theme-builder-api.md),
+  [`DL-014`](../../design/DL-014-theme-inspector-and-lab.md),
+  [`DL-015`](../../design/DL-015-theme-safe-pairs-and-contrast-matrices.md),
+  and
+  [`DL-016`](../../design/DL-016-mode-aware-runtime-theme-adapter.md).
+- Landed PRs: [#309](https://github.com/flyingrobots/bijou/pull/309),
+  [#310](https://github.com/flyingrobots/bijou/pull/310), and
+  [#319](https://github.com/flyingrobots/bijou/pull/319).
+- Completed slices: 4 theme/product slices: token builder, DOGFOOD token
+  retuning with first-party presets, safe-pair contracts with Theme Lab and
+  Inspector surfaces, and mode-aware shell theme families.
+- Canonical proof inputs:
+  `packages/bijou/src/core/theme/builder.test.ts`,
+  `packages/bijou/src/core/theme/presets.test.ts`,
+  `packages/bijou/src/core/theme/doctor.test.ts`,
+  `tests/cycles/DL-013/design-token-theme-builder-spec.test.ts`,
+  `tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts`, and
+  `scripts/docs-preview.test.ts`.
+- Replay: `npm test -- --run packages/bijou/src/core/theme/builder.test.ts packages/bijou/src/core/theme/presets.test.ts packages/bijou/src/core/theme/doctor.test.ts tests/cycles/DL-013/design-token-theme-builder-spec.test.ts tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts scripts/docs-preview.test.ts`.
+- Witness: tests assert immutable dark/light theme definitions, duplicate and
+  missing-mode token rejection, `tokenRef()` / `resolveThemeColorRef()`,
+  first-party `BIJOU_DARK` / `BIJOU_LIGHT` presets, safe-pair validation,
+  DOGFOOD shell theme choices, and Theme Lab / Theme Inspector rendering.
+- Residual risk: the full product Theme Lab and workbench remain V9-plus work;
+  this release ships token contracts, shell-mode selection, and inspection
+  surfaces.
+
+### Raster-To-Glyph And Title Surface Polish
+
+- Tracker: V7 DOGFOOD title and side-app polish tracked through the release
+  roadmap.
+- Design:
+  [`DF-060`](../../design/DF-060-v7-dogfood-release-title-screen.md),
+  [`DF-072`](../../design/DF-072-dogfood-release-title-artifact-gallery.md),
+  [`DF-073`](../../design/DF-073-raster-to-glyph-title-art.md), and
+  [`DX-041`](../../design/DX-041-image-to-glyph-side-app.md).
+- Landed PRs: [#297](https://github.com/flyingrobots/bijou/pull/297) and
+  [#304](https://github.com/flyingrobots/bijou/pull/304).
+- Completed slices: 3 product slices: release title gallery, raster-to-glyph
+  title art, and the image-to-glyph side app, plus review polish.
+- Canonical proof inputs:
+  `packages/bijou-tui/src/raster-glyph.test.ts`,
+  `scripts/image-viewer.test.ts`, `scripts/svg-raster.test.ts`,
+  `scripts/docs-preview.test.ts`, and
+  `tests/cycles/DF-060/v7-dogfood-release-title-screen.test.ts`.
+- Replay: `npm test -- --run packages/bijou-tui/src/raster-glyph.test.ts scripts/image-viewer.test.ts scripts/svg-raster.test.ts scripts/docs-preview.test.ts tests/cycles/DF-060/v7-dogfood-release-title-screen.test.ts`.
+- Witness: tests assert raw RGBA-to-`Surface` rendering, ASCII / Braille /
+  quadrant glyph modes, color preservation, SVG rasterization, V7 title wake
+  behavior, release-title gallery previewing, and image-viewer controls.
+- Residual risk: Geordi/GPU title rendering and full visual workbench support
+  remain V8/V9-plus work; this release ships deterministic CPU glyph rendering
+  and DOGFOOD proof surfaces.
+
 ### DOGFOOD Rendering And Navigation Fixes
 
 - Tracker: review-discovered regression repairs in the v7.1 release window.
@@ -159,13 +217,13 @@ first proof slices and fixture evidence, not the full Runtime Graph product.
 | Phase 1 origin parity | `git rev-parse HEAD origin/main` | Both SHAs equal. | Passed at `c950d257d248e1b45ffbc3bf7fb741749af7caf9`. |
 | Latest public release | `git tag --merged HEAD --list 'v*' --sort=-version:refname \| head -n 1` | `v7.0.0`. | Passed. |
 | Target milestone issue gate | `gh issue list --repo flyingrobots/bijou --milestone v7.1.0 --state open` | Empty list. | Passed before release prep. |
-| Target milestone PR gate | `gh pr list --repo flyingrobots/bijou --state open --search 'milestone:v7.1.0'` | Empty list before the release PR opens; the release PR itself is closed by the tag commit. | Passed before release prep. |
+| Target milestone PR gate | `gh pr list --repo flyingrobots/bijou --state open --search 'milestone:v7.1.0'` | Empty list before the release PR opens; after merge and before tagging, rerun this gate and require no open milestone PRs. | Passed before release prep; final live gate required before tag. |
 | High-priority issue gate | `gh issue list --repo flyingrobots/bijou --state open --label priority:high` | Empty list, or packeted risk. | Passed before release prep. |
 | Version lock-step | `npm run version 7.1.0` and `npm run release:preflight` | All workspace manifests and internal dependencies agree on `7.1.0`. | Passed in release prep. |
 | Release readiness | `npm run release:readiness -- --milestone v7.1.0` | Milestone report passes, then local gauntlet passes. | Passed in release prep: 346 test files and 3844 tests. |
 | Documentation inventory | `npm run docs:inventory` | Inventory passes with `docs/releases/7.1.0/`. | Passed in release prep. |
 | Runtime audit | `npm audit --omit=dev --audit-level=high` | No high or critical runtime vulnerability. | Passed in release prep: 0 vulnerabilities. |
-| Release dry run | [Release Dry Run run 27477234620](https://github.com/flyingrobots/bijou/actions/runs/27477234620) on `release/v7.1.0` at `12003411e75be5b2cb3dff95e549af8b1fa19bf4` | Build, lint, tests, DOGFOOD smoke, pack checks, npm publish dry-runs, and notes preview pass. | Passed. |
+| Branch release dry run | [Release Dry Run run 27477234620](https://github.com/flyingrobots/bijou/actions/runs/27477234620) on `release/v7.1.0` at `12003411e75be5b2cb3dff95e549af8b1fa19bf4` | Build, lint, tests, DOGFOOD smoke, pack checks, npm publish dry-runs, and notes preview pass. | Passed for the first release-prep commit; final pre-tag dry run must be rerun after this PR merges if the tag target differs. |
 
 ## Human Review Matrix
 
@@ -205,10 +263,13 @@ After the release PR is merged and only after explicit operator approval to tag:
    Abort before tagging if any release-blocking item appears without an explicit
    packeted risk disposition.
 3. Re-run `npm run release:preflight` and `npm run docs:inventory`.
-4. Create the annotated `v7.1.0` tag from clean synced `main`.
-5. Push only `v7.1.0`.
-6. Verify tag guard and publish workflows pass.
-7. Verify npm reports `7.1.0` and `latest` for each automated publish package:
+4. Run the Release Dry Run workflow against the exact merged release commit, or
+   against the release branch head only if it still matches the tag target.
+   Record the run URL and abort before tagging if the run is not green.
+5. Create the annotated `v7.1.0` tag from clean synced `main`.
+6. Push only `v7.1.0`.
+7. Verify tag guard and publish workflows pass.
+8. Verify npm reports `7.1.0` and `latest` for each automated publish package:
    `@flyingrobots/bijou`, `@flyingrobots/bijou-node`,
    `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`,
    `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`,
@@ -216,14 +277,16 @@ After the release PR is merged and only after explicit operator approval to tag:
    `@flyingrobots/bijou-i18n-tools-node`,
    `@flyingrobots/bijou-i18n-tools-xlsx`, and
    `@flyingrobots/bijou-mcp`.
-8. Verify the GitHub Release exists with generated notes.
+9. Verify the GitHub Release exists with generated notes.
 
 ## Residual Risk
 
-- The release dry-run workflow has passed for this branch. The final tag guard,
-  publish workflow, npm registry verification, and GitHub Release verification
-  still cannot occur in this prep pass because the operator explicitly
-  prohibited tag creation and tag pushes.
+- A branch dry-run workflow passed for an earlier release-prep commit. Because
+  this packet changed after that run, the final pre-tag Release Dry Run must be
+  rerun on the exact merged release commit before tag creation. The final tag
+  guard, publish workflow, npm registry verification, and GitHub Release
+  verification still cannot occur in this prep pass because the operator
+  explicitly prohibited tag creation and tag pushes.
 - The broad Runtime Graph and Scene IR product contract remains V8 work. The
   7.1.0 release intentionally ships proof slices and guardrails only.
 
