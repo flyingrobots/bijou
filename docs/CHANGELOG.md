@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- **DOGFOOD shell polish** — repeated `Tab` presses no longer trigger a hidden
+  footer hide/show gesture, the quit confirmation now renders as a compact
+  themed modal with readable action keys, and the Blocks section now opens the
+  interactive `CounterDemoBlock` preview first.
+
 ### 🧭 Planning
 
 - **DOGFOOD post-release polish shaping** —

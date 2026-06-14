@@ -109,6 +109,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const model = result.model as any;
     const blocksModel = docsPageModel(model, 'blocks');
     const guideLabels = blocksModel.guideState.items.map((item: { label: string }) => item.label);
+    const text = frameText(result.frames.at(-1)!);
 
     expect(model.docsModel.activePageId).toBe('blocks');
     expect(guideLabels).toEqual([
@@ -121,10 +122,12 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       '  CounterDemoBlock',
       'How Blocks Lower',
     ]);
-    expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
+    expect(blocksModel.selectedGuideId).toBe('blocks-preview-counterdemoblock');
+    expect(text).toContain('CounterDemoBlock fixture');
+    expect(text).toContain('Counter: 5');
   });
 
-  it('opens the Block Preview group on the first standard block preview', async () => {
+  it('opens the Block Preview group on the interactive CounterDemoBlock preview', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
 
@@ -135,13 +138,14 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
     }], { ctx });
     const text = frameText(result.frames.at(-1)!);
-    const firstBlockName = standardBlocks[0]!.metadata.blockName;
 
-    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(firstBlockName));
-    expect(text).toContain(`${firstBlockName}`);
+    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
+    expect(text).toContain('CounterDemoBlock fixture');
+    expect(text).toContain('Counter: 5');
+    expect(text).toContain('[-] decrease');
+    expect(text).toContain('[+] increase');
     expect(text).toContain('lowering summary');
     expect(text).toContain('documentation');
-    expect(text).not.toContain('Live example');
     expect(text).not.toContain('Available Blocks');
   });
 
@@ -152,6 +156,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
     const result = await runScript(app, [
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'blocks-what-are-blocks' } } },
+      { msg: { type: 'docs', msg: { type: 'guide-next' } } },
       { msg: { type: 'docs', msg: { type: 'guide-next' } } },
       { msg: { type: 'docs', msg: { type: 'guide-next' } } },
       { msg: { type: 'docs', msg: { type: 'guide-next' } } },
