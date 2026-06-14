@@ -1,7 +1,7 @@
 ---
 title: DF-075 DOGFOOD Post-Release Polish
 legend: DF
-lane: inbox
+lane: asap
 priority: medium
 status: proposed
 github_issue: 334
