@@ -6,9 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Notes
+### 🧭 Planning
 
-- _Nothing yet._
+- **DOGFOOD post-release polish shaping** —
+  `docs/design/DF-075-dogfood-post-release-polish.md` scopes a bounded #334
+  follow-up for disabling the hidden double-`Tab` footer toggle, restyling the
+  quit confirmation, and making Blocks lead with `CounterDemoBlock`.
 
 ## [7.1.0] - 2026-06-14
 
