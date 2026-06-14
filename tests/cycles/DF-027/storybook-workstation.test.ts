@@ -138,18 +138,30 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
 
     for (const key of [KEY_DOWN, 'j']) {
       const app = createStorybookFrameApp(ctx);
+      const [initialModel] = app.init();
+      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const before = selectedStorybookStory(initialPageModel).id;
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
       const pageModel = (result.model as any).pageModels.storybook;
+      const after = selectedStorybookStory(pageModel).id;
 
-      expect(selectedStorybookStory(pageModel).id).toBe('badge');
+      expect(before).toBe('alert');
+      expect(after).not.toBe(before);
+      expect(after).toBe('badge');
     }
 
     for (const key of [KEY_UP, 'k']) {
       const app = createStorybookFrameApp(ctx, { initialStoryId: 'badge' });
+      const [initialModel] = app.init();
+      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const before = selectedStorybookStory(initialPageModel).id;
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
       const pageModel = (result.model as any).pageModels.storybook;
+      const after = selectedStorybookStory(pageModel).id;
 
-      expect(selectedStorybookStory(pageModel).id).toBe('alert');
+      expect(before).toBe('badge');
+      expect(after).not.toBe(before);
+      expect(after).toBe('alert');
     }
   });
 });
