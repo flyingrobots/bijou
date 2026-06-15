@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { runScript, testRuntime } from './driver.js';
+import {
+  mouseMove,
+  mousePress,
+  mouseRelease,
+  mouseWheel,
+  runScript,
+  sgrMouse,
+  testRuntime,
+} from './driver.js';
 import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
@@ -219,20 +227,104 @@ describe('runScript', () => {
       },
     };
 
-    const result = await runScript(app, [{
+    const result = await runScript(app, [mousePress('left', 4, 2)]);
+
+    expect(result.model.clicked).toBe(1);
+  });
+
+  it('builds mouse script steps', () => {
+    expect(mouseMove(4, 2)).toEqual({
       mouse: {
         type: 'mouse',
-        button: 'left',
-        action: 'press',
+        button: 'none',
+        action: 'move',
         col: 4,
         row: 2,
         shift: false,
         alt: false,
         ctrl: false,
       },
-    }]);
+    });
+    expect(mouseMove(4, 2, { button: 'left', shift: true, delay: 12 })).toEqual({
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'move',
+        col: 4,
+        row: 2,
+        shift: true,
+        alt: false,
+        ctrl: false,
+      },
+      delay: 12,
+    });
+    expect(mousePress('right', 6, 3, { alt: true }).mouse).toMatchObject({
+      button: 'right',
+      action: 'press',
+      col: 6,
+      row: 3,
+      alt: true,
+    });
+    expect(mouseRelease('middle', 7, 4, { ctrl: true }).mouse).toMatchObject({
+      button: 'middle',
+      action: 'release',
+      col: 7,
+      row: 4,
+      ctrl: true,
+    });
+    expect(mouseWheel('down', 8, 5).mouse).toMatchObject({
+      button: 'none',
+      action: 'scroll-down',
+      col: 8,
+      row: 5,
+    });
+    expect(mouseWheel('up', 8, 5).mouse).toMatchObject({
+      button: 'none',
+      action: 'scroll-up',
+      col: 8,
+      row: 5,
+    });
+  });
 
-    expect(result.model.clicked).toBe(1);
+  it('builds mouse script steps from SGR sequences', () => {
+    expect(sgrMouse('\x1b[<35;10;20M')).toEqual({
+      mouse: {
+        type: 'mouse',
+        button: 'none',
+        action: 'move',
+        col: 9,
+        row: 19,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    });
+    expect(sgrMouse('\x1b[<0;2;3M', 5)).toEqual({
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'press',
+        col: 1,
+        row: 2,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+      delay: 5,
+    });
+    expect(sgrMouse('\x1b[<0;2;3m').mouse).toMatchObject({
+      button: 'left',
+      action: 'release',
+      col: 1,
+      row: 2,
+    });
+    expect(sgrMouse('\x1b[<65;8;9M').mouse).toMatchObject({
+      button: 'none',
+      action: 'scroll-down',
+      col: 7,
+      row: 8,
+    });
+    expect(() => sgrMouse('not mouse')).toThrow('sgrMouse: invalid SGR mouse sequence');
   });
 
   it('installs the BCSS resolver when css is provided', async () => {

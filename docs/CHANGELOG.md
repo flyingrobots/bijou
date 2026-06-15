@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Framework mouse fallthrough** — framed workspace mouse movement, releases,
+  and non-left presses now fall through to the active page instead of being
+  swallowed by the shell router. `@flyingrobots/bijou-tui` also exposes
+  package-root page-scoped frame message helpers and scripted mouse driver
+  helpers for deterministic pointer regressions.
 - **BlockLab navigation ownership** — `npm run blocklab` now lets the
   workbench's `up` / `down` and `j` / `k` story navigation bindings win over
   generic framed-shell scroll bindings, so the release-demo workbench moves the

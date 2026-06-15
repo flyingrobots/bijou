@@ -16,10 +16,10 @@
  * ```
  */
 
-import type { App, RunOptions, ResizeMsg, MouseMsg, Cmd } from './types.js';
+import type { App, RunOptions, ResizeMsg, MouseMsg, MouseButton, Cmd } from './types.js';
 import { isCmdCleanup, isResizeMsg, QUIT } from './types.js';
 import { createEventBus, type BusMsg } from './eventbus.js';
-import { parseKey } from './keys.js';
+import { parseKey, parseMouse } from './keys.js';
 import { type Surface, resolveClock, sleep } from '@flyingrobots/bijou';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput } from './view-output.js';
@@ -60,6 +60,27 @@ export type ScriptStep<M = never> =
     /** Milliseconds to wait before sending this step. Default: 0. */
     delay?: number;
   };
+
+/** Shared modifier and delay options for scripted mouse helpers. */
+export interface MouseScriptStepOptions {
+  /** Milliseconds to wait before sending this step. Default: 0. */
+  readonly delay?: number;
+  /** Whether the Shift modifier was held. Default: false. */
+  readonly shift?: boolean;
+  /** Whether the Alt/Option modifier was held. Default: false. */
+  readonly alt?: boolean;
+  /** Whether the Ctrl modifier was held. Default: false. */
+  readonly ctrl?: boolean;
+}
+
+/** Options for {@link mouseMove}. */
+export interface MouseMoveStepOptions extends MouseScriptStepOptions {
+  /** Button carried by the movement event. Default: "none". */
+  readonly button?: MouseButton;
+}
+
+/** Direction for scripted wheel steps. */
+export type MouseWheelDirection = 'up' | 'down';
 
 /** Options for {@link runScript}, extending the base {@link RunOptions}. */
 export interface RunScriptOptions extends RunOptions {
@@ -197,6 +218,79 @@ interface MutableCommandRecord<M> extends TestRuntimeCommandRecord<M> {
 // ---------------------------------------------------------------------------
 // Implementation
 // ---------------------------------------------------------------------------
+
+function mouseMsg(
+  button: MouseButton,
+  action: MouseMsg['action'],
+  col: number,
+  row: number,
+  options: MouseScriptStepOptions = {},
+): MouseMsg {
+  return {
+    type: 'mouse',
+    button,
+    action,
+    col,
+    row,
+    shift: options.shift ?? false,
+    alt: options.alt ?? false,
+    ctrl: options.ctrl ?? false,
+  };
+}
+
+function mouseScriptStep<M>(mouse: MouseMsg, delay?: number): ScriptStep<M> {
+  if (delay === undefined) return { mouse };
+  return { mouse, delay };
+}
+
+/** Create a scripted mouse-move step for {@link runScript} or {@link TestHarness.run}. */
+export function mouseMove<M = never>(
+  col: number,
+  row: number,
+  options: MouseMoveStepOptions = {},
+): ScriptStep<M> {
+  return mouseScriptStep(mouseMsg(options.button ?? 'none', 'move', col, row, options), options.delay);
+}
+
+/** Create a scripted mouse-press step for {@link runScript} or {@link TestHarness.run}. */
+export function mousePress<M = never>(
+  button: Exclude<MouseButton, 'none'>,
+  col: number,
+  row: number,
+  options: MouseScriptStepOptions = {},
+): ScriptStep<M> {
+  return mouseScriptStep(mouseMsg(button, 'press', col, row, options), options.delay);
+}
+
+/** Create a scripted mouse-release step for {@link runScript} or {@link TestHarness.run}. */
+export function mouseRelease<M = never>(
+  button: Exclude<MouseButton, 'none'>,
+  col: number,
+  row: number,
+  options: MouseScriptStepOptions = {},
+): ScriptStep<M> {
+  return mouseScriptStep(mouseMsg(button, 'release', col, row, options), options.delay);
+}
+
+/** Create a scripted mouse-wheel step for {@link runScript} or {@link TestHarness.run}. */
+export function mouseWheel<M = never>(
+  direction: MouseWheelDirection,
+  col: number,
+  row: number,
+  options: MouseScriptStepOptions = {},
+): ScriptStep<M> {
+  const action = direction === 'up' ? 'scroll-up' : 'scroll-down';
+  return mouseScriptStep(mouseMsg('none', action, col, row, options), options.delay);
+}
+
+/** Parse an SGR mouse escape sequence into a scripted mouse step. */
+export function sgrMouse<M = never>(raw: string, delay?: number): ScriptStep<M> {
+  const mouse = parseMouse(raw);
+  if (mouse == null) {
+    throw new Error(`sgrMouse: invalid SGR mouse sequence: ${JSON.stringify(raw)}`);
+  }
+  return mouseScriptStep(mouse, delay);
+}
 
 function initialSize(ctx: RunOptions['ctx']): { width: number; height: number } {
   return {

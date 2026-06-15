@@ -517,8 +517,17 @@ export type {
   PageScopedMsg,
 } from './app-frame-types.js';
 export {
+  FRAME_MSG_TOKEN,
+  PAGE_MSG_TOKEN,
+  emitMsg,
   emitFrameAction,
+  emitMsgForPage,
+  isFrameScopedMsg,
+  isPageScopedMsg,
   notify,
+  wrapCmdForPage,
+  wrapFrameMsg,
+  wrapPageMsg,
 } from './app-frame-types.js';
 
 export type {
@@ -1966,7 +1975,7 @@ export function createFramedApp<PageModel, Msg>(
           }
         }
 
-        return { handled: true };
+        return { handled: false };
       },
     );
   }

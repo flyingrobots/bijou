@@ -13,7 +13,7 @@ import {
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
-import { runScript } from './driver.js';
+import { mouseMove, mousePress, mouseRelease, runScript } from './driver.js';
 import { normalizeViewOutput } from './view-output.js';
 import { FRAME_I18N_CATALOG } from './app-frame-i18n.js';
 import {
@@ -1058,17 +1058,17 @@ describe('createFramedApp', () => {
     expect(result.model.scrollByPage.home?.main?.y).toBeGreaterThan(0);
   });
 
-  it('forwards unhandled mouse messages to the active page', async () => {
+  it('forwards unmapped workspace mouse messages to the active page', async () => {
     type MsgWithMouse = Msg | MouseMsg;
 
-    let sawMouseInPageUpdate = false;
+    const seenMouseActions: string[] = [];
     const page: FramePage<PageModel, MsgWithMouse> = {
       id: 'home',
       title: 'Home',
       init: () => [{ count: 0 }, []],
       update(msg, model) {
         if (msg.type === 'mouse') {
-          sawMouseInPageUpdate = true;
+          seenMouseActions.push(`${msg.button}:${msg.action}:${msg.col}:${msg.row}`);
           return [model, []];
         }
         if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
@@ -1083,19 +1083,21 @@ describe('createFramedApp', () => {
     };
 
     const app = createFramedApp<PageModel, MsgWithMouse>({ pages: [page] });
-    const mouse: MouseMsg = {
-      type: 'mouse',
-      button: 'left',
-      action: 'press',
-      col: 4,
-      row: 2,
-      shift: false,
-      alt: false,
-      ctrl: false,
-    };
 
-    const result = await runScript(app, [{ mouse }, { key: 'x' }]);
-    expect(sawMouseInPageUpdate).toBe(true);
+    const result = await runScript(app, [
+      mouseMove(4, 2),
+      mouseRelease('left', 5, 3),
+      mousePress('right', 6, 4),
+      mousePress('left', 7, 5),
+      { key: 'x' },
+    ]);
+
+    expect(seenMouseActions).toEqual([
+      'none:move:4:2',
+      'left:release:5:3',
+      'right:press:6:4',
+      'left:press:7:5',
+    ]);
     expect(result.model.pageModels.home?.count).toBe(1);
   });
 
