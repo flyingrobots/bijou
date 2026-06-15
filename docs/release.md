@@ -218,16 +218,17 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-There is no selected feature `7.2.0` train.
+`7.2.0` is selected as a narrow stabilization and demo-integrity release, not
+as a broad feature train.
 
 The latest shipped package release is `7.1.0`. The older `v6.0.0`, `v7.0.0`,
 and `v7.1.0` milestones are zero-open tracker lanes retained as release lineage,
-not as the next target.
+not as the next target. The current target is the `v7.2.0` milestone.
 
-New feature work should shape toward `8.0.0`: the Runtime Graph and Scene IR
-product contract built from the proof chain that `7.1.0` shipped. Use `7.1.x`
-or, if semver requires it, `7.2.x` only for bounded maintenance: bug fixes,
-security fixes, dependency fixes, or release-process corrections.
+New feature work should still shape toward `8.0.0`: the Runtime Graph and Scene
+IR product contract built from the proof chain that `7.1.0` shipped. Use
+`7.2.0` for the selected framework-input and DOGFOOD demo-integrity repair
+lane only.
 
 Before the next release-prep cycle begins, keep the selected scope reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live

@@ -19,6 +19,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **v7.2.0 stabilization train** —
+  `docs/ROADMAP.md`, `docs/BEARING.md`, `docs/release.md`, and
+  `docs/design/RE-036-v72-framework-input-stabilization.md` now select
+  `v7.2.0` as a narrow demo-integrity and framework-input stabilization
+  release, with #354 as the goalpost and #344, #345, and #353 as the first
+  implementation pull.
 - **DOGFOOD post-release polish shaping** —
   `docs/design/DF-075-dogfood-post-release-polish.md` scopes a bounded #334
   follow-up for disabling the hidden double-`Tab` footer toggle, restyling the
