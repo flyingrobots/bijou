@@ -100,11 +100,13 @@ Current direction and active tensions. Historical ship data is in
   release packet on 2026-06-14.
 - The `v6.0.0`, `v7.0.0`, and `v7.1.0` GitHub milestone lanes are complete
   release lineage, not the next implementation target.
-- There is no planned `v7.2.0` feature train. New feature work should shape
-  toward `v8.0.0` unless maintenance pressure requires a narrow `v7.1.x` patch
-  or stabilization release.
-- The next feature horizon is `v8.0.0`: the Runtime Graph and Scene IR product
-  contract built from the proof chain that v7.1.0 shipped.
+- `v7.2.0` is now selected as a narrow stabilization and demo-integrity release,
+  not as a broad feature train.
+- The first `v7.2.0` pull is RE-041: fix framework mouse fallthrough (#344),
+  expose page-scoped frame helpers (#345), and add scripted mouse builders
+  (#353).
+- The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
+  product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
   the release process lives in [release.md](./release.md).
 
@@ -115,13 +117,17 @@ Current direction and active tensions. Historical ship data is in
 - `ROADMAP.md` is the human-readable mirror of milestone triage, not an
   independent source of truth.
 - Any issue or pull request moved between release horizons, including
-  `v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` / `v7.0.0`
-  lanes, should get a GitHub comment and a matching roadmap update.
+  `v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` /
+  `v7.0.0` lanes, should get a GitHub comment and a matching roadmap update.
 
-### 3. Shape V8 And V9 From Beyond
+### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `Beyond` milestone is the current post-v7 backlog: 30 open and 5 closed
+- The `v7.2.0` milestone is the current active stabilization lane: 10 open and
+  0 closed milestone items as of the latest roadmap sync.
+- The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
+- `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
+  issues selected in #354.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
   versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
   modes, debug facts, DOGFOOD round-trip fixtures, and capture evidence.
@@ -136,9 +142,9 @@ Current direction and active tensions. Historical ship data is in
 
 - **Closed Release Gravity**: `v6.0.0`, `v7.0.0`, and `v7.1.0` are complete
   release lineage. Do not use those lanes for new feature work.
-- **Minor-Release Temptation**: Do not reopen v7.1.0 as a feature train. Adding
-  a full workbench, theme lab, localization suite, Wesley path, or Geordi path
-  turns the work into V8/V9 scope.
+- **Minor-Release Temptation**: Do not let `v7.2.0` become a full feature train.
+  Adding a full workbench, theme lab, localization suite, Wesley path, or Geordi
+  path turns the work into V8/V9 scope.
 - **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
   New product-facing work should consume geometry contracts, not bypass them
   with bespoke string/surface measurement.
@@ -157,10 +163,20 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-After the `v7.1.0` tag and publish verification, the immediate planning focus is
-`v8.0.0`.
+After the `v7.1.0` tag and publish verification, the immediate focus is
+`v7.2.0` stabilization.
 
-V8 must turn the proof chain into product contract:
+The first pull is RE-041:
+
+```text
+workspace mouse fallthrough
+  -> page-scoped frame helper exports
+    -> scripted mouse driver helpers
+      -> deterministic pointer regressions
+```
+
+After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
+into product contract:
 
 ```text
 GraphQL SDL fixture
@@ -173,20 +189,21 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Finish final `v7.1.0` tag, publish, npm, and GitHub Release verification from
-   the exact merged `origin/main` release commit.
-2. Shape #302 into a V8 design packet with artifact semantics, receipt
+1. Land RE-041 for #344, #345, and #353.
+2. Move through selected `v7.2.0` DOGFOOD demo-integrity items from #354.
+3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+4. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
-3. Promote only the Runtime Graph and Scene IR issues needed for that contract
+5. Promote only the Runtime Graph and Scene IR issues needed for that contract
    out of `Beyond`.
-4. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-5. Keep dependency PR #326 outside release horizons until it is green, current,
+7. Keep dependency PR #326 outside release horizons until it is green, current,
    and deliberately selected.
 
 Non-goals for the next cycle:
 
-- no feature-train `v7.2.0`
+- no broad feature-train `v7.2.0`
 - no broad DOGFOOD runtime rewrite
 - no full remaining component-family audit sweep from `v7.0.0`
 - no full visual redesign of DOGFOOD as a post-release cleanup for `v7.1.0`

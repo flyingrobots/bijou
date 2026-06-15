@@ -7,10 +7,17 @@ import type {
 import {
   canvas,
   fitCellGlyph,
+  PAGE_MSG_TOKEN,
   projectFrameControls,
   raytraceLookAtRay,
+  wrapCmdForPage,
+  wrapPageMsg,
+  emitMsgForPage,
+  isPageScopedMsg,
   type BijouContext,
   type Cell,
+  type FramedAppMsg,
+  type MouseScriptStepOptions,
   type RaytraceRay,
   type ShaderFn,
   type Surface,
@@ -29,6 +36,33 @@ describe('package root export ergonomics', () => {
 
   it('re-exports framed shell control projection helpers from the package root', () => {
     expect(typeof projectFrameControls).toBe('function');
+  });
+
+  it('re-exports page-scoped frame message helpers from the package root', async () => {
+    const wrapped = wrapPageMsg('home', { type: 'local' });
+    expect(wrapped[PAGE_MSG_TOKEN]).toBe(true);
+    expect(isPageScopedMsg(wrapped)).toBe(true);
+    expectTypeOf(wrapped).toMatchTypeOf<FramedAppMsg<{ type: string }>>();
+
+    const emitted = await emitMsgForPage('home', { type: 'from-command' })(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    expect(isPageScopedMsg(emitted)).toBe(true);
+
+    const cmd = wrapCmdForPage('home', async () => ({ type: 'wrapped' as const }));
+    const result = await cmd(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    expect(isPageScopedMsg(result)).toBe(true);
+  });
+
+  it('re-exports mouse driver helper types from the package root', () => {
+    const options: MouseScriptStepOptions = { delay: 1, shift: true };
+    expect(options.delay).toBe(1);
   });
 
   it('re-exports raytrace shader helpers from the package root', () => {

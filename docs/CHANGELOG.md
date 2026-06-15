@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Framework mouse fallthrough** — framed workspace mouse movement, releases,
+  and non-left presses now fall through to the active page instead of being
+  swallowed by the shell router. `@flyingrobots/bijou-tui` also exposes
+  package-root page-scoped frame message helpers and scripted mouse driver
+  helpers for deterministic pointer regressions.
 - **BlockLab navigation ownership** — `npm run blocklab` now lets the
   workbench's `up` / `down` and `j` / `k` story navigation bindings win over
   generic framed-shell scroll bindings, so the release-demo workbench moves the
@@ -19,6 +24,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **v7.2.0 stabilization train** —
+  `docs/ROADMAP.md`, `docs/BEARING.md`, `docs/release.md`, and
+  `docs/design/RE-041-v72-framework-input-stabilization.md` now select
+  `v7.2.0` as a narrow demo-integrity and framework-input stabilization
+  release, with #354 as the goalpost and #344, #345, and #353 as the first
+  implementation pull.
 - **DOGFOOD post-release polish shaping** —
   `docs/design/DF-075-dogfood-post-release-polish.md` scopes a bounded #334
   follow-up for disabling the hidden double-`Tab` footer toggle, restyling the

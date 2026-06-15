@@ -224,6 +224,29 @@ Keep `runScript()` for fixture-style interaction playback and GIF/demo
 capture, and use `testRuntime()` when you need direct assertions on
 snapshots, emitted messages, command outcomes, or cleanup disposal.
 
+Mouse playback can use helper steps instead of hand-authored `MouseMsg`
+objects. `sgrMouse()` parses raw SGR mouse sequences when a regression should
+match terminal input bytes directly.
+
+```typescript
+import { mouseMove, mousePress, mouseRelease, mouseWheel, runScript, sgrMouse } from '@flyingrobots/bijou-tui';
+
+await runScript(app, [
+  mouseMove(12, 4),
+  mousePress('left', 12, 4),
+  mouseRelease('left', 12, 4),
+  mouseWheel('down', 12, 8),
+  sgrMouse('\x1b[<35;10;20M'),
+]);
+```
+
+For framed-app integrations that need to wrap or route page-level commands,
+import the page-scoped frame helpers from the package root:
+
+```typescript
+import { PAGE_MSG_TOKEN, emitMsgForPage, isPageScopedMsg, wrapCmdForPage, wrapPageMsg } from '@flyingrobots/bijou-tui';
+```
+
 Use `surfaceDiffText()` or `surfaceDiffSurface()` when a frame assertion fails
 and you need cell-level truth instead of a raw string dump:
 

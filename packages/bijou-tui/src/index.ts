@@ -409,13 +409,22 @@ export {
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
   createFramedApp,
+  emitMsg,
   emitFrameAction,
+  emitMsgForPage,
+  FRAME_MSG_TOKEN,
+  isFrameScopedMsg,
+  isPageScopedMsg,
   notify,
+  PAGE_MSG_TOKEN,
   projectFrameControls,
   renderFramePerfHudOverlay,
   runFramedApp,
   summarizeFrameTimings,
   underlyingFrameLayer,
+  wrapCmdForPage,
+  wrapFrameMsg,
+  wrapPageMsg,
 } from './app-frame.js';
 
 // Panel state (minimize/maximize)
@@ -794,14 +803,23 @@ export {
 // Scripted driver
 export {
   type ScriptStep,
+  type MouseScriptStep,
   type RunScriptOptions,
   type RunScriptResult,
+  type MouseMoveStepOptions,
+  type MouseScriptStepOptions,
+  type MouseWheelDirection,
   type TestRuntimeOptions,
   type TestRuntimeCommandResolution,
   type TestRuntimeCommandRecord,
   type TestRuntimeSnapshot,
   type TestHarness,
+  mouseMove,
+  mousePress,
+  mouseRelease,
+  mouseWheel,
   runScript,
+  sgrMouse,
   testRuntime,
 } from './driver.js';
 
