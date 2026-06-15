@@ -67,8 +67,8 @@ Shipped scope:
   [#312](https://github.com/flyingrobots/bijou/issues/312) for default
   DOGFOOD i18n debt coverage across new docs modules
 - dependency PR [#326](https://github.com/flyingrobots/bijou/pull/326) was not
-  selected for `v7.1.0`; it remains outside release horizons until it is green,
-  current, and deliberately selected
+  selected for `v7.1.0`; it was later closed and superseded by issue-backed
+  `v7.2.0` security patch [#357](https://github.com/flyingrobots/bijou/issues/357)
 
 Non-scope:
 
@@ -200,13 +200,13 @@ that a cross-repository release is the next smallest honest boundary.
 
 ## Next Pull
 
-The immediate implementation pull should land **v7.2.0 framework input
-stabilization** from #344, #345, and #353.
+The immediate implementation pull should land the **v7.2.0 esbuild security
+patch** from #357.
 
-That pull should fix workspace mouse fallthrough, add package-root exports for
-page-scoped frame message helpers, and add scripted mouse driver helpers so the
-pointer behavior is directly testable. After that, v7.2.0 should move through
-the DOGFOOD demo-integrity items before release prep.
+That pull should update `esbuild@0.28.0` to `0.28.1`, keep dependency churn
+limited to the lockfile-resolved package family, prove `npm audit` is clean,
+and then return `v7.2.0` to selected DOGFOOD demo-integrity items before
+release prep.
 
 ## Forward Goalposts
 

@@ -105,6 +105,8 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` pull is RE-041: fix framework mouse fallthrough (#344),
   expose page-scoped frame helpers (#345), and add scripted mouse builders
   (#353).
+- The current urgent `v7.2.0` pull is WF-133: patch `esbuild@0.28.0` to
+  `0.28.1` for #357.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -189,7 +191,7 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land RE-041 for #344, #345, and #353.
+1. Land WF-133 for #357 so the GitHub/npm audit is clean.
 2. Move through selected `v7.2.0` DOGFOOD demo-integrity items from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt
@@ -198,8 +200,8 @@ Recommended pull order:
    out of `Beyond`.
 6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-7. Keep dependency PR #326 outside release horizons until it is green, current,
-   and deliberately selected.
+7. Keep closed dependency PR #326 as superseded lineage, not active release
+   work.
 
 Non-goals for the next cycle:
 

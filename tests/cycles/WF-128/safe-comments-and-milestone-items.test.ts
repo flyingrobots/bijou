@@ -36,8 +36,8 @@ describe('WF-128 safe GitHub comments and milestone item mirrors', () => {
       'Do not compare release snapshot item totals to issue-only `gh issue list` output',
     );
     expect(roadmap).toContain('gh pr list --state all --search');
-    expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
-    expect(roadmap).toContain('These pull requests are open and unmilestoned.');
+    expect(roadmap).toContain('Dependency Security Lineage');
+    expect(roadmap).toContain('Closed Dependabot PR for `esbuild` `0.28.0` to `0.28.1`');
     expect(roadmap).not.toContain('| Horizon | Milestone | Open | Closed | Intent |');
   });
 
