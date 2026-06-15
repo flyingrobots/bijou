@@ -60,7 +60,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 7 | 4 |');
+    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 8 | 4 |');
     expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
     expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
     expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
@@ -98,6 +98,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#249]');
     expect(roadmap).toContain('Dependency Security Lineage');
     expect(roadmap).toContain('[#357]');
+    expect(roadmap).toContain('[#358]');
     expect(roadmap).toContain('[#326]');
     expect(roadmap).toContain('was not selected for `v7.1.0`');
     expect(roadmap).toContain('superseded by issue-backed');
@@ -116,7 +117,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
     expect(bearing).toContain('the immediate focus is');
     expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
-    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 7 open and 4 closed milestone items');
+    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 8 open and 4 closed milestone items');
     expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 

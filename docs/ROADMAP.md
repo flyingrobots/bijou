@@ -38,7 +38,7 @@ V7 story harder to use, test, or demonstrate.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
-| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 7 | 4 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
+| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 8 | 4 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
 | `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Latest shipped release lineage after the release PR merges. Complete; do not reopen for new feature work. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Shipped release lineage. Complete; do not reopen for new feature work. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 31 | 6 | Active forward backlog. Promote shaped work from here into a versioned release. |
@@ -311,7 +311,7 @@ These issues are open but not assigned to a release horizon. Move them into
 
 | Item | Type | Current Posture |
 | :--- | :--- | :--- |
-| [#357](https://github.com/flyingrobots/bijou/issues/357) | dependency issue | Active `v7.2.0` security patch for `esbuild` `0.28.0` to `0.28.1`. |
+| [#357](https://github.com/flyingrobots/bijou/issues/357) / [#358](https://github.com/flyingrobots/bijou/pull/358) | dependency issue and PR | Active `v7.2.0` security patch for `esbuild` `0.28.0` to `0.28.1`. |
 | [#326](https://github.com/flyingrobots/bijou/pull/326) | dependency PR | Closed Dependabot PR for `esbuild` `0.28.0` to `0.28.1`; superseded by issue-backed #357. |
 
 ## Closed Lineage

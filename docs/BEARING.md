@@ -102,9 +102,9 @@ Current direction and active tensions. Historical ship data is in
   release lineage, not the next implementation target.
 - `v7.2.0` is now selected as a narrow stabilization and demo-integrity release,
   not as a broad feature train.
-- The first `v7.2.0` pull is RE-041: fix framework mouse fallthrough (#344),
-  expose page-scoped frame helpers (#345), and add scripted mouse builders
-  (#353).
+- The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
+  fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
+  mouse builders (#353).
 - The current urgent `v7.2.0` pull is WF-133: patch `esbuild@0.28.0` to
   `0.28.1` for #357.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
@@ -124,7 +124,7 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 7 open and
+- The `v7.2.0` milestone is the current active stabilization lane: 8 open and
   4 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
