@@ -997,7 +997,7 @@ function loadDogfoodRuntimeCatalogs(
 function shouldShowMissingLocalizationMarkers(
   options: Pick<DocsAppOptions, 'showMissingLocalizationMarkers'>,
 ): boolean {
-  return options.showMissingLocalizationMarkers ?? process.env.NODE_ENV !== 'production';
+  return options.showMissingLocalizationMarkers ?? false;
 }
 
 function dogfoodLocaleSettingDescription(currentLocale: string, localization?: LocalizationPort): string {
@@ -1981,7 +1981,25 @@ function guideDocSummary(doc: GuideDoc, localization?: LocalizationPort): string
 }
 
 function guideDocBody(doc: GuideDoc, localization?: LocalizationPort): string {
-  return doc.localizedBody?.(localization) ?? doc.body;
+  const body = doc.localizedBody?.(localization) ?? doc.body;
+  if (localization !== undefined && shouldLabelEnglishSourceBody(doc, localization)) {
+    return `${englishSourceDocumentationNotice(localization)}\n\n---\n\n${body}`;
+  }
+  return body;
+}
+
+function shouldLabelEnglishSourceBody(doc: GuideDoc, localization: LocalizationPort): boolean {
+  return localization.locale !== DEFAULT_LOCALE.id
+    && doc.localizedBody === undefined
+    && doc.body.trim().length > 0;
+}
+
+function englishSourceDocumentationNotice(localization: LocalizationPort): string {
+  return dogfoodText(
+    localization,
+    'docs.englishSourceNotice',
+    'English-source documentation. This article has not been translated yet.',
+  );
 }
 
 function storySearchText(story: ComponentStory): string {

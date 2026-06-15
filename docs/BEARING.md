@@ -105,8 +105,8 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
-- The current urgent `v7.2.0` pull is WF-133: patch `esbuild@0.28.0` to
-  `0.28.1` for #357.
+- The current urgent `v7.2.0` pull is LX-020: make DOGFOOD non-English locale
+  demo paths honest and marker-free for #340.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -124,8 +124,8 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 8 open and
-  4 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is the current active stabilization lane: 7 open and
+  6 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
@@ -191,8 +191,10 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land WF-133 for #357 so the GitHub/npm audit is clean.
-2. Move through selected `v7.2.0` DOGFOOD demo-integrity items from #354.
+1. Land LX-020 for #340 so non-English DOGFOOD demo paths are marker-free and
+   English-source documentation is labeled.
+2. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
+   from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
