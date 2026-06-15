@@ -26,7 +26,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **v7.2.0 stabilization train** —
   `docs/ROADMAP.md`, `docs/BEARING.md`, `docs/release.md`, and
-  `docs/design/RE-036-v72-framework-input-stabilization.md` now select
+  `docs/design/RE-041-v72-framework-input-stabilization.md` now select
   `v7.2.0` as a narrow demo-integrity and framework-input stabilization
   release, with #354 as the goalpost and #344, #345, and #353 as the first
   implementation pull.

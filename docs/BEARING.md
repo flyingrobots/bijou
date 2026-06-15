@@ -102,7 +102,7 @@ Current direction and active tensions. Historical ship data is in
   release lineage, not the next implementation target.
 - `v7.2.0` is now selected as a narrow stabilization and demo-integrity release,
   not as a broad feature train.
-- The first `v7.2.0` pull is RE-036: fix framework mouse fallthrough (#344),
+- The first `v7.2.0` pull is RE-041: fix framework mouse fallthrough (#344),
   expose page-scoped frame helpers (#345), and add scripted mouse builders
   (#353).
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
@@ -117,8 +117,8 @@ Current direction and active tensions. Historical ship data is in
 - `ROADMAP.md` is the human-readable mirror of milestone triage, not an
   independent source of truth.
 - Any issue or pull request moved between release horizons, including
-  `v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` / `v7.0.0`
-  lanes, should get a GitHub comment and a matching roadmap update.
+  `v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` /
+  `v7.0.0` lanes, should get a GitHub comment and a matching roadmap update.
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
@@ -166,7 +166,7 @@ Current direction and active tensions. Historical ship data is in
 After the `v7.1.0` tag and publish verification, the immediate focus is
 `v7.2.0` stabilization.
 
-The first pull is RE-036:
+The first pull is RE-041:
 
 ```text
 workspace mouse fallthrough
@@ -189,7 +189,7 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land RE-036 for #344, #345, and #353.
+1. Land RE-041 for #344, #345, and #353.
 2. Move through selected `v7.2.0` DOGFOOD demo-integrity items from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt

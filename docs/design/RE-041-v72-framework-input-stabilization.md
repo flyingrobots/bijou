@@ -1,5 +1,5 @@
 ---
-title: RE-036 v7.2 Framework Input Stabilization
+title: RE-041 v7.2 Framework Input Stabilization
 legend: RE
 lane: release
 priority: high
@@ -14,7 +14,7 @@ keywords:
   - v7.2.0
 ---
 
-# RE-036 v7.2 Framework Input Stabilization
+# RE-041 v7.2 Framework Input Stabilization
 
 Legend: [RE - Runtime Engine](../legends/RE-runtime-engine.md)
 

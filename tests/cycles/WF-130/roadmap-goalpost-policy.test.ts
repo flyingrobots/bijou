@@ -60,7 +60,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 9 | 0 |');
+    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 10 | 0 |');
     expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
     expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
     expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
@@ -169,7 +169,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     const bearing = normalizeWhitespace(read('docs/BEARING.md'));
 
     expect(bearing).toContain('Any issue or pull request moved between release horizons');
-    expect(bearing).toContain('`v7.1.0`, `v8.0.0`, `v9.0.0`, `Beyond`');
+    expect(bearing).toContain('`v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`');
     expect(bearing).not.toContain('Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond`');
   });
 
