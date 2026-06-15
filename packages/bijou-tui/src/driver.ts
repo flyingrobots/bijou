@@ -61,6 +61,9 @@ export type ScriptStep<M = never> =
     delay?: number;
   };
 
+/** Script step variant carrying a mouse message. */
+export type MouseScriptStep<M = never> = Extract<ScriptStep<M>, { mouse: MouseMsg }>;
+
 /** Shared modifier and delay options for scripted mouse helpers. */
 export interface MouseScriptStepOptions {
   /** Milliseconds to wait before sending this step. Default: 0. */
@@ -238,7 +241,7 @@ function mouseMsg(
   };
 }
 
-function mouseScriptStep<M>(mouse: MouseMsg, delay?: number): ScriptStep<M> {
+function mouseScriptStep<M>(mouse: MouseMsg, delay?: number): MouseScriptStep<M> {
   if (delay === undefined) return { mouse };
   return { mouse, delay };
 }
@@ -248,7 +251,7 @@ export function mouseMove<M = never>(
   col: number,
   row: number,
   options: MouseMoveStepOptions = {},
-): ScriptStep<M> {
+): MouseScriptStep<M> {
   return mouseScriptStep(mouseMsg(options.button ?? 'none', 'move', col, row, options), options.delay);
 }
 
@@ -258,7 +261,7 @@ export function mousePress<M = never>(
   col: number,
   row: number,
   options: MouseScriptStepOptions = {},
-): ScriptStep<M> {
+): MouseScriptStep<M> {
   return mouseScriptStep(mouseMsg(button, 'press', col, row, options), options.delay);
 }
 
@@ -268,7 +271,7 @@ export function mouseRelease<M = never>(
   col: number,
   row: number,
   options: MouseScriptStepOptions = {},
-): ScriptStep<M> {
+): MouseScriptStep<M> {
   return mouseScriptStep(mouseMsg(button, 'release', col, row, options), options.delay);
 }
 
@@ -278,13 +281,13 @@ export function mouseWheel<M = never>(
   col: number,
   row: number,
   options: MouseScriptStepOptions = {},
-): ScriptStep<M> {
+): MouseScriptStep<M> {
   const action = direction === 'up' ? 'scroll-up' : 'scroll-down';
   return mouseScriptStep(mouseMsg('none', action, col, row, options), options.delay);
 }
 
 /** Parse an SGR mouse escape sequence into a scripted mouse step. */
-export function sgrMouse<M = never>(raw: string, delay?: number): ScriptStep<M> {
+export function sgrMouse<M = never>(raw: string, delay?: number): MouseScriptStep<M> {
   const mouse = parseMouse(raw);
   if (mouse == null) {
     throw new Error(`sgrMouse: invalid SGR mouse sequence: ${JSON.stringify(raw)}`);

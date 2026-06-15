@@ -803,6 +803,7 @@ export {
 // Scripted driver
 export {
   type ScriptStep,
+  type MouseScriptStep,
   type RunScriptOptions,
   type RunScriptResult,
   type MouseMoveStepOptions,
