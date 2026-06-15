@@ -1775,6 +1775,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.englishSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "English-source documentation. This article has not been translated yet."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.footer.counterBlock"
       },
       "kind": "message",

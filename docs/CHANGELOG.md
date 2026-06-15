@@ -24,6 +24,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   footer hide/show gesture, the quit confirmation now renders as a compact
   themed modal with readable action keys, and the Blocks section now opens the
   interactive `CounterDemoBlock` preview first.
+- **DOGFOOD locale demo readiness** — DOGFOOD no longer enables high-visibility
+  missing-localization markers by default in the user-facing docs app, so
+  incomplete non-English locales fall back to source copy instead of leaking
+  marker text during release demos. Non-English documentation views now label
+  intentionally untranslated Markdown as English-source content while keeping
+  the maintainer-facing i18n completeness and debt gates intact.
 
 ### 🧭 Planning
 
@@ -37,6 +43,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/DF-075-dogfood-post-release-polish.md` scopes a bounded #334
   follow-up for disabling the hidden double-`Tab` footer toggle, restyling the
   quit confirmation, and making Blocks lead with `CounterDemoBlock`.
+- **DOGFOOD locale demo-readiness shaping** —
+  `docs/design/LX-020-dogfood-locale-demo-readiness.md` scopes a bounded #340
+  repair for keeping non-English DOGFOOD release-demo paths free of missing
+  localization markers while labeling English-source docs honestly.
 
 ## [7.1.0] - 2026-06-14
 
