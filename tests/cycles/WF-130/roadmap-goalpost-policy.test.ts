@@ -115,6 +115,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
     expect(bearing).toContain('the immediate focus is');
     expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
+    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 10 open and 0 closed milestone items');
     expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 

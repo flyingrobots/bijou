@@ -122,7 +122,7 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 9 open and
+- The `v7.2.0` milestone is the current active stabilization lane: 10 open and
   0 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
