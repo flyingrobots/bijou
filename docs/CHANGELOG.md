@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Dependency security patch** — the lockfile now resolves `esbuild@0.28.1`,
+  clearing the GitHub/npm audit advisories reported against the development
+  tooling path for `esbuild@0.28.0`.
 - **Framework mouse fallthrough** — framed workspace mouse movement, releases,
   and non-left presses now fall through to the active page instead of being
   swallowed by the shell router. `@flyingrobots/bijou-tui` also exposes

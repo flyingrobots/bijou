@@ -60,7 +60,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 10 | 0 |');
+    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 8 | 4 |');
     expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
     expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
     expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
@@ -73,8 +73,8 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('31 | 6');
     expect(roadmap).toContain('Next Pull');
-    expect(roadmap).toContain('v7.2.0 framework input stabilization');
-    expect(roadmap).toContain('workspace mouse fallthrough');
+    expect(roadmap).toContain('v7.2.0 esbuild security patch');
+    expect(roadmap).toContain('prove `npm audit` is clean');
     expect(roadmap).toContain('versioned artifact semantics');
     expect(roadmap).toContain('DOGFOOD fixtures that round-trip');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/270');
@@ -96,10 +96,12 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('[#316]');
     expect(roadmap).toContain('[#306]');
     expect(roadmap).toContain('[#249]');
-    expect(roadmap).toContain('Open Pull Requests Outside Release Horizons');
+    expect(roadmap).toContain('Dependency Security Lineage');
+    expect(roadmap).toContain('[#357]');
+    expect(roadmap).toContain('[#358]');
     expect(roadmap).toContain('[#326]');
     expect(roadmap).toContain('was not selected for `v7.1.0`');
-    expect(roadmap).toContain('until it is green, current, and deliberately selected');
+    expect(roadmap).toContain('superseded by issue-backed');
     expect(roadmap).toContain('The `v7.1.0` GitHub milestone is closed release lineage.');
     expect(roadmap).toContain('Closed Lineage');
     expect(roadmap).toContain('Portable `ui-scene-ir/1` proof');
@@ -115,7 +117,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
     expect(bearing).toContain('the immediate focus is');
     expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
-    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 10 open and 0 closed milestone items');
+    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 8 open and 4 closed milestone items');
     expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 

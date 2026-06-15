@@ -102,9 +102,11 @@ Current direction and active tensions. Historical ship data is in
   release lineage, not the next implementation target.
 - `v7.2.0` is now selected as a narrow stabilization and demo-integrity release,
   not as a broad feature train.
-- The first `v7.2.0` pull is RE-041: fix framework mouse fallthrough (#344),
-  expose page-scoped frame helpers (#345), and add scripted mouse builders
-  (#353).
+- The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
+  fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
+  mouse builders (#353).
+- The current urgent `v7.2.0` pull is WF-133: patch `esbuild@0.28.0` to
+  `0.28.1` for #357.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -122,12 +124,12 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 10 open and
-  0 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is the current active stabilization lane: 8 open and
+  4 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
-  issues selected in #354.
+  issues selected in #354, plus narrow security repairs such as #357.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
   versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
   modes, debug facts, DOGFOOD round-trip fixtures, and capture evidence.
@@ -189,7 +191,7 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land RE-041 for #344, #345, and #353.
+1. Land WF-133 for #357 so the GitHub/npm audit is clean.
 2. Move through selected `v7.2.0` DOGFOOD demo-integrity items from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt
@@ -198,8 +200,8 @@ Recommended pull order:
    out of `Beyond`.
 6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-7. Keep dependency PR #326 outside release horizons until it is green, current,
-   and deliberately selected.
+7. Keep closed dependency PR #326 as superseded lineage, not active release
+   work.
 
 Non-goals for the next cycle:
 
