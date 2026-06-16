@@ -16,6 +16,8 @@ const DRAWER_BORDER_CHARS = new Set(['┌', '┐', '└', '┘', '│', '─']);
 const KEY_F2 = { key: '\x1bOQ' };
 const KEY_DOWN = { key: '\x1b[B' };
 const KEY_ENTER = { key: '\r' };
+const KEY_ESCAPE = { key: '\x1b' };
+const KEY_CTRL_P = { key: '\x10' };
 const KEY_Q = { key: 'q' };
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
@@ -54,6 +56,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
+      KEY_ESCAPE,
       KEY_Q,
     ], { ctx });
     const model = result.model as {
@@ -67,8 +70,35 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     expect(model.docsModel.activeShellThemeId).toBe('dogfood:light');
     assertBorderCellsPaintBackground(
       frame,
-      centeredModalBorderCells(frame),
+      centeredModalBorderCells(frame, 'Quit?'),
       'quit modal',
+    );
+  });
+
+  it('paints DOGFOOD light command palette menu chrome with explicit backgrounds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs' });
+
+    const result = await runScript(app, [
+      KEY_F2,
+      KEY_DOWN,
+      KEY_ENTER,
+      KEY_ESCAPE,
+      KEY_CTRL_P,
+    ], { ctx });
+    const model = result.model as {
+      docsModel: { activeShellThemeId?: string };
+    };
+    const frame = normalizeViewOutput(app.view(result.model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+
+    expect(model.docsModel.activeShellThemeId).toBe('dogfood:light');
+    assertBorderCellsPaintBackground(
+      frame,
+      centeredModalBorderCells(frame, 'Command Palette'),
+      'command palette',
     );
   });
 
@@ -114,8 +144,8 @@ function rightAnchoredDrawerBorderCells(surface: Surface): readonly [number, num
   return cells;
 }
 
-function centeredModalBorderCells(surface: Surface): readonly [number, number][] {
-  const modalTitleRow = firstBorderRowContaining(surface, 'Quit?');
+function centeredModalBorderCells(surface: Surface, title: string): readonly [number, number][] {
+  const modalTitleRow = firstBorderRowContaining(surface, title);
   const topRow = findNearestBorderRow(surface, modalTitleRow, -1);
   const bottomRow = findNearestBorderRow(surface, modalTitleRow, 1);
   const startCol = firstTopBorderCol(surface, 0, topRow);
