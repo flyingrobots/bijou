@@ -45,8 +45,9 @@ describe('WF-130 roadmap goalpost policy', () => {
     const bearing = normalizeWhitespace(read('docs/BEARING.md'));
     const releaseRunbook = normalizeWhitespace(read('docs/release.md'));
     const dx046Design = normalizeWhitespace(read('docs/design/DX-046-graphql-authored-dogfood-block-fixture.md'));
+    const dx047Design = normalizeWhitespace(read('docs/design/DX-047-blocks-app-binding-snippets.md'));
 
-    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-15.');
+    expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-06-16.');
     expect(roadmap).toContain('The latest shipped public release is');
     expect(roadmap).toContain('v7.1.0');
     expect(roadmap).toContain('v7.0.0');
@@ -60,7 +61,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 6 | 8 |');
+    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 4 | 10 |');
     expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
     expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
     expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
@@ -73,9 +74,10 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('31 | 6');
     expect(roadmap).toContain('Next Pull');
-    expect(roadmap).toContain('DOGFOOD light theme readiness');
-    expect(roadmap).toContain('unpainted background path');
-    expect(roadmap).toContain('DOGFOOD chrome contrast');
+    expect(roadmap).toContain('Blocks app-binding snippets');
+    expect(roadmap).toContain('CounterDemoBlock` app-binding walkthrough');
+    expect(roadmap).toContain('application-owned state and command-intent routing');
+    expect(roadmap).toContain('real APIs instead of drifting into pseudo-code');
     expect(roadmap).toContain('versioned artifact semantics');
     expect(roadmap).toContain('DOGFOOD fixtures that round-trip');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/270');
@@ -118,7 +120,8 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
     expect(bearing).toContain('the immediate focus is');
     expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
-    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 6 open and 8 closed milestone items');
+    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 4 open and 10 closed milestone items');
+    expect(bearing).toContain('The current urgent `v7.2.0` pull is DX-047');
     expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 
@@ -131,6 +134,10 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(dx046Design).toContain('Parent tracker: [#302](https://github.com/flyingrobots/bijou/issues/302)');
     expect(dx046Design).toContain('NavigationListBlock');
     expect(dx046Design).toContain('Tests To Write First');
+    expect(dx047Design).toContain('github_issue: 342');
+    expect(dx047Design).toContain('CounterDemoBlock');
+    expect(dx047Design).toContain('application state/update path');
+    expect(dx047Design).toContain('command-intent routing');
   });
 
   it('disables Markdown line-length linting for project docs', () => {

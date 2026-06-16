@@ -64,6 +64,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/DL-017-dogfood-light-theme-readiness.md` scopes a bounded #341
   repair for light-theme settings/menu/modal background ownership, chrome
   contrast, and DOGFOOD theme diagnostics.
+- **Blocks app-binding snippets shaping** —
+  `docs/design/DX-047-blocks-app-binding-snippets.md` scopes a bounded #342
+  repair for showing how DOGFOOD's `CounterDemoBlock` binds to application
+  state, command-intent routing, render-time config, and lower-mode output.
 
 ## [7.1.0] - 2026-06-14
 

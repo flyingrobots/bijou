@@ -105,8 +105,11 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
-- The current urgent `v7.2.0` pull is DL-017: make DOGFOOD light-theme chrome
-  painted, readable, and diagnostically covered for #341.
+- The localization (#340), DOGFOOD shell polish (#334), and light-theme
+  readiness (#341) repairs have landed as v7.2.0 demo-integrity lineage.
+- The current urgent `v7.2.0` pull is DX-047: add Blocks app-binding snippets
+  for #342 so the release video can show how `CounterDemoBlock` binds to
+  application state and command routing.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -124,8 +127,8 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 6 open and
-  8 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is the current active stabilization lane: 4 open and
+  10 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
@@ -168,13 +171,14 @@ Current direction and active tensions. Historical ship data is in
 After the `v7.1.0` tag and publish verification, the immediate focus is
 `v7.2.0` stabilization.
 
-The first pull is RE-041:
+The current pull is DX-047:
 
 ```text
-workspace mouse fallthrough
-  -> page-scoped frame helper exports
-    -> scripted mouse driver helpers
-      -> deterministic pointer regressions
+CounterDemoBlock fixture
+  -> app-owned state snippet
+    -> command-intent routing
+      -> lower-mode explanation
+        -> DOGFOOD docs proof
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
@@ -191,8 +195,9 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land DL-017 for #341 so DOGFOOD light-theme chrome is painted, readable,
-   and covered by deterministic theme diagnostics.
+1. Land DX-047 for #342 so Blocks docs explain application-owned state,
+   command-intent routing, and render-time binding with real
+   `CounterDemoBlock` APIs.
 2. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
    from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
