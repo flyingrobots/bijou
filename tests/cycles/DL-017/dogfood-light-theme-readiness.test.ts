@@ -19,6 +19,7 @@ const KEY_ENTER = { key: '\r' };
 const KEY_ESCAPE = { key: '\x1b' };
 const KEY_CTRL_P = { key: '\x10' };
 const KEY_Q = { key: 'q' };
+const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false } as const;
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
   afterEach(() => _resetDefaultContextForTesting());
@@ -128,6 +129,44 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     const report = doctorTheme(lightTheme!, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
     expect(report.issues.filter((issue) => issue.kind === 'low-contrast')).toEqual([]);
   });
+
+  it('renders Theme Lab and Theme Inspector swatch text with readable light theme tokens', async () => {
+    const lightTheme = DOGFOOD_SHELL_THEMES[0]?.modes?.find((mode) => mode.id === 'light')?.theme;
+    expect(lightTheme?.name).toBe('dogfood-light');
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 56 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'themes' });
+
+    const labResult = await runScript(app, [
+      KEY_F2,
+      KEY_DOWN,
+      KEY_ENTER,
+      KEY_ESCAPE,
+    ], { ctx });
+    const labFrame = normalizeViewOutput(app.view(labResult.model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    assertTokenTextColors(
+      labFrame,
+      'semantic.success',
+      lightTheme!.surface.primary.hex,
+      lightTheme!.surface.muted.hex,
+      'Theme Lab',
+    );
+
+    const [inspectorModel] = app.update(MSG_F10, labResult.model);
+    const inspectorFrame = normalizeViewOutput(app.view(inspectorModel), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    assertTokenTextColors(
+      inspectorFrame,
+      'semantic.success',
+      lightTheme!.surface.primary.hex,
+      lightTheme!.surface.muted.hex,
+      'Theme Inspector',
+    );
+  });
 });
 
 function rightAnchoredDrawerBorderCells(surface: Surface): readonly [number, number][] {
@@ -174,6 +213,48 @@ function assertBorderCellsPaintBackground(
   });
 
   expect(unpainted, `${label} border cells without background`).toEqual([]);
+}
+
+function assertTokenTextColors(
+  surface: Surface,
+  tokenLabel: string,
+  expectedLabelFg: string,
+  expectedValueFg: string,
+  surfaceLabel: string,
+): void {
+  const labelCell = firstTextCell(surface, tokenLabel);
+  expect(labelCell.cell.fg, `${surfaceLabel} ${tokenLabel} label foreground`).toBe(expectedLabelFg);
+
+  const tokenValue = firstHexTokenCellAfter(surface, labelCell.y, labelCell.x + tokenLabel.length);
+  expect(tokenValue.cell.fg, `${surfaceLabel} ${tokenLabel} value foreground`).toBe(expectedValueFg);
+}
+
+function firstTextCell(
+  surface: Surface,
+  text: string,
+): { readonly x: number; readonly y: number; readonly cell: ReturnType<Surface['get']> } {
+  for (let y = 0; y < surface.height; y += 1) {
+    const line = Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).join('');
+    const x = line.indexOf(text);
+    if (x !== -1) {
+      return { x, y, cell: surface.get(x, y) };
+    }
+  }
+  throw new Error(`No row containing "${text}".`);
+}
+
+function firstHexTokenCellAfter(
+  surface: Surface,
+  y: number,
+  startX: number,
+): { readonly x: number; readonly y: number; readonly cell: ReturnType<Surface['get']> } {
+  for (let x = Math.max(0, startX); x < surface.width; x += 1) {
+    const cell = surface.get(x, y);
+    if (cell.char === '#') {
+      return { x, y, cell };
+    }
+  }
+  throw new Error(`No hex token cell found on row ${y} after column ${startX}.`);
 }
 
 function firstTopBorderCol(surface: Surface, start: number, row = 0): number {
