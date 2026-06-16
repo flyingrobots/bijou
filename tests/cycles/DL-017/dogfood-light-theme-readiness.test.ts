@@ -19,6 +19,7 @@ const KEY_ENTER = { key: '\r' };
 const KEY_ESCAPE = { key: '\x1b' };
 const KEY_CTRL_P = { key: '\x10' };
 const KEY_Q = { key: 'q' };
+const MSG_CTRL_T = { type: 'key', key: 't', ctrl: true, alt: false, shift: false } as const;
 const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false } as const;
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
@@ -136,13 +137,9 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 56 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'themes' });
 
-    const labResult = await runScript(app, [
-      KEY_F2,
-      KEY_DOWN,
-      KEY_ENTER,
-      KEY_ESCAPE,
-    ], { ctx });
-    const labFrame = normalizeViewOutput(app.view(labResult.model), {
+    const [initialModel] = app.init();
+    const [lightModel] = app.update(MSG_CTRL_T, initialModel);
+    const labFrame = normalizeViewOutput(app.view(lightModel), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
@@ -154,7 +151,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
       'Theme Lab',
     );
 
-    const [inspectorModel] = app.update(MSG_F10, labResult.model);
+    const [inspectorModel] = app.update(MSG_F10, lightModel);
     const inspectorFrame = normalizeViewOutput(app.view(inspectorModel), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
