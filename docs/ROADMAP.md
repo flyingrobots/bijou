@@ -38,7 +38,7 @@ V7 story harder to use, test, or demonstrate.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
-| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 5 | 8 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
+| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 6 | 8 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
 | `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Latest shipped release lineage after the release PR merges. Complete; do not reopen for new feature work. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Shipped release lineage. Complete; do not reopen for new feature work. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 31 | 6 | Active forward backlog. Promote shaped work from here into a versioned release. |
