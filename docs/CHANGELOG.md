@@ -47,6 +47,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/LX-020-dogfood-locale-demo-readiness.md` scopes a bounded #340
   repair for keeping non-English DOGFOOD release-demo paths free of missing
   localization markers while labeling English-source docs honestly.
+- **DOGFOOD light-theme readiness shaping** —
+  `docs/design/DL-017-dogfood-light-theme-readiness.md` scopes a bounded #341
+  repair for light-theme settings/menu/modal background ownership, chrome
+  contrast, and DOGFOOD theme diagnostics.
 
 ## [7.1.0] - 2026-06-14
 
