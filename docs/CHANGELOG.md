@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Documentation
+
+- **Blocks app-binding snippets** — DOGFOOD's Blocks docs now show how
+  `CounterDemoBlock` binds to application-owned state, key-driven command
+  intents, update routing, render-time config, and pipe/accessible lower modes
+  so the release demo can explain how a reusable Block becomes app code.
+
 ### Fixed
 
 - **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
