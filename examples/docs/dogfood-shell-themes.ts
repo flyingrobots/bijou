@@ -44,8 +44,8 @@ function cloneThemeWithName(theme: Theme, name: string): Theme {
   };
 }
 
-const DOGFOOD_DARK_THEME = cloneThemeWithName(BIJOU_DARK, 'dogfood-dark');
-const DOGFOOD_LIGHT_THEME = cloneThemeWithName(BIJOU_LIGHT, 'dogfood-light');
+export const DOGFOOD_DARK_THEME = cloneThemeWithName(BIJOU_DARK, 'dogfood-dark');
+export const DOGFOOD_LIGHT_THEME = cloneThemeWithName(BIJOU_LIGHT, 'dogfood-light');
 
 const DOGFOOD_READABLE_FOREGROUNDS = [
   'semantic.primary',
@@ -86,7 +86,14 @@ for (const foreground of DOGFOOD_STATUS_FOREGROUNDS) {
 
 for (const background of DOGFOOD_SURFACE_BACKGROUNDS) {
   dogfoodPairs.chrome('ui.cursor', background);
+  dogfoodPairs.chrome('border.primary', background);
+  dogfoodPairs.chrome('border.secondary', background);
+  dogfoodPairs.chrome('ui.scrollThumb', background);
+  dogfoodPairs.chrome('border.muted', background, { minRatio: 3 });
+  dogfoodPairs.chrome('ui.scrollTrack', background, { minRatio: 3 });
 }
+
+dogfoodPairs.chrome('ui.focusGutter', 'ui.focusGutter.bg');
 
 export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 

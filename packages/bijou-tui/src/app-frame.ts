@@ -106,6 +106,7 @@ import {
   resolveFrameShellThemeChoices,
   resolveCurrentShellTheme,
   resolveNextShellTheme,
+  resolveShellThemeModeToggle,
   resolveShellThemeForContext,
   resolveFrameSettings,
   resolveFrameNotificationCenter,
@@ -904,6 +905,7 @@ export function createFramedApp<PageModel, Msg>(
 
   const frameKeys = createFrameKeyMap({
     enableSettings: options.settings != null || enableShellThemeSettings,
+    enableShellThemeModeToggle: shellThemeSpecs.some((theme) => (theme.modes?.length ?? 0) > 1),
     enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
     i18n: options.i18n,
   });
@@ -1098,6 +1100,11 @@ export function createFramedApp<PageModel, Msg>(
       teaCmds.push(...cmds);
       return nextModel;
     },
+    'toggle-shell-theme-mode': (model, _cmd, teaCmds) => {
+      const [nextModel, cmds] = toggleShellThemeMode(model);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
 
     // --- notification center ---
     'notification-center-scroll': (model, cmd) => {
@@ -1184,7 +1191,16 @@ export function createFramedApp<PageModel, Msg>(
     },
     'palette-key': (model, cmd, teaCmds) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'palette-key' }>;
-      const [nextModel, cmds] = handlePaletteKey(c.msg, model, paletteKeys, options, pagesById);
+      const [nextModel, cmds] = handlePaletteKey(
+        c.msg,
+        model,
+        paletteKeys,
+        options,
+        pagesById,
+        (action, closedModel) => action.type === 'toggle-shell-theme-mode'
+          ? toggleShellThemeMode(closedModel)
+          : undefined,
+      );
       teaCmds.push(...cmds);
       return nextModel;
     },
@@ -1291,6 +1307,9 @@ export function createFramedApp<PageModel, Msg>(
     if (action.type === 'open-palette' && options.enableCommandPalette) {
       return [{ type: 'observed-key', msg, route }, { type: 'open-command-palette' }];
     }
+    if (action.type === 'toggle-shell-theme-mode') {
+      return [{ type: 'observed-key', msg, route }, { type: 'toggle-shell-theme-mode' }];
+    }
     return [{ type: 'observed-key', msg, route }, { type: 'apply-frame-action', action }];
   }
 
@@ -1316,6 +1335,9 @@ export function createFramedApp<PageModel, Msg>(
         ? [obs, { type: 'close-palette' }]
         : [obs, { type: 'open-command-palette' }];
     }
+    if (frameAction?.type === 'toggle-shell-theme-mode') {
+      return [obs, { type: 'toggle-shell-theme-mode' }];
+    }
     if (frameAction?.type === 'toggle-notifications') {
       return [obs, { type: 'close-palette' }, { type: 'apply-frame-action', action: frameAction }];
     }
@@ -1336,6 +1358,9 @@ export function createFramedApp<PageModel, Msg>(
       return quitRequestCommands(msg, 'help');
     }
     const helpAction = frameKeys.handle(msg);
+    if (helpAction?.type === 'toggle-shell-theme-mode') {
+      return [obs, { type: 'toggle-shell-theme-mode' }];
+    }
     if (helpAction?.type === 'toggle-perf-hud') {
       return [obs, { type: 'apply-frame-action', action: helpAction }];
     }
@@ -1377,6 +1402,9 @@ export function createFramedApp<PageModel, Msg>(
       return [obs, { type: 'open-command-palette' }];
     }
     const settingsFrameAction = frameKeys.handle(msg);
+    if (settingsFrameAction?.type === 'toggle-shell-theme-mode') {
+      return [obs, { type: 'toggle-shell-theme-mode' }];
+    }
     if (settingsFrameAction?.type === 'toggle-notifications') {
       return [obs, { type: 'apply-frame-action', action: settingsFrameAction }];
     }
@@ -1442,6 +1470,9 @@ export function createFramedApp<PageModel, Msg>(
       return quitRequestCommands(msg, 'frame');
     }
     const centerFrameAction = frameKeys.handle(msg);
+    if (centerFrameAction?.type === 'toggle-shell-theme-mode') {
+      return [obs, { type: 'toggle-shell-theme-mode' }];
+    }
     if (centerFrameAction?.type === 'toggle-notifications') {
       return [obs, { type: 'apply-frame-action', action: centerFrameAction }];
     }
@@ -2228,6 +2259,47 @@ export function createFramedApp<PageModel, Msg>(
     return [nextModel, notificationCmds];
   }
 
+  function pushShellThemeModeFeedback(
+    model: InternalFrameModel<PageModel, Msg>,
+    nextTheme: ResolvedFrameShellTheme,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    if (!frameNotificationOptions.enabled) {
+      return [model, []];
+    }
+    const nowMs = resolveClock(resolveFrameCtx()).now();
+    const notifications = pushNotification(model.runtimeNotifications, {
+      title: frameMessage(options.i18n, 'settings.title', 'Settings'),
+      message: frameMessage(
+        options.i18n,
+        'settings.shellTheme.feedback',
+        'Shell theme set to {theme}.',
+        { theme: nextTheme.label },
+      ),
+      variant: 'TOAST',
+      tone: 'INFO',
+      width: SETTINGS_FEEDBACK_TOAST_WIDTH,
+      placement: frameNotificationOptions.placement,
+      durationMs: 2_500,
+      overflow: frameNotificationOptions.overflow,
+    }, nowMs);
+    return applyFrameNotificationState(model, notifications, nowMs);
+  }
+
+  function toggleShellThemeMode(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    ensureResolvedShellThemes(resolveFrameCtx());
+    const nextTheme = resolveShellThemeModeToggle(resolvedShellThemes, model.activeShellThemeId);
+    if (nextTheme == null) {
+      return [model, []];
+    }
+    publishShellThemeContext(nextTheme);
+    return pushShellThemeModeFeedback({
+      ...model,
+      activeShellThemeId: nextTheme.id,
+    }, nextTheme);
+  }
+
   const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
     init() {
       const pageModels: Record<string, PageModel> = {};
@@ -2345,6 +2417,9 @@ export function createFramedApp<PageModel, Msg>(
         if (action.type === 'notification-tick') {
           const notifications = tickNotifications(model.runtimeNotifications, action.atMs);
           return applyFrameNotificationState(model, notifications, action.atMs, true);
+        }
+        if (action.type === 'toggle-shell-theme-mode') {
+          return toggleShellThemeMode(model);
         }
         if (action.type === 'transition') {
           // Ignore stale transition ticks from a previous generation

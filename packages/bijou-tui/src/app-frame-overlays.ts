@@ -268,6 +268,32 @@ export function resolveNextShellTheme(
   return shellThemes[(currentIndex + 1) % shellThemes.length];
 }
 
+export function resolveShellThemeModeToggle(
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  activeShellThemeId: string | undefined,
+): ResolvedFrameShellTheme | undefined {
+  const current = resolveCurrentShellTheme(shellThemes, activeShellThemeId);
+  if (current?.modeId == null) return undefined;
+
+  const siblings = shellThemes.filter((theme) =>
+    theme.shellThemeId === current.shellThemeId && theme.modeId != null,
+  );
+  if (siblings.length < 2) return undefined;
+
+  const oppositeModeId = current.modeId === 'dark'
+    ? 'light'
+    : current.modeId === 'light'
+      ? 'dark'
+      : undefined;
+  const opposite = oppositeModeId == null
+    ? undefined
+    : siblings.find((theme) => theme.modeId === oppositeModeId);
+  if (opposite != null) return opposite;
+
+  const currentIndex = Math.max(0, siblings.findIndex((theme) => theme.id === current.id));
+  return siblings[(currentIndex + 1) % siblings.length];
+}
+
 export function resolveShellThemeForContext(
   shellThemes: readonly ResolvedFrameShellTheme[],
   ctx: BijouContext | undefined,

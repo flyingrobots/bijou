@@ -41,6 +41,7 @@ import {
   type FrameOverlayContext,
   type PageTransition,
   underlyingFrameLayer,
+  wrapFrameMsg,
 } from './app-frame.js';
 import { activeRuntimeView } from './runtime-engine.js';
 import { QUIT, isCmdCleanup, type Cmd, type MouseMsg } from './types.js';
@@ -2577,6 +2578,94 @@ describe('createFramedApp', () => {
     }
   });
 
+  it('toggles the active shell theme family mode with ctrl+t', () => {
+    const explicitCtx = createTestContext({ mode: 'interactive' });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+    const emitted: Array<{
+      readonly id: string;
+      readonly shellThemeId: string | undefined;
+      readonly modeId: string | undefined;
+    }> = [];
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        shellThemes: [
+          {
+            id: 'dogfood',
+            label: 'DOGFOOD',
+            modes: [
+              { id: 'dark', label: 'Dark', theme: explicitCtx.theme.theme },
+              { id: 'light', label: 'Light', theme: alternateTheme },
+            ],
+          },
+          { id: 'single', label: 'Single', theme: explicitCtx.theme.theme },
+        ],
+        onShellThemeChange(change) {
+          emitted.push({
+            id: change.shellTheme.id,
+            shellThemeId: change.shellThemeId,
+            modeId: change.modeId,
+          });
+        },
+      });
+
+      let [model] = app.init();
+      expect(model.activeShellThemeId).toBe('dogfood:dark');
+
+      [model] = app.update(ctrlKey('t'), model);
+      expect(model.activeShellThemeId).toBe('dogfood:light');
+      expect(model.settingsOpen).toBe(false);
+      expect(emitted).toEqual([
+        { id: 'dogfood:dark', shellThemeId: 'dogfood', modeId: 'dark' },
+        { id: 'dogfood:light', shellThemeId: 'dogfood', modeId: 'light' },
+      ]);
+      expect(model.runtimeNotifications.items[0]?.message).toBe('Shell theme set to DOGFOOD / Light.');
+
+      [model] = app.update(ctrlKey('t'), model);
+      expect(model.activeShellThemeId).toBe('dogfood:dark');
+      expect(emitted.at(-1)).toEqual({
+        id: 'dogfood:dark',
+        shellThemeId: 'dogfood',
+        modeId: 'dark',
+      });
+      expect(model.activeShellThemeId).not.toBe('single');
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
+  it('toggles shell theme mode through the frame action wrapper', () => {
+    const explicitCtx = createTestContext({ mode: 'interactive' });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        shellThemes: [{
+          id: 'dogfood',
+          label: 'DOGFOOD',
+          modes: [
+            { id: 'dark', label: 'Dark', theme: explicitCtx.theme.theme },
+            { id: 'light', label: 'Light', theme: alternateTheme },
+          ],
+        }],
+      });
+
+      let [model] = app.init();
+      [model] = app.update(wrapFrameMsg({ type: 'toggle-shell-theme-mode' }), model);
+
+      expect(model.activeShellThemeId).toBe('dogfood:light');
+      expect(model.runtimeNotifications.items[0]?.message).toBe('Shell theme set to DOGFOOD / Light.');
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
   it('uses the run-time ctx as the shell rendering context when shellThemes are configured without an ambient default', async () => {
     const clock = mockClock();
     const explicitCtx = createTestContext({
@@ -2981,6 +3070,43 @@ describe('createFramedApp', () => {
 
     expect((result.model as any).settingsOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('toggles shell theme mode from the standard command palette entry', async () => {
+    const explicitCtx = createTestContext({ mode: 'interactive' });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        enableCommandPalette: true,
+        shellThemes: [{
+          id: 'dogfood',
+          label: 'DOGFOOD',
+          modes: [
+            { id: 'dark', label: 'Dark', theme: explicitCtx.theme.theme },
+            { id: 'light', label: 'Light', theme: alternateTheme },
+          ],
+        }],
+      });
+
+      const result = await runScript(app, [
+        { key: KEY_CTRL_P },
+        { key: 't' },
+        { key: 'h' },
+        { key: 'e' },
+        { key: 'm' },
+        { key: 'e' },
+        { key: KEY_ENTER },
+      ], { ctx: explicitCtx });
+
+      expect(result.model.activeShellThemeId).toBe('dogfood:light');
+      expect(result.model.commandPalette).toBeUndefined();
+    } finally {
+      setDefaultContext(testCtx);
+    }
   });
 
   it('opens the shell notification center with Shift+N and closes it with the same binding', () => {

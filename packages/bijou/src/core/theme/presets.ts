@@ -171,14 +171,14 @@ export const BIJOU_DARK: Theme<BaseStatusKey> = {
     success:   tv('#8bd67d'),
     warning:   tv('#f2c45d'),
     error:     tv('#ff8a80'),
-    muted:     tv('#5f6b86'),
+    muted:     tv('#77809d'),
   },
 
   ui: {
     cursor:        tv('#f2c45d'),
     focusGutter:   { hex: '#f2c45d', bg: '#171827', modifiers: ['bold'] },
     scrollThumb:   tv('#7aa7e8'),
-    scrollTrack:   tv('#5f6b86'),
+    scrollTrack:   tv('#77809d'),
     sectionHeader: tv('#f2c45d', ['bold']),
     logo:          tv('#f2c45d'),
     tableHeader:   tv('#f4e8bf', ['bold']),
@@ -235,14 +235,14 @@ export const BIJOU_LIGHT: Theme<BaseStatusKey> = {
     success:   tv('#246a3d'),
     warning:   tv('#7a5200'),
     error:     tv('#a33a3a'),
-    muted:     tv('#8a93a2'),
+    muted:     tv('#6f7888'),
   },
 
   ui: {
     cursor:        tv('#7a5200'),
     focusGutter:   { hex: '#7a5200', bg: '#fbf7ea', modifiers: ['bold'] },
     scrollThumb:   tv('#285c9e'),
-    scrollTrack:   tv('#cdd5e2'),
+    scrollTrack:   tv('#718399'),
     sectionHeader: tv('#7a5200', ['bold']),
     logo:          tv('#7a5200'),
     tableHeader:   tv('#1e2433', ['bold']),

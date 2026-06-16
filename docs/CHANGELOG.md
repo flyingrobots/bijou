@@ -8,6 +8,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
+  themes now inherit `Ctrl+T` from the shared frame shell to toggle the active
+  theme family between dark and light modes without opening Settings.
+- **Theme Lab light-mode readability** — DOGFOOD Theme Lab and Theme Inspector
+  token swatches now render diagnostic label/value text with the active shell
+  theme's readable foreground tokens while preserving the inspected token
+  colors in the swatch bars.
+- **DOGFOOD light theme readiness** — modal and drawer chrome now paint
+  explicit panel backgrounds behind border cells instead of inheriting
+  terminal-default background. The Bijou light theme has darker muted border
+  and scroll-track tokens, the dark theme's subtle chrome now clears the same
+  cross-mode diagnostic floor, and DOGFOOD's theme safe-pair diagnostics cover
+  chrome tokens used by borders, scrollbars, focus gutters, and modal surfaces.
 - **Dependency security patch** — the lockfile now resolves `esbuild@0.28.1`,
   clearing the GitHub/npm audit advisories reported against the development
   tooling path for `esbuild@0.28.0`.
@@ -47,6 +60,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/LX-020-dogfood-locale-demo-readiness.md` scopes a bounded #340
   repair for keeping non-English DOGFOOD release-demo paths free of missing
   localization markers while labeling English-source docs honestly.
+- **DOGFOOD light-theme readiness shaping** —
+  `docs/design/DL-017-dogfood-light-theme-readiness.md` scopes a bounded #341
+  repair for light-theme settings/menu/modal background ownership, chrome
+  contrast, and DOGFOOD theme diagnostics.
 
 ## [7.1.0] - 2026-06-14
 

@@ -3877,13 +3877,36 @@ function describeThemeToken(entry: ThemeTokenEntry, localization: LocalizationPo
   return (entry.stops ?? []).join(' -> ');
 }
 
+function foregroundOnlyToken(token: TokenValue): TokenValue {
+  return {
+    hex: token.hex,
+    modifiers: token.modifiers,
+  };
+}
+
+function themePaletteChromeTokens(theme: Theme): {
+  readonly group: TokenValue;
+  readonly label: TokenValue;
+  readonly value: TokenValue;
+} {
+  return {
+    group: foregroundOnlyToken(theme.ui.sectionHeader),
+    label: foregroundOnlyToken(theme.surface.primary),
+    value: foregroundOnlyToken(theme.surface.muted),
+  };
+}
+
 function renderThemeTokenPalette(
   theme: Theme,
   width: number,
   localization: LocalizationPort | undefined,
-  options: { readonly maxRows?: number } = {},
+  options: {
+    readonly maxRows?: number;
+    readonly chromeTheme?: Theme;
+  } = {},
 ): Surface {
   const safeWidth = Math.max(24, width);
+  const chrome = themePaletteChromeTokens(options.chromeTheme ?? theme);
   const rows = themePaletteRows(theme);
   const visibleRows = options.maxRows === undefined
     ? rows
@@ -3895,17 +3918,17 @@ function renderThemeTokenPalette(
 
   visibleRows.forEach((row, y) => {
     if (row.kind === 'group') {
-      writeSurfaceText(surface, 0, y, row.label.toUpperCase(), { hex: '#f2c45d', modifiers: ['bold'] });
+      writeSurfaceText(surface, 0, y, row.label.toUpperCase(), chrome.group);
       return;
     }
     renderSwatch(surface, row.entry, 0, y, swatchWidth);
-    writeSurfaceText(surface, labelX, y, row.entry.path, { hex: '#f4e8bf' });
+    writeSurfaceText(surface, labelX, y, row.entry.path, chrome.label);
     writeSurfaceText(
       surface,
       Math.min(safeWidth - 1, labelX + 26),
       y,
       describeThemeToken(row.entry, localization),
-      { hex: '#a8b1c7', modifiers: ['dim'] },
+      chrome.value,
     );
   });
 
@@ -3917,7 +3940,7 @@ function renderThemeTokenPalette(
       dogfoodText(localization, 'themePalette.moreTokens', '... {count} more tokens', {
         count: truncatedCount,
       }),
-      { hex: '#a8b1c7', modifiers: ['dim'] },
+      chrome.value,
     );
   }
 
@@ -4013,7 +4036,10 @@ function renderThemeLabPane(
       ctx,
     }),
     spacer(1, 1),
-    boxSurface(renderThemeTokenPalette(BIJOU_DARK, bodyWidth, localization, { maxRows: 28 }), {
+    boxSurface(renderThemeTokenPalette(BIJOU_DARK, bodyWidth, localization, {
+      maxRows: 28,
+      chromeTheme: ctx.theme.theme,
+    }), {
       title: dogfoodText(localization, 'themeLab.darkSwatchesTitle', 'bijou-dark token swatches'),
       width: Math.max(28, paneWidth),
       borderToken: docsThemeMutedBorderToken(landingTheme),
@@ -4022,7 +4048,10 @@ function renderThemeLabPane(
       ctx,
     }),
     spacer(1, 1),
-    boxSurface(renderThemeTokenPalette(BIJOU_LIGHT, bodyWidth, localization, { maxRows: 28 }), {
+    boxSurface(renderThemeTokenPalette(BIJOU_LIGHT, bodyWidth, localization, {
+      maxRows: 28,
+      chromeTheme: ctx.theme.theme,
+    }), {
       title: dogfoodText(localization, 'themeLab.lightSwatchesTitle', 'bijou-light token swatches'),
       width: Math.max(28, paneWidth),
       borderToken: docsThemeMutedBorderToken(landingTheme),
@@ -4052,7 +4081,9 @@ function renderThemeInspectorDrawer(
     })),
     line(dogfoodSafePairSummary(activeTheme.theme, localization)),
     spacer(1, 1),
-    renderThemeTokenPalette(activeTheme.theme, bodyWidth, localization),
+    renderThemeTokenPalette(activeTheme.theme, bodyWidth, localization, {
+      chromeTheme: activeTheme.theme,
+    }),
     spacer(1, 1),
     line(dogfoodText(localization, 'themeInspector.close', 'F10/Esc close • ↑/↓ scroll • q quit')),
   ]);

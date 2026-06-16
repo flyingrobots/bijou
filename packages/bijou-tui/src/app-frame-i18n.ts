@@ -23,6 +23,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('key.prevPane', 'Previous pane'),
     message('key.search', 'Search'),
     message('key.openPalette', 'Open command palette'),
+    message('key.toggleThemeMode', 'Toggle theme mode'),
     message('key.toggleMinimize', 'Fold/unfold pane'),
     message('key.toggleMaximize', 'Full-screen pane'),
     message('key.dockUp', 'Move pane up'),

@@ -60,7 +60,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`v9.0.0`: Product Workbench And Operator Surfaces');
     expect(roadmap).toContain('`v10.0.0+`: Ecosystem Integration');
     expect(roadmap).toContain('v6.0.0` was never published as a public package release');
-    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 7 | 6 |');
+    expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 6 | 8 |');
     expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
     expect(roadmap).toContain('Latest shipped release lineage after the release PR merges.');
     expect(roadmap).toContain('#270 release-readiness guardrails, #312 DOGFOOD i18n debt coverage');
@@ -73,8 +73,9 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(roadmap).toContain('`Beyond`');
     expect(roadmap).toContain('31 | 6');
     expect(roadmap).toContain('Next Pull');
-    expect(roadmap).toContain('DOGFOOD localization demo readiness');
-    expect(roadmap).toContain('preserve the maintainer-facing i18n debt ratchets');
+    expect(roadmap).toContain('DOGFOOD light theme readiness');
+    expect(roadmap).toContain('unpainted background path');
+    expect(roadmap).toContain('DOGFOOD chrome contrast');
     expect(roadmap).toContain('versioned artifact semantics');
     expect(roadmap).toContain('DOGFOOD fixtures that round-trip');
     expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/270');
@@ -117,7 +118,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
     expect(bearing).toContain('the immediate focus is');
     expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
-    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 7 open and 6 closed milestone items');
+    expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 6 open and 8 closed milestone items');
     expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
     expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 
