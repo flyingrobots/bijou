@@ -326,6 +326,16 @@ function mergeStyles(base: CellStyle, extra: CellStyle): CellStyle {
   };
 }
 
+function withFallbackBackground(style: CellStyle, background: Pick<CellStyle, 'bg' | 'bgRGB'>): CellStyle {
+  if (style.bg != null || style.bgRGB != null) return style;
+  if (background.bg == null && background.bgRGB == null) return style;
+  return {
+    ...style,
+    bg: background.bg,
+    bgRGB: background.bgRGB,
+  };
+}
+
 function plainSurfaceToString(surface: Surface): string {
   const lines: string[] = [];
   for (let y = 0; y < surface.height; y++) {
@@ -456,24 +466,25 @@ function renderBoxSurface(
   fillStyle: CellStyle,
   innerWidthOverride?: number,
 ): Surface {
+  const paintedBorderStyle = withFallbackBackground(borderStyle, fillStyle);
   const innerWidth = innerWidthOverride ?? lines.reduce((max, line) => Math.max(max, line.width), 0);
   const width = innerWidth + 4;
   const height = lines.length + 2;
   const surface = createSurface(width, height);
 
-  setStyledCell(surface, 0, 0, BORDER.tl, borderStyle);
-  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, 0, BORDER.h, borderStyle);
-  setStyledCell(surface, width - 1, 0, BORDER.tr, borderStyle);
+  setStyledCell(surface, 0, 0, BORDER.tl, paintedBorderStyle);
+  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, 0, BORDER.h, paintedBorderStyle);
+  setStyledCell(surface, width - 1, 0, BORDER.tr, paintedBorderStyle);
 
-  setStyledCell(surface, 0, height - 1, BORDER.bl, borderStyle);
-  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, height - 1, BORDER.h, borderStyle);
-  setStyledCell(surface, width - 1, height - 1, BORDER.br, borderStyle);
+  setStyledCell(surface, 0, height - 1, BORDER.bl, paintedBorderStyle);
+  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, height - 1, BORDER.h, paintedBorderStyle);
+  setStyledCell(surface, width - 1, height - 1, BORDER.br, paintedBorderStyle);
 
   for (let i = 0; i < lines.length; i++) {
     const y = i + 1;
-    setStyledCell(surface, 0, y, BORDER.v, borderStyle);
+    setStyledCell(surface, 0, y, BORDER.v, paintedBorderStyle);
     for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, y, ' ', fillStyle);
-    setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
+    setStyledCell(surface, width - 1, y, BORDER.v, paintedBorderStyle);
 
     const line = lineWithInheritedBackground(lines[i]!, fillStyle);
     if (line.width > 0 && innerWidth > 0) {
@@ -696,8 +707,8 @@ export function drawer(options: DrawerOptions): Overlay {
   const { width, height, row, col } = dims;
   const innerWidth = Math.max(0, width - 4); // border + padding on each side
 
-  const borderStyle = styleFromToken(options.borderToken, ctx);
   const fillStyle = backgroundStyleFromToken(options.bgToken, ctx);
+  const borderStyle = withFallbackBackground(styleFromToken(options.borderToken, ctx), fillStyle);
   const titleStyle = ctx ? { modifiers: ['bold'] as string[] } : {};
   const surface = createSurface(width, height);
 

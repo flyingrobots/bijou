@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD light theme readiness** — modal and drawer chrome now paint
+  explicit panel backgrounds behind border cells instead of inheriting
+  terminal-default background. The Bijou light theme has darker muted border
+  and scroll-track tokens, the dark theme's subtle chrome now clears the same
+  cross-mode diagnostic floor, and DOGFOOD's theme safe-pair diagnostics cover
+  chrome tokens used by borders, scrollbars, focus gutters, and modal surfaces.
 - **Dependency security patch** — the lockfile now resolves `esbuild@0.28.1`,
   clearing the GitHub/npm audit advisories reported against the development
   tooling path for `esbuild@0.28.0`.

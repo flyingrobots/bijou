@@ -1,0 +1,179 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { doctorTheme, type Surface } from '@flyingrobots/bijou';
+import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
+import {
+  DOGFOOD_SHELL_THEMES,
+  DOGFOOD_THEME_SAFE_PAIRS,
+} from '../../../examples/docs/dogfood-shell-themes.js';
+import { createDocsApp } from '../../../examples/docs/app.js';
+
+const DRAWER_BORDER_CHARS = new Set(['┌', '┐', '└', '┘', '│', '─']);
+const KEY_F2 = { key: '\x1bOQ' };
+const KEY_DOWN = { key: '\x1b[B' };
+const KEY_ENTER = { key: '\r' };
+const KEY_Q = { key: 'q' };
+
+describe('DL-017 DOGFOOD light theme readiness', () => {
+  afterEach(() => _resetDefaultContextForTesting());
+
+  it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs' });
+
+    const result = await runScript(app, [
+      KEY_F2,
+      KEY_DOWN,
+      KEY_ENTER,
+    ], { ctx });
+    const model = result.model as {
+      docsModel: { activeShellThemeId?: string };
+    };
+    const frame = normalizeViewOutput(app.view(result.model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+
+    expect(model.docsModel.activeShellThemeId).toBe('dogfood:light');
+    assertBorderCellsPaintBackground(
+      frame,
+      rightAnchoredDrawerBorderCells(frame),
+      'settings drawer',
+    );
+  });
+
+  it('paints DOGFOOD light quit modal chrome with explicit backgrounds', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs' });
+
+    const result = await runScript(app, [
+      KEY_F2,
+      KEY_DOWN,
+      KEY_ENTER,
+      KEY_Q,
+    ], { ctx });
+    const model = result.model as {
+      docsModel: { activeShellThemeId?: string };
+    };
+    const frame = normalizeViewOutput(app.view(result.model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+
+    expect(model.docsModel.activeShellThemeId).toBe('dogfood:light');
+    assertBorderCellsPaintBackground(
+      frame,
+      centeredModalBorderCells(frame),
+      'quit modal',
+    );
+  });
+
+  it('covers DOGFOOD light chrome tokens in safe-pair diagnostics', () => {
+    const lightTheme = DOGFOOD_SHELL_THEMES[0]?.modes?.find((mode) => mode.id === 'light')?.theme;
+    expect(lightTheme?.name).toBe('dogfood-light');
+
+    const requiredChromePairs = [
+      'border.primary -> surface.elevated.bg',
+      'border.primary -> surface.overlay.bg',
+      'border.muted -> surface.primary.bg',
+      'border.muted -> surface.elevated.bg',
+      'ui.scrollThumb -> surface.elevated.bg',
+      'ui.scrollTrack -> surface.elevated.bg',
+      'ui.focusGutter -> ui.focusGutter.bg',
+    ];
+    const chromePairs = new Set(
+      DOGFOOD_THEME_SAFE_PAIRS
+        .filter((pair) => pair.kind === 'chrome')
+        .map((pair) => `${pair.foreground} -> ${pair.background}`),
+    );
+
+    for (const pair of requiredChromePairs) {
+      expect(chromePairs).toContain(pair);
+    }
+
+    const report = doctorTheme(lightTheme!, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
+    expect(report.issues.filter((issue) => issue.kind === 'low-contrast')).toEqual([]);
+  });
+});
+
+function rightAnchoredDrawerBorderCells(surface: Surface): readonly [number, number][] {
+  const startCol = Math.floor(surface.width * 0.55);
+  const cells: [number, number][] = [];
+  for (let y = 0; y < surface.height; y += 1) {
+    for (let x = startCol; x < surface.width; x += 1) {
+      if (DRAWER_BORDER_CHARS.has(surface.get(x, y).char)) {
+        cells.push([x, y]);
+      }
+    }
+  }
+  expect(cells.length).toBeGreaterThan(0);
+  return cells;
+}
+
+function centeredModalBorderCells(surface: Surface): readonly [number, number][] {
+  const modalTitleRow = firstBorderRowContaining(surface, 'Quit?');
+  const topRow = findNearestBorderRow(surface, modalTitleRow, -1);
+  const bottomRow = findNearestBorderRow(surface, modalTitleRow, 1);
+  const startCol = firstTopBorderCol(surface, 0, topRow);
+  const endCol = lastTopBorderCol(surface, topRow);
+
+  const cells: [number, number][] = [];
+  for (let y = topRow; y <= bottomRow; y += 1) {
+    for (let x = startCol; x <= endCol; x += 1) {
+      if (DRAWER_BORDER_CHARS.has(surface.get(x, y).char)) {
+        cells.push([x, y]);
+      }
+    }
+  }
+  expect(cells.length).toBeGreaterThan(0);
+  return cells;
+}
+
+function assertBorderCellsPaintBackground(
+  surface: Surface,
+  cells: readonly [number, number][],
+  label: string,
+): void {
+  const unpainted = cells.filter(([x, y]) => {
+    const cell = surface.get(x, y);
+    return cell.bg == null && cell.bgRGB == null;
+  });
+
+  expect(unpainted, `${label} border cells without background`).toEqual([]);
+}
+
+function firstTopBorderCol(surface: Surface, start: number, row = 0): number {
+  for (let x = start; x < surface.width; x += 1) {
+    if (surface.get(x, row).char === '┌') return x;
+  }
+  throw new Error(`No top-left border found from column ${start} on row ${row}.`);
+}
+
+function lastTopBorderCol(surface: Surface, row: number): number {
+  for (let x = surface.width - 1; x >= 0; x -= 1) {
+    if (surface.get(x, row).char === '┐') return x;
+  }
+  throw new Error(`No top-right border found on row ${row}.`);
+}
+
+function firstBorderRowContaining(surface: Surface, text: string): number {
+  for (let y = 0; y < surface.height; y += 1) {
+    const line = Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).join('');
+    if (line.includes(text)) return y;
+  }
+  throw new Error(`No row containing "${text}".`);
+}
+
+function findNearestBorderRow(surface: Surface, startRow: number, step: -1 | 1): number {
+  for (let y = startRow; y >= 0 && y < surface.height; y += step) {
+    const expected = step === -1 ? '┌' : '└';
+    if (Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).includes(expected)) {
+      return y;
+    }
+  }
+  throw new Error(`No modal border row found from ${startRow}.`);
+}
