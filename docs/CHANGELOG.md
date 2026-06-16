@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
+  themes now inherit `Ctrl+T` from the shared frame shell to toggle the active
+  theme family between dark and light modes without opening Settings.
 - **DOGFOOD light theme readiness** — modal and drawer chrome now paint
   explicit panel backgrounds behind border cells instead of inheriting
   terminal-default background. The Bijou light theme has darker muted border

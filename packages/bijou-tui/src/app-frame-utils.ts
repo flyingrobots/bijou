@@ -137,7 +137,12 @@ export function mergeBindingSources(...sources: Array<BindingSource | undefined>
 
 /** Build the default key map for frame-level actions (tabs, panes, scroll, help '?', command palette 'ctrl+p'/':'). */
 export function createFrameKeyMap(
-  options: { readonly enableSettings?: boolean; readonly enableNotifications?: boolean; readonly i18n?: I18nRuntime } = {},
+  options: {
+    readonly enableSettings?: boolean;
+    readonly enableShellThemeModeToggle?: boolean;
+    readonly enableNotifications?: boolean;
+    readonly i18n?: I18nRuntime;
+  } = {},
 ): KeyMap<FrameAction> {
   const t = (id: string, fallback: string) => frameMessage(options.i18n, id, fallback);
   const group = (id: string, fallback: string) => frameMessage(options.i18n, id, fallback);
@@ -176,6 +181,11 @@ export function createFrameKeyMap(
     keyMap.group(group('key.group.shell', 'Shell'), (g) => g
       .bind('ctrl+,', t('key.settings', 'Settings'), { type: 'toggle-settings' })
       .bind('f2', t('key.settings', 'Settings'), { type: 'toggle-settings' }));
+  }
+
+  if (options.enableShellThemeModeToggle) {
+    keyMap.group(group('key.group.shell', 'Shell'), (g) => g
+      .bind('ctrl+t', t('key.toggleThemeMode', 'Toggle theme mode'), { type: 'toggle-shell-theme-mode' }));
   }
 
   if (options.enableNotifications) {

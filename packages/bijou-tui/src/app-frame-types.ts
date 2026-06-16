@@ -223,6 +223,7 @@ export type FrameAction =
   | { type: 'toggle-perf-hud' }
   | { type: 'toggle-footer' }
   | { type: 'toggle-settings' }
+  | { type: 'toggle-shell-theme-mode' }
   | { type: 'toggle-notifications' }
   | { type: 'push-notification'; notification: FrameNotificationSpec }
   | { type: 'prev-tab' }
@@ -288,6 +289,7 @@ export type FrameShellCommand<Msg> =
   | { readonly type: 'settings-scroll'; readonly delta: number }
   | { readonly type: 'settings-scroll-to'; readonly position: 'top' | 'bottom' }
   | { readonly type: 'activate-settings-row'; readonly rowIndex: number }
+  | { readonly type: 'toggle-shell-theme-mode' }
   // --- notification center ---
   | { readonly type: 'notification-center-scroll'; readonly delta: number }
   | { readonly type: 'notification-center-scroll-to'; readonly position: 'top' | 'bottom' }

@@ -37,6 +37,10 @@ export function handlePaletteKey<PageModel, Msg>(
   paletteKeys: KeyMap<PaletteAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  applyFrameActionOverride?: (
+    action: FrameAction,
+    model: InternalFrameModel<PageModel, Msg>,
+  ) => [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] | undefined,
 ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   const cp = model.commandPalette!;
   const action = paletteKeys.handle(msg);
@@ -67,6 +71,8 @@ export function handlePaletteKey<PageModel, Msg>(
             commandPaletteTitle: undefined,
             commandPaletteKind: undefined,
           };
+          const overridden = applyFrameActionOverride?.(entry.frameAction, closed);
+          if (overridden !== undefined) return overridden;
           return applyFrameAction(entry.frameAction, closed, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {

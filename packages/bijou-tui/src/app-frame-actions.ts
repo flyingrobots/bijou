@@ -114,6 +114,8 @@ export function applyFrameAction<PageModel, Msg>(
         commandPaletteKind: opening ? undefined : model.commandPaletteKind,
       }, []];
     }
+    case 'toggle-shell-theme-mode':
+      return [model, []];
     case 'toggle-notifications': {
       if (!hasNotificationCenter(model, options, pagesById)) {
         return [model, []];
