@@ -18,7 +18,14 @@ describe('app-frame test support', () => {
           resolve('timed out');
         }, 0);
       }),
-    ])).rejects.toThrow('stuck after 1 pulse');
+    ])).rejects.toThrow('stuck 1 pulse');
     expect(resolvers).toHaveLength(1);
+  });
+
+  it('preserves command rejection errors while collecting messages', async () => {
+    const failure = new Error('command rejected');
+    const rejectingCmd: Cmd<string> = () => Promise.reject(failure);
+
+    await expect(collectCommandMessages(rejectingCmd, [0.1])).rejects.toBe(failure);
   });
 });

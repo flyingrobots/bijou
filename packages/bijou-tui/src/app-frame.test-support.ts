@@ -106,7 +106,7 @@ async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[])
         },
       };
     },
-  })).then(() => {
+  })).finally(() => {
     done = true;
   });
 
@@ -118,7 +118,7 @@ async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[])
     await Promise.resolve();
   }
 
-  if (!done) throw new Error(`stuck after ${String(pulses.length)} pulse`);
+  if (!done) throw new Error(`stuck ${String(pulses.length)} pulse`);
   await run;
   return msgs;
 }
