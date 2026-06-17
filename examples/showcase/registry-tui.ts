@@ -1,29 +1,12 @@
-import type { BijouContext, DagNode, TreeNode, TimelineEvent } from '@flyingrobots/bijou';
 import {
-  alert,
-  box,
-  headerBox,
-  separator,
-  skeleton,
-  kbd,
-  hyperlink,
-  log,
-  gradientText,
-  progressBar,
-  spinnerFrame,
-  table,
-  tree,
   accordion,
-  timeline,
-  tabs,
-  breadcrumb,
-  paginator,
-  stepper,
+  box,
   dag,
-  enumeratedList,
-  markdown,
+  table,
 } from '@flyingrobots/bijou';
-import { SAMPLE_DAG, SAMPLE_TIMELINE, SAMPLE_TREE } from './registry-samples.js';
+import { statusBarSurface } from '@flyingrobots/bijou-tui';
+import { SAMPLE_DAG } from './registry-samples.js';
+import type { ComponentEntry } from './types.js';
 
 export const TUI: ComponentEntry[] = [
   {

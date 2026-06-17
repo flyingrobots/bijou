@@ -26,6 +26,14 @@ describe('showcase registry', () => {
 
     expect(entry.render(80, ctx)).toBeTruthy();
   });
+
+  it('renders the TUI status bar showcase entry with its surface helper', async () => {
+    const registry = await loadShowcaseRegistry();
+    const entry = findRegistryEntry(registry, 'TUI', 'status-bar');
+    const ctx = createTestContext();
+
+    expect(entry.render(80, ctx)).toBeTruthy();
+  });
 });
 
 interface ShowcaseRegistry {
