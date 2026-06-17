@@ -1,4 +1,3 @@
-import type { BijouContext, DagNode, TreeNode, TimelineEvent } from '@flyingrobots/bijou';
 import {
   alert,
   box,
@@ -11,19 +10,9 @@ import {
   gradientText,
   progressBar,
   spinnerFrame,
-  table,
-  tree,
-  accordion,
-  timeline,
-  tabs,
-  breadcrumb,
-  paginator,
-  stepper,
-  dag,
-  enumeratedList,
-  markdown,
 } from '@flyingrobots/bijou';
-import { SAMPLE_DAG, SAMPLE_TIMELINE, SAMPLE_TREE } from './registry-samples.js';
+import { badgeSurface, column, row, spacer } from '../_shared/example-surfaces.ts';
+import type { ComponentEntry } from './types.js';
 
 export const DISPLAY: ComponentEntry[] = [
   {
