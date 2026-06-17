@@ -24,6 +24,7 @@ export interface DogfoodI18nDebtInventoryIO {
   readonly baseline?: DogfoodI18nDebtBaseline;
   readonly markdownInventory?: DogfoodMarkdownLocalizationInventory;
   readonly markdownBaseline?: DogfoodMarkdownLocalizationBaseline;
+  readonly gitOutput?: (args: readonly string[]) => string;
   readonly stdout?: (text: string) => void;
   readonly stderr?: (text: string) => void;
 }
@@ -51,7 +52,7 @@ export function runDogfoodI18nDebtInventory(io: DogfoodI18nDebtInventoryIO = {})
   const markdownBaseline = io.markdownBaseline ?? DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE;
   const result = evaluateDogfoodI18nDebtRatchet(inventory, baseline);
   const markdownResult = evaluateDogfoodMarkdownLocalizationRatchet(markdownInventory, markdownBaseline);
-  const changedPaths = io.changedPaths ?? changedPathsFromBase(baseRefFromArgs(args));
+  const changedPaths = io.changedPaths ?? changedPathsFromBase(baseRefFromArgs(args), io.gitOutput ?? gitOutput);
   const touchedResult = evaluateDogfoodTouchedI18nDebt(inventory, changedPaths);
 
   if (!result.ok || !markdownResult.ok || !touchedResult.ok) {
@@ -83,31 +84,33 @@ function baseRefFromArgs(args: readonly string[]): string {
   return explicitBase ?? process.env.DOGFOOD_I18N_BASE_REF ?? DEFAULT_BASE_REF;
 }
 
-function changedPathsFromBase(baseRef: string): readonly string[] {
+function changedPathsFromBase(baseRef: string, runGit: (args: readonly string[]) => string): readonly string[] {
   const paths = new Set<string>();
-  const mergeBase = mergeBaseFor(baseRef);
-  for (const path of gitLines(['diff', '--name-only', `${mergeBase}...HEAD`])) {
+  const mergeBase = mergeBaseFor(baseRef, runGit);
+  if (mergeBase !== undefined) {
+    for (const path of gitLines(['diff', '--name-only', `${mergeBase}...HEAD`], runGit)) {
+      paths.add(path);
+    }
+  }
+  for (const path of gitLines(['diff', '--name-only', '--cached'], runGit)) {
     paths.add(path);
   }
-  for (const path of gitLines(['diff', '--name-only', '--cached'])) {
-    paths.add(path);
-  }
-  for (const path of gitLines(['diff', '--name-only'])) {
+  for (const path of gitLines(['diff', '--name-only'], runGit)) {
     paths.add(path);
   }
   return Object.freeze([...paths].sort());
 }
 
-function mergeBaseFor(baseRef: string): string {
+function mergeBaseFor(baseRef: string, runGit: (args: readonly string[]) => string): string | undefined {
   try {
-    return gitOutput(['merge-base', 'HEAD', baseRef]).trim() || baseRef;
+    return runGit(['merge-base', 'HEAD', baseRef]).trim() || baseRef;
   } catch {
-    return baseRef;
+    return undefined;
   }
 }
 
-function gitLines(args: readonly string[]): readonly string[] {
-  return gitOutput(args)
+function gitLines(args: readonly string[], runGit: (args: readonly string[]) => string): readonly string[] {
+  return runGit(args)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
