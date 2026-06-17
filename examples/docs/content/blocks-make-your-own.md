@@ -38,7 +38,7 @@ import {
   createCounterDemoModel,
   tickCounterDemoModel,
   type CounterDemoModel,
-} from './counter-block-demo.js';
+} from '../counter-block-demo.js';
 
 interface CounterAppModel {
   readonly counterBlock: CounterDemoModel;
