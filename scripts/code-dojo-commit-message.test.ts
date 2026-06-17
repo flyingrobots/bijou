@@ -1,5 +1,5 @@
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +27,42 @@ describe('Code Dojo commit-message hook', () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Garbage commit summary detected');
+  });
+
+  it('rejects Graft receipt trailers outside the repo receipt directory', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'bijou-graft-receipt-'));
+    tempDirs.push(dir);
+    const receipt = join(dir, 'receipt.json');
+    writeFileSync(receipt, '{}\n');
+
+    const result = runCommitMessageHook([
+      'fix: correct parser bug',
+      '',
+      'AI-Authored: true',
+      'Agent: Codex',
+      `Graft-Receipt: ${receipt}`,
+    ].join('\n'));
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('Graft receipt must be committed under .graft/receipts/');
+  });
+
+  it('rejects unstaged Graft receipt trailers', () => {
+    const receipt = '.graft/receipts/commit-message-test.json';
+    mkdirSync(resolve(ROOT, dirname(receipt)), { recursive: true });
+    writeFileSync(resolve(ROOT, receipt), '{}\n');
+    tempDirs.push(resolve(ROOT, receipt));
+
+    const result = runCommitMessageHook([
+      'fix: correct parser bug',
+      '',
+      'AI-Authored: true',
+      'Agent: Codex',
+      `Graft-Receipt: ${receipt}`,
+    ].join('\n'));
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('Graft receipt must be staged or already tracked');
   });
 });
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, existsSync } from "node:fs";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const file = process.argv[2];
 
@@ -34,8 +36,12 @@ if (message.includes("AI-Authored: true") || message.includes("Agent: ")) {
     failures.push("AI-authored commits must include a 'Graft-Receipt: <path>' trailer.");
   } else {
     const receiptPath = receiptLine.replace("Graft-Receipt: ", "").trim();
-    if (!existsSync(receiptPath)) {
+    if (!isRepoReceiptPath(receiptPath)) {
+      failures.push("Graft receipt must be committed under .graft/receipts/ as JSON.");
+    } else if (!existsSync(receiptPath)) {
       failures.push(`Graft receipt does not exist: ${receiptPath}`);
+    } else if (!isStagedOrTracked(receiptPath)) {
+      failures.push(`Graft receipt must be staged or already tracked: ${receiptPath}`);
     }
   }
 }
@@ -48,4 +54,21 @@ if (failures.length > 0) {
   console.error("  fix(clock): inject fixed clock into token expiry test");
   console.error("  refactor(user): split repository port from postgres adapter\n");
   process.exit(1);
+}
+
+function isRepoReceiptPath(receiptPath) {
+  const normalized = receiptPath.split(/[\\/]+/u).join("/");
+  return !path.isAbsolute(receiptPath)
+    && !normalized.startsWith("../")
+    && normalized.startsWith(".graft/receipts/")
+    && normalized.endsWith(".json");
+}
+
+function isStagedOrTracked(receiptPath) {
+  const result = spawnSync("git", ["ls-files", "--error-unmatch", "--", receiptPath], {
+    encoding: "utf8",
+    shell: process.platform === "win32",
+    stdio: ["ignore", "ignore", "ignore"],
+  });
+  return result.status === 0;
 }
