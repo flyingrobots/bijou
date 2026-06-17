@@ -105,8 +105,9 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
-- The current urgent `v7.2.0` pull is DL-017: make DOGFOOD light-theme chrome
-  painted, readable, and diagnostically covered for #341.
+- The current urgent `v7.2.0` pull is DL-018: make DOGFOOD first-party shell
+  themes declare paired or single-mode coverage, and make unsupported
+  theme-mode toggles explicit for #343.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -191,8 +192,8 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land DL-017 for #341 so DOGFOOD light-theme chrome is painted, readable,
-   and covered by deterministic theme diagnostics.
+1. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
+   visible, and covered by deterministic AppShell feedback tests.
 2. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
    from #354.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.

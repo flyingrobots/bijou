@@ -64,6 +64,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/DL-017-dogfood-light-theme-readiness.md` scopes a bounded #341
   repair for light-theme settings/menu/modal background ownership, chrome
   contrast, and DOGFOOD theme diagnostics.
+- **First-party theme variant coverage shaping** —
+  `docs/design/DL-018-first-party-theme-variant-coverage.md` scopes a bounded
+  #343 repair for DOGFOOD shell theme inventory, paired versus single-mode
+  declarations, AppShell mode-toggle feedback, and deterministic dark/light
+  switch coverage.
 
 ## [7.1.0] - 2026-06-14
 
