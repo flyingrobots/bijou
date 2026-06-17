@@ -292,7 +292,7 @@ export interface FrameShellThemeMode {
   readonly description?: string;
 }
 
-/** Stable values for declaring whether a first-party shell theme has mode siblings. */
+/** Stable values for shell theme mode siblings. */
 export const FRAME_SHELL_THEME_MODE_SUPPORT = Object.freeze({
   single: 'single',
   paired: 'paired',
@@ -302,7 +302,7 @@ export const FRAME_SHELL_THEME_MODE_SUPPORT = Object.freeze({
 export type FrameShellThemeModeSupport =
   typeof FRAME_SHELL_THEME_MODE_SUPPORT[keyof typeof FRAME_SHELL_THEME_MODE_SUPPORT];
 
-/** A stock concrete shell-theme option that the frame can surface in its settings drawer. */
+/** Concrete shell-theme option surfaced in settings. */
 export interface FrameShellTheme {
   /** Stable option id. */
   readonly id: string;
@@ -311,14 +311,14 @@ export interface FrameShellTheme {
   /** Theme payload applied when this option is selected. */
   readonly theme: Theme;
   /** Concrete shell themes are single-mode unless a family provides modes. */
-  readonly modeSupport?: 'single';
+  readonly modeSupport?: typeof FRAME_SHELL_THEME_MODE_SUPPORT.single;
   /** Mode-aware shell theme families use FrameShellThemeFamily instead. */
   readonly modes?: never;
   /** Optional helper copy shown beneath the row when active. */
   readonly description?: string;
 }
 
-/** A stock shell-theme family with concrete selectable modes. */
+/** Shell-theme family with selectable modes. */
 export interface FrameShellThemeFamily {
   /** Stable shell theme family id. */
   readonly id: string;
@@ -327,7 +327,7 @@ export interface FrameShellThemeFamily {
   /** Concrete modes exposed as settings choices. */
   readonly modes: readonly FrameShellThemeMode[];
   /** Mode-aware shell theme families provide paired or otherwise sibling modes. */
-  readonly modeSupport?: 'paired';
+  readonly modeSupport?: typeof FRAME_SHELL_THEME_MODE_SUPPORT.paired;
   /** Concrete single-theme entries use FrameShellTheme instead. */
   readonly theme?: never;
   /** Optional helper copy shown beneath the row when active. */
