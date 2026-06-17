@@ -14,7 +14,7 @@
     "build:watch": "tsc -b -w",
     "test": "vitest run --config vitest.config.ts",
     "pretest": "npm run build",
-    "test:run": "npm test",
+    "test:run": "vitest run --config vitest.config.ts",
     "hello": "node --import tsx examples/hello/hello.ts",
     "counter": "node --import tsx examples/counter/main.ts",
     "app-frame": "node --import tsx examples/app-frame/main.ts",

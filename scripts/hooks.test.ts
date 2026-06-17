@@ -74,5 +74,6 @@ describe('git hooks', () => {
     expect(hookShim).toContain('scripts/hooks/pre-push');
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*npm test/u);
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*test:run/u);
+    expect(packageJson).not.toMatch(/"test:run": "npm test"/u);
   });
 });
