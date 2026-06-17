@@ -83,6 +83,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run lint
+      - run: npm run code:size
       - name: Design-system docs preflight
         if: matrix.node-version == 22
         run: npm run docs:design-system:preflight
@@ -97,11 +98,12 @@ jobs:
           if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}"
             npm run dogfood:i18n:complete -- --base FETCH_HEAD
+            npm run dogfood:i18n:debt -- --base FETCH_HEAD
           else
             npm run dogfood:i18n:complete -- --base HEAD^
+            npm run dogfood:i18n:debt -- --base HEAD^
           fi
           npm run dogfood:i18n:check
-          npm run dogfood:i18n:debt
       - run: npm test
       - name: Smoke interactive examples
         if: matrix.node-version == 22

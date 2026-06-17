@@ -105,9 +105,15 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
-- The current urgent `v7.2.0` pull is DL-018: make DOGFOOD first-party shell
-  themes declare paired or single-mode coverage, and make unsupported
-  theme-mode toggles explicit for #343.
+- Before the next `v7.2.0` pull, the active goalpost is **Respectful Repo:
+  Enter the Code Dojo**. The repository must live under the verbatim
+  [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
+  artifact with enforceable baselines for existing file/context, mega-file, and
+  mock-ban debt.
+- DL-018 remains the next `v7.2.0` product pull after the Code Dojo gate is
+  enforceable: make DOGFOOD first-party shell themes declare paired or
+  single-mode coverage, and make unsupported theme-mode toggles explicit for
+  #343.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -166,16 +172,16 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-After the `v7.1.0` tag and publish verification, the immediate focus is
-`v7.2.0` stabilization.
+Before returning to `v7.2.0` stabilization, the immediate focus is
+**Respectful Repo: Enter the Code Dojo**.
 
-The first pull is RE-041:
+The current pull is a standards gate:
 
 ```text
-workspace mouse fallthrough
-  -> page-scoped frame helper exports
-    -> scripted mouse driver helpers
-      -> deterministic pointer regressions
+TypeScript Code Standards artifact
+  -> Code Dojo scripts, hooks, and CI
+    -> file/context and mock-ban baselines
+      -> ratchets that fail new or growing debt
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
@@ -192,18 +198,20 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
+1. Land Respectful Repo: Enter the Code Dojo so standards enforcement is active
+   before more product work lands.
+2. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
    visible, and covered by deterministic AppShell feedback tests.
-2. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
+3. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
    from #354.
-3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
-4. Shape #302 into a V8 design packet with artifact semantics, receipt
+4. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+5. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
-5. Promote only the Runtime Graph and Scene IR issues needed for that contract
+6. Promote only the Runtime Graph and Scene IR issues needed for that contract
    out of `Beyond`.
-6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-7. Keep closed dependency PR #326 as superseded lineage, not active release
+8. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:

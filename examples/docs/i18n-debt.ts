@@ -46,6 +46,12 @@ export interface DogfoodI18nDebtRatchetResult {
   readonly violations: readonly string[];
 }
 
+export interface DogfoodTouchedI18nDebtResult {
+  readonly ok: boolean;
+  readonly touchedPaths: readonly string[];
+  readonly violations: readonly string[];
+}
+
 export interface DogfoodMarkdownLocalizationDocument {
   readonly surface: string;
   readonly path: string;
@@ -249,6 +255,25 @@ export function evaluateDogfoodI18nDebtRatchet(
     ok: violations.length === 0,
     total: inventory.total,
     baseline,
+    violations: Object.freeze(violations),
+  });
+}
+
+export function evaluateDogfoodTouchedI18nDebt(
+  inventory: DogfoodI18nDebtInventory,
+  touchedPaths: readonly string[],
+): DogfoodTouchedI18nDebtResult {
+  const touched = new Set(touchedPaths);
+  const violations = inventory.bySurface.flatMap((surface) => {
+    const entries = inventory.entries.filter((entry) => entry.surface === surface.surface);
+    const path = entries[0]?.path;
+    if (path == null || !touched.has(path) || entries.length === 0) return [];
+    return [`touched DOGFOOD source ${path} has ${entries.length} raw string debt entr${entries.length === 1 ? 'y' : 'ies'}`];
+  });
+
+  return Object.freeze({
+    ok: violations.length === 0,
+    touchedPaths: Object.freeze([...touched].sort()),
     violations: Object.freeze(violations),
   });
 }

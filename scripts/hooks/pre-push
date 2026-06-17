@@ -39,6 +39,12 @@ echo "pre-push: running DOGFOOD i18n debt ratchet"
 npm run dogfood:i18n:debt
 
 # ---------------------------------------------------------------------------
+# Code size gate
+# ---------------------------------------------------------------------------
+echo "pre-push: running code size gate"
+npm run code:size
+
+# ---------------------------------------------------------------------------
 # Typecheck gate
 # ---------------------------------------------------------------------------
 echo "pre-push: running typecheck:test"

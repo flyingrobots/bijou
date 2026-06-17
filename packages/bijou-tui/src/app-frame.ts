@@ -292,6 +292,16 @@ export interface FrameShellThemeMode {
   readonly description?: string;
 }
 
+/** Stable values for declaring whether a first-party shell theme has mode siblings. */
+export const FRAME_SHELL_THEME_MODE_SUPPORT = Object.freeze({
+  single: 'single',
+  paired: 'paired',
+} as const);
+
+/** Declares whether a first-party shell theme has mode siblings. */
+export type FrameShellThemeModeSupport =
+  typeof FRAME_SHELL_THEME_MODE_SUPPORT[keyof typeof FRAME_SHELL_THEME_MODE_SUPPORT];
+
 /** A stock concrete shell-theme option that the frame can surface in its settings drawer. */
 export interface FrameShellTheme {
   /** Stable option id. */
@@ -300,6 +310,8 @@ export interface FrameShellTheme {
   readonly label: string;
   /** Theme payload applied when this option is selected. */
   readonly theme: Theme;
+  /** Concrete shell themes are single-mode unless a family provides modes. */
+  readonly modeSupport?: 'single';
   /** Mode-aware shell theme families use FrameShellThemeFamily instead. */
   readonly modes?: never;
   /** Optional helper copy shown beneath the row when active. */
@@ -314,6 +326,8 @@ export interface FrameShellThemeFamily {
   readonly label: string;
   /** Concrete modes exposed as settings choices. */
   readonly modes: readonly FrameShellThemeMode[];
+  /** Mode-aware shell theme families provide paired or otherwise sibling modes. */
+  readonly modeSupport?: 'paired';
   /** Concrete single-theme entries use FrameShellTheme instead. */
   readonly theme?: never;
   /** Optional helper copy shown beneath the row when active. */
@@ -2285,13 +2299,40 @@ export function createFramedApp<PageModel, Msg>(
     return applyFrameNotificationState(model, notifications, nowMs);
   }
 
+  function pushShellThemeModeUnsupportedFeedback(
+    model: InternalFrameModel<PageModel, Msg>,
+    currentTheme: ResolvedFrameShellTheme | undefined,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    if (!frameNotificationOptions.enabled || currentTheme == null) {
+      return [model, []];
+    }
+    const nowMs = resolveClock(resolveFrameCtx()).now();
+    const notifications = pushNotification(model.runtimeNotifications, {
+      title: frameMessage(options.i18n, 'settings.title', 'Settings'),
+      message: frameMessage(
+        options.i18n,
+        'settings.shellTheme.modeUnsupported',
+        'Shell theme {theme} has no alternate mode.',
+        { theme: currentTheme.label },
+      ),
+      variant: 'TOAST',
+      tone: 'INFO',
+      width: SETTINGS_FEEDBACK_TOAST_WIDTH,
+      placement: frameNotificationOptions.placement,
+      durationMs: 2_500,
+      overflow: frameNotificationOptions.overflow,
+    }, nowMs);
+    return applyFrameNotificationState(model, notifications, nowMs);
+  }
+
   function toggleShellThemeMode(
     model: InternalFrameModel<PageModel, Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     ensureResolvedShellThemes(resolveFrameCtx());
+    const currentTheme = resolveCurrentShellTheme(resolvedShellThemes, model.activeShellThemeId);
     const nextTheme = resolveShellThemeModeToggle(resolvedShellThemes, model.activeShellThemeId);
     if (nextTheme == null) {
-      return [model, []];
+      return pushShellThemeModeUnsupportedFeedback(model, currentTheme);
     }
     publishShellThemeContext(nextTheme);
     return pushShellThemeModeFeedback({

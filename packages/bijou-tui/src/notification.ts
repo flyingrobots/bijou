@@ -10,18 +10,13 @@ import {
   isPackedSurface,
   prepareWrappedText,
   segmentGraphemes,
-  surfaceToString,
   wrapPreparedTextToWidth,
 } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
-import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
-import { visibleLength } from './viewport.js';
-import { resolveNotificationGap, resolveOverlayMargin } from './design-language.js';
 import { vstackSurface } from './surface-layout.js';
-import { forceTextPresentation } from './icon-presentation.js';
 
-function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
+export function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
   return typeof ref === 'object'
     && ref !== null
     && 'kind' in ref
@@ -31,7 +26,7 @@ function resolvedColorRgb(ref: unknown): readonly [number, number, number] | und
     : undefined;
 }
 
-function resolvedColorHex(ref: unknown): string | undefined {
+export function resolvedColorHex(ref: unknown): string | undefined {
   if (typeof ref === 'string') return ref;
   return typeof ref === 'object'
     && ref !== null
@@ -154,24 +149,12 @@ export interface NotificationMouseTarget<Msg> {
   readonly kind: NotificationMouseTargetKind;
 }
 
-interface CellTextStyle {
+export interface CellTextStyle {
   readonly fg?: string;
   readonly bg?: string;
   readonly fgRGB?: readonly [number, number, number];
   readonly bgRGB?: readonly [number, number, number];
   readonly modifiers?: readonly string[];
-}
-
-interface NotificationRenderEntry<Msg> {
-  readonly item: NotificationRecord<Msg>;
-  readonly surface: Surface;
-  readonly dismissRect: LayoutRect;
-  readonly actionRect?: LayoutRect;
-}
-
-interface PositionedNotificationRenderEntry<Msg> extends NotificationRenderEntry<Msg> {
-  readonly row: number;
-  readonly col: number;
 }
 
 interface PreparedNotificationHistoryEntry {
@@ -184,20 +167,6 @@ interface PreparedNotificationHistoryEntry {
 const ENTER_DURATION_MS = 180;
 const EXIT_DURATION_MS = 320;
 const HISTORY_LIMIT = 250;
-
-const TONE_ICONS: Record<NotificationTone, string> = {
-  INFO: forceTextPresentation('\u2139'),
-  SUCCESS: forceTextPresentation('\u2714'),
-  WARNING: forceTextPresentation('\u26a0'),
-  ERROR: forceTextPresentation('\u2718'),
-};
-
-const TONE_BORDER_KEYS: Record<NotificationTone, 'primary' | 'success' | 'warning' | 'error'> = {
-  INFO: 'primary',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'error',
-};
 
 export function createNotificationState<Msg>(): NotificationState<Msg> {
   return {
@@ -482,7 +451,7 @@ function focusableIds<Msg>(items: readonly NotificationRecord<Msg>[]): readonly 
     .map((item) => item.id);
 }
 
-function normalizeFocusedId<Msg>(
+export function normalizeFocusedId<Msg>(
   items: readonly NotificationRecord<Msg>[],
   focusedId: number | undefined,
 ): number | undefined {
@@ -739,7 +708,7 @@ export function notificationsNeedTick<Msg>(state: NotificationState<Msg>): boole
     || state.items.some((item) => item.phase !== 'visible' || item.durationMs != null);
 }
 
-function toneSemanticKey(tone: NotificationTone): 'info' | 'success' | 'warning' | 'error' {
+export function toneSemanticKey(tone: NotificationTone): 'info' | 'success' | 'warning' | 'error' {
   switch (tone) {
     case 'INFO':
       return 'info';
@@ -752,11 +721,11 @@ function toneSemanticKey(tone: NotificationTone): 'info' | 'success' | 'warning'
   }
 }
 
-function defaultBgToken(ctx: BijouContext | undefined): TokenValue | undefined {
+export function defaultBgToken(ctx: BijouContext | undefined): TokenValue | undefined {
   return ctx?.theme.theme.surface.overlay;
 }
 
-function formatTimeLabel(ms: number): string {
+export function formatTimeLabel(ms: number): string {
   return new Date(ms).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
@@ -764,7 +733,7 @@ function formatTimeLabel(ms: number): string {
   });
 }
 
-function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
+export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
   if (token == null) return {};
   // Pass pre-parsed RGB alongside hex so encodeCellIntoBuf can skip
   // inlineHexRGB on the hot path. Build the object with conditional
@@ -778,7 +747,7 @@ function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
   };
 }
 
-function withModifiers(style: CellTextStyle, modifiers: readonly string[]): CellTextStyle {
+export function withModifiers(style: CellTextStyle, modifiers: readonly string[]): CellTextStyle {
   const next = new Set(style.modifiers ?? []);
   for (const modifier of modifiers) {
     next.add(modifier);
@@ -789,7 +758,7 @@ function withModifiers(style: CellTextStyle, modifiers: readonly string[]): Cell
   };
 }
 
-function createSegmentSurface(segments: readonly { readonly text: string; readonly style?: CellTextStyle }[]): Surface {
+export function createSegmentSurface(segments: readonly { readonly text: string; readonly style?: CellTextStyle }[]): Surface {
   const graphemeSegments = segments.map((segment) => ({
     graphemes: segmentGraphemes(segment.text ?? ''),
     style: segment.style,
@@ -834,7 +803,7 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
   return surface;
 }
 
-function createBlankLineSurface(width: number): Surface {
+export function createBlankLineSurface(width: number): Surface {
   return createSurface(Math.max(0, width), 1);
 }
 
@@ -921,7 +890,7 @@ function isWhitespaceSurfaceCell(surface: Surface, col: number): boolean {
   return /^\s+$/.test(surface.get(col, 0).char);
 }
 
-function renderPlainSurface(surface: Surface): string {
+export function renderPlainSurface(surface: Surface): string {
   const lines: string[] = [];
   for (let y = 0; y < surface.height; y++) {
     let line = '';
@@ -933,7 +902,7 @@ function renderPlainSurface(surface: Surface): string {
   return lines.join('\n');
 }
 
-function standaloneRows(
+export function standaloneRows(
   lineSurface: Surface,
   width: number,
   overflow: OverflowBehavior,
@@ -942,7 +911,7 @@ function standaloneRows(
   return wrapLineSurface(lineSurface, width);
 }
 
-function composeColumnRows(
+export function composeColumnRows(
   left: Surface,
   right: Surface,
   width: number,
@@ -976,7 +945,7 @@ function composeColumnRows(
   });
 }
 
-function resolveRegion(options: RenderNotificationStackOptions): LayoutRect {
+export function resolveRegion(options: RenderNotificationStackOptions): LayoutRect {
   const screenWidth = Math.max(0, options.screenWidth);
   const screenHeight = Math.max(0, options.screenHeight);
   if (options.region == null) {
@@ -990,532 +959,8 @@ function resolveRegion(options: RenderNotificationStackOptions): LayoutRect {
   };
 }
 
-function measureTextWidth<Msg>(
-  item: NotificationRecord<Msg>,
-  screenWidth: number,
-): number {
-  const available = Math.max(18, screenWidth - 7);
-  if (item.width != null) {
-    return Math.max(18, Math.min(available, item.width));
-  }
-  const titleWidth = visibleLength(item.title);
-  const messageWidth = visibleLength(item.message);
-  const buttonWidth = item.action == null ? 0 : visibleLength(item.action.label) + 6;
-  const base = Math.max(titleWidth + 8, messageWidth + 2, buttonWidth + 2);
-
-  if (item.variant === 'INLINE') {
-    const target = Math.max(base + 8, Math.floor(screenWidth * 0.66));
-    return Math.min(available, Math.max(28, target));
-  }
-
-  return Math.min(available, Math.max(26, Math.min(52, base + 6)));
-}
-
-function renderNotificationSurface<Msg>(
-  item: NotificationRecord<Msg>,
-  options: RenderNotificationStackOptions,
-  focused: boolean,
-): NotificationRenderEntry<Msg> {
-  const ctx = options.ctx;
-  const textWidth = measureTextWidth(item, resolveRegion(options).width);
-  const mutedStyle = tokenToCellStyle(ctx?.semantic('muted'));
-  const titleStyle = withModifiers({}, ['bold']);
-  const iconStyle = tokenToCellStyle(ctx?.semantic(toneSemanticKey(item.tone)));
-  const accentStyle = tokenToCellStyle(item.accentToken ?? ctx?.border(TONE_BORDER_KEYS[item.tone]));
-  const backgroundStyle = tokenToCellStyle(item.bgToken ?? defaultBgToken(ctx));
-  const closeSurface = createSegmentSurface([{ text: '\u2715', style: mutedStyle }]);
-  const icon = TONE_ICONS[item.tone];
-  const overflow = item.overflow;
-
-  const rows: Surface[] = [];
-  let actionRect: LayoutRect | undefined;
-
-  if (item.variant === 'INLINE') {
-    const left = createSegmentSurface([
-      { text: icon, style: iconStyle },
-      { text: ' ' },
-      { text: item.title, style: titleStyle },
-      ...(item.message.length > 0
-        ? [
-          { text: ' ' },
-          { text: item.message, style: mutedStyle },
-        ]
-        : []),
-    ]);
-    rows.push(...composeColumnRows(left, closeSurface, textWidth, overflow));
-  } else {
-    const titleLeft = createSegmentSurface([
-      { text: icon, style: iconStyle },
-      { text: ' ' },
-      { text: item.title, style: titleStyle },
-    ]);
-    rows.push(...composeColumnRows(titleLeft, closeSurface, textWidth, overflow));
-
-    if (item.message.length > 0) {
-      const messageSurface = createSegmentSurface([{ text: item.message, style: mutedStyle }]);
-      rows.push(...standaloneRows(messageSurface, textWidth, overflow));
-    }
-
-    if (item.variant === 'ACTIONABLE') {
-      rows.push(createBlankLineSurface(textWidth));
-      const actionLabel = item.action == null
-        ? 'Dismiss'
-        : (focused ? `[ ${item.action.label} ]` : `  ${item.action.label}  `);
-      const actionStyle = focused ? withModifiers({}, ['bold']) : {};
-      const actionRows = standaloneRows(
-        createSegmentSurface([{ text: actionLabel, style: actionStyle }]),
-        textWidth,
-        overflow,
-      );
-      actionRect = {
-        row: rows.length,
-        col: 2,
-        width: textWidth,
-        height: actionRows.length,
-      };
-      rows.push(...actionRows);
-    }
-
-    if (item.variant === 'TOAST') {
-      rows.push(createBlankLineSurface(textWidth));
-      const timestampSurface = createSegmentSurface([{ text: formatTimeLabel(item.createdAtMs), style: mutedStyle }]);
-      rows.push(...standaloneRows(timestampSurface, textWidth, overflow));
-    }
-  }
-
-  const contentRows = rows.length === 0 ? [createBlankLineSurface(textWidth)] : rows;
-  const cardWidth = textWidth + 3;
-  const cardHeight = contentRows.length;
-  const card = createSurface(cardWidth, cardHeight, {
-    char: ' ',
-    fg: backgroundStyle.fg,
-    bg: backgroundStyle.bg,
-    modifiers: backgroundStyle.modifiers ? [...backgroundStyle.modifiers] : undefined,
-    empty: false,
-  });
-
-  const cardPacked = isPackedSurface(card);
-  for (let y = 0; y < contentRows.length; y++) {
-    const accentRgb = cardPacked
-      ? (() => {
-          const accentHex = resolvedColorHex(accentStyle.fg);
-          return accentStyle.fgRGB ?? resolvedColorRgb(accentStyle.fg) ?? (accentHex ? parseHex(accentHex) : undefined);
-        })()
-      : undefined;
-    if (accentRgb) {
-      const [fR, fG, fB] = accentRgb;
-      let bR = -1, bG = 0, bB = 0;
-      const backgroundHex = resolvedColorHex(backgroundStyle.bg);
-      const bgRgb = backgroundStyle.bgRGB
-        ?? resolvedColorRgb(backgroundStyle.bg)
-        ?? (backgroundHex ? parseHex(backgroundHex) : undefined);
-      if (bgRgb) { [bR, bG, bB] = bgRgb; }
-      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
-    } else {
-      card.set(0, y, {
-        char: '\u258e',
-        fg: accentStyle.fg,
-        bg: backgroundStyle.bg,
-        fgRGB: accentStyle.fgRGB,
-        bgRGB: backgroundStyle.bgRGB,
-        modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
-        empty: false,
-      });
-    }
-    card.blit(
-      contentRows[y]!,
-      2,
-      y,
-      0,
-      0,
-      contentRows[y]!.width,
-      1,
-      {
-        char: true,
-        fg: true,
-        bg: false,
-        modifiers: true,
-        alpha: true,
-      },
-    );
-  }
-
-  return {
-    item,
-    surface: card,
-    dismissRect: {
-      row: 0,
-      col: Math.max(0, card.width - 2),
-      width: 1,
-      height: 1,
-    },
-    actionRect,
-  };
-}
-
-function sortForPlacement<Msg>(
-  items: readonly NotificationRecord<Msg>[],
-  placement: NotificationPlacement,
-): readonly NotificationRecord<Msg>[] {
-  const ordered = [...items].sort((left, right) => right.createdAtMs - left.createdAtMs || right.id - left.id);
-  return placementSortSign(placement) === 'bottom' ? ordered.reverse() : ordered;
-}
-
-function placementSortSign(placement: NotificationPlacement): 'top' | 'bottom' | 'center' {
-  switch (placement) {
-    case 'UPPER_LEFT':
-    case 'UPPER_RIGHT':
-    case 'TOP_CENTER':
-      return 'top';
-    case 'LOWER_LEFT':
-    case 'LOWER_RIGHT':
-    case 'BOTTOM_CENTER':
-      return 'bottom';
-    case 'CENTER':
-      return 'center';
-  }
-}
-
-function anchoredCol(placement: NotificationPlacement, width: number, screenWidth: number, margin: number): number {
-  switch (placement) {
-    case 'UPPER_LEFT':
-    case 'LOWER_LEFT':
-      return margin;
-    case 'UPPER_RIGHT':
-    case 'LOWER_RIGHT':
-      return Math.max(margin, screenWidth - width - margin);
-    case 'TOP_CENTER':
-    case 'BOTTOM_CENTER':
-    case 'CENTER':
-      return Math.max(0, Math.floor((screenWidth - width) / 2));
-  }
-}
-
-function applyAnimationOffset(
-  placement: NotificationPlacement,
-  width: number,
-  height: number,
-  margin: number,
-  progress: number,
-): { readonly rowDelta: number; readonly colDelta: number } {
-  const remaining = 1 - progress;
-  const slideX = Math.round(remaining * (width + margin));
-  const slideY = Math.round(remaining * (height + margin));
-
-  switch (placement) {
-    case 'UPPER_LEFT':
-    case 'LOWER_LEFT':
-      return { rowDelta: 0, colDelta: -slideX };
-    case 'UPPER_RIGHT':
-    case 'LOWER_RIGHT':
-      return { rowDelta: 0, colDelta: slideX };
-    case 'TOP_CENTER':
-      return { rowDelta: -slideY, colDelta: 0 };
-    case 'BOTTOM_CENTER':
-      return { rowDelta: slideY, colDelta: 0 };
-    case 'CENTER':
-      return { rowDelta: -slideY, colDelta: 0 };
-  }
-}
-
-function createRenderEntry<Msg>(
-  item: NotificationRecord<Msg>,
-  options: RenderNotificationStackOptions,
-  focusedId: number | undefined,
-): NotificationRenderEntry<Msg> {
-  return renderNotificationSurface(item, options, focusedId === item.id);
-}
-
-function prepareRenderEntriesById<Msg>(
-  items: readonly NotificationRecord<Msg>[],
-  options: RenderNotificationStackOptions,
-  focusedId: number | undefined,
-): ReadonlyMap<number, NotificationRenderEntry<Msg>> {
-  const prepared = new Map<number, NotificationRenderEntry<Msg>>();
-  for (const item of items) {
-    prepared.set(item.id, createRenderEntry(item, options, focusedId));
-  }
-  return prepared;
-}
-
-function selectVisibleNotificationIds<Msg>(
-  state: NotificationState<Msg>,
-  options: RenderNotificationStackOptions,
-  preparedEntries: ReadonlyMap<number, NotificationRenderEntry<Msg>> = prepareRenderEntriesById(
-    state.items,
-    options,
-    state.focusedId,
-  ),
-): ReadonlySet<number> {
-  const region = resolveRegion(options);
-  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
-  const gap = resolveNotificationGap(options.gap);
-  const availableHeight = Math.max(1, region.height - (margin * 2));
-  const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
-
-  for (const item of state.items) {
-    const placementItems = grouped.get(item.placement) ?? [];
-    placementItems.push(item);
-    grouped.set(item.placement, placementItems);
-  }
-
-  const visibleIds = new Set<number>();
-
-  for (const items of grouped.values()) {
-    const newestFirst = [...items].sort((left, right) => right.createdAtMs - left.createdAtMs || right.id - left.id);
-    let usedHeight = 0;
-    let keptCount = 0;
-
-    for (const item of newestFirst) {
-      const entry = preparedEntries.get(item.id)!;
-      const required = entry.surface.height + (keptCount > 0 ? gap : 0);
-      if (keptCount === 0 || usedHeight + required <= availableHeight) {
-        visibleIds.add(item.id);
-        usedHeight += required;
-        keptCount++;
-      }
-    }
-  }
-
-  return visibleIds;
-}
-
-export function trimNotificationsToViewport<Msg>(
-  state: NotificationState<Msg>,
-  options: RenderNotificationStackOptions,
-  nowMs?: number,
-): NotificationState<Msg> {
-  const visibleIds = selectVisibleNotificationIds(state, options);
-  const keptItems = state.items.filter((item) => visibleIds.has(item.id));
-
-  if (keptItems.length === state.items.length) {
-    const focusedId = normalizeFocusedId(keptItems, state.focusedId);
-    return focusedId === state.focusedId ? state : { ...state, focusedId };
-  }
-
-  const evictedItems = state.items.filter((item) => !visibleIds.has(item.id));
-  const exitStartedAtMs = nowMs ?? evictedItems.reduce(
-    (max, item) => Math.max(max, item.updatedAtMs, item.createdAtMs),
-    0,
-  );
-  const overflowExits = [
-    ...state.overflowExits,
-    ...evictedItems.map((item) => ({
-      ...item,
-      phase: 'exiting' as const,
-      progress: 1,
-      updatedAtMs: exitStartedAtMs,
-      exitStartedAtMs,
-    })),
-  ].sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id);
-
-  return {
-    ...state,
-    items: keptItems,
-    overflowExits,
-    focusedId: normalizeFocusedId(keptItems, state.focusedId),
-  };
-}
-
-function renderOverflowExits<Msg>(
-  exits: readonly NotificationRecord<Msg>[],
-  placement: NotificationPlacement,
-  activeTotalHeight: number,
-  region: LayoutRect,
-  margin: number,
-  gap: number,
-  preparedEntries: ReadonlyMap<number, NotificationRenderEntry<Msg>>,
-): readonly PositionedNotificationRenderEntry<Msg>[] {
-  if (exits.length === 0) return [];
-
-  const rendered = [...exits]
-    .sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id)
-    .map((item) => preparedEntries.get(item.id)!)
-    .filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
-  const entries: PositionedNotificationRenderEntry<Msg>[] = [];
-  const mode = placementSortSign(placement);
-
-  if (mode === 'bottom') {
-    let cursor = Math.max(margin, region.height - activeTotalHeight - margin) - gap;
-    for (const entry of rendered) {
-      cursor -= entry.surface.height;
-      const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
-      const offset = applyAnimationOffset(
-        placement,
-        entry.surface.width,
-        entry.surface.height,
-        margin,
-        entry.item.progress,
-      );
-      entries.push({
-        ...entry,
-        row: region.row + cursor + offset.rowDelta,
-        col: region.col + baseCol + offset.colDelta,
-      });
-      cursor -= gap;
-    }
-    return entries;
-  }
-
-  let cursor = mode === 'top'
-    ? margin + activeTotalHeight + (activeTotalHeight > 0 ? gap : 0)
-    : Math.max(0, Math.floor((region.height + activeTotalHeight) / 2) + gap);
-
-  for (const entry of rendered) {
-    const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
-    const offset = applyAnimationOffset(
-      placement,
-      entry.surface.width,
-      entry.surface.height,
-      margin,
-      entry.item.progress,
-    );
-    entries.push({
-      ...entry,
-      row: region.row + cursor + offset.rowDelta,
-      col: region.col + baseCol + offset.colDelta,
-    });
-    cursor += entry.surface.height + gap;
-  }
-
-  return entries;
-}
-
-function resolveNotificationOverlayEntries<Msg>(
-  state: NotificationState<Msg>,
-  options: RenderNotificationStackOptions,
-): readonly PositionedNotificationRenderEntry<Msg>[] {
-  const screenWidth = Math.max(0, options.screenWidth);
-  const screenHeight = Math.max(0, options.screenHeight);
-  if (screenWidth <= 0 || screenHeight <= 0) return [];
-
-  const region = resolveRegion(options);
-  if (region.width <= 0 || region.height <= 0) return [];
-
-  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
-  const gap = resolveNotificationGap(options.gap);
-  const activePrepared = prepareRenderEntriesById(state.items, options, state.focusedId);
-  const overflowPrepared = prepareRenderEntriesById(state.overflowExits, options, state.focusedId);
-  const visibleIds = selectVisibleNotificationIds(state, options, activePrepared);
-  const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
-  const overflowGrouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
-
-  for (const item of state.items) {
-    if (!visibleIds.has(item.id)) continue;
-    const placementItems = grouped.get(item.placement) ?? [];
-    placementItems.push(item);
-    grouped.set(item.placement, placementItems);
-  }
-
-  for (const item of state.overflowExits) {
-    const placementItems = overflowGrouped.get(item.placement) ?? [];
-    placementItems.push(item);
-    overflowGrouped.set(item.placement, placementItems);
-  }
-
-  const entries: PositionedNotificationRenderEntry<Msg>[] = [];
-  const placements = new Set<NotificationPlacement>([
-    ...grouped.keys(),
-    ...overflowGrouped.keys(),
-  ]);
-
-  for (const placement of placements) {
-    const items = grouped.get(placement) ?? [];
-    const rendered = sortForPlacement(items, placement).map((item) =>
-      activePrepared.get(item.id)!
-    ).filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
-
-    const totalHeight = rendered.reduce((sum, entry) => sum + entry.surface.height, 0)
-      + Math.max(0, rendered.length - 1) * gap;
-    const mode = placementSortSign(placement);
-    let cursor = mode === 'top'
-      ? margin
-      : (mode === 'bottom'
-        ? Math.max(margin, region.height - totalHeight - margin)
-        : Math.max(0, Math.floor((region.height - totalHeight) / 2)));
-
-    for (const entry of rendered) {
-      const baseRow = cursor;
-      const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
-      const offset = applyAnimationOffset(
-        placement,
-        entry.surface.width,
-        entry.surface.height,
-        margin,
-        entry.item.progress,
-      );
-      entries.push({
-        ...entry,
-        row: region.row + baseRow + offset.rowDelta,
-        col: region.col + baseCol + offset.colDelta,
-      });
-      cursor += entry.surface.height + gap;
-    }
-
-    entries.push(...renderOverflowExits(
-      overflowGrouped.get(placement) ?? [],
-      placement,
-      totalHeight,
-      region,
-      margin,
-      gap,
-      overflowPrepared,
-    ));
-  }
-
-  return entries;
-}
-
-function containsRect(rect: LayoutRect | undefined, col: number, row: number): boolean {
-  if (rect == null) return false;
-  return col >= rect.col
-    && col < rect.col + rect.width
-    && row >= rect.row
-    && row < rect.row + rect.height;
-}
-
-export function hitTestNotificationStack<Msg>(
-  state: NotificationState<Msg>,
-  options: RenderNotificationStackOptions,
-  col: number,
-  row: number,
-): NotificationMouseTarget<Msg> | undefined {
-  const entries = resolveNotificationOverlayEntries(state, options);
-  for (let index = entries.length - 1; index >= 0; index--) {
-    const entry = entries[index]!;
-    if (
-      col < entry.col
-      || col >= entry.col + entry.surface.width
-      || row < entry.row
-      || row >= entry.row + entry.surface.height
-    ) {
-      continue;
-    }
-
-    const localCol = col - entry.col;
-    const localRow = row - entry.row;
-    if (containsRect(entry.dismissRect, localCol, localRow)) {
-      return { item: entry.item, kind: 'dismiss' };
-    }
-    if (containsRect(entry.actionRect, localCol, localRow)) {
-      return { item: entry.item, kind: 'action' };
-    }
-    return { item: entry.item, kind: 'body' };
-  }
-
-  return undefined;
-}
-
-export function renderNotificationStack<Msg>(
-  state: NotificationState<Msg>,
-  options: RenderNotificationStackOptions,
-): readonly Overlay[] {
-  return resolveNotificationOverlayEntries(state, options).map((entry) => ({
-    row: entry.row,
-    col: entry.col,
-    surface: entry.surface,
-    content: options.ctx != null
-      ? surfaceToString(entry.surface, options.ctx.style)
-      : renderPlainSurface(entry.surface),
-  }));
-}
+export {
+  hitTestNotificationStack,
+  renderNotificationStack,
+  trimNotificationsToViewport,
+} from './notification-stack.js';

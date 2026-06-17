@@ -6,6 +6,7 @@ import {
   discoverDogfoodI18nDebtSources,
   evaluateDogfoodI18nDebtRatchet,
   evaluateDogfoodMarkdownLocalizationRatchet,
+  evaluateDogfoodTouchedI18nDebt,
 } from '../examples/docs/i18n-debt.js';
 import { runDogfoodI18nDebtInventory } from './dogfood-i18n-debt.js';
 
@@ -49,6 +50,38 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(inventory.bySurface).toEqual([{ surface: 'new-docs-module', count: 1 }]);
     expect(result.ok).toBe(false);
     expect(result.violations).toContain('new-docs-module 1 exceeds baseline 0');
+  });
+
+  it('fails the touched-file policy when a changed DOGFOOD source still has raw string debt', () => {
+    const sources = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/fixture.ts', 'examples/docs/clean.ts'],
+    }).map((source) => ({
+      ...source,
+      text: source.path.endsWith('fixture.ts')
+        ? "export const label = 'Fresh DOGFOOD Label';"
+        : "export const id = 'machine-id';",
+    }));
+    const inventory = collectDogfoodI18nDebt({ sources });
+    const result = evaluateDogfoodTouchedI18nDebt(inventory, ['examples/docs/fixture.ts']);
+
+    expect(result.ok).toBe(false);
+    expect(result.violations).toEqual([
+      'touched DOGFOOD source examples/docs/fixture.ts has 1 raw string debt entry',
+    ]);
+  });
+
+  it('allows touched DOGFOOD sources once their raw string debt is cleared', () => {
+    const sources = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/clean.ts'],
+    }).map((source) => ({
+      ...source,
+      text: "export const id = 'machine-id';",
+    }));
+    const inventory = collectDogfoodI18nDebt({ sources });
+    const result = evaluateDogfoodTouchedI18nDebt(inventory, ['examples/docs/clean.ts']);
+
+    expect(result.ok).toBe(true);
+    expect(result.violations).toEqual([]);
   });
 
   it('counts uncataloged visible strings while ignoring ids, paths, and catalog fallbacks', () => {
@@ -266,6 +299,7 @@ describe('DOGFOOD i18n debt inventory', () => {
 
     const exitCode = runDogfoodI18nDebtInventory({
       inventory,
+      changedPaths: [],
       baseline: { total: 0, bySurface: { fixture: 0 } },
       markdownInventory: collectDogfoodMarkdownLocalizationDebt({ sources: [] }),
       markdownBaseline: { total: 0, byLocale: {} },
@@ -276,6 +310,32 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(exitCode).toBe(1);
     expect(stdout).toEqual([]);
     expect(stderr.join('').length).toBeGreaterThan(0);
+  });
+
+  it('reports a nonzero exit when a touched file still has raw string debt', () => {
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+    const inventory = collectDogfoodI18nDebt({
+      sources: [{
+        surface: 'fixture',
+        path: 'examples/docs/fixture.ts',
+        text: "const title = 'Raw English Title';",
+      }],
+    });
+
+    const exitCode = runDogfoodI18nDebtInventory({
+      inventory,
+      changedPaths: ['examples/docs/fixture.ts'],
+      baseline: { total: 1, bySurface: { fixture: 1 } },
+      markdownInventory: collectDogfoodMarkdownLocalizationDebt({ sources: [] }),
+      markdownBaseline: { total: 0, byLocale: {} },
+      stdout: (text) => stdout.push(text),
+      stderr: (text) => stderr.push(text),
+    });
+
+    expect(exitCode).toBe(1);
+    expect(stdout).toEqual([]);
+    expect(stderr.join('')).toContain('touched DOGFOOD source examples/docs/fixture.ts has 1 raw string debt entry');
   });
 
   it('reports a nonzero exit when Markdown localization debt exceeds a supplied baseline', () => {
@@ -294,6 +354,7 @@ describe('DOGFOOD i18n debt inventory', () => {
 
     const exitCode = runDogfoodI18nDebtInventory({
       inventory: collectDogfoodI18nDebt({ sources: [] }),
+      changedPaths: [],
       baseline: { total: 0, bySurface: {} },
       markdownInventory,
       markdownBaseline: { total: 0, byLocale: { fr: 0 } },

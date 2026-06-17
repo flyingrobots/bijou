@@ -28,6 +28,7 @@ describe('release-readiness', () => {
     expect(plan.map((step) => step.label)).toEqual([
       'build',
       'lint',
+      'code:size',
       'typecheck:test',
       'docs:design-system:preflight',
       'dogfood:coverage:gate',
@@ -80,6 +81,7 @@ describe('release-readiness', () => {
     expect(executed).toEqual([
       '/tmp/bijou:build',
       '/tmp/bijou:lint',
+      '/tmp/bijou:code:size',
       '/tmp/bijou:typecheck:test',
       '/tmp/bijou:docs:design-system:preflight',
       '/tmp/bijou:dogfood:coverage:gate',

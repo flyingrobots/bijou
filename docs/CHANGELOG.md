@@ -8,9 +8,25 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Respectful Repo Code Dojo** — the verbatim
+  [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
+  artifact is now installed as an enforced Code Dojo gate. File/context
+  threshold debt, legacy mega-file debt, and existing mock-ban exceptions are
+  captured as ratcheting baselines, so current debt may hold or shrink while new
+  or growing violations fail pre-commit, pre-push, and CI.
 - **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
   themes now inherit `Ctrl+T` from the shared frame shell to toggle the active
   theme family between dark and light modes without opening Settings.
+- **First-party theme variant coverage** — DOGFOOD first-party shell themes now
+  have deterministic paired versus single-mode spec coverage, the shared
+  AppShell theme metadata exposes the same declaration to agents, and `Ctrl+T`
+  on a single-mode theme now reports that no alternate mode exists instead of
+  silently doing nothing.
+- **DOGFOOD localization policy hardening** — `npm run dogfood:i18n:complete`
+  now treats any localization-row edit as a changed key that must keep all
+  supported locales current, ratchets the full missing-translation count, and
+  `npm run dogfood:i18n:debt` now fails when a branch touches a DOGFOOD
+  TypeScript source file that still carries raw visible-copy debt.
 - **Theme Lab light-mode readability** — DOGFOOD Theme Lab and Theme Inspector
   token swatches now render diagnostic label/value text with the active shell
   theme's readable foreground tokens while preserving the inspected token

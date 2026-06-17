@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+
+printf '%s\n' "Code Dojo: pre-push full verification"
+npm run -s code-dojo:prepush
+
+printf '%s\n' "Bijou: pre-push full verification"
+scripts/hooks/pre-push

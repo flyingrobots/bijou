@@ -22,7 +22,7 @@
     "rootDir": "src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.test-support.ts"],
   "references": [
     { "path": "../bijou" },
     { "path": "../bijou-i18n" }

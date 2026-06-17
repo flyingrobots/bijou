@@ -78,13 +78,20 @@ In non-production builds, missing selected-locale strings render as a bright
 missing-localization marker instead of quietly falling back to English. That
 keeps untranslated UI visible while development is running.
 
-New DOGFOOD localization keys, and existing keys whose English source string
-changes, must include current rows for every supported locale: `en`, `fr`,
-`es`, and `de`. `npm run dogfood:i18n:complete` enforces that policy for rows
-changed relative to `origin/main` by default, and accepts `-- --base <ref>` for
+New DOGFOOD localization keys, changed source strings, changed translated
+values, and removed keys must be handled semantically across every supported
+locale: `en`, `fr`, `es`, and `de`. `npm run dogfood:i18n:complete` enforces
+that policy for localization keys changed relative to `origin/main` by default,
+ratchets the full missing-translation count, and accepts `-- --base <ref>` for
 CI comparison refs or `-- --all` for a full-table audit. The pre-push hook and
 CI both run the completeness gate plus `npm run dogfood:i18n:check`, so a new
 string cannot merge with missing translations or stale generated catalogs.
+
+The raw-string debt gate is stricter than a global ratchet. If a branch touches
+a DOGFOOD TypeScript source file that still has raw visible-copy debt,
+`npm run dogfood:i18n:debt` fails until that file is cleaned or the strings are
+proved non-localizable by scanner policy. This prevents old localization debt
+from surviving in files that are actively being edited.
 
 The same source table can also be exported through the i18n workbook adapters
 instead of requiring translators to edit the docs app source directly:
@@ -141,10 +148,12 @@ reconstructing product truth from adjacent rendering code.
 - **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining
   localizable source strings by DOGFOOD surface across `examples/docs/**/*.ts`
   modules, keeps tooling-only exclusions documented, counts missing Markdown
-  localizations by locale, and fails when either baseline increases.
+  localizations by locale, fails when either baseline increases, and blocks
+  touched DOGFOOD TypeScript files that still contain raw visible-copy debt.
 - **Localization Completeness Gate**: `npm run dogfood:i18n:complete` requires
-  every newly added or source-changed DOGFOOD string to carry current values for
-  all supported locales before pre-push or CI can pass.
+  every changed DOGFOOD localization key to carry current values for all
+  supported locales, and ratchets the full missing-translation count before
+  pre-push or CI can pass.
 - **BlockLab Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
 - **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.

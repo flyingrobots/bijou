@@ -19,8 +19,9 @@ mixes one paired shell family with several landing-art shell presets that do
 not have light/dark siblings. For `v7.2.0`, the bounded repair is:
 
 - inventory every first-party DOGFOOD shell theme as paired or single-mode
+  through deterministic shell-spec coverage
 - keep `DOGFOOD / Dark` and `DOGFOOD / Light` as the paired release-demo path
-- declare landing-art shell presets as explicit single-mode choices instead of
+- classify landing-art shell presets as explicit single-mode choices instead of
   implying that they support a dark/light toggle
 - make unsupported theme-mode toggles visible through shell feedback
 - prove dark-to-light and light-to-dark toggles deterministically
@@ -43,10 +44,10 @@ and assert that unsupported mode switches do not silently no-op.
 
 ## Hill
 
-After this cycle, DOGFOOD's theme surface tells the truth: paired themes have
-dark/light behavior, single-mode themes are labeled as single-mode, and the
-AppShell mode toggle gives deterministic feedback in both supported and
-unsupported paths.
+After this cycle, DOGFOOD's theme path tells the truth: paired themes have
+dark/light behavior, single-mode themes are classified as single-mode in
+deterministic shell-spec coverage, and the AppShell mode toggle gives
+deterministic feedback in both supported and unsupported paths.
 
 ## Problem
 
@@ -62,10 +63,11 @@ full DOGFOOD theme inventory.
 
 ## Scope
 
-- Add first-party shell theme metadata that distinguishes paired families from
+- Add first-party shell theme coverage that distinguishes paired families from
   single-mode concrete themes.
-- Render that inventory in Theme Lab so users can see which themes support
-  dark/light mode switching.
+- Do not touch the DOGFOOD app rendering file for visible Theme Lab inventory
+  until its existing raw-string debt is cleaned under the touched-file
+  localization policy.
 - Keep the DOGFOOD family as the paired first-party dark/light shell path.
 - Keep landing-art shell presets single-mode unless a real light/dark pair is
   intentionally designed for a given preset.
@@ -73,7 +75,7 @@ full DOGFOOD theme inventory.
   instead of silently doing nothing.
 - Add deterministic AppShell tests for supported dark-to-light and
   light-to-dark switching and for unsupported single-mode feedback.
-- Add DOGFOOD tests that prove the Theme Lab inventory lists paired and
+- Add DOGFOOD tests that prove the shell-spec inventory lists paired and
   single-mode coverage.
 
 ## Non-Goals
@@ -96,10 +98,10 @@ When the active shell choice is a concrete single-mode theme, `Ctrl+T` posts a
 short settings notification that names the active theme and says it has no
 alternate mode. The active theme remains unchanged.
 
-Theme Lab must show:
+The shell spec and settings surfaces must prove:
 
 - the active default dark and light presets
-- a shell inventory where each first-party choice declares `paired` or
+- a shell inventory where each first-party choice is classified as `paired` or
   `single-mode`
 - enough concrete labels that users can tell which entries respond to
   `Ctrl+T`
@@ -108,8 +110,8 @@ Theme Lab must show:
 
 ### Static Mode
 
-Static Theme Lab rendering should include the same inventory labels as the
-interactive path so tests can assert coverage from rendered text.
+Static tests should assert the same inventory classification from shell specs
+without requiring screenshot or ANSI scraping.
 
 ### Pipe Mode
 
@@ -127,8 +129,9 @@ New user-facing strings should use the existing DOGFOOD or AppShell i18n ports.
 The tests may assert English source copy, but the source strings must be
 catalog-discoverable so the localization gates can track them.
 
-Directionality is unchanged. The inventory is plain text in existing DOGFOOD
-surfaces and should flow through the current shell layout.
+Directionality is unchanged. Future visible inventory copy should flow through
+the current shell layout after the touched DOGFOOD app file is localization
+clean.
 
 ## Agent Inspectability / Explainability Posture
 
@@ -136,7 +139,7 @@ Agents should be able to inspect:
 
 - raw DOGFOOD shell theme specs and their mode support
 - resolved AppShell theme choices and their `modeId` facts
-- Theme Lab rendered text for paired and single-mode labels
+- shell-spec classification for paired and single-mode choices
 - runtime notifications after supported and unsupported `Ctrl+T` paths
 
 The proof should not require screenshots or terminal color sampling.
@@ -145,23 +148,23 @@ The proof should not require screenshots or terminal color sampling.
 
 - Visible controls are a promise: a mode toggle must either work or explain why
   it cannot.
-- Docs are the demo: Theme Lab should explain the actual first-party theme
-  inventory users can select.
+- Docs are the demo: once the DOGFOOD app rendering file is localization-clean,
+  Theme Lab should explain the actual first-party theme inventory users can
+  select.
 - Shell owns shell concerns: mode switching remains AppShell behavior inherited
   by DOGFOOD and other apps through `createFramedApp`.
 - Tests are the spec: paired and unsupported paths need deterministic coverage.
 
 ## Implementation Plan
 
-1. Add first-party shell theme support metadata and export DOGFOOD inventory
-   helpers for tests.
-2. Render a Theme Lab inventory row for every first-party shell choice,
-   including paired and single-mode declarations.
+1. Add first-party shell theme support coverage for tests.
+2. Keep visible Theme Lab inventory out of this cycle until the touched DOGFOOD
+   app file is localization-clean.
 3. Add AppShell feedback for unsupported mode toggles on single-mode concrete
    themes.
 4. Add tests that fail before the implementation:
-   - DOGFOOD Theme Lab lists `DOGFOOD` as paired dark/light.
-   - DOGFOOD Theme Lab lists landing-art shell presets as single-mode.
+   - DOGFOOD shell specs list `DOGFOOD` as paired dark/light.
+   - DOGFOOD shell specs list landing-art shell presets as single-mode.
    - AppShell toggles paired themes dark -> light -> dark.
    - AppShell `Ctrl+T` on a single-mode theme leaves the id unchanged and posts
      explicit feedback.
@@ -171,7 +174,7 @@ The proof should not require screenshots or terminal color sampling.
 ## Tests To Write First
 
 - `tests/cycles/DL-018/first-party-theme-variant-coverage.test.ts` for DOGFOOD
-  shell inventory and rendered Theme Lab copy.
+  shell inventory.
 - `packages/bijou-tui/src/app-frame.test.ts` coverage for supported
   dark-to-light and light-to-dark `Ctrl+T` switching.
 - `packages/bijou-tui/src/app-frame.test.ts` coverage for unsupported
@@ -180,7 +183,8 @@ The proof should not require screenshots or terminal color sampling.
 ## Acceptance Criteria
 
 - Every DOGFOOD first-party shell theme is classified as paired or single-mode.
-- Theme Lab renders the first-party theme inventory with mode-support labels.
+- DOGFOOD shell-spec coverage proves the first-party theme inventory with
+  mode-support labels.
 - `Ctrl+T` toggles the paired DOGFOOD family in both directions.
 - `Ctrl+T` on a single-mode theme posts explicit feedback instead of silently
   doing nothing.
