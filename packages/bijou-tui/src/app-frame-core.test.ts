@@ -1,6 +1,7 @@
 import {
   afterAll,
   beforeAll,
+  collectCommandMessages,
   createFramedApp,
   createInteractiveContext,
   createKeyMap,
@@ -354,7 +355,7 @@ describe('createFramedApp', () => {
       transitionDuration: 10,
     });
 
-    const [initModel, initCmds] = app.init();
+    const [initModel] = app.init();
     expect(initModel.activePageId).toBe('p1');
 
     // Trigger tab switch
@@ -364,34 +365,17 @@ describe('createFramedApp', () => {
     expect(switchedModel.transitionProgress).toBe(0);
     expect(switchCmds.length).toBe(1);
 
-    // Manually drive the animation command
-    const messages: any[] = [];
-    const pulseHandlers = new Set<(dt: number) => void>();
-    let settled = false;
-    const promise = Promise.resolve(switchCmds[0]!((m) => messages.push(m), {
-      onPulse(handler) {
-        pulseHandlers.add(handler);
-        return {
-          dispose() {
-            pulseHandlers.delete(handler);
-          },
-        };
-      },
-    })).then(() => {
-      settled = true;
-    });
-
-    for (let i = 0; i < 10 && !settled; i++) {
-      for (const handler of [...pulseHandlers]) {
-        handler(0.002);
-      }
-      await Promise.resolve();
+    const transitionCmd = switchCmds[0];
+    if (transitionCmd == null) {
+      throw new Error('expected transition command');
     }
-
-    await promise;
+    const messages = await collectCommandMessages(
+      transitionCmd,
+      Array.from({ length: 10 }, () => 0.002),
+    );
 
     expect(messages.length).toBeGreaterThan(0);
-    
+
     let model = switchedModel;
     for (const m of messages) {
       const [nextModel] = app.update(m, model);
