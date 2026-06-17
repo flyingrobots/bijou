@@ -93,36 +93,34 @@ function createInteractiveContext(options: Parameters<typeof createTestContext>[
   return { clock, ctx };
 }
 
-async function collectCommandMessages<M>(
-  cmd: Cmd<M>,
-  pulses: readonly number[],
-): Promise<M[]> {
-  const messages: M[] = [];
-  const pulseHandlers = new Set<(dt: number) => void>();
-  let settled = false;
-  const promise = Promise.resolve(cmd((message) => messages.push(message), {
+async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[]): Promise<M[]> {
+  const msgs: M[] = [];
+  const hooks = new Set<(dt: number) => void>();
+  let done = false;
+  const run = Promise.resolve(cmd((msg) => msgs.push(msg), {
     onPulse(handler) {
-      pulseHandlers.add(handler);
+      hooks.add(handler);
       return {
         dispose() {
-          pulseHandlers.delete(handler);
+          hooks.delete(handler);
         },
       };
     },
   })).then(() => {
-    settled = true;
+    done = true;
   });
 
   for (const dt of pulses) {
-    if (settled) break;
-    for (const handler of [...pulseHandlers]) {
+    if (done) break;
+    for (const handler of [...hooks]) {
       handler(dt);
     }
     await Promise.resolve();
   }
 
-  await promise;
-  return messages;
+  if (!done) throw new Error(`stuck after ${String(pulses.length)} pulse`);
+  await run;
+  return msgs;
 }
 
 function scheduleKeys(
