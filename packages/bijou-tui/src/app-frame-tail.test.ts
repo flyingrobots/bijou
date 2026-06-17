@@ -24,7 +24,6 @@ import {
   shiftKey,
   surfaceToString,
   textView,
-  tick,
   _resetDefaultContextForTesting,
   Cmd,
   FrameOverlayContext,
