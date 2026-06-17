@@ -4,6 +4,20 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
+const typeCheckedFiles = [
+  "bench/**/*.ts",
+  "examples/**/*.ts",
+  "packages/**/*.ts",
+  "scripts/**/*.ts",
+  "tests/**/*.ts",
+  "vitest.config.ts",
+];
+const coreFiles = [
+  "src/core/**/*.ts",
+  "src/domain/**/*.ts",
+  "packages/*/src/core/**/*.ts",
+  "packages/*/src/domain/**/*.ts",
+];
 
 export default tseslint.config(
   {
@@ -13,17 +27,20 @@ export default tseslint.config(
       "node_modules/**",
       "vendor/**",
       "generated/**",
+      "**/*.d.ts",
       "*.min.*",
     ],
   },
-  js.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
   {
-    files: ["src/**/*.ts", "test/**/*.ts", "tests/**/*.ts"],
+    files: typeCheckedFiles,
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.strictTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
+    ],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.code-standards.json",
         tsconfigRootDir,
       },
     },
@@ -58,7 +75,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/core/**/*.ts", "src/domain/**/*.ts"],
+    files: coreFiles,
     rules: {
       "no-restricted-imports": [
         "error",

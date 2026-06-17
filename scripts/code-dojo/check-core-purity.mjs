@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { allWorkspaceFiles, repoRoot, stagedFiles, stagedContent } from "./git.mjs";
 
 const root = repoRoot();
@@ -8,8 +9,11 @@ const args = new Set(process.argv.slice(2));
 const all = args.has("--all");
 const allowMarker = "code-dojo: allow-core-impurity";
 
-const corePrefixes = ["src/core/", "src/domain/"];
 const extensions = new Set([".ts", ".tsx", ".mts", ".cts"]);
+const rootCorePattern = /^(?:src\/(?:core|domain)\/).+\.[cm]?tsx?$/u;
+const packageCorePattern = /^(?:packages\/[^/]+\/src\/(?:core|domain)\/).+\.[cm]?tsx?$/u;
+const testFilePattern = /\.(?:test|spec)\.[cm]?tsx?$/u;
+const testSupportFilePattern = /(?:^|\/)(?:[^/]*\.)?test-support\.[cm]?tsx?$/u;
 
 const forbidden = [
   { pattern: /from\s+["'](?:node:)?fs(?:\/promises)?["']/u, message: "filesystem import belongs in an adapter" },
@@ -29,9 +33,13 @@ const forbidden = [
   { pattern: /\bsessionStorage\b/u, message: "browser storage belongs in an adapter" }
 ];
 
-function isCoreFile(file) {
+export function isCoreFile(file) {
   const normalized = file.split(path.sep).join("/");
-  return corePrefixes.some((prefix) => normalized.startsWith(prefix)) && extensions.has(path.extname(normalized)) && !normalized.endsWith(".d.ts");
+  return (rootCorePattern.test(normalized) || packageCorePattern.test(normalized))
+    && extensions.has(path.extname(normalized))
+    && !normalized.endsWith(".d.ts")
+    && !testFilePattern.test(normalized)
+    && !testSupportFilePattern.test(normalized);
 }
 
 function contentOf(file) {
@@ -43,26 +51,36 @@ function contentOf(file) {
   return stagedContent(file);
 }
 
-const files = (all ? allWorkspaceFiles() : stagedFiles()).filter(isCoreFile);
-const failures = [];
+export function findCorePurityFailures(files, readContent) {
+  const failures = [];
+  for (const file of files) {
+    const content = readContent(file);
+    if (content.includes(allowMarker)) continue;
 
-for (const file of files) {
-  const content = contentOf(file);
-  if (content.includes(allowMarker)) continue;
-
-  const lines = content.split(/\r?\n/u);
-  for (const [index, line] of lines.entries()) {
-    for (const rule of forbidden) {
-      if (rule.pattern.test(line)) {
-        failures.push(`${file}:${index + 1} — ${rule.message}: ${line.trim()}`);
+    const lines = content.split(/\r?\n/u);
+    for (const [index, line] of lines.entries()) {
+      for (const rule of forbidden) {
+        if (rule.pattern.test(line)) {
+          failures.push(`${file}:${index + 1} — ${rule.message}: ${line.trim()}`);
+        }
       }
     }
   }
+  return failures;
 }
 
-if (failures.length > 0) {
-  console.error("\nCode Dojo: core purity failed\n");
-  for (const failure of failures) console.error(`- ${failure}`);
-  console.error(`\nUse ports/adapters, or add '${allowMarker}: <approved reason>' only for documented exceptions.\n`);
-  process.exit(1);
+function main() {
+  const files = (all ? allWorkspaceFiles() : stagedFiles()).filter(isCoreFile);
+  const failures = findCorePurityFailures(files, contentOf);
+
+  if (failures.length > 0) {
+    console.error("\nCode Dojo: core purity failed\n");
+    for (const failure of failures) console.error(`- ${failure}`);
+    console.error(`\nUse ports/adapters, or add '${allowMarker}: <approved reason>' only for documented exceptions.\n`);
+    process.exit(1);
+  }
+}
+
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  main();
 }

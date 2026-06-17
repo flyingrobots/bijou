@@ -29,6 +29,8 @@ export interface LogoOptions {
   fallbackText?: string;
   /** Bijou context for I/O operations. */
   ctx?: BijouContext;
+  /** Random number source for deterministic logo selection in tests and scripted renders. */
+  random?: () => number;
 }
 
 /** Ordered fallback chains for each logo size (tries preferred size first, then smaller). */
@@ -128,12 +130,13 @@ export function loadRandomLogo(
   const fallback: LogoResult = { text: fallbackText, lines: 1, width: fallbackText.length };
   const sizes = SIZE_CASCADE[size];
   const io = options?.ctx?.io ?? getDefaultContext().io;
+  const random = options?.random ?? Math.random;
 
   for (const trySize of sizes) {
     const dir = io.joinPath(logosDir, family, trySize);
     const candidates = loadCandidates(io, dir, constraints);
     if (candidates.length > 0) {
-      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      const picked = candidates[Math.floor(random() * candidates.length)];
       if (picked !== undefined) return picked;
     }
   }

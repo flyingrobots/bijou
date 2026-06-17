@@ -175,10 +175,12 @@ The proof should not require screenshots or terminal color sampling.
 
 - `tests/cycles/DL-018/first-party-theme-variant-coverage.test.ts` for DOGFOOD
   shell inventory.
-- `packages/bijou-tui/src/app-frame.test.ts` coverage for supported
+- `packages/bijou-tui/src/app-frame-notifications.test.ts` coverage for supported
   dark-to-light and light-to-dark `Ctrl+T` switching.
-- `packages/bijou-tui/src/app-frame.test.ts` coverage for unsupported
+- `packages/bijou-tui/src/app-frame-notifications.test.ts` coverage for unsupported
   single-mode `Ctrl+T` feedback.
+- `packages/bijou-tui/src/app-frame-modal-routing.test.ts` coverage for the
+  command-palette theme-mode action.
 
 ## Acceptance Criteria
 

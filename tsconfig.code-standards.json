@@ -5,6 +5,7 @@
     "lib": ["ES2022"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -16,9 +17,30 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["node", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@flyingrobots/bijou": ["./packages/bijou/src/index.ts"],
+      "@flyingrobots/bijou/adapters/test": ["./packages/bijou/src/adapters/test/index.ts"],
+      "@flyingrobots/bijou/perf": ["./packages/bijou/src/core/render/packed-cell.ts"],
+      "@flyingrobots/bijou-i18n": ["./packages/bijou-i18n/src/index.ts"],
+      "@flyingrobots/bijou-i18n-tools": ["./packages/bijou-i18n-tools/src/index.ts"],
+      "@flyingrobots/bijou-i18n-tools-node": ["./packages/bijou-i18n-tools-node/src/index.ts"],
+      "@flyingrobots/bijou-i18n-tools-xlsx": ["./packages/bijou-i18n-tools-xlsx/src/index.ts"],
+      "@flyingrobots/bijou-node": ["./packages/bijou-node/src/index.ts"],
+      "@flyingrobots/bijou-tui": ["./packages/bijou-tui/src/index.ts"],
+      "@flyingrobots/bijou-tui-app": ["./packages/bijou-tui-app/src/index.ts"]
+    },
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "tests/**/*.ts", "scripts/**/*.mjs", "eslint.config.mjs"],
+  "include": [
+    "bench/**/*.ts",
+    "examples/**/*.ts",
+    "packages/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", "dist", "coverage", "vendor", "generated"]
 }

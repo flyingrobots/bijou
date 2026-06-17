@@ -23,7 +23,8 @@ Current count:
 | File/context baseline | 342 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 23 | Existing test mock/spy violations. |
 | Code-size baseline | 58 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| **Total** | **423** | Aggregate Code Dojo standards debt. |
+| ESLint baseline | 5,345 | Type-aware ESLint findings from the initial monorepo-wide ratchet. |
+| **Total** | **5,768** | Aggregate Code Dojo standards debt. |
 
 ## Goalpost Burndown Policy
 
@@ -48,8 +49,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `423`. The next met goalpost must lower the ceiling to
-`373` or lower.
+The current ceiling is `5,768`. The next met goalpost must lower the ceiling to
+`5,718` or lower.
 
 ## Updating The Ceiling
 

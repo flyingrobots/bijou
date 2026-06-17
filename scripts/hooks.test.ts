@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -38,5 +38,35 @@ describe('git hooks', () => {
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:debt -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
+  });
+
+  it('focused CI unit-test filters point at existing split docs-preview tests', () => {
+    const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
+    const tokens = policy.focusedUnitTestsJob.focusedPortableRun.split(/\s+/u);
+    const runIndex = tokens.indexOf('--run');
+    const runPaths = tokens.slice(runIndex + 1);
+
+    expect(runIndex).toBeGreaterThanOrEqual(0);
+    expect(runPaths).not.toContain('scripts/docs-preview.test.ts');
+    expect(runPaths).toEqual(expect.arrayContaining([
+      'scripts/docs-preview-components.test.ts',
+      'scripts/docs-preview-entry.test.ts',
+      'scripts/docs-preview-landing.test.ts',
+      'scripts/docs-preview-search.test.ts',
+      'scripts/docs-preview-theme.test.ts',
+    ]));
+    for (const runPath of runPaths) {
+      expect(existsSync(resolve(ROOT, runPath)), runPath).toBe(true);
+    }
+  });
+
+  it('pre-push composes Code Dojo without running the full test suite twice', () => {
+    const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-push'), 'utf8');
+    const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
+
+    expect(hookShim).toContain('npm run -s code-dojo:prepush');
+    expect(hookShim).toContain('scripts/hooks/pre-push');
+    expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*npm test/u);
+    expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*test:run/u);
   });
 });
