@@ -16,7 +16,7 @@ if (/^(Merge|Revert)\b/u.test(firstLine)) {
 }
 
 const conventional = /^(feat|fix|test|refactor|docs|chore|build|ci|perf|style)(\([a-z0-9-]+\))?!?: [a-z0-9].{11,71}$/u;
-const garbage = /^(wip|misc|changes|fix|stuff|updates?|work|temp|checkpoint)(?:\s|:|$)/iu;
+const garbage = /^(?:(?:wip|misc|changes|stuff|updates?|work|temp|checkpoint)(?:\s|:|$)|fix(?:\s|$))/iu;
 
 const failures = [];
 
