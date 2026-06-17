@@ -5,16 +5,16 @@ import { FORMS } from './registry-forms.js';
 import { TUI } from './registry-tui.js';
 
 export interface Category {
-  id: string;
-  name: string;
-  entries: ComponentEntry[];
+  readonly id: string;
+  readonly title: string;
+  readonly entries: readonly ComponentEntry[];
 }
 
 export const CATEGORIES: readonly Category[] = [
-  { id: 'display', name: 'Display', entries: DISPLAY },
-  { id: 'data', name: 'Data', entries: DATA },
-  { id: 'forms', name: 'Forms', entries: FORMS },
-  { id: 'tui', name: 'TUI', entries: TUI },
+  { id: 'display', title: 'Display', entries: DISPLAY },
+  { id: 'data', title: 'Data', entries: DATA },
+  { id: 'forms', title: 'Forms', entries: FORMS },
+  { id: 'tui', title: 'TUI', entries: TUI },
 ];
 
 export function findEntry(id: string): ComponentEntry | undefined {
