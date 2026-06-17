@@ -11,6 +11,7 @@ export interface CiWorkflowTestJobPolicy {
 export interface CiWorkflowPolicy {
   readonly testJob: CiWorkflowTestJobPolicy;
   readonly focusedUnitTestsJob: {
+    readonly permissionsContents: string | undefined;
     readonly focusedPortableRun: string;
   };
 }
@@ -24,6 +25,9 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const jobs = asRecord(workflow.jobs, 'workflow.jobs');
   const testJob = asRecord(jobs.test, 'workflow.jobs.test');
   const focusedUnitTestsJob = asRecord(jobs.unit_cross_platform, 'workflow.jobs.unit_cross_platform');
+  const focusedUnitTestsPermissions = focusedUnitTestsJob.permissions == null
+    ? undefined
+    : asRecord(focusedUnitTestsJob.permissions, 'workflow.jobs.unit_cross_platform.permissions');
   const focusedUnitTestsSteps = asArray(focusedUnitTestsJob.steps, 'workflow.jobs.unit_cross_platform.steps');
   const steps = asArray(testJob.steps, 'workflow.jobs.test.steps');
   const i18nPolicyGateIndex = steps.findIndex((step) => {
@@ -63,6 +67,9 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
       i18nPolicyGateRun: asString(i18nPolicyGate.run, 'workflow.jobs.test.i18nPolicyGate.run'),
     },
     focusedUnitTestsJob: {
+      permissionsContents: focusedUnitTestsPermissions == null
+        ? undefined
+        : asString(focusedUnitTestsPermissions.contents, 'workflow.jobs.unit_cross_platform.permissions.contents'),
       focusedPortableRun: asString(focusedPortableStep.run, 'workflow.jobs.unit_cross_platform.focusedPortable.run'),
     },
   };

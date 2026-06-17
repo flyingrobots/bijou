@@ -60,6 +60,12 @@ describe('git hooks', () => {
     }
   });
 
+  it('focused CI unit-test job uses read-only repository permissions', () => {
+    const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
+
+    expect(policy.focusedUnitTestsJob.permissionsContents).toBe('read');
+  });
+
   it('pre-push composes Code Dojo without running the full test suite twice', () => {
     const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-push'), 'utf8');
     const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
