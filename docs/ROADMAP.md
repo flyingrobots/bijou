@@ -40,7 +40,10 @@ Before the next `v7.2.0` product pull, the active pre-release quality goalpost
 is **Respectful Repo: Enter the Code Dojo**. The verbatim
 [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
 artifact, Code Dojo hooks, CI workflow, and ratcheting baselines must be
-enforceable so future stabilization work cannot add or grow standards debt.
+enforceable so future stabilization work cannot add or grow standards debt. The
+[Code Dojo exception ledger](./code-dojo-exceptions.md) also requires every met
+goalpost to remove at least 50 counted standards violations until the aggregate
+count reaches zero.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
@@ -120,6 +123,8 @@ Release gate:
 - Code Dojo file/context, core-purity, mock-ban, Graft receipt, code-size,
   typecheck, lint, and deterministic test gates are enforceable with ratcheting
   baselines for current debt.
+- `npm run code-dojo:debt` reports the aggregate standards-debt count and every
+  met goalpost lowers that count by at least 50 until zero.
 - no swallowed workspace mouse movement, release, or non-left press events
 - root-exported page-scoped app-frame helpers
 - reusable scripted mouse driver helpers and focused pointer regressions

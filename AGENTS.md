@@ -32,6 +32,10 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 - Code Dojo baseline files under `scripts/code-dojo/baselines/` are ratchets.
   Existing entries may hold or shrink. New entries, grown baselines, or
   softened thresholds require explicit design-review justification.
+- `docs/code-dojo-exceptions.md` is the human exception ledger. Every met repo
+  goalpost must reduce the aggregate `npm run code-dojo:debt` count by at
+  least 50 violations until zero. This goalpost burndown is additive to all
+  other touched-file rules, ratchets, CI gates, review gates, and release gates.
 - The active code-size ratchet is part of the standards posture: no source file
   over 1,000 lines unless it is named as legacy debt in the code-size baseline;
   files over 500 lines must be explicitly baselined and may hold or shrink, not
@@ -66,6 +70,7 @@ Do not audit the repository by recursively walking the filesystem. Follow the au
 - **`docs/VISION.md`**: Core tenets and project identity.
 - **`docs/METHOD.md`**: Repo work doctrine (Backlog lanes, Cycle loop).
 - **`docs/typescript-code-standards.editors-edition.md`**: Verbatim TypeScript Code Standards doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture.
+- **`docs/code-dojo-exceptions.md`**: Human exception ledger and 50-violation-per-goalpost burndown policy.
 
 ### 3. The Direction
 - **`docs/BEARING.md`**: Current execution gravity and active tensions.

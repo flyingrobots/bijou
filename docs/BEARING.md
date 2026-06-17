@@ -109,7 +109,9 @@ Current direction and active tensions. Historical ship data is in
   Enter the Code Dojo**. The repository must live under the verbatim
   [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
   artifact with enforceable baselines for existing file/context, mega-file, and
-  mock-ban debt.
+  mock-ban debt. The active exception ledger is
+  [Code Dojo Exceptions](./code-dojo-exceptions.md): every met goalpost must
+  remove at least 50 counted violations until the aggregate count reaches zero.
 - DL-018 remains the next `v7.2.0` product pull after the Code Dojo gate is
   enforceable: make DOGFOOD first-party shell themes declare paired or
   single-mode coverage, and make unsupported theme-mode toggles explicit for
@@ -181,7 +183,7 @@ The current pull is a standards gate:
 TypeScript Code Standards artifact
   -> Code Dojo scripts, hooks, and CI
     -> file/context and mock-ban baselines
-      -> ratchets that fail new or growing debt
+      -> 50-violation goalpost burndown until zero
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain

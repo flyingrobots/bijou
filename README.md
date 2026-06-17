@@ -239,6 +239,7 @@ Most production apps eventually move to tier 2 or tier 3.
 | [`DOGFOOD`](./docs/DOGFOOD.md) | Human-facing walkthrough and interactive proof surface. |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Ports, adapters, package stack, and structural rules. |
 | [`docs/typescript-code-standards.editors-edition.md`](./docs/typescript-code-standards.editors-edition.md) | Verbatim Code Dojo doctrine for TypeScript, tests, adapters, scripts, and architecture changes. |
+| [`docs/code-dojo-exceptions.md`](./docs/code-dojo-exceptions.md) | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
 | [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
 | [`docs/BEARING.md`](./docs/BEARING.md) | Current execution direction and active tensions. |
 | [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Broad strategic direction and active themes. |

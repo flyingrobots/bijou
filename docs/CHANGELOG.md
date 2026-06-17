@@ -12,8 +12,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
   artifact is now installed as an enforced Code Dojo gate. File/context
   threshold debt, legacy mega-file debt, and existing mock-ban exceptions are
-  captured as ratcheting baselines, so current debt may hold or shrink while new
-  or growing violations fail pre-commit, pre-push, and CI.
+  captured as ratcheting baselines, `npm run code-dojo:debt` reports the
+  aggregate exception count, and every met goalpost must burn down at least 50
+  counted violations until zero. Current debt may hold or shrink while new or
+  growing violations fail pre-commit, pre-push, and CI.
 - **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
   themes now inherit `Ctrl+T` from the shared frame shell to toggle the active
   theme family between dark and light modes without opening Settings.
