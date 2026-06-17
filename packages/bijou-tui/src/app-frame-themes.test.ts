@@ -317,7 +317,7 @@ describe('createFramedApp', () => {
     expect(rendered).toContain('Modal custom hint');
   });
 
-  it('quits immediately in pipe mode instead of opening quit confirm', async () => {
+  it('quits in pipe mode instead of opening quit confirm', async () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     setDefaultContext(pipeCtx);
     try {
@@ -325,7 +325,7 @@ describe('createFramedApp', () => {
         pages: [makePage('home', 'Home', 'main')],
       });
 
-      let [model] = app.init();
+      const [model] = app.init();
       const [nextModel, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
       expect((nextModel as any).quitConfirmOpen).toBe(false);
       expect(cmds).toHaveLength(1);
