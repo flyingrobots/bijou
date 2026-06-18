@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2580,
-  "errors": 2580,
+  "total": 2528,
+  "errors": 2528,
   "warnings": 0,
   "rules": [
     {
@@ -42,7 +42,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 46
+      "count": 37
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
@@ -50,11 +50,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 80
+      "count": 75
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 32
+      "count": 30
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 82
+      "count": 80
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -102,19 +102,19 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 32
+      "count": 29
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 17
+      "count": 13
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 382
+      "count": 377
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 61
+      "count": 60
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -146,7 +146,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 71
+      "count": 65
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 582
+      "count": 576
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -162,7 +162,7 @@
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",
-      "count": 14
+      "count": 13
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -170,7 +170,7 @@
     },
     {
       "ruleId": "@typescript-eslint/use-unknown-in-catch-callback-variable",
-      "count": 5
+      "count": 1
     },
     {
       "ruleId": "no-control-regex",
@@ -182,7 +182,7 @@
     },
     {
       "ruleId": "no-useless-assignment",
-      "count": 6
+      "count": 5
     },
     {
       "ruleId": "no-useless-escape",
@@ -190,7 +190,7 @@
     },
     {
       "ruleId": "prefer-const",
-      "count": 4
+      "count": 1
     },
     {
       "ruleId": "preserve-caught-error",

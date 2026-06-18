@@ -31,9 +31,14 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
+  const commandRuntime = {
+    onPulse: () => ({ dispose: () => undefined }),
+    sleep: () => Promise.resolve(),
+    now: () => 0,
+  };
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
-  it('respects transitionOverride to select animation dynamically', async () => {
+  it('respects transitionOverride to select animation dynamically', () => {
     const app = createFramedApp({
       pages: [
         makePage('p1', 'P1', 'm'),
@@ -137,17 +142,14 @@ describe('createFramedApp', () => {
     const app = createFramedApp({
       pages: [page],
     });
-    let [model, initCmds] = app.init();
+    const [initialModel, initCmds] = app.init();
+    let model = initialModel;
     expect(initCmds).toHaveLength(0);
     const [nextModel, cmds] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = nextModel;
     expect(model.helpOpen).toBe(true);
     expect(cmds).toHaveLength(1);
-    const warningMsg = await cmds[0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 0,
-    });
+    const warningMsg = await cmds[0]?.(() => undefined, commandRuntime);
     if (warningMsg == null || warningMsg === QUIT || isCmdCleanup(warningMsg)) {
       throw new Error('expected runtime warning message');
     }
@@ -174,16 +176,13 @@ describe('createFramedApp', () => {
     const app = createFramedApp({
       pages: [page('home', 'Home'), page('logs', 'Logs')],
     });
-    let [model, initCmds] = app.init();
+    const [initialModel, initCmds] = app.init();
+    let model = initialModel;
     expect(initCmds).toHaveLength(0);
     let update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
     expect(update[1]).toHaveLength(1);
-    const homeWarning = await update[1][0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 0,
-    });
+    const homeWarning = await update[1][0]?.(() => undefined, commandRuntime);
     if (homeWarning == null || homeWarning === QUIT || isCmdCleanup(homeWarning)) {
       throw new Error('expected home collision warning');
     }
@@ -196,11 +195,7 @@ describe('createFramedApp', () => {
     update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
     expect(update[1]).toHaveLength(1);
-    const logsWarning = await update[1][0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 0,
-    });
+    const logsWarning = await update[1][0]?.(() => undefined, commandRuntime);
     if (logsWarning == null || logsWarning === QUIT || isCmdCleanup(logsWarning)) {
       throw new Error('expected logs collision warning');
     }
@@ -245,7 +240,7 @@ describe('createFramedApp', () => {
     expect(frame).not.toContain('Tab Next pane');
   });
   it('keeps init command messages scoped to their originating page', async () => {
-    const initInc: Cmd<Msg> = async () => ({ type: 'inc' });
+    const initInc: Cmd<Msg> = () => ({ type: 'inc' });
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
       id,
       title,
@@ -303,7 +298,8 @@ describe('createFramedApp', () => {
     const app = createFramedApp({
       pages: [home, logs],
     });
-    let [model, initCmds] = app.init();
+    const [initialModel, initCmds] = app.init();
+    let model = initialModel;
     expect(initCmds).toHaveLength(0);
     let update = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
@@ -312,9 +308,7 @@ describe('createFramedApp', () => {
     model = update[0];
     const noopCmd = update[1][0];
     expect(noopCmd).toBeDefined();
-    const noopResult = await must(noopCmd)(() => {}, {
-      onPulse: () => ({ dispose() {} }),
-    });
+    const noopResult = await must(noopCmd)(() => undefined, commandRuntime);
     expect(noopResult).toBeDefined();
     expect(noopResult).not.toBe(QUIT);
     if (noopResult === undefined || noopResult === QUIT) {
@@ -328,10 +322,9 @@ describe('createFramedApp', () => {
     const delayedCmd = update[1][0];
     expect(delayedCmd).toBeDefined();
     const emitted: FramedAppMsg<Msg>[] = [];
-    const delayedPromise = must(delayedCmd)((msg) => emitted.push(msg), {
-      onPulse: () => ({ dispose() {} }),
-      sleep: () => Promise.resolve(),
-    });
+    const delayedPromise = must(delayedCmd)((msg) => {
+      emitted.push(msg);
+    }, commandRuntime);
     update = app.update({ type: 'key', key: '[', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
     expect(model.activePageId).toBe('home');
@@ -363,7 +356,7 @@ describe('createFramedApp', () => {
       init: () => [{ count: 0 }, []],
       update(msg, model) {
         if (msg.type === 'mouse') {
-          seenMouseActions.push(`${msg.button}:${msg.action}:${msg.col}:${msg.row}`);
+          seenMouseActions.push(`${msg.button}:${msg.action}:${String(msg.col)}:${String(msg.row)}`);
           return [model, []];
         }
         if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];

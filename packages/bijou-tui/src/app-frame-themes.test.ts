@@ -30,6 +30,7 @@ import {
   Msg,
   PageModel,
 } from './app-frame.test-support.js';
+import { createCommandPaletteState } from './command-palette.js';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
@@ -46,7 +47,7 @@ describe('createFramedApp', () => {
 
     const model = {
       helpOpen: false,
-      commandPalette: {} as any,
+      commandPalette: createCommandPaletteState([]),
       commandPaletteKind: 'search' as const,
       settingsOpen: true,
       notificationCenterOpen: false,
@@ -167,7 +168,7 @@ describe('createFramedApp', () => {
 
     const model = {
       helpOpen: false,
-      commandPalette: {} as any,
+      commandPalette: createCommandPaletteState([]),
       commandPaletteKind: 'search' as const,
       settingsOpen: true,
       notificationCenterOpen: false,
@@ -231,7 +232,7 @@ describe('createFramedApp', () => {
     });
   });
 
-  it('shows settings controls in help when help opens above settings', async () => {
+  it('shows settings controls in help when help opens above settings', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({
@@ -252,8 +253,8 @@ describe('createFramedApp', () => {
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
 
-    expect((model as any).settingsOpen).toBe(true);
-    expect((model as any).helpOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
+    expect(model.helpOpen).toBe(true);
     expect(describeFrameLayerStack(model).map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'help']);
 
     const rendered = surfaceToString(
@@ -308,7 +309,6 @@ describe('createFramedApp', () => {
     expect(rendered).toContain('Open workspace command');
     expect(rendered).not.toContain('Apply modal action');
 
-    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = (await runScript(app, [{ key: 'm' }])).model;
     rendered = surfaceToString(
       normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
@@ -327,12 +327,12 @@ describe('createFramedApp', () => {
 
       const [model] = app.init();
       const [nextModel, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-      expect((nextModel as any).quitConfirmOpen).toBe(false);
+      expect(nextModel.quitConfirmOpen).toBe(false);
       expect(cmds).toHaveLength(1);
 
-      const returned = await cmds[0]?.(() => {}, {
+      const returned = await cmds[0]?.(() => undefined, {
         onPulse() {
-          return { dispose() {} };
+          return { dispose: () => undefined };
         },
       });
       expect(returned).toBe(QUIT);

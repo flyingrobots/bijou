@@ -9,7 +9,6 @@ import {
   describe,
   EXIT_ALT_SCREEN,
   expect,
-  frame,
   HOME,
   it,
   quit,
@@ -173,7 +172,7 @@ describe('run', () => {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
           return [model, []];
         },
-        view: () => textView(`size:${ctx.runtime.columns}x${ctx.runtime.rows}`),
+        view: () => textView(`size:${String(ctx.runtime.columns)}x${String(ctx.runtime.rows)}`),
       };
 
       scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
@@ -191,10 +190,7 @@ describe('run', () => {
     it('restores the terminal before rejecting when a scheduled render fails', async () => {
       const { clock, ctx } = createInteractiveContext();
       const promise = run(counterApp(), { ctx });
-      const rejection = promise.then(
-        () => null,
-        (error) => error,
-      );
+      const rejection = promise.catch((error: unknown) => error);
 
       let columns = ctx.runtime.columns;
       Object.defineProperty(ctx.runtime, 'columns', {
@@ -227,7 +223,7 @@ describe('run', () => {
           }
           return [model, []];
         },
-        view: (model) => textView(`count:${model.count}`),
+        view: (model) => textView(`count:${String(model.count)}`),
       };
 
       scheduleKeys(ctx, clock, [
@@ -236,11 +232,8 @@ describe('run', () => {
       ]);
 
       const promise = run(app, { ctx });
-      const rejection = promise.then(
-        () => null,
-        (error) => error,
-      );
-      rejection.finally(() => {
+      const rejection = promise.catch((error: unknown) => error);
+      void rejection.finally(() => {
         settled = true;
       });
 
@@ -272,11 +265,8 @@ describe('run', () => {
       scheduleKeys(ctx, clock, [{ at: 50, key: '\r' }]);
 
       const promise = run(app, { ctx });
-      const rejection = promise.then(
-        () => null,
-        (error) => error,
-      );
-      rejection.finally(() => {
+      const rejection = promise.catch((error: unknown) => error);
+      void rejection.finally(() => {
         settled = true;
       });
 
@@ -301,7 +291,7 @@ describe('run', () => {
       let onKey: ((key: string) => void) | null = null;
       ctx.io.rawInput = (handler) => {
         onKey = handler;
-        return { dispose() {} };
+        return { dispose: () => undefined };
       };
 
       const app: App<number> = {
@@ -313,10 +303,7 @@ describe('run', () => {
       };
 
       const promise = run(app, { ctx });
-      const rejection = promise.then(
-        () => null,
-        (error) => error,
-      );
+      const rejection = promise.catch((error: unknown) => error);
 
       await clock.advanceByAsync(20);
       await expect(rejection).resolves.toBeInstanceOf(Error);
@@ -327,7 +314,8 @@ describe('run', () => {
     });
 
     it('does not leave runtime timeout handles active after shutdown', async () => {
-      const { clock, activeTimeoutCount } = createTrackingClock();
+      const trackingClock = createTrackingClock();
+      const { clock } = trackingClock;
       const ctx = createTestContext({ mode: 'interactive', clock });
       const app: App<string> = {
         init: () => ['bye', [quit()]],
@@ -339,7 +327,7 @@ describe('run', () => {
       await clock.advanceByAsync(5);
       await promise;
 
-      expect(activeTimeoutCount()).toBe(0);
+      expect(trackingClock.activeTimeoutCount()).toBe(0);
     });
 
     it('coalesces same-timestamp input bursts into one follow-up render', async () => {
@@ -355,7 +343,7 @@ describe('run', () => {
         },
         view(model) {
           viewCalls += 1;
-          return textView(`count: ${model}`);
+          return textView(`count: ${String(model)}`);
         },
       };
 
