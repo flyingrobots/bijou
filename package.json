@@ -71,7 +71,7 @@
     "version": "node scripts/version.mjs"
   },
   "overrides": {
-    "hono": "4.12.22",
+    "hono": "4.12.25",
     "picomatch": "^4.0.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
