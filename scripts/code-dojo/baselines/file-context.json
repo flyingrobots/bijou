@@ -11,32 +11,32 @@
     {
       "path": "examples/docs/stories.ts",
       "lines": 5008,
-      "bytes": 181779
+      "bytes": 181773
     },
     {
       "path": "packages/bijou-tui/src/app-frame.ts",
-      "lines": 2872,
-      "bytes": 109644
+      "lines": 2871,
+      "bytes": 109583
     },
     {
       "path": "examples/docs/dogfood-blocks.ts",
-      "lines": 2640,
-      "bytes": 92021
+      "lines": 2639,
+      "bytes": 92017
     },
     {
       "path": "packages/bijou/src/core/components/table.ts",
       "lines": 994,
-      "bytes": 33001
+      "bytes": 32996
     },
     {
       "path": "packages/bijou-tui/src/notification.ts",
-      "lines": 967,
-      "bytes": 30157
+      "lines": 966,
+      "bytes": 30123
     },
     {
       "path": "packages/bijou-tui/src/runtime-engine.ts",
-      "lines": 966,
-      "bytes": 25150
+      "lines": 964,
+      "bytes": 25048
     },
     {
       "path": "packages/bijou-tui/src/overlay.ts",
@@ -45,8 +45,8 @@
     },
     {
       "path": "packages/bijou/src/core/binding.ts",
-      "lines": 936,
-      "bytes": 28469
+      "lines": 934,
+      "bytes": 28411
     },
     {
       "path": "packages/bijou-tui/src/index.ts",
@@ -56,12 +56,12 @@
     {
       "path": "packages/bijou/src/core/render/differ.ts",
       "lines": 908,
-      "bytes": 30773
+      "bytes": 30767
     },
     {
       "path": "packages/bijou/src/core/ui-scene-ir.ts",
       "lines": 891,
-      "bytes": 26348
+      "bytes": 26341
     },
     {
       "path": "packages/bijou/src/index.ts",
@@ -71,12 +71,7 @@
     {
       "path": "packages/bijou-tui/src/app-frame-overlays.ts",
       "lines": 881,
-      "bytes": 28743
-    },
-    {
-      "path": "packages/bijou-tui/src/runtime-engine.test.ts",
-      "lines": 860,
-      "bytes": 24535
+      "bytes": 28716
     },
     {
       "path": "examples/docs/i18n-debt.ts",
@@ -91,7 +86,7 @@
     {
       "path": "packages/bijou/src/ports/surface.ts",
       "lines": 828,
-      "bytes": 28064
+      "bytes": 28028
     },
     {
       "path": "scripts/pr-review-status.ts",
@@ -99,19 +94,19 @@
       "bytes": 22896
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-render.ts",
-      "lines": 776,
-      "bytes": 27243
+      "path": "packages/bijou-tui/src/runtime-engine.test.ts",
+      "lines": 775,
+      "bytes": 24450
     },
     {
-      "path": "packages/bijou-tui/src/notification.test.ts",
-      "lines": 762,
-      "bytes": 25467
+      "path": "packages/bijou-tui/src/app-frame-render.ts",
+      "lines": 774,
+      "bytes": 27243
     },
     {
       "path": "packages/bijou/src/core/standard-blocks.test.ts",
       "lines": 760,
-      "bytes": 26072
+      "bytes": 26063
     },
     {
       "path": "examples/image-viewer/main.ts",
@@ -126,12 +121,12 @@
     {
       "path": "examples/_shared/canonical-app.ts",
       "lines": 736,
-      "bytes": 24448
+      "bytes": 24443
     },
     {
       "path": "packages/bijou-tui/src/dag-pane.ts",
       "lines": 711,
-      "bytes": 22659
+      "bytes": 22657
     },
     {
       "path": "packages/bijou/src/core/binding.test.ts",
@@ -141,7 +136,7 @@
     {
       "path": "packages/bijou-tui/src/driver.ts",
       "lines": 697,
-      "bytes": 20905
+      "bytes": 20863
     },
     {
       "path": "packages/bijou-tui/src/runtime.ts",
@@ -159,29 +154,34 @@
       "bytes": 25088
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-render.test.ts",
-      "lines": 692,
-      "bytes": 23433
-    },
-    {
-      "path": "examples/perf-gradient/main.ts",
-      "lines": 681,
-      "bytes": 23472
-    },
-    {
       "path": "packages/bijou-tui/src/flex.ts",
       "lines": 681,
       "bytes": 23359
     },
     {
-      "path": "packages/bijou-tui/src/eventbus.test.ts",
-      "lines": 667,
-      "bytes": 20588
+      "path": "examples/perf-gradient/main.ts",
+      "lines": 679,
+      "bytes": 23472
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-render.test.ts",
+      "lines": 661,
+      "bytes": 23433
+    },
+    {
+      "path": "packages/bijou-tui/src/notification.test.ts",
+      "lines": 658,
+      "bytes": 25464
     },
     {
       "path": "packages/bijou-tui/src/viewport.ts",
       "lines": 655,
       "bytes": 20320
+    },
+    {
+      "path": "packages/bijou-tui/src/eventbus.test.ts",
+      "lines": 651,
+      "bytes": 20506
     },
     {
       "path": "packages/bijou-tui/src/timeline.ts",
@@ -210,23 +210,23 @@
     },
     {
       "path": "packages/bijou/src/core/schema-block.ts",
-      "lines": 607,
-      "bytes": 17133
+      "lines": 603,
+      "bytes": 17035
     },
     {
       "path": "packages/bijou/src/core/selection.ts",
-      "lines": 596,
+      "lines": 588,
       "bytes": 16197
     },
     {
       "path": "packages/bijou/src/core/layout/envelope.ts",
       "lines": 571,
-      "bytes": 18470
+      "bytes": 18465
     },
     {
       "path": "packages/bijou-tui/src/app-frame-actions.ts",
       "lines": 570,
-      "bytes": 19496
+      "bytes": 19433
     },
     {
       "path": "packages/bijou-tui/src/transition-shaders.test.ts",
@@ -236,12 +236,12 @@
     {
       "path": "scripts/smoke-all-examples-lib.ts",
       "lines": 563,
-      "bytes": 15743
+      "bytes": 15738
     },
     {
       "path": "packages/bijou/src/core/binding-lifecycle.ts",
       "lines": 554,
-      "bytes": 16627
+      "bytes": 16602
     },
     {
       "path": "packages/bijou-i18n/src/runtime.test.ts",
@@ -251,7 +251,7 @@
     {
       "path": "packages/bijou-i18n/src/runtime.ts",
       "lines": 553,
-      "bytes": 17353
+      "bytes": 17348
     },
     {
       "path": "tests/cycles/DF-054/dogfood-late-family-six-pack.test.ts",
@@ -259,23 +259,18 @@
       "bytes": 16624
     },
     {
-      "path": "packages/bijou-tui/src/viewport.test.ts",
-      "lines": 540,
-      "bytes": 15771
-    },
-    {
       "path": "packages/bijou/src/core/theme/dtcg.test.ts",
       "lines": 538,
-      "bytes": 22463
+      "bytes": 22432
     },
     {
       "path": "packages/bijou-tui/src/eventbus.ts",
       "lines": 536,
-      "bytes": 16231
+      "bytes": 16226
     },
     {
       "path": "packages/bijou-tui/src/focus-area.test.ts",
-      "lines": 534,
+      "lines": 532,
       "bytes": 19901
     },
     {
@@ -284,34 +279,14 @@
       "bytes": 18747
     },
     {
-      "path": "packages/bijou/src/core/components/table.test.ts",
-      "lines": 512,
-      "bytes": 16467
-    },
-    {
       "path": "tests/cycles/DF-069/dogfood-block-registry.test.ts",
       "lines": 510,
-      "bytes": 18571
-    },
-    {
-      "path": "packages/bijou/src/core/graphql-bijou-block.test.ts",
-      "lines": 494,
-      "bytes": 18936
+      "bytes": 18552
     },
     {
       "path": "packages/bijou-tui/src/runtime-binding.ts",
       "lines": 493,
-      "bytes": 15554
-    },
-    {
-      "path": "tests/cycles/DF-046/dogfood-choice-navigation-six-pack.test.ts",
-      "lines": 491,
-      "bytes": 15373
-    },
-    {
-      "path": "packages/bijou/src/core/ui-scene-ir.test.ts",
-      "lines": 490,
-      "bytes": 14721
+      "bytes": 15487
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/sections.ts",
@@ -321,7 +296,12 @@
     {
       "path": "scripts/smoke-canaries.ts",
       "lines": 479,
-      "bytes": 14667
+      "bytes": 14662
+    },
+    {
+      "path": "packages/bijou-tui/src/viewport.test.ts",
+      "lines": 478,
+      "bytes": 15771
     },
     {
       "path": "scripts/docs-preview.test-support.ts",
@@ -339,49 +319,54 @@
       "bytes": 21637
     },
     {
+      "path": "packages/bijou/src/core/graphql-bijou-block.test.ts",
+      "lines": 464,
+      "bytes": 18906
+    },
+    {
+      "path": "tests/cycles/DF-046/dogfood-choice-navigation-six-pack.test.ts",
+      "lines": 464,
+      "bytes": 15346
+    },
+    {
+      "path": "packages/bijou/src/core/ui-scene-ir.test.ts",
+      "lines": 458,
+      "bytes": 14675
+    },
+    {
       "path": "tests/cycles/DF-039/dogfood-component-family-six-pack.test.ts",
       "lines": 457,
       "bytes": 14715
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-core.test.ts",
-      "lines": 457,
-      "bytes": 13711
-    },
-    {
       "path": "packages/bijou-tui/src/app-frame-themes.test.ts",
-      "lines": 453,
-      "bytes": 14060
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-routing.test.ts",
       "lines": 452,
-      "bytes": 14428
+      "bytes": 14060
     },
     {
       "path": "packages/bijou/src/core/theme/presets.ts",
       "lines": 452,
-      "bytes": 12831
+      "bytes": 12756
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/render.ts",
       "lines": 451,
-      "bytes": 15354
+      "bytes": 15328
     },
     {
       "path": "packages/bijou-tui/src/app-frame-notifications.test.ts",
       "lines": 448,
-      "bytes": 15097
+      "bytes": 15092
     },
     {
-      "path": "tests/cycles/DX-031/dogfood-blocks-section.test.ts",
-      "lines": 446,
-      "bytes": 18195
+      "path": "packages/bijou/src/core/components/table.test.ts",
+      "lines": 445,
+      "bytes": 16402
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-input-overlays.test.ts",
-      "lines": 444,
-      "bytes": 14869
+      "path": "packages/bijou-tui/src/app-frame-core.test.ts",
+      "lines": 442,
+      "bytes": 13409
     },
     {
       "path": "packages/bijou-tui/src/command-palette.test.ts",
@@ -391,12 +376,7 @@
     {
       "path": "packages/bijou-tui/src/app-frame-tail.test.ts",
       "lines": 438,
-      "bytes": 12974
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
-      "lines": 427,
-      "bytes": 12656
+      "bytes": 12812
     },
     {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
@@ -406,22 +386,17 @@
     {
       "path": "packages/bijou/src/core/components/preference-list.ts",
       "lines": 425,
-      "bytes": 14343
+      "bytes": 14249
     },
     {
-      "path": "packages/bijou-tui/src/dag-pane.test.ts",
-      "lines": 422,
-      "bytes": 16841
-    },
-    {
-      "path": "packages/bijou-tui/src/timeline.test.ts",
-      "lines": 420,
-      "bytes": 13135
+      "path": "packages/bijou-tui/src/app-frame-input-overlays.test.ts",
+      "lines": 424,
+      "bytes": 14869
     },
     {
       "path": "packages/bijou-tui/src/app-frame-settings.test.ts",
       "lines": 419,
-      "bytes": 14468
+      "bytes": 14462
     },
     {
       "path": "packages/bijou-tui/src/command-palette.ts",
@@ -434,24 +409,19 @@
       "bytes": 13022
     },
     {
-      "path": "packages/bijou-tui/src/driver.test.ts",
-      "lines": 414,
-      "bytes": 12511
+      "path": "packages/bijou/src/core/forms/filter.test.ts",
+      "lines": 412,
+      "bytes": 18225
     },
     {
       "path": "packages/bijou/src/core/components/markdown-render.ts",
-      "lines": 414,
-      "bytes": 12111
-    },
-    {
-      "path": "packages/bijou/src/core/forms/filter.test.ts",
       "lines": 412,
-      "bytes": 18235
+      "bytes": 12111
     },
     {
       "path": "packages/bijou-tui/src/app-frame-types.ts",
       "lines": 409,
-      "bytes": 17037
+      "bytes": 17019
     },
     {
       "path": "packages/bijou-tui/src/file-picker.test.ts",
@@ -459,14 +429,34 @@
       "bytes": 14690
     },
     {
+      "path": "packages/bijou-tui/src/dag-pane.test.ts",
+      "lines": 404,
+      "bytes": 16841
+    },
+    {
       "path": "packages/bijou-tui/src/runtime-interactive-pipeline.test.ts",
       "lines": 401,
-      "bytes": 13227
+      "bytes": 13150
+    },
+    {
+      "path": "packages/bijou-tui/src/driver.test.ts",
+      "lines": 400,
+      "bytes": 12511
+    },
+    {
+      "path": "tests/cycles/DX-031/dogfood-blocks-section.test.ts",
+      "lines": 399,
+      "bytes": 18179
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-routing.test.ts",
+      "lines": 396,
+      "bytes": 14387
     },
     {
       "path": "packages/bijou-tui/src/file-picker.ts",
       "lines": 395,
-      "bytes": 13938
+      "bytes": 13929
     },
     {
       "path": "packages/bijou-node/src/index.ts",
@@ -484,24 +474,14 @@
       "bytes": 14188
     },
     {
-      "path": "scripts/docs-preview-landing.test.ts",
-      "lines": 388,
-      "bytes": 17027
-    },
-    {
       "path": "packages/bijou/src/core/components/table-v3.ts",
       "lines": 388,
-      "bytes": 14661
+      "bytes": 14656
     },
     {
       "path": "packages/bijou-tui/src/notification-stack.ts",
       "lines": 388,
       "bytes": 12666
-    },
-    {
-      "path": "packages/bijou-tui/src/overlay-composite-modal.test.ts",
-      "lines": 387,
-      "bytes": 14209
     },
     {
       "path": "packages/bijou/src/core/layout/envelope.test.ts",
@@ -511,17 +491,17 @@
     {
       "path": "scripts/docs-preview-entry.test.ts",
       "lines": 385,
-      "bytes": 16193
+      "bytes": 16164
     },
     {
-      "path": "packages/bijou-tui/src/runtime-interactive-input.test.ts",
-      "lines": 383,
-      "bytes": 12489
+      "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
+      "lines": 382,
+      "bytes": 12638
     },
     {
       "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",
       "lines": 382,
-      "bytes": 12477
+      "bytes": 12465
     },
     {
       "path": "packages/bijou/src/core/theme/builder.ts",
@@ -531,12 +511,7 @@
     {
       "path": "packages/bijou/src/core/components/markdown-parse.ts",
       "lines": 380,
-      "bytes": 12572
-    },
-    {
-      "path": "packages/bijou-tui/src/flex.test.ts",
-      "lines": 378,
-      "bytes": 12729
+      "bytes": 12562
     },
     {
       "path": "examples/showcase/app.ts",
@@ -551,12 +526,7 @@
     {
       "path": "packages/bijou-tui/src/canvas.ts",
       "lines": 377,
-      "bytes": 11320
-    },
-    {
-      "path": "packages/bijou-tui/src/raster-glyph.test.ts",
-      "lines": 377,
-      "bytes": 9286
+      "bytes": 11295
     },
     {
       "path": "packages/bijou/src/core/theme/doctor.ts",
@@ -569,6 +539,11 @@
       "bytes": 13111
     },
     {
+      "path": "scripts/docs-preview-landing.test.ts",
+      "lines": 374,
+      "bytes": 17027
+    },
+    {
       "path": "packages/bijou-tui/src/keybindings.ts",
       "lines": 374,
       "bytes": 11250
@@ -576,12 +551,7 @@
     {
       "path": "examples/image-viewer/image-codecs.ts",
       "lines": 371,
-      "bytes": 11808
-    },
-    {
-      "path": "packages/bijou/src/core/components/dag-source-adapter-sliced.test.ts",
-      "lines": 370,
-      "bytes": 14171
+      "bytes": 11791
     },
     {
       "path": "scripts/dogfood-i18n-debt.test.ts",
@@ -591,32 +561,22 @@
     {
       "path": "scripts/image-viewer.test.ts",
       "lines": 370,
-      "bytes": 13345
+      "bytes": 13317
     },
     {
       "path": "bench/src/soak-runner.ts",
       "lines": 368,
-      "bytes": 13874
+      "bytes": 13864
     },
     {
-      "path": "tests/cycles/DF-062/notification-system-family-audit.test.ts",
-      "lines": 362,
-      "bytes": 13911
+      "path": "packages/bijou-tui/src/flex.test.ts",
+      "lines": 365,
+      "bytes": 12729
     },
     {
       "path": "packages/bijou-i18n-tools/src/exchange.ts",
       "lines": 361,
-      "bytes": 11556
-    },
-    {
-      "path": "scripts/pr-review-status.test.ts",
-      "lines": 360,
-      "bytes": 13704
-    },
-    {
-      "path": "packages/bijou/src/core/components/dag-basic.test.ts",
-      "lines": 360,
-      "bytes": 13494
+      "bytes": 11459
     },
     {
       "path": "tests/cycles/DF-031/status-feedback-blocks.test.ts",
@@ -624,29 +584,14 @@
       "bytes": 11880
     },
     {
-      "path": "tests/cycles/LX-011/dogfood-locale-ratchet.test.ts",
-      "lines": 359,
-      "bytes": 12955
-    },
-    {
       "path": "packages/bijou-node/src/recorder.ts",
       "lines": 357,
-      "bytes": 10676
+      "bytes": 10673
     },
     {
-      "path": "packages/bijou/src/core/active-binding-collection.test.ts",
-      "lines": 356,
-      "bytes": 12816
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame.test-support.ts",
-      "lines": 356,
-      "bytes": 8708
-    },
-    {
-      "path": "packages/bijou-node/src/worker/worker.ts",
-      "lines": 354,
-      "bytes": 11496
+      "path": "packages/bijou-tui/src/timeline.test.ts",
+      "lines": 353,
+      "bytes": 13135
     },
     {
       "path": "packages/bijou/src/core/environment.test.ts",
@@ -661,17 +606,22 @@
     {
       "path": "scripts/docs-preview-theme.test.ts",
       "lines": 351,
-      "bytes": 12329
+      "bytes": 12054
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame.test-support.ts",
+      "lines": 348,
+      "bytes": 8708
     },
     {
       "path": "packages/bijou/src/core/theme/dtcg.ts",
-      "lines": 350,
-      "bytes": 12400
+      "lines": 347,
+      "bytes": 12346
     },
     {
-      "path": "scripts/release-metadata.test.ts",
-      "lines": 350,
-      "bytes": 11378
+      "path": "scripts/pr-review-status.test.ts",
+      "lines": 345,
+      "bytes": 13704
     },
     {
       "path": "examples/docs/counter-block-demo.ts",
@@ -689,9 +639,24 @@
       "bytes": 10606
     },
     {
-      "path": "packages/bijou/src/core/components/dag-output-tokens.test.ts",
+      "path": "packages/bijou-tui/src/raster-glyph.test.ts",
+      "lines": 344,
+      "bytes": 9215
+    },
+    {
+      "path": "packages/bijou-tui/src/runtime-interactive-input.test.ts",
+      "lines": 342,
+      "bytes": 12489
+    },
+    {
+      "path": "packages/bijou/src/core/components/dag-basic.test.ts",
+      "lines": 341,
+      "bytes": 12777
+    },
+    {
+      "path": "packages/bijou-tui/src/overlay-composite-modal.test.ts",
       "lines": 340,
-      "bytes": 11946
+      "bytes": 14143
     },
     {
       "path": "packages/bijou-tui/src/navigable-table.ts",
@@ -701,12 +666,12 @@
     {
       "path": "packages/create-bijou-tui-app/src/index.ts",
       "lines": 338,
-      "bytes": 10110
+      "bytes": 10106
     },
     {
-      "path": "packages/bijou-tui/src/overlay-drawer.test.ts",
-      "lines": 335,
-      "bytes": 12369
+      "path": "packages/bijou/src/core/active-binding-collection.test.ts",
+      "lines": 336,
+      "bytes": 12796
     },
     {
       "path": "packages/bijou/src/core/text/grapheme.ts",
@@ -714,9 +679,14 @@
       "bytes": 11761
     },
     {
-      "path": "scripts/docs-preview-search.test.ts",
-      "lines": 332,
-      "bytes": 11267
+      "path": "packages/bijou-tui/src/overlay-drawer.test.ts",
+      "lines": 334,
+      "bytes": 12290
+    },
+    {
+      "path": "packages/bijou-node/src/worker/worker.ts",
+      "lines": 334,
+      "bytes": 11496
     },
     {
       "path": "packages/bijou/src/core/forms/filter-interactive.ts",
@@ -729,19 +699,19 @@
       "bytes": 10833
     },
     {
-      "path": "tests/cycles/DF-030/dogfood-docs-surface-block.test.ts",
+      "path": "tests/cycles/LX-011/dogfood-locale-ratchet.test.ts",
       "lines": 319,
-      "bytes": 10902
-    },
-    {
-      "path": "scripts/release-metadata.ts",
-      "lines": 319,
-      "bytes": 10720
+      "bytes": 12915
     },
     {
       "path": "packages/bijou-i18n-tools-node/src/filesystem.ts",
       "lines": 318,
       "bytes": 10133
+    },
+    {
+      "path": "scripts/release-metadata.ts",
+      "lines": 317,
+      "bytes": 10713
     },
     {
       "path": "scripts/dogfood-i18n-completeness.ts",
@@ -759,14 +729,14 @@
       "bytes": 11972
     },
     {
+      "path": "tests/cycles/DF-030/dogfood-docs-surface-block.test.ts",
+      "lines": 315,
+      "bytes": 10902
+    },
+    {
       "path": "scripts/smoke-all-examples.test.ts",
       "lines": 315,
       "bytes": 10134
-    },
-    {
-      "path": "tests/cycles/DF-068/dogfood-block-preview-regressions.test.ts",
-      "lines": 314,
-      "bytes": 11060
     },
     {
       "path": "packages/bijou/src/core/components/timer.ts",
@@ -774,14 +744,19 @@
       "bytes": 10657
     },
     {
-      "path": "examples/showcase/registry-tui.ts",
-      "lines": 314,
-      "bytes": 9030
+      "path": "tests/cycles/DF-062/notification-system-family-audit.test.ts",
+      "lines": 313,
+      "bytes": 13848
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/schema-blocks.ts",
       "lines": 313,
       "bytes": 12939
+    },
+    {
+      "path": "scripts/release-metadata.test.ts",
+      "lines": 313,
+      "bytes": 11375
     },
     {
       "path": "packages/bijou-tui/src/keybindings.test.ts",
@@ -794,11 +769,6 @@
       "bytes": 8283
     },
     {
-      "path": "scripts/docs-preview-components.test.ts",
-      "lines": 312,
-      "bytes": 13121
-    },
-    {
       "path": "scripts/smoke-dogfood-lib.ts",
       "lines": 312,
       "bytes": 8623
@@ -806,12 +776,12 @@
     {
       "path": "packages/bijou/src/core/forms/form-utils.test.ts",
       "lines": 311,
-      "bytes": 10305
+      "bytes": 10271
     },
     {
-      "path": "packages/bijou/src/core/forms/wizard.test.ts",
-      "lines": 311,
-      "bytes": 9532
+      "path": "scripts/docs-preview-components.test.ts",
+      "lines": 310,
+      "bytes": 13121
     },
     {
       "path": "packages/bijou/src/core/forms/textarea.test.ts",
@@ -824,19 +794,34 @@
       "bytes": 10040
     },
     {
+      "path": "packages/bijou/src/core/forms/wizard.test.ts",
+      "lines": 309,
+      "bytes": 9211
+    },
+    {
       "path": "packages/bijou-tui/src/app-frame-layers.ts",
       "lines": 307,
       "bytes": 8378
     },
     {
+      "path": "packages/bijou/src/core/components/dag-output-tokens.test.ts",
+      "lines": 305,
+      "bytes": 11412
+    },
+    {
       "path": "packages/bijou-tui/src/pager.test.ts",
-      "lines": 306,
+      "lines": 304,
       "bytes": 10787
     },
     {
       "path": "packages/bijou/src/core/components/dag-edges.ts",
       "lines": 304,
       "bytes": 10013
+    },
+    {
+      "path": "packages/bijou/src/core/components/dag-source-adapter-sliced.test.ts",
+      "lines": 302,
+      "bytes": 13039
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/block-definitions.ts",
@@ -851,12 +836,17 @@
     {
       "path": "packages/bijou-mcp/src/tools/docs.ts",
       "lines": 297,
-      "bytes": 12786
+      "bytes": 12777
     },
     {
-      "path": "tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts",
+      "path": "examples/showcase/registry-tui.ts",
+      "lines": 297,
+      "bytes": 8802
+    },
+    {
+      "path": "scripts/docs-preview-search.test.ts",
       "lines": 288,
-      "bytes": 10193
+      "bytes": 11237
     },
     {
       "path": "packages/bijou-tui/src/animate.ts",
@@ -881,7 +871,12 @@
     {
       "path": "bench/src/cli.ts",
       "lines": 285,
-      "bytes": 10326
+      "bytes": 10312
+    },
+    {
+      "path": "tests/cycles/DF-068/dogfood-block-preview-regressions.test.ts",
+      "lines": 284,
+      "bytes": 11060
     },
     {
       "path": "packages/bijou/src/core/component-metadata.ts",
@@ -891,7 +886,7 @@
     {
       "path": "packages/bijou/src/core/block-tree-render.ts",
       "lines": 284,
-      "bytes": 7958
+      "bytes": 7922
     },
     {
       "path": "packages/bijou/src/core/components/progress.ts",
@@ -904,29 +899,19 @@
       "bytes": 9814
     },
     {
-      "path": "examples/showcase/registry-display.ts",
-      "lines": 281,
-      "bytes": 8434
-    },
-    {
       "path": "packages/bijou-tui/src/types.ts",
       "lines": 279,
       "bytes": 9239
     },
     {
-      "path": "packages/bijou/src/core/components/dag-rendering.test.ts",
+      "path": "tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts",
       "lines": 278,
-      "bytes": 11404
+      "bytes": 10053
     },
     {
       "path": "packages/bijou-tui/src/surface-diff.ts",
       "lines": 276,
       "bytes": 7828
-    },
-    {
-      "path": "packages/bijou-tui/src/pipeline/middleware/surface-shaders.ts",
-      "lines": 275,
-      "bytes": 7517
     },
     {
       "path": "packages/bijou/src/core/components/timer.test.ts",
@@ -941,12 +926,7 @@
     {
       "path": "packages/bijou/src/core/layout/geometry.ts",
       "lines": 271,
-      "bytes": 8909
-    },
-    {
-      "path": "packages/bijou-tui/src/input-map.ts",
-      "lines": 271,
-      "bytes": 7644
+      "bytes": 8899
     },
     {
       "path": "examples/docs/release-title.ts",
@@ -954,34 +934,34 @@
       "bytes": 10343
     },
     {
-      "path": "packages/bijou/src/core/components/box.test.ts",
-      "lines": 270,
-      "bytes": 10009
-    },
-    {
       "path": "packages/bijou/src/core/forms/form-utils.ts",
       "lines": 270,
-      "bytes": 9124
+      "bytes": 9120
     },
     {
-      "path": "packages/bijou-tui/src/pipeline/pipeline.ts",
+      "path": "examples/showcase/registry-display.ts",
       "lines": 270,
-      "bytes": 8646
+      "bytes": 8270
     },
     {
       "path": "packages/bijou-i18n/src/localization.ts",
       "lines": 270,
-      "bytes": 8286
+      "bytes": 8268
     },
     {
-      "path": "packages/bijou-tui/src/runtime-binding.test.ts",
-      "lines": 268,
-      "bytes": 9893
+      "path": "packages/bijou-tui/src/input-map.ts",
+      "lines": 270,
+      "bytes": 7568
     },
     {
-      "path": "examples/showcase/registry-data.ts",
+      "path": "packages/bijou-tui/src/pipeline/middleware/surface-shaders.ts",
+      "lines": 269,
+      "bytes": 7517
+    },
+    {
+      "path": "packages/bijou-tui/src/pipeline/pipeline.ts",
       "lines": 268,
-      "bytes": 7788
+      "bytes": 8646
     },
     {
       "path": "packages/bijou-tui/src/keys.test.ts",
@@ -996,7 +976,12 @@
     {
       "path": "packages/bijou/src/core/binding-lifecycle.test.ts",
       "lines": 262,
-      "bytes": 10010
+      "bytes": 10001
+    },
+    {
+      "path": "packages/bijou-tui/src/runtime-binding.test.ts",
+      "lines": 262,
+      "bytes": 9893
     },
     {
       "path": "packages/bijou-tui/src/browsable-list.test.ts",
@@ -1019,9 +1004,9 @@
       "bytes": 6196
     },
     {
-      "path": "packages/bijou/src/core/forms/textarea-editor.ts",
-      "lines": 254,
-      "bytes": 8643
+      "path": "examples/showcase/registry-data.ts",
+      "lines": 257,
+      "bytes": 7619
     },
     {
       "path": "tests/cycles/DX-031/first-party-block-definitions.test.ts",
@@ -1034,19 +1019,14 @@
       "bytes": 10922
     },
     {
+      "path": "packages/bijou/src/core/forms/textarea-editor.ts",
+      "lines": 252,
+      "bytes": 8643
+    },
+    {
       "path": "packages/bijou/src/core/selection.test.ts",
       "lines": 252,
       "bytes": 7172
-    },
-    {
-      "path": "packages/bijou-tui/src/animate.test.ts",
-      "lines": 252,
-      "bytes": 7072
-    },
-    {
-      "path": "examples/showcase/registry-forms.ts",
-      "lines": 252,
-      "bytes": 6189
     },
     {
       "path": "packages/bijou/src/core/theme/graph.ts",
@@ -1094,14 +1074,9 @@
       "bytes": 8173
     },
     {
-      "path": "packages/bijou/src/core/render/packed-cell.test.ts",
-      "lines": 234,
-      "bytes": 7790
-    },
-    {
       "path": "packages/bijou-tui/src/pipeline/pipeline.test.ts",
       "lines": 234,
-      "bytes": 7012
+      "bytes": 7007
     },
     {
       "path": "scripts/workflow-shell-preflight.ts",
@@ -1114,6 +1089,11 @@
       "bytes": 7495
     },
     {
+      "path": "packages/bijou/src/core/components/box.test.ts",
+      "lines": 231,
+      "bytes": 9953
+    },
+    {
       "path": "packages/bijou/src/core/text/grapheme.test.ts",
       "lines": 231,
       "bytes": 7321
@@ -1124,9 +1104,14 @@
       "bytes": 6904
     },
     {
+      "path": "examples/showcase/registry-forms.ts",
+      "lines": 230,
+      "bytes": 5820
+    },
+    {
       "path": "tests/cycles/WF-130/roadmap-goalpost-policy.test.ts",
       "lines": 229,
-      "bytes": 12900
+      "bytes": 12899
     },
     {
       "path": "packages/bijou/src/core/components/dag.ts",
@@ -1141,12 +1126,7 @@
     {
       "path": "packages/bijou-tui/src/runtime-interactive-resize.test.ts",
       "lines": 229,
-      "bytes": 6767
-    },
-    {
-      "path": "packages/bijou/src/core/binding-frame-update.ts",
-      "lines": 228,
-      "bytes": 7329
+      "bytes": 6713
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/schema-parsers-advanced.ts",
@@ -1156,7 +1136,7 @@
     {
       "path": "packages/bijou/src/core/components/box.ts",
       "lines": 227,
-      "bytes": 9120
+      "bytes": 9112
     },
     {
       "path": "packages/bijou/src/core/forms/input.test.ts",
@@ -1164,9 +1144,19 @@
       "bytes": 9041
     },
     {
+      "path": "packages/bijou/src/core/binding-frame-update.ts",
+      "lines": 227,
+      "bytes": 7294
+    },
+    {
+      "path": "packages/bijou-tui/src/animate.test.ts",
+      "lines": 226,
+      "bytes": 7072
+    },
+    {
       "path": "packages/create-bijou-tui-app/src/cli.test.ts",
       "lines": 225,
-      "bytes": 8349
+      "bytes": 8344
     },
     {
       "path": "packages/bijou/src/core/binding-frame-update.test.ts",
@@ -1194,14 +1184,9 @@
       "bytes": 6673
     },
     {
-      "path": "packages/bijou/src/core/components/dag-source-adapter-core.test.ts",
-      "lines": 221,
-      "bytes": 7319
-    },
-    {
-      "path": "packages/bijou-tui/src/accordion.test.ts",
+      "path": "packages/bijou/src/core/components/dag-rendering.test.ts",
       "lines": 220,
-      "bytes": 7891
+      "bytes": 10404
     },
     {
       "path": "packages/bijou-tui/src/accordion.ts",
@@ -1212,11 +1197,6 @@
       "path": "packages/bijou/src/core/text/wrap.ts",
       "lines": 220,
       "bytes": 6519
-    },
-    {
-      "path": "scripts/record-gifs.ts",
-      "lines": 219,
-      "bytes": 6291
     },
     {
       "path": "packages/bijou-tui/src/layout-inspector.ts",
@@ -1254,11 +1234,6 @@
       "bytes": 6182
     },
     {
-      "path": "packages/bijou/src/core/components/dag-slice-layout.test.ts",
-      "lines": 214,
-      "bytes": 7977
-    },
-    {
       "path": "packages/bijou-tui/src/navigable-table.test.ts",
       "lines": 214,
       "bytes": 7657
@@ -1269,6 +1244,11 @@
       "bytes": 5713
     },
     {
+      "path": "scripts/record-gifs.ts",
+      "lines": 209,
+      "bytes": 6291
+    },
+    {
       "path": "packages/bijou-tui/src/keys.ts",
       "lines": 208,
       "bytes": 7251
@@ -1276,7 +1256,7 @@
     {
       "path": "packages/bijou-tui/src/notification-card.ts",
       "lines": 208,
-      "bytes": 6760
+      "bytes": 6728
     },
     {
       "path": "packages/bijou-i18n-tools/src/adapters.ts",
@@ -1289,19 +1269,19 @@
       "bytes": 6925
     },
     {
-      "path": "tests/cycles/DX-034/active-binding-runtime-loop.test.ts",
-      "lines": 206,
-      "bytes": 7595
-    },
-    {
       "path": "scripts/code-size-gate.ts",
       "lines": 204,
       "bytes": 8598
     },
     {
-      "path": "tests/cycles/LX-008/localized-shell-and-dogfood.test.ts",
+      "path": "packages/bijou/src/core/render/packed-cell.test.ts",
       "lines": 204,
-      "bytes": 8061
+      "bytes": 7786
+    },
+    {
+      "path": "tests/cycles/DX-034/active-binding-runtime-loop.test.ts",
+      "lines": 204,
+      "bytes": 7595
     },
     {
       "path": "packages/bijou-node/src/io.test.ts",
@@ -1314,29 +1294,24 @@
       "bytes": 5926
     },
     {
-      "path": "packages/bijou-tui/src/overlay-tooltip.test.ts",
-      "lines": 202,
-      "bytes": 7721
-    },
-    {
       "path": "packages/bijou/src/core/theme/resolve.test.ts",
       "lines": 201,
       "bytes": 7020
     },
     {
-      "path": "packages/bijou-tui/src/layout-preset.test.ts",
-      "lines": 201,
-      "bytes": 6678
-    },
-    {
-      "path": "packages/bijou-tui/src/panels.test.ts",
+      "path": "packages/bijou-tui/src/overlay-tooltip.test.ts",
       "lines": 200,
-      "bytes": 7450
+      "bytes": 7557
     },
     {
       "path": "packages/bijou/src/core/components/surface-text.ts",
       "lines": 200,
-      "bytes": 6937
+      "bytes": 6929
+    },
+    {
+      "path": "packages/bijou-tui/src/layout-preset.test.ts",
+      "lines": 200,
+      "bytes": 6678
     },
     {
       "path": "bench/src/harnesses/wall-time/runner.ts",
@@ -1356,12 +1331,12 @@
     {
       "path": "packages/bijou-tui/src/status-bar.ts",
       "lines": 199,
-      "bytes": 6365
+      "bytes": 6360
     },
     {
       "path": "packages/bijou-tui/src/css/text-style.ts",
       "lines": 199,
-      "bytes": 6228
+      "bytes": 6210
     },
     {
       "path": "packages/bijou/src/core/components/guided-flow.ts",
@@ -1371,7 +1346,12 @@
     {
       "path": "packages/bijou-tui/src/app-frame-utils.ts",
       "lines": 198,
-      "bytes": 8371
+      "bytes": 8368
+    },
+    {
+      "path": "packages/bijou-tui/src/panels.test.ts",
+      "lines": 198,
+      "bytes": 7450
     },
     {
       "path": "packages/bijou-tui/src/spring.test.ts",
@@ -1387,11 +1367,6 @@
       "path": "packages/bijou/src/core/app-shell-composition.test.ts",
       "lines": 196,
       "bytes": 6955
-    },
-    {
-      "path": "tests/cycles/DF-066/data-visualization-family-audit.test.ts",
-      "lines": 195,
-      "bytes": 8541
     },
     {
       "path": "tests/cycles/DX-046/graphql-dogfood-navigation-fixture.test.ts",
@@ -1436,12 +1411,7 @@
     {
       "path": "packages/bijou/src/core/theme/dtcg.fuzz.test.ts",
       "lines": 190,
-      "bytes": 7173
-    },
-    {
-      "path": "tests/cycles/DF-061/overlay-primitives-family-audit.test.ts",
-      "lines": 189,
-      "bytes": 7604
+      "bytes": 6993
     },
     {
       "path": "tests/cycles/LX-005/bijou-i18n-tools-node.test.ts",
@@ -1449,14 +1419,14 @@
       "bytes": 7478
     },
     {
+      "path": "packages/bijou/src/core/components/dag-slice-layout.test.ts",
+      "lines": 189,
+      "bytes": 7178
+    },
+    {
       "path": "packages/bijou-tui/src/app-frame-i18n.ts",
       "lines": 188,
       "bytes": 7228
-    },
-    {
-      "path": "packages/bijou-tui/src/overlay-toast-drawer.test.ts",
-      "lines": 188,
-      "bytes": 7187
     },
     {
       "path": "examples/_stories/protocol.ts",
@@ -1464,24 +1434,39 @@
       "bytes": 5434
     },
     {
-      "path": "packages/bijou-tui/src/grid.test.ts",
-      "lines": 188,
-      "bytes": 4976
-    },
-    {
       "path": "bench/src/scenarios/soak.ts",
       "lines": 187,
       "bytes": 7298
     },
     {
+      "path": "packages/bijou-tui/src/overlay-toast-drawer.test.ts",
+      "lines": 187,
+      "bytes": 7055
+    },
+    {
       "path": "packages/bijou/src/adapters/test/clock.ts",
       "lines": 187,
-      "bytes": 5042
+      "bytes": 5039
     },
     {
       "path": "packages/bijou/src/core/forms/multiselect.ts",
       "lines": 186,
       "bytes": 6826
+    },
+    {
+      "path": "tests/cycles/LX-008/localized-shell-and-dogfood.test.ts",
+      "lines": 185,
+      "bytes": 8048
+    },
+    {
+      "path": "packages/bijou-tui/src/accordion.test.ts",
+      "lines": 185,
+      "bytes": 7753
+    },
+    {
+      "path": "packages/bijou/src/core/components/dag-source-adapter-core.test.ts",
+      "lines": 184,
+      "bytes": 6388
     },
     {
       "path": "bench/src/scenarios/component-app.ts",
@@ -1499,11 +1484,6 @@
       "bytes": 5844
     },
     {
-      "path": "tests/cycles/DF-070/dogfood-block-product-polish.test.ts",
-      "lines": 180,
-      "bytes": 5819
-    },
-    {
       "path": "packages/bijou-tui/src/layout-preset.ts",
       "lines": 178,
       "bytes": 5842
@@ -1517,11 +1497,6 @@
       "path": "packages/bijou-tui/src/surface-layout.test.ts",
       "lines": 177,
       "bytes": 5466
-    },
-    {
-      "path": "packages/bijou-tui/src/canvas.test.ts",
-      "lines": 177,
-      "bytes": 5179
     },
     {
       "path": "packages/bijou-mcp/src/tools/docs-catalog/motion.ts",
@@ -1539,14 +1514,19 @@
       "bytes": 5510
     },
     {
-      "path": "examples/split-editors/main.ts",
-      "lines": 175,
-      "bytes": 4936
+      "path": "tests/cycles/DF-066/data-visualization-family-audit.test.ts",
+      "lines": 173,
+      "bytes": 8509
     },
     {
       "path": "packages/bijou/src/core/components/cursor-guard.test.ts",
       "lines": 173,
       "bytes": 5343
+    },
+    {
+      "path": "examples/split-editors/main.ts",
+      "lines": 173,
+      "bytes": 4936
     },
     {
       "path": "packages/bijou/src/core/block-tree-render.test.ts",
@@ -1556,7 +1536,7 @@
     {
       "path": "packages/bijou/src/core/forms/select.ts",
       "lines": 171,
-      "bytes": 6077
+      "bytes": 6059
     },
     {
       "path": "packages/bijou/src/core/components/inspector.ts",
@@ -1569,9 +1549,9 @@
       "bytes": 5434
     },
     {
-      "path": "packages/bijou/src/ports/surface.test.ts",
-      "lines": 170,
-      "bytes": 4387
+      "path": "tests/cycles/DF-070/dogfood-block-product-polish.test.ts",
+      "lines": 169,
+      "bytes": 5819
     },
     {
       "path": "packages/bijou/src/core/theme/downsample.test.ts",
@@ -1581,12 +1561,7 @@
     {
       "path": "packages/bijou-tui/src/runtime.test-support.ts",
       "lines": 169,
-      "bytes": 4214
-    },
-    {
-      "path": "tests/cycles/DF-027/storybook-workstation.test.ts",
-      "lines": 168,
-      "bytes": 8303
+      "bytes": 4207
     },
     {
       "path": "packages/bijou-node/src/style.test.ts",
@@ -1601,12 +1576,12 @@
     {
       "path": "packages/bijou-tui/src/css/resolver.ts",
       "lines": 167,
-      "bytes": 5044
+      "bytes": 5043
     },
     {
       "path": "packages/bijou/src/core/layout/flex.ts",
       "lines": 166,
-      "bytes": 4587
+      "bytes": 4582
     },
     {
       "path": "packages/bijou/src/core/theme/graph.test.ts",
@@ -1619,29 +1594,19 @@
       "bytes": 6134
     },
     {
-      "path": "tests/cycles/DL-004/drawer-rhythm-and-notice-rows.test.ts",
+      "path": "packages/bijou-tui/src/grid.test.ts",
       "lines": 164,
-      "bytes": 5652
+      "bytes": 4886
+    },
+    {
+      "path": "tests/cycles/DF-061/overlay-primitives-family-audit.test.ts",
+      "lines": 163,
+      "bytes": 7568
     },
     {
       "path": "packages/bijou/src/core/forms/select.test.ts",
       "lines": 163,
       "bytes": 6570
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-slice-10.test.ts",
-      "lines": 163,
-      "bytes": 5133
-    },
-    {
-      "path": "tests/cycles/DF-060/viewport-masking-family-audit.test.ts",
-      "lines": 162,
-      "bytes": 7070
-    },
-    {
-      "path": "scripts/dogfood-i18n-export.test.ts",
-      "lines": 162,
-      "bytes": 6100
     },
     {
       "path": "examples/app-frame/main.ts",
@@ -1661,7 +1626,7 @@
     {
       "path": "bench/src/harnesses/wall-time/read-report.ts",
       "lines": 158,
-      "bytes": 4840
+      "bytes": 4826
     },
     {
       "path": "packages/bijou-i18n-tools-node/src/filesystem.test.ts",
@@ -1676,7 +1641,7 @@
     {
       "path": "packages/bijou-tui/src/subapp/mount.ts",
       "lines": 157,
-      "bytes": 5081
+      "bytes": 5071
     },
     {
       "path": "packages/bijou/src/core/components/inspector.test.ts",
@@ -1686,12 +1651,7 @@
     {
       "path": "packages/bijou-node/src/worker/worker.proxy.test.ts",
       "lines": 156,
-      "bytes": 5105
-    },
-    {
-      "path": "packages/bijou-tui/src/subapp/mount.test.ts",
-      "lines": 156,
-      "bytes": 5082
+      "bytes": 5095
     },
     {
       "path": "packages/bijou-tui/src/surface-budget.ts",
@@ -1699,14 +1659,19 @@
       "bytes": 3941
     },
     {
-      "path": "tests/cycles/DF-064/keybinding-help-family-audit.test.ts",
-      "lines": 154,
-      "bytes": 6333
-    },
-    {
       "path": "packages/bijou/src/core/forms/forms.fuzz.test.ts",
       "lines": 154,
       "bytes": 5565
+    },
+    {
+      "path": "packages/bijou-tui/src/subapp/mount.test.ts",
+      "lines": 153,
+      "bytes": 4945
+    },
+    {
+      "path": "tests/cycles/DF-027/storybook-workstation.test.ts",
+      "lines": 152,
+      "bytes": 8303
     },
     {
       "path": "packages/bijou/src/ports/io.ts",

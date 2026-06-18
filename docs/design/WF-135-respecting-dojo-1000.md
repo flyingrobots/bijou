@@ -136,8 +136,9 @@ visible rendering.
 ## Retrospective
 
 Completed with a measured aggregate Code Dojo debt reduction from `4,940` to
-`3,799` (`-1,141`). The stored ESLint baseline now records `3,376` live
-findings, down from `4,517` (`-1,141`), and the next aggregate target is
-`3,749` or lower. Follow-on passes removed fake async wrappers, dead DAG
-fixtures/imports, and implicit numeric template formatting while keeping
-touched file/context budgets below their stored ceilings.
+`3,714` (`-1,226`). The stored ESLint baseline now records `3,298` live
+findings, down from `4,517` (`-1,219`), and the next aggregate target is
+`3,664` or lower. Follow-on passes removed fake async wrappers, dead DAG
+fixtures/imports, implicit numeric template formatting, stale demo helper
+assertions, and seven file/context baseline entries while keeping touched
+file/context budgets below their stored ceilings.
