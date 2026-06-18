@@ -7,6 +7,7 @@ import { readRepoFile } from '../repo.js';
 
 const ENTER = { type: 'key', key: 'enter', ctrl: false, alt: false, shift: false } as const;
 const NEXT_TAB = { type: 'key', key: ']', ctrl: false, alt: false, shift: false } as const;
+type DocsRootModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];
 
 function renderEnteredDocs(columns: number, rows: number, openComponents = false) {
   const ctx = createTestContext({ mode: 'interactive', runtime: { columns, rows } });
@@ -26,9 +27,8 @@ function renderEnteredDocs(columns: number, rows: number, openComponents = false
   };
 }
 
-function activePageModel(model: unknown): any {
-  const root = model as any;
-  return root.docsModel.pageModels[root.docsModel.activePageId];
+function activePageModel(model: DocsRootModel) {
+  return model.docsModel.pageModels[model.docsModel.activePageId];
 }
 
 describe('DF-067 responsive DOGFOOD layout variants', () => {

@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2721,
-  "errors": 2721,
+  "total": 2658,
+  "errors": 2658,
   "warnings": 0,
   "rules": [
     {
@@ -42,7 +42,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 50
+      "count": 46
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
@@ -50,11 +50,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 92
+      "count": 83
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 38
+      "count": 32
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 167
+      "count": 165
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -90,11 +90,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 49
+      "count": 44
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 106
+      "count": 103
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -102,7 +102,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 88
+      "count": 70
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
@@ -110,11 +110,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 391
+      "count": 383
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 62
+      "count": 61
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -126,7 +126,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 34
+      "count": 33
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 593
+      "count": 587
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
