@@ -355,8 +355,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-notifications.test.ts",
-      "lines": 448,
-      "bytes": 15092
+      "lines": 446,
+      "bytes": 14990
     },
     {
       "path": "packages/bijou/src/core/components/table.test.ts",
@@ -495,8 +495,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
-      "lines": 382,
-      "bytes": 12638
+      "lines": 381,
+      "bytes": 12510
     },
     {
       "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",

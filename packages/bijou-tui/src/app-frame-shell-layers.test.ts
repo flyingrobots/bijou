@@ -73,7 +73,7 @@ describe('createFramedApp', () => {
     });
     const result = await runScript(app, [{ key: '?' }, { key: KEY_ESCAPE }]);
     expect(result.model.helpOpen).toBe(false);
-    expect((result.model as any).quitConfirmOpen).toBe(false);
+    expect(result.model.quitConfirmOpen).toBe(false);
   });
   it('toggles the perf HUD from the workspace and active help layer', async () => {
     const app = createFramedApp({
@@ -104,7 +104,7 @@ describe('createFramedApp', () => {
         .group('Extra', (group) => {
           let next = group;
           for (let index = 0; index < 32; index++) {
-            next = next.bind(`${index % 10}`, `Binding ${index}`, { type: 'noop' });
+            next = next.bind(String(index % 10), `Binding ${String(index)}`, { type: 'noop' });
           }
           return next;
         }),
@@ -117,8 +117,8 @@ describe('createFramedApp', () => {
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).helpOpen).toBe(true);
-    expect((model as any).helpScrollY).toBeGreaterThan(0);
+    expect(model.helpOpen).toBe(true);
+    expect('helpScrollY' in model && typeof model.helpScrollY === 'number' && model.helpScrollY > 0).toBe(true);
   });
   it('treats help as modal and ignores non-close keys', async () => {
     const app = createFramedApp({
@@ -227,28 +227,28 @@ describe('createFramedApp', () => {
     });
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(false);
+    expect(model.settingsOpen).toBe(false);
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPalette).toBeDefined();
-    expect((model as any).commandPaletteTitle).toBe('Search home');
+    expect(model.commandPalette).toBeDefined();
+    expect(model.commandPaletteKind).toBe('search');
     [model] = app.update(ctrlKey('p'), model);
-    expect((model as any).commandPalette).toBeDefined();
-    expect((model as any).commandPaletteTitle).toBe('Command Palette');
+    expect(model.commandPalette).toBeDefined();
+    expect(model.commandPaletteKind).toBe('command');
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPalette).toBeDefined();
-    expect((model as any).commandPaletteTitle).toBe('Search home');
+    expect(model.commandPalette).toBeDefined();
+    expect(model.commandPaletteKind).toBe('search');
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPalette).toBeUndefined();
+    expect(model.commandPalette).toBeUndefined();
   });
   it('opens page search with search metadata derived from the active page model', () => {
     const page: FramePage<PageModel, Msg> = {
       ...makePage('home', 'Home', 'main'),
-      searchTitle: (model) => `Search count ${model.count}`,
+      searchTitle: (model) => `Search count ${String(model.count)}`,
       searchItems: (model) => [{
         id: 'count-result',
-        label: `Count ${model.count}`,
+        label: `Count ${String(model.count)}`,
       }],
     };
     const app = createFramedApp({
@@ -259,9 +259,8 @@ describe('createFramedApp', () => {
     [model] = app.update({ type: 'inc' }, model);
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect(model.pageModels.home?.count).toBe(1);
-    expect((model as any).commandPaletteKind).toBe('search');
-    expect((model as any).commandPaletteTitle).toBe('Search count 1');
-    expect((model as any).commandPalette?.items).toEqual([{
+    expect(model.commandPaletteKind).toBe('search');
+    expect(model.commandPalette?.items).toEqual([{
       id: 'search:0',
       label: 'Count 1',
       category: 'Home',

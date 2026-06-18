@@ -19,8 +19,6 @@ import {
   wrapFrameMsg,
   _resetDefaultContextForTesting,
   BijouContext,
-  Cmd,
-  FramedAppMsg,
   Msg,
   PageModel,
 } from './app-frame.test-support.js';
@@ -88,11 +86,11 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
-    expect((model as any).settingsOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
 
     const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
     expect(nextModel.pageModels.home?.count).toBe(0);
-    expect((nextModel as any).settingsOpen).toBe(true);
+    expect(nextModel.settingsOpen).toBe(true);
     expect(cmds).toHaveLength(0);
   });
 
@@ -123,26 +121,26 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
-    expect((model as any).settingsOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
 
-    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
-    [model, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    const [pageKeyModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    model = pageKeyModel;
     expect(model.pageModels.home?.count).toBe(0);
     expect(cmds).toHaveLength(0);
 
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).helpOpen).toBe(true);
+    expect(model.helpOpen).toBe(true);
 
     [model] = app.update(ctrlKey('p'), model);
-    expect((model as any).commandPalette).toBeUndefined();
+    expect(model.commandPalette).toBeUndefined();
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).helpOpen).toBe(false);
+    expect(model.helpOpen).toBe(false);
 
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPaletteKind).toBe('search');
+    expect(model.commandPaletteKind).toBe('search');
 
-    [model] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
 
     expect(observed).toEqual([
       'frame:ctrl+,',
