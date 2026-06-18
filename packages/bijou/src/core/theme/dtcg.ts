@@ -271,19 +271,18 @@ function gradientToDTCG(stops: GradientStop[]): DTCGToken {
 
 /**
  * Convert a record of values into a DTCGGroup.
- * @template K - String keys of the record.
  * @template V - Values in the record.
  * @param record - Record to convert.
  * @param convert - Converts each record value into a DTCG token.
  * @returns DTCGGroup with each key mapped to a DTCG token.
  */
-function recordToDTCGGroup<K extends string, V>(
-  record: Record<K, V>,
+function recordToDTCGGroup<V>(
+  record: Readonly<Record<string, V>>,
   convert: (value: V) => DTCGToken,
 ): DTCGGroup {
   const group: DTCGGroup = {};
-  for (const key in record) {
-    group[key] = convert(record[key]);
+  for (const [key, value] of Object.entries(record)) {
+    group[key] = convert(value);
   }
   return group;
 }
