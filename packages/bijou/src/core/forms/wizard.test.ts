@@ -152,17 +152,15 @@ describe('wizard()', () => {
   });
 
   it('transform returning void keeps original field', async () => {
+    const keepOriginal = (): void => undefined;
+
     const result = await wizard<{ mode: string; greeting: string }>({
       steps: [
         { key: 'mode', field: () => 'casual' },
         {
           key: 'greeting',
           field: () => 'hi',
-          transform: (vals) => {
-            if (vals.mode === 'formal') {
-              return () => 'Good day';
-            }
-          },
+          transform: keepOriginal,
         },
       ],
     });

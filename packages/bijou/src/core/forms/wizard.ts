@@ -5,6 +5,9 @@ const MAX_WIZARD_STEPS = 1000;
 
 type MaybePromise<T> = T | Promise<T>;
 type WizardField<T, K extends keyof T> = (values: Partial<T>) => MaybePromise<T[K]>;
+type NoWizardTransform = ReturnType<() => void>;
+type WizardTransform<T, K extends keyof T> =
+  (values: Partial<T>) => WizardField<T, K> | NoWizardTransform;
 
 /**
  * Single step in a multi-step wizard form.
@@ -21,10 +24,10 @@ export interface WizardStep<T, K extends keyof T = keyof T> {
   skip?: (values: Partial<T>) => boolean;
   /**
    * Called before `field()`. May return a replacement field function
-   * (which will be called instead of the original `field`), or undefined
+   * (which will be called instead of the original `field`), or void
    * to keep the original.
    */
-  transform?: (values: Partial<T>) => WizardField<T, K> | undefined;
+  transform?: WizardTransform<T, K>;
   /**
    * Called after value collection. Returns additional steps to splice
    * in immediately after the current step.
