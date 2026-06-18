@@ -79,7 +79,6 @@ describe('mapCmds', () => {
 
   it('passes cleanup handles through unaltered', async () => {
     interface SubMsg { sub: true; val: number }
-    interface ParentMsg { parent: true; val: number }
     const dispose = vi.fn();
     const handle = { dispose };
 
@@ -95,7 +94,6 @@ describe('mapCmds', () => {
 describe('initSubApp', () => {
   it('returns the child model and mapped init commands', async () => {
     interface SubMsg { type: 'ready'; value: number }
-    interface ParentMsg { type: 'child'; value: number }
 
     const child: App<number, SubMsg> = {
       init: () => [7, [async () => ({ type: 'ready', value: 7 })]],
@@ -116,7 +114,6 @@ describe('initSubApp', () => {
 describe('updateSubApp', () => {
   it('maps returned commands into the parent message space', async () => {
     interface SubMsg { type: 'inc' }
-    interface ParentMsg { type: 'left'; inner: SubMsg }
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
@@ -138,7 +135,6 @@ describe('updateSubApp', () => {
 
   it('passes QUIT through when mapping child commands', async () => {
     interface SubMsg { type: 'noop' }
-    interface ParentMsg { type: 'parent-noop' }
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
