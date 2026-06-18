@@ -46,8 +46,7 @@ async function drainCommands<Model, Msg>(
       const emitted: Msg[] = [];
       const result = await command((msg) => { emitted.push(msg); }, caps);
       if (result === QUIT) throw new Error('Unexpected quit command');
-      if (isCmdCleanup(result)) continue;
-      if (result !== undefined) emitted.push(result);
+      if (!isCmdCleanup(result) && result !== undefined) emitted.push(result);
       for (const msg of emitted) {
         const [nextModel, nextCommands] = app.update(msg, model);
         model = nextModel;
