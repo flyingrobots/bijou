@@ -17,9 +17,13 @@ import {
   runScript,
   TOKEN_DOCTRINE_PATH,
   _resetDefaultContextForTesting,
-  Theme,
 } from './docs-preview.test-support.js';
-
+type DocsFrame = Parameters<typeof frameText>[0];
+function last(frames: readonly DocsFrame[]): DocsFrame {
+  const frame = frames.at(-1);
+  if (frame == null) throw new Error('Missing frame');
+  return frame;
+}
 describe('docs preview app', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
@@ -116,15 +120,13 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const switched = await runScript(app, [{ key: '2' }], { ctx });
-    const switchedFrame = switched.frames[switched.frames.length - 1]!;
-    expect(frameText(switchedFrame)).toContain('Cabinet of Curiosities');
+    expect(frameText(last(switched.frames))).toContain('Cabinet of Curiosities');
 
     const settled = await runScript(app, [
       { key: '2' },
       { pulse: { dt: 2 } },
     ], { ctx });
-    const settledFrame = settled.frames[settled.frames.length - 1]!;
-    expect(frameText(settledFrame)).not.toContain('Cabinet of Curiosities');
+    expect(frameText(last(settled.frames))).not.toContain('Cabinet of Curiosities');
   });
 
   it('lets the landing screen adjust quality before entering the docs and shows feedback', async () => {
@@ -132,7 +134,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const changed = await runScript(app, [{ key: KEY_DOWN }], { ctx });
-    const frame = changed.frames[changed.frames.length - 1]!;
+    const frame = last(changed.frames);
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
     expect(activeDocsPageModel(changed.model).landingQualityMode).toBe('quality');
@@ -154,7 +156,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect((result.model).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
@@ -182,8 +184,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const frame = result.frames[result.frames.length - 1]!;
-    const text = frameText(frame);
+    const text = frameText(last(result.frames));
 
     expect(pageModel.selectedStoryId).toBe('modal');
     expect(pageModel.expandedFamilies['overlays-and-interruption']).toBe(true);
@@ -209,7 +210,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect((result.model).docsModel.activePageId).toBe('components');
     expect(pageModel.selectedStoryId).toBe('dense-comparison');
@@ -238,7 +239,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'release');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect((result.model).docsModel.activePageId).toBe('release');
     expect(pageModel.selectedGuideId).toContain('release-migration');
@@ -263,7 +264,7 @@ describe('docs preview app', () => {
 
     expect((result.model).docsModel.commandPalette?.query).toBe('table');
     expect((result.model).docsModel.commandPalette?.focusIndex).toBe(1);
-    expect(frameText(result.frames[result.frames.length - 1]!)).toContain('Search documentation');
+    expect(frameText(last(result.frames))).toContain('Search documentation');
   });
 
   it('can open the new inspector story directly from component search', async () => {
@@ -287,7 +288,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect(pageModel.selectedStoryId).toBe('inspector');
     expect(text).toContain('inspector()');
@@ -312,7 +313,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect(pageModel.selectedStoryId).toBe('toast');
     expect(text).toContain('toast()');
@@ -339,7 +340,7 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = docsPageModel(result.model, 'components');
-    const text = frameText(result.frames[result.frames.length - 1]!);
+    const text = frameText(last(result.frames));
 
     expect(pageModel.selectedStoryId).toBe('markdown');
     expect(text).toContain('markdown()');
