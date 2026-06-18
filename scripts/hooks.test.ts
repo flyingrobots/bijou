@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readCiWorkflowPolicy } from './ci-workflow-policy.js';
+import vitestConfig from '../vitest.config.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -75,5 +76,12 @@ describe('git hooks', () => {
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*npm test/u);
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*test:run/u);
     expect(packageJson).not.toMatch(/"test:run": "npm test"/u);
+  });
+
+  it('bounds the full Vitest worker pool for CI stability', () => {
+    const config = vitestConfig as { test?: { fileParallelism?: unknown; maxWorkers?: unknown } };
+
+    expect(config.test?.fileParallelism).toBe(false);
+    expect(config.test?.maxWorkers).toBe(1);
   });
 });

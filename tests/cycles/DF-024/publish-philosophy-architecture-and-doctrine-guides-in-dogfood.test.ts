@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
-import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
