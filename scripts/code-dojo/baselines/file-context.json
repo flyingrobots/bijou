@@ -165,8 +165,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-render.test.ts",
-      "lines": 661,
-      "bytes": 23433
+      "lines": 599,
+      "bytes": 21511
     },
     {
       "path": "packages/bijou-tui/src/notification.test.ts",
