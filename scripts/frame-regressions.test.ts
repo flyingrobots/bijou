@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext, type TestContext  } from '@flyingrobots/bijou/adapters/test';
 import { chalkStyle } from '@flyingrobots/bijou-node';
 import type { App, KeyMsg } from '@flyingrobots/bijou-tui';
 import { runScript } from '@flyingrobots/bijou-tui';
@@ -61,7 +61,7 @@ describe('frame regressions', () => {
     const result = await runScript(app, [{ key: ']' }], { ctx });
 
     expect(initialFrame).toMatchSnapshot('scaffold-home');
-    expect(renderFrameText(result.frames.at(-1)!, ctx.style)).toMatchSnapshot('scaffold-split');
+    expect(renderFrameText(must(result.frames.at(-1)), ctx.style)).toMatchSnapshot('scaffold-split');
   });
 
   it('keeps scaffold frames width-correct through scripted resizes', async () => {
@@ -77,8 +77,8 @@ describe('frame regressions', () => {
     const frames = renderFrameTexts(result.frames, ctx.style);
 
     expect(result.frames).toHaveLength(3);
-    assertFrameWidth(frames[1]!, 120);
-    assertFrameWidth(frames[2]!, 92);
+    assertFrameWidth(must(frames[1]), 120);
+    assertFrameWidth(must(frames[2]), 92);
     expect(frames[1]).toContain('Home ready');
     expect(frames[2]).toContain('Home ready');
   });
@@ -88,8 +88,8 @@ describe('frame regressions', () => {
     const spaceKey: KeyMsg = { type: 'key', key: ' ', ctrl: false, alt: false, shift: false };
     const result = await runScript(module.app as App<unknown, KeyMsg>, [{ msg: spaceKey }], { ctx });
 
-    expect(renderFrameText(result.frames[0]!, ctx.style, { crop: true })).toMatchSnapshot('v3-demo-initial');
-    expect(renderFrameText(result.frames[1]!, ctx.style, { crop: true })).toMatchSnapshot('v3-demo-after-space');
+    expect(renderFrameText(must(result.frames[0]), ctx.style, { crop: true })).toMatchSnapshot('v3-demo-initial');
+    expect(renderFrameText(must(result.frames[1]), ctx.style, { crop: true })).toMatchSnapshot('v3-demo-after-space');
   });
 
   it('locks the BCSS demo frames across responsive width changes', async () => {
@@ -105,10 +105,10 @@ describe('frame regressions', () => {
       css: wide.module.css,
     });
 
-    const narrowText = renderFrameText(narrowResult.frames[0]!, narrow.ctx.style);
-    const wideText = renderFrameText(wideResult.frames[0]!, wide.ctx.style);
-    expect(renderFrameText(narrowResult.frames[0]!, narrow.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-narrow');
-    expect(renderFrameText(wideResult.frames[0]!, wide.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-wide');
+    const narrowText = renderFrameText(must(narrowResult.frames[0]), narrow.ctx.style);
+    const wideText = renderFrameText(must(wideResult.frames[0]), wide.ctx.style);
+    expect(renderFrameText(must(narrowResult.frames[0]), narrow.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-narrow');
+    expect(renderFrameText(must(wideResult.frames[0]), wide.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-wide');
     expect(narrowText).toContain('Current width:');
     expect(narrowText).not.toContain('Current width: 96');
     expect(wideText).toContain('Current width: 96');
@@ -123,7 +123,7 @@ describe('frame regressions', () => {
       { key: 'm' },
     ], { ctx });
 
-    expect(renderFrameText(result.frames[0]!, ctx.style, { crop: true })).toMatchSnapshot('v3-subapp-initial');
-    expect(renderFrameText(result.frames.at(-1)!, ctx.style, { crop: true })).toMatchSnapshot('v3-subapp-updated');
+    expect(renderFrameText(must(result.frames[0]), ctx.style, { crop: true })).toMatchSnapshot('v3-subapp-initial');
+    expect(renderFrameText(must(result.frames.at(-1)), ctx.style, { crop: true })).toMatchSnapshot('v3-subapp-updated');
   });
 });

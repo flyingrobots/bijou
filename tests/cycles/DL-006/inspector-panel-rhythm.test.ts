@@ -4,6 +4,7 @@ import {
   _resetDefaultContextForTesting,
   createTestContext,
 } from '../../../packages/bijou/src/adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import {
   inspector,
   setDefaultContext,
@@ -82,7 +83,7 @@ describe('DL-006 inspector panel rhythm cycle', () => {
       { key: '\x1b[B' },
       { key: '\r' },
     ], { ctx });
-    const frame = result.frames.at(-1)!;
+    const frame = must(result.frames.at(-1));
 
     let text = '';
     for (let y = 0; y < frame.height; y++) {

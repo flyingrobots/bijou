@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { composite, tooltip } from './overlay.js';
 import { visibleLength, stripAnsi } from './viewport.js';
@@ -32,7 +32,7 @@ describe('tooltip', () => {
 
   it('left direction positions to the left of target', () => {
     const t = tooltip({ ...base, row: 10, col: 40, direction: 'left' });
-    const boxW = visibleLength(t.content.split('\n')[0]!);
+    const boxW = visibleLength(must(t.content.split('\n')[0]));
     expect(t.col).toBe(40 - boxW);
   });
 
@@ -65,15 +65,15 @@ describe('tooltip', () => {
 
   it('clamps to right edge', () => {
     const t = tooltip({ ...base, row: 10, col: 79, direction: 'right' });
-    const boxW = visibleLength(t.content.split('\n')[0]!);
+    const boxW = visibleLength(must(t.content.split('\n')[0]));
     expect(t.col).toBeLessThanOrEqual(80 - boxW);
   });
 
   it('renders bordered box', () => {
     const t = tooltip({ ...base, row: 10, col: 40 });
     const lines = t.content.split('\n');
-    expect(stripAnsi(lines[0]!)).toContain('\u250c');
-    expect(stripAnsi(lines[lines.length - 1]!)).toContain('\u2514');
+    expect(stripAnsi(must(lines[0]))).toContain('\u250c');
+    expect(stripAnsi(must(lines[lines.length - 1]))).toContain('\u2514');
     expect(stripAnsi(t.content)).toContain('hint');
   });
 
@@ -156,14 +156,14 @@ describe('tooltip', () => {
     const result = composite(bg, [t]);
     const lines = result.split('\n');
     expect(lines).toHaveLength(24);
-    expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+    expect(stripAnsi(must(lines[t.row]))).toContain('\u250c');
   });
 
   it('provides a surface that matches its rendered content', () => {
     const ctx = createTestContext();
     const result = tooltip({ ...base, row: 10, col: 40, ctx });
     expect(result.surface).toBeDefined();
-    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+    expectSurfaceTextMatch(surfaceToString(must(result.surface), ctx.style), result.content);
   });
 
   it('accepts structured surface content', () => {
@@ -178,7 +178,7 @@ describe('tooltip', () => {
     });
     expect(stripAnsi(result.content)).toContain('line1');
     expect(stripAnsi(result.content)).toContain('line2');
-    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+    expectSurfaceTextMatch(surfaceToString(must(result.surface), ctx.style), result.content);
   });
 
   it('clips structured surface content to screen width', () => {

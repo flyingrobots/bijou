@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { BIJOU_LIGHT } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { must, _resetDefaultContextForTesting  } from '@flyingrobots/bijou/adapters/test';
 import type { KeyMsg } from '@flyingrobots/bijou-tui';
 import {
   createScriptTestContext as createTestContext,
@@ -30,7 +30,7 @@ describe('RE-017 framed shell theme demo', () => {
       landingToast?: { message: string };
       docsModel: { activeShellThemeId?: string; pageModels: Record<string, { landingThemeIndex: number }> };
     };
-    const frame = result.frames.at(-1)!;
+    const frame = must(result.frames.at(-1));
 
     expect(model.route).toBe('docs');
     expect(model.landingThemeIndex).toBe(5);

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { tabs } from './tabs.js';
 import { createTestContext, auditStyle } from '../../adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const items = [
   { label: 'Dashboard' },
@@ -72,7 +73,7 @@ describe('tabs', () => {
       tabs(items, { active: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
-      expect(bgCalls[0]!.color).toBe('#001122');
+      expect(must(bgCalls[0]).color).toBe('#001122');
     });
 
     it('skips bg in pipe mode', () => {

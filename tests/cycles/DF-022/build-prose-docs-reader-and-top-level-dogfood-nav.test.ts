@@ -3,6 +3,7 @@ import { createTestContext } from '../../../packages/bijou/src/adapters/test/ind
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -50,7 +51,7 @@ describe('DF-022 build prose docs reader and top-level DOGFOOD nav cycle', () =>
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
     const result = await runScript(app, [{ key: ']' }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(result.model.docsModel.activePageId).toBe('components');
     expect(text).toContain('component families');

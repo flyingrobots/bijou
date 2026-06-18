@@ -7,6 +7,7 @@ import {
   V7_LAUNCH_DOGFOOD_RELEASE_TITLE,
   V7_DOGFOOD_RELEASE_TITLE,
 } from '../../../examples/docs/release-title.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   createScriptTestContext as createTestContext,
@@ -94,7 +95,7 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
         msg: { type: 'select-guide', guideId: 'release-title-v7-launch' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
     const releaseModel = (result.model as any).docsModel.pageModels.release;
 
     expect(releaseModel.guideState.items[0].value).toBe('release-title-v7-launch');
@@ -117,7 +118,7 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
         msg: { type: 'select-guide', guideId: 'release-title-v7' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
     const releaseModel = (result.model as any).docsModel.pageModels.release;
 
     expect(releaseModel.selectedGuideId).toBe('release-title-v7');

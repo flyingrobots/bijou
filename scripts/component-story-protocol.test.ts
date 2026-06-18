@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import {
   CANONICAL_STORY_PROFILE_PRESETS,
   createStoryProfileContext,
@@ -51,7 +51,7 @@ describe('ComponentStory protocol', () => {
       runtime: { columns: 80, rows: 24 },
     });
 
-    const profiled = createStoryProfileContext(ctx, CANONICAL_STORY_PROFILE_PRESETS[2]!, {
+    const profiled = createStoryProfileContext(ctx, must(CANONICAL_STORY_PROFILE_PRESETS[2]), {
       width: 44,
       height: 13,
     });

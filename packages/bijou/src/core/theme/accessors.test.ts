@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createThemeAccessors } from './accessors.js';
 import { createResolved } from './resolve.js';
 import { CYAN_MAGENTA } from './presets.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createThemeAccessors()', () => {
   const theme = createResolved(CYAN_MAGENTA, false);
@@ -25,10 +26,10 @@ describe('createThemeAccessors()', () => {
 
   it('status() returns matching token', () => {
     expect(acc.status('muted').hex).toBe(
-      (theme.theme.status as Record<string, { hex: string }>)['muted']!.hex,
+      must((theme.theme.status as Record<string, { hex: string }>)['muted']).hex,
     );
     expect(acc.status('muted').fgRGB).toEqual(
-      (theme.theme.status as Record<string, { fgRGB?: [number, number, number] }>)['muted']!.fgRGB,
+      must((theme.theme.status as Record<string, { fgRGB?: [number, number, number] }>)['muted']).fgRGB,
     );
   });
 

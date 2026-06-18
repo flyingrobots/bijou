@@ -3,6 +3,7 @@ import { createTestContext } from '../../../packages/bijou/src/adapters/test/ind
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -35,7 +36,7 @@ describe('DF-026 demote examples to secondary reference status', () => {
     const result = await runScript(app, [{
       msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'secondary-example-map' } },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(result.model.docsModel.activePageId).toBe('guides');
     expect(text).toContain('Secondary Example Map');

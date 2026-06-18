@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { auditStyle } from './audit-style.js';
 import type { TokenValue } from '../../core/theme/tokens.js';
 import { createTestContext } from './index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const token: TokenValue = { hex: '#ff0000' };
 const token2: TokenValue = { hex: '#00ff00', modifiers: ['bold'] };
@@ -49,9 +50,9 @@ describe('auditStyle', () => {
     style.bold('second');
     style.styled(token2, 'third');
     expect(style.calls).toHaveLength(3);
-    expect(style.calls[0]!.text).toBe('first');
-    expect(style.calls[1]!.text).toBe('second');
-    expect(style.calls[2]!.text).toBe('third');
+    expect(must(style.calls[0]).text).toBe('first');
+    expect(must(style.calls[1]).text).toBe('second');
+    expect(must(style.calls[2]).text).toBe('third');
   });
 
   it('wasStyled() finds matching calls', () => {

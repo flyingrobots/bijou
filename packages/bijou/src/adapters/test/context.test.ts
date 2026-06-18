@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext, auditStyle, mockClock } from './index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
@@ -78,8 +79,8 @@ describe('createTestContext()', () => {
     expect(brandGradient.length).toBeGreaterThan(0);
     expect(brandGradient[0]).toHaveProperty('pos');
     expect(brandGradient[0]).toHaveProperty('color');
-    expect(brandGradient[0]!.pos).toBeTypeOf('number');
-    expect(Array.isArray(brandGradient[0]!.color)).toBe(true);
+    expect(must(brandGradient[0]).pos).toBeTypeOf('number');
+    expect(Array.isArray(must(brandGradient[0]).color)).toBe(true);
     expect(brandGradient).toEqual(ctx.theme.theme.gradient.brand);
   });
 
@@ -104,7 +105,7 @@ describe('createTestContext()', () => {
     expect(ctx.style).toBe(style);
     ctx.style.bold('hello');
     expect(style.calls).toHaveLength(1);
-    expect(style.calls[0]!.method).toBe('bold');
+    expect(must(style.calls[0]).method).toBe('bold');
   });
 
 });

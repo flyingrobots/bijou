@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
@@ -29,7 +29,7 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
         msg: { type: 'select-guide', guideId: 'blocks-dogfood-surfaces' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('DOGFOOD Surface Blocks');
     for (const entry of defaultDogfoodBlockRegistry.entries()) {
@@ -49,7 +49,7 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{ key: '/' }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
     const expectedTitle = String(searchPanelBlock.render({
       config: { title: 'Search documentation' },
       mode: 'accessible',

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { stripAnsi, surfaceToString, type OutputMode } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, _resetDefaultContextForTesting, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import {
   createStoryProfileContext,
   storyPreviewSurface,
@@ -17,7 +17,7 @@ const BOX_DRAWING_RE = /[┌┐└┘─│]/;
 function getWorkspaceLayoutStory() {
   const story = COMPONENT_STORIES.find((candidate) => candidate.id === WORKSPACE_LAYOUT_STORY_ID);
   expect(story).toBeDefined();
-  return story!;
+  return must(story);
 }
 
 function renderWorkspaceLayoutVariantText(variantId: string, mode: OutputMode): string {
@@ -29,14 +29,14 @@ function renderWorkspaceLayoutVariantText(variantId: string, mode: OutputMode): 
   expect(preset).toBeDefined();
 
   const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-  const previewCtx = createStoryProfileContext(baseCtx, preset!, {
-    width: preset!.width,
+  const previewCtx = createStoryProfileContext(baseCtx, must(preset), {
+    width: must(preset).width,
     height: 18,
   });
-  const preview = storyPreviewSurface(variant!.render({
-    width: preset!.width,
+  const preview = storyPreviewSurface(must(variant).render({
+    width: must(preset).width,
     ctx: previewCtx,
-    state: variant!.initialState,
+    state: must(variant).initialState,
     timeMs: 0,
   }));
 

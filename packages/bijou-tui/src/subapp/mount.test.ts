@@ -3,6 +3,7 @@ import { createSubAppAdapter, initSubApp, mount, mapCmds, updateSubApp } from '.
 import type { App, Cmd } from '../types.js';
 import { QUIT } from '../types.js';
 import { createSurface } from '@flyingrobots/bijou';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 type AdapterChildMsg =
   | { type: 'child-done'; count: number }
@@ -63,7 +64,7 @@ describe('mapCmds', () => {
       onPulse: vi.fn(),
     };
 
-    const result = await mapped[0]!((m) => emitted.push(m), mockCaps);
+    const result = await must(mapped[0])((m) => emitted.push(m), mockCaps);
 
     expect(emitted).toEqual([{ parent: true, val: 1 }]);
     expect(result).toEqual({ parent: true, val: 2 });
@@ -85,7 +86,7 @@ describe('mapCmds', () => {
     const cmd: Cmd<SubMsg> = () => handle;
     const mapped = mapCmds([cmd], (msg) => ({ parent: true as const, val: msg.val }));
 
-    const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
+    const result = await must(mapped[0])(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(handle);
     expect(dispose).not.toHaveBeenCalled();
   });
@@ -107,7 +108,7 @@ describe('initSubApp', () => {
 
     expect(model).toBe(7);
     expect(cmds).toHaveLength(1);
-    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({ type: 'child', value: 7 });
+    await expect(must(cmds[0])(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({ type: 'child', value: 7 });
   });
 });
 
@@ -127,7 +128,7 @@ describe('updateSubApp', () => {
 
     expect(nextModel).toBe(2);
     expect(cmds).toHaveLength(1);
-    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({
+    await expect(must(cmds[0])(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({
       type: 'left',
       inner: { type: 'inc' },
     });
@@ -146,6 +147,6 @@ describe('updateSubApp', () => {
       onMsg: () => ({ type: 'parent-noop' }),
     });
 
-    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toBe(QUIT);
+    await expect(must(cmds[0])(vi.fn(), { onPulse: vi.fn() })).resolves.toBe(QUIT);
   });
 });

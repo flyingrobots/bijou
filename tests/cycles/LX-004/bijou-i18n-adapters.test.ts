@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
@@ -38,8 +39,8 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
     ]);
 
     const workbook = tools.exportTranslationWorkbook(staleCatalogs, 'de');
-    const tsv = tools.serializeExchangeSheet(workbook.sheets[0]!, 'tsv');
-    const parsedSheet = tools.parseExchangeSheet(workbook.sheets[0]!.name, tsv, 'tsv');
+    const tsv = tools.serializeExchangeSheet(must(workbook.sheets[0]), 'tsv');
+    const parsedSheet = tools.parseExchangeSheet(must(workbook.sheets[0]).name, tsv, 'tsv');
     const importedRows = tools.importTranslationWorkbook({
       version: 1,
       sheets: [
@@ -89,8 +90,8 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
       },
     ], 'de');
 
-    const csv = tools.serializeExchangeSheet(workbook.sheets[0]!, 'csv');
-    const parsed = tools.parseExchangeSheet(workbook.sheets[0]!.name, csv, 'csv');
+    const csv = tools.serializeExchangeSheet(must(workbook.sheets[0]), 'csv');
+    const parsed = tools.parseExchangeSheet(must(workbook.sheets[0]).name, csv, 'csv');
 
     expect(parsed.rows[0]?.sourceValue).toBe('Help, "now"\nplease');
     expect(parsed.rows[0]?.translatedValue).toBe('Hilfe, "jetzt"\nbitte');

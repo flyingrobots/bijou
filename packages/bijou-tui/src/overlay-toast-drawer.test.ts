@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { composite, toast } from './overlay.js';
 import { resolveOverlayMargin } from './design-language.js';
@@ -47,7 +47,7 @@ describe('toast', () => {
     const tl = toast({ ...base, anchor: 'top-left' });
 
     const boxH = tr.content.split('\n').length;
-    const boxW = visibleLength(tr.content.split('\n')[0]!);
+    const boxW = visibleLength(must(tr.content.split('\n')[0]));
 
     expect(tr.row).toBe(1);
     expect(tr.col).toBe(80 - boxW - 1);
@@ -65,7 +65,7 @@ describe('toast', () => {
   it('default anchor is bottom-right', () => {
     const { row, col, content } = toast({ message: 'x', screenWidth: 80, screenHeight: 24 });
     const boxH = content.split('\n').length;
-    const boxW = visibleLength(content.split('\n')[0]!);
+    const boxW = visibleLength(must(content.split('\n')[0]));
     const margin = resolveOverlayMargin(80, 24);
     expect(row).toBe(24 - boxH - margin);
     expect(col).toBe(80 - boxW - margin);
@@ -157,14 +157,14 @@ describe('toast', () => {
     const lines = result.split('\n');
     expect(lines).toHaveLength(24);
     // Toast should appear near bottom-right
-    expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+    expect(stripAnsi(must(lines[t.row]))).toContain('\u250c');
   });
 
   it('provides a surface that matches its rendered content', () => {
     const ctx = createTestContext();
     const result = toast({ message: 'saved', variant: 'success', screenWidth: 80, screenHeight: 24, ctx });
     expect(result.surface).toBeDefined();
-    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+    expectSurfaceTextMatch(surfaceToString(must(result.surface), ctx.style), result.content);
   });
 
   it('applies semantic styling directly to toast text cells', () => {
@@ -177,7 +177,7 @@ describe('toast', () => {
       ctx,
     });
     expect(result.surface).toBeDefined();
-    expect(result.surface!.get(2, 1).fg).toBe(ctx.semantic('error').hex);
+    expect(must(result.surface).get(2, 1).fg).toBe(ctx.semantic('error').hex);
   });
 });
 

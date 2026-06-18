@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { BIJOU_DARK, BIJOU_LIGHT, PRESETS, CYAN_MAGENTA, TEAL_ORANGE_PINK } from './presets.js';
 import type { BaseStatusKey, Theme } from './tokens.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const ALL_STATUS_KEYS: readonly BaseStatusKey[] = [
   'success', 'error', 'warning', 'info', 'pending', 'active', 'muted',
@@ -42,8 +43,8 @@ function validateTheme(theme: Theme): void {
           const curr = stops[i];
           expect(prev, `gradient.${name} stop ${i - 1}`).toBeDefined();
           expect(curr, `gradient.${name} stop ${i}`).toBeDefined();
-          expect(curr!.pos, `gradient.${name}[${i}].pos >= [${i - 1}].pos`)
-            .toBeGreaterThanOrEqual(prev!.pos);
+          expect(must(curr).pos, `gradient.${name}[${i}].pos >= [${i - 1}].pos`)
+            .toBeGreaterThanOrEqual(must(prev).pos);
         }
       }
     });

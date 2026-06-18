@@ -115,7 +115,8 @@ describe('MCP structured output modes', () => {
   it('bijou_docs supports both text and structured payloads', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
     const result = await docsTool.handler({ query: 'dag', output: 'both' });
-    const structured = result.structuredContent!;
+    const structured = result.structuredContent;
+    if (structured == null) throw new Error('Expected structured content');
     const payload = structured['data'] as Record<string, unknown>;
     const entries = payload['entries'] as Record<string, unknown>[];
 
