@@ -65,7 +65,7 @@ describe('run', () => {
 
     it('updates model on key input', async () => {
       const seen: number[] = [];
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'key') {
@@ -96,7 +96,7 @@ describe('run', () => {
 
     it('handles double Ctrl+C force-quit', async () => {
       // App that ignores Ctrl+C (doesn't quit on it)
-      const stubbornApp: App<string, never> = {
+      const stubbornApp: App<string> = {
         init: () => ['running', []],
         update(_msg, model) { return [model, []]; },
         view: (model) => textView(model),
@@ -118,7 +118,7 @@ describe('run', () => {
     it('sends first Ctrl+C to app as KeyMsg', async () => {
       const received: KeyMsg[] = [];
 
-      const spyApp: App<null, never> = {
+      const spyApp: App<null> = {
         init: () => [null, []],
         update(msg, model) {
           if (msg.type === 'key') received.push(msg);
@@ -143,7 +143,7 @@ describe('run', () => {
       const clock = mockClock({ nowMs: 0 });
       const received: KeyMsg[] = [];
 
-      const spyApp: App<null, never> = {
+      const spyApp: App<null> = {
         init: () => [null, []],
         update(msg, model) {
           if (msg.type === 'key') {
@@ -158,8 +158,8 @@ describe('run', () => {
       const ctx = createTestContext({ mode: 'interactive', clock });
       ctx.io.rawInput = (onKey) => {
         const handles = [
-          clock.setTimeout(() => onKey('\x03'), 0),
-          clock.setTimeout(() => onKey('q'), 10),
+          clock.setTimeout(() => { onKey('\x03'); }, 0),
+          clock.setTimeout(() => { onKey('q'); }, 10),
         ];
         return {
           dispose() {
@@ -179,7 +179,7 @@ describe('run', () => {
     });
 
     it('executes startup commands from init', async () => {
-      type Msg = { type: 'started' };
+      interface Msg { type: 'started' }
 
       const startupApp: App<string, Msg> = {
         init() {
@@ -203,7 +203,7 @@ describe('run', () => {
     });
 
     it('routes rejected commands through the app runtime issue hook', async () => {
-      type Msg = { type: 'issue'; text: string };
+      interface Msg { type: 'issue'; text: string }
       const seenIssues: string[] = [];
 
       const rejectingApp: App<string, Msg> = {
@@ -240,7 +240,7 @@ describe('run', () => {
     });
 
     it('routes opt-in surface budget warnings through the app runtime issue hook', async () => {
-      type Msg = { type: 'issue'; text: string };
+      interface Msg { type: 'issue'; text: string }
       const seenIssues: string[] = [];
 
       const budgetedApp: App<string, Msg> = {
@@ -320,7 +320,7 @@ describe('run', () => {
 
     it('allows callers to extend the render pipeline', async () => {
       const { clock, ctx } = createInteractiveContext();
-      const app: App<null, never> = {
+      const app: App<null> = {
         init: () => [null, [quit()]],
         update: (_msg, model) => [model, []],
         view: () => {
@@ -350,7 +350,7 @@ describe('run', () => {
       const { clock, ctx } = createInteractiveContext();
       const completed: string[] = [];
       const seenDuringDiff: string[][] = [];
-      const app: App<null, never> = {
+      const app: App<null> = {
         init: () => [null, [quit()]],
         update: (_msg, model) => [model, []],
         view: () => {

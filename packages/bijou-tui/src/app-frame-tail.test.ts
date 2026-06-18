@@ -37,8 +37,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('keeps notification-center mouse interactions from leaking through to the underlying page', () => {
     type MsgWithMouse = Msg | MouseMsg;
@@ -82,7 +82,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    [model] = app.update(shiftKey('n') as unknown as MsgWithMouse, model);
+    [model] = app.update(shiftKey('n'), model);
 
     const wheel: MouseMsg = {
       type: 'mouse',
@@ -94,7 +94,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    [model] = app.update(wheel, model);
     const scrolledY = (model as any).notificationCenterScrollY;
 
     const outsideWheel: MouseMsg = {
@@ -107,7 +107,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
+    [model] = app.update(outsideWheel, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -119,7 +119,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(click as unknown as MsgWithMouse, model);
+    [model] = app.update(click, model);
 
     expect((model as any).notificationCenterScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
@@ -165,7 +165,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    [model] = app.update(ctrlKey(',') as unknown as MsgWithMouse, model);
+    [model] = app.update(ctrlKey(','), model);
 
     const wheel: MouseMsg = {
       type: 'mouse',
@@ -177,7 +177,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    [model] = app.update(wheel, model);
     const scrolledY = (model as any).settingsScrollY;
 
     const outsideWheel: MouseMsg = {
@@ -190,7 +190,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
+    [model] = app.update(outsideWheel, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -202,7 +202,7 @@ describe('createFramedApp', () => {
       alt: false,
       ctrl: false,
     };
-    [model] = app.update(click as unknown as MsgWithMouse, model);
+    [model] = app.update(click, model);
 
     expect((model as any).settingsScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
@@ -406,7 +406,7 @@ describe('createFramedApp', () => {
       throw new Error('expected a frame notification message');
     }
 
-    [model, cmds] = app.update(returned as Msg, model);
+    [model, cmds] = app.update(returned, model);
 
     expect(model.runtimeNotifications.items).toHaveLength(1);
     expect(model.runtimeNotifications.items[0]).toMatchObject({
@@ -428,7 +428,7 @@ describe('createFramedApp', () => {
       throw new Error('expected a notification tick message');
     }
 
-    const [visibleModel] = app.update(tickMsg as Msg, model);
+    const [visibleModel] = app.update(tickMsg, model);
     const frame = app.view(visibleModel);
     if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
     expect(surfaceToString(frame, testCtx.style)).toContain('notices:1');

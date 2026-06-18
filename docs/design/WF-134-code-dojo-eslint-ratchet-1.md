@@ -20,6 +20,7 @@ Legend: [WF - Workflow and Delivery](../legends/WF-workflow-delivery.md)
 ## Linked Work
 
 - Issue: [#364](https://github.com/flyingrobots/bijou/issues/364)
+- Follow-up ratchet: [#366](https://github.com/flyingrobots/bijou/issues/366)
 - Standards artifact:
   [TypeScript Code Standards Editor's Edition](../typescript-code-standards.editors-edition.md)
 - Exception ledger:
@@ -53,8 +54,9 @@ violations are already paid down.
 ## Hill
 
 Reduce live type-aware ESLint findings from `5,121` to at most `4,900`, then
-lower the official ESLint and aggregate Code Dojo debt ceilings so future work
-cannot regain the cleaned-up violations.
+continue the same bounded cleanup pass to at most `4,600` when the first target
+is comfortably met. Lower the official ESLint and aggregate Code Dojo debt
+ceilings so future work cannot regain the cleaned-up violations.
 
 ## Scope
 
@@ -108,7 +110,8 @@ Top file clusters:
 
 ## Playback Questions
 
-1. Did the live ESLint count fall to `4,900` or lower?
+1. Did the live ESLint count fall to `4,900` or lower, then to `4,600` or lower
+   after the follow-up ratchet?
 2. Did the stored ESLint baseline match the new live count?
 3. Did the aggregate Code Dojo ceiling move down by at least 50 violations?
 4. Do focused tests still prove the touched surfaces behave the same?
@@ -125,6 +128,7 @@ count plus the relevant existing focused suite.
 ## Acceptance Criteria
 
 - Live ESLint findings are `4,900` or lower.
+- Follow-up ratchet findings are `4,600` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live count.
 - `docs/code-dojo-exceptions.md` reports the lower aggregate debt count and next
   target.

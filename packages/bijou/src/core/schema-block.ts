@@ -244,7 +244,7 @@ function normalizeSchemaResult<Data>(result: BlockSchemaResult<Data>): BlockSche
     throw new Error('block schema result: result must be an object');
   }
 
-  if (result.ok === true) {
+  if (result.ok) {
     if (!Object.prototype.hasOwnProperty.call(result, 'data')) {
       throw new Error('block schema result: data is required for ok result');
     }
@@ -252,10 +252,10 @@ function normalizeSchemaResult<Data>(result: BlockSchemaResult<Data>): BlockSche
     return Object.freeze({
       ok: true,
       data: freezeInertData(result.data, 'data') as DeepReadonly<Data>,
-    }) as BlockSchemaResult<Data>;
+    });
   }
 
-  if (result.ok === false) {
+  if (!result.ok) {
     return Object.freeze({
       ok: false,
       issues: freezeSchemaIssues(result.issues),
@@ -340,7 +340,7 @@ function freezeRenderInput<Config>(
     ...(normalizedMode === undefined ? {} : { mode: normalizedMode }),
   };
 
-  return Object.freeze(normalizedInput) as DeepReadonly<BlockRenderInput<Config>>;
+  return Object.freeze(normalizedInput);
 }
 
 function freezeSchemaIssues(
@@ -501,7 +501,7 @@ function freezeInertData<T>(
 function cloneInertData<T>(
   value: T,
   path: string,
-  seen: WeakSet<object> = new WeakSet<object>(),
+  seen = new WeakSet(),
 ): T {
   if (
     value === null
@@ -567,9 +567,7 @@ function cloneInertData<T>(
   }
 }
 
-interface InertDataObject {
-  [key: string]: unknown;
-}
+type InertDataObject = Record<string, unknown>;
 
 function isPlainObject(value: object): boolean {
   const prototype = Object.getPrototypeOf(value);
@@ -582,7 +580,7 @@ function objectKind(value: object): string {
 
 function deepFreeze<T>(
   value: T,
-  seen: WeakSet<object> = new WeakSet<object>(),
+  seen = new WeakSet(),
 ): DeepReadonly<T> {
   if (value === null || typeof value !== 'object') {
     return value as DeepReadonly<T>;

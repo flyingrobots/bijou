@@ -62,7 +62,7 @@ function renderPaneSurfaceForMeasurement(output: ViewOutput, width: number, heig
     output,
     width,
     height,
-    scratch != null && scratch.width === width && scratch.height === height
+    scratch?.width === width && scratch.height === height
       ? scratch
       : createSurface(width, height),
   );
@@ -541,7 +541,7 @@ export function createTransitionTickCmd<Msg>(durationMs: number, generation: num
   return (emit, caps) =>
     new Promise<void>((resolve) => {
       if (durationMs <= 0) {
-        emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction));
+        emit(wrapFrameMsg({ type: 'transition-complete', generation }));
         resolve();
         return;
       }
@@ -557,11 +557,11 @@ export function createTransitionTickCmd<Msg>(durationMs: number, generation: num
           generation,
           dt,
           elapsedMs,
-        } as FrameAction));
+        }));
 
         if (rawProgress >= 1) {
           pulse.dispose();
-          emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction));
+          emit(wrapFrameMsg({ type: 'transition-complete', generation }));
           resolve();
         }
       });
