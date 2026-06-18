@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 import { accordionTool } from './accordion.js';
 import { alertTool } from './alert.js';
@@ -49,11 +50,26 @@ const ALL_TOOLS = [
   inspectorTool,
 ] as const;
 
-interface DocsPayloadEntry {
-  readonly tool: string;
-  readonly mcpExposed: boolean;
-  readonly family: string;
-  readonly exampleOutput?: string;
+const docsPayloadEntrySchema = z.object({
+  tool: z.string(),
+  mcpExposed: z.boolean(),
+  family: z.string(),
+  exampleOutput: z.string().optional(),
+}).passthrough();
+const docsPayloadSchema = z.object({
+  documentedEntries: z.number().optional(),
+  documentedTools: z.number().optional(),
+  docsOnlyEntries: z.number().optional(),
+  returnedEntries: z.number(),
+  includeExamples: z.boolean().optional(),
+  entries: z.array(docsPayloadEntrySchema),
+}).passthrough();
+
+function parseDocsPayload(result: Awaited<ReturnType<ReturnType<typeof createDocsTool>['handler']>>) {
+  const text = result.content[0]?.text;
+  if (text === undefined) throw new Error('Expected bijou_docs to return text content');
+  const parsed: unknown = JSON.parse(text);
+  return docsPayloadSchema.parse(parsed);
 }
 
 const EXPECTED_DOCS_ONLY_FAMILIES = [
@@ -70,14 +86,7 @@ const EXPECTED_DOCS_ONLY_FAMILIES = [
 describe('bijou_docs tool', () => {
   it('returns the full catalog without examples by default', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({})).content[0]!.text) as {
-      documentedEntries: number;
-      documentedTools: number;
-      docsOnlyEntries: number;
-      returnedEntries: number;
-      includeExamples: boolean;
-      entries: DocsPayloadEntry[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({}));
 
     expect(payload.documentedEntries).toBe(MCP_DOCS_CATALOG.length);
     expect(payload.documentedTools).toBe(ALL_TOOLS.length);
@@ -92,70 +101,59 @@ describe('bijou_docs tool', () => {
 
   it('matches tool docs by query and renders example output for small result sets', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({ query: 'table' })).content[0]!.text) as {
-      includeExamples: boolean;
-      entries: DocsPayloadEntry[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({ query: 'table' }));
+    const entry = payload.entries[0];
 
     expect(payload.includeExamples).toBe(true);
     expect(payload.entries.length).toBeGreaterThanOrEqual(1);
-    expect(payload.entries[0]!.tool).toBe('bijou_table');
-    expect(payload.entries[0]!.family).toBe('table()');
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('Service');
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('healthy');
+    expect(entry?.tool).toBe('bijou_table');
+    expect(entry?.family).toBe('table()');
+    expect(entry?.exampleOutput).toContain('Service');
+    expect(entry?.exampleOutput).toContain('healthy');
   });
 
   it('returns docs-only entries with synthesized example output', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({ query: 'markdown' })).content[0]!.text) as {
-      includeExamples: boolean;
-      entries: DocsPayloadEntry[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({ query: 'markdown' }));
+    const entry = payload.entries[0];
 
     expect(payload.includeExamples).toBe(true);
     expect(payload.entries.length).toBeGreaterThanOrEqual(1);
-    expect(payload.entries[0]!.tool).toBe('bijou_markdown');
-    expect(payload.entries[0]!.mcpExposed).toBe(false);
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('Release');
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('Build');
+    expect(entry?.tool).toBe('bijou_markdown');
+    expect(entry?.mcpExposed).toBe(false);
+    expect(entry?.exampleOutput).toContain('Release');
+    expect(entry?.exampleOutput).toContain('Build');
   });
 
   it('documents the staged form family with a synthesized prompt snapshot', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({ query: 'wizard' })).content[0]!.text) as {
-      includeExamples: boolean;
-      entries: DocsPayloadEntry[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({ query: 'wizard' }));
+    const entry = payload.entries[0];
 
     expect(payload.includeExamples).toBe(true);
     expect(payload.entries.length).toBeGreaterThanOrEqual(1);
-    expect(payload.entries[0]!.tool).toBe('bijou_multi_field_forms');
-    expect(payload.entries[0]!.mcpExposed).toBe(false);
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('Step 2 of 3');
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('Continue deployment? [Y/n]');
+    expect(entry?.tool).toBe('bijou_multi_field_forms');
+    expect(entry?.mcpExposed).toBe(false);
+    expect(entry?.exampleOutput).toContain('Step 2 of 3');
+    expect(entry?.exampleOutput).toContain('Continue deployment? [Y/n]');
   });
 
   it('documents the mode-aware authoring helper as a docs-only family', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({ query: 'renderByMode' })).content[0]!.text) as {
-      includeExamples: boolean;
-      entries: DocsPayloadEntry[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({ query: 'renderByMode' }));
+    const entry = payload.entries[0];
 
     expect(payload.includeExamples).toBe(true);
     expect(payload.entries.length).toBeGreaterThanOrEqual(1);
-    expect(payload.entries[0]!.tool).toBe('bijou_mode_aware_authoring');
-    expect(payload.entries[0]!.mcpExposed).toBe(false);
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('interactive ->');
-    expect(String(payload.entries[0]!.exampleOutput)).toContain('accessible ->');
+    expect(entry?.tool).toBe('bijou_mode_aware_authoring');
+    expect(entry?.mcpExposed).toBe(false);
+    expect(entry?.exampleOutput).toContain('interactive ->');
+    expect(entry?.exampleOutput).toContain('accessible ->');
   });
 
   it('returns an empty entry set for unknown queries without throwing', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
-    const payload = JSON.parse((await docsTool.handler({ query: 'definitely-missing-component' })).content[0]!.text) as {
-      returnedEntries: number;
-      entries: unknown[];
-    };
+    const payload = parseDocsPayload(await docsTool.handler({ query: 'definitely-missing-component' }));
 
     expect(payload.returnedEntries).toBe(0);
     expect(payload.entries).toEqual([]);
