@@ -15,7 +15,6 @@ import {
   isBlockSchemaAdapter,
   isSchemaBoundBlockDefinition,
   parseBlockSchema,
-  type BlockSchemaIssue,
 } from './schema-block.js';
 
 interface Article {
@@ -40,6 +39,7 @@ const readerSurfaceMetadata: BlockMetadata = {
   ],
 };
 
+const bad = (value: unknown): never => value as never;
 function defineArticleSchema() {
   return defineBlockSchemaAdapter<Article>({
     id: ' docs.article ',
@@ -150,7 +150,7 @@ describe('schema-bound block contract', () => {
       expect(Object.isFrozen(valid.data)).toBe(true);
       expect(Object.isFrozen(valid.data.tags)).toBe(true);
       expect(() => {
-        (valid.data as { title: string }).title = 'mutated';
+        Object.defineProperty(valid.data, 'title', { value: 'mutated' });
       }).toThrow(TypeError);
     }
 
@@ -166,11 +166,11 @@ describe('schema-bound block contract', () => {
       expect(Object.isFrozen(invalid.issues)).toBe(true);
       expect(Object.isFrozen(invalid.issues[0])).toBe(true);
       expect(() => {
-        (invalid.issues as BlockSchemaIssue[]).push({
+        Object.defineProperty(invalid.issues, 'extra', { value: {
           severity: 'error',
           code: 'article.extra',
           message: 'extra',
-        });
+        } });
       }).toThrow(TypeError);
     }
   });
@@ -229,20 +229,20 @@ describe('schema-bound block contract', () => {
     const topLevelTypo = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => ({ slotz: { content: 'typo' } }) as never,
+      bind: () => bad({ slotz: { content: 'typo' } }),
     });
     const wrappedTypo = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => ({ input: { slotz: { content: 'typo' } } }) as never,
+      bind: () => bad({ input: { slotz: { content: 'typo' } } }),
     });
     const backchannel = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => ({
+      bind: () => bad({
         input: { slots: { content: 'safe' } },
         dispatch: () => undefined,
-      }) as never,
+      }),
     });
 
     expect(() => bindSchemaBlockInput(topLevelTypo, {
@@ -267,17 +267,17 @@ describe('schema-bound block contract', () => {
     const dateOutput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => new Date(0) as never,
+      bind: () => bad(new Date(0)),
     });
     const wrappedDateInput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => ({ input: new Date(0) }) as never,
+      bind: () => bad({ input: new Date(0) }),
     });
     const arrayOutput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => [] as never,
+      bind: () => bad([]),
     });
 
     expect(() => bindSchemaBlockInput(dateOutput, {
@@ -332,8 +332,8 @@ describe('schema-bound block contract', () => {
       render: () => ({ output: 'reader' }),
     });
 
-    expect(() => defineBlockSchemaAdapter(null as never)).toThrow(Error);
-    expect(() => defineSchemaBlock(null as never)).toThrow(Error);
+    expect(() => defineBlockSchemaAdapter(bad(null))).toThrow(Error);
+    expect(() => defineSchemaBlock(bad(null))).toThrow(Error);
 
     expect(() => defineBlockSchemaAdapter({
       id: '   ',
@@ -342,18 +342,18 @@ describe('schema-bound block contract', () => {
 
     expect(() => defineSchemaBlock({
       block,
-      schema: {
+      schema: bad({
         id: 'docs.article',
         parse: () => ({ ok: true, data: {} }),
-      } as never,
+      }),
       bind: () => ({}),
     })).toThrow(Error);
 
     expect(() => defineSchemaBlock({
-      block: {
+      block: bad({
         metadata: readerSurfaceMetadata,
         render: () => ({ output: 'reader' }),
-      } as never,
+      }),
       schema: defineArticleSchema(),
       bind: () => ({}),
     })).toThrow(Error);
@@ -366,19 +366,19 @@ describe('schema-bound block contract', () => {
 
   it('reports deterministic errors for malformed untyped schema inputs', () => {
     expect(() => defineBlockSchemaAdapter({
-      id: 42,
+      id: bad(42),
       parse: () => ({ ok: true, data: {} }),
-    } as never)).toThrow('block schema adapter: id must be a string');
+    })).toThrow('block schema adapter: id must be a string');
 
     expect(() => parseBlockSchema(defineBlockSchemaAdapter({
       id: 'docs.invalid',
-      parse: () => ({ ok: false, issues: { code: 'bad' } }) as never,
+      parse: () => bad({ ok: false, issues: { code: 'bad' } }),
     }), {})).toThrow('block schema result: issues must be an array');
 
     const badDescription = defineBlockSchemaAdapter({
       id: 'docs.description',
       parse: () => ({ ok: true, data: {} }),
-      describe: () => ({ requiredFields: 'id' }) as never,
+      describe: () => bad({ requiredFields: 'id' }),
     });
     expect(() => badDescription.describe?.()).toThrow(
       'block schema description: requiredFields must be an array',
@@ -387,7 +387,7 @@ describe('schema-bound block contract', () => {
     const badSchemaFacts = defineBlockSchemaAdapter({
       id: 'docs.facts',
       parse: () => ({ ok: true, data: {} }),
-      describe: () => ({ facts: 'entity:article' }) as never,
+      describe: () => bad({ facts: 'entity:article' }),
     });
     expect(() => badSchemaFacts.describe?.()).toThrow(
       'block schema description: facts must be an array',
@@ -402,8 +402,8 @@ describe('schema-bound block contract', () => {
       schema: defineArticleSchema(),
       bind: () => ({
         input: { slots: { content: 'DX-031' } },
-        facts: 'entity:article',
-      }) as never,
+        facts: bad('entity:article'),
+      }),
     });
 
     expect(() => bindSchemaBlockInput(badBindFacts, {

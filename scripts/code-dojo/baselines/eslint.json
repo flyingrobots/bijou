@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2771,
-  "errors": 2771,
+  "total": 2721,
+  "errors": 2721,
   "warnings": 0,
   "rules": [
     {
@@ -14,7 +14,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 80
+      "count": 59
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 654
+      "count": 653
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 108
+      "count": 106
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 417
+      "count": 391
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",

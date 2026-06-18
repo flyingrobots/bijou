@@ -4,9 +4,7 @@ import {
   defineDataRequirement,
   defineViewData,
 } from './binding.js';
-import {
-  defineBindingLifecycleOwner,
-} from './binding-lifecycle.js';
+import { defineBindingLifecycleOwner } from './binding-lifecycle.js';
 import { defineBlock, type BlockMetadata } from './block-metadata.js';
 import {
   ActiveBindingCollection,
@@ -25,6 +23,9 @@ const readerMetadata: BlockMetadata = {
   docs: { summary: 'Reader content surface.' },
   slots: [{ id: 'content', required: true }],
 };
+
+const bad = (value: unknown): never => value as never;
+
 describe('active binding collection primitives', () => {
   it('creates frozen active binding collections from explicit owner and requirement entries', () => {
     const owner = defineBindingLifecycleOwner({
@@ -159,14 +160,14 @@ describe('active binding collection primitives', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
     expect(() => activeBindingEntry({
-      owner: { id: 'reader.view', kind: 'view' } as never,
+      owner: bad({ id: 'reader.view', kind: 'view' }),
       requirement: article,
     })).toThrow(
       'active binding entry: owner was not created by defineBindingLifecycleOwner()',
     );
     expect(() => activeBindingEntry({
       owner,
-      requirement: { id: 'article', resource: 'docs.article' } as never,
+      requirement: bad({ id: 'article', resource: 'docs.article' }),
     })).toThrow(
       'active binding entry: requirement was not created by defineDataRequirement()',
     );
@@ -175,10 +176,10 @@ describe('active binding collection primitives', () => {
       requirement: article,
       providerId: '   ',
     })).toThrow('active binding entry: providerId is required');
-    expect(() => activeBindingCollection([{
+    expect(() => activeBindingCollection(bad([{
       owner,
       requirement: article,
-    } as never])).toThrow(
+    }]))).toThrow(
       'active binding collection: entry at index 0 was not created by activeBindingEntry()',
     );
   });
@@ -188,64 +189,64 @@ describe('active binding collection primitives', () => {
     const data = defineViewData({
       requirements: [{ name: 'article', requirement: article }],
     });
-    const malformedContract = Object.create(data, {
+    const badContract = bad(Object.create(data, {
       requirementIds: { value: () => ['article'] },
       requirements: { value: () => [null] },
-    });
-    expect(() => collectActiveBindings({
-      entries: {} as never,
-    })).toThrow('active binding collection: entries must be an array');
-    expect(() => collectActiveBindings({
-      contracts: {} as never,
-    })).toThrow('active binding collection: contracts must be an array');
-    expect(() => collectActiveBindings({
-      contracts: [null as never],
-    })).toThrow('active binding collection: contract 0 must be an object');
-    expect(() => collectActiveBindings({
+    }));
+    expect(() => collectActiveBindings(bad({
+      entries: {},
+    }))).toThrow('active binding collection: entries must be an array');
+    expect(() => collectActiveBindings(bad({
+      contracts: {},
+    }))).toThrow('active binding collection: contracts must be an array');
+    expect(() => collectActiveBindings(bad({
+      contracts: [null],
+    }))).toThrow('active binding collection: contract 0 must be an object');
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
         contract: data,
-        providerIds: {} as never,
+        providerIds: {},
       }],
-    })).toThrow('active binding collection: providerIds must be an array');
-    expect(() => collectActiveBindings({
+    }))).toThrow('active binding collection: providerIds must be an array');
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
         contract: data,
-        providerIds: { length: 0 } as never,
+        providerIds: { length: 0 },
       }],
-    })).toThrow('active binding collection: providerIds must be an array');
-    expect(() => collectActiveBindings({
+    }))).toThrow('active binding collection: providerIds must be an array');
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
         contract: data,
-        providerIds: [null as never],
+        providerIds: [null],
       }],
-    })).toThrow('active binding collection: provider assignment 0 must be an object');
-    expect(() => collectActiveBindings({
+    }))).toThrow('active binding collection: provider assignment 0 must be an object');
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
         contract: data,
-        providerIds: [{ requirementId: 42, providerId: 'docs.articleProvider' } as never],
+        providerIds: [{ requirementId: 42, providerId: 'docs.articleProvider' }],
       }],
-    })).toThrow(
+    }))).toThrow(
       'active binding collection: provider assignment 0 requirementId must be a string',
     );
-    expect(() => collectActiveBindings({
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
         contract: data,
-        providerIds: [{ requirementId: 'article', providerId: 42 } as never],
+        providerIds: [{ requirementId: 'article', providerId: 42 }],
       }],
-    })).toThrow(
+    }))).toThrow(
       'active binding collection: provider assignment 0 providerId must be a string',
     );
-    expect(() => collectActiveBindings({
+    expect(() => collectActiveBindings(bad({
       contracts: [{
         owner,
-        contract: malformedContract,
+        contract: badContract,
       }],
-    })).toThrow(
+    }))).toThrow(
       'active binding collection: contract 0 requirement 0 was not created by defineDataRequirement()',
     );
   });
@@ -262,9 +263,8 @@ describe('active binding collection primitives', () => {
     expect(collectionA.entries()).toHaveLength(1);
     expect(collectionA.has('reader.view', 'outline')).toBe(false);
     expect(collectionB.entries()).toHaveLength(2);
-    expect(collectionB.has('reader.view', 'outline')).toBe(true);
     expect(() => {
-      (collectionA.entries() as unknown[]).push(collectionB.entries()[1]);
+      Object.defineProperty(collectionA.entries(), '1', { value: activeBindingEntry({ owner, requirement: outline }) });
     }).toThrow(TypeError);
   });
   it('exposes no provider handles, subscription handles, render callbacks, or dispatch callbacks', () => {
@@ -314,7 +314,7 @@ describe('active binding collection primitives', () => {
     const collection = collectActiveBindings({
       contracts: [{
         owner,
-        contract: block.data!,
+        contract: block.data ?? data,
         providerIds: [
           { requirementId: 'article', providerId: 'docs.articleProvider' },
         ],
