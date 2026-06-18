@@ -95,7 +95,7 @@ function standardBlockPreviewRenderCases() {
 }
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('publishes Blocks as a top-level DOGFOOD section with the requested pages', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 44 } });
@@ -106,7 +106,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       { key: KEY_NEXT_TAB },
       { key: KEY_NEXT_TAB },
     ], { ctx });
-    const model = result.model as any;
+    const model = result.model;
     const blocksModel = docsPageModel(model, 'blocks');
     const guideLabels = blocksModel.guideState.items.map((item: { label: string }) => item.label);
     const text = frameText(result.frames.at(-1)!);
@@ -129,7 +129,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
   it('opens the Block Preview group on the interactive CounterDemoBlock preview', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
 
     const result = await runScript(app, [{
       msg: {
@@ -154,7 +154,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(firstBlock).toBeDefined();
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'blocks-what-are-blocks' } } },
       { msg: { type: 'docs', msg: { type: 'guide-next' } } },
@@ -167,7 +167,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const blockName = firstBlock!.metadata.blockName;
 
     expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
-    expect(text).toContain(`${blockName}`);
+    expect(text).toContain(blockName);
     expect(text).toContain('lowering summary');
     expect(text).not.toContain('Available Blocks');
   });
@@ -177,7 +177,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(firstBlock).toBeDefined();
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [
       {
         msg: {
@@ -196,7 +196,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
   it('renders the pre-made block catalog without raw contract dumps', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
@@ -221,7 +221,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(readerBlock).toBeDefined();
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
@@ -292,7 +292,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
   it('does not tick the CounterDemoBlock fixture when another Blocks guide is selected', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
 
     const result = await runScript(app, [
       {
@@ -328,7 +328,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
   it('renders the selected standard block preview without stacking every block page', async () => {
     for (const block of standardBlockPreviewRenderCases()) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
-      const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+      const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
       const result = await runScript(app, [{
         msg: {
           type: 'docs',
@@ -390,16 +390,15 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
   it('resets the guide content scroll when selecting another block preview', async () => {
     const [firstBlock, secondBlock] = standardBlocks;
-    expect(firstBlock).toBeDefined();
-    expect(secondBlock).toBeDefined();
+    if (firstBlock == null || secondBlock == null) throw new Error('Expected two standard blocks');
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 60 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock!.metadata.blockName) },
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock.metadata.blockName) },
         },
       },
       { key: KEY_TAB },
@@ -407,21 +406,22 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: blockPreviewGuideId(secondBlock!.metadata.blockName) },
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(secondBlock.metadata.blockName) },
         },
       },
     ], { ctx });
-    const model = result.model as any;
-    const text = frameText(result.frames.at(-1)!);
-
+    const model = result.model;
+    const last = result.frames.at(-1);
+    if (!last) throw new Error('frame');
+    const text = frameText(last);
     expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
-    expect(text).toContain(`${secondBlock!.metadata.blockName}`);
+    expect(text).toContain(secondBlock.metadata.blockName);
     expect(text).toContain('lowering summary');
   });
 
   it('renders block lowering posture from the standard block mode declarations', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 54 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
 
     const result = await runScript(app, [{
       msg: {

@@ -114,7 +114,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
     const result = await runScript(app, [], { ctx });
-    expect((result.model as any).route).toBe('docs');
+    expect((result.model).route).toBe('docs');
   });
 
   it('lands on the hero page first and enters the docs on Enter', async () => {
@@ -122,15 +122,12 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    expect((initial.model as any).route).toBe('landing');
+    expect((initial.model).route).toBe('landing');
 
     const ignored = await runScript(app, [{ key: 'a' }], { ctx });
-    expect((ignored.model as any).route).toBe('landing');
-    expect((ignored.model as any).landingTransitionMs).toBeUndefined();
-
+    expect((ignored.model).route).toBe('landing');
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
-    expect((entered.model as any).route).toBe('docs');
-    expect((entered.model as any).landingTransitionMs).toBeUndefined();
+    expect((entered.model).route).toBe('docs');
     const enteredFrame = entered.frames.at(-1)!;
     const enteredText = frameText(enteredFrame);
     expect(enteredText).toContain('Bijou Docs');

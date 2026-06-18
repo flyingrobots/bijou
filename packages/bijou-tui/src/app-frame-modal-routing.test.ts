@@ -36,8 +36,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('toggles shell theme mode from the standard command palette entry', async () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
@@ -144,7 +144,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    [model] = app.update(shiftKey('n') as unknown as Msg, model);
+    [model] = app.update(shiftKey('n'), model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false } as unknown as Msg, model);
 
     expect((model as any).notificationCenterOpen).toBe(true);
@@ -209,7 +209,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    [model] = app.update(shiftKey('n') as unknown as NotificationMsg, model);
+    [model] = app.update(shiftKey('n'), model);
     let cmds: Cmd<FramedAppMsg<NotificationMsg>>[] = [];
     [model, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false } as unknown as NotificationMsg, model);
 
@@ -284,7 +284,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    [model] = app.update(shiftKey('n') as unknown as Msg, model);
+    [model] = app.update(shiftKey('n'), model);
     const surface = normalizeViewOutput(app.view(model), {
       width: 90,
       height: 18,
@@ -334,7 +334,7 @@ describe('createFramedApp', () => {
       let [model] = app.init();
       [model] = app.update(ctrlKey(','), model);
       [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
-      [model] = app.update(shiftKey('n') as unknown as Msg, model);
+      [model] = app.update(shiftKey('n'), model);
 
       const surface = normalizeViewOutput(app.view(model), {
         width: explicitCtx.runtime.columns,
@@ -365,7 +365,7 @@ describe('createFramedApp', () => {
     });
     if (runtimeMsg == null) throw new Error('expected runtime issue message');
 
-    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const [nextModel, cmds] = app.update(runtimeMsg, model);
     const tickMsg = await cmds[0]!(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,

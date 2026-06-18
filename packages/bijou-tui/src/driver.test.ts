@@ -83,7 +83,7 @@ describe('runScript', () => {
   });
 
   it('calls onFrame callback', async () => {
-    const captured: Array<{ frame: string; index: number }> = [];
+    const captured: { frame: string; index: number }[] = [];
     await runScript(counterApp, [{ key: '\x1b[A' }], {
       onFrame(frame, index) {
         captured.push({ frame: surfaceToString(frame, style), index });
@@ -110,7 +110,7 @@ describe('runScript', () => {
   });
 
   it('works with app that has init commands', async () => {
-    type Msg = { type: 'loaded'; data: string };
+    interface Msg { type: 'loaded'; data: string }
     interface Model { data: string; loaded: boolean }
 
     const app: App<Model, Msg> = {
@@ -119,8 +119,8 @@ describe('runScript', () => {
         return [{ data: '', loaded: false }, [cmd]];
       },
       update(msg, model) {
-        if ('data' in msg && (msg as Msg).type === 'loaded') {
-          return [{ data: (msg as Msg).data, loaded: true }, []];
+        if ('data' in msg && (msg).type === 'loaded') {
+          return [{ data: (msg).data, loaded: true }, []];
         }
         return [model, []];
       },
@@ -194,7 +194,7 @@ describe('runScript', () => {
   });
 
   it('emits custom msg steps', async () => {
-    type Msg = { type: 'inc' };
+    interface Msg { type: 'inc' }
     interface Model { count: number }
     const app: App<Model, Msg> = {
       init: () => [{ count: 0 }, []],
@@ -393,7 +393,7 @@ describe('runScript', () => {
       disposeCalls += 1;
     };
 
-    const app: App<string, never> = {
+    const app: App<string> = {
       init: () => ['cleanup', [() => cleanup]],
       update: (_msg, model) => [model, []],
       view: (model) => textView(model),

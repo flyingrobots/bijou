@@ -3,6 +3,12 @@ import type { GroupFieldResult } from './types.js';
 /** Maximum number of wizard steps before throwing to prevent infinite loops. */
 const MAX_WIZARD_STEPS = 1000;
 
+type MaybePromise<T> = T | Promise<T>;
+type WizardField<T, K extends keyof T> = (values: Partial<T>) => MaybePromise<T[K]>;
+type NoWizardTransform = ReturnType<() => void>;
+type WizardTransform<T, K extends keyof T> =
+  (values: Partial<T>) => WizardField<T, K> | NoWizardTransform;
+
 /**
  * Single step in a multi-step wizard form.
  *
@@ -12,8 +18,8 @@ const MAX_WIZARD_STEPS = 1000;
 export interface WizardStep<T, K extends keyof T = keyof T> {
   /** Key in the result record where this step's value is stored. */
   key: K;
-  /** Async field function that receives previously collected values and returns this step's value. */
-  field: (values: Partial<T>) => Promise<T[K]>;
+  /** Field function that receives previously collected values and returns this step's value. */
+  field: WizardField<T, K>;
   /** Predicate that, when returning `true`, causes this step to be skipped. */
   skip?: (values: Partial<T>) => boolean;
   /**
@@ -21,7 +27,7 @@ export interface WizardStep<T, K extends keyof T = keyof T> {
    * (which will be called instead of the original `field`), or void
    * to keep the original.
    */
-  transform?: (values: Partial<T>) => ((values: Partial<T>) => Promise<T[K]>) | void;
+  transform?: WizardTransform<T, K>;
   /**
    * Called after value collection. Returns additional steps to splice
    * in immediately after the current step.
@@ -65,16 +71,19 @@ export interface WizardOptions<T extends Record<string, unknown>> {
 export async function wizard<T extends Record<string, unknown>>(
   options: WizardOptions<T>,
 ): Promise<GroupFieldResult<T>> {
-  const values = {} as T;
+  const values: Partial<T> = {};
   const steps = [...options.steps];
 
   let i = 0;
   let iterations = 0;
   while (i < steps.length) {
     if (++iterations > MAX_WIZARD_STEPS) {
-      throw new Error(`Wizard exceeded ${MAX_WIZARD_STEPS} steps — possible infinite loop`);
+      throw new Error(`Wizard exceeded ${String(MAX_WIZARD_STEPS)} steps — possible infinite loop`);
     }
-    const step = steps[i]!;
+    const step = steps[i];
+    if (step == null) {
+      throw new Error(`Wizard step ${String(i)} is missing`);
+    }
 
     // Skip check
     if (step.skip?.(values)) {
@@ -93,7 +102,7 @@ export async function wizard<T extends Record<string, unknown>>(
 
     // Collect value
     const result = await fieldFn(values);
-    (values as Record<string, unknown>)[step.key as string] = result;
+    values[step.key] = result;
 
     // Branch: splice in additional steps after current position
     if (step.branch) {
@@ -106,5 +115,15 @@ export async function wizard<T extends Record<string, unknown>>(
     i++;
   }
 
+  assertCollectedWizardValues(values);
   return { values, cancelled: false };
+}
+
+function assertCollectedWizardValues<T extends Record<string, unknown>>(
+  _values: Partial<T>,
+): asserts _values is T {
+  // Preserve the historical GroupFieldResult<T> return contract; skipped steps
+  // may still leave keys absent at runtime.
+  void _values;
+  return;
 }

@@ -27,9 +27,7 @@ export interface DTCGGroup {
 }
 
 /** A top-level DTCG document containing token groups and/or individual tokens. */
-export interface DTCGDocument {
-  [key: string]: DTCGToken | DTCGGroup;
-}
+export type DTCGDocument = Record<string, DTCGToken | DTCGGroup>;
 
 // --- Helpers ---
 
@@ -148,7 +146,7 @@ function toGradientStops(value: unknown, doc: DTCGDocument): GradientStop[] {
     const color = Array.isArray(s['color'])
       ? (s['color'] as RGB)
       : typeof s['color'] === 'string'
-        ? hexToRgb(s['color'] as string)
+        ? hexToRgb(s['color'])
         : [0, 0, 0] as RGB;
     return { pos, color };
   });
@@ -272,15 +270,19 @@ function gradientToDTCG(stops: GradientStop[]): DTCGToken {
 }
 
 /**
- * Convert a record of TokenValues into a DTCGGroup.
- * @template K - String keys of the record.
+ * Convert a record of values into a DTCGGroup.
+ * @template V - Values in the record.
  * @param record - Record to convert.
- * @returns DTCGGroup with each key mapped to a DTCG color token.
+ * @param convert - Converts each record value into a DTCG token.
+ * @returns DTCGGroup with each key mapped to a DTCG token.
  */
-function recordToDTCGGroup<K extends string>(record: Record<K, TokenValue>): DTCGGroup {
+function recordToDTCGGroup<V>(
+  record: Readonly<Record<string, V>>,
+  convert: (value: V) => DTCGToken,
+): DTCGGroup {
   const group: DTCGGroup = {};
-  for (const [key, value] of Object.entries(record) as Array<[string, TokenValue]>) {
-    group[key] = tokenToDTCG(value);
+  for (const [key, value] of Object.entries(record)) {
+    group[key] = convert(value);
   }
   return group;
 }
@@ -294,17 +296,12 @@ export function toDTCG(theme: Theme): DTCGDocument {
   const doc: DTCGDocument = {};
 
   doc['name'] = { $type: 'string', $value: theme.name };
-  doc['status'] = recordToDTCGGroup(theme.status);
-  doc['semantic'] = recordToDTCGGroup(theme.semantic);
-  doc['border'] = recordToDTCGGroup(theme.border);
-  doc['ui'] = recordToDTCGGroup(theme.ui);
-  doc['surface'] = recordToDTCGGroup(theme.surface);
-
-  const gradientDoc: DTCGGroup = {};
-  for (const [key, stops] of Object.entries(theme.gradient) as Array<[string, GradientStop[]]>) {
-    gradientDoc[key] = gradientToDTCG(stops);
-  }
-  doc['gradient'] = gradientDoc;
+  doc['status'] = recordToDTCGGroup(theme.status, tokenToDTCG);
+  doc['semantic'] = recordToDTCGGroup(theme.semantic, tokenToDTCG);
+  doc['border'] = recordToDTCGGroup(theme.border, tokenToDTCG);
+  doc['ui'] = recordToDTCGGroup(theme.ui, tokenToDTCG);
+  doc['surface'] = recordToDTCGGroup(theme.surface, tokenToDTCG);
+  doc['gradient'] = recordToDTCGGroup(theme.gradient, gradientToDTCG);
 
   return doc;
 }

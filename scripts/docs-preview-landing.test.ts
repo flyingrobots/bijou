@@ -48,11 +48,11 @@ describe('docs preview app', () => {
     let cmds: any[] = [];
 
     [model, cmds] = app.update(keyMsg('escape'), model);
-    expect((model as any).landingQuitConfirmOpen).toBe(true);
+    expect((model).landingQuitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
     [model, cmds] = app.update(keyMsg('y'), model);
-    expect((model as any).landingQuitConfirmOpen).toBe(false);
+    expect((model).landingQuitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
     const returned = await cmds[0]!(() => {}, {
@@ -69,10 +69,10 @@ describe('docs preview app', () => {
 
     let [model] = app.init();
     [model] = app.update(keyMsg('escape'), model);
-    expect((model as any).landingQuitConfirmOpen).toBe(true);
+    expect((model).landingQuitConfirmOpen).toBe(true);
 
     [model] = app.update(keyMsg('n'), model);
-    expect((model as any).landingQuitConfirmOpen).toBe(false);
+    expect((model).landingQuitConfirmOpen).toBe(false);
   });
 
   it('quits immediately from the landing screen in pipe mode', async () => {
@@ -98,7 +98,7 @@ describe('docs preview app', () => {
     const initial = await runScript(app, [], { ctx });
     const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
 
-    expect((pulsed.model as any).route).toBe('landing');
+    expect((pulsed.model).route).toBe('landing');
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
@@ -207,7 +207,7 @@ describe('docs preview app', () => {
 
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
-    expect((pulsed.model as any).landingFps).toBe(54);
+    expect((pulsed.model).landingFps).toBe(54);
     const footer = frameText(pulsed.frames[pulsed.frames.length - 1]!).split('\n')[pulsed.frames[pulsed.frames.length - 1]!.height - 1] ?? '';
     expect(footer).toContain('54 fps • auto/full');
   });
@@ -217,14 +217,14 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const opened = await runScript(app, [{ key: KEY_BACKTICK }], { ctx });
-    expect((opened.model as any).route).toBe('landing');
-    expect((opened.model as any).docsModel.perfHudOpen).toBe(true);
+    expect((opened.model).route).toBe('landing');
+    expect((opened.model).docsModel.perfHudOpen).toBe(true);
     const openedText = frameText(opened.frames.at(-1)!);
     expect(openedText).toContain('Perf HUD');
     expect(openedText).toContain('view');
     expect(openedText).toContain('diff');
 
-    const timedModel = opened.model as any;
+    const timedModel = opened.model;
     const timedFrame = normalizeViewOutput(app.view({
       ...timedModel,
       docsModel: {
@@ -241,8 +241,8 @@ describe('docs preview app', () => {
     expect(timedText).not.toContain('frame 0.00 ms');
 
     const closed = await runScript(app, [{ key: KEY_BACKTICK }, { key: KEY_BACKTICK }], { ctx });
-    expect((closed.model as any).route).toBe('landing');
-    expect((closed.model as any).docsModel.perfHudOpen).toBe(false);
+    expect((closed.model).route).toBe('landing');
+    expect((closed.model).docsModel.perfHudOpen).toBe(false);
     expect(frameText(closed.frames.at(-1)!)).not.toContain('Perf HUD');
   });
 
@@ -255,13 +255,13 @@ describe('docs preview app', () => {
     const cycledRight = await runScript(app, [{ key: KEY_RIGHT }], { ctx });
     const cycledLeft = await runScript(app, [{ key: KEY_LEFT }], { ctx });
 
-    expect((numbered.model as any).landingThemeIndex).toBe(2);
-    expect(activeDocsPageModel(numbered.model as any).landingThemeIndex).toBe(2);
-    expect((cycledRight.model as any).landingThemeIndex).toBe(1);
-    expect(activeDocsPageModel(cycledRight.model as any).landingThemeIndex).toBe(1);
-    expect((cycledLeft.model as any).landingThemeIndex).toBe(5);
-    expect(activeDocsPageModel(cycledLeft.model as any).landingThemeIndex).toBe(5);
-    expect((cycledLeft.model as any).docsModel.activeShellThemeId).toBe('verdant-plum');
+    expect((numbered.model).landingThemeIndex).toBe(2);
+    expect(activeDocsPageModel(numbered.model).landingThemeIndex).toBe(2);
+    expect((cycledRight.model).landingThemeIndex).toBe(1);
+    expect(activeDocsPageModel(cycledRight.model).landingThemeIndex).toBe(1);
+    expect((cycledLeft.model).landingThemeIndex).toBe(5);
+    expect(activeDocsPageModel(cycledLeft.model).landingThemeIndex).toBe(5);
+    expect((cycledLeft.model).docsModel.activeShellThemeId).toBe('verdant-plum');
 
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
@@ -300,8 +300,8 @@ describe('docs preview app', () => {
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
     const openedText = frameText(opened.frames.at(-1)!);
 
-    expect((opened.model as any).route).toBe('docs');
-    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect((opened.model).route).toBe('docs');
+    expect((opened.model).themeInspectorOpen).toBe(true);
     expect(openedText).toContain('Theme Inspector');
     expect(openedText).toContain('Active: DOGFOOD / Dark');
     expect(openedText).toContain('semantic.primary');
@@ -309,7 +309,7 @@ describe('docs preview app', () => {
     expect(openedText).toContain('safe pairs pass');
 
     const closed = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: KEY_F10 }], { ctx });
-    expect((closed.model as any).themeInspectorOpen).toBe(false);
+    expect((closed.model).themeInspectorOpen).toBe(false);
     expect(frameText(closed.frames.at(-1)!)).not.toContain('Theme Inspector');
   });
 
@@ -320,7 +320,7 @@ describe('docs preview app', () => {
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
     const frame = opened.frames.at(-1)!;
 
-    expect((opened.model as any).themeInspectorOpen).toBe(true);
+    expect((opened.model).themeInspectorOpen).toBe(true);
     expect(frame.width).toBe(30);
     expect(frame.height).toBe(18);
     expect(frameText(frame)).toContain('Theme Inspector');
@@ -332,8 +332,8 @@ describe('docs preview app', () => {
 
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: 'q' }], { ctx });
 
-    expect((opened.model as any).themeInspectorOpen).toBe(false);
-    expect((opened.model as any).docsModel.quitConfirmOpen).toBe(true);
+    expect((opened.model).themeInspectorOpen).toBe(false);
+    expect((opened.model).docsModel.quitConfirmOpen).toBe(true);
     expect(frameText(opened.frames.at(-1)!)).toContain('Quit?');
   });
 
@@ -348,8 +348,8 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
     ], { ctx });
 
-    expect((scrolled.model as any).themeInspectorOpen).toBe(true);
-    expect((scrolled.model as any).themeInspectorScrollY).toBeGreaterThan(0);
+    expect((scrolled.model).themeInspectorOpen).toBe(true);
+    expect((scrolled.model).themeInspectorScrollY).toBeGreaterThan(0);
     expect(frameText(scrolled.frames.at(-1)!)).toContain('Theme Inspector');
 
     const restored = await runScript(app, [
@@ -360,8 +360,8 @@ describe('docs preview app', () => {
       { key: KEY_UP },
     ], { ctx });
 
-    expect((restored.model as any).themeInspectorOpen).toBe(true);
-    expect((restored.model as any).themeInspectorScrollY).toBeLessThan((scrolled.model as any).themeInspectorScrollY);
+    expect((restored.model).themeInspectorOpen).toBe(true);
+    expect((restored.model).themeInspectorScrollY).toBeLessThan((scrolled.model).themeInspectorScrollY);
   });
 
   it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
@@ -374,7 +374,7 @@ describe('docs preview app', () => {
     const result = await runScript(app, [], { ctx });
     const text = frameText(result.frames.at(-1)!);
 
-    expect((result.model as any).docsModel.activePageId).toBe('themes');
+    expect((result.model).docsModel.activePageId).toBe('themes');
     expect(text).toContain('Theme Lab');
     expect(text).toContain('Default dark preset: bijou-dark');
     expect(text).toContain('Default light preset: bijou-light');

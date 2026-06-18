@@ -33,17 +33,17 @@ function blockPreviewGuideId(blockName: string): string {
   return `blocks-preview-${slug || 'family'}`;
 }
 
-type FrameCell = {
+interface FrameCell {
   readonly char?: string;
   readonly fg?: string | { readonly hex?: string };
   readonly modifiers?: readonly string[];
-};
+}
 
-type FrameLike = {
+interface FrameLike {
   readonly width: number;
   readonly height: number;
   get(x: number, y: number): FrameCell;
-};
+}
 
 function frameText(frame: FrameLike) {
   let text = '';
@@ -62,7 +62,7 @@ function rowsFor(text: string): readonly string[] {
 
 async function renderBlocksGuide(guideId: string, columns = 150, rows = 43) {
   const ctx = createTestContext({ mode: 'interactive', runtime: { columns, rows } });
-  const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+  const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
   const result = await runScript(app, [{
     msg: {
       type: 'docs',
@@ -84,7 +84,7 @@ async function renderBlocksGuideWithRealAnsi(guideId: string, columns = 150, row
     runtime: { columns, rows },
     style: chalkStyle({ level: 3 }),
   });
-  const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+  const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
   const result = await runScript(app, [{
     msg: {
       type: 'docs',
@@ -156,7 +156,7 @@ function standardBlockNamed(blockName: string) {
 }
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the full docs-app preview regression sample bounded as the block catalog grows', () => {
     expect(PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES).toHaveLength(3);
@@ -196,7 +196,7 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
       const { text } = await renderBlocksGuide(blockPreviewGuideId(block.metadata.blockName), 150, 43);
       const previewRegion = textBefore(text, 'documentation');
 
-      expect(text).toContain(`${block.metadata.blockName}`);
+      expect(text).toContain(block.metadata.blockName);
       expect(previewRegion).toContain(block.metadata.blockName);
       expect(previewRegion).toContain('lowering summary');
       expect(previewRegion).toContain('interactive mode');
@@ -293,7 +293,7 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
 
   it('keeps the shell-owned perf HUD toggle available from block preview pages', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const toggled = await runScript(app, [
       {
         msg: {

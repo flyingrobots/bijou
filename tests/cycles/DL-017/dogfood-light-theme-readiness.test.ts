@@ -1,24 +1,23 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { doctorTheme, type Surface } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { parseKey } from '@flyingrobots/bijou-tui';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
-import {
-  createScriptTestContext as createTestContext,
-  runScriptDeterministic as runScript,
-} from '../../helpers/scripted.js';
+import { createScriptTestContext as createTestContext } from '../../helpers/scripted.js';
 import {
   DOGFOOD_SHELL_THEMES,
   DOGFOOD_THEME_SAFE_PAIRS,
 } from '../../../examples/docs/dogfood-shell-themes.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
+import { runKeysDeterministically } from './dogfood-light-theme-readiness.test-support.js';
 
 const DRAWER_BORDER_CHARS = new Set(['┌', '┐', '└', '┘', '│', '─']);
-const KEY_F2 = { key: '\x1bOQ' };
-const KEY_DOWN = { key: '\x1b[B' };
-const KEY_ENTER = { key: '\r' };
-const KEY_ESCAPE = { key: '\x1b' };
-const KEY_CTRL_P = { key: '\x10' };
-const KEY_Q = { key: 'q' };
+const KEY_F2 = parseKey('\x1bOQ');
+const KEY_DOWN = parseKey('\x1b[B');
+const KEY_ENTER = parseKey('\r');
+const KEY_ESCAPE = parseKey('\x1b');
+const KEY_CTRL_P = parseKey('\x10');
+const KEY_Q = parseKey('q');
 const MSG_CTRL_T = { type: 'key', key: 't', ctrl: true, alt: false, shift: false } as const;
 const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false } as const;
 
@@ -29,15 +28,12 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const result = await runScript(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
-    ], { ctx });
-    const model = result.model as {
-      docsModel: { activeShellThemeId?: string };
-    };
-    const frame = normalizeViewOutput(app.view(result.model), {
+    ]);
+    const frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
@@ -54,17 +50,14 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const result = await runScript(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
       KEY_ESCAPE,
       KEY_Q,
-    ], { ctx });
-    const model = result.model as {
-      docsModel: { activeShellThemeId?: string };
-    };
-    const frame = normalizeViewOutput(app.view(result.model), {
+    ]);
+    const frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
@@ -81,17 +74,14 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const result = await runScript(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
       KEY_ESCAPE,
       KEY_CTRL_P,
-    ], { ctx });
-    const model = result.model as {
-      docsModel: { activeShellThemeId?: string };
-    };
-    const frame = normalizeViewOutput(app.view(result.model), {
+    ]);
+    const frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;

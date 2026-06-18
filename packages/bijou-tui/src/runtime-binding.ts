@@ -101,7 +101,7 @@ export function runtimeViewBindingSource(
 
 export function runtimeCommandIntentEmission(
   intent: CommandIntent,
-): RuntimeCommandIntentEmission<undefined>;
+): RuntimeCommandIntentEmission;
 export function runtimeCommandIntentEmission<Payload>(
   intent: CommandIntent<Payload>,
   payload: Payload,
@@ -325,7 +325,7 @@ function freezeProviderAssignments(
     const requirementId = normalizeRequiredText({
       scope: 'runtime binding source',
       field: `provider assignment ${index} requirementId`,
-      value: assignment['requirementId'],
+      value: assignment.requirementId,
     });
     if (seenRequirementIds.has(requirementId)) {
       throw new Error(
@@ -339,7 +339,7 @@ function freezeProviderAssignments(
       providerId: normalizeRequiredText({
         scope: 'runtime binding source',
         field: `provider assignment ${index} providerId`,
-        value: assignment['providerId'],
+        value: assignment.providerId,
       }),
     });
   }));
@@ -358,7 +358,7 @@ function freezeRuntimePayload<Payload>(
 function cloneRuntimePayload<Payload>(
   value: Payload,
   path: string,
-  seen: WeakSet<object> = new WeakSet<object>(),
+  seen = new WeakSet(),
 ): Payload {
   if (
     value === null
@@ -433,7 +433,7 @@ function cloneRuntimePayload<Payload>(
 
 function deepFreeze<Payload>(
   value: Payload,
-  seen: WeakSet<object> = new WeakSet<object>(),
+  seen = new WeakSet(),
 ): DeepReadonly<Payload> {
   if (value === null || typeof value !== 'object') {
     return value as DeepReadonly<Payload>;

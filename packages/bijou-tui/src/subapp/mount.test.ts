@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createSubAppAdapter, initSubApp, mount, mapCmds, updateSubApp } from './mount.js';
-import type { App, Cmd, QuitSignal } from '../types.js';
+import type { App, Cmd } from '../types.js';
 import { QUIT } from '../types.js';
 import { createSurface } from '@flyingrobots/bijou';
 
@@ -47,8 +47,8 @@ describe('mapCmds', () => {
   });
 
   it('maps emitted messages to the parent type', async () => {
-    type SubMsg = { sub: true; val: number };
-    type ParentMsg = { parent: true; val: number };
+    interface SubMsg { sub: true; val: number }
+    interface ParentMsg { parent: true; val: number }
 
     const cmd: Cmd<SubMsg> = async (emit) => {
       emit({ sub: true, val: 1 });
@@ -69,17 +69,16 @@ describe('mapCmds', () => {
     expect(result).toEqual({ parent: true, val: 2 });
   });
 
-  it('passes QUIT signals through unaltered', async () => {
-    const cmd: Cmd<any> = () => QUIT as QuitSignal;
-    const mapped = mapCmds([cmd], (m) => m);
-
-    const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
+  it('QUIT', async () => {
+    const cmd: Cmd<never> = () => QUIT;
+    const mapped = mapCmds([cmd], (m) => m).at(0);
+    if (!mapped) throw new Error('missing');
+    const result = await mapped(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(QUIT);
   });
 
   it('passes cleanup handles through unaltered', async () => {
-    type SubMsg = { sub: true; val: number };
-    type ParentMsg = { parent: true; val: number };
+    interface SubMsg { sub: true; val: number }
     const dispose = vi.fn();
     const handle = { dispose };
 
@@ -94,8 +93,7 @@ describe('mapCmds', () => {
 
 describe('initSubApp', () => {
   it('returns the child model and mapped init commands', async () => {
-    type SubMsg = { type: 'ready'; value: number };
-    type ParentMsg = { type: 'child'; value: number };
+    interface SubMsg { type: 'ready'; value: number }
 
     const child: App<number, SubMsg> = {
       init: () => [7, [async () => ({ type: 'ready', value: 7 })]],
@@ -115,8 +113,7 @@ describe('initSubApp', () => {
 
 describe('updateSubApp', () => {
   it('maps returned commands into the parent message space', async () => {
-    type SubMsg = { type: 'inc' };
-    type ParentMsg = { type: 'left'; inner: SubMsg };
+    interface SubMsg { type: 'inc' }
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
@@ -137,12 +134,11 @@ describe('updateSubApp', () => {
   });
 
   it('passes QUIT through when mapping child commands', async () => {
-    type SubMsg = { type: 'noop' };
-    type ParentMsg = { type: 'parent-noop' };
+    interface SubMsg { type: 'noop' }
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
-      update: (_msg, model) => [model, [() => QUIT as QuitSignal]],
+      update: (_msg, model) => [model, [() => QUIT]],
       view: () => createSurface(1, 1),
     };
 

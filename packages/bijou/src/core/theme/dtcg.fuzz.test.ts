@@ -41,7 +41,7 @@ const gradientArb: fc.Arbitrary<GradientStop[]> = fc.array(
       fc.integer({ min: 0, max: 255 }),
       fc.integer({ min: 0, max: 255 }),
       fc.integer({ min: 0, max: 255 }),
-    ) as fc.Arbitrary<[number, number, number]>,
+    ),
   }),
   { minLength: 1, maxLength: 5 },
 );
@@ -58,11 +58,11 @@ function buildTheme(
   return {
     name,
     status: makeRecord(STATUS_KEYS),
-    semantic: makeRecord(SEMANTIC_KEYS) as Theme['semantic'],
-    gradient: gradients as Record<BaseGradientKey, GradientStop[]>,
-    border: makeRecord(BORDER_KEYS) as Theme['border'],
+    semantic: makeRecord(SEMANTIC_KEYS),
+    gradient: gradients,
+    border: makeRecord(BORDER_KEYS),
     ui: makeRecord(UI_KEYS),
-    surface: makeRecord(SURFACE_KEYS) as Theme['surface'],
+    surface: makeRecord(SURFACE_KEYS),
   };
 }
 
@@ -133,12 +133,12 @@ describe('DTCG fuzz (property-based)', () => {
     const depth = 7;
     const doc: DTCGDocument = {
       name: { $type: 'string', $value: 'chain-test' },
-      status: {} as any,
-      semantic: {} as any,
+      status: {},
+      semantic: {},
       gradient: { brand: { $type: 'gradient', $value: [{ pos: 0, color: [0, 0, 0] }, { pos: 1, color: [255, 255, 255] }] } },
-      border: {} as any,
-      ui: {} as any,
-      surface: {} as any,
+      border: {},
+      ui: {},
+      surface: {},
     };
 
     // Create chain tokens in status: chain_0 → chain_1 → ... → chain_N (concrete)

@@ -50,7 +50,7 @@ describe('animate', () => {
 
       const emitted: number[] = [];
       const caps = createMockCaps();
-      await cmd((msg) => emitted.push(msg as number), caps);
+      await cmd((msg) => emitted.push(msg), caps);
       expect(frames).toEqual([100]);
       expect(emitted).toEqual([100]);
     });
@@ -73,14 +73,14 @@ describe('animate', () => {
       const caps = createMockCaps();
       
       let settled = false;
-      const promise = Promise.resolve(cmd((msg) => emitted.push(msg as number), caps)).then(() => {
+      const promise = Promise.resolve(cmd((msg) => emitted.push(msg), caps)).then(() => {
         settled = true;
       });
       
       // Manually pulse until done (or safety limit)
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
-        await new Promise<void>((resolve) => queueMicrotask(resolve));
+        await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
       
       await promise;
@@ -111,7 +111,7 @@ describe('animate', () => {
       // Pulse
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
-        await new Promise<void>((resolve) => queueMicrotask(resolve));
+        await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
       
       await promise;
@@ -144,7 +144,7 @@ describe('animate', () => {
 
       for (let i = 0; i < 240 && !settled; i++) {
         caps.pulse(1);
-        await new Promise<void>((resolve) => queueMicrotask(resolve));
+        await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
 
       expect(settled).toBe(true);
@@ -200,7 +200,7 @@ describe('animate', () => {
 
       const emitted: number[] = [];
       const caps = createMockCaps();
-      await cmd((msg) => emitted.push(msg as number), caps);
+      await cmd((msg) => emitted.push(msg), caps);
       expect(frames).toEqual([50]);
       expect(emitted).toEqual([50]);
     });

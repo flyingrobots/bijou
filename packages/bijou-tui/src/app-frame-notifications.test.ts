@@ -27,8 +27,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('dispatches selected custom commandItems actions', async () => {
     const app = createFramedApp({
@@ -199,7 +199,7 @@ describe('createFramedApp', () => {
     const originalTheme = explicitCtx.theme;
     const originalTokenGraph = explicitCtx.tokenGraph;
     const alternateTheme = createAlternateShellTheme(explicitCtx);
-    const emitted: Array<{ readonly id: string; readonly ctx: BijouContext }> = [];
+    const emitted: { readonly id: string; readonly ctx: BijouContext }[] = [];
 
     _resetDefaultContextForTesting();
     try {
@@ -243,14 +243,14 @@ describe('createFramedApp', () => {
     const originalTheme = explicitCtx.theme;
     const originalTokenGraph = explicitCtx.tokenGraph;
     const alternateTheme = createAlternateShellTheme(explicitCtx);
-    const emitted: Array<{
+    const emitted: {
       readonly shellThemeId: string | undefined;
       readonly modeId: string | undefined;
       readonly id: string;
       readonly shellThemeSpecId: string;
       readonly themeName: string;
       readonly ctx: BijouContext;
-    }> = [];
+    }[] = [];
 
     _resetDefaultContextForTesting();
     try {
@@ -319,11 +319,11 @@ describe('createFramedApp', () => {
   it('toggles the active shell theme family mode with ctrl+t', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const alternateTheme = createAlternateShellTheme(explicitCtx);
-    const emitted: Array<{
+    const emitted: {
       readonly id: string;
       readonly shellThemeId: string | undefined;
       readonly modeId: string | undefined;
-    }> = [];
+    }[] = [];
 
     _resetDefaultContextForTesting();
     try {

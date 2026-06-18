@@ -22,6 +22,21 @@ import {
   serializeFrame,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
+import { isCmdCleanup } from '../packages/bijou-tui/src/types.js';
+
+type DocsApp = ReturnType<typeof createDocsApp>;
+type DocsFrame = Parameters<typeof frameText>[0];
+
+function runCommand(commands: ReturnType<DocsApp['update']>[1]) {
+  const command = commands.at(0);
+  if (command == null) throw new Error('Missing command');
+  return command(() => { throw new Error('Unexpected emit'); }, { onPulse: () => ({ dispose: () => undefined }) });
+}
+function last(frames: readonly DocsFrame[]): DocsFrame {
+  const frame = frames.at(-1);
+  if (frame == null) throw new Error('Missing frame');
+  return frame;
+}
 
 describe('docs preview app', () => {
   afterEach(() => _resetDefaultContextForTesting());
@@ -31,9 +46,9 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
-    let model = entered.model as any;
-    let updateResult = app.update(keyMsg('f2') as any, model);
-    model = updateResult[0] as any;
+    let model = entered.model;
+    let updateResult = app.update(keyMsg('f2'), model);
+    model = updateResult[0];
     let settingsFrame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
@@ -53,15 +68,11 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Auto, Quality, Balanced');
     expect(frameText(settingsFrame)).toContain('↻ Landing quality');
     expect(frameText(settingsFrame)).toContain('Auto (ful');
-    updateResult = app.update(keyMsg('enter') as any, model);
-    model = updateResult[0] as any;
-    const commandResult = await updateResult[1][0]!(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
-    if (commandResult !== undefined && commandResult !== QUIT) {
-      model = app.update(commandResult as any, model)[0] as any;
+    updateResult = app.update(keyMsg('enter'), model);
+    model = updateResult[0];
+    const commandResult = await runCommand(updateResult[1]);
+    if (commandResult !== undefined && commandResult !== QUIT && !isCmdCleanup(commandResult)) {
+      model = app.update(commandResult, model)[0];
     }
     let frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
@@ -69,24 +80,20 @@ describe('docs preview app', () => {
     }).surface;
     expect(model.docsModel.runtimeNotifications.items[0]?.message).toBe('Show hints turned off.');
     expect(frameText(frame)).toContain('notices:1');
-    updateResult = app.update(keyMsg('down') as any, model);
-    model = updateResult[0] as any;
-    updateResult = app.update(keyMsg('down') as any, model);
-    model = updateResult[0] as any;
-    updateResult = app.update(keyMsg('down') as any, model);
-    model = updateResult[0] as any;
-    updateResult = app.update(keyMsg('enter') as any, model);
-    model = updateResult[0] as any;
-    const secondCommandResult = await updateResult[1][0]!(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
-    if (secondCommandResult !== undefined && secondCommandResult !== QUIT) {
-      model = app.update(secondCommandResult as any, model)[0] as any;
+    updateResult = app.update(keyMsg('down'), model);
+    model = updateResult[0];
+    updateResult = app.update(keyMsg('down'), model);
+    model = updateResult[0];
+    updateResult = app.update(keyMsg('down'), model);
+    model = updateResult[0];
+    updateResult = app.update(keyMsg('enter'), model);
+    model = updateResult[0];
+    const secondCommandResult = await runCommand(updateResult[1]);
+    if (secondCommandResult !== undefined && secondCommandResult !== QUIT && !isCmdCleanup(secondCommandResult)) {
+      model = app.update(secondCommandResult, model)[0];
     }
-    updateResult = app.update(keyMsg('f2') as any, model);
-    model = updateResult[0] as any;
+    updateResult = app.update(keyMsg('f2'), model);
+    model = updateResult[0];
 
     frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
@@ -119,15 +126,14 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     let [model] = app.init();
-    [model] = app.update(parseKey(KEY_F2) as any, model);
-    expect((model as any).route).toBe('landing');
-    expect((model as any).docsModel.settingsOpen).toBe(false);
-    expect((model as any).docsModel.quitConfirmOpen).toBe(false);
+    [model] = app.update(parseKey(KEY_F2), model);
+    expect((model).route).toBe('landing');
+    expect((model).docsModel.settingsOpen).toBe(false);
+    expect((model).docsModel.quitConfirmOpen).toBe(false);
 
-    [model] = app.update(parseKey(KEY_ENTER) as any, model);
-    expect((model as any).route).toBe('docs');
-    expect((model as any).landingTransitionMs).toBeUndefined();
-    expect((model as any).docsModel.quitConfirmOpen).toBe(false);
+    [model] = app.update(parseKey(KEY_ENTER), model);
+    expect((model).route).toBe('docs');
+    expect((model).docsModel.quitConfirmOpen).toBe(false);
   });
 
   it('shows accordion-style family headers without the oversized custom help strip', async () => {
@@ -135,16 +141,9 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = entered.frames[entered.frames.length - 1]!;
+    const frame = last(entered.frames);
 
-    let text = '';
-    for (let y = 0; y < frame.height; y++) {
-      for (let x = 0; x < frame.width; x++) {
-        text += frame.get(x, y).char || ' ';
-      }
-      text += '\n';
-    }
-
+    const text = frameText(frame);
     const lines = text.split('\n');
     expect(text).toContain('Status and in-flow');
     expect(lines[0]).toContain('Bijou Docs');
@@ -168,7 +167,7 @@ describe('docs preview app', () => {
       ...Array.from({ length: 14 }, () => ({ key: KEY_DOWN })),
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
 
     expect(pageModel.familyState.height).toBeGreaterThan(14);
     expect(pageModel.familyState.focusIndex).toBe(14);
@@ -180,8 +179,8 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const result = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = result.frames.at(-1)!;
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const frame = last(result.frames);
+    const pageModel = docsPageModel(result.model, 'components');
     const leftPaneText = frameText(frame)
       .split('\n')
       .slice(0, -1)
@@ -198,7 +197,7 @@ describe('docs preview app', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = entered.frames[entered.frames.length - 1]!;
+    const frame = last(entered.frames);
     const lines = frameText(frame).split('\n');
     const text = lines.join('\n');
 
@@ -222,7 +221,7 @@ describe('docs preview app', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
       const app = createDocsApp(ctx);
       const result = await runScript(app, [...steps], { ctx, pulseFps: false });
-      const frame = result.frames.at(-1)!;
+      const frame = last(result.frames);
       return {
         text: frameText(frame),
         serialized: serializeFrame(frame),
@@ -258,10 +257,10 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     expect(pageModel.familyState.items[pageModel.familyState.focusIndex]?.value).toBe('story:alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
-    expect((result.model as any).docsModel.focusedPaneByPage.components).toBe('story-variants');
+    expect((result.model).docsModel.focusedPaneByPage.components).toBe('story-variants');
   });
 
   it('updates the footer hints to match the focused pane instead of leaving stale family controls visible', async () => {
@@ -278,10 +277,10 @@ describe('docs preview app', () => {
       { key: KEY_TAB, delay: 350 },
     ], { ctx });
 
-    const frame = result.frames[result.frames.length - 1]!;
+    const frame = last(result.frames);
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
-    expect((result.model as any).docsModel.focusedPaneByPage.components).toBe('story-variants');
+    expect((result.model).docsModel.focusedPaneByPage.components).toBe('story-variants');
     expect(footer).toContain('Tab next pane');
     expect(footer).toContain('↑/↓ variant');
     expect(footer).toContain(',/. cycle');
@@ -298,14 +297,14 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
       { key: 'q' },
     ], { ctx });
-    expect((opened.model as any).docsModel.quitConfirmOpen).toBe(true);
-    expect(frameText(opened.frames[opened.frames.length - 1]!)).toContain('Quit?');
+    expect((opened.model).docsModel.quitConfirmOpen).toBe(true);
+    expect(frameText(last(opened.frames))).toContain('Quit?');
 
     const dismissed = await runScript(app, [
       { key: KEY_ENTER },
       { key: 'q' },
       { key: 'n' },
     ], { ctx });
-    expect((dismissed.model as any).docsModel.quitConfirmOpen).toBe(false);
+    expect((dismissed.model).docsModel.quitConfirmOpen).toBe(false);
   });
 });

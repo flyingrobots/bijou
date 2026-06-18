@@ -18,7 +18,7 @@ describe('run', () => {
     it('waits for async cleanup-producing commands to settle before shutdown completes', async () => {
       let disposeCalls = 0;
       const { clock, ctx } = createInteractiveContext();
-      const app: App<string, never> = {
+      const app: App<string> = {
         init: () => ['cleanup', [
           () => new Promise((resolve) => {
             clock.setTimeout(() => {
@@ -52,7 +52,7 @@ describe('run', () => {
 
     it('emits one explicit warning when shutdown drain times out', async () => {
       const { clock, ctx } = createInteractiveContext();
-      const app: App<string, never> = {
+      const app: App<string> = {
         init: () => ['hang', [
           () => new Promise(() => {}),
           quit(),
@@ -79,7 +79,7 @@ describe('run', () => {
     });
 
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
-      const app: App<boolean, never> = {
+      const app: App<boolean> = {
         init: () => [true, []],
         update(msg, model) {
           if (msg.type === 'key') {
@@ -107,9 +107,9 @@ describe('run', () => {
     });
 
     it('reuses two framebuffers across steady-state renders', async () => {
-      const seen: Array<{ current: object; target: object }> = [];
+      const seen: { current: object; target: object }[] = [];
 
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'pulse' && model < 2) return [model + 1, []];
@@ -150,7 +150,7 @@ describe('run', () => {
       let viewCalls = 0;
       const model = { count: 0 };
 
-      const app: App<typeof model, never> = {
+      const app: App<typeof model> = {
         init: () => [model, []],
         update(msg, current) {
           if (msg.type === 'key' && msg.key === 'x') return [current, []];
@@ -178,7 +178,7 @@ describe('run', () => {
 
     it('skips idle pulse rerenders when the model is unchanged', async () => {
       let viewCalls = 0;
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
@@ -202,7 +202,7 @@ describe('run', () => {
 
     it('still rerenders on resize when update returns the same model reference', async () => {
       let viewCalls = 0;
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];

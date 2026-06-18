@@ -27,7 +27,7 @@ describe('run', () => {
     it('lets internal callers fold committed frame timings back into model state', async () => {
       const { clock, ctx } = createInteractiveContext();
       const seenFrameTimes: number[] = [];
-      const app: App<{ frameTimeMs: number }, never> = {
+      const app: App<{ frameTimeMs: number }> = {
         init: () => [{ frameTimeMs: 0 }, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') {
@@ -64,7 +64,7 @@ describe('run', () => {
       const { clock, ctx } = createInteractiveContext();
       let shouldHydrate = false;
       let hydratedSeenOnQuit = false;
-      const app: App<{ hydrated: boolean }, never> = {
+      const app: App<{ hydrated: boolean }> = {
         init: () => [{ hydrated: false }, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') {
@@ -108,7 +108,7 @@ describe('run', () => {
 
     it('repaints blank cells after resize instead of relying on terminal clear', async () => {
       const { clock, ctx } = createInteractiveContext({ runtime: { columns: 1, rows: 1 } });
-      const app: App<null, never> = {
+      const app: App<null> = {
         init: () => [null, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
@@ -136,7 +136,7 @@ describe('run', () => {
 
     it('keeps the invalidated resize buffer reusable as a blank back buffer', async () => {
       const { clock, ctx } = createInteractiveContext({ runtime: { columns: 1, rows: 1 } });
-      const app: App<boolean, never> = {
+      const app: App<boolean> = {
         init: () => [true, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'x') return [false, []];
@@ -167,7 +167,7 @@ describe('run', () => {
 
     it('updates runtime dimensions before rerendering after resize', async () => {
       const { clock, ctx } = createInteractiveContext();
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
@@ -219,7 +219,7 @@ describe('run', () => {
     it('renders a crash surface and waits for enter when update throws', async () => {
       const { clock, ctx } = createInteractiveContext();
       let settled = false;
-      const app: App<{ count: number }, never> = {
+      const app: App<{ count: number }> = {
         init: () => [{ count: 3 }, []],
         update(msg, model) {
           if (msg.type === 'key' && msg.key === 'up') {
@@ -261,7 +261,7 @@ describe('run', () => {
     it('renders a crash surface and waits for enter when render fails', async () => {
       const { clock, ctx } = createInteractiveContext();
       let settled = false;
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [7, []],
         update: (_msg, model) => [model, []],
         view: () => {
@@ -304,7 +304,7 @@ describe('run', () => {
         return { dispose() {} };
       };
 
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [7, []],
         update: (_msg, model) => [model, []],
         view: () => {
@@ -329,7 +329,7 @@ describe('run', () => {
     it('does not leave runtime timeout handles active after shutdown', async () => {
       const { clock, activeTimeoutCount } = createTrackingClock();
       const ctx = createTestContext({ mode: 'interactive', clock });
-      const app: App<string, never> = {
+      const app: App<string> = {
         init: () => ['bye', [quit()]],
         update: (_msg, model) => [model, []],
         view: (model) => textView(model),
@@ -344,7 +344,7 @@ describe('run', () => {
 
     it('coalesces same-timestamp input bursts into one follow-up render', async () => {
       let viewCalls = 0;
-      const app: App<number, never> = {
+      const app: App<number> = {
         init: () => [0, []],
         update(msg, model) {
           if (msg.type === 'key') {
@@ -384,7 +384,7 @@ describe('run', () => {
         disposeCalls += 1;
       };
       const { clock, ctx } = createInteractiveContext();
-      const app: App<string, never> = {
+      const app: App<string> = {
         init: () => ['cleanup', [() => ({ dispose }), quit()]],
         update: (_msg, model) => [model, []],
         view: (model) => textView(model),
