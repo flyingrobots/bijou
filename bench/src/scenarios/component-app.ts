@@ -54,11 +54,10 @@ function paintApp(state: State, frameIndex: number): void {
   surface.clear();
 
   const bodyWidth = Math.max(1, cols - SIDEBAR_WIDTH - 1);
-  const bodyHeight = Math.max(1, rows - HEADER_ROWS - FOOTER_ROWS);
 
   // --- Header: alert banner ---
   const headerAlert = alertSurface(
-    `Build #${1042 + (frameIndex % 100)} passed — deployed to staging`,
+    `Build #${String(1042 + (frameIndex % 100))} passed — deployed to staging`,
     { variant: 'success', ctx },
   );
   surface.blit(headerAlert, 0, 0);
@@ -75,7 +74,7 @@ function paintApp(state: State, frameIndex: number): void {
     { label: 'requests', value: '1.2M' },
     { label: 'errors', value: '0.03%' },
     { label: 'p99', value: '42ms', sparkline: sparkData },
-    { label: 'CPU', value: `${Math.round(percent)}%` },
+    { label: 'CPU', value: `${String(Math.round(percent))}%` },
   ], {
     title: 'System',
     width: SIDEBAR_WIDTH,
@@ -144,7 +143,7 @@ function paintApp(state: State, frameIndex: number): void {
   // --- Footer: status line ---
   const footerLine = ` ${sparkline(sparkData, { width: 10 })}  p99: 42ms  errors: 0.03%  nodes: 12`;
   for (let x = 0; x < Math.min(cols, footerLine.length); x++) {
-    surface.set(x, rows - 1, { char: footerLine[x]!, empty: false });
+    surface.set(x, rows - 1, { char: footerLine.charAt(x), empty: false });
   }
 }
 

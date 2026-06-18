@@ -13,7 +13,7 @@ describe('code size gate', () => {
 
     expect(result.ok).toBe(false);
     expect(result.violations).toEqual([
-      'src/giant.ts has 1001 lines; hard limit is 1000',
+      'src/giant.ts has 1001 lines; hard limit 1000',
     ]);
   });
 
@@ -24,7 +24,7 @@ describe('code size gate', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(formatCodeSizeGateResult(result)).toBe('code-size-gate: ok (1 files over 500 lines; 1 legacy files over hard limit 1000)\n');
+    expect(formatCodeSizeGateResult(result)).toBe('code-size-gate: ok (1 files over 500 lines; 1 legacy hard-limit files over 1000)\n');
   });
 
   it('rejects legacy hard-limit files that grow beyond their baseline', () => {
@@ -35,7 +35,7 @@ describe('code size gate', () => {
 
     expect(result.ok).toBe(false);
     expect(result.violations).toEqual([
-      'src/legacy-giant.ts has 1101 lines; legacy hard-limit baseline is 1100',
+      'src/legacy-giant.ts has 1101 lines; legacy 1100',
     ]);
   });
 
@@ -47,7 +47,7 @@ describe('code size gate', () => {
 
     expect(result.ok).toBe(false);
     expect(result.violations).toEqual([
-      'src/new-large.ts has 501 lines; files over 500 require an explicit ratchet baseline',
+      'src/new-large.ts has 501 lines; over 500 needs ratchet',
     ]);
   });
 
@@ -59,7 +59,7 @@ describe('code size gate', () => {
 
     expect(result.ok).toBe(false);
     expect(result.violations).toEqual([
-      'src/legacy-large.ts has 650 lines; ratchet baseline is 600',
+      'src/legacy-large.ts has 650 lines; ratchet 600',
     ]);
   });
 
@@ -73,6 +73,6 @@ describe('code size gate', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(formatCodeSizeGateResult(result)).toBe('code-size-gate: ok (1 files over 500 lines; 0 legacy files over hard limit 1000)\n');
+    expect(formatCodeSizeGateResult(result)).toBe('code-size-gate: ok (1 files over 500 lines; 0 legacy hard-limit files over 1000)\n');
   });
 });

@@ -1,11 +1,8 @@
-import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator, kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flexSurface, viewportSurface, createScrollState, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
-
-const ctx = initDefaultContext();
 
 interface Message {
   sender: string;
@@ -41,8 +38,8 @@ const app: App<Model, Msg> = {
   init: () => [{
     messages: [...INITIAL_MESSAGES],
     input: '',
-    cols: process.stdout.columns ?? 80,
-    rows: process.stdout.rows ?? 24,
+    cols: process.stdout.columns,
+    rows: process.stdout.rows,
   }, []],
 
   update: (msg, model) => {
@@ -89,4 +86,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

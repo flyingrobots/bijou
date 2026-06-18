@@ -25,7 +25,7 @@ export interface CodeSizeGateOptions {
   readonly files?: readonly CodeSizeFile[];
   readonly baseline?: readonly CodeSizeBaselineEntry[];
 }
-
+const S = String;
 const CODE_SIZE_HARD_LIMIT = 1_000;
 const CODE_SIZE_RATCHET_LIMIT = 500;
 const SOURCE_EXTENSIONS = new Set(['.cjs', '.js', '.mjs', '.ts', '.tsx']);
@@ -108,22 +108,22 @@ export function evaluateCodeSizeGate(options: CodeSizeGateOptions = {}): CodeSiz
 
     if (file.lines > CODE_SIZE_HARD_LIMIT) {
       if (allowedLines == null) {
-        violations.push(`${file.path} has ${file.lines} lines; hard limit is ${CODE_SIZE_HARD_LIMIT}`);
+        violations.push(`${file.path} has ${S(file.lines)} lines; hard limit ${S(CODE_SIZE_HARD_LIMIT)}`);
         continue;
       }
       if (file.lines > allowedLines) {
-        violations.push(`${file.path} has ${file.lines} lines; legacy hard-limit baseline is ${allowedLines}`);
+        violations.push(`${file.path} has ${S(file.lines)} lines; legacy ${S(allowedLines)}`);
       }
       continue;
     }
 
     if (file.lines <= CODE_SIZE_RATCHET_LIMIT) continue;
     if (allowedLines == null) {
-      violations.push(`${file.path} has ${file.lines} lines; files over ${CODE_SIZE_RATCHET_LIMIT} require an explicit ratchet baseline`);
+      violations.push(`${file.path} has ${S(file.lines)} lines; over ${S(CODE_SIZE_RATCHET_LIMIT)} needs ratchet`);
       continue;
     }
     if (file.lines > allowedLines) {
-      violations.push(`${file.path} has ${file.lines} lines; ratchet baseline is ${allowedLines}`);
+      violations.push(`${file.path} has ${S(file.lines)} lines; ratchet ${S(allowedLines)}`);
     }
   }
 
@@ -163,11 +163,11 @@ export function formatCodeSizeGateResult(result: CodeSizeGateResult): string {
   if (result.ok) {
     const ratcheted = result.files.filter((file) => file.lines > CODE_SIZE_RATCHET_LIMIT).length;
     const legacyHardLimit = result.files.filter((file) => file.lines > CODE_SIZE_HARD_LIMIT).length;
-    return `code-size-gate: ok (${ratcheted} files over ${CODE_SIZE_RATCHET_LIMIT} lines; ${legacyHardLimit} legacy files over hard limit ${CODE_SIZE_HARD_LIMIT})\n`;
+    return `code-size-gate: ok (${S(ratcheted)} files over ${S(CODE_SIZE_RATCHET_LIMIT)} lines; ${S(legacyHardLimit)} legacy hard-limit files over ${S(CODE_SIZE_HARD_LIMIT)})\n`;
   }
 
   return [
-    `code-size-gate: failed (${result.violations.length} violation${result.violations.length === 1 ? '' : 's'})`,
+    `code-size-gate: failed (${S(result.violations.length)} violation${result.violations.length === 1 ? '' : 's'})`,
     ...result.violations.map((violation) => `- ${violation}`),
     '',
   ].join('\n');
