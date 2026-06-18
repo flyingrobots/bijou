@@ -29,6 +29,9 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
+  const ignoreFrameMsg = (_msg: FramedAppMsg<Msg>): void => { void _msg; };
+  const commandRuntime = { onPulse: (handler: (dt: number) => void) => ({ dispose: () => { void handler; } }) };
+
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
 
@@ -217,20 +220,16 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    let cmds: Cmd<FramedAppMsg<Msg>>[];
     [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(model.quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
     [model, cmds] = app.update({ type: 'key', key: 'y', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]?.(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const returned = await cmds[0]?.(ignoreFrameMsg, commandRuntime);
     expect(returned).toBe(QUIT);
   });
 
@@ -240,29 +239,25 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    let cmds: Cmd<FramedAppMsg<Msg>>[];
 
     [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(model.quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
     [model, cmds] = app.update({ type: 'key', key: 'N', ctrl: false, alt: false, shift: true }, model);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(0);
 
     [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(model.quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
     [model, cmds] = app.update({ type: 'key', key: 'Y', ctrl: false, alt: false, shift: true }, model);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]?.(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const returned = await cmds[0]?.(ignoreFrameMsg, commandRuntime);
     expect(returned).toBe(QUIT);
   });
 
@@ -285,11 +280,11 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(false);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.settingsOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
   });
 
   it('still opens quit confirm with q while settings are open', () => {
@@ -311,11 +306,11 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
 
     [model] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(false);
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(model.settingsOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(true);
   });
 
   it('closes the command palette with escape without opening quit confirm', () => {
@@ -326,11 +321,11 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(ctrlKey('p'), model);
-    expect((model as any).commandPalette).toBeDefined();
+    expect(model.commandPalette).toBeDefined();
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPalette).toBeUndefined();
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.commandPalette).toBeUndefined();
+    expect(model.quitConfirmOpen).toBe(false);
   });
 
   it('dismisses topmost layers before opening quit confirm', () => {
@@ -353,20 +348,20 @@ describe('createFramedApp', () => {
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(true);
-    expect((model as any).helpOpen).toBe(true);
+    expect(model.settingsOpen).toBe(true);
+    expect(model.helpOpen).toBe(true);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).helpOpen).toBe(false);
-    expect((model as any).settingsOpen).toBe(true);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.helpOpen).toBe(false);
+    expect(model.settingsOpen).toBe(true);
+    expect(model.quitConfirmOpen).toBe(false);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsOpen).toBe(false);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.settingsOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(model.quitConfirmOpen).toBe(true);
   });
 
   it('describes the active frame layer stack for shell surfaces and page modals', async () => {

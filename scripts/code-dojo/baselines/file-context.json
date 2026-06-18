@@ -395,8 +395,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-settings.test.ts",
-      "lines": 419,
-      "bytes": 14462
+      "lines": 414,
+      "bytes": 14341
     },
     {
       "path": "packages/bijou-tui/src/command-palette.ts",
