@@ -24,6 +24,20 @@ import {
 } from './docs-preview.test-support.js';
 import { isCmdCleanup } from '../packages/bijou-tui/src/types.js';
 
+type DocsApp = ReturnType<typeof createDocsApp>;
+type DocsFrame = Parameters<typeof frameText>[0];
+
+function runCommand(commands: ReturnType<DocsApp['update']>[1]) {
+  const command = commands.at(0);
+  if (command == null) throw new Error('Missing command');
+  return command(() => { throw new Error('Unexpected emit'); }, { onPulse: () => ({ dispose: () => undefined }) });
+}
+function last(frames: readonly DocsFrame[]): DocsFrame {
+  const frame = frames.at(-1);
+  if (frame == null) throw new Error('Missing frame');
+  return frame;
+}
+
 describe('docs preview app', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
@@ -56,11 +70,7 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Auto (ful');
     updateResult = app.update(keyMsg('enter'), model);
     model = updateResult[0];
-    const commandResult = await updateResult[1][0]!(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const commandResult = await runCommand(updateResult[1]);
     if (commandResult !== undefined && commandResult !== QUIT && !isCmdCleanup(commandResult)) {
       model = app.update(commandResult, model)[0];
     }
@@ -78,11 +88,7 @@ describe('docs preview app', () => {
     model = updateResult[0];
     updateResult = app.update(keyMsg('enter'), model);
     model = updateResult[0];
-    const secondCommandResult = await updateResult[1][0]!(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const secondCommandResult = await runCommand(updateResult[1]);
     if (secondCommandResult !== undefined && secondCommandResult !== QUIT && !isCmdCleanup(secondCommandResult)) {
       model = app.update(secondCommandResult, model)[0];
     }
@@ -135,16 +141,9 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = entered.frames[entered.frames.length - 1]!;
+    const frame = last(entered.frames);
 
-    let text = '';
-    for (let y = 0; y < frame.height; y++) {
-      for (let x = 0; x < frame.width; x++) {
-        text += frame.get(x, y).char || ' ';
-      }
-      text += '\n';
-    }
-
+    const text = frameText(frame);
     const lines = text.split('\n');
     expect(text).toContain('Status and in-flow');
     expect(lines[0]).toContain('Bijou Docs');
@@ -180,7 +179,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const result = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = result.frames.at(-1)!;
+    const frame = last(result.frames);
     const pageModel = docsPageModel(result.model, 'components');
     const leftPaneText = frameText(frame)
       .split('\n')
@@ -198,7 +197,7 @@ describe('docs preview app', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
-    const frame = entered.frames[entered.frames.length - 1]!;
+    const frame = last(entered.frames);
     const lines = frameText(frame).split('\n');
     const text = lines.join('\n');
 
@@ -222,7 +221,7 @@ describe('docs preview app', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
       const app = createDocsApp(ctx);
       const result = await runScript(app, [...steps], { ctx, pulseFps: false });
-      const frame = result.frames.at(-1)!;
+      const frame = last(result.frames);
       return {
         text: frameText(frame),
         serialized: serializeFrame(frame),
@@ -278,7 +277,7 @@ describe('docs preview app', () => {
       { key: KEY_TAB, delay: 350 },
     ], { ctx });
 
-    const frame = result.frames[result.frames.length - 1]!;
+    const frame = last(result.frames);
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
     expect((result.model).docsModel.focusedPaneByPage.components).toBe('story-variants');
@@ -299,7 +298,7 @@ describe('docs preview app', () => {
       { key: 'q' },
     ], { ctx });
     expect((opened.model).docsModel.quitConfirmOpen).toBe(true);
-    expect(frameText(opened.frames[opened.frames.length - 1]!)).toContain('Quit?');
+    expect(frameText(last(opened.frames))).toContain('Quit?');
 
     const dismissed = await runScript(app, [
       { key: KEY_ENTER },
