@@ -56,6 +56,23 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 - PRs are non-draft at cycle start. Request final review only after
   implementation, validation, and self-review are complete.
 
+## GitHub Issue Logging
+
+- Agents are encouraged to create GitHub Issues at will when they find
+  follow-up work worth preserving, especially when they see **BAD CODE** or
+  have **COOL IDEAS™**.
+- Do not ask for permission before logging clear follow-up work. Create the
+  issue, tag it appropriately, and keep moving.
+- Use `lane:bad-code` for known debt, rot, structural risk, brittle tests,
+  misleading types, weak tooling, or standards violations.
+- Use `lane:cool-ideas` for promising product, tooling, documentation, or
+  workflow ideas that are not committed implementation scope yet.
+- Add useful sorting labels when they are clear: priority, type, legend,
+  milestone, `needs-design`, `needs-playback`, or other existing repo labels.
+- Issue bodies should include evidence, scope, non-goals when useful, and
+  acceptance criteria so humans and agents can triage the item later without
+  reconstructing the original context.
+
 ## Documentation & Planning Map
 
 Do not audit the repository by recursively walking the filesystem. Follow the authoritative manifests:
