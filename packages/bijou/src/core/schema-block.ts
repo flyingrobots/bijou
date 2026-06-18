@@ -244,25 +244,23 @@ function normalizeSchemaResult<Data>(result: BlockSchemaResult<Data>): BlockSche
     throw new Error('block schema result: result must be an object');
   }
 
-  if (result.ok) {
-    if (!Object.prototype.hasOwnProperty.call(result, 'data')) {
-      throw new Error('block schema result: data is required for ok result');
-    }
-
-    return Object.freeze({
-      ok: true,
-      data: freezeInertData(result.data, 'data') as DeepReadonly<Data>,
-    });
+  switch (result.ok) {
+    case true:
+      if (!Object.prototype.hasOwnProperty.call(result, 'data')) {
+        throw new Error('block schema result: data is required for ok result');
+      }
+      return Object.freeze({
+        ok: true,
+        data: freezeInertData(result.data, 'data') as DeepReadonly<Data>,
+      });
+    case false:
+      return Object.freeze({
+        ok: false,
+        issues: freezeSchemaIssues(result.issues),
+      });
+    default:
+      throw new Error('block schema result: ok must be true or false');
   }
-
-  if (!result.ok) {
-    return Object.freeze({
-      ok: false,
-      issues: freezeSchemaIssues(result.issues),
-    });
-  }
-
-  throw new Error('block schema result: ok must be true or false');
 }
 
 function normalizeSchemaDescription(
