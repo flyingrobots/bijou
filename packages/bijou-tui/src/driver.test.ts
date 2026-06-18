@@ -12,7 +12,7 @@ import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
 import { badge, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext, mockClock, plainStyle } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext, mockClock, plainStyle } from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
 
@@ -55,7 +55,7 @@ describe('runScript', () => {
   it('captures initial frame', async () => {
     const result = await runScript(counterApp, []);
     expect(result.frames).toHaveLength(1);
-    expect(surfaceToString(result.frames[0]!, style)).toContain('Count: 0');
+    expect(surfaceToString(must(result.frames[0]), style)).toContain('Count: 0');
     expect(result.model.count).toBe(0);
   });
 
@@ -68,9 +68,9 @@ describe('runScript', () => {
     // Initial frame + 3 update frames
     expect(result.frames).toHaveLength(4);
     expect(result.model.count).toBe(1);
-    expect(surfaceToString(result.frames[1]!, style)).toContain('Count: 1');
-    expect(surfaceToString(result.frames[2]!, style)).toContain('Count: 2');
-    expect(surfaceToString(result.frames[3]!, style)).toContain('Count: 1');
+    expect(surfaceToString(must(result.frames[1]), style)).toContain('Count: 1');
+    expect(surfaceToString(must(result.frames[2]), style)).toContain('Count: 2');
+    expect(surfaceToString(must(result.frames[3]), style)).toContain('Count: 1');
   });
 
   it('stops on quit signal', async () => {
@@ -90,8 +90,8 @@ describe('runScript', () => {
       },
     });
     expect(captured).toHaveLength(2); // initial + 1 update
-    expect(captured[0]!.index).toBe(0);
-    expect(captured[1]!.index).toBe(1);
+    expect(captured[0]?.index).toBe(0);
+    expect(captured[1]?.index).toBe(1);
   });
 
   it('supports delays between steps', async () => {
@@ -160,7 +160,7 @@ describe('runScript', () => {
     const result = await runScript(app, [{ resize: { columns: 120, rows: 40 } }]);
     expect(result.model.cols).toBe(120);
     expect(result.model.rows).toBe(40);
-    expect(surfaceToString(result.frames[result.frames.length - 1]!, style)).toContain('120x40');
+    expect(surfaceToString(must(result.frames[result.frames.length - 1]), style)).toContain('120x40');
   });
 
   it('uses the latest scripted dimensions when normalizing layout views', async () => {
@@ -187,7 +187,7 @@ describe('runScript', () => {
       { resize: { columns: 18, rows: 3 } },
     ]);
 
-    const lastFrame = result.frames[result.frames.length - 1]!;
+    const lastFrame = must(result.frames[result.frames.length - 1]);
     expect(lastFrame.width).toBe(18);
     expect(lastFrame.height).toBe(3);
     expect(surfaceToString(lastFrame, style)).toContain('18x3');
@@ -285,7 +285,6 @@ describe('runScript', () => {
       row: 5,
     });
   });
-
   it('builds mouse script steps from SGR sequences', () => {
     expect(sgrMouse('\x1b[<35;10;20M')).toEqual({
       mouse: {
@@ -326,18 +325,15 @@ describe('runScript', () => {
     });
     expect(() => sgrMouse('not mouse')).toThrow('sgrMouse: invalid SGR mouse sequence');
   });
-
   it('installs the BCSS resolver when css is provided', async () => {
     const ctx = createTestContext({
       runtime: { columns: 40, rows: 8 },
     });
-
     const app: App<null> = {
       init: () => [null, []],
       update: (_msg, model) => [model, []],
       view: () => badge('Styled', { class: 'active', ctx }),
     };
-
     const result = await runScript(app, [], {
       ctx,
       css: `
@@ -347,16 +343,13 @@ describe('runScript', () => {
         }
       `,
     });
-
-    const badgeCell = result.frames[0]!.get(1, 0);
+    const badgeCell = result.frames[0]?.get(1, 0);
     expect(badgeCell.fg).toBe('#001122');
     expect(badgeCell.bg).toBe('#33aa44');
   });
-
   it('records snapshots, handled messages, and emitted command messages', async () => {
     type Msg = { type: 'load' } | { type: 'loaded'; value: string };
     interface Model { value: string; loaded: boolean }
-
     const app: App<Model, Msg> = {
       init: () => [{
         value: '',
@@ -372,42 +365,35 @@ describe('runScript', () => {
         return textView(model.loaded ? `Loaded: ${model.value}` : 'Loading...');
       },
     };
-
     const harness = await testRuntime(app);
-
     expect(harness.snapshots).toHaveLength(2);
-    expect(harness.snapshots[0]!.cause).toBe('init');
-    expect(harness.snapshots[1]!.cause).toBe('update');
+    expect(harness.snapshots[0]?.cause).toBe('init');
+    expect(harness.snapshots[1]?.cause).toBe('update');
     expect(harness.messages).toEqual([{ type: 'loaded', value: 'hello' }]);
     expect(harness.emittedMessages).toEqual([{ type: 'loaded', value: 'hello' }]);
     expect(harness.commands).toHaveLength(1);
-    expect(harness.commands[0]!.source).toBe('init');
-    expect(harness.commands[0]!.resolution).toBe('message');
-    expect(harness.commands[0]!.settled).toBe(true);
+    expect(harness.commands[0]?.source).toBe('init');
+    expect(harness.commands[0]?.resolution).toBe('message');
+    expect(harness.commands[0]?.settled).toBe(true);
     expect(surfaceToString(harness.frame, style)).toContain('Loaded: hello');
   });
-
   it('disposes cleanup-producing commands during harness teardown', async () => {
     let disposeCalls = 0;
     const cleanup = () => {
       disposeCalls += 1;
     };
-
     const app: App<string> = {
       init: () => ['cleanup', [() => cleanup]],
       update: (_msg, model) => [model, []],
       view: (model) => textView(model),
     };
-
     const harness = await testRuntime(app);
     expect(harness.commands).toHaveLength(1);
-    expect(harness.commands[0]!.resolution).toBe('cleanup');
-    expect(harness.commands[0]!.cleanedUp).toBe(false);
-
+    expect(harness.commands[0]?.resolution).toBe('cleanup');
+    expect(harness.commands[0]?.cleanedUp).toBe(false);
     await harness.teardown();
-
     expect(disposeCalls).toBe(1);
-    expect(harness.commands[0]!.cleanedUp).toBe(true);
+    expect(harness.commands[0]?.cleanedUp).toBe(true);
     expect(harness.running).toBe(false);
   });
 });

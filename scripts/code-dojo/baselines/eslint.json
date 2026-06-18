@@ -1,36 +1,16 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 4517,
-  "errors": 4513,
-  "warnings": 4,
+  "total": 3391,
+  "errors": 3391,
+  "warnings": 0,
   "rules": [
-    {
-      "ruleId": "@typescript-eslint/array-type",
-      "count": 39
-    },
     {
       "ruleId": "@typescript-eslint/ban-ts-comment",
       "count": 1
     },
     {
-      "ruleId": "@typescript-eslint/consistent-generic-constructors",
-      "count": 1
-    },
-    {
-      "ruleId": "@typescript-eslint/consistent-indexed-object-style",
-      "count": 3
-    },
-    {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 97
-    },
-    {
-      "ruleId": "@typescript-eslint/consistent-type-definitions",
-      "count": 26
-    },
-    {
-      "ruleId": "@typescript-eslint/dot-notation",
-      "count": 8
+      "count": 94
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
@@ -38,19 +18,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-non-null-assertion",
-      "count": 3
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-void-expression",
-      "count": 62
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/no-deprecated",
       "count": 16
-    },
-    {
-      "ruleId": "@typescript-eslint/no-duplicate-type-constituents",
-      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-dynamic-delete",
@@ -66,15 +42,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 204
+      "count": 182
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
       "count": 40
-    },
-    {
-      "ruleId": "@typescript-eslint/no-inferrable-types",
-      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
@@ -82,31 +54,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 1408
+      "count": 739
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
       "count": 18
     },
     {
-      "ruleId": "@typescript-eslint/no-unnecessary-boolean-literal-compare",
-      "count": 4
-    },
-    {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 181
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-template-expression",
-      "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
-      "count": 27
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
-      "count": 100
+      "count": 179
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -118,11 +74,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 81
+      "count": 67
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 130
+      "count": 124
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -134,27 +90,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 20
+      "count": 19
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 584
+      "count": 531
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 157
-    },
-    {
-      "ruleId": "@typescript-eslint/no-useless-default-assignment",
-      "count": 1
-    },
-    {
-      "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
-      "count": 9
-    },
-    {
-      "ruleId": "@typescript-eslint/prefer-as-const",
-      "count": 1
+      "count": 128
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
@@ -166,19 +110,11 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
-      "count": 16
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/prefer-promise-reject-errors",
       "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/prefer-regexp-exec",
-      "count": 10
-    },
-    {
-      "ruleId": "@typescript-eslint/prefer-string-starts-ends-with",
-      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/require-await",
@@ -198,7 +134,7 @@
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",
-      "count": 15
+      "count": 14
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -209,16 +145,8 @@
       "count": 5
     },
     {
-      "ruleId": "fatal",
-      "count": 4
-    },
-    {
       "ruleId": "no-control-regex",
       "count": 26
-    },
-    {
-      "ruleId": "no-regex-spaces",
-      "count": 1
     },
     {
       "ruleId": "no-restricted-imports",
@@ -234,7 +162,7 @@
     },
     {
       "ruleId": "prefer-const",
-      "count": 10
+      "count": 4
     },
     {
       "ruleId": "preserve-caught-error",

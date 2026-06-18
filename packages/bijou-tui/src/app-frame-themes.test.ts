@@ -330,7 +330,7 @@ describe('createFramedApp', () => {
       expect((nextModel as any).quitConfirmOpen).toBe(false);
       expect(cmds).toHaveLength(1);
 
-      const returned = await cmds[0]!(() => {}, {
+      const returned = await cmds[0]?.(() => {}, {
         onPulse() {
           return { dispose() {} };
         },
@@ -445,7 +445,6 @@ describe('createFramedApp', () => {
       { key: 'z' },
       { key: KEY_ENTER },
     ]);
-
     expect(result.model.pageModels.home?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
   });

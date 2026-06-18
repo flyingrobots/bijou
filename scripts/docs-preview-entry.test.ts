@@ -33,6 +33,7 @@ import {
   wrapPageMsg,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
@@ -76,7 +77,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F2 }], { ctx });
 
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(frameText(must(result.frames.at(-1)))).toContain('Langue préférée');
   });
 
   it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
@@ -128,7 +129,7 @@ describe('docs preview app', () => {
     expect((ignored.model).route).toBe('landing');
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     expect((entered.model).route).toBe('docs');
-    const enteredFrame = entered.frames.at(-1)!;
+    const enteredFrame = must(entered.frames.at(-1));
     const enteredText = frameText(enteredFrame);
     expect(enteredText).toContain('Bijou Docs');
     expect(enteredText).toContain('Start Here');
@@ -141,7 +142,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
+    const frame = must(initial.frames[0]);
 
     let text = '';
     for (let y = 0; y < frame.height; y++) {
@@ -178,7 +179,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
+    const frame = must(initial.frames[0]);
     const text = frameText(frame);
     const lines = text.split('\n');
     const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
@@ -186,7 +187,7 @@ describe('docs preview app', () => {
     const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
     const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
     const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
-    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    const logoX = logoY >= 0 ? must(lines[logoY]).indexOf(visiblePrefix) : -1;
     let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
     let backgroundBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
 
@@ -214,19 +215,21 @@ describe('docs preview app', () => {
       if (wakeBackedLogoCell != null && backgroundBackedLogoCell != null) break;
     }
     expect(wakeBackedLogoCell).toBeDefined();
+    const wakeCell = must(wakeBackedLogoCell);
     const wakeBackedBg = expectedLandingWakeColorAt(
-      wakeBackedLogoCell!.x,
-      wakeBackedLogoCell!.y,
+      wakeCell.x,
+      wakeCell.y,
       frame.width,
       frame.height,
     );
-    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).bg)).toBe(wakeBackedBg);
-    expect(colorHex(frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y).fg)).toBe(
+    expect(colorHex(frame.get(wakeCell.x, wakeCell.y).bg)).toBe(wakeBackedBg);
+    expect(colorHex(frame.get(wakeCell.x, wakeCell.y).fg)).toBe(
       oppositeHexColor(wakeBackedBg),
     );
     expect(backgroundBackedLogoCell).toBeDefined();
-    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
-    expect(colorHex(frame.get(backgroundBackedLogoCell!.x, backgroundBackedLogoCell!.y).fg)).toBe(
+    const backgroundCell = must(backgroundBackedLogoCell);
+    expect(colorHex(frame.get(backgroundCell.x, backgroundCell.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    expect(colorHex(frame.get(backgroundCell.x, backgroundCell.y).fg)).toBe(
       oppositeHexColor(V7_DEFAULT_BACKGROUND),
     );
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
@@ -245,8 +248,8 @@ describe('docs preview app', () => {
     const faded = await runScript(app, [{ pulse: { dt: 4.2 } }], { ctx });
 
     expect(visiblePrefix.length).toBeGreaterThan(8);
-    expect(frameText(initial.frames[0]!)).toContain(visiblePrefix);
-    expect(frameText(faded.frames.at(-1)!)).not.toContain(visiblePrefix);
+    expect(frameText(must(initial.frames[0]))).toContain(visiblePrefix);
+    expect(frameText(must(faded.frames.at(-1)))).not.toContain(visiblePrefix);
   });
 
   it('uses a foreground gradient across the Enter prompt letters', async () => {
@@ -254,10 +257,10 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
+    const frame = must(initial.frames[0]);
     const lines = frameText(frame).split('\n');
     const promptY = lines.findIndex((line) => line.includes('Press [Enter]'));
-    const promptX = promptY >= 0 ? lines[promptY]!.indexOf('Press [Enter]') : -1;
+    const promptX = promptY >= 0 ? must(lines[promptY]).indexOf('Press [Enter]') : -1;
     const prompt = 'Press [Enter]';
     const enterStart = prompt.indexOf('Enter');
 
@@ -278,7 +281,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const opened = await runScript(app, [{ key: KEY_ESCAPE }], { ctx });
-    const frame = opened.frames.at(-1)!;
+    const frame = must(opened.frames.at(-1));
     const text = frameText(frame);
     const lines = text.split('\n');
     const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);
@@ -286,7 +289,7 @@ describe('docs preview app', () => {
     const transparentOffset = firstLogoLine.indexOf(FLYING_ROBOTS_TRANSPARENT_CELL);
     const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
     const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
-    const logoX = logoY >= 0 ? lines[logoY]!.indexOf(visiblePrefix) : -1;
+    const logoX = logoY >= 0 ? must(lines[logoY]).indexOf(visiblePrefix) : -1;
     let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
 
     expect(text).toContain('Quit?');
@@ -308,10 +311,11 @@ describe('docs preview app', () => {
     }
 
     expect(wakeBackedLogoCell).toBeDefined();
-    const cell = frame.get(wakeBackedLogoCell!.x, wakeBackedLogoCell!.y);
+    const wakeCell = must(wakeBackedLogoCell);
+    const cell = frame.get(wakeCell.x, wakeCell.y);
     const wakeBackedBg = expectedLandingWakeColorAt(
-      wakeBackedLogoCell!.x,
-      wakeBackedLogoCell!.y,
+      wakeCell.x,
+      wakeCell.y,
       frame.width,
       frame.height,
     );
@@ -325,7 +329,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
+    const frame = must(initial.frames[0]);
 
     expect(cellsWithoutBackground(frame)).toEqual([]);
   });
@@ -343,10 +347,10 @@ describe('docs preview app', () => {
     });
 
     const landing = await runScript(app, [], { ctx });
-    expect(frameText(landing.frames.at(-1)!)).toContain(pseudoLocalize('Press [Enter]'));
+    expect(frameText(must(landing.frames.at(-1)))).toContain(pseudoLocalize('Press [Enter]'));
 
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
-    const text = frameText(entered.frames.at(-1)!);
+    const text = frameText(must(entered.frames.at(-1)));
     expect(text).toContain(pseudoLocalize('Guides'));
     expect(text).toMatch(/Šëàřçħ/);
   });
@@ -370,8 +374,7 @@ describe('docs preview app', () => {
         msg: wrapPageMsg('blocks', { type: 'select-guide', guideId: 'blocks-dogfood-surfaces' }),
       },
     }], { ctx });
-    const text = frameText(selected.frames.at(-1)!);
-
+    const text = frameText(must(selected.frames.at(-1)));
     expect(text).toContain(pseudoLocalize('DOGFOOD Surface Blocks'));
     expect(text).toContain(pseudoLocalize('Surface index'));
     expect(text).toContain(pseudoLocalize('DOGFOOD title and entry action surface.'));

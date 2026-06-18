@@ -211,25 +211,25 @@ describe('parseMouse', () => {
   it('extracts shift modifier', () => {
     // 0 + 4 (shift) = 4
     const msg = parseMouse('\x1b[<4;1;1M');
-    expect(msg!.shift).toBe(true);
-    expect(msg!.alt).toBe(false);
-    expect(msg!.ctrl).toBe(false);
+    expect(msg?.shift).toBe(true);
+    expect(msg?.alt).toBe(false);
+    expect(msg?.ctrl).toBe(false);
   });
 
   it('extracts alt modifier', () => {
     // 0 + 8 (alt) = 8
     const msg = parseMouse('\x1b[<8;1;1M');
-    expect(msg!.alt).toBe(true);
-    expect(msg!.shift).toBe(false);
-    expect(msg!.ctrl).toBe(false);
+    expect(msg?.alt).toBe(true);
+    expect(msg?.shift).toBe(false);
+    expect(msg?.ctrl).toBe(false);
   });
 
   it('extracts ctrl modifier', () => {
     // 0 + 16 (ctrl) = 16
     const msg = parseMouse('\x1b[<16;1;1M');
-    expect(msg!.ctrl).toBe(true);
-    expect(msg!.shift).toBe(false);
-    expect(msg!.alt).toBe(false);
+    expect(msg?.ctrl).toBe(true);
+    expect(msg?.shift).toBe(false);
+    expect(msg?.alt).toBe(false);
   });
 
   it('parses drag (motion) events', () => {
@@ -250,8 +250,8 @@ describe('parseMouse', () => {
   it('coords are 0-based', () => {
     // SGR reports 1-based coords
     const msg = parseMouse('\x1b[<0;1;1M');
-    expect(msg!.col).toBe(0);
-    expect(msg!.row).toBe(0);
+    expect(msg?.col).toBe(0);
+    expect(msg?.row).toBe(0);
   });
 
   it('rejects malformed zero coordinates', () => {

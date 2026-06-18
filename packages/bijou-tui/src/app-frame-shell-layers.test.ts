@@ -25,13 +25,12 @@ import {
   MouseMsg,
   Msg,
   PageModel,
+  must,
 } from './app-frame.test-support.js';
-
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
-
   it('switches tabs when the user clicks a header tab', async () => {
     const app = createFramedApp({
       title: 'Test',
@@ -40,7 +39,6 @@ describe('createFramedApp', () => {
         makePage('logs', 'Logs', 'main'),
       ],
     });
-
     const result = await runScript(app, [{
       mouse: {
         type: 'mouse',
@@ -53,55 +51,44 @@ describe('createFramedApp', () => {
         ctrl: false,
       },
     }]);
-
     expect(result.model.activePageId).toBe('logs');
   });
-
   it('toggles help with ?', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const result = await runScript(app, [{ key: '?' }]);
     expect(result.model.helpOpen).toBe(true);
   });
-
   it('closes help with ? when help is open', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const result = await runScript(app, [{ key: '?' }, { key: '?' }]);
     expect(result.model.helpOpen).toBe(false);
   });
-
   it('closes help with escape without opening quit confirm', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const result = await runScript(app, [{ key: '?' }, { key: KEY_ESCAPE }]);
     expect(result.model.helpOpen).toBe(false);
     expect((result.model as any).quitConfirmOpen).toBe(false);
   });
-
   it('toggles the perf HUD from the workspace and active help layer', async () => {
     const app = createFramedApp({
       initialColumns: 96,
       initialRows: 30,
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const workspaceResult = await runScript(app, [{ key: KEY_BACKTICK }]);
     expect(workspaceResult.model.perfHudOpen).toBe(true);
-    expect(surfaceToString(workspaceResult.frames.at(-1)!, testCtx.style)).toContain('Perf HUD');
-
+    expect(surfaceToString(must(workspaceResult.frames.at(-1)), testCtx.style)).toContain('Perf HUD');
     const helpResult = await runScript(app, [{ key: '?' }, { key: KEY_BACKTICK }]);
     expect(helpResult.model.helpOpen).toBe(true);
     expect(helpResult.model.perfHudOpen).toBe(true);
-    expect(surfaceToString(helpResult.frames.at(-1)!, testCtx.style)).toContain('Perf HUD');
+    expect(surfaceToString(must(helpResult.frames.at(-1)), testCtx.style)).toContain('Perf HUD');
   });
-
   it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
     const tallHelpPage: FramePage<PageModel, Msg> = {
       id: 'home',
@@ -122,42 +109,34 @@ describe('createFramedApp', () => {
           return next;
         }),
     };
-
     const app = createFramedApp({
       initialColumns: 80,
       initialRows: 16,
       pages: [tallHelpPage],
     });
-
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
-
     expect((model as any).helpOpen).toBe(true);
     expect((model as any).helpScrollY).toBeGreaterThan(0);
   });
-
   it('treats help as modal and ignores non-close keys', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       globalKeys: createKeyMap<Msg>().bind('z', 'Increment', { type: 'inc' }),
       enableCommandPalette: true,
     });
-
     const result = await runScript(app, [
       { key: '?' },
       { key: 'z' },
       { key: KEY_CTRL_P }, // ctrl+p should be ignored while help is open
     ]);
-
     expect(result.model.helpOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
     expect(result.model.pageModels.home?.count).toBe(0);
   });
-
   it('blocks page mouse updates while help or the command palette is open', async () => {
     type MsgWithMouse = Msg | MouseMsg;
-
     const page: FramePage<PageModel, MsgWithMouse> = {
       id: 'home',
       title: 'Home',
@@ -179,12 +158,10 @@ describe('createFramedApp', () => {
         action: { type: 'inc' },
       }],
     };
-
     const app = createFramedApp<PageModel, MsgWithMouse>({
       pages: [page],
       enableCommandPalette: true,
     });
-
     const result = await runScript(app, [
       {
         key: '?',
@@ -220,12 +197,10 @@ describe('createFramedApp', () => {
         },
       },
     ]);
-
     expect(result.model.helpOpen).toBe(false);
     expect(result.model.commandPalette).toBeDefined();
     expect(result.model.pageModels.home?.count).toBe(0);
   });
-
   it('opens settings with F2 and lets / and ctrl+p switch between search and the command palette', () => {
     const app = createFramedApp({
       pages: [{
@@ -250,30 +225,23 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).settingsOpen).toBe(true);
-
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).settingsOpen).toBe(false);
-
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeDefined();
     expect((model as any).commandPaletteTitle).toBe('Search home');
-
     [model] = app.update(ctrlKey('p'), model);
     expect((model as any).commandPalette).toBeDefined();
     expect((model as any).commandPaletteTitle).toBe('Command Palette');
-
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeDefined();
     expect((model as any).commandPaletteTitle).toBe('Search home');
-
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeUndefined();
   });
-
   it('opens page search with search metadata derived from the active page model', () => {
     const page: FramePage<PageModel, Msg> = {
       ...makePage('home', 'Home', 'main'),
@@ -287,11 +255,9 @@ describe('createFramedApp', () => {
       pages: [page],
       enableCommandPalette: true,
     });
-
     let [model] = app.init();
     [model] = app.update({ type: 'inc' }, model);
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-
     expect(model.pageModels.home?.count).toBe(1);
     expect((model as any).commandPaletteKind).toBe('search');
     expect((model as any).commandPaletteTitle).toBe('Search count 1');
@@ -301,7 +267,6 @@ describe('createFramedApp', () => {
       category: 'Home',
     }]);
   });
-
   it('lets search results dispatch to another page and activate that page', async () => {
     const app = createFramedApp({
       pages: [

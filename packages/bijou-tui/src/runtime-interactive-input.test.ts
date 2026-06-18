@@ -26,6 +26,7 @@ import {
   WRAP_DISABLE,
   WRAP_ENABLE,
 } from './runtime.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('run', () => {
   describe('interactive mode', () => {
@@ -48,7 +49,7 @@ describe('run', () => {
       await clock.advanceByAsync(50);
       await promise;
 
-      const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
+      const lastWrite = must(ctx.io.written[ctx.io.written.length - 1]);
       expect(lastWrite).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
 
@@ -57,12 +58,10 @@ describe('run', () => {
       const promise = run(counterApp(), { ctx, mouse: true });
       await clock.advanceByAsync(50);
       await promise;
-
       expect(ctx.io.written).toContain(DISABLE_MOUSE);
       expect(ctx.io.written[ctx.io.written.length - 2]).toBe(DISABLE_MOUSE);
       expect(ctx.io.written[ctx.io.written.length - 1]).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
-
     it('updates model on key input', async () => {
       const seen: number[] = [];
       const app: App<number> = {
@@ -80,7 +79,6 @@ describe('run', () => {
         },
         view: (model) => textView(`count: ${model}`),
       };
-
       const { clock, ctx } = createInteractiveContext();
       scheduleKeys(ctx, clock, [
         { at: 5, key: '\x1b[A' },
@@ -90,10 +88,8 @@ describe('run', () => {
       const promise = run(app, { ctx });
       await clock.advanceByAsync(50);
       await promise;
-
       expect(seen).toEqual([1, 2]);
     });
-
     it('handles double Ctrl+C force-quit', async () => {
       // App that ignores Ctrl+C (doesn't quit on it)
       const stubbornApp: App<string> = {
@@ -101,7 +97,6 @@ describe('run', () => {
         update(_msg, model) { return [model, []]; },
         view: (model) => textView(model),
       };
-
       // Two Ctrl+C in rapid succession
       const { clock, ctx } = createInteractiveContext({
         io: { keys: ['\x03', '\x03'] },
@@ -109,15 +104,12 @@ describe('run', () => {
       const promise = run(stubbornApp, { ctx });
       await clock.advanceByAsync(50);
       await promise;
-
       // Should have exited despite app not issuing quit
-      const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
+      const lastWrite = must(ctx.io.written[ctx.io.written.length - 1]);
       expect(lastWrite).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
-
     it('sends first Ctrl+C to app as KeyMsg', async () => {
       const received: KeyMsg[] = [];
-
       const spyApp: App<null> = {
         init: () => [null, []],
         update(msg, model) {
@@ -127,7 +119,6 @@ describe('run', () => {
         },
         view: () => textView('spy'),
       };
-
       // Ctrl+C then q to quit normally
       const { clock, ctx } = createInteractiveContext({
         io: { keys: ['\x03', 'q'] },
@@ -135,14 +126,11 @@ describe('run', () => {
       const promise = run(spyApp, { ctx });
       await clock.advanceByAsync(50);
       await promise;
-
       expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
     });
-
     it('does not treat the first Ctrl+C at clock time zero as a double-press', async () => {
       const clock = mockClock({ nowMs: 0 });
       const received: KeyMsg[] = [];
-
       const spyApp: App<null> = {
         init: () => [null, []],
         update(msg, model) {
@@ -154,7 +142,6 @@ describe('run', () => {
         },
         view: () => textView('spy'),
       };
-
       const ctx = createTestContext({ mode: 'interactive', clock });
       ctx.io.rawInput = (onKey) => {
         const handles = [
@@ -169,18 +156,14 @@ describe('run', () => {
           },
         };
       };
-
       const promise = run(spyApp, { ctx });
       await clock.advanceByAsync(20);
       await promise;
-
       expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
       expect(received.some((msg) => msg.key === 'q')).toBe(true);
     });
-
     it('executes startup commands from init', async () => {
       interface Msg { type: 'started' }
-
       const startupApp: App<string, Msg> = {
         init() {
           const cmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'started' as const });
@@ -192,20 +175,16 @@ describe('run', () => {
         },
         view: (model) => textView(model),
       };
-
       const { clock, ctx } = createInteractiveContext();
       const promise = run(startupApp, { ctx });
       await clock.advanceByAsync(50);
       await promise;
-
       const hasReady = ctx.io.written.some((w) => w.includes('ready'));
       expect(hasReady).toBe(true);
     });
-
     it('routes rejected commands through the app runtime issue hook', async () => {
       interface Msg { type: 'issue'; text: string }
       const seenIssues: string[] = [];
-
       const rejectingApp: App<string, Msg> = {
         init() {
           const rejectCmd: Cmd<Msg> = async () => {
@@ -228,21 +207,17 @@ describe('run', () => {
           return { type: 'issue', text: `${issue.source}:${issue.message}` };
         },
       };
-
       const { clock, ctx } = createInteractiveContext();
       scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
       const promise = run(rejectingApp, { ctx });
       await clock.advanceByAsync(100);
       await promise;
-
       expect(ctx.io.writtenErr.some((chunk) => chunk.includes('[EventBus] Command rejected: Error: boom'))).toBe(true);
       expect(seenIssues).toContain('command:Error: boom');
     });
-
     it('routes opt-in surface budget warnings through the app runtime issue hook', async () => {
       interface Msg { type: 'issue'; text: string }
       const seenIssues: string[] = [];
-
       const budgetedApp: App<string, Msg> = {
         init: () => ['idle', []],
         update(msg, model) {
@@ -265,7 +240,6 @@ describe('run', () => {
           };
         },
       };
-
       const { clock, ctx } = createInteractiveContext({ runtime: { columns: 4, rows: 4 } });
       scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
       const promise = run(budgetedApp, {
@@ -274,14 +248,11 @@ describe('run', () => {
       });
       await clock.advanceByAsync(100);
       await promise;
-
       expect(seenIssues).toContain('warning:runtime:surface surface-area 16 > 1');
     });
-
     it('runs init commands before startup resize commands', async () => {
       type Msg = { type: 'init-cmd' } | { type: 'resize-cmd' };
       const order: string[] = [];
-
       const orderingApp: App<null, Msg> = {
         init() {
           const initCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'init-cmd' });
@@ -299,25 +270,20 @@ describe('run', () => {
         },
         view: () => textView('ordering'),
       };
-
       const { clock, ctx } = createInteractiveContext();
       const promise = run(orderingApp, { ctx });
       await clock.advanceByAsync(50);
       await promise;
-
       expect(order).toEqual(['init', 'resize']);
     });
-
     it('skips alt screen when altScreen is false', async () => {
       const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
       const promise = run(counterApp(), { ctx, altScreen: false, hideCursor: false });
       await clock.advanceByAsync(50);
       await promise;
-
       const hasAltScreen = ctx.io.written.some((w) => w.includes(ENTER_ALT_SCREEN));
       expect(hasAltScreen).toBe(false);
     });
-
     it('allows callers to extend the render pipeline', async () => {
       const { clock, ctx } = createInteractiveContext();
       const app: App<null> = {
@@ -329,7 +295,6 @@ describe('run', () => {
           return surface;
         },
       };
-
       const promise = run(app, {
         ctx,
         configurePipeline(pipeline) {
@@ -339,13 +304,10 @@ describe('run', () => {
           });
         },
       });
-
       await clock.advanceByAsync(50);
       await promise;
-
       expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
     });
-
     it('exposes per-stage pipeline timings through observers and render state data', async () => {
       const { clock, ctx } = createInteractiveContext();
       const completed: string[] = [];
@@ -359,7 +321,6 @@ describe('run', () => {
           return surface;
         },
       };
-
       const promise = run(app, {
         ctx,
         configurePipeline(pipeline) {
@@ -371,10 +332,8 @@ describe('run', () => {
           });
         },
       });
-
       await clock.advanceByAsync(50);
       await promise;
-
       expect(completed).toEqual(['Layout', 'Paint', 'PostProcess', 'Diff', 'Output']);
       expect(seenDuringDiff).toEqual([['Layout', 'Paint', 'PostProcess', 'Diff']]);
     });

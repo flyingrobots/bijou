@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { createSurface, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, must } from '@flyingrobots/bijou/adapters/test';
 import { visibleLength } from './viewport.js';
 import { gridLayout, grid, gridSurface } from './grid.js';
-
 describe('gridLayout', () => {
   it('solves fixed + fr tracks', () => {
     const rects = gridLayout({
@@ -14,33 +13,24 @@ describe('gridLayout', () => {
       areas: ['nav main main', 'nav body body'],
       gap: 1,
     });
-
     const nav = rects.get('nav');
     const main = rects.get('main');
     const body = rects.get('body');
-
-    expect(nav).toBeDefined();
-    expect(main).toBeDefined();
-    expect(body).toBeDefined();
-    expect(nav!.width).toBe(10);
-    expect(nav!.row).toBe(0);
-    expect(nav!.col).toBe(0);
-    expect(nav!.height).toBe(10);
-
-    expect(main!.row).toBe(0);
-    expect(main!.col).toBe(11);
-    expect(main!.width).toBe(29);
-    expect(main!.height).toBe(2);
-
-    expect(body!.row).toBe(3);
-    expect(body!.col).toBe(11);
-    expect(body!.width).toBe(29);
-    expect(body!.height).toBe(7);
-
-    expect(nav!.width + 1 + main!.width).toBe(40);
-    expect(main!.height + 1 + body!.height).toBe(10);
+    expect(nav?.width).toBe(10);
+    expect(nav?.row).toBe(0);
+    expect(nav?.col).toBe(0);
+    expect(nav?.height).toBe(10);
+    expect(main?.row).toBe(0);
+    expect(main?.col).toBe(11);
+    expect(main?.width).toBe(29);
+    expect(main?.height).toBe(2);
+    expect(body?.row).toBe(3);
+    expect(body?.col).toBe(11);
+    expect(body?.width).toBe(29);
+    expect(body?.height).toBe(7);
+    expect(must(nav).width + 1 + must(main).width).toBe(40);
+    expect(must(main).height + 1 + must(body).height).toBe(10);
   });
-
   it('clamps fixed columns when they exceed available width', () => {
     const rects = gridLayout({
       width: 10,
@@ -50,12 +40,10 @@ describe('gridLayout', () => {
       areas: ['a b'],
       gap: 1,
     });
-
     expect(rects.get('a')?.width).toBe(8);
     expect(rects.get('b')?.width).toBe(1);
     expect(rects.get('b')?.col).toBe(9);
   });
-
   it('clamps fixed rows when they exceed available height', () => {
     const rects = gridLayout({
       width: 6,
@@ -65,12 +53,10 @@ describe('gridLayout', () => {
       areas: ['top', 'bottom'],
       gap: 1,
     });
-
     expect(rects.get('top')?.height).toBe(5);
     expect(rects.get('bottom')?.height).toBe(1);
     expect(rects.get('bottom')?.row).toBe(6);
   });
-
   it('throws when area rows mismatch tracks', () => {
     expect(() => gridLayout({
       width: 10,
@@ -80,7 +66,6 @@ describe('gridLayout', () => {
       areas: ['a b'],
     })).toThrow(/areas row count/);
   });
-
   it('throws on non-rectangular named area', () => {
     expect(() => gridLayout({
       width: 20,
@@ -90,7 +75,6 @@ describe('gridLayout', () => {
       areas: ['a a b', 'a b b'],
     })).toThrow(/contiguous rectangle/);
   });
-
   it('rejects fractional fr tracks', () => {
     expect(() => gridLayout({
       width: 20,
@@ -101,7 +85,6 @@ describe('gridLayout', () => {
     })).toThrow(/invalid fr track/);
   });
 });
-
 describe('grid render', () => {
   it('renders exact dimensions', () => {
     const output = grid({
@@ -117,7 +100,6 @@ describe('grid render', () => {
         right: () => 'RIGHT',
       },
     });
-
     const lines = output.split('\n');
     expect(lines).toHaveLength(6);
     for (const line of lines) {
@@ -127,7 +109,6 @@ describe('grid render', () => {
     expect(output).toContain('LEFT');
     expect(output).toContain('RIGHT');
   });
-
   it('throws when a renderer is missing', () => {
     expect(() => grid({
       width: 10,
@@ -138,7 +119,6 @@ describe('grid render', () => {
       cells: {},
     })).toThrow(/missing renderer/);
   });
-
   it('renders exact dimensions on the surface path', () => {
     const ctx = createTestContext();
     const surface = gridSurface({
@@ -154,10 +134,8 @@ describe('grid render', () => {
         right: () => stringToSurface('RIGHT', 5, 1),
       },
     });
-
     expect(surface.width).toBe(20);
     expect(surface.height).toBe(6);
-
     const lines = surfaceToString(surface, ctx.style).split('\n');
     expect(lines).toHaveLength(6);
     for (const line of lines) {
@@ -167,7 +145,6 @@ describe('grid render', () => {
     expect(lines.join('\n')).toContain('LEFT');
     expect(lines.join('\n')).toContain('RIGHT');
   });
-
   it('preserves structured cell styling on the surface path', () => {
     const surface = gridSurface({
       width: 8,
@@ -179,7 +156,6 @@ describe('grid render', () => {
         only: () => createSurface(2, 1, { char: 'X', fg: '#ff00ff', bg: '#101010', empty: false }),
       },
     });
-
     expect(surface.get(0, 0).char).toBe('X');
     expect(surface.get(0, 0).fg).toBe('#ff00ff');
     expect(surface.get(0, 0).bg).toBe('#101010');

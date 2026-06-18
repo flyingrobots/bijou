@@ -20,9 +20,7 @@ import {
   validateBlockMetadata,
 } from '../../../packages/bijou/src/index.js';
 import { readRepoFile } from '../repo.js';
-
 const DESIGN_DOC = 'docs/design/DF-046-choice-navigation-standard-blocks.md';
-
 const CHOICE_NAVIGATION_BLOCKS = [
   singleChoiceBlock,
   multipleChoiceBlock,
@@ -31,7 +29,6 @@ const CHOICE_NAVIGATION_BLOCKS = [
   progressiveDisclosureBlock,
   pathProgressBlock,
 ] as const;
-
 const CHOICE_NAVIGATION_SCHEMA_BLOCKS = [
   {
     block: singleChoiceBlock,
@@ -166,7 +163,6 @@ const CHOICE_NAVIGATION_SCHEMA_BLOCKS = [
     },
   },
 ] as const;
-
 describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
   it('publishes the choice/navigation block slice through the standard catalog', () => {
     expect(CHOICE_NAVIGATION_BLOCKS.map((block) => block.metadata.blockName)).toEqual([
@@ -177,7 +173,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       'ProgressiveDisclosureBlock',
       'PathProgressBlock',
     ]);
-
     expect(CHOICE_NAVIGATION_BLOCKS.map((block) => block.metadata.family)).toEqual([
       'input',
       'input',
@@ -194,7 +189,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       'section',
       'section',
     ]);
-
     for (const block of CHOICE_NAVIGATION_BLOCKS) {
       expect(validateBlockMetadata(block.metadata).passed).toBe(true);
       expect(block.metadata.modes).toEqual([
@@ -214,7 +208,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
         `${commandPrefix(block.metadata.blockName)}.openStory`,
       ]);
     }
-
     expect(standardBlocks).toEqual(expect.arrayContaining([...CHOICE_NAVIGATION_BLOCKS]));
     expect(standardBlockPackageManifest.blocks).toEqual(expect.arrayContaining([
       'SingleChoiceBlock',
@@ -225,7 +218,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       'PathProgressBlock',
     ]));
   });
-
   it('renders each choice/navigation block across visual and lower modes', () => {
     for (const block of CHOICE_NAVIGATION_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
@@ -233,7 +225,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       const staticOutput = block.render({ mode: 'static', slots, config: { width: 60 } });
       const pipe = block.render({ mode: 'pipe', slots });
       const accessible = block.render({ mode: 'accessible', slots });
-
       expect(typeof interactive.output).toBe('object');
       expect(typeof staticOutput.output).toBe('object');
       expect(String(pipe.output)).toContain(block.metadata.blockName);
@@ -242,7 +233,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       expect(String(accessible.output)).toContain(expectedNeedle(block.metadata.blockName));
     }
   });
-
   it('binds schema-validated choice/navigation data to render slots', () => {
     for (const spec of CHOICE_NAVIGATION_SCHEMA_BLOCKS) {
       expect(isSchemaBoundBlockDefinition(spec.schemaBlock)).toBe(true);
@@ -252,7 +242,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
         optionalFields: spec.optionalFields,
         facts: [{ kind: 'entity', key: 'block.schema', value: spec.block.metadata.blockName }],
       });
-
       const bound = spec.bind(spec.valid);
       expect(bound).toMatchObject({
         ok: true,
@@ -261,7 +250,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       expect(bound.facts).toEqual(expect.arrayContaining([
         { kind: 'entity', key: 'block.schema', value: spec.block.metadata.blockName },
       ]));
-
       expect(spec.bind(spec.invalid)).toMatchObject({
         ok: false,
         issues: [{
@@ -271,7 +259,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       });
     }
   });
-
   it('rejects choice/navigation schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorEntry = Object.defineProperties({}, {
@@ -297,13 +284,11 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
         },
       },
     });
-
     expect(bindSchemaBlockInput(singleChoiceSchemaBlock, accessorEntry)).toMatchObject({
       ok: false,
     });
     expect(getterCalls).toBe(0);
   });
-
   it('preserves required semantic facts in lowerings for the slice', () => {
     for (const block of CHOICE_NAVIGATION_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
@@ -313,7 +298,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
           facts: block.render({ mode, slots }).facts ?? [],
         })),
       });
-
       expect(report, block.metadata.blockName).toMatchObject({ passed: true });
       expect(block.render({ mode: 'pipe', slots }).facts).toEqual(expect.arrayContaining([
         { kind: 'entity', key: 'block', value: block.metadata.blockName },
@@ -328,7 +312,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
         },
       ]));
     }
-
     for (const blockName of ['SingleChoiceBlock', 'MultipleChoiceBlock', 'BinaryDecisionBlock']) {
       const block = CHOICE_NAVIGATION_BLOCKS.find((candidate) => candidate.metadata.blockName === blockName)!;
       expect(block.render({
@@ -341,11 +324,9 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       });
     }
   });
-
   it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
     const design = readRepoFile(DESIGN_DOC);
     const changelog = readRepoFile('docs/CHANGELOG.md');
-
     for (const issue of ['#232', '#233', '#234', '#235', '#236', '#237']) {
       expect(design).toContain(issue);
     }
@@ -353,7 +334,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       expect(design).toContain(blockName);
       expect(changelog).toContain(blockName);
     }
-
     expect(design).toContain('## TUI Mockups');
     expect(design).toContain('## Lower Modes');
     expect(design).toContain('Pipe mode');
@@ -361,7 +341,6 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
     expect(design).toContain('Design Thinking');
   });
 });
-
 function storyPrefix(blockName: string): string {
   return blockName
     .replace(/Block$/, '')
@@ -370,12 +349,10 @@ function storyPrefix(blockName: string): string {
       (letter, index) => `${index === 0 ? '' : '-'}${letter.toLowerCase()}`,
     );
 }
-
 function commandPrefix(blockName: string): string {
   const withoutBlock = blockName.replace(/Block$/, '');
   return withoutBlock.charAt(0).toLowerCase() + withoutBlock.slice(1);
 }
-
 function slotsFor(blockName: string): Readonly<Record<string, unknown>> {
   switch (blockName) {
     case 'SingleChoiceBlock':
@@ -430,7 +407,6 @@ function slotsFor(blockName: string): Readonly<Record<string, unknown>> {
       throw new Error(`missing slots for ${blockName}`);
   }
 }
-
 function expectedNeedle(blockName: string): string {
   switch (blockName) {
     case 'SingleChoiceBlock':
@@ -449,7 +425,6 @@ function expectedNeedle(blockName: string): string {
       throw new Error(`missing needle for ${blockName}`);
   }
 }
-
 function primarySemanticSlot(blockName: string): string {
   switch (blockName) {
     case 'SingleChoiceBlock':
@@ -464,7 +439,6 @@ function primarySemanticSlot(blockName: string): string {
       throw new Error(`missing semantic slot for ${blockName}`);
   }
 }
-
 function primarySemanticValue(blockName: string): string {
   switch (blockName) {
     case 'PeerNavigationBlock':
@@ -475,7 +449,6 @@ function primarySemanticValue(blockName: string): string {
       return expectedNeedle(blockName);
   }
 }
-
 function selectedFactValue(blockName: string): string {
   switch (blockName) {
     case 'SingleChoiceBlock':

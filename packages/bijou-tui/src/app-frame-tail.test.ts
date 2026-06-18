@@ -300,10 +300,10 @@ describe('createFramedApp', () => {
     app.view(model);
 
     expect(captured).toBeDefined();
-    expect(must(captured).paneRects.has('left')).toBe(true);
-    expect(must(captured).paneRects.has('right')).toBe(true);
+    expect(captured?.paneRects.has('left')).toBe(true);
+    expect(captured?.paneRects.has('right')).toBe(true);
     // Body starts below the single-line header and above the footer
-    expect(must(captured!.paneRects.get('left')).row).toBeGreaterThanOrEqual(1);
+    expect(must(captured).paneRects.get('left')?.row).toBeGreaterThanOrEqual(1);
   });
 
   it('renders mode and focused pane in the frame footer line', () => {
@@ -338,7 +338,7 @@ describe('createFramedApp', () => {
     expect(runtimeMsg).toBeDefined();
 
     const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
-    const tickMsg = await must(cmds[0])(() => undefined, {
+    const tickMsg = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
       now: () => 200,
@@ -396,7 +396,7 @@ describe('createFramedApp', () => {
     expect(model.pageModels.home?.count).toBe(1);
     expect(cmds).toHaveLength(1);
 
-    const returned = await must(cmds[0])(() => undefined, {
+    const returned = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
       now: () => 123,
@@ -419,7 +419,7 @@ describe('createFramedApp', () => {
     });
     expect(cmds).toHaveLength(1);
 
-    const tickMsg = await must(cmds[0])(() => undefined, {
+    const tickMsg = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
       now: () => 200,

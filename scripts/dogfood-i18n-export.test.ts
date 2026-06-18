@@ -21,21 +21,17 @@ import {
 } from '../examples/docs/i18n/dogfood-authoring.js';
 import { runDogfoodI18nBuild } from './dogfood-i18n-build.js';
 import { runDogfoodI18nExport } from './dogfood-i18n-export.js';
-
 const tempDirs: string[] = [];
-
 async function makeTempDir(): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'bijou-dogfood-i18n-'));
   tempDirs.push(dir);
   return dir;
 }
-
 afterEach(async () => {
   await Promise.all(tempDirs.splice(0).map(async (dir) => {
     await rm(dir, { recursive: true, force: true });
   }));
 });
-
 describe('DOGFOOD i18n export workflow', () => {
   it('keeps generated selected-locale catalog files language-specific', () => {
     const languageEntry = DOGFOOD_I18N_CATALOG.entries.find(
@@ -44,7 +40,6 @@ describe('DOGFOOD i18n export workflow', () => {
     const frLanguageEntry = dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(
       (entry) => entry.key.id === 'settings.language.label',
     );
-
     expect(DOGFOOD_I18N_CATALOG.namespace).toBe('bijou.dogfood');
     expect(languageEntry?.values.en).toBe('Preferred language');
     expect(languageEntry?.values.fr).toBeUndefined();
@@ -54,23 +49,19 @@ describe('DOGFOOD i18n export workflow', () => {
     expect(frLanguageEntry?.values.en).toBeUndefined();
     expect(frLanguageEntry?.values.es).toBeUndefined();
   });
-
   it('uses the committed Dogfood CSV string table as the authoring source', () => {
     const table = dogfoodStringTable();
     const authoring = dogfoodAuthoringCatalogs();
     const compiled = compileCatalogs(authoring);
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
-
     for (const catalog of compiled) {
       runtime.loadCatalog(catalog);
     }
-
     expect(table.rows.length).toBeGreaterThan(DOGFOOD_I18N_CATALOG.entries.length);
     expect(authoring[0]?.entries.length).toBe(DOGFOOD_I18N_CATALOG.entries.length);
     expect(runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' }))
       .toBe('Langue préférée');
   });
-
   it('exports Dogfood translations through the existing CSV workbook adapter', async () => {
     const workbook = createDogfoodTranslationWorkbook('it');
     const sheet = workbook.sheets[0]!;
@@ -81,39 +72,32 @@ describe('DOGFOOD i18n export workflow', () => {
     })).stdout;
     const parsed = parseExchangeSheet(sheet.name, csv, 'csv');
     const rows = importTranslationWorkbook({ version: 1, sheets: [parsed] });
-
     expect(sheet.name).toBe('translations-it');
     expect(rows.length).toBe(DOGFOOD_I18N_CATALOG.entries.length);
     expect(rows.find((row) => row.id === 'settings.language.description')?.sourceValue)
       .toBe('Current language: {language}. Options: {options}.');
   });
-
   it('exports Dogfood authoring catalogs as JSON bundles without losing translations', () => {
     const bundle = createDogfoodCatalogBundle();
     const restored = importCatalogBundle(bundle);
     const runtime = createI18nRuntime({ locale: 'de', direction: 'ltr' });
-
     for (const catalog of compileCatalogs(restored)) {
       runtime.loadCatalog(catalog);
     }
-
     expect(bundle.catalogs[0]?.entries[0]?.sourceValue.kind).toBe('string');
     expect(runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' }))
       .toBe('Bevorzugte Sprache');
   });
-
   it('prints help as a successful usage path', async () => {
     const result = await runDogfoodI18nExport({
       args: ['--help'],
       stdout: (text) => text,
       stderr: () => undefined,
     });
-
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Usage: npm run dogfood:i18n:export');
     expect(result.stderr).toBe('');
   });
-
   it('can write CSV workbooks and JSON bundles to explicit filesystem targets', async () => {
     const dir = await makeTempDir();
     const result = await runDogfoodI18nExport({
@@ -121,15 +105,12 @@ describe('DOGFOOD i18n export workflow', () => {
       stdout: (text) => text,
       stderr: () => undefined,
     });
-
     const manifest = await readFile(join(dir, 'fr', 'workbook.json'), 'utf8');
     const bundle = await readFile(join(dir, 'bundle.json'), 'utf8');
-
     expect(result.exitCode).toBe(0);
     expect(manifest).toContain('"format": "csv"');
     expect(bundle).toContain('"namespace": "bijou.dogfood"');
   });
-
   it('builds per-locale runtime catalog JSON files from the committed CSV source', async () => {
     const dir = await makeTempDir();
     const result = runDogfoodI18nBuild({
@@ -138,7 +119,6 @@ describe('DOGFOOD i18n export workflow', () => {
       stderr: () => undefined,
     });
     const frCatalog = await readFile(join(dir, 'catalogs', 'fr', 'bijou.dogfood.json'), 'utf8');
-
     expect(result.exitCode).toBe(0);
     expect(result.files).toEqual([
       join(dir, 'catalogs', 'de', 'bijou.dogfood.json'),

@@ -4,7 +4,7 @@ legend: WF
 lane: bad-code
 priority: high
 github_issue: 374
-status: proposed
+status: complete
 keywords:
   - code-dojo
   - eslint
@@ -135,4 +135,7 @@ visible rendering.
 
 ## Retrospective
 
-To be completed when the PR lands.
+Completed with a measured aggregate Code Dojo debt reduction from `4,940` to
+`3,814` (`-1,126`). The stored ESLint baseline now records `3,391` live
+findings, down from `4,517` (`-1,126`), and the next aggregate target is
+`3,764` or lower.

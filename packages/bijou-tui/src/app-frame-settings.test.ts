@@ -226,7 +226,7 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]!(() => {}, {
+    const returned = await cmds[0]?.(() => {}, {
       onPulse() {
         return { dispose() {} };
       },
@@ -258,7 +258,7 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]!(() => {}, {
+    const returned = await cmds[0]?.(() => {}, {
       onPulse() {
         return { dispose() {} };
       },

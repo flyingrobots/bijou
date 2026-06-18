@@ -16,7 +16,6 @@ import {
   isActiveBindingCollection,
   isActiveBindingEntry,
 } from './active-binding-collection.js';
-
 const readerMetadata: BlockMetadata = {
   packageName: '@flyingrobots/bijou',
   blockName: 'ReaderSurface',
@@ -26,7 +25,6 @@ const readerMetadata: BlockMetadata = {
   docs: { summary: 'Reader content surface.' },
   slots: [{ id: 'content', required: true }],
 };
-
 describe('active binding collection primitives', () => {
   it('creates frozen active binding collections from explicit owner and requirement entries', () => {
     const owner = defineBindingLifecycleOwner({
@@ -45,7 +43,6 @@ describe('active binding collection primitives', () => {
       providerId: ' docs.articleProvider ',
     });
     const collection = activeBindingCollection([entry]);
-
     expect(isActiveBindingEntry(entry)).toBe(true);
     expect(isActiveBindingCollection(collection)).toBe(true);
     expect(collection).toBeInstanceOf(ActiveBindingCollection);
@@ -63,7 +60,6 @@ describe('active binding collection primitives', () => {
     expect(Object.isFrozen(collection)).toBe(true);
     expect(Object.isFrozen(collection.entries())).toBe(true);
   });
-
   it('produces one active lifecycle record per owner and requirement pair', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({
@@ -86,7 +82,6 @@ describe('active binding collection primitives', () => {
         requirement: outline,
       }),
     ]);
-
     expect(collection.lifecycleRecords()).toEqual([
       {
         owner,
@@ -111,7 +106,6 @@ describe('active binding collection primitives', () => {
     expect(Object.isFrozen(collection.lifecycleRecords())).toBe(true);
     expect(Object.isFrozen(collection.lifecycleRecords()[0])).toBe(true);
   });
-
   it('treats repeated owner and requirement pairs as one logical active binding', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
@@ -125,7 +119,6 @@ describe('active binding collection primitives', () => {
       }),
       activeBindingEntry({ owner, requirement: outline }),
     ]);
-
     expect(collection.entries().map((entry) => ({
       ownerId: entry.owner.id,
       requirementId: entry.requirement.id,
@@ -144,11 +137,9 @@ describe('active binding collection primitives', () => {
     ]);
     expect(collection.lifecycleRecords()).toHaveLength(2);
   });
-
   it('rejects repeated owner and requirement pairs with conflicting provider ids', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
-
     expect(() => activeBindingCollection([
       activeBindingEntry({
         owner,
@@ -164,11 +155,9 @@ describe('active binding collection primitives', () => {
       'active binding collection: conflicting providers for owner reader.view requirement article',
     );
   });
-
   it('rejects duplicate active entries and loose owner, requirement, or entry objects', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
-
     expect(() => activeBindingEntry({
       owner: { id: 'reader.view', kind: 'view' } as never,
       requirement: article,
@@ -193,7 +182,6 @@ describe('active binding collection primitives', () => {
       'active binding collection: entry at index 0 was not created by activeBindingEntry()',
     );
   });
-
   it('rejects malformed contract inputs and provider assignments with domain errors', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
@@ -204,7 +192,6 @@ describe('active binding collection primitives', () => {
       requirementIds: { value: () => ['article'] },
       requirements: { value: () => [null] },
     });
-
     expect(() => collectActiveBindings({
       entries: {} as never,
     })).toThrow('active binding collection: entries must be an array');
@@ -262,7 +249,6 @@ describe('active binding collection primitives', () => {
       'active binding collection: contract 0 requirement 0 was not created by defineDataRequirement()',
     );
   });
-
   it('does not mutate previous collections when with() creates a new collection', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
@@ -273,7 +259,6 @@ describe('active binding collection primitives', () => {
     const collectionB = collectionA.with(
       activeBindingEntry({ owner, requirement: outline }),
     );
-
     expect(collectionA.entries()).toHaveLength(1);
     expect(collectionA.has('reader.view', 'outline')).toBe(false);
     expect(collectionB.entries()).toHaveLength(2);
@@ -282,7 +267,6 @@ describe('active binding collection primitives', () => {
       (collectionA.entries() as unknown[]).push(collectionB.entries()[1]);
     }).toThrow(TypeError);
   });
-
   it('exposes no provider handles, subscription handles, render callbacks, or dispatch callbacks', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
@@ -292,7 +276,6 @@ describe('active binding collection primitives', () => {
       providerId: 'docs.articleProvider',
     });
     const collection = activeBindingCollection([entry]);
-
     expect('provider' in entry).toBe(false);
     expect('providerHandle' in entry).toBe(false);
     expect('subscription' in entry).toBe(false);
@@ -308,7 +291,6 @@ describe('active binding collection primitives', () => {
     expect('dispatch' in collection).toBe(false);
     expect('render' in collection).toBe(false);
   });
-
   it('collects declared view data contracts without executing block render functions', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
@@ -329,7 +311,6 @@ describe('active binding collection primitives', () => {
         return { output: 'rendered' };
       },
     });
-
     const collection = collectActiveBindings({
       contracts: [{
         owner,
@@ -339,7 +320,6 @@ describe('active binding collection primitives', () => {
         ],
       }],
     });
-
     expect(renderCalls).toBe(0);
     expect(collection.entries().map((entry) => entry.requirement.id)).toEqual([
       'article',

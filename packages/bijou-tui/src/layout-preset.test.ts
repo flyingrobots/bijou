@@ -48,9 +48,9 @@ describe('serializeLayoutState', () => {
     const result = serializeLayoutState(model, ['page1']);
     expect(result.version).toBe(1);
     expect(result.activePageId).toBe('page1');
-    expect(result.pages['page1']!.focusedPane).toBe('a');
-    expect(result.pages['page1']!.minimized).toEqual([]);
-    expect(result.pages['page1']!.maximizedPane).toBeUndefined();
+    expect(result.pages['page1']?.focusedPane).toBe('a');
+    expect(result.pages['page1']?.minimized).toEqual([]);
+    expect(result.pages['page1']?.maximizedPane).toBeUndefined();
   });
 
   it('reads panel state from model when perPage is omitted', () => {
@@ -88,10 +88,10 @@ describe('serializeLayoutState', () => {
     };
 
     const result = serializeLayoutState(model, ['page1']);
-    expect(result.pages['page1']!.minimized).toEqual(['b']);
-    expect(result.pages['page1']!.maximizedPane).toBe('a');
-    expect(result.pages['page1']!.dockOrder).toEqual({ 'split-1': ['b', 'a'] });
-    expect(result.pages['page1']!.splitRatios).toEqual({ 'split-1': 0.3 });
+    expect(result.pages['page1']?.minimized).toEqual(['b']);
+    expect(result.pages['page1']?.maximizedPane).toBe('a');
+    expect(result.pages['page1']?.dockOrder).toEqual({ 'split-1': ['b', 'a'] });
+    expect(result.pages['page1']?.splitRatios).toEqual({ 'split-1': 0.3 });
   });
 
   it('serializes with per-page state', () => {
@@ -135,10 +135,10 @@ describe('serializeLayoutState', () => {
       dockStateByPage: { page1: { orderByContainer: { 'split-1': ['b', 'a'] } } },
     });
 
-    expect(result.pages['page1']!.minimized).toEqual(['a']);
-    expect(result.pages['page1']!.maximizedPane).toBe('b');
-    expect(result.pages['page1']!.splitRatios).toEqual({ 'split-1': 0.7 });
-    expect(result.pages['page1']!.dockOrder).toEqual({ 'split-1': ['b', 'a'] });
+    expect(result.pages['page1']?.minimized).toEqual(['a']);
+    expect(result.pages['page1']?.maximizedPane).toBe('b');
+    expect(result.pages['page1']?.splitRatios).toEqual({ 'split-1': 0.7 });
+    expect(result.pages['page1']?.dockOrder).toEqual({ 'split-1': ['b', 'a'] });
   });
 });
 
@@ -161,10 +161,10 @@ describe('restoreLayoutState', () => {
     const restored = restoreLayoutState(serialized);
     expect(restored.activePageId).toBe('page1');
     expect(restored.focusedPaneByPage['page1']).toBe('b');
-    expect(restored.minimizedByPage['page1']!.minimized.has('a')).toBe(true);
-    expect(restored.maximizedPaneByPage['page1']!.maximizedPaneId).toBe('b');
-    expect(restored.dockStateByPage['page1']!.orderByContainer['split-1']).toEqual(['b', 'a']);
-    expect(restored.splitRatiosByPage['page1']!['split-1']).toBe(0.6);
+    expect(restored.minimizedByPage['page1']?.minimized.has('a')).toBe(true);
+    expect(restored.maximizedPaneByPage['page1']?.maximizedPaneId).toBe('b');
+    expect(restored.dockStateByPage['page1']?.orderByContainer['split-1']).toEqual(['b', 'a']);
+    expect(restored.splitRatiosByPage['page1']?.['split-1']).toBe(0.6);
   });
 
   it('handles empty pages', () => {
@@ -191,7 +191,6 @@ describe('preset helpers', () => {
     const preset = presetStacked('split-1');
     expect(preset.splitRatios['split-1']).toBe(0.5);
   });
-
   it('presetFocused maximizes the given pane', () => {
     const preset = presetFocused('editor');
     expect(preset.maximizedPane).toBe('editor');

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { storyCaptureMatrixText, stripAnsi, surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, must } from '@flyingrobots/bijou/adapters/test';
 import {
   createStorybookApp,
   createStorybookFrameApp,
@@ -61,53 +61,44 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     expect(index).toContain('modes=interactive,static,pipe,accessible');
     expect(index).toContain('source=examples/notifications/main.ts');
   });
-
   it('captures a selected story across every profile and variant', () => {
     const matrix = captureDogfoodStorybookMatrix({ storyId: 'notification-system' });
     const story = COMPONENT_STORIES.find((candidate) => candidate.id === 'notification-system');
     expect(story).toBeDefined();
-
     expect(matrix.storyId).toBe('notification-system');
-    expect(matrix.title).toBe(story!.title);
+    expect(matrix.title).toBe(story?.title);
     expect(matrix.missingModes).toEqual([]);
-    expect(matrix.captures).toHaveLength(story!.profilePresets.length * story!.variants.length);
+    expect(matrix.captures).toHaveLength(must(story).profilePresets.length * must(story).variants.length);
     expect(matrix.captures.some((capture) => (
       capture.profileId === 'pipe'
       && capture.variantId === 'framed-routing'
       && capture.output.includes('frame runtime notifications')
     ))).toBe(true);
-
     const text = storyCaptureMatrixText(matrix);
     expect(text).toContain('story capture matrix: notification-system');
     expect(text).toContain('variant framed-routing (Framed routing)');
     expect(text).toContain('Footer cue: notices:2');
   });
-
   it('registers the text-first workstation commands', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
-
     expect(packageJson.scripts['blocklab:index']).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['storybook:index']).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['dogfood:storybook']).toBe('tsx examples/docs/storybook-workstation.ts');
   });
-
   it('registers the interactive story browser command', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
     const entrypoint = readRepoFile('examples/docs/storybook.ts');
-
     expect(packageJson.scripts.blocklab).toBe('node --import tsx examples/docs/storybook.ts');
     expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
     expect(entrypoint).toContain('createBlockLabFrameApp');
     expect(entrypoint).not.toContain('createDocsApp');
   });
-
   it('can start a standalone interactive BlockLab workbench', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createStorybookApp(ctx, { initialStoryId: 'notification-system' });
     const [model] = app.init();
     const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
     const text = stripAnsi(surfaceToString(surface, ctx.style));
-
     expect(selectedStorybookStory(model).id).toBe('notification-system');
     expect((model as any).route).toBeUndefined();
     expect((model as any).docsModel).toBeUndefined();
@@ -117,7 +108,6 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     expect(text).toContain('all required modes');
     expect(text).not.toContain('Press [Enter]');
   });
-
   it('runs the interactive Storybook entrypoint through the AppFrame shell', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createStorybookFrameApp(ctx, { initialStoryId: 'notification-system' });
@@ -125,17 +115,14 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     const pageModel = (model as any).pageModels.storybook;
     const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
     const text = stripAnsi(surfaceToString(surface, ctx.style));
-
     expect((model as any).activePageId).toBe('storybook');
     expect(selectedStorybookStory(pageModel).id).toBe('notification-system');
     expect(text).toContain('Bijou BlockLab');
     expect(text).toContain('BlockLab');
     expect(text).toContain('notification-system');
   });
-
   it('lets framed BlockLab navigation keys move the selected story', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-
     for (const key of [KEY_DOWN, 'j']) {
       const app = createStorybookFrameApp(ctx);
       const [initialModel] = app.init();
@@ -144,12 +131,10 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
       const pageModel = (result.model as any).pageModels.storybook;
       const after = selectedStorybookStory(pageModel).id;
-
       expect(before).toBe('alert');
       expect(after).not.toBe(before);
       expect(after).toBe('badge');
     }
-
     for (const key of [KEY_UP, 'k']) {
       const app = createStorybookFrameApp(ctx, { initialStoryId: 'badge' });
       const [initialModel] = app.init();
@@ -158,7 +143,6 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
       const pageModel = (result.model as any).pageModels.storybook;
       const after = selectedStorybookStory(pageModel).id;
-
       expect(before).toBe('badge');
       expect(after).not.toBe(before);
       expect(after).toBe('alert');

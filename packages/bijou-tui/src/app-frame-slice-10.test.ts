@@ -19,18 +19,16 @@ import {
   FramePage,
   MouseMsg,
   Msg,
+  must,
 } from './app-frame.test-support.js';
-
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
-
   it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const [model] = app.init();
     const runtimeMsg = app.routeRuntimeIssue?.({
       level: 'warning',
@@ -39,15 +37,13 @@ describe('createFramedApp', () => {
       atMs: 0,
     });
     if (runtimeMsg == null) throw new Error('expected runtime issue message');
-
     const [nextModel, cmds] = app.update(runtimeMsg, model);
-    const tickMsg = await cmds[0]!(() => undefined, {
+    const tickMsg = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
       now: () => 200,
     });
     const [visibleModel] = app.update(tickMsg as Msg, nextModel);
-
     let dismissMouse: MouseMsg | undefined;
     let sawActionTarget = false;
     for (let row = 0; row < visibleModel.rows; row++) {
@@ -74,16 +70,12 @@ describe('createFramedApp', () => {
         }
       }
     }
-
     expect(sawActionTarget).toBe(false);
-    expect(dismissMouse).toBeDefined();
-
-    const [dismissedModel] = app.update(dismissMouse!, visibleModel);
+    const [dismissedModel] = app.update(must(dismissMouse), visibleModel);
     expect(dismissedModel.runtimeNotifications.items).toHaveLength(1);
     expect(dismissedModel.runtimeNotifications.items[0]?.phase).toBe('exiting');
     expect(dismissedModel.runtimeNotificationLoopActive).toBe(true);
   }, 10000);
-
   it('treats modal keymaps as exclusive while a page modal is open', async () => {
     const app = createFramedApp({
       pages: [{
@@ -109,17 +101,14 @@ describe('createFramedApp', () => {
         },
       }],
     });
-
     const result = await runScript(app, [
       { key: 'x' },
       { key: ']' },
       { key: KEY_ESCAPE },
     ]);
-
     expect(result.model.activePageId).toBe('home');
     expect(result.model.pageModels.home?.count).toBe(0);
   });
-
   it('keeps pane keymaps inactive while a page modal is open', async () => {
     type PaneMsg = { type: 'pane-hit' } | { type: 'close-modal' };
     const page: FramePage<{ paneHits: number; modalOpen: boolean }, PaneMsg> = {

@@ -33,6 +33,7 @@ import {
   NotificationState,
   PageModel,
 } from './app-frame.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
@@ -203,7 +204,7 @@ describe('createFramedApp', () => {
       notificationCenter: ({ pageModel }) => ({
         state: pageModel.notifications,
         filters,
-        activeFilter: filters[pageModel.filterIndex]!,
+        activeFilter: must(filters[pageModel.filterIndex]),
         onFilterChange: (filter) => ({ type: 'set-history-filter', filter }),
       }),
     });
@@ -214,7 +215,7 @@ describe('createFramedApp', () => {
     [model, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false } as unknown as NotificationMsg, model);
 
     expect(cmds).toHaveLength(1);
-    const returned = await cmds[0]!(() => undefined, {
+    const returned = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
     });
     [model] = app.update(returned as NotificationMsg, model);
@@ -298,7 +299,7 @@ describe('createFramedApp', () => {
     expect(liveLine).toBeGreaterThanOrEqual(0);
     expect(stackLine).toBeGreaterThan(liveLine + 1);
     expect(noticeLine).toBeGreaterThan(stackLine + 1);
-    expect(lines[noticeLine]!.indexOf('Deploy failed')).toBeGreaterThan(0);
+    expect(lines[noticeLine]?.indexOf('Deploy failed')).toBeGreaterThan(0);
     expect(historyLine).toBeGreaterThan(noticeLine + 2);
   });
 
@@ -366,7 +367,7 @@ describe('createFramedApp', () => {
     if (runtimeMsg == null) throw new Error('expected runtime issue message');
 
     const [nextModel, cmds] = app.update(runtimeMsg, model);
-    const tickMsg = await cmds[0]!(() => undefined, {
+    const tickMsg = await cmds[0]?.(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
       now: () => 8_000,
@@ -374,8 +375,7 @@ describe('createFramedApp', () => {
     const [archivedModel] = app.update(tickMsg as Msg, nextModel);
     const frame = app.view(archivedModel);
     if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
-    const footer = surfaceToString(frame, testCtx.style).split('\n').at(-1)!;
-
+    const footer = must(surfaceToString(frame, testCtx.style).split('\n').at(-1));
     expect(footer).toContain('notices:1');
   });
 });
