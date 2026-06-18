@@ -390,8 +390,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
   it('resets the guide content scroll when selecting another block preview', async () => {
     const [firstBlock, secondBlock] = standardBlocks;
-    expect(firstBlock).toBeDefined();
-    expect(secondBlock).toBeDefined();
+    if (firstBlock == null || secondBlock == null) throw new Error('Expected two standard blocks');
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 60 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
@@ -399,7 +398,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock!.metadata.blockName) },
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock.metadata.blockName) },
         },
       },
       { key: KEY_TAB },
@@ -407,7 +406,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: blockPreviewGuideId(secondBlock!.metadata.blockName) },
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(secondBlock.metadata.blockName) },
         },
       },
     ], { ctx });
@@ -415,7 +414,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const text = frameText(result.frames.at(-1)!);
 
     expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
-    expect(text).toContain(secondBlock!.metadata.blockName);
+    expect(text).toContain(secondBlock.metadata.blockName);
     expect(text).toContain('lowering summary');
   });
 
