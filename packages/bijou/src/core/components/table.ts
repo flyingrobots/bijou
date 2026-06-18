@@ -192,12 +192,13 @@ function normalizePositiveWeight(weight: number | undefined): number {
 }
 
 function maxVisibleLineWidth(value: string): number {
-  const lines = String(value ?? '').split('\n');
+  const lines = value.split('\n');
   return lines.reduce((max, line) => Math.max(max, visibleLength(line)), 0);
 }
 
 function normalizeRows(rows: readonly TableTextRow[] | undefined): string[][] {
-  return (rows ?? []).map(row => (row ?? []).map(cell => String(cell ?? '')));
+  const raw = (rows ?? []) as readonly unknown[];
+  return raw.map(row => Array.isArray(row) ? row.map(cell => typeof cell === 'string' ? cell : '') : []);
 }
 
 function resolveColumns(
@@ -226,7 +227,7 @@ function normalizeTable(options: TableOptions): NormalizedTable {
   return {
     columns,
     rows,
-    showHeader: variant === 'definition' || columns.some(column => (column.header ?? '').length > 0),
+    showHeader: variant === 'definition' || columns.some(column => column.header.length > 0),
   };
 }
 
@@ -264,7 +265,7 @@ function columnPreferredWidth(
   const fixedWidth = normalizeColumnWidth(column.width);
   if (fixedWidth !== undefined) return fixedWidth;
 
-  let preferred = Math.max(1, maxVisibleLineWidth(column.header ?? ''));
+  let preferred = Math.max(1, maxVisibleLineWidth(column.header));
   for (const row of rows) {
     preferred = Math.max(preferred, maxVisibleLineWidth(row[columnIndex] ?? ''));
   }
@@ -307,12 +308,12 @@ function fitColumnWidths(
   const preferredTotal = preferred.reduce((sum, width) => sum + width, 0);
   if (preferredTotal <= contentTarget) return preferred;
 
-  const minimum = columns.map((column, index) => columnMinWidth(column, preferred[index]!));
+  const minimum = columns.map((column, index) => columnMinWidth(column, preferred[index] ?? 0));
   const minimumTotal = minimum.reduce((sum, width) => sum + width, 0);
   if (minimumTotal >= contentTarget) return minimum;
 
   const widths = [...minimum];
-  const remainingCapacity = preferred.map((width, index) => Math.max(0, width - minimum[index]!));
+  const remainingCapacity = preferred.map((width, index) => Math.max(0, width - (minimum[index] ?? 0)));
   let remainingBudget = contentTarget - minimumTotal;
 
   while (remainingBudget > 0) {
@@ -332,14 +333,14 @@ function fitColumnWidths(
       const exact = (remainingBudget * weight) / totalWeight;
       const add = Math.min(entry.capacity, Math.floor(exact));
       if (add > 0) {
-        widths[entry.index]! += add;
-        remainingCapacity[entry.index]! -= add;
+        widths[entry.index] = (widths[entry.index] ?? 0) + add;
+        remainingCapacity[entry.index] = (remainingCapacity[entry.index] ?? 0) - add;
         used += add;
       }
       remainders.push({
         index: entry.index,
         remainder: exact - Math.floor(exact),
-        capacity: remainingCapacity[entry.index]!,
+        capacity: remainingCapacity[entry.index] ?? 0,
       });
     }
 
@@ -348,12 +349,12 @@ function fitColumnWidths(
         .filter(entry => entry.capacity > 0)
         .sort((left, right) => {
           if (right.remainder !== left.remainder) return right.remainder - left.remainder;
-          return remainingCapacity[right.index]! - remainingCapacity[left.index]!;
+          return (remainingCapacity[right.index] ?? 0) - (remainingCapacity[left.index] ?? 0);
         });
       const next = sortedRemainders[0];
       if (!next) break;
-      widths[next.index]!++;
-      remainingCapacity[next.index]!--;
+      widths[next.index] = (widths[next.index] ?? 0) + 1;
+      remainingCapacity[next.index] = (remainingCapacity[next.index] ?? 0) - 1;
       used = 1;
     }
 
@@ -369,12 +370,11 @@ function formatCellLines(
   overflow: OverflowBehavior,
   wrapMode: TableWrapMode,
 ): string[] {
-  const safeValue = value ?? '';
   if (overflow === 'truncate') {
-    return safeValue.split('\n').map(line => clipCellToWidth(line, width));
+    return value.split('\n').map(line => clipCellToWidth(line, width));
   }
-  if (wrapMode === 'word') return wrapToWidth(safeValue, width);
-  return safeValue.split('\n').flatMap(line => wrapCellToWidth(line, width));
+  if (wrapMode === 'word') return wrapToWidth(value, width);
+  return value.split('\n').flatMap(line => wrapCellToWidth(line, width));
 }
 
 const TABLE_EMOJI_PRESENTATION_RE = /\p{Emoji_Presentation}/u;
@@ -405,7 +405,7 @@ function tokenizeTableText(str: string): TableWrapToken[] {
   let lastIndex = 0;
 
   for (const match of str.matchAll(regex)) {
-    const index = match.index ?? 0;
+    const index = match.index;
     if (index > lastIndex) {
       const raw = str.slice(lastIndex, index);
       for (const grapheme of segmentGraphemes(raw)) {
@@ -558,7 +558,7 @@ function buildFittedTable(
   const headerToken = options.headerToken ?? ctx.ui('tableHeader');
   const styleHeaders = optionsOverride.styleHeaders ?? true;
   const headerLines = columns.map((column, index) => {
-    const header = column.header ?? '';
+    const header = column.header;
     const value = styleHeaders ? ctx.style.styled(headerToken, header) : header;
     return formatCellLines(value, widths[index] ?? 0, overflow, wrapMode);
   });
@@ -573,7 +573,7 @@ function buildFittedTable(
 
   return {
     columns: columns.map((column, index) => ({
-      header: column.header ?? '',
+      header: column.header,
       width: widths[index] ?? 0,
       align: column.align ?? 'left',
     })),
@@ -688,8 +688,7 @@ function renderRuledTable(
       ]
     : [];
 
-  for (let rowIndex = 0; rowIndex < model.rows.length; rowIndex++) {
-    const row = model.rows[rowIndex]!;
+  for (const [rowIndex, row] of model.rows.entries()) {
     for (let lineIndex = 0; lineIndex < row.height; lineIndex++) {
       lines.push(renderBorderlessRow(model, row.cells, lineIndex));
     }
@@ -754,7 +753,7 @@ function renderMarkdownTable(model: FittedTable): string {
   ): string => {
     return '|' + model.columns.map((column, index) => {
       const value = cells[index]?.[lineIndex] ?? '';
-      return ' ' + alignCell(value, renderWidths[index]!, column.align) + ' ';
+      return ' ' + alignCell(value, renderWidths[index] ?? 1, column.align) + ' ';
     }).join('|') + '|';
   };
 
@@ -762,7 +761,7 @@ function renderMarkdownTable(model: FittedTable): string {
     return rowLine(model.headerLines, index);
   });
   const separator = '|' + model.columns.map((column, index) => {
-    return markdownSeparator(renderWidths[index]!, column.align);
+    return markdownSeparator(renderWidths[index] ?? 1, column.align);
   }).join('|') + '|';
   const rows = model.rows.flatMap((row) => {
     return Array.from({ length: row.height }, (_line, index) => rowLine(row.cells, index));
@@ -779,7 +778,7 @@ function renderExpandedTable(
   const borderToken = options.borderToken ?? ctx.border('muted');
   const lines: string[] = [];
   const columnLabel = (index: number): string => {
-    return tableData.showHeader ? tableData.columns[index]?.header ?? '' : `Column ${index + 1}`;
+    return tableData.showHeader ? tableData.columns[index]?.header ?? '' : 'Column ' + String(index + 1);
   };
   const preferredLabelWidth = tableData.columns.reduce((max, _column, index) => {
     return Math.max(max, visibleLength(columnLabel(index)));
@@ -805,14 +804,13 @@ function renderExpandedTable(
   );
   const wrapMode = options.wrap ?? 'word';
 
-  for (let rowIndex = 0; rowIndex < tableData.rows.length; rowIndex++) {
-    const title = `-[ RECORD ${rowIndex + 1} ]`;
+  for (const [rowIndex, row] of tableData.rows.entries()) {
+    const title = '-[ RECORD ' + String(rowIndex + 1) + ' ]';
     const clippedTitle = targetWidth === undefined ? title : clipCellToWidth(title, ruleWidth);
     lines.push(ctx.style.styled(
       borderToken,
       clippedTitle + '-'.repeat(Math.max(0, ruleWidth - visibleLength(clippedTitle))),
     ));
-    const row = tableData.rows[rowIndex]!;
     for (let columnIndex = 0; columnIndex < tableData.columns.length; columnIndex++) {
       const rawLabel = columnLabel(columnIndex);
       const label = padRight(
@@ -825,7 +823,7 @@ function renderExpandedTable(
         : formatCellLines(rawValue, valueWidth, overflow, wrapMode);
       for (let lineIndex = 0; lineIndex < valueLines.length; lineIndex++) {
         const lineLabel = lineIndex === 0 ? label : ' '.repeat(labelWidth);
-        lines.push(`${lineLabel}${separator}${valueLines[lineIndex] ?? ''}`.trimEnd());
+        lines.push((lineLabel + separator + (valueLines[lineIndex] ?? '')).trimEnd());
       }
     }
   }
@@ -834,7 +832,7 @@ function renderExpandedTable(
 }
 
 function markdownEscapeCell(value: string): string {
-  return stripAnsi(String(value ?? ''))
+  return stripAnsi(value)
     .replace(/\\/g, '\\\\')
     .replace(/\|/g, '\\|')
     .replace(/\r\n?/g, '\n')
@@ -845,7 +843,7 @@ function markdownTableData(tableData: NormalizedTable): NormalizedTable {
   return {
     columns: tableData.columns.map(column => ({
       ...column,
-      header: markdownEscapeCell(column.header ?? ''),
+      header: markdownEscapeCell(column.header),
     })),
     rows: tableData.rows.map(row => row.map(cell => markdownEscapeCell(cell))),
     showHeader: tableData.showHeader,
@@ -889,7 +887,7 @@ function renderVisualTable(
 }
 
 function escapeTsvCell(value: string): string {
-  return String(value ?? '')
+  return value
     .replace(/\\/g, '\\\\')
     .replace(/\t/g, '\\t')
     .replace(/\r/g, '\\r')
@@ -897,7 +895,7 @@ function escapeTsvCell(value: string): string {
 }
 
 function escapeCsvCell(value: string): string {
-  const text = String(value ?? '');
+  const text = value;
   if (!/[",\r\n]/.test(text)) return text;
   return `"${text.replace(/"/g, '""')}"`;
 }
@@ -907,7 +905,7 @@ function renderSeparatedPipe(
   separator: string,
   escapeCell: (value: string) => string,
 ): string {
-  const headerLine = tableData.columns.map(column => escapeCell(column.header ?? '')).join(separator);
+  const headerLine = tableData.columns.map(column => escapeCell(column.header)).join(separator);
   const dataLines = tableData.rows.map(row => row.map(escapeCell).join(separator));
   if (!tableData.showHeader) return dataLines.join('\n');
   return [headerLine, ...dataLines].join('\n');
@@ -978,13 +976,12 @@ export function table(
     pipe: () => renderPipeTable(options, ctx, tableData),
     accessible: () => {
       const lines: string[] = [];
-      for (let i = 0; i < tableData.rows.length; i++) {
-        const row = tableData.rows[i]!;
+      for (const [i, row] of tableData.rows.entries()) {
         const pairs = tableData.columns.map((col, j) => {
-          const label = tableData.showHeader ? col.header ?? '' : `Column ${j + 1}`;
-          return `${label}=${row[j] ?? ''}`;
+          const label = tableData.showHeader ? col.header : 'Column ' + String(j + 1);
+          return label + '=' + (row[j] ?? '');
         });
-        lines.push(`Row ${i + 1}: ${pairs.join(', ')}`);
+        lines.push('Row ' + String(i + 1) + ': ' + pairs.join(', '));
       }
       return lines.join('\n');
     },

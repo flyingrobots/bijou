@@ -25,8 +25,8 @@
     },
     {
       "path": "packages/bijou/src/core/components/table.ts",
-      "lines": 994,
-      "bytes": 32996
+      "lines": 991,
+      "bytes": 32987
     },
     {
       "path": "packages/bijou-tui/src/notification.ts",
@@ -505,8 +505,8 @@
     },
     {
       "path": "packages/bijou/src/core/components/markdown-parse.ts",
-      "lines": 380,
-      "bytes": 12562
+      "lines": 374,
+      "bytes": 12540
     },
     {
       "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",

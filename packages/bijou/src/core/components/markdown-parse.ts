@@ -45,7 +45,7 @@ export function parseBlocks(source: string): BlockType[] {
   let i = 0;
 
   while (i < lines.length) {
-    const line = lines[i]!;
+    const line = lines[i] ?? '';
 
     // Blank line
     if (line.trim() === '') {
@@ -59,9 +59,8 @@ export function parseBlocks(source: string): BlockType[] {
       const lang = line.trimStart().slice(3).trim();
       const codeLines: string[] = [];
       i++;
-      while (i < lines.length && !lines[i]!.trimStart().startsWith('```')) {
-        codeLines.push(lines[i]!);
-        i++;
+      while (i < lines.length && !(lines[i] ?? '').trimStart().startsWith('```')) {
+        codeLines.push(lines[i++] ?? '');
       }
       if (i < lines.length) i++; // skip closing ```
       blocks.push({ type: 'code-block', lang, lines: codeLines });
@@ -78,7 +77,7 @@ export function parseBlocks(source: string): BlockType[] {
     // Heading
     const headingMatch = /^(#{1,4})\s+(.+)$/.exec(line);
     if (headingMatch) {
-      blocks.push({ type: 'heading', level: headingMatch[1]!.length, text: headingMatch[2]! });
+      blocks.push({ type: 'heading', level: (headingMatch[1] ?? '').length, text: headingMatch[2] ?? '' });
       i++;
       continue;
     }
@@ -86,11 +85,10 @@ export function parseBlocks(source: string): BlockType[] {
     // Blockquote
     if (line.trimStart().startsWith('>')) {
       const quoteLines: string[] = [];
-      while (i < lines.length && lines[i]!.trimStart().startsWith('>')) {
-        const ql = lines[i]!;
+      while (i < lines.length && (lines[i] ?? '').trimStart().startsWith('>')) {
+        const ql = lines[i++] ?? '';
         quoteLines.push(ql.replace(/^\s*>\s?/, ''));
-        i++;
-        if (i < lines.length && lines[i]!.trim() === '') break;
+        if (i < lines.length && (lines[i] ?? '').trim() === '') break;
       }
       blocks.push({ type: 'blockquote', lines: quoteLines });
       continue;
@@ -99,9 +97,8 @@ export function parseBlocks(source: string): BlockType[] {
     // Bullet list
     if (/^\s*[-*]\s+/.test(line)) {
       const items: string[] = [];
-      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i]!)) {
-        items.push(lines[i]!.replace(/^\s*[-*]\s+/, ''));
-        i++;
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i] ?? '')) {
+        items.push((lines[i++] ?? '').replace(/^\s*[-*]\s+/, ''));
       }
       blocks.push({ type: 'bullet-list', items });
       continue;
@@ -110,9 +107,8 @@ export function parseBlocks(source: string): BlockType[] {
     // Numbered list
     if (/^\s*\d+\.\s+/.test(line)) {
       const items: string[] = [];
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i]!)) {
-        items.push(lines[i]!.replace(/^\s*\d+\.\s+/, ''));
-        i++;
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i] ?? '')) {
+        items.push((lines[i++] ?? '').replace(/^\s*\d+\.\s+/, ''));
       }
       blocks.push({ type: 'numbered-list', items });
       continue;
@@ -125,8 +121,9 @@ export function parseBlocks(source: string): BlockType[] {
       const rows: string[][] = [];
       i += 2;
       while (i < lines.length) {
-        const rowCells = parseTableRow(lines[i]!);
-        if (!rowCells || isTableSeparatorRow(lines[i]!, headerCells.length)) break;
+        const rowLine = lines[i] ?? '';
+        const rowCells = parseTableRow(rowLine);
+        if (!rowCells || isTableSeparatorRow(rowLine, headerCells.length)) break;
         rows.push(normalizeTableCells(rowCells, headerCells.length));
         i++;
       }
@@ -137,9 +134,8 @@ export function parseBlocks(source: string): BlockType[] {
     // Paragraph: collect consecutive non-special lines
     let text = line;
     i++;
-    while (i < lines.length && lines[i]!.trim() !== '' && !isBlockStart(lines[i]!, lines[i + 1])) {
-      text += ' ' + lines[i]!;
-      i++;
+    while (i < lines.length && (lines[i] ?? '').trim() !== '' && !isBlockStart(lines[i] ?? '', lines[i + 1])) {
+      text += ' ' + (lines[i++] ?? '');
     }
     blocks.push({ type: 'paragraph', text });
   }
@@ -179,7 +175,7 @@ function parseTableRow(line: string): string[] | null {
   let current = '';
 
   for (let i = 0; i < trimmed.length; i++) {
-    const char = trimmed[i]!;
+    const char = trimmed[i] ?? '';
     if (char === '\\' && trimmed[i + 1] === '|') {
       current += '|';
       i++;
@@ -216,6 +212,8 @@ function normalizeTableCells(cells: string[], expectedColumns: number): string[]
 
 // ── Inline parser ──────────────────────────────────────────────────
 
+const CODE_SPAN_PLACEHOLDER_RE = /\uE000C(\d+)\uE001/gu;
+
 /**
  * Parse and render inline markdown syntax within a text fragment.
  *
@@ -227,7 +225,7 @@ function normalizeTableCells(cells: string[], expectedColumns: number): string[]
  */
 export function parseInline(text: string, ctx: BijouContext): string {
   return renderByMode(ctx.mode, {
-    accessible: () => parseInlineAccessible(text, ctx),
+    accessible: () => parseInlineAccessible(text),
     pipe: () => parseInlinePlain(text),
     interactive: () => parseInlineStyled(text, ctx),
   }, text);
@@ -256,7 +254,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
     const idx = codeSpans.length;
     codeSpans.push(ctx.style.styled(ctx.semantic('warning'), code));
-    return `\x00\x01BIJOU_CS${idx}\x01\x00`;
+    return '\uE000C' + String(idx) + '\uE001';
   });
 
   // Bold: **text**
@@ -270,8 +268,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
     return ctx.style.styled(ctx.semantic('muted'), italic);
   });
 
-  // Restore code spans
-  result = result.replace(/\x00\x01BIJOU_CS(\d+)\x01\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
+  result = result.replace(CODE_SPAN_PLACEHOLDER_RE, (_m, idx: string) => codeSpans[Number(idx)] ?? '');
 
   return result;
 }
@@ -292,7 +289,6 @@ function parseInlineStripped(
 ): string {
   let result = text;
 
-  // Links
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, linkReplacer);
 
   // Code: extract and replace with placeholders to isolate from bold/italic
@@ -300,7 +296,7 @@ function parseInlineStripped(
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
     const idx = codeSpans.length;
     codeSpans.push(code);
-    return `\x00\x01BIJOU_CS${idx}\x01\x00`;
+    return '\uE000C' + String(idx) + '\uE001';
   });
 
   // Bold: **text** → text
@@ -309,8 +305,7 @@ function parseInlineStripped(
   // Italic: *text* → text
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
 
-  // Restore code spans
-  result = result.replace(/\x00\x01BIJOU_CS(\d+)\x01\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
+  result = result.replace(CODE_SPAN_PLACEHOLDER_RE, (_m, idx: string) => codeSpans[Number(idx)] ?? '');
 
   return result;
 }
@@ -333,10 +328,9 @@ function parseInlinePlain(text: string): string {
  * Prefixes links with `Link:` and strips formatting markers.
  *
  * @param text - The inline text to parse.
- * @param _ctx - Bijou context (unused, kept for signature consistency).
  * @returns The accessible inline text.
  */
-function parseInlineAccessible(text: string, _ctx: BijouContext): string {
+function parseInlineAccessible(text: string): string {
   return parseInlineStripped(text, 'Link: $1 ($2)');
 }
 

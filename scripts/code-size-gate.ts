@@ -41,7 +41,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'examples/docs/stories.ts', lines: 5007 },
   { path: 'packages/bijou-tui/src/app-frame.ts', lines: 2871 },
   { path: 'examples/docs/dogfood-blocks.ts', lines: 2639 },
-  { path: 'packages/bijou/src/core/components/table.ts', lines: 993 },
+  { path: 'packages/bijou/src/core/components/table.ts', lines: 990 },
   { path: 'packages/bijou-tui/src/notification.ts', lines: 966 },
   { path: 'packages/bijou-tui/src/runtime-engine.ts', lines: 965 },
   { path: 'packages/bijou-tui/src/overlay.ts', lines: 941 },
