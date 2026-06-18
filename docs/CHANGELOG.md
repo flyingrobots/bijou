@@ -13,7 +13,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe
   docs-preview test casts, lets `wizard()` steps return synchronous values as
   well as promises, and applies a second bounded ESLint autofix pass across TUI
-  tests and core theme/schema helpers.
+  tests and core theme/schema helpers. Code Lawyer review cleanup then lowers
+  the stored ESLint ceiling to `4,527` and the aggregate debt ceiling to
+  `4,950`.
 - **Respectful Repo Code Dojo** — the verbatim
   [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
   artifact is now installed as an enforced Code Dojo gate. File/context
