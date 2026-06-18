@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { storyCaptureMatrixText, stripAnsi, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext, must } from '@flyingrobots/bijou/adapters/test';
@@ -7,6 +5,7 @@ import {
   createStorybookApp,
   createStorybookFrameApp,
   selectedStorybookStory,
+  type StorybookModel,
 } from '../../../examples/docs/storybook-app.js';
 import {
   captureDogfoodStorybookMatrix,
@@ -20,6 +19,8 @@ import { readRepoFile } from '../repo.js';
 
 const KEY_UP = '\x1b[A';
 const KEY_DOWN = '\x1b[B';
+type StorybookFrameModel = ReturnType<ReturnType<typeof createStorybookFrameApp>['init']>[0];
+function storybookPageModel(model: StorybookFrameModel): StorybookModel { return must(model.pageModels.storybook); }
 
 describe('DF-027 BlockLab DOGFOOD workstation', () => {
   it('keeps the active cycle doc tied to the playback contract', () => {
@@ -50,9 +51,8 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
 
   it('renders a deterministic BlockLab index for humans and agents', () => {
     const index = renderDogfoodStorybookIndex();
-
     expect(index).toContain('# Bijou BlockLab Workstation');
-    expect(index).toContain(`Stories: ${COMPONENT_STORIES.length}`);
+    expect(index).toContain(`Stories: ${String(COMPONENT_STORIES.length)}`);
     expect(index).toContain('Required modes: interactive, static, pipe, accessible');
     expect(index).toContain('## Feedback overlays and history');
     expect(index).toContain('- notification-system');
@@ -80,16 +80,16 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     expect(text).toContain('Footer cue: notices:2');
   });
   it('registers the text-first workstation commands', () => {
-    const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
-    expect(packageJson.scripts['blocklab:index']).toBe('tsx examples/docs/storybook-workstation.ts');
-    expect(packageJson.scripts['storybook:index']).toBe('tsx examples/docs/storybook-workstation.ts');
-    expect(packageJson.scripts['dogfood:storybook']).toBe('tsx examples/docs/storybook-workstation.ts');
+    const packageJson = readRepoFile('package.json');
+    expect(packageJson).toContain('"blocklab:index": "tsx examples/docs/storybook-workstation.ts"');
+    expect(packageJson).toContain('"storybook:index": "tsx examples/docs/storybook-workstation.ts"');
+    expect(packageJson).toContain('"dogfood:storybook": "tsx examples/docs/storybook-workstation.ts"');
   });
   it('registers the interactive story browser command', () => {
-    const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
+    const packageJson = readRepoFile('package.json');
     const entrypoint = readRepoFile('examples/docs/storybook.ts');
-    expect(packageJson.scripts.blocklab).toBe('node --import tsx examples/docs/storybook.ts');
-    expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
+    expect(packageJson).toContain('"blocklab": "node --import tsx examples/docs/storybook.ts"');
+    expect(packageJson).toContain('"storybook": "node --import tsx examples/docs/storybook.ts"');
     expect(entrypoint).toContain('createBlockLabFrameApp');
     expect(entrypoint).not.toContain('createDocsApp');
   });
@@ -100,8 +100,8 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
     const text = stripAnsi(surfaceToString(surface, ctx.style));
     expect(selectedStorybookStory(model).id).toBe('notification-system');
-    expect((model as any).route).toBeUndefined();
-    expect((model as any).docsModel).toBeUndefined();
+    expect('route' in model).toBe(false);
+    expect('docsModel' in model).toBe(false);
     expect(text).toContain('Bijou BlockLab');
     expect(text).toContain('notification-system');
     expect(text).toContain('test matrix');
@@ -112,10 +112,10 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createStorybookFrameApp(ctx, { initialStoryId: 'notification-system' });
     const [model] = app.init();
-    const pageModel = (model as any).pageModels.storybook;
+    const pageModel = storybookPageModel(model);
     const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
     const text = stripAnsi(surfaceToString(surface, ctx.style));
-    expect((model as any).activePageId).toBe('storybook');
+    expect(model.activePageId).toBe('storybook');
     expect(selectedStorybookStory(pageModel).id).toBe('notification-system');
     expect(text).toContain('Bijou BlockLab');
     expect(text).toContain('BlockLab');
@@ -126,10 +126,10 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     for (const key of [KEY_DOWN, 'j']) {
       const app = createStorybookFrameApp(ctx);
       const [initialModel] = app.init();
-      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const initialPageModel = storybookPageModel(initialModel);
       const before = selectedStorybookStory(initialPageModel).id;
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
-      const pageModel = (result.model as any).pageModels.storybook;
+      const pageModel = storybookPageModel(result.model);
       const after = selectedStorybookStory(pageModel).id;
       expect(before).toBe('alert');
       expect(after).not.toBe(before);
@@ -138,10 +138,10 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     for (const key of [KEY_UP, 'k']) {
       const app = createStorybookFrameApp(ctx, { initialStoryId: 'badge' });
       const [initialModel] = app.init();
-      const initialPageModel = (initialModel as any).pageModels.storybook;
+      const initialPageModel = storybookPageModel(initialModel);
       const before = selectedStorybookStory(initialPageModel).id;
       const result = await runScript(app, [{ key }], { ctx, pulseFps: false });
-      const pageModel = (result.model as any).pageModels.storybook;
+      const pageModel = storybookPageModel(result.model);
       const after = selectedStorybookStory(pageModel).id;
       expect(before).toBe('badge');
       expect(after).not.toBe(before);

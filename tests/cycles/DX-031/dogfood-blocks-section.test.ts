@@ -7,25 +7,24 @@ import {
 } from '../../helpers/scripted.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { counterDemoBlockSurface } from '../../../examples/docs/counter-block-demo.js';
+type DocsRootModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];
+
 const KEY_ENTER = '\r';
 const KEY_NEXT_TAB = ']';
 const KEY_TAB = '\t';
 const KEY_BOTTOM = 'G';
 function blockPreviewGuideId(blockName: string): string {
-  const slug = blockName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return `blocks-preview-${slug || 'block'}`;
+  const slug = blockName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return `blocks-preview-${slug.length > 0 ? slug : 'block'}`;
 }
-function docsPageModel(model: any, pageId: string) {
-  return model.docsModel.pageModels[pageId];
-}
+
+function pageModel(model: DocsRootModel, pageId: string) { return must(model.docsModel.pageModels[pageId]); }
+
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -50,7 +49,7 @@ function foregroundStyledTextCellExists(
   for (let y = 0; y < frame.height; y++) {
     let row = '';
     for (let x = 0; x < frame.width; x++) {
-      row += frame.get(x, y).char || ' ';
+      row += frame.get(x, y).char ?? ' ';
     }
     for (
       let start = row.indexOf(needle);
@@ -93,7 +92,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       { key: KEY_NEXT_TAB },
     ], { ctx });
     const model = result.model;
-    const blocksModel = docsPageModel(model, 'blocks');
+    const blocksModel = pageModel(model, 'blocks');
     const guideLabels = blocksModel.guideState.items.map((item: { label: string }) => item.label);
     const text = frameText(must(result.frames.at(-1)));
     expect(model.docsModel.activePageId).toBe('blocks');
@@ -121,7 +120,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
     }], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
+    expect(pageModel(result.model, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
     expect(text).toContain('CounterDemoBlock fixture');
     expect(text).toContain('Counter: 5');
     expect(text).toContain('[-] decrease');
@@ -145,7 +144,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
     const blockName = firstBlock?.metadata.blockName;
-    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
+    expect(pageModel(result.model, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
     expect(text).toContain(blockName);
     expect(text).toContain('lowering summary');
     expect(text).not.toContain('Available Blocks');
@@ -164,7 +163,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
       { msg: { type: 'docs', msg: { type: 'guide-prev' } } },
     ], { ctx });
-    const blocksModel = docsPageModel(result.model as any, 'blocks');
+    const blocksModel = pageModel(result.model, 'blocks');
     const focusedItem = blocksModel.guideState.items[blocksModel.guideState.focusIndex];
     expect(blocksModel.selectedGuideId).toBe(blockPreviewGuideId(firstBlock?.metadata.blockName));
     expect(focusedItem.value).toBe('blocks-preview');
@@ -213,7 +212,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
   it('renders the CounterDemoBlock fixture and applies command-intent keys', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const runCounterSteps = async (keys: readonly string[]) => runScript(
-      createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any }),
+      createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' }),
       [
         {
           msg: {
@@ -228,9 +227,9 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const selected = await runCounterSteps([]);
     const incremented = await runCounterSteps(['+']);
     const decremented = await runCounterSteps(['+', '-']);
-    expect(docsPageModel(selected.model as any, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
-    expect(docsPageModel(incremented.model as any, 'blocks').counterBlockDemo.counter).toBe(6);
-    expect(docsPageModel(decremented.model as any, 'blocks').counterBlockDemo.counter).toBe(5);
+    expect(pageModel(selected.model, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
+    expect(pageModel(incremented.model, 'blocks').counterBlockDemo.counter).toBe(6);
+    expect(pageModel(decremented.model, 'blocks').counterBlockDemo.counter).toBe(5);
     expect(frameText(must(selected.frames.at(-1)))).toContain('Counter: 5');
     expect(frameText(must(selected.frames.at(-1)))).toContain('[-] decrease');
     expect(frameText(must(selected.frames.at(-1)))).toContain('[+] increase');
@@ -273,7 +272,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
       { pulse: { dt: 0.6 } },
     ], { ctx });
-    const blocksModel = docsPageModel(result.model as any, 'blocks');
+    const blocksModel = pageModel(result.model, 'blocks');
     expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
     expect(blocksModel.counterBlockDemo.counter).toBe(6);
     expect(blocksModel.counterBlockDemo.animationTimeMs).toBe(0);
@@ -298,7 +297,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       const otherBlocks = standardBlocks.filter(
         (candidate) => candidate.metadata.blockName !== block.metadata.blockName,
       );
-      expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(
+      expect(pageModel(result.model, 'blocks').selectedGuideId).toBe(
         blockPreviewGuideId(block.metadata.blockName),
       );
       expect(text).toContain('blocks • live preview');
@@ -387,7 +386,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const declaredModes = Array.from(
       new Set(standardBlocks.flatMap((block) => block.metadata.modes)),
     ).sort();
-    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-lowering');
+    expect(pageModel(result.model, 'blocks').selectedGuideId).toBe('blocks-lowering');
     for (const mode of declaredModes) {
       expect(text).toContain(mode);
     }

@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2929,
-  "errors": 2929,
+  "total": 2838,
+  "errors": 2838,
   "warnings": 0,
   "rules": [
     {
@@ -50,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 125
+      "count": 106
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -90,27 +90,27 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 54
+      "count": 49
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 123
+      "count": 110
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
-      "count": 9
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 133
+      "count": 102
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 20
+      "count": 19
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 456
+      "count": 438
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -126,7 +126,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 36
+      "count": 34
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 598
+      "count": 597
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",

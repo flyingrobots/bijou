@@ -445,8 +445,8 @@
     },
     {
       "path": "tests/cycles/DX-031/dogfood-blocks-section.test.ts",
-      "lines": 399,
-      "bytes": 18179
+      "lines": 398,
+      "bytes": 18162
     },
     {
       "path": "packages/bijou-tui/src/app-frame-routing.test.ts",
@@ -1671,7 +1671,7 @@
     {
       "path": "tests/cycles/DF-027/storybook-workstation.test.ts",
       "lines": 152,
-      "bytes": 8303
+      "bytes": 8257
     },
     {
       "path": "packages/bijou/src/ports/io.ts",
