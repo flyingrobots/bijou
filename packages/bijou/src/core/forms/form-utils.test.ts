@@ -16,10 +16,10 @@ import {
 import { decodeRawKeyInput, decodeRawKeySequence } from '../key-input.js';
 import { auditStyle } from '../../adapters/test/audit-style.js';
 
-/** Join all writes into a single string for substring assertions. */
 function allWritten(ctx: { io: { written: string[] } }): string {
   return ctx.io.written.join('');
 }
+const interactiveResult = () => Promise.resolve('interactive'), fallbackResult = () => Promise.resolve('fallback');
 
 describe('formatFormTitle', () => {
   it('returns ? title when noColor: true', () => {
@@ -145,8 +145,8 @@ describe('formDispatch', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { stdinIsTTY: true } });
     const result = await formDispatch(
       ctx,
-      async () => 'interactive',
-      async () => 'fallback',
+      interactiveResult,
+      fallbackResult,
     );
     expect(result).toBe('interactive');
   });
@@ -155,8 +155,8 @@ describe('formDispatch', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { stdinIsTTY: false } });
     const result = await formDispatch(
       ctx,
-      async () => 'interactive',
-      async () => 'fallback',
+      interactiveResult,
+      fallbackResult,
     );
     expect(result).toBe('fallback');
   });
@@ -165,8 +165,8 @@ describe('formDispatch', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = await formDispatch(
       ctx,
-      async () => 'interactive',
-      async () => 'fallback',
+      interactiveResult,
+      fallbackResult,
     );
     expect(result).toBe('fallback');
   });
@@ -175,8 +175,8 @@ describe('formDispatch', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     const result = await formDispatch(
       ctx,
-      async () => 'interactive',
-      async () => 'fallback',
+      interactiveResult,
+      fallbackResult,
     );
     expect(result).toBe('fallback');
   });
@@ -185,8 +185,8 @@ describe('formDispatch', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = await formDispatch(
       ctx,
-      async () => 'interactive',
-      async () => 'fallback',
+      interactiveResult,
+      fallbackResult,
     );
     expect(result).toBe('fallback');
   });

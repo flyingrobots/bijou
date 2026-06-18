@@ -247,7 +247,7 @@ describe('runCmd', () => {
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
 
-    const cmd: Cmd<TestMsg> = async () => ({ type: 'custom' as const, value: 99 });
+    const cmd: Cmd<TestMsg> = () => ({ type: 'custom' as const, value: 99 });
     bus.runCmd(cmd);
 
     await bus.drain();
@@ -259,7 +259,7 @@ describe('runCmd', () => {
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
 
-    const cmd: Cmd<TestMsg> = async () => undefined;
+    const cmd: Cmd<TestMsg> = () => undefined;
     bus.runCmd(cmd);
 
     await bus.drain();
@@ -408,9 +408,7 @@ describe('runCmd', () => {
     const onCommandRejected = vi.fn();
     const bus = createEventBus<TestMsg>({ onCommandRejected });
 
-    bus.runCmd(async () => {
-      throw new Error('boom');
-    });
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
     await bus.drain();
     expect(onCommandRejected).toHaveBeenCalledTimes(1);
@@ -424,9 +422,7 @@ describe('runCmd', () => {
     });
     const onError = vi.fn();
     const bus = createEventBus<TestMsg>({ onCommandRejected, onError });
-    bus.runCmd(async () => {
-      throw new Error('boom');
-    });
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
     await bus.drain();
     expect(onError).toHaveBeenCalledTimes(2);
@@ -438,9 +434,7 @@ describe('runCmd', () => {
   it('routes rejected commands through onError when no rejection handler is configured', async () => {
     const onError = vi.fn();
     const bus = createEventBus<TestMsg>({ onError });
-    bus.runCmd(async () => {
-      throw new Error('boom');
-    });
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
     await bus.drain();
     expect(onError).toHaveBeenCalledTimes(1);
@@ -467,9 +461,7 @@ describe('runCmd', () => {
       throw new Error('onError blew up');
     });
     const bus = createEventBus<TestMsg>({ onError: throwingOnError });
-    bus.runCmd(async () => {
-      throw new Error('boom');
-    });
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
     await bus.drain();
     // onError was called but its throw was swallowed
@@ -487,9 +479,7 @@ describe('runCmd', () => {
       onCommandRejected: throwingRejected,
       onError: throwingOnError,
     });
-    bus.runCmd(async () => {
-      throw new Error('boom');
-    });
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
     await bus.drain();
     expect(throwingRejected).toHaveBeenCalledTimes(1);
@@ -501,9 +491,7 @@ describe('runCmd', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const bus = createEventBus<TestMsg>();
-      bus.runCmd(async () => {
-        throw new Error('boom');
-      });
+      bus.runCmd(() => Promise.reject(new Error('boom')));
 
       await bus.drain();
       expect(consoleError).not.toHaveBeenCalled();

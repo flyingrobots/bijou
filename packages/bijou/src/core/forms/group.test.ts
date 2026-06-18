@@ -4,8 +4,8 @@ import { group } from './group.js';
 describe('group', () => {
   it('collects results from field functions', async () => {
     const result = await group({
-      name: async () => 'Alice',
-      age: async () => 30,
+      name: () => Promise.resolve('Alice'),
+      age: () => Promise.resolve(30),
     });
     expect(result.values.name).toBe('Alice');
     expect(result.values.age).toBe(30);
@@ -15,16 +15,16 @@ describe('group', () => {
   it('executes fields in order', async () => {
     const order: string[] = [];
     await group({
-      first: async () => { order.push('first'); return 1; },
-      second: async () => { order.push('second'); return 2; },
-      third: async () => { order.push('third'); return 3; },
+      first: () => { order.push('first'); return Promise.resolve(1); },
+      second: () => { order.push('second'); return Promise.resolve(2); },
+      third: () => { order.push('third'); return Promise.resolve(3); },
     });
     expect(order).toEqual(['first', 'second', 'third']);
   });
 
   it('handles single field', async () => {
     const result = await group({
-      only: async () => 'value',
+      only: () => Promise.resolve('value'),
     });
     expect(result.values.only).toBe('value');
   });
@@ -32,8 +32,8 @@ describe('group', () => {
   it('propagates error when a child field rejects (cancellation)', async () => {
     await expect(
       group({
-        name: async () => 'Alice',
-        age: async () => { throw new Error('cancelled'); },
+        name: () => Promise.resolve('Alice'),
+        age: () => Promise.reject(new Error('cancelled')),
       }),
     ).rejects.toThrow('cancelled');
   });
@@ -42,9 +42,9 @@ describe('group', () => {
     const order: string[] = [];
     await expect(
       group({
-        first: async () => { order.push('first'); return 1; },
-        second: async () => { order.push('second'); throw new Error('cancelled'); },
-        third: async () => { order.push('third'); return 3; },
+        first: () => { order.push('first'); return Promise.resolve(1); },
+        second: () => { order.push('second'); return Promise.reject(new Error('cancelled')); },
+        third: () => { order.push('third'); return Promise.resolve(3); },
       }),
     ).rejects.toThrow('cancelled');
     expect(order).toEqual(['first', 'second']);

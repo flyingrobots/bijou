@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice, dagLayout } from './dag.js';
+import { dag, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { createTestContext } from '../../adapters/test/index.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 // ── Test Data ──────────────────────────────────────────────────────
 const twoNodes: DagNode[] = [
@@ -22,18 +20,6 @@ const compactDiamond: DagNode[] = [
   { id: 'c', label: 'C', edges: ['d'] },
   { id: 'd', label: 'D' },
 ];
-const linear: DagNode[] = [
-  { id: 'a', label: 'First', edges: ['b'] },
-  { id: 'b', label: 'Second', edges: ['c'] },
-  { id: 'c', label: 'Third' },
-];
-const fanOut: DagNode[] = [
-  { id: 'root', label: 'Root', edges: ['a', 'b', 'c', 'd'] },
-  { id: 'a', label: 'A' },
-  { id: 'b', label: 'B' },
-  { id: 'c', label: 'C' },
-  { id: 'd', label: 'D' },
-];
 const withBadges: DagNode[] = [
   { id: 'a', label: 'Build', edges: ['b'], badge: 'DONE' },
   { id: 'b', label: 'Test', edges: ['c'], badge: 'WIP' },
@@ -45,15 +31,6 @@ const cyclic: DagNode[] = [
 ];
 const selfLoop: DagNode[] = [
   { id: 'a', label: 'A', edges: ['a'] },
-];
-const largeGraph: DagNode[] = [
-  { id: 'root', label: 'Root', edges: ['a', 'b'] },
-  { id: 'a', label: 'A', edges: ['c', 'd'] },
-  { id: 'b', label: 'B', edges: ['d', 'e'] },
-  { id: 'c', label: 'C', edges: ['f'] },
-  { id: 'd', label: 'D', edges: ['f'] },
-  { id: 'e', label: 'E', edges: ['f'] },
-  { id: 'f', label: 'F' },
 ];
 // ── Basic Tests ────────────────────────────────────────────────────
 describe('dag', () => {

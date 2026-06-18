@@ -8,12 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
-- **Respecting the Dojo 1000-count burndown** — WF-135 lowers live
-  type-aware ESLint findings from `4,517` to `3,493`, cutting `1,024`
-  counted Code Dojo violations in one pass. The aggregate debt ceiling now
-  ratchets from `4,940` to `3,916`, with the next goalpost target set to
-  `3,866` or lower, while touched file/context budgets remain held under
-  their stored ceilings.
+- **Respecting the Dojo burndown** — WF-135 lowers live type-aware ESLint
+  findings from `4,517` to `3,436`, cutting `1,081` counted Code Dojo
+  violations across the initial 1000-count pass and a follow-on fake-async,
+  dead-fixture, and explicit-formatting cleanup. The aggregate debt ceiling
+  now ratchets from `4,940` to `3,859`, with the next goalpost target set to
+  `3,809` or lower, while touched file/context budgets remain held under their
+  stored ceilings.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe

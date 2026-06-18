@@ -57,7 +57,7 @@ export function runDogfoodI18nDebtInventory(io: DogfoodI18nDebtInventoryIO = {})
 
   if (!result.ok || !markdownResult.ok || !touchedResult.ok) {
     stderr([
-      `dogfood-i18n-debt: failed (${inventory.total} raw strings; baseline ${baseline.total}; ${markdownInventory.total} missing Markdown localizations; baseline ${markdownBaseline.total})`,
+      `dogfood-i18n-debt: failed (${inventory.total.toString()} raw strings; baseline ${baseline.total.toString()}; ${markdownInventory.total.toString()} missing Markdown localizations; baseline ${markdownBaseline.total.toString()})`,
       ...result.violations.map((violation) => `- ${violation}`),
       ...markdownResult.violations.map((violation) => `- ${violation}`),
       ...touchedResult.violations.map((violation) => `- ${violation}`),
@@ -67,9 +67,9 @@ export function runDogfoodI18nDebtInventory(io: DogfoodI18nDebtInventoryIO = {})
   }
 
   stdout([
-    `dogfood-i18n-debt: ok (${inventory.total} raw strings; baseline ${baseline.total}; ${markdownInventory.total} missing Markdown localizations; baseline ${markdownBaseline.total})`,
-    ...inventory.bySurface.map((surface) => `- ${surface.surface}: ${surface.count}`),
-    ...markdownInventory.byLocale.map((locale) => `- markdown ${locale.locale}: ${locale.count}`),
+    `dogfood-i18n-debt: ok (${inventory.total.toString()} raw strings; baseline ${baseline.total.toString()}; ${markdownInventory.total.toString()} missing Markdown localizations; baseline ${markdownBaseline.total.toString()})`,
+    ...inventory.bySurface.map((surface) => `- ${surface.surface}: ${surface.count.toString()}`),
+    ...markdownInventory.byLocale.map((locale) => `- markdown ${locale.locale}: ${locale.count.toString()}`),
     '',
   ].join('\n'));
   return 0;
