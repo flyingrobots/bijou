@@ -121,7 +121,6 @@ describe('docs preview app', () => {
 
     const switched = await runScript(app, [{ key: '2' }], { ctx });
     expect(frameText(last(switched.frames))).toContain('Cabinet of Curiosities');
-
     const settled = await runScript(app, [
       { key: '2' },
       { pulse: { dt: 2 } },
