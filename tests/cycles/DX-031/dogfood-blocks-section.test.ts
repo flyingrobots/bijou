@@ -106,7 +106,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       { key: KEY_NEXT_TAB },
       { key: KEY_NEXT_TAB },
     ], { ctx });
-    const model = result.model as any;
+    const model = result.model;
     const blocksModel = docsPageModel(model, 'blocks');
     const guideLabels = blocksModel.guideState.items.map((item: { label: string }) => item.label);
     const text = frameText(result.frames.at(-1)!);
