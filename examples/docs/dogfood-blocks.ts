@@ -43,7 +43,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'fixture',
 ]);
 
-export type DogfoodBlockDefinition = BlockDefinition<never>;
+export type DogfoodBlockDefinition = BlockDefinition<never, unknown>;
 
 export type DogfoodBlockRole =
   | 'app-shell'

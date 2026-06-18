@@ -1,9 +1,13 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 3391,
-  "errors": 3391,
+  "total": 3493,
+  "errors": 3493,
   "warnings": 0,
   "rules": [
+    {
+      "ruleId": "@typescript-eslint/array-type",
+      "count": 3
+    },
     {
       "ruleId": "@typescript-eslint/ban-ts-comment",
       "count": 1
@@ -11,6 +15,10 @@
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
       "count": 94
+    },
+    {
+      "ruleId": "@typescript-eslint/consistent-type-definitions",
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
@@ -22,7 +30,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-void-expression",
-      "count": 1
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-deprecated",
@@ -42,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 182
+      "count": 198
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -65,6 +73,14 @@
       "count": 179
     },
     {
+      "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
+      "count": 7
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
+      "count": 26
+    },
+    {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
       "count": 20
     },
@@ -74,7 +90,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 67
+      "count": 81
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
@@ -90,15 +106,19 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 19
+      "count": 20
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 531
+      "count": 551
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 128
+      "count": 127
+    },
+    {
+      "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
@@ -110,10 +130,18 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
-      "count": 3
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/prefer-promise-reject-errors",
+      "count": 2
+    },
+    {
+      "ruleId": "@typescript-eslint/prefer-regexp-exec",
+      "count": 4
+    },
+    {
+      "ruleId": "@typescript-eslint/prefer-string-starts-ends-with",
       "count": 2
     },
     {

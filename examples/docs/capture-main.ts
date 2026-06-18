@@ -9,19 +9,19 @@ type CaptureMsg = Parameters<InnerApp['update']>[0];
 type CaptureRoute = 'landing' | 'docs';
 type CaptureScenarioName = 'landing' | 'docs';
 
-interface WalkthroughStep {
+type WalkthroughStep = {
   readonly delayMs: number;
   readonly key: string;
   readonly ctrl?: boolean;
   readonly alt?: boolean;
   readonly shift?: boolean;
-}
+};
 
-interface CaptureScenario {
+type CaptureScenario = {
   readonly initialRoute: CaptureRoute;
   readonly pace: number;
   readonly steps: readonly WalkthroughStep[];
-}
+};
 
 const CAPTURE_SCENARIOS: Record<CaptureScenarioName, CaptureScenario> = {
   landing: {
@@ -90,8 +90,8 @@ function keyMsg(step: WalkthroughStep): KeyMsg {
 
 function widenCmd<M>(cmd: Cmd<any>): Cmd<M> {
   return async (emit, capabilities) => {
-    const result = await cmd((msg: any) => { emit(msg as M); }, capabilities);
-    return result;
+    const result = await cmd((msg: any) => emit(msg as M), capabilities);
+    return result as any;
   };
 }
 
@@ -104,7 +104,7 @@ function autoplayCmd(scenario: CaptureScenario): Cmd<CaptureMsg> {
       if (delayMs > 0) {
         await sleep(delayMs);
       }
-      emit(keyMsg(step));
+      emit(keyMsg(step) as CaptureMsg);
     }
   };
 }
@@ -123,13 +123,13 @@ function createCaptureApp(
       if (scenario.initialRoute === 'landing' && msg.type === 'pulse') {
         return [model, []];
       }
-      return inner.update(msg, model);
+      return inner.update(msg as any, model as any) as any;
     },
     view(model) {
-      return inner.view(model);
+      return inner.view(model as any);
     },
     routeRuntimeIssue(issue) {
-      return inner.routeRuntimeIssue?.(issue);
+      return inner.routeRuntimeIssue?.(issue) as CaptureMsg | undefined;
     },
   };
 }

@@ -326,7 +326,7 @@ function fallbackProgressBar(counter: number, width: number): string {
 }
 
 function normalizeCounterMode(mode: OutputMode | undefined): OutputMode {
-  return COUNTER_DEMO_MODES.includes(mode!) ? mode! : 'interactive';
+  return COUNTER_DEMO_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
 }
 
 function widestLine(lines: readonly string[]): number {
