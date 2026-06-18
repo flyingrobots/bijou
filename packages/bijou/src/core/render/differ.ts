@@ -1,6 +1,6 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
-import { colorHex, colorRgb } from '../theme/color.js';
+import { colorRgb } from '../theme/color.js';
 import { ANSI_OSC8_RE, graphemeClusterWidth, sanitizeTerminalText, segmentGraphemes } from '../text/index.js';
 import {
   CELL_STRIDE,
@@ -12,9 +12,10 @@ import {
   SIDE_TABLE_THRESHOLD,
   decodeChar,
 } from './packed-cell.js';
+import { byteAt, cellAtOrEmpty, cellToken, EMPTY_CELL, sgrByteHex, wordAt } from './safe-read.js';
 
-const EMPTY_CELL: Cell = { char: ' ', empty: true };
 const EMPTY_MODIFIERS: readonly string[] = [];
+const ANSI_ESCAPE = String.fromCharCode(0x1b);
 
 function hasVisibleStyle(cell: Cell): boolean {
   return cell.fg !== undefined
@@ -34,7 +35,7 @@ export function stringToSurface(text: string, width: number, height: number): Su
   const lines = plainText.split('\n');
 
   for (let y = 0; y < Math.min(height, lines.length); y++) {
-    const line = lines[y]!;
+    const line = lines[y] ?? '';
     const gs = segmentGraphemes(line);
     let x = 0;
     for (const char of gs) {
@@ -57,10 +58,10 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
   });
   const lines = safeText.replace(ANSI_OSC8_RE, '').split('\n');
 
-  const ANSI_RE = /\x1b\[([0-9;]*)m/g;
+  const ANSI_RE = new RegExp(ANSI_ESCAPE + '\\[([0-9;]*)m', 'g');
 
   for (let y = 0; y < Math.min(height, lines.length); y++) {
-    const line = lines[y]!;
+    const line = lines[y] ?? '';
     let x = 0;
     
     let currentFg: string | undefined;
@@ -83,7 +84,7 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
         });
       }
 
-      const codeStr = match[1]!;
+      const codeStr = match[1] ?? '';
       if (codeStr === '0' || codeStr === '') {
         currentFg = undefined;
         currentBg = undefined;
@@ -92,7 +93,7 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
         const parts = codeStr.split(';');
         let i = 0;
         while (i < parts.length) {
-          const code = parts[i]!;
+          const code = parts[i] ?? '';
           if (code === '0') {
             currentFg = undefined;
             currentBg = undefined;
@@ -111,18 +112,18 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
           else if (code === '29') currentMods.delete('strike');
           else if (code === '39') currentFg = undefined;
           else if (code === '49') currentBg = undefined;
-          else if (code === '38' && parts[i+1] === '2') {
+          else if (code === '38' && parts[i + 1] === '2') {
             // Truecolor FG: 38;2;R;G;B
-            const r = parseInt(parts[i+2]!, 10).toString(16).padStart(2, '0');
-            const g = parseInt(parts[i+3]!, 10).toString(16).padStart(2, '0');
-            const b = parseInt(parts[i+4]!, 10).toString(16).padStart(2, '0');
+            const r = sgrByteHex(parts, i + 2);
+            const g = sgrByteHex(parts, i + 3);
+            const b = sgrByteHex(parts, i + 4);
             currentFg = '#' + r + g + b;
             i += 4;
-          } else if (code === '48' && parts[i+1] === '2') {
+          } else if (code === '48' && parts[i + 1] === '2') {
             // Truecolor BG: 48;2;R;G;B
-            const r = parseInt(parts[i+2]!, 10).toString(16).padStart(2, '0');
-            const g = parseInt(parts[i+3]!, 10).toString(16).padStart(2, '0');
-            const b = parseInt(parts[i+4]!, 10).toString(16).padStart(2, '0');
+            const r = sgrByteHex(parts, i + 2);
+            const g = sgrByteHex(parts, i + 3);
+            const b = sgrByteHex(parts, i + 4);
             currentBg = '#' + r + g + b;
             i += 4;
           }
@@ -159,10 +160,10 @@ function writeSurfaceGrapheme(
   const width = Math.max(1, graphemeClusterWidth(char));
 
   if (isPackedSurface(surface) && (style?.fg || style?.bg)) {
-    const fg = colorRgb(style?.fg);
+    const fg = colorRgb(style.fg);
     let fR = -1, fG = 0, fB = 0;
     if (fg) { fR = fg[0]; fG = fg[1]; fB = fg[2]; }
-    const bg = colorRgb(style?.bg);
+    const bg = colorRgb(style.bg);
     let bR = -1, bG = 0, bB = 0;
     if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
     surface.setRGB(x, y, char, fR, fG, fB, bR, bG, bB);
@@ -194,12 +195,9 @@ export function surfaceToString(surface: Surface, style: StylePort): string {
     let line = '';
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
-      const token = {
-        hex: cell.fg,
-        bg: cell.bg,
-        modifiers: cell.modifiers as any,
-      };
-      line += style.styled(token as any, cell.char);
+      line += hasVisibleStyle(cell)
+        ? style.styled(cellToken(cell), cell.char)
+        : cell.char;
     }
     lines.push(line);
   }
@@ -238,8 +236,8 @@ export function isSameCell(a: Cell, b: Cell): boolean {
   if (aMods.length !== bMods.length) return false;
   // Order-insensitive comparison: every modifier in a must exist in b.
   // For short arrays (typically 0-3 modifiers) this is faster than sorting.
-  for (let i = 0; i < aMods.length; i++) {
-    if (!bMods.includes(aMods[i]!)) return false;
+  for (const modifier of aMods) {
+    if (!bMods.includes(modifier)) return false;
   }
   
   return true;
@@ -250,7 +248,7 @@ export function isSameCell(a: Cell, b: Cell): boolean {
  * Coordinates are 0-based in Bijou, but 1-based in ANSI.
  */
 function moveCursor(x: number, y: number): string {
-  return `\x1b[${y + 1};${x + 1}H`;
+  return `\x1b[${String(y + 1)};${String(x + 1)}H`;
 }
 
 /**
@@ -326,9 +324,9 @@ function packedStyleBytesEqual(
 }
 
 function packedHasVisibleStyle(buf: Uint8Array, off: number): boolean {
-  const alpha = buf[off + 9]!;
+  const alpha = byteAt(buf, off + 9);
   return (alpha & (FLAG_FG_SET | FLAG_BG_SET)) !== 0
-    || (buf[off + 8]! & ~FLAG_EMPTY) !== 0;
+    || (byteAt(buf, off + 8) & ~FLAG_EMPTY) !== 0;
 }
 
 // --- Direct ANSI byte emission ─────────────────────────
@@ -432,8 +430,8 @@ function writeSgrFromBufBytes(
   buf[off + 3] = 0x6d;
   off += 4;
 
-  const flags = srcBuf[srcOff + 8]!;
-  const alpha = srcBuf[srcOff + 9]!;
+  const flags = byteAt(srcBuf, srcOff + 8);
+  const alpha = byteAt(srcBuf, srcOff + 9);
 
   if (alpha & FLAG_FG_SET) {
     // \x1b[38;2;R;G;Bm — 7-byte prefix inlined as individual writes.
@@ -445,11 +443,11 @@ function writeSgrFromBufBytes(
     buf[off + 5] = 0x32;
     buf[off + 6] = 0x3b;
     off += 7;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_FG_R));
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R + 1]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_FG_R + 1));
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R + 2]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_FG_R + 2));
     buf[off++] = 0x6d;
   }
 
@@ -463,11 +461,11 @@ function writeSgrFromBufBytes(
     buf[off + 5] = 0x32;
     buf[off + 6] = 0x3b;
     off += 7;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_R]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_BG_R));
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_G]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_BG_G));
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_B]!);
+    off = writeDecimal(buf, off, byteAt(srcBuf, srcOff + OFF_BG_B));
     buf[off++] = 0x6d;
   }
 
@@ -515,7 +513,7 @@ function writeCharBytes(
   srcBuf: Uint8Array, srcOff: number,
   sideTable: readonly string[],
 ): number {
-  const code = srcBuf[srcOff]! | (srcBuf[srcOff + 1]! << 8);
+  const code = byteAt(srcBuf, srcOff) | (byteAt(srcBuf, srcOff + 1) << 8);
 
   if (code < 0x80) {
     // ASCII fast path
@@ -552,9 +550,9 @@ function packedCellsSemanticallyEqual(
   bBuf: Uint8Array, bOff: number, bSide: readonly string[],
 ): boolean {
   if (!packedBytesEqual(aBuf, aOff, bBuf, bOff)) return false;
-  const aChar = aBuf[aOff]! | (aBuf[aOff + 1]! << 8);
+  const aChar = byteAt(aBuf, aOff) | (byteAt(aBuf, aOff + 1) << 8);
   if (aChar < SIDE_TABLE_THRESHOLD) return true;
-  const bChar = bBuf[bOff]! | (bBuf[bOff + 1]! << 8);
+  const bChar = byteAt(bBuf, bOff) | (byteAt(bBuf, bOff + 1) << 8);
   return aChar === bChar && decodeChar(aChar, aSide) === decodeChar(bChar, bSide);
 }
 
@@ -609,7 +607,7 @@ function renderDiffPacked(
   const cWords = Math.min(wordCount, cDirty.length);
   const minWords = Math.min(tWords, cWords);
   for (let w = 0; w < minWords; w++) {
-    if ((tDirty[w]! | cDirty[w]!) !== 0) {
+    if ((wordAt(tDirty, w) | wordAt(cDirty, w)) !== 0) {
       anyDirty = true;
       break;
     }
@@ -617,10 +615,10 @@ function renderDiffPacked(
   if (!anyDirty) {
     // Check tail words from whichever bitmap is longer
     for (let w = minWords; w < tWords && !anyDirty; w++) {
-      if (tDirty[w]! !== 0) anyDirty = true;
+      if (wordAt(tDirty, w) !== 0) anyDirty = true;
     }
     for (let w = minWords; w < cWords && !anyDirty; w++) {
-      if (cDirty[w]! !== 0) anyDirty = true;
+      if (wordAt(cDirty, w) !== 0) anyDirty = true;
     }
   }
   if (!anyDirty) {
@@ -680,8 +678,8 @@ function renderDiffPacked(
       const wordIdx = tIdx >>> 5;
       const bitMask = 1 << (tIdx & 31);
       const cellDirty =
-        ((wordIdx < tDirty.length ? tDirty[wordIdx]! : 0) & bitMask) !== 0
-        || ((wordIdx < cDirty.length ? cDirty[wordIdx]! : 0) & bitMask) !== 0;
+        ((wordIdx < tDirty.length ? wordAt(tDirty, wordIdx) : 0) & bitMask) !== 0
+        || ((wordIdx < cDirty.length ? wordAt(cDirty, wordIdx) : 0) & bitMask) !== 0;
       if (!cellDirty) {
         x++;
         continue;
@@ -793,16 +791,15 @@ function renderDiffCells(
   let output = '';
   let cursorX = -1;
   let cursorY = -1;
-  const token: { hex?: string; bg?: string; modifiers?: Cell['modifiers'] } = {};
 
   for (let y = 0; y < height; y++) {
     const targetRowOffset = y * width;
     const currentRowOffset = y * currentWidth;
     let x = 0;
     while (x < width) {
-      const targetCell = targetCells[targetRowOffset + x]!;
+      const targetCell = cellAtOrEmpty(targetCells, targetRowOffset + x);
       const currentCell = y < currentHeight && x < currentWidth
-        ? currentCells[currentRowOffset + x]!
+        ? cellAtOrEmpty(currentCells, currentRowOffset + x)
         : EMPTY_CELL;
 
       const targetMods = targetCell.modifiers ?? EMPTY_MODIFIERS;
@@ -837,9 +834,9 @@ function renderDiffCells(
       let batchText = '';
       const batchStyleMods = targetMods;
       while (batchX < width) {
-        const c = targetCells[targetRowOffset + batchX]!;
+        const c = cellAtOrEmpty(targetCells, targetRowOffset + batchX);
         const curr = y < currentHeight && batchX < currentWidth
-          ? currentCells[currentRowOffset + batchX]!
+          ? cellAtOrEmpty(currentCells, currentRowOffset + batchX)
           : EMPTY_CELL;
 
         if (batchX > x) {
@@ -886,10 +883,7 @@ function renderDiffCells(
       }
 
       if (hasVisibleStyle(targetCell)) {
-        token.hex = colorHex(targetCell.fg) ?? token.hex;
-        token.bg = colorHex(targetCell.bg);
-        token.modifiers = targetCell.modifiers;
-        output += style.styled(token as any, batchText);
+        output += style.styled(cellToken(targetCell), batchText);
       } else {
         output += batchText;
       }

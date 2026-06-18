@@ -55,8 +55,8 @@
     },
     {
       "path": "packages/bijou/src/core/render/differ.ts",
-      "lines": 908,
-      "bytes": 30767
+      "lines": 902,
+      "bytes": 30645
     },
     {
       "path": "packages/bijou/src/core/ui-scene-ir.ts",
@@ -164,11 +164,6 @@
       "bytes": 23472
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-render.test.ts",
-      "lines": 599,
-      "bytes": 21511
-    },
-    {
       "path": "packages/bijou-tui/src/notification.test.ts",
       "lines": 658,
       "bytes": 25464
@@ -212,6 +207,11 @@
       "path": "packages/bijou/src/core/schema-block.ts",
       "lines": 603,
       "bytes": 17035
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-render.test.ts",
+      "lines": 599,
+      "bytes": 21511
     },
     {
       "path": "packages/bijou/src/core/selection.ts",
@@ -394,11 +394,6 @@
       "bytes": 14869
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-settings.test.ts",
-      "lines": 414,
-      "bytes": 14341
-    },
-    {
       "path": "packages/bijou-tui/src/command-palette.ts",
       "lines": 418,
       "bytes": 14755
@@ -407,6 +402,11 @@
       "path": "packages/bijou/src/core/schema-block.test.ts",
       "lines": 415,
       "bytes": 13022
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-settings.test.ts",
+      "lines": 414,
+      "bytes": 14341
     },
     {
       "path": "packages/bijou/src/core/forms/filter.test.ts",
@@ -494,14 +494,14 @@
       "bytes": 16164
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
-      "lines": 381,
-      "bytes": 12510
-    },
-    {
       "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",
       "lines": 382,
       "bytes": 12465
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
+      "lines": 381,
+      "bytes": 12510
     },
     {
       "path": "packages/bijou/src/core/theme/builder.ts",
