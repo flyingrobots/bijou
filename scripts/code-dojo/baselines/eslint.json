@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 4527,
-  "errors": 4523,
+  "total": 4526,
+  "errors": 4522,
   "warnings": 4,
   "rules": [
     {
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 182
+      "count": 181
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-template-expression",
