@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2412,
-  "errors": 2412,
+  "total": 2357,
+  "errors": 2357,
   "warnings": 0,
   "rules": [
     {
@@ -34,7 +34,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-deprecated",
-      "count": 16
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/no-dynamic-delete",
@@ -50,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 74
+      "count": 73
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 569
+      "count": 539
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 79
+      "count": 77
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -102,7 +102,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 28
+      "count": 25
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 374
+      "count": 373
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -122,11 +122,11 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
-      "count": 17
+      "count": 14
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 32
+      "count": 31
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 570
+      "count": 563
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",

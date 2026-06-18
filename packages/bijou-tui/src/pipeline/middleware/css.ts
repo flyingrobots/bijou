@@ -1,7 +1,12 @@
 import type { RenderMiddleware } from '../pipeline.js';
+import type { RenderState } from '../pipeline.js';
 import { parseBCSS } from '../../css/parser.js';
 import type { BCSSSheet } from '../../css/types.js';
-import { resolveStyles } from '../../css/resolver.js';
+import {
+  resolveStyles,
+  type ComponentIdentity,
+  type ResolvedStyles,
+} from '../../css/resolver.js';
 
 /**
  * Creates a BCSS styling middleware for the rendering pipeline.
@@ -16,9 +21,7 @@ export function bcssMiddleware(css: string): RenderMiddleware {
   let cachedSheet: BCSSSheet | null = null;
 
   return (state, next) => {
-    if (!cachedSheet) {
-      cachedSheet = parseBCSS(css);
-    }
+    cachedSheet ??= parseBCSS(css);
 
     // Pass the sheet through the data bag so stages can use it
     state.data['bcss_sheet'] = cachedSheet;
@@ -37,14 +40,26 @@ export function bcssMiddleware(css: string): RenderMiddleware {
 /**
  * Helper for components to resolve their own BCSS styles.
  */
-export function useBCSS(state: any, identity: { type: string, id?: string, classes?: string[] }) {
-  const sheet = state.data.bcss_sheet as BCSSSheet | undefined;
-  if (!sheet) return {};
+export function useBCSS(
+  state: Pick<RenderState, 'data' | 'ctx'>,
+  identity: ComponentIdentity,
+): ResolvedStyles {
+  const sheet: unknown = state.data['bcss_sheet'];
+  if (!isBCSSSheet(sheet)) return {};
 
   const terminal = {
     width: state.ctx.runtime.columns,
-    height: state.ctx.runtime.rows
+    height: state.ctx.runtime.rows,
   };
 
   return resolveStyles(identity, sheet, terminal);
+}
+
+function isBCSSSheet(value: unknown): value is BCSSSheet {
+  return typeof value === 'object'
+    && value !== null
+    && 'rules' in value
+    && 'mediaQueries' in value
+    && Array.isArray(value.rules)
+    && Array.isArray(value.mediaQueries);
 }

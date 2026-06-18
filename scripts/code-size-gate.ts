@@ -88,12 +88,10 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou-i18n/src/runtime.test.ts', lines: 553 },
   { path: 'packages/bijou-i18n/src/runtime.ts', lines: 552 },
   { path: 'tests/cycles/DF-054/dogfood-late-family-six-pack.test.ts', lines: 544 },
-  { path: 'packages/bijou-tui/src/viewport.test.ts', lines: 539 },
   { path: 'packages/bijou/src/core/theme/dtcg.test.ts', lines: 537 },
   { path: 'packages/bijou-tui/src/eventbus.ts', lines: 535 },
   { path: 'packages/bijou-tui/src/focus-area.test.ts', lines: 533 },
   { path: 'packages/bijou-tui/src/transition-shaders.ts', lines: 517 },
-  { path: 'packages/bijou/src/core/components/table.test.ts', lines: 511 },
   { path: 'tests/cycles/DF-069/dogfood-block-registry.test.ts', lines: 509 },
 ]);
 

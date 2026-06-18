@@ -10,19 +10,19 @@
  * are finite.
  */
 export function sanitizeValues(values: readonly number[]): readonly number[] {
-  let needsCopy = false;
-  for (let i = 0; i < values.length; i++) {
-    if (!Number.isFinite(values[i])) { needsCopy = true; break; }
+  for (const value of values) {
+    if (!Number.isFinite(value)) {
+      return values.map((v) => Number.isFinite(v) ? v : 0);
+    }
   }
-  if (!needsCopy) return values;
-  return values.map((v) => Number.isFinite(v) ? v : 0);
+  return values;
 }
 
 /** Stack-safe minimum of a numeric array. Returns `Infinity` for empty arrays. */
 export function safeMin(values: readonly number[]): number {
   let min = Infinity;
-  for (let i = 0; i < values.length; i++) {
-    if (values[i]! < min) min = values[i]!;
+  for (const value of values) {
+    if (value < min) min = value;
   }
   return min;
 }
@@ -30,8 +30,8 @@ export function safeMin(values: readonly number[]): number {
 /** Stack-safe maximum of a numeric array. Returns `-Infinity` for empty arrays. */
 export function safeMax(values: readonly number[]): number {
   let max = -Infinity;
-  for (let i = 0; i < values.length; i++) {
-    if (values[i]! > max) max = values[i]!;
+  for (const value of values) {
+    if (value > max) max = value;
   }
   return max;
 }
@@ -45,6 +45,7 @@ export function safeMax(values: readonly number[]): number {
  * Returns an empty array when `count <= 0`.
  */
 export function sampleToWidth(values: readonly number[], count: number): number[] {
+  if (count <= 0) return [];
   if (values.length === 0) return new Array<number>(count).fill(0);
   if (values.length === count) return [...values];
 
@@ -54,14 +55,18 @@ export function sampleToWidth(values: readonly number[], count: number): number[
     const lo = Math.floor(i * ratio);
     const hi = Math.min(values.length, Math.ceil((i + 1) * ratio));
     if (hi - lo <= 1) {
-      out.push(values[lo]!);
+      out.push(valueAt(values, lo));
     } else {
       let sum = 0;
       for (let j = lo; j < hi; j++) {
-        sum += values[j]!;
+        sum += valueAt(values, j);
       }
       out.push(sum / (hi - lo));
     }
   }
   return out;
+}
+
+function valueAt(values: readonly number[], index: number): number {
+  return values[index] ?? 0;
 }
