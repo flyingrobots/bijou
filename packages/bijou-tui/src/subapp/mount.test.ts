@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createSubAppAdapter, initSubApp, mount, mapCmds, updateSubApp } from './mount.js';
-import type { App, Cmd, QuitSignal } from '../types.js';
+import type { App, Cmd } from '../types.js';
 import { QUIT } from '../types.js';
 import { createSurface } from '@flyingrobots/bijou';
 
@@ -69,11 +69,11 @@ describe('mapCmds', () => {
     expect(result).toEqual({ parent: true, val: 2 });
   });
 
-  it('passes QUIT signals through unaltered', async () => {
-    const cmd: Cmd<any> = () => QUIT;
-    const mapped = mapCmds([cmd], (m) => m);
-
-    const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
+  it('QUIT', async () => {
+    const cmd: Cmd<never> = () => QUIT;
+    const mapped = mapCmds([cmd], (m) => m).at(0);
+    if (!mapped) throw new Error('missing');
+    const result = await mapped(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(QUIT);
   });
 
