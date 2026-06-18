@@ -7,6 +7,14 @@ import { repoRoot } from "./git.mjs";
 
 const baselinePath = "scripts/code-dojo/baselines/eslint.json";
 const schema = "code-dojo.eslint-baseline.v1";
+const lintTargets = [
+  "bench/**/*.ts",
+  "examples/**/*.ts",
+  "packages/**/*.ts",
+  "scripts/**/*.ts",
+  "tests/**/*.ts",
+  "vitest.config.ts",
+];
 
 function readBaseline(root) {
   const parsed = JSON.parse(readFileSync(path.join(root, baselinePath), "utf8"));
@@ -46,7 +54,7 @@ function runEslint(root) {
   try {
     const result = spawnSync(
       "eslint",
-      ["--format", "json", "--output-file", outputPath, "--no-warn-ignored", "."],
+      ["--format", "json", "--output-file", outputPath, "--no-warn-ignored", ...lintTargets],
       {
         cwd: root,
         encoding: "utf8",
