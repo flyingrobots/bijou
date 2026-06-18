@@ -410,7 +410,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         },
       },
     ], { ctx });
-    const model = result.model as any;
+    const model = result.model;
     const text = frameText(result.frames.at(-1)!);
 
     expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
