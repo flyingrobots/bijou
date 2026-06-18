@@ -41,9 +41,9 @@ function validateTheme(theme: Theme): void {
         for (let i = 1; i < stops.length; i++) {
           const prev = stops[i - 1];
           const curr = stops[i];
-          expect(prev, `gradient.${name} stop ${i - 1}`).toBeDefined();
-          expect(curr, `gradient.${name} stop ${i}`).toBeDefined();
-          expect(must(curr).pos, `gradient.${name}[${i}].pos >= [${i - 1}].pos`)
+          expect(prev, `gradient.${name} stop ${String(i - 1)}`).toBeDefined();
+          expect(curr, `gradient.${name} stop ${String(i)}`).toBeDefined();
+          expect(must(curr).pos, `gradient.${name}[${String(i)}].pos >= [${String(i - 1)}].pos`)
             .toBeGreaterThanOrEqual(must(prev).pos);
         }
       }
@@ -59,9 +59,10 @@ function validateTheme(theme: Theme): void {
       for (const [name, stops] of Object.entries(theme.gradient)) {
         for (const [index, stop] of stops.entries()) {
           for (const component of stop.color) {
-            expect(Number.isInteger(component), `gradient.${name}[${index}] component`).toBe(true);
-            expect(component, `gradient.${name}[${index}] component`).toBeGreaterThanOrEqual(0);
-            expect(component, `gradient.${name}[${index}] component`).toBeLessThanOrEqual(255);
+            const label = `gradient.${name}[${String(index)}] component`;
+            expect(Number.isInteger(component), label).toBe(true);
+            expect(component, label).toBeGreaterThanOrEqual(0);
+            expect(component, label).toBeLessThanOrEqual(255);
           }
         }
       }
@@ -84,7 +85,7 @@ describe('presets', () => {
   validateTheme(CYAN_MAGENTA);
   validateTheme(TEAL_ORANGE_PINK);
 
-  for (const [name, preset] of Object.entries(PRESETS)) {
+  for (const preset of Object.values(PRESETS)) {
     if (
       preset !== BIJOU_DARK
       && preset !== BIJOU_LIGHT

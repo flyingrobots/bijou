@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { alert } from './alert.js';
 import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import type { BijouContext } from '../../ports/context.js';
+
+function alertWithUnknownMessage(message: unknown, ctx: BijouContext): string {
+  const result: unknown = Reflect.apply(alert, undefined, [message, { ctx }]);
+  if (typeof result === 'string') return result;
+  throw new TypeError('alert did not return a string');
+}
 
 describe('alert', () => {
   it('renders box with icon in interactive mode', () => {
@@ -89,8 +96,8 @@ describe('alert', () => {
   describe('defensive input handling', () => {
     it('handles null/undefined message gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });
-      expect(alert(null as any, { ctx })).toBe('[INFO] ');
-      expect(alert(undefined as any, { ctx })).toBe('[INFO] ');
+      expect(alertWithUnknownMessage(null, ctx)).toBe('[INFO] ');
+      expect(alertWithUnknownMessage(undefined, ctx)).toBe('[INFO] ');
     });
 
     it('renders with explicit context in pipe mode', () => {

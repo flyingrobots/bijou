@@ -18,7 +18,7 @@
 import type { BijouNodeOptions } from './types.js';
 import { safeMax, safeMin, sampleToWidth, sanitizeValues } from './data-viz-utils.js';
 
-const BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+const BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'] as const;
 
 export interface SparklineOptions extends BijouNodeOptions {
   /** Output width in characters. Defaults to `values.length`. */
@@ -43,16 +43,15 @@ export function sparkline(values: readonly number[], options: SparklineOptions =
   if (width <= 0 || !Number.isFinite(rawWidth)) return '';
 
   const sampled = sampleToWidth(sanitizeValues(values), width);
-  const min = Number.isFinite(options.min) ? options.min! : safeMin(sampled);
-  const max = Number.isFinite(options.max) ? options.max! : safeMax(sampled);
+  const min = options.min !== undefined && Number.isFinite(options.min) ? options.min : safeMin(sampled);
+  const max = options.max !== undefined && Number.isFinite(options.max) ? options.max : safeMax(sampled);
   const range = max - min;
 
   let result = '';
-  for (let i = 0; i < sampled.length; i++) {
-    const v = sampled[i]!;
-    const normalized = range === 0 ? 0.5 : (v - min) / range;
+  for (const value of sampled) {
+    const normalized = range === 0 ? 0.5 : (value - min) / range;
     const index = Math.round(normalized * (BLOCKS.length - 1));
-    result += BLOCKS[Math.max(0, Math.min(BLOCKS.length - 1, index))]!;
+    result += BLOCKS[Math.max(0, Math.min(BLOCKS.length - 1, index))] ?? '▁';
   }
   return result;
 }
