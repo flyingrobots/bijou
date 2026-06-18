@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2528,
-  "errors": 2528,
+  "total": 2475,
+  "errors": 2475,
   "warnings": 0,
   "rules": [
     {
@@ -50,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 75
+      "count": 74
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 649
+      "count": 603
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 164
+      "count": 163
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 80
+      "count": 79
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -102,7 +102,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 29
+      "count": 28
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 377
+      "count": 374
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",

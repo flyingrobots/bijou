@@ -54,7 +54,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou-tui/src/runtime-engine.test.ts', lines: 859 },
   { path: 'examples/docs/i18n-debt.ts', lines: 857 },
   { path: 'packages/bijou/src/core/graphql-bijou-block.ts', lines: 839 },
-  { path: 'packages/bijou/src/ports/surface.ts', lines: 827 },
+  { path: 'packages/bijou/src/ports/surface.ts', lines: 823 },
   { path: 'scripts/pr-review-status.ts', lines: 778 },
   { path: 'packages/bijou-tui/src/app-frame-render.ts', lines: 775 },
   { path: 'packages/bijou-tui/src/notification.test.ts', lines: 761 },

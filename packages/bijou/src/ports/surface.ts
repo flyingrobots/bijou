@@ -6,6 +6,7 @@
  */
 
 import { sanitizeNonNegativeInt } from '../core/numeric.js';
+import { byteAt, cellAt, hexAt, rgbAt, wordAt } from '../core/render/safe-read.js';
 import { colorHex, colorRgb, isResolvedColor, type ColorRef } from '../core/theme/color.js';
 
 /**
@@ -278,7 +279,7 @@ function copyCellInto(target: Cell, source: Cell): void {
 }
 
 export function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
+  return 'buffer' in s && s.buffer instanceof Uint8Array;
 }
 
 // ── Packed buffer helpers ────────────────────────────────
@@ -296,7 +297,6 @@ import {
   encodeChar, decodeChar,
   encodeModifiers, decodeModifiers,
   encodeOpacity, decodeOpacity,
-  toHex,
   packCell,
 } from '../core/render/packed-cell.js';
 
@@ -326,16 +326,16 @@ function writeColorRefInto(
   off: number,
 ): boolean {
   if (rgb !== undefined) {
-    out[off] = rgb[0]!;
-    out[off + 1] = rgb[1]!;
-    out[off + 2] = rgb[2]!;
+    out[off] = rgb[0];
+    out[off + 1] = rgb[1];
+    out[off + 2] = rgb[2];
     return true;
   }
   if (ref == null) return false;
   if (isResolvedColor(ref)) {
-    out[off] = ref.rgb[0]!;
-    out[off + 1] = ref.rgb[1]!;
-    out[off + 2] = ref.rgb[2]!;
+    out[off] = ref.rgb[0];
+    out[off + 1] = ref.rgb[1];
+    out[off + 2] = ref.rgb[2];
     return true;
   }
   return inlineHexRGB(ref, out, off);
@@ -380,17 +380,17 @@ function decodeCellFromBuf(
   sideTable: readonly string[],
 ): Cell {
   const off = idx * CELL_STRIDE;
-  const charCode = buf[off + OFF_CHAR]! | (buf[off + OFF_CHAR + 1]! << 8);
-  const alphaByte = buf[off + OFF_ALPHA]!;
-  const flags = buf[off + OFF_FLAGS]!;
+  const charCode = byteAt(buf, off + OFF_CHAR) | (byteAt(buf, off + OFF_CHAR + 1) << 8);
+  const alphaByte = byteAt(buf, off + OFF_ALPHA);
+  const flags = byteAt(buf, off + OFF_FLAGS);
   const fgSet = (alphaByte & FLAG_FG_SET) !== 0;
   const bgSet = (alphaByte & FLAG_BG_SET) !== 0;
-  const fgRGB = fgSet ? [buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!] as const : undefined;
-  const bgRGB = bgSet ? [buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!] as const : undefined;
+  const fgRGB = fgSet ? rgbAt(buf, off + OFF_FG_R) : undefined;
+  const bgRGB = bgSet ? rgbAt(buf, off + OFF_BG_R) : undefined;
   return {
     char: decodeChar(charCode, sideTable),
-    fg: fgSet ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!) : undefined,
-    bg: bgSet ? toHex(buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!) : undefined,
+    fg: fgSet ? hexAt(buf, off + OFF_FG_R) : undefined,
+    bg: bgSet ? hexAt(buf, off + OFF_BG_R) : undefined,
     fgRGB,
     bgRGB,
     modifiers: decodeModifiers(flags & ~FLAG_EMPTY),
@@ -440,32 +440,30 @@ function applyMaskToBuf(
   }
   if (mask.fg) {
     if (writeColorRefInto(source.fg, source.fgRGB, buf, off + OFF_FG_R)) {
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_FG_SET;
+      buf[off + OFF_ALPHA] = byteAt(buf, off + OFF_ALPHA) | FLAG_FG_SET;
     } else {
       buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! & ~FLAG_FG_SET;
+      buf[off + OFF_ALPHA] = byteAt(buf, off + OFF_ALPHA) & ~FLAG_FG_SET;
     }
   }
   if (mask.bg) {
     if (writeColorRefInto(source.bg, source.bgRGB, buf, off + OFF_BG_R)) {
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+      buf[off + OFF_ALPHA] = byteAt(buf, off + OFF_ALPHA) | FLAG_BG_SET;
     } else {
       buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! & ~FLAG_BG_SET;
+      buf[off + OFF_ALPHA] = byteAt(buf, off + OFF_ALPHA) & ~FLAG_BG_SET;
     }
   }
   if (mask.modifiers) {
     const modFlags = encodeModifiers(source.modifiers);
-    const existing = buf[off + OFF_FLAGS]!;
+    const existing = byteAt(buf, off + OFF_FLAGS);
     // Preserve the empty bit, replace modifier bits
     buf[off + OFF_FLAGS] = (existing & FLAG_EMPTY) | modFlags;
   }
   if (mask.alpha) {
-    const existing = buf[off + OFF_FLAGS]!;
-    buf[off + OFF_FLAGS] = source.empty
-      ? (existing | FLAG_EMPTY)
-      : (existing & ~FLAG_EMPTY);
-    const alphaByte = buf[off + OFF_ALPHA]!;
+    const existing = byteAt(buf, off + OFF_FLAGS);
+    buf[off + OFF_FLAGS] = existing & ~FLAG_EMPTY;
+    const alphaByte = byteAt(buf, off + OFF_ALPHA);
     const opacityBits = encodeOpacity(source.opacity ?? 1);
     buf[off + OFF_ALPHA] = (alphaByte & ~OPACITY_MASK) | opacityBits;
   }
@@ -480,7 +478,7 @@ export interface PackedSurface extends Surface {
   /** Raw packed byte buffer. CELL_STRIDE bytes per cell, row-major. */
   readonly buffer: Uint8Array;
   /** Side table for multi-codepoint grapheme clusters. */
-  readonly sideTable: readonly string[];
+  readonly sideTable: string[];
   /**
    * Per-cell render-dirty bitmap. One bit per cell, packed into
    * Uint32 words (`renderDirtyWords[idx >> 5] & (1 << (idx & 31))`).
@@ -543,32 +541,31 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
   const renderDirtyWords = new Uint32Array(Math.ceil(size / 32));
 
   // Cell array: lazily decoded from the buffer on read.
-  const cells: Cell[] = new Array(size);
+  const cells = Array.from({ length: size }, () => cloneCell(defaultCell));
 
   // Initialize buffer and cell array from the default cell
   for (let i = 0; i < size; i++) {
     encodeCellIntoBuf(buf, i, defaultCell, sideTable);
-    cells[i] = cloneCell(defaultCell);
   }
 
   function markDirty(idx: number): void {
-    const w = idx >> 5;
-    const bit = 1 << (idx & 31);
-    dirtyWords[w]! |= bit;
-    renderDirtyWords[w]! |= bit;
+    const wordIndex = idx >> 5, bit = 1 << (idx & 31);
+    dirtyWords[wordIndex] = wordAt(dirtyWords, wordIndex) | bit;
+    renderDirtyWords[wordIndex] = wordAt(renderDirtyWords, wordIndex) | bit;
   }
 
   function ensureClean(idx: number): void {
-    const word = dirtyWords[idx >> 5]!;
+    const wordIndex = idx >> 5;
+    const word = wordAt(dirtyWords, wordIndex);
     const bit = 1 << (idx & 31);
     if (word & bit) {
       // Preserve the exact float opacity stored by set() to avoid quantization
       // drift. When set() marks dirty, it writes the caller's opacity to the
       // cell first. When markAllDirty() marks dirty (clone), the cell retains
       // whatever opacity it had, which is acceptable.
-      const exactOpacity = cells[idx]!.opacity;
-      syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
-      dirtyWords[idx >> 5] = word & ~bit;
+      const cell = cellAt(cells, idx);
+      syncCellFromBuf(cell, buf, idx, sideTable, cell.opacity);
+      dirtyWords[wordIndex] = word & ~bit;
     }
   }
 
@@ -602,10 +599,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         encodeCellIntoBuf(buf, 0, defaultCell, sideTable);
         for (let i = 1; i < size; i++) {
           const off = i * CELL_STRIDE;
-          for (let b = 0; b < CELL_STRIDE; b++) buf[off + b] = buf[b]!;
+          buf.set(buf.subarray(0, CELL_STRIDE), off);
         }
       }
-      for (let i = 0; i < size; i++) copyCellInto(cells[i]!, defaultCell);
+      for (let i = 0; i < size; i++) copyCellInto(cellAt(cells, i), defaultCell);
       markAllClean();
     },
 
@@ -615,7 +612,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       }
       const idx = y * w + x;
       ensureClean(idx);
-      return maskCell(cells[idx]!, mask);
+      return maskCell(cellAt(cells, idx), mask);
     },
 
     set(x, y, cell, mask = FULL_MASK) {
@@ -632,7 +629,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         applyMaskToBuf(buf, idx, cell, mask, sideTable);
       }
       if (mask.alpha) {
-        cells[idx]!.opacity = cell.opacity ?? 1;
+        cellAt(cells, idx).opacity = cell.opacity ?? 1;
       }
       markDirty(idx);
     },
@@ -653,7 +650,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         63, // full opacity
       );
       // Sync cached opacity so ensureClean doesn't resurrect a stale value
-      cells[idx]!.opacity = 1;
+      cellAt(cells, idx).opacity = 1;
       markDirty(idx);
     },
 
@@ -672,7 +669,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
           for (let x = xStart; x < xEnd; x++) {
             const idx = y * w + x;
             const off = idx * CELL_STRIDE;
-            for (let b = 0; b < CELL_STRIDE; b++) buf[off + b] = template[b]!;
+            buf.set(template, off);
             markDirty(idx);
           }
         }
@@ -717,14 +714,12 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
           for (let j = 0; j < blitW; j++) {
             const sOff = (sRowBase + srcXStart + j) * CELL_STRIDE;
             // Skip empty source cells (brush transparency)
-            if (sBuf[sOff + OFF_FLAGS]! & FLAG_EMPTY) continue;
+            if (byteAt(sBuf, sOff + OFF_FLAGS) & FLAG_EMPTY) continue;
             const tOff = (tRowBase + xStart + j) * CELL_STRIDE;
             // Copy 10 bytes directly
-            for (let b = 0; b < CELL_STRIDE; b++) {
-              buf[tOff + b] = sBuf[sOff + b]!;
-            }
+            buf.set(sBuf.subarray(sOff, sOff + CELL_STRIDE), tOff);
             // Re-encode side-table chars into target's side table
-            const charCode = sBuf[sOff]! | (sBuf[sOff + 1]! << 8);
+            const charCode = byteAt(sBuf, sOff) | (byteAt(sBuf, sOff + 1) << 8);
             if (charCode >= SIDE_TABLE_THRESHOLD) {
               const srcChar = sSide[charCode - SIDE_TABLE_THRESHOLD] ?? ' ';
               const tCharCode = encodeChar(srcChar, sideTable);
@@ -770,8 +765,9 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
             if (sourceCell.empty) continue;
 
             const transformedCell = { ...sourceCell };
-            if (charMap[transformedCell.char]) {
-              transformedCell.char = charMap[transformedCell.char]!;
+            const transformedChar = charMap[transformedCell.char];
+            if (transformedChar !== undefined) {
+              transformedCell.char = transformedChar;
             }
 
             const idx = y * w + x;
@@ -800,7 +796,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const count = Math.min(w - xStart, rowCells.length);
       for (let i = 0; i < count; i++) {
         const idx = y * w + xStart + i;
-        applyMaskToBuf(buf, idx, rowCells[i]!, mask, sideTable);
+        applyMaskToBuf(buf, idx, cellAt(rowCells, i), mask, sideTable);
         markDirty(idx);
       }
     },
@@ -813,8 +809,8 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       // includes() is O(n) per entry, but side tables are typically small
       // (only entries for multi-codepoint grapheme clusters above SIDE_TABLE_THRESHOLD).
       for (const entry of sideTable) {
-        if (!(s.sideTable as string[]).includes(entry)) {
-          (s.sideTable as string[]).push(entry);
+        if (!s.sideTable.includes(entry)) {
+          s.sideTable.push(entry);
         }
       }
       // Cells will decode lazily from the copied buffer

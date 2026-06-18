@@ -85,8 +85,8 @@
     },
     {
       "path": "packages/bijou/src/ports/surface.ts",
-      "lines": 828,
-      "bytes": 28028
+      "lines": 824,
+      "bytes": 27988
     },
     {
       "path": "scripts/pr-review-status.ts",
