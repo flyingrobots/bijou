@@ -23,7 +23,7 @@ import {
 } from '../../../packages/bijou-tui/src/app-frame.js';
 
 
-type Msg = { type: 'noop' };
+interface Msg { type: 'noop' }
 
 interface PageModel {
   readonly count: number;
@@ -37,11 +37,11 @@ function textView(text: string) {
 }
 
 function seedNotificationHistory(
-  specs: ReadonlyArray<{
+  specs: readonly {
     readonly title: string;
     readonly message?: string;
     readonly tone?: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
-  }>,
+  }[],
 ): NotificationState<Msg> {
   let state = createNotificationState<Msg>();
   let nowMs = 0;
@@ -66,8 +66,8 @@ function seedNotificationHistory(
 describe('DL-004 drawer rhythm and notice rows cycle', () => {
   const ctx = createTestContext({ mode: 'interactive' });
 
-  beforeAll(() => setDefaultContext(ctx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(ctx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('creates an active cycle doc with the required workflow sections', () => {
     const cycle = readRepoFile('docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
@@ -78,7 +78,6 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
     expect(cycle).toContain('## Implementation outline');
     expect(cycle).toContain('## Retrospective');
   });
-
   it('renders notification review rows with inset rhythm and secondary copy hierarchy', () => {
     const history = seedNotificationHistory([
       {
@@ -87,7 +86,6 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
         tone: 'ERROR',
       },
     ]);
-
     const surface = renderNotificationHistorySurface(history, {
       width: 34,
       height: 8,
@@ -98,14 +96,12 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
     const titleLine = rendered.findIndex((line) => line.includes('Deploy blocked'));
     const metaLine = rendered.findIndex((line) => line.includes('TOAST'));
     const messageLine = rendered.findIndex((line) => line.includes('worker crashed'));
-
     expect(historyLine).toBeGreaterThanOrEqual(0);
     expect(titleLine).toBeGreaterThan(historyLine + 1);
     expect(rendered[titleLine]!.indexOf('Deploy blocked')).toBeGreaterThan(0);
     expect(metaLine).toBe(titleLine + 1);
     expect(messageLine).toBeGreaterThan(metaLine);
   });
-
   it('renders the shell notification-center drawer with section spacing and structured live/archive rows', () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
@@ -124,7 +120,6 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
         render: () => textView('home'),
       }),
     };
-
     const app = createFramedApp<PageModel, Msg>({
       initialColumns: 90,
       initialRows: 18,
@@ -138,7 +133,6 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
         }, 999),
       }),
     });
-
     let [model] = app.init();
     [model] = app.update({ type: 'key', key: 'n', ctrl: false, alt: false, shift: true } as never, model);
     const view = app.view(model);
@@ -148,14 +142,12 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
     const stackLine = lines.findIndex((line) => line.includes('Current stack'));
     const noticeLine = lines.findIndex((line) => line.includes('Deploy failed'));
     const historyLine = lines.findIndex((line) => line.includes('History • All'));
-
     expect(liveLine).toBeGreaterThanOrEqual(0);
     expect(stackLine).toBeGreaterThan(liveLine + 1);
     expect(noticeLine).toBeGreaterThan(stackLine + 1);
     expect(lines[noticeLine]!.indexOf('Deploy failed')).toBeGreaterThan(0);
     expect(historyLine).toBeGreaterThan(noticeLine + 2);
   });
-
   it('spawns the next design-language backlog item', () => {
     const cycle = readRepoFile('docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');
     expect(cycle).toContain('# DL-005 — Prove Inspector and Guided Flow Rhythm');

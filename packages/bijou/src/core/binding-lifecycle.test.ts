@@ -142,7 +142,7 @@ describe('binding lifecycle primitives', () => {
     );
     expect(() => defineBindingLifecycleOwner({
       id: 'reader.view',
-      kind: 'page' as never,
+      kind: 'page',
     })).toThrow('binding lifecycle owner: unsupported kind page');
     expect(() => bindingLifecycleRecord({
       owner: { id: 'reader.view', kind: 'view' } as never,

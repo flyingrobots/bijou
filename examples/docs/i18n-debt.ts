@@ -130,7 +130,7 @@ export function discoverDogfoodI18nDebtSources(
   const paths = options.paths ?? listRepoTypescriptFiles(rootPath);
   return Object.freeze(paths
     .filter((path) => path.startsWith(`${rootPath}/`))
-    .filter((path) => /\.tsx?$/.test(path) && !/\.d\.ts$/.test(path))
+    .filter((path) => /\.tsx?$/.test(path) && !path.endsWith(".d.ts"))
     .filter((path) => !excludedPaths.has(path))
     .sort()
     .map((path) => Object.freeze({
@@ -355,7 +355,7 @@ function listRepoTypescriptFiles(rootPath: string): readonly string[] {
         visit(entryPath);
         continue;
       }
-      if (entry.isFile() && /\.tsx?$/.test(entry.name) && !/\.d\.ts$/.test(entry.name)) {
+      if (entry.isFile() && /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".d.ts")) {
         files.push(entryPath);
       }
     }
@@ -555,7 +555,7 @@ function readDogfoodMarkdownLocalizationSpec(
 
 function markdownFrontmatterYaml(text: string): string | undefined {
   const withoutBom = text.replace(/^\uFEFF/, '');
-  const opening = withoutBom.match(/^---\r?\n/);
+  const opening = /^---\r?\n/.exec(withoutBom);
   if (opening == null) return undefined;
   const bodyStart = opening[0].length;
   const body = withoutBom.slice(bodyStart);
@@ -841,7 +841,6 @@ function freezeInventory(inventory: DogfoodI18nDebtInventory): DogfoodI18nDebtIn
     total: inventory.total,
   });
 }
-
 function freezeMarkdownLocalizationInventory(
   inventory: DogfoodMarkdownLocalizationInventory,
 ): DogfoodMarkdownLocalizationInventory {

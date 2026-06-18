@@ -6,7 +6,7 @@ interface Model {
   readonly text: string;
 }
 
-const app: App<Model, never> = {
+const app: App<Model> = {
   init: () => [{ text: 'Hello, Bijou!' }, []],
 
   update: (msg, model) => {
@@ -17,7 +17,7 @@ const app: App<Model, never> = {
   },
 
   view: (model) => {
-    const lines = [`${model.text}`, '', 'Press q to exit.'];
+    const lines = [model.text, '', 'Press q to exit.'];
     return ansiSurface(lines.join('\n'), Math.max(24, ...lines.map((line) => line.length)), lines.length);
   },
 };

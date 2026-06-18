@@ -65,13 +65,13 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
     
     let currentFg: string | undefined;
     let currentBg: string | undefined;
-    let currentMods = new Set<string>();
+    const currentMods = new Set<string>();
 
     const matches = Array.from(line.matchAll(ANSI_RE));
     let lastIndex = 0;
 
     for (const match of matches) {
-      const matchIndex = match.index!;
+      const matchIndex = match.index;
       const part = line.slice(lastIndex, matchIndex);
       const gs = segmentGraphemes(part);
       for (const char of gs) {
@@ -888,7 +888,7 @@ function renderDiffCells(
       if (hasVisibleStyle(targetCell)) {
         token.hex = colorHex(targetCell.fg) ?? token.hex;
         token.bg = colorHex(targetCell.bg);
-        token.modifiers = targetCell.modifiers as any;
+        token.modifiers = targetCell.modifiers;
         output += style.styled(token as any, batchText);
       } else {
         output += batchText;

@@ -61,7 +61,7 @@ function renderOverlayVariantText(
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -69,7 +69,7 @@ function renderOverlayVariantText(
 }
 
 describe('DF-061 overlay primitives family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md');

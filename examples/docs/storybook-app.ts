@@ -64,7 +64,7 @@ export interface StorybookModel {
   readonly title: string;
   readonly columns: number;
   readonly rows: number;
-  readonly storyState: BrowsableListState<string>;
+  readonly storyState: BrowsableListState;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly profileIndexByStory: Readonly<Record<string, number>>;
   readonly previewTimeMs: number;
@@ -379,7 +379,7 @@ function renderPreviewPane(
   const preview = storyPreviewSurface(variant.render({
     width: previewWidth,
     ctx: previewCtx,
-    state: variant.initialState as never,
+    state: variant.initialState,
     timeMs: model.previewTimeMs,
   }));
   const previewTitle = `${profile.label} / ${variant.label}`;
@@ -545,7 +545,7 @@ function setProfileIndex(
   };
 }
 
-function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableListItem<string>[] {
+function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableListItem[] {
   return stories.map((story) => ({
     label: story.title,
     value: story.id,
@@ -554,9 +554,9 @@ function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableL
 }
 
 function setStoryFocus(
-  state: BrowsableListState<string>,
+  state: BrowsableListState,
   focusIndex: number,
-): BrowsableListState<string> {
+): BrowsableListState {
   const nextFocusIndex = Math.max(0, Math.min(focusIndex, state.items.length - 1));
   return {
     ...state,
@@ -566,9 +566,9 @@ function setStoryFocus(
 }
 
 function syncStoryListHeight(
-  state: BrowsableListState<string>,
+  state: BrowsableListState,
   height: number,
-): BrowsableListState<string> {
+): BrowsableListState {
   const nextHeight = Math.max(1, Math.floor(height));
   return {
     ...state,

@@ -39,7 +39,7 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -49,7 +49,7 @@ describe('docs preview app', () => {
     let model = entered.model;
     let updateResult = app.update(keyMsg('f2'), model);
     model = updateResult[0];
-    let settingsFrame = normalizeViewOutput(app.view(model), {
+    const settingsFrame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
@@ -299,7 +299,6 @@ describe('docs preview app', () => {
     ], { ctx });
     expect((opened.model).docsModel.quitConfirmOpen).toBe(true);
     expect(frameText(last(opened.frames))).toContain('Quit?');
-
     const dismissed = await runScript(app, [
       { key: KEY_ENTER },
       { key: 'q' },

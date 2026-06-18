@@ -471,7 +471,7 @@ function resolveStackTrackSizes(
   if (totalFlex <= 0 || remaining <= 0) return sizes;
 
   let assigned = 0;
-  const fractionalShares: Array<{ readonly index: number; readonly remainder: number }> = [];
+  const fractionalShares: { readonly index: number; readonly remainder: number }[] = [];
   for (let index = 0; index < children.length; index++) {
     const track = children[index]!.track;
     if (track.kind !== 'flex') continue;

@@ -308,7 +308,7 @@ function parsePackResult(stdout: string, packageName: string): { filename: strin
     throw new Error(`could not parse npm pack output for ${packageName}\n${trimmed}`);
   }
 
-  const parsed = JSON.parse(trimmed.slice(arrayStart, arrayEnd + 1)) as Array<{ filename?: string }>;
+  const parsed = JSON.parse(trimmed.slice(arrayStart, arrayEnd + 1)) as { filename?: string }[];
   const filename = parsed[0]?.filename;
   if (filename == null || filename === '') {
     throw new Error(`npm pack did not report a filename for ${packageName}\n${trimmed}`);

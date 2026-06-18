@@ -20,7 +20,7 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 const INITIAL_MESSAGES: Message[] = [
   { sender: 'alice', text: 'Hey, have you tried bijou?', variant: 'info' },

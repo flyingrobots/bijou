@@ -19,7 +19,7 @@ interface Model {
 
 type Msg = never;
 
-const app: App<Model, Msg> = {
+const app: App<Model> = {
   init: () => [{
     cols: process.stdout.columns ?? 80,
     rows: process.stdout.rows ?? 24,

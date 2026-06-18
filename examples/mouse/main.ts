@@ -13,7 +13,7 @@ interface Model {
   lastClick: { col: number; row: number } | null;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 const MAX_EVENTS = 10;
 

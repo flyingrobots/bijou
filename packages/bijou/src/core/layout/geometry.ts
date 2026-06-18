@@ -114,7 +114,7 @@ export function solveGridRects(options: GridRectOptions): ReadonlyMap<string, La
   const colStarts = trackStarts(colSizes, gap);
   const rowStarts = trackStarts(rowSizes, gap);
 
-  const areaCells = new Map<string, Array<{ readonly row: number; readonly col: number }>>();
+  const areaCells = new Map<string, { readonly row: number; readonly col: number }[]>();
   for (let rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
     for (let colIndex = 0; colIndex < matrix[rowIndex]!.length; colIndex++) {
       const area = matrix[rowIndex]![colIndex]!;
@@ -212,7 +212,7 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   const remaining = Math.max(0, available - fixed);
   if (frTotal > 0) {
     let assigned = 0;
-    const fractionalShares: Array<{ readonly index: number; readonly remainder: number }> = [];
+    const fractionalShares: { readonly index: number; readonly remainder: number }[] = [];
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i]!;
       if (typeof track === 'number') continue;

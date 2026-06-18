@@ -22,7 +22,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 describe('DF-071 DOGFOOD block-authored surfaces', () => {
   it('renders a DOGFOOD surface block inventory from the runtime registry', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 80 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
@@ -47,7 +47,7 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
 
   it('opens Blocks search with title text owned by SearchPanelBlock', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{ key: '/' }], { ctx });
     const text = frameText(result.frames.at(-1)!);
     const expectedTitle = String(searchPanelBlock.render({

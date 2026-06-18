@@ -147,7 +147,7 @@ function getMatchSpecificity(identity: ComponentIdentity, selectors: BCSSSelecto
 export function matchesMediaQuery(condition: string, terminal: { width: number; height: number }): boolean {
   // Simple regex for (property op value)
   const regex = /\((width|height)\s*(<|>|<=|>=|==|!=)\s*(\d+)\)/;
-  const match = condition.match(regex);
+  const match = regex.exec(condition);
   if (!match) return false;
 
   const property = match[1] === 'width' ? terminal.width : terminal.height;

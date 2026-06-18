@@ -12,7 +12,7 @@ interface Model {
 
 type Msg = never;
 
-export const app: App<Model, Msg> = {
+export const app: App<Model> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {

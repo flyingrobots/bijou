@@ -46,7 +46,7 @@ export function makeBgFill(
 ): ((text: string) => string) | undefined {
   if (!token?.bg || !shouldApplyBg(ctx)) return undefined;
 
-  const wrappedMarker = ctx!.style.bgHex(token.bg!, MARKER);
+  const wrappedMarker = ctx!.style.bgHex(token.bg, MARKER);
   const markerIndex = wrappedMarker.indexOf(MARKER);
 
   if (markerIndex < 0 || wrappedMarker === MARKER) {

@@ -19,7 +19,7 @@ import {
 } from './docs-preview.test-support.js';
 
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('demonstrates every table variant in the DOGFOOD dense-comparison story', () => {
     const story = COMPONENT_STORIES.find((candidate) => candidate.id === 'dense-comparison');
@@ -49,7 +49,7 @@ describe('docs preview app', () => {
       const preview = variant!.render({
         width: 60,
         ctx,
-        state: undefined as never,
+        state: undefined,
         timeMs: 0,
       });
       if (typeof preview === 'string') return preview;

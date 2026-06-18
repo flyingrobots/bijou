@@ -43,8 +43,8 @@ function keyMsg(key: string) {
   };
 }
 
-function brailleGlyphCells(frame: Surface): Array<ReturnType<Surface['get']>> {
-  const cells: Array<ReturnType<Surface['get']>> = [];
+function brailleGlyphCells(frame: Surface): ReturnType<Surface['get']>[] {
+  const cells: ReturnType<Surface['get']>[] = [];
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
       const cell = frame.get(x, y);
@@ -234,7 +234,7 @@ describe('image viewer app', () => {
     expect(colored.tuning.colorMode).toBe('fg-bg');
     expect(glyphCells.some((cell) => {
       const bg = cell.bgRGB;
-      return bg !== undefined && bg[0] === 255 && bg[1] === 255 && bg[2] === 255;
+      return bg?.[0] === 255 && bg[1] === 255 && bg[2] === 255;
     }))
       .toBe(true);
     expect(text).toContain('Color: full color');

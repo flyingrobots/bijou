@@ -834,7 +834,7 @@ function freezeSnapshotData<T>(value: T): DeepReadonly<T> {
   return deepFreeze(cloneSnapshotData(value, 'data'));
 }
 
-function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = new WeakSet<object>()): T {
+function cloneSnapshotData<T>(value: T, path: string, seen = new WeakSet()): T {
   if (
     value === null
     || typeof value === 'string'
@@ -899,9 +899,7 @@ function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = ne
   }
 }
 
-interface SnapshotDataObject {
-  [key: string]: unknown;
-}
+type SnapshotDataObject = Record<string, unknown>;
 
 function isPlainObject(value: object): boolean {
   const prototype = Object.getPrototypeOf(value);
@@ -912,7 +910,7 @@ function objectKind(value: object): string {
   return Object.prototype.toString.call(value).slice(8, -1);
 }
 
-function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet<object>()): DeepReadonly<T> {
+function deepFreeze<T>(value: T, seen = new WeakSet()): DeepReadonly<T> {
   if (value === null || typeof value !== 'object') {
     return value as DeepReadonly<T>;
   }

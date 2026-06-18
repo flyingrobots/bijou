@@ -184,7 +184,7 @@ describe('interactiveAccordion', () => {
 // ── accordionKeyMap ───────────────────────────────────────────────
 
 describe('accordionKeyMap', () => {
-  type Msg = { type: string };
+  interface Msg { type: string }
 
   const km = accordionKeyMap<Msg>({
     focusNext: { type: 'next' },
@@ -207,12 +207,10 @@ describe('accordionKeyMap', () => {
     expect(km.handle(keyMsg('enter'))).toEqual({ type: 'toggle' });
     expect(km.handle(keyMsg('space'))).toEqual({ type: 'toggle' });
   });
-
   it('handles quit', () => {
     expect(km.handle(keyMsg('q'))).toEqual({ type: 'quit' });
     expect(km.handle(keyMsg('c', { ctrl: true }))).toEqual({ type: 'quit' });
   });
-
   it('returns undefined for unbound keys', () => {
     expect(km.handle(keyMsg('x'))).toBeUndefined();
   });

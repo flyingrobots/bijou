@@ -85,7 +85,7 @@ describe('dag', () => {
       const topLine = lines.find(l => l.includes('╭'));
       expect(topLine).toBeDefined();
       // Count the box chars (╭ + ─ repeated + ╮)
-      const boxMatch = topLine!.match(/╭[─]+╮/);
+      const boxMatch = /╭[─]+╮/.exec((topLine!));
       expect(boxMatch).toBeDefined();
       expect(boxMatch![0].length).toBe(30);
     });
@@ -174,7 +174,7 @@ describe('dag', () => {
       const result = dag(nodes, { ctx });
       const lines = result.split('\n');
       const topLine = lines.find(l => l.includes('╭'));
-      const boxMatch = topLine!.match(/╭[─]+╮/);
+      const boxMatch = /╭[─]+╮/.exec((topLine!));
       expect(boxMatch).toBeDefined();
       expect(boxMatch![0].length).toBeGreaterThanOrEqual(16);
     });
@@ -263,7 +263,6 @@ describe('dag', () => {
       expect(result).toContain('Alpha');
       expect(result).toContain('Beta');
     });
-
     it('defaults to ui.cursor token when selectedToken omitted', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       // Should not throw — uses default cursor token
@@ -273,5 +272,4 @@ describe('dag', () => {
     });
   });
 });
-
 // ── dagSlice Tests ─────────────────────────────────────────────────

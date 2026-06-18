@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { composite, compositeSurface, compositeSurfaceInto, modal, toast, drawer, tooltip } from './overlay.js';
-import type { Overlay, DrawerOptions } from './overlay.js';
-import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
+import { surfaceToString } from '@flyingrobots/bijou';
+import { composite, toast } from './overlay.js';
+import { resolveOverlayMargin } from './design-language.js';
 import { visibleLength, stripAnsi } from './viewport.js';
 
 function expectSurfaceTextMatch(actualSurfaceText: string, expectedContent: string) {

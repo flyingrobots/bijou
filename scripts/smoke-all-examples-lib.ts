@@ -469,7 +469,7 @@ async function runScenariosInPool(
   scenarios: readonly Scenario[],
   io: SmokeAllExamplesIO,
   concurrency: number,
-): Promise<Array<{ scenario: Scenario; result: Result }>> {
+): Promise<{ scenario: Scenario; result: Result }[]> {
   if (scenarios.length === 0) return [];
   const runScenario = io.runScenarioImpl ?? runScenarioWithTimeout;
   const results = new Array<{ scenario: Scenario; result: Result }>(scenarios.length);

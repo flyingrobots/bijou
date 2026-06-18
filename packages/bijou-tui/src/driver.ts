@@ -325,7 +325,7 @@ export async function testRuntime<Model, M>(
   const start = clock.now();
   const frames: Surface[] = [];
   const snapshots: TestRuntimeSnapshot<Model, M>[] = [];
-  const handledMessages: Array<BusMsg<M>> = [];
+  const handledMessages: BusMsg<M>[] = [];
   const emittedMessages: M[] = [];
   const commandRecords: MutableCommandRecord<M>[] = [];
   const bus = createEventBus<M>({ clock });
@@ -418,7 +418,7 @@ export async function testRuntime<Model, M>(
         if (result !== undefined) {
           record.resolution = 'message';
           record.result = result;
-          emittedMessages.push(result as M);
+          emittedMessages.push(result);
           return result;
         }
 
@@ -459,7 +459,7 @@ export async function testRuntime<Model, M>(
       };
       bus.emit(resizeMsg);
     } else if ('mouse' in step) {
-      bus.emit(step.mouse as unknown as M);
+      bus.emit(step.mouse);
     } else if ('msg' in step) {
       bus.emit(step.msg);
     } else {
@@ -672,7 +672,7 @@ export async function runScript<Model, M>(
         };
         bus.emit(resizeMsg);
       } else if ('mouse' in step) {
-        bus.emit(step.mouse as unknown as M);
+        bus.emit(step.mouse);
       } else if ('msg' in step) {
         bus.emit(step.msg);
       } else {

@@ -64,7 +64,7 @@ function renderStoryPreviewText(
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -72,7 +72,7 @@ function renderStoryPreviewText(
 }
 
 describe('DF-066 data visualization family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-066-audit-data-visualization-family-across-real-surfaces.md');

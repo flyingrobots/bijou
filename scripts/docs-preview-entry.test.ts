@@ -35,7 +35,7 @@ import {
 } from './docs-preview.test-support.js';
 
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('uses the live local runtime entrypoint instead of the packaged build', () => {
     const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');

@@ -300,9 +300,7 @@ export function dropInactiveRuntimeLayouts<
   const nextByViewId: Record<string, RuntimeRetainedLayout<Node>> = {};
   let changed = false;
 
-  for (const [viewId, retained] of Object.entries(layouts.byViewId) as Array<
-    [string, RuntimeRetainedLayout<Node>]
-  >) {
+  for (const [viewId, retained] of Object.entries(layouts.byViewId)) {
     if (activeViewIds.has(viewId)) {
       nextByViewId[viewId] = retained;
       continue;
@@ -859,7 +857,7 @@ export function runtimeComponentAcceptsInput<
   event: RuntimeInputEvent,
 ): boolean {
   const interaction = component.interaction;
-  if (interaction == null || interaction.enabled === false) {
+  if (!interaction?.enabled) {
     return false;
   }
 
@@ -894,7 +892,7 @@ export function resolveRuntimeInteractiveTarget<
 ): Node | undefined {
   for (let index = hit.path.length - 1; index >= 0; index -= 1) {
     const node = hit.path[index];
-    if (node == null || node.component == null) {
+    if (node?.component == null) {
       continue;
     }
 

@@ -3,7 +3,7 @@ import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/tes
 import { docsShellThemesForTesting } from '../../../examples/docs/app.js';
 
 describe('DL-018 first-party theme variant coverage', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('classifies every DOGFOOD first-party shell theme as paired or single-mode from the shell spec', () => {
     const themes = docsShellThemesForTesting();

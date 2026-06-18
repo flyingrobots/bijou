@@ -38,7 +38,7 @@ function renderMotionVariantText(variantId: string, mode: OutputMode): string {
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 1_200,
   }));
 
@@ -46,7 +46,7 @@ function renderMotionVariantText(variantId: string, mode: OutputMode): string {
 }
 
 describe('DF-053 motion and shader DOGFOOD audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the Design Thinking playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-053-audit-motion-and-shader-effects-family-across-real-surfaces.md');

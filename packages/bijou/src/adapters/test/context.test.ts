@@ -80,7 +80,7 @@ describe('createTestContext()', () => {
     expect(brandGradient[0]).toHaveProperty('color');
     expect(brandGradient[0]!.pos).toBeTypeOf('number');
     expect(Array.isArray(brandGradient[0]!.color)).toBe(true);
-    expect(brandGradient).toEqual(ctx.theme.theme.gradient['brand']);
+    expect(brandGradient).toEqual(ctx.theme.theme.gradient.brand);
   });
 
   it('status() falls back to muted for unknown keys', () => {

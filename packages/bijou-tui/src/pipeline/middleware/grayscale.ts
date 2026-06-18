@@ -85,7 +85,7 @@ function grayscaleCellFallback(surface: Surface): void {
 }
 
 function hexToGrayscale(hex: string): string {
-  if (hex.length !== 7 || hex[0] !== '#') return hex;
+  if (hex.length !== 7 || !hex.startsWith('#')) return hex;
 
   const digits = hex.slice(1);
   if (!/^[0-9A-Fa-f]{6}$/.test(digits)) return hex;

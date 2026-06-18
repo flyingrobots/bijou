@@ -135,7 +135,7 @@ export function parseBenchReportText(text: string): ReportLike {
     if (!isNestedRunReport(parsed)) {
       throw new Error('invalid nested bench report');
     }
-    return parsed as ReportLike;
+    return parsed;
   } catch {
     // Not one JSON object; fall through to JSONL parsing.
   }

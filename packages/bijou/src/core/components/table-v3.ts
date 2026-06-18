@@ -142,7 +142,7 @@ function fitTableSurfaceColumnWidths(
       sum + Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight))
     ), 0);
     let used = 0;
-    const remainders: Array<{ readonly index: number; readonly remainder: number; readonly capacity: number }> = [];
+    const remainders: { readonly index: number; readonly remainder: number; readonly capacity: number }[] = [];
 
     for (const entry of active) {
       const weight = Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight));

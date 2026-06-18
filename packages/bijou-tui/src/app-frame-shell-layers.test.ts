@@ -29,8 +29,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('switches tabs when the user clicks a header tab', async () => {
     const app = createFramedApp({
@@ -318,17 +318,14 @@ describe('createFramedApp', () => {
       ],
       enableCommandPalette: true,
     });
-
     const result = await runScript(app, [
       { key: '/' },
       { key: KEY_ENTER },
     ]);
-
     expect(result.model.activePageId).toBe('docs');
     expect(result.model.pageModels.docs?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
   });
-
   it('ignores search result page targets that are no longer available', async () => {
     const app = createFramedApp({
       pages: [
@@ -344,17 +341,14 @@ describe('createFramedApp', () => {
       ],
       enableCommandPalette: true,
     });
-
     const result = await runScript(app, [
       { key: '/' },
       { key: KEY_ENTER },
     ]);
-
     expect(result.model.activePageId).toBe('home');
     expect(result.model.pageModels.home?.count).toBe(0);
     expect(result.model.commandPalette).toBeUndefined();
   });
-
   it('uses localized shell defaults for command palette and settings footer copy', () => {
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
     runtime.loadCatalog(FRAME_I18N_CATALOG);
@@ -384,7 +378,6 @@ describe('createFramedApp', () => {
         },
       ],
     });
-
     const app = createFramedApp({
       i18n: runtime,
       enableCommandPalette: true,
@@ -401,7 +394,6 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     let [model] = app.init();
     [model] = app.update(ctrlKey('p'), model);
     let surface = normalizeViewOutput(app.view(model), {
@@ -409,7 +401,6 @@ describe('createFramedApp', () => {
       height: 24,
     }).surface;
     expect(surfaceToString(surface, testCtx.style)).toContain('Palette de commandes');
-
     [model] = app.update(ctrlKey('p'), model);
     [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
     surface = normalizeViewOutput(app.view(model), {
@@ -418,7 +409,6 @@ describe('createFramedApp', () => {
     }).surface;
     const rendered = surfaceToString(surface, testCtx.style);
     const footer = rendered.split('\n').at(-1) ?? '';
-
     expect(rendered).toContain('Paramètres');
     expect(footer).toContain('Échap fermer');
     expect(footer).toContain('Entrée basculer');

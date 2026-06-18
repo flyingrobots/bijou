@@ -11,7 +11,7 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 const sidebarContent = tree([
   { label: 'src', children: [

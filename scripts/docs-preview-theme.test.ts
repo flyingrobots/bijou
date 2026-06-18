@@ -25,7 +25,7 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
   return frame;
 }
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('documents every built-in token with usage guidance and dark/light UX posture', () => {
     const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');

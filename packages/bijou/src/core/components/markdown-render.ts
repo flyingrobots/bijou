@@ -205,7 +205,7 @@ function fitMarkdownTableWidths(
     };
   });
 
-  let usedContentWidth = fitted.reduce((sum, column) => sum + column.width, 0);
+  const usedContentWidth = fitted.reduce((sum, column) => sum + column.width, 0);
   let remainderBudget = targetContentWidth - usedContentWidth;
 
   if (remainderBudget > 0) {
@@ -400,11 +400,9 @@ function applyStyledInlineControl(
 
   state.sgr.push(raw);
 }
-
 function buildStyledInlinePrefix(state: StyledInlineState): string {
   return `${state.osc8 ?? ''}${state.sgr.join('')}`;
 }
-
 function buildStyledInlineSuffix(state: StyledInlineState): string {
   let suffix = '';
   if (state.osc8 != null) suffix += OSC8_CLOSE;

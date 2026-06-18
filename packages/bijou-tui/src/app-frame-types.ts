@@ -330,7 +330,7 @@ export function isFrameScopedMsg(value: unknown): value is FrameScopedMsg {
   return typeof value === 'object'
     && value !== null
     && FRAME_MSG_TOKEN in value
-    && (value as FrameScopedMsg)[FRAME_MSG_TOKEN] === true;
+    && (value as FrameScopedMsg)[FRAME_MSG_TOKEN];
 }
 
 /** Wrap a frame action into a FrameScopedMsg for the update loop. */
@@ -356,7 +356,7 @@ export function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg
   return typeof value === 'object'
     && value !== null
     && PAGE_MSG_TOKEN in value
-    && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN] === true;
+    && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN];
 }
 
 /** Tag a page-bound message with its originating page ID. */

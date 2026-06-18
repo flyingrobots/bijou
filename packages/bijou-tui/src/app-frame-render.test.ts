@@ -20,7 +20,7 @@ import {
 import { createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState } from './panel-dock.js';
 
-afterEach(() => _resetDefaultContextForTesting());
+afterEach(() => { _resetDefaultContextForTesting(); });
 
 function surfacePlainText(surface: Surface): string {
   const lines: string[] = [];
@@ -622,7 +622,6 @@ describe('frame direct-paint helpers', () => {
         paneB: { kind: 'pane' as const, paneId: 'right', render: () => parseAnsiToSurface('right', 5, 1) },
       }),
     };
-
     const geometry = renderPageContentInto(
       'home',
       {
@@ -637,7 +636,6 @@ describe('frame direct-paint helpers', () => {
       new Map([[page.id, page]]) as never,
       target,
     );
-
     const renderedText = Array.from({ length: target.height }, (_, y) =>
       Array.from({ length: target.width }, (_, x) => target.get(x, y).char).join(''),
     ).join('\n');
@@ -646,7 +644,6 @@ describe('frame direct-paint helpers', () => {
     expect(geometry.paneRects.get('left')).toEqual({ row: 2, col: 3, width: 7, height: 4 });
     expect(geometry.paneRects.get('right')).toEqual({ row: 2, col: 11, width: 6, height: 4 });
   });
-
   it('can paint a maximized pane directly into an existing frame surface', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     setDefaultContext(ctx);
@@ -664,7 +661,6 @@ describe('frame direct-paint helpers', () => {
         paneB: { kind: 'pane' as const, paneId: 'right', render: () => parseAnsiToSurface('right', 5, 1) },
       }),
     };
-
     const geometry = renderMaximizedPaneInto(
       'home',
       {
@@ -680,7 +676,6 @@ describe('frame direct-paint helpers', () => {
       'right',
       target,
     );
-
     const renderedText = Array.from({ length: target.height }, (_, y) =>
       Array.from({ length: target.width }, (_, x) => target.get(x, y).char).join(''),
     ).join('\n');

@@ -12,7 +12,7 @@ function keyMsg(key: string, mods?: Partial<KeyMsg>): KeyMsg {
   return { type: 'key', key, ctrl: false, alt: false, shift: false, ...mods };
 }
 
-type TestMsg = { type: 'custom'; value: number };
+interface TestMsg { type: 'custom'; value: number }
 
 /** Minimal mock IOPort for bus tests. */
 function createMockIO(): {
@@ -323,7 +323,7 @@ describe('runCmd', () => {
       commandBackpressureThreshold: 2,
       onCommandBackpressure,
     });
-    const resolvers: Array<() => void> = [];
+    const resolvers: (() => void)[] = [];
     const cmd: Cmd<TestMsg> = () => new Promise<void>((resolve) => {
       resolvers.push(resolve);
     });
@@ -344,7 +344,7 @@ describe('runCmd', () => {
       backpressureThreshold: 2,
     });
 
-    resolvers.forEach((resolve) => resolve());
+    resolvers.forEach((resolve) => { resolve(); });
     await bus.drain();
     expect(bus.getCommandDiagnostics().pendingCommands).toBe(0);
   });
@@ -644,21 +644,17 @@ describe('dispose', () => {
     bus.dispose();
     simulateKey('a');
     simulateResize(100, 50);
-
     expect(received).toHaveLength(0);
   });
-
   it('clears all subscribers and quit handlers', async () => {
     const bus = createEventBus<TestMsg>();
     const received: BusMsg<TestMsg>[] = [];
     const quitCalled = vi.fn();
     bus.on((msg) => received.push(msg));
     bus.onQuit(quitCalled);
-
     bus.dispose();
     bus.emit({ type: 'custom', value: 1 });
     bus.runCmd(() => QUIT);
-
     await bus.drain();
     expect(received).toHaveLength(0);
     expect(quitCalled).not.toHaveBeenCalled();

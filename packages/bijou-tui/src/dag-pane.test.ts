@@ -360,7 +360,7 @@ describe('auto-scroll to selection', () => {
 // ── Keymap ──────────────────────────────────────────────────────────
 
 describe('dagPaneKeyMap', () => {
-  type Msg = { type: string };
+  interface Msg { type: string }
 
   const km = dagPaneKeyMap<Msg>({
     selectParent: { type: 'parent' },
@@ -409,12 +409,10 @@ describe('dagPaneKeyMap', () => {
   it('handles enter for confirm', () => {
     expect(km.handle(keyMsg('enter'))).toEqual({ type: 'ok' });
   });
-
   it('handles quit', () => {
     expect(km.handle(keyMsg('q'))).toEqual({ type: 'quit' });
     expect(km.handle(keyMsg('c', { ctrl: true }))).toEqual({ type: 'quit' });
   });
-
   it('returns undefined for unbound keys', () => {
     expect(km.handle(keyMsg('x'))).toBeUndefined();
   });

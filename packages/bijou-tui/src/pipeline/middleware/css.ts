@@ -38,7 +38,7 @@ export function bcssMiddleware(css: string): RenderMiddleware {
  * Helper for components to resolve their own BCSS styles.
  */
 export function useBCSS(state: any, identity: { type: string, id?: string, classes?: string[] }) {
-  const sheet = state.data['bcss_sheet'] as BCSSSheet | undefined;
+  const sheet = state.data.bcss_sheet as BCSSSheet | undefined;
   if (!sheet) return {};
 
   const terminal = {

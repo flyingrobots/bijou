@@ -36,7 +36,7 @@ function renderHelpVariantText(variantId: string, mode: OutputMode): string {
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -44,7 +44,7 @@ function renderHelpVariantText(variantId: string, mode: OutputMode): string {
 }
 
 describe('DF-064 keybinding help and shell hints family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md');

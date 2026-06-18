@@ -870,7 +870,7 @@ export function createFramedApp<PageModel, Msg>(
       );
     }
     defaultFrameCtx ??= baseCtx;
-    resolvedShellThemes = resolveFrameShellThemeChoices(shellThemeSpecs, defaultFrameCtx!);
+    resolvedShellThemes = resolveFrameShellThemeChoices(shellThemeSpecs, defaultFrameCtx);
   }
 
   if (frameCtx != null) {
@@ -1010,8 +1010,7 @@ export function createFramedApp<PageModel, Msg>(
 
   function getComposedFrameScratch(width: number, height: number): Surface {
     if (
-      composedFrameScratch == null
-      || composedFrameScratch.width !== width
+      composedFrameScratch?.width !== width
       || composedFrameScratch.height !== height
     ) {
       composedFrameScratch = createSurface(width, height);
@@ -2186,7 +2185,7 @@ export function createFramedApp<PageModel, Msg>(
 
     const pageModel = model.pageModels[targetPageId]!;
     const updateResult = targetPage.update(targetMsg, pageModel);
-    const [nextPageModel, cmds = []] = updateResult;
+    const [nextPageModel, cmds] = updateResult;
 
     const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
     const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);

@@ -131,7 +131,7 @@ export function freezeLocalizedObject<Value>(
  * properties only; accessor-backed plain objects are rejected.
  */
 export function freezeLocalizedValue<Value>(value: Value): Value {
-  return cloneLocalizedValue(value, 'value', new WeakSet<object>()) as Value;
+  return cloneLocalizedValue(value, 'value', new WeakSet()) as Value;
 }
 
 /**
@@ -162,7 +162,7 @@ function cloneLocalizedValue(
     return value;
   }
 
-  const objectValue = value as object;
+  const objectValue = value;
   if (seen.has(objectValue)) {
     throw new Error(`Localized value contains circular reference at ${path}`);
   }

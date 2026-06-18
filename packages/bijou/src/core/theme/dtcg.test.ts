@@ -116,7 +116,7 @@ describe('DTCG interop', () => {
       const doc: DTCGDocument = {
         color: {
           primary: { $type: 'color', $value: '#3bcfd4' },
-        } as DTCGDocument['string'],
+        },
         name: { $type: 'string', $value: 'ref-test' },
         status: {
           success: { $type: 'color', $value: '#00ff00' },
@@ -344,7 +344,7 @@ describe('DTCG interop', () => {
       const doc = toDTCG(CYAN_MAGENTA);
       const gradient = doc['gradient'] as Record<string, { $value: unknown }>;
       expect(gradient['brand']).toBeDefined();
-      const stops = gradient['brand'].$value as Array<{ pos: number; color: string }>;
+      const stops = gradient['brand'].$value as { pos: number; color: string }[];
       expect(stops.length).toBeGreaterThan(0);
       for (const stop of stops) {
         expect(stop.color).toMatch(/^#[0-9a-f]{6}$/);

@@ -87,7 +87,7 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
 
   it('renders the post-release title as the first DOGFOOD Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
@@ -110,7 +110,7 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
 
   it('keeps the original v7 title selectable as a historical Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',

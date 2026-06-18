@@ -14,9 +14,7 @@ export type ModeHandler<I, O> = (options: I) => O;
  * @template I - Input options type.
  * @template O - Output type.
  */
-export type ModeMap<I, O> = {
-  readonly [K in OutputMode]?: ModeHandler<I, O>;
-};
+export type ModeMap<I, O> = Readonly<Partial<Record<OutputMode, ModeHandler<I, O>>>>;
 
 /**
  * Dispatch rendering to a mode-specific handler.
@@ -60,7 +58,7 @@ export function renderByMode<I, O>(
 
   // 3. First available
   const first = Object.values(map)[0];
-  if (first) return (first as ModeHandler<I, O>)(options);
+  if (first) return (first)(options);
 
   throw new Error(`renderByMode: no handlers defined in map for mode "${mode}"`);
 }

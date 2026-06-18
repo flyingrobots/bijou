@@ -1,4 +1,4 @@
-import type { PackedSurface, Surface } from '@flyingrobots/bijou';
+import type { Surface } from '@flyingrobots/bijou';
 import { createSurface, isPackedSurface } from '@flyingrobots/bijou';
 import { encodeModifiers, parseHex } from '@flyingrobots/bijou/perf';
 import type { LayoutRect } from './layout-rect.js';
@@ -163,7 +163,7 @@ export function renderNotificationSurface<Msg>(
         ?? resolvedColorRgb(backgroundStyle.bg)
         ?? (backgroundHex ? parseHex(backgroundHex) : undefined);
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
-      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
+      (card).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
     } else {
       card.set(0, y, {
         char: '\u258e',

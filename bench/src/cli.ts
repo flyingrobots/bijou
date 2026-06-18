@@ -15,7 +15,7 @@
  *   node --import tsx bench/src/cli.ts list
  */
 
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import {
   listScenarioIds,

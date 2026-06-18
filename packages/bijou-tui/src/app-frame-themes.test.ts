@@ -33,8 +33,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('supports richer explicit layer titles and control sources for shell introspection', () => {
     const workspaceHelp = createKeyMap<{ type: 'noop' }>()

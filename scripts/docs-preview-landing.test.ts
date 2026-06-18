@@ -38,7 +38,7 @@ import {
 } from './docs-preview.test-support.js';
 
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });

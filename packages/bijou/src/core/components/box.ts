@@ -54,7 +54,7 @@ function drawBox(
   padding: { top: number; bottom: number; left: number; right: number },
   fixedWidth?: number,
   bgFill?: (s: string) => string,
-  fillChar: string = ' ',
+  fillChar = ' ',
   title?: string,
   overflow: OverflowBehavior = 'wrap',
 ): string {

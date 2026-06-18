@@ -273,7 +273,7 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     );
 
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 140 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',

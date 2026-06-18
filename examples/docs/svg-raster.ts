@@ -70,7 +70,7 @@ export function svgViewBoxAspectRatio(svg: string): number {
 }
 
 function parseSvgGeometry(svg: string): SvgGeometry {
-  const viewBox = svg.match(/\bviewBox\s*=\s*"([^"]+)"/i);
+  const viewBox = /\bviewBox\s*=\s*"([^"]+)"/i.exec(svg);
   if (viewBox == null) {
     throw new Error('SVG rasterizer expected a viewBox.');
   }
@@ -101,7 +101,7 @@ function parseSvgGeometry(svg: string): SvgGeometry {
 }
 
 function parsePathPolygons(path: string): readonly Polygon[] {
-  const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), (match) => match[0]!);
+  const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), (match) => match[0]);
   const polygons: Polygon[] = [];
   let index = 0;
   let command: PathCommand | undefined;

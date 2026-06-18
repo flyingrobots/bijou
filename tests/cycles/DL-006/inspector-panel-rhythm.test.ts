@@ -13,8 +13,8 @@ import { createDocsApp } from '../../../examples/docs/app.js';
 
 
 describe('DL-006 inspector panel rhythm cycle', () => {
-  beforeAll(() => setDefaultContext(createTestContext({ mode: 'interactive' })));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(createTestContext({ mode: 'interactive' })); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('creates an active cycle doc with the required workflow sections', () => {
     const cycle = readRepoFile('docs/design/DL-006-prove-inspector-panel-rhythm.md');

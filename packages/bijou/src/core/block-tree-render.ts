@@ -72,7 +72,7 @@ export function renderBlockTree<Config = unknown>(
 }
 
 function snapshotInput<Config>(input: BlockRenderInput<Config>): BlockRenderInput<Config> {
-  return snapshotPlainRecord(input, 'input', new WeakSet<object>()) as BlockRenderInput<Config>;
+  return snapshotPlainRecord(input, 'input', new WeakSet());
 }
 
 function snapshotValue(value: unknown, path: string, seen: WeakSet<object>): unknown {

@@ -77,7 +77,7 @@ function renderNotificationVariantText(
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -123,7 +123,7 @@ function makeNotificationPage(): FramePage<SaveModel, SaveMsg> {
 }
 
 describe('DF-062 notification system family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-062-audit-notification-system-family-across-real-surfaces.md');
@@ -294,7 +294,7 @@ describe('DF-062 notification system family audit', () => {
 
     expect(runtimeMsg).toBeDefined();
     let cmds: Cmd<FramedAppMsg<SaveMsg>>[] = [];
-    [model, cmds] = app.update(runtimeMsg as FramedAppMsg<SaveMsg>, model);
+    [model, cmds] = app.update(runtimeMsg!, model);
     expect(model.runtimeNotifications.items).toHaveLength(1);
     expect(model.runtimeNotifications.items[0]!.message).toBe('Command rejected: worker crashed during boot');
 

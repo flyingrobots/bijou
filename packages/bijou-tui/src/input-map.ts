@@ -130,7 +130,7 @@ export function inputFeatureEvent(
 ): InputFeatureEvent {
   return freezePlain({
     feature,
-    type: normalizeId(type, 'input feature event type') as InputFeatureEventType,
+    type: normalizeId(type, 'input feature event type'),
     atMs: normalizeTimestamp(atMs),
   });
 }
@@ -166,8 +166,7 @@ export function createInputGestureRecognizer(
       featureEvents.push(inputFeatureEvent(keyFeature, 'tap', timestamp));
 
       const signature = keySignature(msg);
-      const isDoubleTap = lastTap != null
-        && lastTap.signature === signature
+      const isDoubleTap = lastTap?.signature === signature
         && timestamp - lastTap.atMs <= doubleTapMs;
 
       if (isDoubleTap) {
@@ -197,7 +196,7 @@ export function createInputActionMap<Action>(): InputActionMap<Action> {
       const normalizedFeatureEvents = featureEvents.map((featureEvent) => freezePlain({
         ...featureEvent,
         featureId: normalizeId(featureEvent.featureId, 'input action feature id'),
-        type: normalizeId(featureEvent.type, 'input action event type') as InputFeatureEventType,
+        type: normalizeId(featureEvent.type, 'input action event type'),
         deviceId: featureEvent.deviceId != null
           ? normalizeId(featureEvent.deviceId, 'input action device id')
           : undefined,

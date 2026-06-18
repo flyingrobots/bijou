@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { tree, type TreeNode } from '@flyingrobots/bijou';
+import { tree } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
 import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
@@ -28,7 +28,7 @@ export const treeTool: ToolRegistration = withStructuredToolOutput({
   handler: async (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
-    const result = tree(input.nodes as TreeNode[], { ctx });
+    const result = tree(input.nodes, { ctx });
     return { content: [{ type: 'text', text: result }] };
   },
 });

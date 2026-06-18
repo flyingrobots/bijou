@@ -44,7 +44,7 @@ function resolvedColorHex(ref: unknown): string | undefined {
     : undefined;
 }
 
-function resolveCellColor(rgb: RGB | undefined, ref: Cell['fg'] | Cell['bg']): RGB | undefined {
+function resolveCellColor(rgb: RGB | undefined, ref: Cell['fg']  ): RGB | undefined {
   if (rgb !== undefined) return rgb;
 
   const resolvedRgb = resolvedColorRgb(ref);
@@ -66,13 +66,13 @@ function createStyleAccumulator(): StyleAccumulator {
 }
 
 function accumulateColor(accumulator: ColorAccumulator, rgb: RGB): void {
-  accumulator.r += rgb[0]!;
-  accumulator.g += rgb[1]!;
-  accumulator.b += rgb[2]!;
+  accumulator.r += rgb[0];
+  accumulator.g += rgb[1];
+  accumulator.b += rgb[2];
   accumulator.count++;
 }
 
-function accumulateResolvedColor(accumulator: ColorAccumulator, rgb: RGB | undefined, ref: Cell['fg'] | Cell['bg']): void {
+function accumulateResolvedColor(accumulator: ColorAccumulator, rgb: RGB | undefined, ref: Cell['fg']  ): void {
   const resolved = resolveCellColor(rgb, ref);
   if (resolved !== undefined) accumulateColor(accumulator, resolved);
 }

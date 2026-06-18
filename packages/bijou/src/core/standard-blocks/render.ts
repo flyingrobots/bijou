@@ -298,7 +298,7 @@ function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBloc
 }
 
 function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
-  return ALL_OUTPUT_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
+  return ALL_OUTPUT_MODES.includes(mode!) ? mode! : 'interactive';
 }
 
 function renderSurfaceBounds(input: BlockRenderInput): RenderSurfaceBounds {

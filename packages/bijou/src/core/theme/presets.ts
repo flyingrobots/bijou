@@ -1,4 +1,4 @@
-import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
+import type { Theme, TokenValue, TextModifier } from './tokens.js';
 import { tryHexToRgb } from './color.js';
 
 const FULL_HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -67,7 +67,7 @@ function gradient(hexes: readonly string[]): { readonly pos: number; readonly co
  *   red     = #ff0000    yellow  = #ffff00    blue    = #0000ff
  *   gray    = #808080    white   = #ffffff
  */
-export const CYAN_MAGENTA: Theme<BaseStatusKey> = {
+export const CYAN_MAGENTA: Theme = {
   name: 'cyan-magenta',
 
   status: {
@@ -137,7 +137,7 @@ export const CYAN_MAGENTA: Theme<BaseStatusKey> = {
  * palette. It keeps neutral surfaces dominant, separates focus/brand/status
  * roles, and preserves readable foregrounds across dense product surfaces.
  */
-export const BIJOU_DARK: Theme<BaseStatusKey> = {
+export const BIJOU_DARK: Theme = {
   name: 'bijou-dark',
 
   status: {
@@ -201,7 +201,7 @@ export const BIJOU_DARK: Theme<BaseStatusKey> = {
  * foregrounds instead of pastel text, so dense terminal surfaces remain
  * scannable on bright backgrounds.
  */
-export const BIJOU_LIGHT: Theme<BaseStatusKey> = {
+export const BIJOU_LIGHT: Theme = {
   name: 'bijou-light',
 
   status: {
@@ -264,7 +264,7 @@ export const BIJOU_LIGHT: Theme<BaseStatusKey> = {
  * Uses the gradient colors (#3bcfd4 → #fc9305 → #f20094) as the
  * foundation, with harmonized status/semantic tokens.
  */
-export const TEAL_ORANGE_PINK: Theme<BaseStatusKey> = {
+export const TEAL_ORANGE_PINK: Theme = {
   name: 'teal-orange-pink',
 
   status: {

@@ -74,13 +74,13 @@ function issueFormFieldLabels(source: string): readonly string[] {
 
 function requiredTextareaBlocks(source: string): readonly string[] {
   return source
-    .split(/\n(?=  - type: )/)
+    .split(/\n(?= {2}- type: )/)
     .filter((block) => block.startsWith('  - type: textarea'))
     .filter((block) => /^\s{6}required: true$/m.test(block));
 }
 
 function fieldLabel(source: string): string {
-  return source.match(/^\s{6}label:\s*(.+)$/m)?.[1]?.trim() ?? '<missing label>';
+  return (/^\s{6}label:\s*(.+)$/m.exec(source))?.[1]?.trim() ?? '<missing label>';
 }
 
 function normalizeWhitespace(source: string): string {

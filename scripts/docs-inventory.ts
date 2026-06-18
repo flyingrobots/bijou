@@ -4,10 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-type InventorySection = {
+interface InventorySection {
   readonly title: string;
   readonly entries: readonly string[];
-};
+}
 
 const SECTIONS: readonly InventorySection[] = [
   {

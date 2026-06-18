@@ -568,7 +568,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       // whatever opacity it had, which is acceptable.
       const exactOpacity = cells[idx]!.opacity;
       syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
-      dirtyWords[idx >> 5]! = word & ~bit;
+      dirtyWords[idx >> 5] = word & ~bit;
     }
   }
 
@@ -707,8 +707,8 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       // Fast path: packed-to-packed with FULL_MASK — byte copy per cell
       const srcPacked = isPackedSurface(source);
       if (srcPacked && mask === FULL_MASK) {
-        const sBuf = (source as PackedSurface).buffer;
-        const sSide = (source as PackedSurface).sideTable;
+        const sBuf = (source).buffer;
+        const sSide = (source).sideTable;
         for (let i = 0; i < blitH; i++) {
           const targetY = yStart + i;
           const sourceY = srcYStart + i;
@@ -791,7 +791,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       for (let i = 0; i < count; i++) ensureClean(base + i);
       return cells
         .slice(base, base + count)
-        .map((c) => maskCell(c!, mask));
+        .map((c) => maskCell(c, mask));
     },
 
     setRow(y, rowCells, sx = 0, mask = FULL_MASK) {

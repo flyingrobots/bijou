@@ -262,7 +262,7 @@ describe('pagerSurface', () => {
 // ── Keymap ──────────────────────────────────────────────────────────
 
 describe('pagerKeyMap', () => {
-  type Msg = { type: string };
+  interface Msg { type: string }
 
   const km = pagerKeyMap<Msg>({
     scrollUp: { type: 'up' },
@@ -293,12 +293,10 @@ describe('pagerKeyMap', () => {
     expect(km.handle(keyMsg('g'))).toEqual({ type: 'top' });
     expect(km.handle(keyMsg('g', { shift: true }))).toEqual({ type: 'bot' });
   });
-
   it('handles quit', () => {
     expect(km.handle(keyMsg('q'))).toEqual({ type: 'quit' });
     expect(km.handle(keyMsg('c', { ctrl: true }))).toEqual({ type: 'quit' });
   });
-
   it('returns undefined for unbound keys', () => {
     expect(km.handle(keyMsg('x'))).toBeUndefined();
   });

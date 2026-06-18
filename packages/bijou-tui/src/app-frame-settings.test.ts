@@ -29,8 +29,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('localizes shell help groups and notification-center review copy', () => {
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
@@ -154,7 +154,7 @@ describe('createFramedApp', () => {
     expect(rendered).toContain('Basculer l’aide');
 
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
-    [model] = app.update(shiftKey('n') as unknown as Msg, model);
+    [model] = app.update(shiftKey('n'), model);
     rendered = surfaceToString(
       normalizeViewOutput(app.view(model), { width: 90, height: 24 }).surface,
       testCtx.style,

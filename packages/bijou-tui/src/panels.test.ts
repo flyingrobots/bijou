@@ -10,7 +10,7 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 // Helpers
 // ---------------------------------------------------------------------------
 
-type Msg = { type: string };
+interface Msg { type: string }
 
 function key(k: string): KeyMsg {
   return { type: 'key', key: k, ctrl: false, alt: false, shift: false };
@@ -176,7 +176,6 @@ describe('PanelGroup with InputStack', () => {
     group.dispose();
     expect(stack.size).toBe(0);
   });
-
   it('dispatch through stack reaches focused panel', () => {
     const stack = createInputStack<KeyMsg, Msg>();
     createPanelGroup({ panels: makePanels(), defaultFocus: 'nav', inputStack: stack });
@@ -184,7 +183,6 @@ describe('PanelGroup with InputStack', () => {
     const result = stack.dispatch(key('j'));
     expect(result).toEqual({ type: 'nav-down' });
   });
-
   it('dispatch routes to new panel after hotkey-triggered switch', () => {
     const stack = createInputStack<KeyMsg, Msg>();
     const group = createPanelGroup({ panels: makePanels(), defaultFocus: 'nav', inputStack: stack });

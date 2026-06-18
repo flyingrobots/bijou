@@ -179,7 +179,7 @@ function layoutStatusBar(options: StatusBarOptions): StatusBarLayout | null {
 
   // Build the output as an array of fill chars, then overlay sections
   // We need to handle ANSI codes, so we build the string by concatenation
-  const segments: Array<{ start: number; len: number; text: string }> = [];
+  const segments: { start: number; len: number; text: string }[] = [];
 
   if (actualLeftLen > 0) {
     segments.push({ start: leftStart, len: actualLeftLen, text: clippedLeft });

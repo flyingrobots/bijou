@@ -32,8 +32,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('uses the run-time ctx as the shell rendering context when shellThemes are configured without an ambient default', async () => {
     const clock = mockClock();
@@ -84,8 +84,8 @@ describe('createFramedApp', () => {
 
       explicitCtx.io.rawInput = (onKey) => {
         const handles = [
-          clock.setTimeout(() => onKey('\x03'), 20),
-          clock.setTimeout(() => onKey('\x03'), 30),
+          clock.setTimeout(() => { onKey('\x03'); }, 20),
+          clock.setTimeout(() => { onKey('\x03'); }, 30),
         ];
         return {
           dispose() {
@@ -236,7 +236,6 @@ describe('createFramedApp', () => {
       runtime: { columns: 80, rows: 24 },
     });
     const alternateTheme = createSameNameAlternateShellTheme(explicitCtx);
-
     _resetDefaultContextForTesting();
     try {
       const app = createFramedApp({
@@ -247,19 +246,15 @@ describe('createFramedApp', () => {
           { id: 'same-name-alternate', label: 'Same Name Alternate', theme: alternateTheme },
         ],
       });
-
       let [model] = app.init();
       expect(model.activeShellThemeId).toBe('default');
-
       [model] = app.update(ctrlKey(','), model);
       [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
       [model] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
-
       const surface = normalizeViewOutput(app.view(model), {
         width: explicitCtx.runtime.columns,
         height: explicitCtx.runtime.rows,
       }).surface;
-
       expect(model.activeShellThemeId).toBe('same-name-alternate');
       expect(surfaceToString(surface, explicitCtx.style)).toContain('Quit?');
       expect(surfaceHasBg(surface, '#18324a')).toBe(true);
@@ -268,7 +263,6 @@ describe('createFramedApp', () => {
       setDefaultContext(testCtx);
     }
   });
-
   it('scrolls a long settings drawer independently of the underlying page', () => {
     const app = createFramedApp({
       initialColumns: 80,
@@ -287,15 +281,12 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
-
     expect((model as any).settingsScrollY).toBeGreaterThan(0);
     expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
   });
-
   it('renders settings row descriptions as secondary drawer copy', () => {
     const app = createFramedApp({
       initialColumns: 90,
@@ -317,7 +308,6 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
     const surface = normalizeViewOutput(app.view(model), {
@@ -329,7 +319,6 @@ describe('createFramedApp', () => {
     const shellLine = lines.findIndex((line) => line.includes('Shell'));
     const rowLine = lines.findIndex((line) => line.includes('Show hints'));
     const rowX = rowLine >= 0 ? lines[rowLine]!.indexOf('Show hints') : -1;
-
     expect(rendered).toContain('Show hints');
     expect(rendered).toContain('☑ On');
     expect(rendered).toContain('Show active control');
@@ -338,7 +327,6 @@ describe('createFramedApp', () => {
     expect(rowX).toBeGreaterThan(0);
     expect(surface.get(rowX, rowLine).bg).toBe(testCtx.surface('elevated').bg);
   });
-
   it('fills the entire frame body with the primary surface background', () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
@@ -361,14 +349,12 @@ describe('createFramedApp', () => {
       initialRows: 6,
       pages: [page],
     });
-
     const [model] = app.init();
     const surface = normalizeViewOutput(app.view(model), {
       width: 24,
       height: 6,
     }).surface;
     const expectedBg = testCtx.surface('primary').bg;
-
     expect(expectedBg).toBeDefined();
     for (let y = 1; y < surface.height - 1; y++) {
       for (let x = 0; x < surface.width; x++) {
@@ -376,7 +362,6 @@ describe('createFramedApp', () => {
       }
     }
   });
-
   it('stacks long settings values beneath the label when inline space is too tight', () => {
     const app = createFramedApp({
       initialColumns: 72,
@@ -396,7 +381,6 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
     const surface = normalizeViewOutput(app.view(model), {
@@ -406,11 +390,9 @@ describe('createFramedApp', () => {
     const lines = surfaceToString(surface, testCtx.style).split('\n');
     const labelLine = lines.findIndex((line) => line.includes('Landing theme'));
     const valueLine = lines.findIndex((line) => line.includes('Storybook Workstation'));
-
     expect(labelLine).toBeGreaterThanOrEqual(0);
     expect(valueLine).toBe(labelLine + 1);
   });
-
   it('opens settings from the standard command palette entry', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -428,7 +410,6 @@ describe('createFramedApp', () => {
         }],
       }),
     });
-
     const result = await runScript(app, [
       { key: KEY_CTRL_P },
       { key: 's' },
@@ -436,7 +417,6 @@ describe('createFramedApp', () => {
       { key: 't' },
       { key: KEY_ENTER },
     ]);
-
     expect((result.model as any).settingsOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
   });

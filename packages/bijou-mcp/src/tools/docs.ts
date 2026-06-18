@@ -262,13 +262,13 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
           aliases: entry.aliases,
         };
         if (entry.exampleArgs !== undefined) {
-          result['exampleInput'] = entry.exampleArgs;
+          result.exampleInput = entry.exampleArgs;
         }
         if (includeExamples && entry.exampleArgs !== undefined) {
           if (tool !== undefined) {
-            result['exampleOutput'] = exampleText(await tool.handler(entry.exampleArgs));
+            result.exampleOutput = exampleText(await tool.handler(entry.exampleArgs));
           } else if (docsOnlyRenderer !== undefined) {
-            result['exampleOutput'] = docsOnlyRenderer(entry.exampleArgs);
+            result.exampleOutput = docsOnlyRenderer(entry.exampleArgs);
           }
         }
         return result;

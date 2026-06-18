@@ -13,14 +13,14 @@ import {
 
 const tempRoots: string[] = [];
 
-function makeWorkspace(packages: Array<{
+function makeWorkspace(packages: {
   readonly dir: string;
   readonly name: string;
   readonly version: string;
   readonly dependencies?: Record<string, string>;
   readonly devDependencies?: Record<string, string>;
   readonly peerDependencies?: Record<string, string>;
-}>, options?: {
+}[], options?: {
   readonly workspaceRoot?: string;
   readonly workspacePatterns?: readonly string[];
 }): string {

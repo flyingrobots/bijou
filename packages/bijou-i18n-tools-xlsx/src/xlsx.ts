@@ -92,7 +92,7 @@ export function parseExchangeWorkbookXlsx(input: Uint8Array | ArrayBuffer): Exch
       header: 1,
       raw: false,
       defval: '',
-    }) as unknown[];
+    });
 
     if (matrix.length === 0) {
       throw new Error(`Invalid XLSX workbook sheet: missing header row in ${sheetName}`);

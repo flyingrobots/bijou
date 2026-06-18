@@ -20,7 +20,7 @@ describe('bijou-i18n-tools adapters', () => {
           sourceValue: 'Help, "now"',
         } as unknown as never,
       ],
-    } as Parameters<typeof serializeExchangeSheet>[0], 'csv');
+    }, 'csv');
 
     expect(csv).toContain('"Help, ""now"""');
   });

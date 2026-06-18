@@ -61,7 +61,7 @@ function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
  * graphemes for cell writes. Callers that intentionally preserve ANSI styling
  * should use `parseAnsiToSurface()` instead.
  */
-export function segmentSurfaceText(text: string, purpose: string = 'Surface text'): string[] {
+export function segmentSurfaceText(text: string, purpose = 'Surface text'): string[] {
   return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text ?? ''), purpose);
 }
 

@@ -1,4 +1,4 @@
-import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { sanitizeNonNegativeInt } from '../numeric.js';
 import { colorRgb } from '../theme/color.js';
@@ -38,7 +38,7 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
 
   if (label.length === 0) {
     if (useRGB) {
-      for (let x = 0; x < width; x++) (surface as PackedSurface).setRGB(x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);
+      for (let x = 0; x < width; x++) (surface).setRGB(x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);
     } else {
       for (let x = 0; x < width; x++) surface.set(x, 0, { char: '\u2500', ...borderStyle, empty: false });
     }
@@ -47,7 +47,7 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
 
   if (labelGraphemes.length >= width) {
     for (let x = 0; x < width; x++) {
-      if (useRGB) (surface as PackedSurface).setRGB(x, 0, labelGraphemes[x] ?? ' ', -1, 0, 0, -1, 0, 0);
+      if (useRGB) (surface).setRGB(x, 0, labelGraphemes[x] ?? ' ', -1, 0, 0, -1, 0, 0);
       else surface.set(x, 0, { char: labelGraphemes[x] ?? ' ', empty: false });
     }
     return surface;
@@ -58,7 +58,7 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const right = remaining - left;
 
   if (useRGB) {
-    const ps = surface as PackedSurface;
+    const ps = surface;
     for (let x = 0; x < left; x++) ps.setRGB(x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);
     for (let i = 0; i < labelGraphemes.length; i++) ps.setRGB(left + i, 0, labelGraphemes[i]!, -1, 0, 0, -1, 0, 0);
     for (let x = 0; x < right; x++) ps.setRGB(left + labelGraphemes.length + x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);

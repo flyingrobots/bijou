@@ -22,7 +22,7 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 function overviewTab(): string {
   return vstack(

@@ -12,7 +12,7 @@ import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output
 const KEY_ENTER = '\r';
 
 describe('RE-017 framed shell theme demo', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('uses the landing theme selector as the same theme source for the docs app', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });

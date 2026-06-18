@@ -23,8 +23,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {
     const app = createFramedApp({
@@ -40,7 +40,7 @@ describe('createFramedApp', () => {
     });
     if (runtimeMsg == null) throw new Error('expected runtime issue message');
 
-    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const [nextModel, cmds] = app.update(runtimeMsg, model);
     const tickMsg = await cmds[0]!(() => undefined, {
       onPulse: () => ({ dispose() {} }),
       sleep: async () => undefined,
@@ -122,7 +122,6 @@ describe('createFramedApp', () => {
 
   it('keeps pane keymaps inactive while a page modal is open', async () => {
     type PaneMsg = { type: 'pane-hit' } | { type: 'close-modal' };
-
     const page: FramePage<{ paneHits: number; modalOpen: boolean }, PaneMsg> = {
       id: 'home',
       title: 'Home',
@@ -148,14 +147,12 @@ describe('createFramedApp', () => {
         keyMap: createKeyMap<PaneMsg>().bind('down', 'Pane hit', { type: 'pane-hit' }),
       }],
     };
-
     const app = createFramedApp({ pages: [page] });
     const result = await runScript(app, [
       { key: KEY_DOWN },
       { key: KEY_ESCAPE },
       { key: KEY_DOWN },
     ]);
-
     expect(result.model.pageModels.home?.modalOpen).toBe(false);
     expect(result.model.pageModels.home?.paneHits).toBe(1);
   });

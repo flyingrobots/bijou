@@ -170,7 +170,7 @@ function unpackPngScanlines(
 
   const rgba = new Uint8ClampedArray(width * height * 4);
   let sourceOffset = 0;
-  let previous: Uint8Array<ArrayBufferLike> = new Uint8Array(rowBytes);
+  let previous: Uint8Array = new Uint8Array(rowBytes);
 
   for (let y = 0; y < height; y++) {
     const filterType = inflated[sourceOffset++]!;

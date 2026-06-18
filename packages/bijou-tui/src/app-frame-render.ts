@@ -328,7 +328,7 @@ function paintFrameNodeInto<PageModel, Msg>(
     gap: node.gap,
   });
 
-  let paneRects = new Map<string, LayoutRect>();
+  const paneRects = new Map<string, LayoutRect>();
   const seenPaneIds = new Set<string>();
   const paneOrder: string[] = [];
   for (const [areaName, areaRect] of relRects) {
@@ -738,7 +738,6 @@ export type FramePaneScratchPool = Map<string, Surface>;
 export function createFramePaneScratchPool(): FramePaneScratchPool {
   return new Map();
 }
-
 function getFramePaneScratch(pool: FramePaneScratchPool, width: number, height: number): Surface {
   const key = `${width}x${height}`;
   let scratch = pool.get(key);
@@ -748,7 +747,6 @@ function getFramePaneScratch(pool: FramePaneScratchPool, width: number, height: 
   }
   return scratch;
 }
-
 function applyTransitionCell(
   baseCell: Cell,
   result: TransitionResult,

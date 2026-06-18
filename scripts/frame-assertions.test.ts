@@ -34,7 +34,7 @@ describe('frame assertions helpers', () => {
   });
 
   it('throws when a frame line does not match the expected width', () => {
-    expect(() => assertFrameWidth('abcd\nabc', 4)).toThrow(/line 1/);
+    expect(() => { assertFrameWidth('abcd\nabc', 4); }).toThrow(/line 1/);
   });
 
   it('preserves ANSI styling when requested', () => {

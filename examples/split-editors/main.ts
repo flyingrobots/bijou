@@ -95,7 +95,7 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 const VP_HEIGHT = 18;
 
@@ -135,7 +135,6 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const leftLabel = model.focusLeft ? '[app.ts]' : 'app.ts';
     const rightLabel = !model.focusLeft ? '[app.test.ts]' : 'app.test.ts';
-
     return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       {
@@ -170,5 +169,4 @@ const app: App<Model, Msg> = {
     );
   },
 };
-
 run(app);

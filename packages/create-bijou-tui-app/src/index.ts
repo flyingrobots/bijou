@@ -177,7 +177,7 @@ await run(
   createTuiAppSkeleton({
     ctx,
     title: 'My Bijou App',
-    statusMessage: ({ activeTabTitle }) => \`${'${activeTabTitle}'} ready\`,
+    statusMessage: ({ activeTabTitle }) => \`\${activeTabTitle} ready\`,
   }),
   { mouse: true },
 );

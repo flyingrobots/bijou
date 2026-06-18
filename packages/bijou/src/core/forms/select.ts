@@ -138,7 +138,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     clearRender();
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
-    const displayLabel = selectedLabel ?? (options.options[cursor] as SelectOption<T>).label;
+    const displayLabel = selectedLabel ?? (options.options[cursor]!).label;
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), displayLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();

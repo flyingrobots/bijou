@@ -209,43 +209,37 @@ describe('summarizeCodeRabbitStatus', () => {
       }],
       [],
     );
-
     expect(status.state).toBe('rate_limited');
     expect(status.staleRateLimitCount).toBe(0);
     expect(status.activeRateLimitCount).toBe(1);
     expect(status.detail).toBe('rate-limited');
   });
 });
-
 describe('mergeReadinessHeading', () => {
   it('uses a pending-specific heading for pending-only states', () => {
     expect(mergeReadinessHeading({ status: 'pending', reasons: ['1 pending check'] })).toBe('Pending merge signals');
     expect(mergeReadinessHeading({ status: 'blocked', reasons: ['1 failing check'] })).toBe('Merge blockers');
   });
 });
-
 describe('assertUntruncatedPullRequestData', () => {
   it('passes when comment and review metadata fit in a single page', () => {
-    expect(() => assertUntruncatedPullRequestData({
+    expect(() => { assertUntruncatedPullRequestData({
       comments: { totalCount: 12, pageInfo: { hasNextPage: false } },
       reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
-    })).not.toThrow();
+    }); }).not.toThrow();
   });
-
   it('fails fast when GitHub reports truncated comment or review metadata', () => {
-    expect(() => assertUntruncatedPullRequestData({
+    expect(() => { assertUntruncatedPullRequestData({
       comments: { totalCount: 101, pageInfo: { hasNextPage: true } },
       reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
-    })).toThrow('pull request metadata truncated; pagination required for comments=101');
+    }); }).toThrow('pull request metadata truncated; pagination required for comments=101');
   });
-
   it('fails fast when review thread metadata is truncated', () => {
-    expect(() => assertUntruncatedPullRequestData({
+    expect(() => { assertUntruncatedPullRequestData({
       reviewThreads: { totalCount: 101, pageInfo: { hasNextPage: true } },
-    })).toThrow('pull request metadata truncated; pagination required for reviewThreads=101');
+    }); }).toThrow('pull request metadata truncated; pagination required for reviewThreads=101');
   });
 });
-
 describe('computeMergeReadiness', () => {
   it('blocks when the review gate is not met even if checks are green', () => {
     const readiness = computeMergeReadiness({
@@ -260,12 +254,10 @@ describe('computeMergeReadiness', () => {
       ),
       minReviews: 2,
     });
-
     expect(readiness.status).toBe('blocked');
     expect(readiness.reasons).toContain('needs at least 2 reviews (found 1)');
     expect(computeMergeReadinessExitCode(readiness)).toBe(1);
   });
-
   it('returns pending when checks are still running after all blocking gates are satisfied', () => {
     const readiness = computeMergeReadiness({
       pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
@@ -285,12 +277,10 @@ describe('computeMergeReadiness', () => {
       ),
       minReviews: 2,
     });
-
     expect(readiness.status).toBe('pending');
     expect(readiness.reasons).toContain('1 pending check');
     expect(computeMergeReadinessExitCode(readiness)).toBe(8);
   });
-
   it('treats unknown merge state as pending while GitHub computes mergeability', () => {
     const readiness = computeMergeReadiness({
       pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'UNKNOWN' },
@@ -307,12 +297,10 @@ describe('computeMergeReadiness', () => {
       ),
       minReviews: 2,
     });
-
     expect(readiness.status).toBe('pending');
     expect(readiness.reasons).toContain('mergeability is still being computed');
     expect(computeMergeReadinessExitCode(readiness)).toBe(8);
   });
-
   it('returns ready once checks, reviews, and bot state are all clear', () => {
     const readiness = computeMergeReadiness({
       pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
@@ -329,12 +317,10 @@ describe('computeMergeReadiness', () => {
       ),
       minReviews: 2,
     });
-
     expect(readiness.status).toBe('ready');
     expect(readiness.reasons).toEqual([]);
     expect(computeMergeReadinessExitCode(readiness)).toBe(0);
   });
-
   it('blocks when GitHub still requires review or reports a non-mergeable state', () => {
     const readiness = computeMergeReadiness({
       pr: { state: 'OPEN', isDraft: false, reviewDecision: 'REVIEW_REQUIRED', mergeStateStatus: 'BLOCKED' },
@@ -351,7 +337,6 @@ describe('computeMergeReadiness', () => {
       ),
       minReviews: 2,
     });
-
     expect(readiness.status).toBe('blocked');
     expect(readiness.reasons).toContain('review decision is review_required');
     expect(readiness.reasons).toContain('merge state is blocked');

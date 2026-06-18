@@ -47,7 +47,7 @@ export function scenarioToMetricRecords(
     'ns_per_frame.p99': scenario.nsPerFrameStats.p99,
   } as const satisfies Record<string, number>;
 
-  return (Object.entries(metricValues) as Array<[keyof typeof metricValues, number]>).map(([metric, value]) => ({
+  return (Object.entries(metricValues) as [keyof typeof metricValues, number][]).map(([metric, value]) => ({
     kind: 'bench.v2.metric',
     runId: report.runId,
     generatedAt: report.generatedAt,

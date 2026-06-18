@@ -135,10 +135,10 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
   const warnedAsyncMiddleware = new WeakSet<RenderMiddleware>();
 
   const STAGE_ORDER: RenderStage[] = ['Layout', 'Paint', 'PostProcess', 'Diff', 'Output'];
-  type StagePlanEntry = {
+  interface StagePlanEntry {
     stage: RenderStage;
     middlewares: readonly RenderMiddleware[];
-  };
+  }
   let cachedPlan: StagePlanEntry[] = [];
   let chainDirty = true;
   const readNow = options.now ?? (() => globalThis.performance?.now?.() ?? Date.now());
@@ -261,9 +261,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
         recordStageTiming(state, timings, entry.stage, readNow() - stageStartMs);
       }
     };
-
     runStage(0, 0, readNow());
   }
-
   return { use, onStageComplete, execute };
 }

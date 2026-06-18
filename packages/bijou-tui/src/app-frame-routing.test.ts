@@ -31,8 +31,8 @@ import {
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('respects transitionOverride to select animation dynamically', async () => {
     const app = createFramedApp({
@@ -378,11 +378,9 @@ describe('createFramedApp', () => {
       onPulse: () => ({ dispose() {} }),
       sleep: () => Promise.resolve(),
     });
-
     update = app.update({ type: 'key', key: '[', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
     expect(model.activePageId).toBe('home');
-
     const returned = await delayedPromise;
     for (const msg of emitted) {
       update = app.update(msg, model);
@@ -392,23 +390,18 @@ describe('createFramedApp', () => {
       update = app.update(returned, model);
       model = update[0];
     }
-
     expect(model.pageModels.home?.count).toBe(0);
     expect(model.pageModels.logs?.count).toBe(1);
   });
-
   it('supports Shift+G for scroll-to-bottom', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
-
     const result = await runScript(app, [{ key: 'G' }]);
     expect(result.model.scrollByPage.home?.main?.y).toBeGreaterThan(0);
   });
-
   it('forwards unmapped workspace mouse messages to the active page', async () => {
     type MsgWithMouse = Msg | MouseMsg;
-
     const seenMouseActions: string[] = [];
     const page: FramePage<PageModel, MsgWithMouse> = {
       id: 'home',
@@ -429,9 +422,7 @@ describe('createFramedApp', () => {
       }),
       keyMap: createKeyMap<MsgWithMouse>().bind('x', 'Increment', { type: 'inc' }),
     };
-
     const app = createFramedApp<PageModel, MsgWithMouse>({ pages: [page] });
-
     const result = await runScript(app, [
       mouseMove(4, 2),
       mouseRelease('left', 5, 3),
@@ -439,7 +430,6 @@ describe('createFramedApp', () => {
       mousePress('left', 7, 5),
       { key: 'x' },
     ]);
-
     expect(seenMouseActions).toEqual([
       'none:move:4:2',
       'left:release:5:3',

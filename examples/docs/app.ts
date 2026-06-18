@@ -359,8 +359,8 @@ interface RootModel {
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
-type RootMsg = { type: 'docs'; msg: FramedAppMsg<DocsMsg> };
-type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
+interface RootMsg { type: 'docs'; msg: FramedAppMsg<DocsMsg> }
+interface PulseLikeMsg { readonly type: 'pulse'; readonly dt: number }
 type DocsMsg = ExplorerMsg | PulseLikeMsg;
 type Rgb = [number, number, number];
 
@@ -1077,12 +1077,12 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
 
 export function stripMarkdownFrontmatter(markdownText: string): string {
   const withoutBom = markdownText.replace(/^\uFEFF/, '');
-  const opening = withoutBom.match(/^---\r?\n/);
+  const opening = /^---\r?\n/.exec(withoutBom);
   if (opening == null) return markdownText;
   const bodyStart = opening[0].length;
   const body = withoutBom.slice(bodyStart);
-  const closingMatch = body.match(/\r?\n---[ \t]*(?:\r?\n|$)/);
-  if (closingMatch == null || closingMatch.index == null) return markdownText;
+  const closingMatch = /\r?\n---[ \t]*(?:\r?\n|$)/.exec(body);
+  if (closingMatch?.index == null) return markdownText;
   return body.slice(closingMatch.index + closingMatch[0].length);
 }
 
@@ -1496,7 +1496,7 @@ function standardBlockLoweringPreviewSurface(
   const slots = standardBlockExampleSlots(block.metadata.blockName, localization);
   const modeLines = block.metadata.modes.map((mode) => {
     const result = renderBlockTree(blockRenderNode(block, {
-      mode: mode as OutputMode,
+      mode: mode,
       slots,
       config: standardBlockExampleConfig(innerWidth, block.metadata.blockName),
     }));
@@ -2543,7 +2543,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
 
     const output = hasToast
       ? compositeSurface(surface, [toast({
-          message: model.landingToast!.message,
+          message: model.landingToast.message,
           variant: 'info',
           anchor: 'top-right',
           screenWidth: width,
@@ -2565,7 +2565,7 @@ function prepareLandingSurface(
   height: number,
   background: string,
 ): Surface {
-  const surface = scratch != null && scratch.width === width && scratch.height === height
+  const surface = scratch?.width === width && scratch.height === height
     ? scratch
     : createSurface(width, height, {
         char: ' ',
@@ -2817,8 +2817,8 @@ function paintLandingLogoOverlay(
         char: markChar,
         fg,
         modifiers: opacity < 0.38
-          ? DIM_MODIFIERS as string[]
-          : BOLD_MODIFIERS as string[],
+          ? DIM_MODIFIERS
+          : BOLD_MODIFIERS,
         empty: false,
         opacity: 1,
       }, LANDING_LOGO_OVERLAY_MASK);
@@ -3367,7 +3367,7 @@ function docsVisualThemeFromShellThemeChoice(shellTheme: DocsShellThemeChoice): 
   });
 }
 
-function createGradientStops(gradient: readonly [string, string, string]): Array<{ pos: number; color: Rgb }> {
+function createGradientStops(gradient: readonly [string, string, string]): { pos: number; color: Rgb }[] {
   return [
     { pos: 0, color: hexToRgb(gradient[0]) },
     { pos: 0.5, color: hexToRgb(gradient[1]) },
@@ -3375,7 +3375,7 @@ function createGradientStops(gradient: readonly [string, string, string]): Array
   ];
 }
 
-function gradientStopsFromHexes(colors: readonly string[]): Array<{ pos: number; color: Rgb }> {
+function gradientStopsFromHexes(colors: readonly string[]): { pos: number; color: Rgb }[] {
   if (colors.length === 0) return [];
   if (colors.length === 1) {
     return [{ pos: 0, color: hexToRgb(colors[0]!) }];
@@ -3386,7 +3386,7 @@ function gradientStopsFromHexes(colors: readonly string[]): Array<{ pos: number;
   }));
 }
 
-function buildColorRamp(stops: Array<{ pos: number; color: Rgb }>): readonly string[] {
+function buildColorRamp(stops: { pos: number; color: Rgb }[]): readonly string[] {
   const ramp = new Array<string>(LANDING_COLOR_RAMP_SIZE);
   for (let index = 0; index < LANDING_COLOR_RAMP_SIZE; index++) {
     const t = index / (LANDING_COLOR_RAMP_SIZE - 1 || 1);
@@ -4371,7 +4371,7 @@ function renderStoryPane(
   const preview = storyPreviewSurface(variant.render({
     width: previewWidth,
     ctx: previewCtx,
-    state: variant.initialState as never,
+    state: variant.initialState,
     timeMs: model.previewTimeMs,
   }));
   const previewTitle = `live preview • ${preset.label} • ${variant.label}`;
@@ -4688,7 +4688,7 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
   const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
   const pageModel = model.pageModels[pageId];
   const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
-  if (pageModel == null || !pageModel.showHints) {
+  if (!pageModel?.showHints) {
     return renderDocsFooterHint({
       controls: shellHint,
     });
@@ -5745,11 +5745,11 @@ function formatFamilyRow(options: {
     if (family == null) return '';
     const expanded = expandedFamilies[row.familyId] ?? false;
     const focusPrefix = focused
-      ? ctx.style.styled(accentToken as any, '›')
+      ? ctx.style.styled(accentToken, '›')
       : ' ';
-    const arrow = ctx.style.styled(accentToken as any, expanded ? '▼' : '▶');
+    const arrow = ctx.style.styled(accentToken, expanded ? '▼' : '▶');
     const title = focused
-      ? ctx.style.styled(accentToken as any, family.label)
+      ? ctx.style.styled(accentToken, family.label)
       : family.label;
     return `${focusPrefix} ${arrow} ${title}`;
   }
@@ -5758,13 +5758,13 @@ function formatFamilyRow(options: {
   if (story == null) return '';
   const selected = selectedStoryId === story.id;
   const focusPrefix = focused
-    ? ctx.style.styled(accentToken as any, '›')
+    ? ctx.style.styled(accentToken, '›')
     : ' ';
   const bullet = selected
-    ? ctx.style.styled(accentToken as any, '•')
-    : ctx.style.styled(mutedToken as any, '•');
+    ? ctx.style.styled(accentToken, '•')
+    : ctx.style.styled(mutedToken, '•');
   const title = selected
-    ? ctx.style.styled(accentToken as any, story.title)
+    ? ctx.style.styled(accentToken, story.title)
     : story.title;
   return `${focusPrefix}   ${bullet} ${title}`;
 }
@@ -5781,13 +5781,13 @@ function formatGuideRow(options: {
   const mutedToken = docsThemeMutedBorderToken(theme);
   const selected = selectedGuideId === item.value;
   const focusPrefix = focused
-    ? ctx.style.styled(accentToken as any, '›')
+    ? ctx.style.styled(accentToken, '›')
     : ' ';
   const bullet = selected
-    ? ctx.style.styled(accentToken as any, '•')
-    : ctx.style.styled(mutedToken as any, '•');
+    ? ctx.style.styled(accentToken, '•')
+    : ctx.style.styled(mutedToken, '•');
   const title = selected || focused
-    ? ctx.style.styled(accentToken as any, item.label)
+    ? ctx.style.styled(accentToken, item.label)
     : item.label;
   return `${focusPrefix} ${bullet} ${title}`;
 }

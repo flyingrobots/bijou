@@ -22,7 +22,7 @@ const MSG_CTRL_T = { type: 'key', key: 't', ctrl: true, alt: false, shift: false
 const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false } as const;
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });

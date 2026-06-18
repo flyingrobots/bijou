@@ -35,7 +35,7 @@ function renderSkeletonVariantText(variantId: string, mode: OutputMode): string 
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -43,7 +43,7 @@ function renderSkeletonVariantText(variantId: string, mode: OutputMode): string 
 }
 
 describe('DF-036 loading placeholders family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md');

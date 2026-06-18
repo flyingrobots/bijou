@@ -59,7 +59,7 @@ export function writeValidationError(message: string, ctx: BijouContext): void {
  * @param ctx - Bijou context for output.
  */
 export function renderNumberedOptions(
-  options: ReadonlyArray<{ label: string; description?: string }>,
+  options: readonly { label: string; description?: string }[],
   ctx: BijouContext,
 ): void {
   for (let i = 0; i < options.length; i++) {

@@ -20,7 +20,7 @@ describe('filter()', () => {
       const result = await filter({
         title: 'Pick',
         options: [],
-        defaultValue: 'fallback' as string,
+        defaultValue: 'fallback',
         ctx: createTestContext({ mode: 'static', io: { answers: [''] } }),
       });
       expect(result).toBe('fallback');

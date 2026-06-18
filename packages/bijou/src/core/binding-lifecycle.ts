@@ -530,7 +530,7 @@ function isBindingTransitionReason(value: string): value is BindingLifecycleTran
   return BINDING_TRANSITION_REASONS.includes(value as BindingLifecycleTransitionReason);
 }
 
-function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet<object>()): T {
+function deepFreeze<T>(value: T, seen = new WeakSet()): T {
   if (value === null || typeof value !== 'object') {
     return value;
   }

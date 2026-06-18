@@ -7,7 +7,7 @@
  * @module
  */
 
-import { QUIT, type Cmd, type QuitSignal } from './types.js';
+import { QUIT, type Cmd } from './types.js';
 
 /**
  * Create a command that signals the runtime to quit.
@@ -16,7 +16,7 @@ import { QUIT, type Cmd, type QuitSignal } from './types.js';
  * @returns A command that resolves to the {@link QUIT} sentinel.
  */
 export function quit<M>(): Cmd<M> {
-  return (_emit, _caps) => QUIT as QuitSignal;
+  return () => QUIT;
 }
 
 /**

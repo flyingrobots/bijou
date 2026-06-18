@@ -10,8 +10,8 @@ describe('notifications demo', () => {
     runtime: { columns: 80, rows: 24 },
   });
 
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('blocks background notification shortcuts while the shell notification center is open', async () => {
     const app = createNotificationDemoApp(testCtx, { autoDemo: false });

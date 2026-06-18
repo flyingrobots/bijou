@@ -23,7 +23,7 @@ describe('worker proxy runtime', () => {
   });
 
   it('includes the host runtime size in workerData and syncs sanitized resize events', async () => {
-    const ctorCalls: Array<{ entry: string; options: Record<string, unknown> }> = [];
+    const ctorCalls: { entry: string; options: Record<string, unknown> }[] = [];
     const posted: unknown[] = [];
     let exitHandler: ((code: number) => void) | undefined;
 
@@ -101,7 +101,7 @@ describe('worker proxy runtime', () => {
       expect(ctx.runtime.columns).toBe(120);
       expect(ctx.runtime.rows).toBe(40);
 
-      const seenResizes: Array<{ columns: number; rows: number }> = [];
+      const seenResizes: { columns: number; rows: number }[] = [];
       const handle = ctx.io.onResize((columns, rows) => {
         seenResizes.push({ columns, rows });
         expect(ctx.runtime.columns).toBe(columns);

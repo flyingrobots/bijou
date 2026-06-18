@@ -77,7 +77,7 @@ if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]
     await startWorkerApp(app);
   } else {
     const useMockContext = process.env['CI'] === '1'
-      || process.stdin.isTTY !== true
+      || !process.stdin.isTTY
       || typeof process.stdin.setRawMode !== 'function';
     const ctx = useMockContext
       ? createTestContext({

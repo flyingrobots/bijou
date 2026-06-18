@@ -152,8 +152,7 @@ function invalidateUpdatedRecords(options: {
       const resolution = resolutionsByRequirementId.get(record.requirementId);
       if (
         snapshot === undefined
-        || resolution === undefined
-        || resolution.providerId === undefined
+        || resolution?.providerId === undefined
         || snapshot.providerId !== resolution.providerId
       ) {
         return record;

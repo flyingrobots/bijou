@@ -36,7 +36,7 @@ function renderWorkspaceLayoutVariantText(variantId: string, mode: OutputMode): 
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -44,7 +44,7 @@ function renderWorkspaceLayoutVariantText(variantId: string, mode: OutputMode): 
 }
 
 describe('DF-065 workspace layout family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-065-audit-workspace-layout-family-across-real-surfaces.md');

@@ -76,7 +76,7 @@ export function parseBlocks(source: string): BlockType[] {
     }
 
     // Heading
-    const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+    const headingMatch = /^(#{1,4})\s+(.+)$/.exec(line);
     if (headingMatch) {
       blocks.push({ type: 'heading', level: headingMatch[1]!.length, text: headingMatch[2]! });
       i++;
@@ -204,7 +204,7 @@ function parseTableRow(line: string): string[] | null {
 
 function isTableSeparatorRow(line: string, expectedColumns: number): boolean {
   const cells = parseTableRow(line);
-  if (!cells || cells.length !== expectedColumns) return false;
+  if (cells?.length !== expectedColumns) return false;
   return cells.every((cell) => /^:?-{3,}:?$/.test(cell.replace(/\s+/g, '')));
 }
 

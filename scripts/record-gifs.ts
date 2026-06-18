@@ -92,8 +92,8 @@ function recordOne(job: RecordJob): Promise<Result> {
   return new Promise<Result>((resolve) => {
     if (job.kind === 'native') {
       recordNative(job.path)
-        .then(() => finish('success'))
-        .catch(() => finish('error'));
+        .then(() => { finish('success'); })
+        .catch(() => { finish('error'); });
       return;
     }
 
@@ -153,14 +153,11 @@ function buildJob(name: string): RecordJob | null {
   if (existsSync(tapePath)) {
     return { example: name, kind: 'vhs', path: tapePath };
   }
-
   if (args.length > 0) {
     console.log(alert(`${name}: no record.ts or demo.tape found, skipping`, { variant: 'warning', ctx }));
   }
-
   return null;
 }
-
 async function recordNative(entryPath: string): Promise<void> {
   const module = await import(pathToFileURL(entryPath).href);
   if (typeof module.default !== 'function') {
@@ -168,22 +165,16 @@ async function recordNative(entryPath: string): Promise<void> {
   }
   await module.default();
 }
-
 await runAll();
-
 // ── Summary ────────────────────────────────────────────────────────
-
 const successes = results.filter(r => r.status === 'success');
 const failures = results.filter(r => r.status === 'error');
-
 results.sort((a, b) => a.name.localeCompare(b.name));
-
 const rows = results.map(r => [
   r.name,
   r.status === 'success' ? '✅' : '❌',
   `${(r.elapsed / 1000).toFixed(1)}s`,
 ]);
-
 console.log(table({
   columns: [
     { header: 'Example' },
@@ -194,7 +185,6 @@ console.log(table({
   ctx,
 }));
 console.log();
-
 if (failures.length > 0) {
   const names = failures.map(f => f.name);
   const lines: string[] = [`${failures.length} failed:`];

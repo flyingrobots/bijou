@@ -154,7 +154,7 @@ export function captureDogfoodStorybookMatrix(
       const preview = storyPreviewSurface(variant.render({
         width: preset.width,
         ctx: previewCtx,
-        state: variant.initialState as never,
+        state: variant.initialState,
         timeMs: 0,
       }));
 

@@ -97,7 +97,7 @@ export function calculateFlex(
 
     if (!spaceDistributed) {
       // Final pass: distribute the last remaining bits without constraints (they are already satisfied)
-      const fractionalShares: Array<{ index: number; remainder: number }> = [];
+      const fractionalShares: { index: number; remainder: number }[] = [];
       let assigned = 0;
       for (let i = 0; i < children.length; i++) {
         if (!isConstrained[i] && (children[i]!.flex ?? 0) > 0) {

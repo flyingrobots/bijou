@@ -209,7 +209,7 @@ export function resolveFrameShellThemeChoices(
         shellThemeId: shellTheme.id,
         shellThemeLabel: shellTheme.label,
         resolvedTheme: createResolved(
-          shellTheme.theme!,
+          shellTheme.theme,
           ctx.theme.noColor,
           ctx.theme.colorScheme,
         ),
@@ -422,7 +422,7 @@ export function resolveFrameNotificationCenter<PageModel, Msg>(
 
   return {
     title: frameMessage(options.i18n, 'notifications.title', 'Notifications'),
-    state: model.runtimeNotifications as NotificationState<Msg>,
+    state: model.runtimeNotifications,
     filters: DEFAULT_NOTIFICATION_CENTER_FILTERS,
     activeFilter: model.runtimeNotificationHistoryFilter,
   };

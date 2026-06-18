@@ -36,7 +36,7 @@ function renderInspectorVariantText(variantId: string, mode: OutputMode): string
   const preview = storyPreviewSurface(variant!.render({
     width: preset!.width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: variant!.initialState,
     timeMs: 0,
   }));
 
@@ -44,7 +44,7 @@ function renderInspectorVariantText(variantId: string, mode: OutputMode): string
 }
 
 describe('DF-041 inspector panels family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-041-audit-inspector-panels-family-across-real-surfaces.md');
