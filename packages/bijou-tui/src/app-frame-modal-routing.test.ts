@@ -25,18 +25,19 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  Cmd,
   FramePage,
-  FramedAppMsg,
   Msg,
   NotificationHistoryFilter,
   NotificationState,
   PageModel,
+  QUIT,
+  isCmdCleanup,
 } from './app-frame.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
+  const hooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
 
@@ -84,10 +85,10 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(shiftKey('n'), model);
-    expect((model as any).notificationCenterOpen).toBe(true);
+    expect(model.notificationCenterOpen).toBe(true);
 
     [model] = app.update(shiftKey('n'), model);
-    expect((model as any).notificationCenterOpen).toBe(false);
+    expect(model.notificationCenterOpen).toBe(false);
   });
 
   it('closes the shell notification center with escape without opening quit confirm', () => {
@@ -97,11 +98,11 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(shiftKey('n'), model);
-    expect((model as any).notificationCenterOpen).toBe(true);
+    expect(model.notificationCenterOpen).toBe(true);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).notificationCenterOpen).toBe(false);
-    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(model.notificationCenterOpen).toBe(false);
+    expect(model.quitConfirmOpen).toBe(false);
   });
 
   it('scrolls a shell notification center independently of the underlying page', () => {
@@ -111,7 +112,7 @@ describe('createFramedApp', () => {
 
     const notifications = seedNotificationHistory<Msg>(
       Array.from({ length: 18 }, (_, index) => ({
-        title: `Notice ${index}`,
+        title: `Notice ${String(index)}`,
         tone: index % 2 === 0 ? 'WARNING' : 'INFO',
       })),
     );
@@ -146,15 +147,15 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(shiftKey('n'), model);
-    [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false } as unknown as Msg, model);
+    [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
 
-    expect((model as any).notificationCenterOpen).toBe(true);
-    expect((model as any).notificationCenterScrollY).toBeGreaterThan(0);
+    expect(model.notificationCenterOpen).toBe(true);
+    expect(model.notificationCenterScrollY).toBeGreaterThan(0);
     expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
 
-    const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false } as unknown as Msg, model);
+    const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
     expect(nextModel.pageModels.home?.count).toBe(0);
-    expect((nextModel as any).notificationCenterOpen).toBe(true);
+    expect(nextModel.notificationCenterOpen).toBe(true);
     expect(cmds).toHaveLength(0);
   });
 
@@ -211,17 +212,16 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(shiftKey('n'), model);
-    let cmds: Cmd<FramedAppMsg<NotificationMsg>>[] = [];
-    [model, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false } as unknown as NotificationMsg, model);
+    const [filteredModel, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false }, model);
+    model = filteredModel;
 
     expect(cmds).toHaveLength(1);
-    const returned = await cmds[0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-    });
-    [model] = app.update(returned as NotificationMsg, model);
+    const returned = await must(cmds[0])(() => undefined, hooks(0));
+    if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) throw new Error();
+    [model] = app.update(returned, model);
 
     expect(model.pageModels.home?.filterIndex).toBe(1);
-    expect((model as any).notificationCenterScrollY).toBe(0);
+    expect(model.notificationCenterScrollY).toBe(0);
   });
 
   it('opens the shell notification center from the command palette', async () => {
@@ -238,7 +238,7 @@ describe('createFramedApp', () => {
       { key: KEY_ENTER },
     ]);
 
-    expect((result.model as any).notificationCenterOpen).toBe(true);
+    expect(result.model.notificationCenterOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
   });
 
@@ -364,15 +364,12 @@ describe('createFramedApp', () => {
       message: 'Framework warning',
       atMs: 0,
     });
-    if (runtimeMsg == null) throw new Error('expected runtime issue message');
+    if (runtimeMsg == null) throw new Error('runtime');
 
     const [nextModel, cmds] = app.update(runtimeMsg, model);
-    const tickMsg = await cmds[0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 8_000,
-    });
-    const [archivedModel] = app.update(tickMsg as Msg, nextModel);
+    const tickMsg = await must(cmds[0])(() => undefined, hooks(8_000));
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) throw new Error();
+    const [archivedModel] = app.update(tickMsg, nextModel);
     const frame = app.view(archivedModel);
     if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
     const footer = must(surfaceToString(frame, testCtx.style).split('\n').at(-1));

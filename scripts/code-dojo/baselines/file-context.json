@@ -374,11 +374,6 @@
       "bytes": 15667
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-tail.test.ts",
-      "lines": 438,
-      "bytes": 12812
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13140
@@ -387,6 +382,11 @@
       "path": "packages/bijou/src/core/components/preference-list.ts",
       "lines": 425,
       "bytes": 14249
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-tail.test.ts",
+      "lines": 425,
+      "bytes": 12735
     },
     {
       "path": "packages/bijou-tui/src/app-frame-input-overlays.test.ts",
@@ -494,11 +494,6 @@
       "bytes": 16164
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",
-      "lines": 382,
-      "bytes": 12465
-    },
-    {
       "path": "packages/bijou-tui/src/app-frame-shell-layers.test.ts",
       "lines": 381,
       "bytes": 12510
@@ -512,6 +507,11 @@
       "path": "packages/bijou/src/core/components/markdown-parse.ts",
       "lines": 380,
       "bytes": 12562
+    },
+    {
+      "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",
+      "lines": 379,
+      "bytes": 12452
     },
     {
       "path": "examples/showcase/app.ts",
