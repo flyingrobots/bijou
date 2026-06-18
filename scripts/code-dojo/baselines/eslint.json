@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 3298,
-  "errors": 3298,
+  "total": 3376,
+  "errors": 3376,
   "warnings": 0,
   "rules": [
     {
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 734
+      "count": 739
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -74,7 +74,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
-      "count": 6
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
@@ -82,7 +82,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
-      "count": 18
+      "count": 20
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 123
+      "count": 124
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 547
+      "count": 550
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -130,7 +130,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
-      "count": 5
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/prefer-promise-reject-errors",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 586
+      "count": 650
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -182,7 +182,7 @@
     },
     {
       "ruleId": "no-useless-assignment",
-      "count": 11
+      "count": 12
     },
     {
       "ruleId": "no-useless-escape",
