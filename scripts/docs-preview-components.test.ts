@@ -22,9 +22,9 @@ import {
   serializeFrame,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
+import type { DocsApp, DocsScriptStep } from './docs-preview-model-types.js';
 import { isCmdCleanup } from '../packages/bijou-tui/src/types.js';
 
-type DocsApp = ReturnType<typeof createDocsApp>;
 type DocsFrame = Parameters<typeof frameText>[0];
 
 function runCommand(commands: ReturnType<DocsApp['update']>[1]) {
@@ -105,13 +105,8 @@ describe('docs preview app', () => {
     expect(model.docsModel.settingsOpen).toBe(false);
     expect(pageModel.showHints).toBe(false);
     expect(pageModel.landingQualityMode).toBe('quality');
-    expect(footer).toContain('? Help');
-    expect(footer).toContain('/ Search');
-    expect(footer).toContain('F2 Settings');
-    expect(footer).toContain('q Quit');
-    expect(footer).not.toContain('↑/↓ browse');
-    expect(footer).not.toContain('Enter open');
-    expect(footer).not.toContain(',/. cycle');
+    for (const hint of ['? Help', '/ Search', 'F2 Settings', 'q Quit']) expect(footer).toContain(hint);
+    for (const hint of ['↑/↓ browse', 'Enter open', ',/. cycle']) expect(footer).not.toContain(hint);
     expect(text).not.toContain('scroll: j/k • d/u • g/G • mouse wheel');
 
     const landingFrame = normalizeViewOutput(app.view({ ...model, route: 'landing' }), {
@@ -147,12 +142,10 @@ describe('docs preview app', () => {
     const lines = text.split('\n');
     expect(text).toContain('Status and in-flow');
     expect(lines[0]).toContain('Bijou Docs');
-    expect(lines[frame.height - 1]).toContain('? Help');
-    expect(lines[frame.height - 1]).toContain('/ Search');
-    expect(lines[frame.height - 1]).toContain('F2 Settings');
-    expect(lines[frame.height - 1]).toContain('Tab next pane');
-    expect(lines[frame.height - 1]).toContain('↑/↓ browse');
-    expect(lines[frame.height - 1]).toContain('Enter open');
+    const footer = lines[frame.height - 1] ?? '';
+    for (const hint of ['? Help', '/ Search', 'F2 Settings', 'Tab next pane', '↑/↓ browse', 'Enter open']) {
+      expect(footer).toContain(hint);
+    }
     expect(lines.slice(0, frame.height - 1).join('\n')).not.toContain('↑/↓ browse • Enter open • Tab next pane');
   });
 
@@ -204,8 +197,8 @@ describe('docs preview app', () => {
     expect(text).toContain('What is Bijou?');
     expect(text).toContain('How to use these docs');
     expect(text).toContain('Documentation coverage');
-    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
-    expect(text).toContain(`${coverage.percent}%`);
+    expect(text).toContain(String(coverage.documentedFamilies) + '/' + String(coverage.totalFamilies));
+    expect(text).toContain(String(coverage.percent) + '%');
     expect(text).toContain('/ to search');
     expect(text).toContain('F2 for settings');
     expect(text).toContain('surface-native terminal UI framework');
@@ -217,7 +210,7 @@ describe('docs preview app', () => {
     const chooseLoopingVariant = [{ msg: { type: 'docs', msg: { type: 'select-variant', index: 1 } } }] as const;
     const pulse = [{ pulse: { dt: 0.45 } }] as const;
 
-    async function renderFrame(steps: readonly any[]) {
+    async function renderFrame(steps: readonly DocsScriptStep[]) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
       const app = createDocsApp(ctx);
       const result = await runScript(app, [...steps], { ctx, pulseFps: false });
