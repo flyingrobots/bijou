@@ -84,7 +84,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'guides');
+    const pageModel = docsPageModel(result.model, 'guides');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedGuideId).toBe('documentation-map');
@@ -145,7 +145,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('confirm');
@@ -170,7 +170,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('tabs');
@@ -194,7 +194,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('group-wizard');
@@ -221,7 +221,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('explainability');
@@ -248,7 +248,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('help-view');
@@ -279,7 +279,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('app-shell');
@@ -320,8 +320,8 @@ describe('docs preview app', () => {
       { key: KEY_ESCAPE },
     ], { ctx });
 
-    expect((result.model as any).docsModel.commandPalette).toBeUndefined();
-    expect((result.model as any).docsModel.quitConfirmOpen).toBe(false);
+    expect((result.model).docsModel.commandPalette).toBeUndefined();
+    expect((result.model).docsModel.quitConfirmOpen).toBe(false);
 
     const frame = result.frames[result.frames.length - 1]!;
     const text = frameText(frame);

@@ -80,8 +80,8 @@ describe('docs preview app', () => {
     const themedApp = createDocsApp(themedCtx);
 
     const defaultDocs = await runScript(defaultApp, [{ key: KEY_ENTER }], { ctx: defaultCtx });
-    const [defaultSettingsModel] = defaultApp.update(keyMsg('f2') as any, defaultDocs.model as any);
-    const defaultSettingsFrame = normalizeViewOutput(defaultApp.view(defaultSettingsModel as any), {
+    const [defaultSettingsModel] = defaultApp.update(keyMsg('f2'), defaultDocs.model);
+    const defaultSettingsFrame = normalizeViewOutput(defaultApp.view(defaultSettingsModel), {
       width: defaultCtx.runtime.columns,
       height: defaultCtx.runtime.rows,
     }).surface;
@@ -90,14 +90,14 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx: themedCtx });
 
-    const themedModel = themedDocs.model as any;
+    const themedModel = themedDocs.model;
     const themedDocsSurface = normalizeViewOutput(themedApp.view(themedModel), {
       width: themedCtx.runtime.columns,
       height: themedCtx.runtime.rows,
     }).surface;
     const themedDocsText = frameText(themedDocsSurface);
-    const [settingsModel] = themedApp.update(keyMsg('f2') as any, themedModel);
-    const settingsFrame = normalizeViewOutput(themedApp.view(settingsModel as any), {
+    const [settingsModel] = themedApp.update(keyMsg('f2'), themedModel);
+    const settingsFrame = normalizeViewOutput(themedApp.view(settingsModel), {
       width: themedCtx.runtime.columns,
       height: themedCtx.runtime.rows,
     }).surface;
@@ -135,7 +135,7 @@ describe('docs preview app', () => {
     const frame = changed.frames[changed.frames.length - 1]!;
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
-    expect(activeDocsPageModel(changed.model as any).landingQualityMode).toBe('quality');
+    expect(activeDocsPageModel(changed.model).landingQualityMode).toBe('quality');
     expect(frameText(frame)).toContain('Landing quality: Quality');
     expect(footer).toContain('60 fps • quality');
   });
@@ -153,10 +153,10 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
-    expect((result.model as any).route).toBe('docs');
+    expect((result.model).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
     expect(text).toContain('active variant');
@@ -181,13 +181,13 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const frame = result.frames[result.frames.length - 1]!;
     const text = frameText(frame);
 
     expect(pageModel.selectedStoryId).toBe('modal');
     expect(pageModel.expandedFamilies['overlays-and-interruption']).toBe(true);
-    expect((result.model as any).docsModel.commandPalette).toBeUndefined();
+    expect((result.model).docsModel.commandPalette).toBeUndefined();
     expect(text).toContain('modal()');
     expect(text).toContain('Confirm deploy');
   });
@@ -208,10 +208,10 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
-    expect((result.model as any).docsModel.activePageId).toBe('components');
+    expect((result.model).docsModel.activePageId).toBe('components');
     expect(pageModel.selectedStoryId).toBe('dense-comparison');
     expect(pageModel.expandedFamilies['data-and-browsing']).toBe(true);
     expect(text).toContain('table() / navigableTableSurface()');
@@ -237,10 +237,10 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'release');
+    const pageModel = docsPageModel(result.model, 'release');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
-    expect((result.model as any).docsModel.activePageId).toBe('release');
+    expect((result.model).docsModel.activePageId).toBe('release');
     expect(pageModel.selectedGuideId).toContain('release-migration');
     expect(text).toContain('Migration Guide');
   });
@@ -261,8 +261,8 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
     ], { ctx });
 
-    expect((result.model as any).docsModel.commandPalette?.query).toBe('table');
-    expect((result.model as any).docsModel.commandPalette?.focusIndex).toBe(1);
+    expect((result.model).docsModel.commandPalette?.query).toBe('table');
+    expect((result.model).docsModel.commandPalette?.focusIndex).toBe(1);
     expect(frameText(result.frames[result.frames.length - 1]!)).toContain('Search documentation');
   });
 
@@ -286,7 +286,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('inspector');
@@ -311,7 +311,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('toast');
@@ -338,7 +338,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = docsPageModel(result.model as any, 'components');
+    const pageModel = docsPageModel(result.model, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('markdown');

@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 5345,
-  "errors": 5341,
+  "total": 4759,
+  "errors": 4755,
   "warnings": 4,
   "rules": [
     {
@@ -22,7 +22,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 101
+      "count": 100
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -66,7 +66,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 324
+      "count": 224
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -78,11 +78,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
-      "count": 4
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 1434
+      "count": 1432
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -106,7 +106,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
-      "count": 166
+      "count": 152
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -118,31 +118,31 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 142
+      "count": 81
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 244
+      "count": 150
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
-      "count": 28
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 238
+      "count": 180
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 23
+      "count": 21
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 719
+      "count": 618
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 248
+      "count": 161
     },
     {
       "ruleId": "@typescript-eslint/no-useless-default-assignment",
@@ -182,7 +182,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 156
+      "count": 112
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -190,7 +190,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 665
+      "count": 664
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -234,7 +234,7 @@
     },
     {
       "ruleId": "prefer-const",
-      "count": 11
+      "count": 10
     },
     {
       "ruleId": "preserve-caught-error",

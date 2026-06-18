@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
+  live type-aware ESLint findings from `5,121` to `4,759`, updates the
+  aggregate Code Dojo debt ceiling from `5,768` to `5,182`, removes unsafe
+  docs-preview test casts, and lets `wizard()` steps return synchronous values
+  as well as promises.
 - **Respectful Repo Code Dojo** — the verbatim
   [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
   artifact is now installed as an enforced Code Dojo gate. File/context

@@ -5,9 +5,9 @@ describe('wizard()', () => {
   it('runs all steps and collects values', async () => {
     const result = await wizard<{ name: string; age: number; active: boolean }>({
       steps: [
-        { key: 'name', field: async () => 'Alice' },
-        { key: 'age', field: async () => 30 },
-        { key: 'active', field: async () => true },
+        { key: 'name', field: () => 'Alice' },
+        { key: 'age', field: () => 30 },
+        { key: 'active', field: () => true },
       ],
     });
     expect(result).toEqual({
@@ -19,10 +19,10 @@ describe('wizard()', () => {
   it('skips step when skip predicate returns true', async () => {
     const result = await wizard<{ mode: string; details: string }>({
       steps: [
-        { key: 'mode', field: async () => 'simple' },
+        { key: 'mode', field: () => 'simple' },
         {
           key: 'details',
-          field: async () => 'extra info',
+          field: () => 'extra info',
           skip: (values) => values.mode === 'simple',
         },
       ],
@@ -35,10 +35,10 @@ describe('wizard()', () => {
   it('does not skip when skip predicate returns false', async () => {
     const result = await wizard<{ mode: string; details: string }>({
       steps: [
-        { key: 'mode', field: async () => 'advanced' },
+        { key: 'mode', field: () => 'advanced' },
         {
           key: 'details',
-          field: async () => 'extra info',
+          field: () => 'extra info',
           skip: (values) => values.mode === 'simple',
         },
       ],
@@ -60,14 +60,14 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'a',
-          field: async (vals) => {
+          field: (vals) => {
             received.push({ ...vals });
             return 'first';
           },
         },
         {
           key: 'b',
-          field: async (vals) => {
+          field: (vals) => {
             received.push({ ...vals });
             return 'second';
           },
@@ -84,21 +84,21 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'a',
-          field: async () => {
+          field: () => {
             order.push(1);
             return 'a';
           },
         },
         {
           key: 'b',
-          field: async () => {
+          field: () => {
             order.push(2);
             return 'b';
           },
         },
         {
           key: 'c',
-          field: async () => {
+          field: () => {
             order.push(3);
             return 'c';
           },
@@ -112,8 +112,8 @@ describe('wizard()', () => {
     await expect(
       wizard<{ a: string; b: string }>({
         steps: [
-          { key: 'a', field: async () => 'first' },
-          { key: 'b', field: async () => { throw new Error('cancelled'); } },
+          { key: 'a', field: () => 'first' },
+          { key: 'b', field: () => { throw new Error('cancelled'); } },
         ],
       }),
     ).rejects.toThrow('cancelled');
@@ -124,9 +124,9 @@ describe('wizard()', () => {
     await expect(
       wizard<{ a: string; b: string; c: string }>({
         steps: [
-          { key: 'a', field: async () => { order.push(1); return 'a'; } },
-          { key: 'b', field: async () => { order.push(2); throw new Error('cancelled'); } },
-          { key: 'c', field: async () => { order.push(3); return 'c'; } },
+          { key: 'a', field: () => { order.push(1); return 'a'; } },
+          { key: 'b', field: () => { order.push(2); throw new Error('cancelled'); } },
+          { key: 'c', field: () => { order.push(3); return 'c'; } },
         ],
       }),
     ).rejects.toThrow('cancelled');
@@ -136,13 +136,13 @@ describe('wizard()', () => {
   it('transform replaces field function', async () => {
     const result = await wizard<{ mode: string; greeting: string }>({
       steps: [
-        { key: 'mode', field: async () => 'formal' },
+        { key: 'mode', field: () => 'formal' },
         {
           key: 'greeting',
-          field: async () => 'hi',
+          field: () => 'hi',
           transform: (vals) => {
             if (vals.mode === 'formal') {
-              return async () => 'Good day';
+              return () => 'Good day';
             }
           },
         },
@@ -154,13 +154,13 @@ describe('wizard()', () => {
   it('transform returning void keeps original field', async () => {
     const result = await wizard<{ mode: string; greeting: string }>({
       steps: [
-        { key: 'mode', field: async () => 'casual' },
+        { key: 'mode', field: () => 'casual' },
         {
           key: 'greeting',
-          field: async () => 'hi',
+          field: () => 'hi',
           transform: (vals) => {
             if (vals.mode === 'formal') {
-              return async () => 'Good day';
+              return () => 'Good day';
             }
           },
         },
@@ -175,18 +175,18 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'type',
-          field: async () => { order.push('type'); return 'advanced'; },
+          field: () => { order.push('type'); return 'advanced'; },
           branch: (vals) => {
             if (vals.type === 'advanced') {
               return [
-                { key: 'subA' as const, field: async () => { order.push('subA'); return 'sub-value-A'; } },
-                { key: 'subB' as const, field: async () => { order.push('subB'); return 'sub-value-B'; } },
+                { key: 'subA' as const, field: () => { order.push('subA'); return 'sub-value-A'; } },
+                { key: 'subB' as const, field: () => { order.push('subB'); return 'sub-value-B'; } },
               ];
             }
             return [];
           },
         },
-        { key: 'final', field: async () => { order.push('final'); return 'done'; } },
+        { key: 'final', field: () => { order.push('final'); return 'done'; } },
       ],
     });
     expect(order).toEqual(['type', 'subA', 'subB', 'final']);
@@ -201,10 +201,10 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'type',
-          field: async () => 'simple',
+          field: () => 'simple',
           branch: () => [],
         },
-        { key: 'final', field: async () => 'done' },
+        { key: 'final', field: () => 'done' },
       ],
     });
     expect(result.values.type).toBe('simple');
@@ -216,16 +216,16 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'mode',
-          field: async () => 'test',
+          field: () => 'test',
           branch: () => [
             {
               key: 'extra' as const,
-              field: async () => 'should-skip',
+              field: () => 'should-skip',
               skip: () => true,
             },
           ],
         },
-        { key: 'final', field: async () => 'done' },
+        { key: 'final', field: () => 'done' },
       ],
     });
     expect(result.values.extra).toBeUndefined();
@@ -238,19 +238,19 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'a',
-          field: async () => 'original',
-          transform: () => async () => {
+          field: () => 'original',
+          transform: () => () => {
             order.push('transformed-a');
             return 'transformed';
           },
           branch: (vals) => {
             if (vals.a === 'transformed') {
-              return [{ key: 'b' as const, field: async () => { order.push('branched-b'); return 'branched'; } }];
+              return [{ key: 'b' as const, field: () => { order.push('branched-b'); return 'branched'; } }];
             }
             return [];
           },
         },
-        { key: 'c', field: async () => { order.push('c'); return 'final'; } },
+        { key: 'c', field: () => { order.push('c'); return 'final'; } },
       ],
     });
     expect(order).toEqual(['transformed-a', 'branched-b', 'c']);
@@ -263,18 +263,18 @@ describe('wizard()', () => {
       steps: [
         {
           key: 'a',
-          field: async () => { order.push('a'); return 'a'; },
+          field: () => { order.push('a'); return 'a'; },
           branch: () => [
             {
               key: 'b' as const,
-              field: async () => { order.push('b'); return 'b'; },
+              field: () => { order.push('b'); return 'b'; },
               branch: () => [
-                { key: 'c' as const, field: async () => { order.push('c'); return 'c'; } },
+                { key: 'c' as const, field: () => { order.push('c'); return 'c'; } },
               ],
             },
           ],
         },
-        { key: 'd', field: async () => { order.push('d'); return 'd'; } },
+        { key: 'd', field: () => { order.push('d'); return 'd'; } },
       ],
     });
     expect(order).toEqual(['a', 'b', 'c', 'd']);
@@ -284,7 +284,7 @@ describe('wizard()', () => {
     // Each step branches a copy of itself, creating unbounded growth
     const selfBranchingStep: WizardStep<{ n: number }> = {
       key: 'n',
-      field: async () => 1,
+      field: () => 1,
       branch: () => [selfBranchingStep],
     };
 
@@ -296,11 +296,11 @@ describe('wizard()', () => {
   it('skip predicate can depend on multiple prior values', async () => {
     const result = await wizard<{ x: number; y: number; sum: number }>({
       steps: [
-        { key: 'x', field: async () => 5 },
-        { key: 'y', field: async () => 10 },
+        { key: 'x', field: () => 5 },
+        { key: 'y', field: () => 10 },
         {
           key: 'sum',
-          field: async (vals) => (vals.x ?? 0) + (vals.y ?? 0),
+          field: (vals) => (vals.x ?? 0) + (vals.y ?? 0),
           skip: (vals) => (vals.x ?? 0) + (vals.y ?? 0) > 20,
         },
       ],
