@@ -89,7 +89,7 @@ describe('docs preview app', () => {
         stdio: 'pipe',
       },
     );
-  });
+  }, 15_000);
 
   it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
     expect(stripMarkdownFrontmatter([

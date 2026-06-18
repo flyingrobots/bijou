@@ -46,7 +46,7 @@ function runEslint(root) {
   try {
     const result = spawnSync(
       "eslint",
-      ["--format", "json", "--output-file", outputPath, "."],
+      ["--format", "json", "--output-file", outputPath, "--no-warn-ignored", "."],
       {
         cwd: root,
         encoding: "utf8",
