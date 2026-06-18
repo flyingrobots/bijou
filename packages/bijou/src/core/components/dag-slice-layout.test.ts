@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { dag, dagSlice, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -19,19 +17,6 @@ const diamond: DagNode[] = [
   { id: 'd', label: 'End' },
 ];
 
-const compactDiamond: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b', 'c'] },
-  { id: 'b', label: 'B', edges: ['d'] },
-  { id: 'c', label: 'C', edges: ['d'] },
-  { id: 'd', label: 'D' },
-];
-
-const linear: DagNode[] = [
-  { id: 'a', label: 'First', edges: ['b'] },
-  { id: 'b', label: 'Second', edges: ['c'] },
-  { id: 'c', label: 'Third' },
-];
-
 const fanOut: DagNode[] = [
   { id: 'root', label: 'Root', edges: ['a', 'b', 'c', 'd'] },
   { id: 'a', label: 'A' },
@@ -40,19 +25,9 @@ const fanOut: DagNode[] = [
   { id: 'd', label: 'D' },
 ];
 
-const withBadges: DagNode[] = [
-  { id: 'a', label: 'Build', edges: ['b'], badge: 'DONE' },
-  { id: 'b', label: 'Test', edges: ['c'], badge: 'WIP' },
-  { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
-];
-
 const cyclic: DagNode[] = [
   { id: 'a', label: 'A', edges: ['b'] },
   { id: 'b', label: 'B', edges: ['a'] },
-];
-
-const selfLoop: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['a'] },
 ];
 
 const largeGraph: DagNode[] = [

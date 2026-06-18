@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice, dagLayout } from './dag.js';
+import { dag, dagSlice } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { arraySource } from './dag-source.js';
+import { auditStyle, createTestContext, type StyledCall } from '../../adapters/test/index.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -17,13 +17,6 @@ const diamond: DagNode[] = [
   { id: 'b', label: 'Left', edges: ['d'] },
   { id: 'c', label: 'Right', edges: ['d'] },
   { id: 'd', label: 'End' },
-];
-
-const compactDiamond: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b', 'c'] },
-  { id: 'b', label: 'B', edges: ['d'] },
-  { id: 'c', label: 'C', edges: ['d'] },
-  { id: 'd', label: 'D' },
 ];
 
 const linear: DagNode[] = [
@@ -46,15 +39,6 @@ const withBadges: DagNode[] = [
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
 ];
 
-const cyclic: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b'] },
-  { id: 'b', label: 'B', edges: ['a'] },
-];
-
-const selfLoop: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['a'] },
-];
-
 const largeGraph: DagNode[] = [
   { id: 'root', label: 'Root', edges: ['a', 'b'] },
   { id: 'a', label: 'A', edges: ['c', 'd'] },
@@ -64,6 +48,11 @@ const largeGraph: DagNode[] = [
   { id: 'e', label: 'E', edges: ['f'] },
   { id: 'f', label: 'F' },
 ];
+
+function styledCallMatches(call: StyledCall, token: TokenValue, text: string): boolean {
+  if (call.method !== 'styled' || call.token == null) return false;
+  return call.token.hex === token.hex && call.token.bg === token.bg && call.text.includes(text);
+}
 
 // ── Basic Tests ────────────────────────────────────────────────────
 
@@ -277,28 +266,16 @@ describe('DagNode labelToken / badgeToken', () => {
     expect(result).toContain('Build');
     expect(result).toContain('HOT');
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === borderToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('╭'),
+      (call) => styledCallMatches(call, { ...borderToken, bg: bgToken.bg }, '╭'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === labelToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('Build'),
+      (call) => styledCallMatches(call, { ...labelToken, bg: bgToken.bg }, 'Build'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === badgeToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('HOT'),
+      (call) => styledCallMatches(call, { ...badgeToken, bg: bgToken.bg }, 'HOT'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === bgToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes(' '),
+      (call) => styledCallMatches(call, bgToken, ' '),
     )).toBe(true);
     expect(style.calls.some(
       (call) => call.method === 'styled'

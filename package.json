@@ -33,7 +33,7 @@
     "release:readiness": "tsx scripts/release-readiness.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",
     "code:size": "tsx scripts/code-size-gate.ts",
-    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 3859",
+    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 3799",
     "code-dojo:precommit": "node scripts/code-dojo/check-staged-files.mjs && node scripts/code-dojo/check-core-purity.mjs && node scripts/code-dojo/check-no-mocks.mjs && node scripts/code-dojo/check-graft-receipts.mjs && npm run code:size && npm run typecheck && npm run lint && npm run lint:eslint",
     "code-dojo:prepush": "npm run code-dojo:debt && npm run code-dojo:strict && npm run lint && npm run lint:eslint",
     "code-dojo:ci": "npm run code-dojo:debt && npm run code-dojo:strict && npm run code:size && npm run build && npm run typecheck && npm run lint && npm run lint:eslint && npm run test:run",

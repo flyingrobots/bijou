@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice, dagLayout } from './dag.js';
+import { dag } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -17,13 +15,6 @@ const diamond: DagNode[] = [
   { id: 'b', label: 'Left', edges: ['d'] },
   { id: 'c', label: 'Right', edges: ['d'] },
   { id: 'd', label: 'End' },
-];
-
-const compactDiamond: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b', 'c'] },
-  { id: 'b', label: 'B', edges: ['d'] },
-  { id: 'c', label: 'C', edges: ['d'] },
-  { id: 'd', label: 'D' },
 ];
 
 const linear: DagNode[] = [
@@ -53,16 +44,6 @@ const cyclic: DagNode[] = [
 
 const selfLoop: DagNode[] = [
   { id: 'a', label: 'A', edges: ['a'] },
-];
-
-const largeGraph: DagNode[] = [
-  { id: 'root', label: 'Root', edges: ['a', 'b'] },
-  { id: 'a', label: 'A', edges: ['c', 'd'] },
-  { id: 'b', label: 'B', edges: ['d', 'e'] },
-  { id: 'c', label: 'C', edges: ['f'] },
-  { id: 'd', label: 'D', edges: ['f'] },
-  { id: 'e', label: 'E', edges: ['f'] },
-  { id: 'f', label: 'F' },
 ];
 
 // ── Basic Tests ────────────────────────────────────────────────────

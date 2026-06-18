@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 3436,
-  "errors": 3436,
+  "total": 3376,
+  "errors": 3376,
   "warnings": 0,
   "rules": [
     {
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 179
+      "count": 175
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -110,11 +110,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 551
+      "count": 550
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 116
+      "count": 65
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 654
+      "count": 650
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
