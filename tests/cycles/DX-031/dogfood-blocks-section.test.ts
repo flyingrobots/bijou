@@ -411,7 +411,9 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
     ], { ctx });
     const model = result.model;
-    const text = frameText(result.frames.at(-1)!);
+    const last = result.frames.at(-1);
+    if (!last) throw new Error('frame');
+    const text = frameText(last);
 
     expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
     expect(text).toContain(secondBlock.metadata.blockName);
