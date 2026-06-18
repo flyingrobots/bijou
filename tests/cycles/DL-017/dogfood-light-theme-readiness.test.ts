@@ -9,6 +9,7 @@ import {
   DOGFOOD_THEME_SAFE_PAIRS,
 } from '../../../examples/docs/dogfood-shell-themes.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
+import { runKeysDeterministically } from './dogfood-light-theme-readiness.test-support.js';
 
 const DRAWER_BORDER_CHARS = new Set(['┌', '┐', '└', '┘', '│', '─']);
 const KEY_F2 = parseKey('\x1bOQ');
@@ -23,11 +24,11 @@ const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false
 describe('DL-017 DOGFOOD light theme readiness', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
-  it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', () => {
+  it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const model = runKeys(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
@@ -45,11 +46,11 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     );
   });
 
-  it('paints DOGFOOD light quit modal chrome with explicit backgrounds', () => {
+  it('paints DOGFOOD light quit modal chrome with explicit backgrounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const model = runKeys(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
@@ -69,11 +70,11 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     );
   });
 
-  it('paints DOGFOOD light command palette menu chrome with explicit backgrounds', () => {
+  it('paints DOGFOOD light command palette menu chrome with explicit backgrounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
-    const model = runKeys(app, [
+    const model = await runKeysDeterministically(app, [
       KEY_F2,
       KEY_DOWN,
       KEY_ENTER,
@@ -154,17 +155,6 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     );
   });
 });
-
-type DocsApp = ReturnType<typeof createDocsApp>;
-type DocsKey = ReturnType<typeof parseKey>;
-
-function runKeys(app: DocsApp, keys: readonly DocsKey[]): ReturnType<DocsApp['init']>[0] {
-  let [model] = app.init();
-  for (const msg of keys) {
-    [model] = app.update(msg, model);
-  }
-  return model;
-}
 
 function rightAnchoredDrawerBorderCells(surface: Surface): readonly [number, number][] {
   const startCol = Math.floor(surface.width * 0.55);
