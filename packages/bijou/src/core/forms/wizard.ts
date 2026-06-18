@@ -81,7 +81,9 @@ export async function wizard<T extends Record<string, unknown>>(
       throw new Error(`Wizard exceeded ${String(MAX_WIZARD_STEPS)} steps — possible infinite loop`);
     }
     const step = steps[i];
-    if (step == null) break;
+    if (step == null) {
+      throw new Error(`Wizard step ${String(i)} is missing`);
+    }
 
     // Skip check
     if (step.skip?.(values)) {
