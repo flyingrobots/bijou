@@ -238,6 +238,8 @@ Most production apps eventually move to tier 2 or tier 3.
 | [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) | DOGFOOD command surface, keyboard orientation, and command coverage notes. |
 | [`DOGFOOD`](./docs/DOGFOOD.md) | Human-facing walkthrough and interactive proof surface. |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Ports, adapters, package stack, and structural rules. |
+| [`docs/typescript-code-standards.editors-edition.md`](./docs/typescript-code-standards.editors-edition.md) | Verbatim Code Dojo doctrine for TypeScript, tests, adapters, scripts, and architecture changes. |
+| [`docs/code-dojo-exceptions.md`](./docs/code-dojo-exceptions.md) | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
 | [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
 | [`docs/BEARING.md`](./docs/BEARING.md) | Current execution direction and active tensions. |
 | [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Broad strategic direction and active themes. |
@@ -298,12 +300,16 @@ npm run dogfood:i18n:coverage
 
 Runtime uses English as fallback and overlays the selected locale. Development mode keeps missing translations visible instead of silently hiding them.
 
-Policy: when a branch adds a DOGFOOD localization key or changes an existing
-source string, it must provide current translations for every supported
-DOGFOOD locale (`en`, `fr`, `es`, and `de`). `npm run dogfood:i18n:complete`
-checks changed source strings against `origin/main`; pre-push and CI run that
-gate with `npm run dogfood:i18n:check` so new strings cannot land with missing
-generated catalogs or untranslated supported-locale rows.
+Policy: when a branch adds, edits, or removes a DOGFOOD localization key, it
+must apply the semantic change across every supported DOGFOOD locale (`en`,
+`fr`, `es`, and `de`). `npm run dogfood:i18n:complete` checks changed
+localization keys against `origin/main` and ratchets the full missing
+translation count. `npm run dogfood:i18n:debt` also enforces the touched-file
+rule: if a branch touches a DOGFOOD TypeScript source file with raw visible-copy
+debt, that file must be cleaned instead of merely keeping the global ratchet
+flat. Pre-push and CI run those gates with `npm run dogfood:i18n:check` so new
+strings cannot land with missing generated catalogs, untranslated
+supported-locale rows, or newly touched raw-string debt.
 
 ## Blocks
 

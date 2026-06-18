@@ -69,6 +69,7 @@ export function buildReleaseReadinessPlan(): readonly ReleaseReadinessStep[] {
   return [
     { label: 'build', command: npm, args: ['run', 'build'] },
     { label: 'lint', command: npm, args: ['run', 'lint'] },
+    { label: 'code:size', command: npm, args: ['run', 'code:size'] },
     { label: 'typecheck:test', command: npm, args: ['run', 'typecheck:test'] },
     { label: 'docs:design-system:preflight', command: npm, args: ['run', 'docs:design-system:preflight'] },
     { label: 'dogfood:coverage:gate', command: npm, args: ['run', 'dogfood:coverage:gate'] },

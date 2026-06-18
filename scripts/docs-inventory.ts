@@ -18,6 +18,8 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/METHOD.md',
       'docs/BEARING.md',
       'docs/VISION.md',
+      'docs/typescript-code-standards.editors-edition.md',
+      'docs/code-dojo-exceptions.md',
       'docs/system-style-javascript.md',
       'docs/DOGFOOD.md',
       'docs/legends/README.md',

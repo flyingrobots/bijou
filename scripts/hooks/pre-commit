@@ -4,5 +4,8 @@ set -euo pipefail
 echo "pre-commit: lint"
 npm run lint
 
+echo "pre-commit: code size gate"
+npm run code:size
+
 echo "pre-commit: lockfile consistency"
 npm ls --all > /dev/null 2>&1

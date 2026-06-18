@@ -24,6 +24,24 @@ export interface DogfoodI18nCompletenessResult {
   readonly issues: readonly DogfoodI18nCompletenessIssue[];
 }
 
+export interface DogfoodI18nMissingTranslationBaseline {
+  readonly total: number;
+  readonly byLocale: Readonly<Record<string, number>>;
+}
+
+export interface DogfoodI18nMissingTranslationLocaleCount {
+  readonly locale: string;
+  readonly count: number;
+}
+
+export interface DogfoodI18nMissingTranslationRatchetResult {
+  readonly ok: boolean;
+  readonly total: number;
+  readonly byLocale: readonly DogfoodI18nMissingTranslationLocaleCount[];
+  readonly baseline: DogfoodI18nMissingTranslationBaseline;
+  readonly violations: readonly string[];
+}
+
 export interface DogfoodI18nCompletenessOptions {
   readonly table: StringTable;
   readonly baseTable?: StringTable;
@@ -46,6 +64,14 @@ interface IndexedEntry {
 
 const SOURCE_TABLE_PATH = 'examples/docs/i18n/source/dogfood-strings.csv';
 const DEFAULT_BASE_REF = 'origin/main';
+export const DOGFOOD_I18N_MISSING_TRANSLATION_BASELINE: DogfoodI18nMissingTranslationBaseline = Object.freeze({
+  total: 432,
+  byLocale: Object.freeze({
+    fr: 144,
+    es: 144,
+    de: 144,
+  }),
+});
 
 export function evaluateDogfoodI18nCompleteness(
   options: DogfoodI18nCompletenessOptions,
@@ -58,7 +84,7 @@ export function evaluateDogfoodI18nCompleteness(
   const changedKeys = [...currentEntries.entries()]
     .filter(([key, entry]) => {
       const baseEntry = baseEntries?.get(key);
-      return baseEntry === undefined || entrySignature(entry.source) !== entrySignature(baseEntry.source);
+      return baseEntry === undefined || entrySignature(entry, locales) !== entrySignature(baseEntry, locales);
     })
     .map(([key]) => key)
     .sort((left, right) => left.localeCompare(right));
@@ -94,6 +120,48 @@ export function evaluateDogfoodI18nCompleteness(
   });
 }
 
+export function evaluateDogfoodI18nMissingTranslationRatchet(
+  options: {
+    readonly table: StringTable;
+    readonly locales?: readonly string[];
+    readonly baseline?: DogfoodI18nMissingTranslationBaseline;
+  },
+): DogfoodI18nMissingTranslationRatchetResult {
+  const baseline = options.baseline ?? DOGFOOD_I18N_MISSING_TRANSLATION_BASELINE;
+  const locales = options.locales ?? DOGFOOD_LOCALE_OPTIONS.map((locale) => locale.id);
+  const completeness = evaluateDogfoodI18nCompleteness({
+    table: options.table,
+    locales,
+  });
+  const byLocale = locales
+    .map((locale) => ({
+      locale,
+      count: completeness.issues.filter((issue) => issue.locale === locale).length,
+    }))
+    .filter((entry) => entry.count > 0);
+  const total = byLocale.reduce((sum, entry) => sum + entry.count, 0);
+  const violations: string[] = [];
+
+  if (total > baseline.total) {
+    violations.push(`missing translations ${total} exceeds baseline ${baseline.total}`);
+  }
+
+  for (const locale of byLocale) {
+    const baselineCount = baseline.byLocale[locale.locale] ?? 0;
+    if (locale.count > baselineCount) {
+      violations.push(`missing translations ${locale.locale} ${locale.count} exceeds baseline ${baselineCount}`);
+    }
+  }
+
+  return Object.freeze({
+    ok: violations.length === 0,
+    total,
+    byLocale: Object.freeze(byLocale),
+    baseline,
+    violations: Object.freeze(violations),
+  });
+}
+
 export function runDogfoodI18nCompleteness(io: DogfoodI18nCompletenessIO = {}): number {
   const args = io.args ?? process.argv.slice(2);
   const stdout = io.stdout ?? ((text: string) => process.stdout.write(text));
@@ -119,16 +187,23 @@ export function runDogfoodI18nCompleteness(io: DogfoodI18nCompletenessIO = {}): 
       baseTable,
       locales: io.locales,
     });
-    if (result.ok) {
-      stdout(`dogfood-i18n-completeness: ok (${result.checked} changed source strings)\n`);
+    const missingResult = evaluateDogfoodI18nMissingTranslationRatchet({
+      table,
+      locales: io.locales,
+    });
+    if (result.ok && missingResult.ok) {
+      stdout(
+        `dogfood-i18n-completeness: ok (${result.checked} changed localization keys; ${missingResult.total} missing translations; baseline ${missingResult.baseline.total})\n`,
+      );
       return 0;
     }
 
     stderr([
-      `dogfood-i18n-completeness: failed (${result.checked} changed source strings; ${result.issues.length} issues)`,
+      `dogfood-i18n-completeness: failed (${result.checked} changed localization keys; ${result.issues.length} issues; ${missingResult.total} missing translations; baseline ${missingResult.baseline.total})`,
       ...result.issues.map((entry) => (
         `- ${entry.namespace}:${entry.id} [${entry.locale}] ${entry.reason}`
       )),
+      ...missingResult.violations.map((violation) => `- ${violation}`),
       '',
     ].join('\n'));
     return 1;
@@ -200,13 +275,27 @@ function entryKey(row: Pick<StringTableRow, 'namespace' | 'id'>): string {
   return `${row.namespace}\u0000${row.id}`;
 }
 
-function entrySignature(row: StringTableRow): string {
+function entrySignature(entry: IndexedEntry, locales: readonly string[]): string {
+  return [
+    rowSignature(entry.source),
+    ...locales.map((locale) => {
+      const row = entry.rowsByLocale.get(locale);
+      return row === undefined ? `${locale}\u0002<missing>` : `${locale}\u0002${rowSignature(row)}`;
+    }),
+  ].join('\u0000');
+}
+
+function rowSignature(row: StringTableRow): string {
   return [
     row.kind,
     row.sourceLocale,
     row.sourceValueKind,
     row.sourceValue,
-  ].join('\u0000');
+    row.locale,
+    row.valueKind,
+    row.value,
+    row.status,
+  ].join('\u0001');
 }
 
 function issue(

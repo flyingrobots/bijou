@@ -12,6 +12,38 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   heredoc or body file. Do not inline shell-sensitive review/comment bodies
   through `--body "..."`.
 
+## CODE_STANDARDS
+
+- The canonical standards artifact is
+  **`docs/typescript-code-standards.editors-edition.md`**, copied verbatim from
+  the TypeScript Code Standards Editor's Edition source package. Humans and
+  agents must read it before making substantive TypeScript, test, adapter,
+  script, or architecture changes.
+- Do not fork that artifact with local edits. Refresh it from the source package
+  when the upstream standards change; keep Bijou-specific enforcement policy in
+  this file, package scripts, hooks, workflows, and design documents.
+- The standards package is installed with Bijou-specific plumbing: keep npm,
+  the project-reference root `tsconfig.json`, and the existing Bijou
+  `scripts/hooks/` gates unless a cycle explicitly changes that infrastructure.
+- Default enforcement runs through `npm run code:size`, `npm run
+  code-dojo:precommit`, `npm run code-dojo:prepush`, and `npm run
+  code-dojo:ci`. `npm run code-dojo:strict` is part of the default CI path, not
+  an optional aspirational check.
+- Code Dojo baseline files under `scripts/code-dojo/baselines/` are ratchets.
+  Existing entries may hold or shrink. New entries, grown baselines, or
+  softened thresholds require explicit design-review justification.
+- `docs/code-dojo-exceptions.md` is the human exception ledger. Every met repo
+  goalpost must reduce the aggregate `npm run code-dojo:debt` count by at
+  least 50 violations until zero. This goalpost burndown is additive to all
+  other touched-file rules, ratchets, CI gates, review gates, and release gates.
+- The active code-size ratchet is part of the standards posture: no source file
+  over 1,000 lines unless it is named as legacy debt in the code-size baseline;
+  files over 500 lines must be explicitly baselined and may hold or shrink, not
+  grow.
+- The DOGFOOD localization touched-file rule remains binding: if a branch
+  touches a DOGFOOD TypeScript source file that still has raw visible-copy debt,
+  clean that file or prove the strings non-localizable by scanner policy.
+
 ## Cycle Start Protocol
 
 - Start cycles from a synced merge target branch. Run `git fetch`, switch to the
@@ -37,6 +69,8 @@ Do not audit the repository by recursively walking the filesystem. Follow the au
 - **`ARCHITECTURE.md`**: The authoritative structural reference (Ports, Adapters, Package Stack).
 - **`docs/VISION.md`**: Core tenets and project identity.
 - **`docs/METHOD.md`**: Repo work doctrine (Backlog lanes, Cycle loop).
+- **`docs/typescript-code-standards.editors-edition.md`**: Verbatim TypeScript Code Standards doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture.
+- **`docs/code-dojo-exceptions.md`**: Human exception ledger and 50-violation-per-goalpost burndown policy.
 
 ### 3. The Direction
 - **`docs/BEARING.md`**: Current execution gravity and active tensions.

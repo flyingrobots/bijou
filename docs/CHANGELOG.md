@@ -8,9 +8,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Respectful Repo Code Dojo** — the verbatim
+  [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
+  artifact is now installed as an enforced Code Dojo gate. File/context
+  threshold debt, legacy mega-file debt, and existing mock-ban exceptions are
+  captured as ratcheting baselines, `npm run code-dojo:debt` reports the
+  aggregate exception count, and every met goalpost must burn down at least 50
+  counted violations until zero. Current debt may hold or shrink while new or
+  growing violations fail pre-commit, pre-push, and CI.
 - **AppShell theme-mode shortcut** — apps that opt into mode-aware stock shell
   themes now inherit `Ctrl+T` from the shared frame shell to toggle the active
   theme family between dark and light modes without opening Settings.
+- **First-party theme variant coverage** — DOGFOOD first-party shell themes now
+  have deterministic paired versus single-mode spec coverage, the shared
+  AppShell theme metadata exposes the same declaration to agents, and `Ctrl+T`
+  on a single-mode theme now reports that no alternate mode exists instead of
+  silently doing nothing.
+- **DOGFOOD localization policy hardening** — `npm run dogfood:i18n:complete`
+  now treats any localization-row edit as a changed key that must keep all
+  supported locales current, ratchets the full missing-translation count, and
+  `npm run dogfood:i18n:debt` now fails when a branch touches a DOGFOOD
+  TypeScript source file that still carries raw visible-copy debt.
 - **Theme Lab light-mode readability** — DOGFOOD Theme Lab and Theme Inspector
   token swatches now render diagnostic label/value text with the active shell
   theme's readable foreground tokens while preserving the inspected token
@@ -64,6 +82,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/DL-017-dogfood-light-theme-readiness.md` scopes a bounded #341
   repair for light-theme settings/menu/modal background ownership, chrome
   contrast, and DOGFOOD theme diagnostics.
+- **First-party theme variant coverage shaping** —
+  `docs/design/DL-018-first-party-theme-variant-coverage.md` scopes a bounded
+  #343 repair for DOGFOOD shell theme inventory, paired versus single-mode
+  declarations, AppShell mode-toggle feedback, and deterministic dark/light
+  switch coverage.
 
 ## [7.1.0] - 2026-06-14
 

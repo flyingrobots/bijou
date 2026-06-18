@@ -32,6 +32,8 @@ entrypoints below. For live work tracking, use open GitHub Issues and labels;
 | **[Design Cycles](./design/README.md)** | Active and landed cycle design docs. |
 | **[Legends](./legends/README.md)** | Thematic intent by lane and doctrine family. |
 | **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
+| **[TypeScript Code Standards](./typescript-code-standards.editors-edition.md)** | Verbatim Code Dojo doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture. |
+| **[Code Dojo Exceptions](./code-dojo-exceptions.md)** | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
 | **[Design System](./design-system/README.md)** | Foundations, patterns, and component families. |
 
 ## Reference

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+
+printf '%s\n' "Code Dojo: pre-commit gate"
+npm run -s code-dojo:precommit
+
+printf '%s\n' "Bijou: pre-commit gate"
+scripts/hooks/pre-commit

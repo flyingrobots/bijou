@@ -50,6 +50,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('settings.shellTheme.label', 'Shell theme'),
     message('settings.shellTheme.description', 'Current theme: {theme}. Options: {options}.'),
     message('settings.shellTheme.feedback', 'Shell theme set to {theme}.'),
+    message('settings.shellTheme.modeUnsupported', 'Shell theme {theme} has no alternate mode.'),
     message('notifications.title', 'Notifications'),
     message('notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit'),
     message('notifications.cue.liveArchived', 'notices:{liveCount}+{archivedCount}'),

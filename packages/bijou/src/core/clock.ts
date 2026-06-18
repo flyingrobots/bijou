@@ -1,5 +1,7 @@
 import type { ClockPort } from '../ports/clock.js';
 
+// code-dojo: allow-core-impurity: systemClock is the default ClockPort adapter seam.
+
 /**
  * Default system-backed clock implementation.
  *
