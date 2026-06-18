@@ -73,15 +73,17 @@ describe('git hooks', () => {
 
     expect(hookShim).toContain('npm run -s code-dojo:prepush');
     expect(hookShim).toContain('scripts/hooks/pre-push');
+    expect(packageJson).toMatch(/"test": "node scripts\/run-vitest\.mjs"/u);
+    expect(packageJson).toMatch(/"test:run": "node scripts\/run-vitest\.mjs"/u);
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*npm test/u);
     expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*test:run/u);
     expect(packageJson).not.toMatch(/"test:run": "npm test"/u);
   });
 
   it('bounds the full Vitest worker pool for CI stability', () => {
-    const config = vitestConfig as { test?: { fileParallelism?: unknown; maxWorkers?: unknown } };
+    const config = vitestConfig as { test?: { maxWorkers?: unknown; testTimeout?: unknown } };
 
-    expect(config.test?.fileParallelism).toBe(false);
-    expect(config.test?.maxWorkers).toBe(1);
+    expect(config.test?.maxWorkers).toBe(2);
+    expect(config.test?.testTimeout).toBe(60_000);
   });
 });

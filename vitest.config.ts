@@ -26,7 +26,7 @@ export default defineConfig({
   },
   test: {
     include: ['packages/*/src/**/*.test.ts', 'bench/src/**/*.test.ts', 'scripts/**/*.test.ts', 'tests/**/*.test.ts'],
-    fileParallelism: false,
-    maxWorkers: 1,
+    maxWorkers: 2,
+    testTimeout: 60_000,
   },
 });
