@@ -378,7 +378,7 @@ describe('runCmd', () => {
       expect.any(Error),
     );
     expect(onError).toHaveBeenCalledWith(
-      expect.stringContaining('Command backpressure'),
+      expect.stringContaining('pending; max'),
       expect.objectContaining({ pendingCommands: 1, backpressureThreshold: 1 }),
     );
   });

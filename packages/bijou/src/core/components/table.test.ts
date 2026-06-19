@@ -406,7 +406,7 @@ describe('table', () => {
       const ctx = createTestContext({ mode: 'interactive', noColor: true });
       const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       expect(result).toContain('Name');
-      expect(result).not.toMatch(/\u001b\[/);
+      expect(result.includes('\u001b[')).toBe(false);
     });
   });
   describe('defensive input handling', () => {
@@ -433,7 +433,7 @@ describe('table', () => {
     });
     it('handles null/undefined fields in rows gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });
-      const badRows = [[null as any, undefined as any, 'value']];
+      const badRows = [[null, undefined, 'value']];
       const result = table({ columns, rows: badRows, ctx });
       expect(result).toContain('Name\tStatus\tScore');
       expect(result).toContain('value');

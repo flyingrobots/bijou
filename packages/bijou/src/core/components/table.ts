@@ -51,14 +51,14 @@ export interface TableColumn {
   align?: TableCellAlign;
 }
 
-export type TableTextCell = string;
+export type TableTextCell = string | null | undefined;
 export type TableTextRow = readonly TableTextCell[];
 
 /** Configuration for rendering a table. */
 export interface TableOptions extends BijouNodeOptions {
   /** Column definitions (headers and optional layout constraints). */
   columns?: readonly TableColumn[];
-  /** Two-dimensional array of cell strings, one inner array per row. */
+  /** Two-dimensional row cell data. */
   rows: readonly TableTextRow[];
   /** Human-mode layout policy. Defaults to `'auto'`. */
   layout?: TableLayout;

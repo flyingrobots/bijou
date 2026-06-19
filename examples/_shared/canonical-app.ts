@@ -190,7 +190,7 @@ function clampIndex(index: number, total: number): number {
 
 function nextAnchor(anchor: DrawerAnchor): DrawerAnchor {
   const idx = DRAWER_ANCHORS.indexOf(anchor);
-  return DRAWER_ANCHORS[(idx + 1) % DRAWER_ANCHORS.length]!;
+  return DRAWER_ANCHORS[clampIndex(idx + 1, DRAWER_ANCHORS.length)] ?? 'right';
 }
 
 function updateSelectionForPage(
@@ -214,15 +214,14 @@ function updateSelectionForPage(
         ...model,
         graphSelectionIndex: clampIndex(model.graphSelectionIndex + delta, GRAPH_SELECTION_IDS.length),
       };
-    default: {
-      const _exhaustive: never = pageId;
+    default:
       return model;
-    }
   }
 }
 
 function paneIdsForPage(pageId: string): readonly string[] {
-  return PANE_IDS_BY_PAGE[pageId as WorkbenchPageId] ?? [];
+  if (pageId === 'ops' || pageId === 'board' || pageId === 'graph') return PANE_IDS_BY_PAGE[pageId];
+  return [];
 }
 
 function tag(label: string): string {
@@ -250,16 +249,15 @@ function toFixedHeight(lines: readonly string[], maxInnerHeight: number): string
 }
 
 function renderOpsSummary(width: number, height: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
+  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)] ?? RELEASES[0];
   const trackWidth = Math.max(8, Math.min(34, width - 12));
-  const healthVariant = release.readiness >= 75 ? 'success' : release.readiness >= 45 ? 'warning' : 'error';
   const drawerState = model.drawerOpen ? 'open' : 'closed';
 
   const lines = [
     `Active train ${release.id}`,
     `Window: ${release.window}`,
     `ETA: ${release.eta}`,
-    `${tag(`${release.readiness}% ready`)} checks:${release.failedChecks} incidents:${release.incidents}`,
+    `${tag(`${String(release.readiness)}% ready`)} checks:${String(release.failedChecks)} incidents:${String(release.incidents)}`,
     progressBar(release.readiness, { width: trackWidth, ctx }),
     `Inspector drawer: ${drawerState} (${model.drawerAnchor})`,
     `o toggle drawer, a cycle anchor, y cycle target`,
@@ -268,7 +266,7 @@ function renderOpsSummary(width: number, height: number, model: WorkbenchPageMod
     statusBar({
       left: 'n/b release',
       center: 'drawer = panel inspector',
-      right: `target #${model.drawerTargetIndex + 1}`,
+      right: `target #${String(model.drawerTargetIndex + 1)}`,
       width: Math.max(10, width - 4),
       fillChar: ' ',
     }),
@@ -286,7 +284,7 @@ function renderOpsSummary(width: number, height: number, model: WorkbenchPageMod
 function renderOpsHealth(width: number, ctx: BijouContext): string {
   const rows = SERVICE_HEALTH.map((service) => [
     service.name,
-    `${service.p95Ms}ms`,
+    `${String(service.p95Ms)}ms`,
     service.errorRate,
     serviceBadge(service.status),
   ]);
@@ -323,7 +321,7 @@ function renderIncidentFeed(width: number, model: WorkbenchPageModel, ctx: Bijou
   const legend = statusBar({
     left: '., incident',
     center: 'tab/shift+tab pane focus',
-    right: `${selected + 1}/${INCIDENT_FEED.length}`,
+    right: `${String(selected + 1)}/${String(INCIDENT_FEED.length)}`,
     width: Math.max(10, width - 4),
   });
 
@@ -346,16 +344,16 @@ function renderBoardLanes(width: number, ctx: BijouContext): string {
   const done = BACKLOG.filter((item) => item.status === 'done');
 
   const laneLines = [
-    `Todo    ${todo.length}`,
+    `Todo    ${String(todo.length)}`,
     ...todo.map((item) => `  ${item.id} ${item.title}`),
     '',
-    `Doing   ${doing.length}`,
+    `Doing   ${String(doing.length)}`,
     ...doing.map((item) => `  ${item.id} ${item.title}`),
     '',
-    `Blocked ${blocked.length}`,
+    `Blocked ${String(blocked.length)}`,
     ...blocked.map((item) => `  ${item.id} ${item.title}`),
     '',
-    `Done    ${done.length}`,
+    `Done    ${String(done.length)}`,
     ...done.map((item) => `  ${item.id} ${item.title}`),
   ];
 
@@ -369,7 +367,7 @@ function renderBoardLanes(width: number, ctx: BijouContext): string {
 }
 
 function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const selected = BACKLOG[clampIndex(model.backlogIndex, BACKLOG.length)]!;
+  const selected = BACKLOG[clampIndex(model.backlogIndex, BACKLOG.length)] ?? BACKLOG[0];
 
   return box([
     separator({ label: `Ticket ${selected.id}`, width: Math.max(8, width - 4), ctx }),
@@ -409,8 +407,8 @@ function renderBoardRunbook(width: number, ctx: BijouContext): string {
 }
 
 function renderGraphDag(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
-  const selectedId = GRAPH_SELECTION_IDS[clampIndex(model.graphSelectionIndex, GRAPH_SELECTION_IDS.length)]!;
+  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)] ?? RELEASES[0];
+  const selectedId = GRAPH_SELECTION_IDS[clampIndex(model.graphSelectionIndex, GRAPH_SELECTION_IDS.length)] ?? 'frame';
 
   const graph = dag(DEPLOY_GRAPH, {
     selectedId,
@@ -431,7 +429,7 @@ function renderGraphDag(width: number, model: WorkbenchPageModel, ctx: BijouCont
 }
 
 function renderGraphTimeline(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
+  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)] ?? RELEASES[0];
   const events = [
     { label: 'API freeze', description: `${release.id} candidate locked`, status: 'success' as const },
     { label: 'Canary rollout', description: '10 percent ring active', status: 'active' as const },
@@ -449,7 +447,7 @@ function renderGraphTimeline(width: number, model: WorkbenchPageModel, ctx: Bijo
 }
 
 function renderGraphNotes(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
+  const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)] ?? RELEASES[0];
 
   return box([
     separator({ label: 'Operator Notes', width: Math.max(8, width - 4), ctx }),
@@ -488,16 +486,9 @@ function buildPage(
       }
 
       if (model.quitConfirmOpen) {
-        switch (msg.type) {
-          case 'confirm-quit':
-            return [model, [quit()]];
-          case 'escape':
-            return [{ ...model, quitConfirmOpen: false }, []];
-          case 'request-quit':
-            return [model, []];
-          default:
-            return [model, []];
-        }
+        if (msg.type === 'confirm-quit') return [model, [quit()]];
+        if (msg.type === 'escape') return [{ ...model, quitConfirmOpen: false }, []];
+        return [model, []];
       }
 
       switch (msg.type) {
@@ -529,10 +520,8 @@ function buildPage(
           return [updateSelectionForPage(id, model, 1), []];
         case 'prev-incident':
           return [updateSelectionForPage(id, model, -1), []];
-        default: {
-          const _exhaustive: never = msg;
+        default:
           return [model, []];
-        }
       }
     },
     keyMap: createKeyMap<WorkbenchMsg>()
@@ -689,7 +678,7 @@ export function createCanonicalWorkbenchApp(
               currentValueLabel: 'Current selection',
               sections: [
                 { title: 'Page', content: frame.activePageId },
-                { title: 'Release', content: RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)]!.id },
+                { title: 'Release', content: (RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)] ?? RELEASES[0]).id },
                 { title: 'Anchor', content: pageModel.drawerAnchor, tone: 'muted' as const },
                 {
                   title: 'Controls',

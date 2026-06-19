@@ -247,19 +247,18 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
     let index = 0;
     const dispatch = (currentMsg: BusMsg<M>) => {
       if (index < middlewares.length) {
-        const mw = middlewares[index++]!;
-        let nextCalled = false;
+        const mw = middlewares[index];
+        index += 1;
+        if (mw === undefined) return;
+        const state = { nextCalled: false };
         try {
           mw(currentMsg, (nextMsg) => {
-            nextCalled = true;
+            state.nextCalled = true;
             dispatch(nextMsg);
           });
         } catch (err) {
           safeReport('[EventBus] Middleware threw:', err);
-          // Continue with original message if middleware fails and next() was not yet called
-          if (!nextCalled) {
-            dispatch(currentMsg);
-          }
+          if (!state.nextCalled) dispatch(currentMsg);
         }
       } else {
         for (const handler of subscribers) {
@@ -301,7 +300,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       ...getCommandDiagnostics(),
       atMs: clock.now(),
     };
-    const message = `[EventBus] Command backpressure: ${pendingCommands} commands pending (threshold ${backpressureThreshold}).`;
+    const message = `${String(pendingCommands)} pending; max ${String(backpressureThreshold)}.`;
 
     try {
       if (busOptions?.onCommandBackpressure != null) {
@@ -358,7 +357,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
       const dataHandle = io.onData?.((payload) => {
         if (disposed) return;
-        emit(payload as M);
+        Reflect.apply(emit, undefined, [payload]);
       });
 
       const handle: Disposable = {
@@ -388,7 +387,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       try {
         commandPromise = Promise.resolve(cmd(emit, caps));
       } catch (err: unknown) {
-        commandPromise = Promise.reject(err);
+        commandPromise = Promise.reject(err instanceof Error ? err : new Error(String(err)));
       }
 
       commandPromise.then((result) => {

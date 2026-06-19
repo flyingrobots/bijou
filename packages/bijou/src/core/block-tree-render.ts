@@ -43,12 +43,12 @@ export function blockRenderNode<Config = unknown>(
     throw new Error('block render node: block must be created by defineBlock()');
   }
 
-  const node = {
+  const node: BlockRenderNode<Config> = {
     block,
     input: snapshotInput(input),
-  } as BlockRenderNode<Config>;
+    [BLOCK_RENDER_NODE_BRAND]: true,
+  };
 
-  Object.defineProperty(node, BLOCK_RENDER_NODE_BRAND, { value: true });
   return Object.freeze(node);
 }
 
@@ -86,7 +86,7 @@ function snapshotValue(value: unknown, path: string, seen: WeakSet<object>): unk
     }
     seen.add(value);
     try {
-      return Object.freeze(value.map((item, index) => snapshotValue(item, `${path}[${index}]`, seen)));
+      return Object.freeze(value.map((item, index) => snapshotValue(item, `${path}[${String(index)}]`, seen)));
     } finally {
       seen.delete(value);
     }
@@ -135,7 +135,7 @@ function renderTarget<Config = unknown>(
 ): BlockRenderResult {
   const node = targetToNode(target);
   if (depth > context.maxDepth) {
-    throw new Error(`block tree render: maximum depth ${context.maxDepth} exceeded at ${node.block.metadata.blockName}`);
+    throw new Error(`block tree render: maximum depth ${String(context.maxDepth)} exceeded at ${node.block.metadata.blockName}`);
   }
 
   const mode = node.input.mode ?? inheritedMode ?? context.optionMode;
@@ -160,14 +160,11 @@ function renderTarget<Config = unknown>(
 function targetToNode<Config = unknown>(
   target: BlockDefinition<Config> | BlockRenderNode<Config>,
 ): BlockRenderNode<Config> {
-  if (isBlockRenderNode(target)) {
-    return target as BlockRenderNode<Config>;
+  if (BLOCK_RENDER_NODE_BRAND in target) {
+    return target;
   }
-  if (isBlockDefinition(target)) {
-    return blockRenderNode(target as BlockDefinition<Config>);
-  }
-
-  throw new Error('block tree render: target must be a BlockDefinition or BlockRenderNode');
+  if (!('metadata' in target)) throw new Error('block tree render: target must be a BlockDefinition or BlockRenderNode');
+  return blockRenderNode(target);
 }
 
 function resolveSlots(
@@ -278,6 +275,6 @@ function isPlainRecord(input: unknown): input is Record<string, unknown> {
     return false;
   }
 
-  const prototype = Object.getPrototypeOf(input);
+  const prototype: unknown = Object.getPrototypeOf(input);
   return prototype === Object.prototype || prototype === null;
 }
