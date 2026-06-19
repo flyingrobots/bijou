@@ -8,7 +8,7 @@ describe('box', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hello World', { ctx });
     expect(result).toContain('Hello World');
-    expect(result).toContain('─'); // border chars
+    expect(result).toContain('─');
   });
   it('returns content only in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
@@ -44,7 +44,6 @@ describe('box() with bgToken', () => {
   it('applies bg fill in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hello', { bgToken, ctx });
-    // plainStyle is identity, so content is unchanged, but no error thrown
     expect(result).toContain('Hello');
     expect(result).toContain('─');
   });
@@ -57,7 +56,6 @@ describe('box() with bgToken', () => {
   it('skips bg fill in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = box('Hello', { bgToken, ctx });
-    // pipe mode returns raw content without borders
     expect(result).toBe('Hello');
   });
   it('skips bg fill in accessible mode', () => {
@@ -68,7 +66,6 @@ describe('box() with bgToken', () => {
   it('skips bg fill when noColor is true', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const result = box('Hello', { bgToken, ctx });
-    // Still renders box, but no bg fill applied
     expect(result).toContain('Hello');
     expect(result).toContain('─');
   });
@@ -219,12 +216,12 @@ describe('box() with fillChar', () => {
 describe('defensive input handling', () => {
   it('handles null/undefined content gracefully', () => {
     const ctx = createTestContext({ mode: 'pipe' });
-    expect(box(null as any, { ctx })).toBe('');
-    expect(box(undefined as any, { ctx })).toBe('');
+    expect(Reflect.apply(box, undefined, [null, { ctx }])).toBe('');
+    expect(Reflect.apply(box, undefined, [undefined, { ctx }])).toBe('');
   });
   it('handles null/undefined label in headerBox gracefully', () => {
     const ctx = createTestContext({ mode: 'pipe' });
-    expect(headerBox(null as any, { ctx })).toBe('');
-    expect(headerBox(undefined as any, { ctx })).toBe('');
+    expect(Reflect.apply(headerBox, undefined, [null, { ctx }])).toBe('');
+    expect(Reflect.apply(headerBox, undefined, [undefined, { ctx }])).toBe('');
   });
 });

@@ -30,7 +30,6 @@ const CAPPED_MS = Math.round(1000 / 60);
 const UNCAPPED_MS = 1; // >0 to yield to the event loop for key input
 const GRAPH_SAMPLES = 60;
 
-// --- Ring buffer for view() time history (zero-alloc after init) ---
 const vtRing = new Float64Array(GRAPH_SAMPLES);
 let vtRingHead = 0;
 let vtRingCount = 0;
@@ -43,7 +42,7 @@ function pushVt(ms: number): void {
 
 function readVt(i: number): number {
   const idx = (vtRingHead - vtRingCount + i + GRAPH_SAMPLES) % GRAPH_SAMPLES;
-  return vtRing[idx]!;
+  return vtRing[idx] ?? 0;
 }
 
 // --- Braille line chart renderer ---
@@ -67,7 +66,6 @@ function renderBrailleLineChart(
   const dotsH = chartH * 4; // vertical dot resolution
   const dotsW = chartW * 2; // horizontal dot resolution
 
-  // Build braille grid (one code point per char cell)
   const grid = new Uint8Array(chartW * chartH);
 
   // Plot the reference line
@@ -77,11 +75,11 @@ function renderBrailleLineChart(
     const refDotRow = refDotY % 4;
     for (let cx = 0; cx < chartW; cx++) {
       // Set both left and right dots for a full horizontal line
-      grid[refCharRow * chartW + cx] |= BRAILLE_DOT_LEFT[refDotRow]! | BRAILLE_DOT_RIGHT[refDotRow]!;
+      grid[refCharRow * chartW + cx] |= (BRAILLE_DOT_LEFT[refDotRow] ?? 0) | (BRAILLE_DOT_RIGHT[refDotRow] ?? 0);
     }
     // Draw the reference line first in ref color
     for (let cx = 0; cx < chartW; cx++) {
-      const code = BRAILLE_BASE | grid[refCharRow * chartW + cx]!;
+      const code = BRAILLE_BASE | (grid[refCharRow * chartW + cx] ?? 0);
       surface.set(sx + cx, sy + refCharRow, { char: String.fromCharCode(code), fg: refFg, bg });
     }
   }
@@ -96,14 +94,14 @@ function renderBrailleLineChart(
     const charRow = Math.floor(dotY / 4);
     const dotCol = dotX % 2;
     const dotRow = dotY % 4;
-    const bits = dotCol === 0 ? BRAILLE_DOT_LEFT[dotRow]! : BRAILLE_DOT_RIGHT[dotRow]!;
+    const bits = dotCol === 0 ? BRAILLE_DOT_LEFT[dotRow] ?? 0 : BRAILLE_DOT_RIGHT[dotRow] ?? 0;
     grid[charRow * chartW + charCol] |= bits;
   }
 
   // Render to surface
   for (let cy = 0; cy < chartH; cy++) {
     for (let cx = 0; cx < chartW; cx++) {
-      const code = grid[cy * chartW + cx]!;
+      const code = grid[cy * chartW + cx] ?? 0;
       if (code !== 0) {
         surface.set(sx + cx, sy + cy, {
           char: String.fromCharCode(BRAILLE_BASE | code),
@@ -192,7 +190,7 @@ function rgbHex(r: number, g: number, b: number): string {
   return `#${hexByte(r)}${hexByte(g)}${hexByte(b)}`;
 }
 
-const { cos, PI, max, min, round } = Math;
+const { cos, PI, max, round } = Math;
 
 // Reusable surface — only reallocated on resize
 let cachedSurface: ReturnType<typeof createSurface> | undefined;
@@ -217,7 +215,7 @@ function stampText(
   text: string, fg: string, bg: string,
 ): void {
   for (let j = 0; j < text.length; j++) {
-    surface.set(x + j, y, { char: text[j]!, fg, bg });
+    surface.set(x + j, y, { char: text[j] ?? ' ', fg, bg });
   }
 }
 
@@ -232,6 +230,8 @@ function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
   const grads = [5,2, 2,5, -5,2, -2,5, 5,-2, 2,-5, -5,-2, -2,-5];
   const perm = new Uint8Array(256);
   const source = new Uint8Array(256);
+  const grad = (index: number): number => grads[index] ?? 0;
+  const p = (index: number): number => perm[index & 0xFF] ?? 0;
   for (let i = 0; i < 256; i++) source[i] = i;
   let s = (seed * 1664525 + 1013904223) | 0;
   s = (s * 1664525 + 1013904223) | 0;
@@ -256,30 +256,30 @@ function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
     let dx = dx0, dy = dy0;
     let attn = 2 - dx * dx - dy * dy;
     if (attn > 0) {
-      const i = (perm[(perm[xsb & 0xFF] + ysb) & 0xFF] & 0x0E);
-      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+      const i = p(p(xsb) + ysb) & 0x0E;
+      attn *= attn; value += attn * attn * (grad(i) * dx + grad(i + 1) * dy);
     }
     // (1,0)
     dx = dx0 - 1 - SQUISH; dy = dy0 - SQUISH;
     attn = 2 - dx * dx - dy * dy;
     if (attn > 0) {
-      const i = (perm[(perm[(xsb + 1) & 0xFF] + ysb) & 0xFF] & 0x0E);
-      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+      const i = p(p(xsb + 1) + ysb) & 0x0E;
+      attn *= attn; value += attn * attn * (grad(i) * dx + grad(i + 1) * dy);
     }
     // (0,1)
     dx = dx0 - SQUISH; dy = dy0 - 1 - SQUISH;
     attn = 2 - dx * dx - dy * dy;
     if (attn > 0) {
-      const i = (perm[(perm[xsb & 0xFF] + ysb + 1) & 0xFF] & 0x0E);
-      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+      const i = p(p(xsb) + ysb + 1) & 0x0E;
+      attn *= attn; value += attn * attn * (grad(i) * dx + grad(i + 1) * dy);
     }
     if (inSum > 1) {
       // (1,1)
       dx = dx0 - 1 - 2 * SQUISH; dy = dy0 - 1 - 2 * SQUISH;
       attn = 2 - dx * dx - dy * dy;
       if (attn > 0) {
-        const i = (perm[(perm[(xsb + 1) & 0xFF] + ysb + 1) & 0xFF] & 0x0E);
-        attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+        const i = p(p(xsb + 1) + ysb + 1) & 0x0E;
+        attn *= attn; value += attn * attn * (grad(i) * dx + grad(i + 1) * dy);
       }
     }
     return value * NORM;
@@ -287,6 +287,7 @@ function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
 }
 
 const noise2D = openSimplexNoise2D(42);
+const out: { columns?: number; rows?: number } = process.stdout;
 const DENSITY = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';
 
 function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): void {
@@ -491,9 +492,9 @@ function renderFrame(model: Model) {
     { text: `frame ${String(model.frame).padStart(7)}`, fg: FG },
     { text: `time  ${(model.elapsed / 1000).toFixed(1).padStart(6)}s`, fg: FG },
     { text: `ft    ${model.frameTimeMs.toFixed(1).padStart(5)}ms`, fg: '#ffaa00' },
-    { text: `size  ${cols}×${rows}  (${cols * rows} cells)`, fg: FG },
+    { text: `size  ${String(cols)}×${String(rows)}  (${String(cols * rows)} cells)`, fg: FG },
     { text: `cap   ${model.capped ? '60fps' : 'OFF'}`, fg: model.capped ? FG : '#ff6666' },
-    { text: `mode  ${model.mode + 1}`, fg: FG },
+    { text: `mode  ${String(model.mode + 1)}`, fg: FG },
     { text: `mouse ${model.mouseDown ? 'DOWN' : 'up'}`, fg: FG },
     { text: '', fg: FG },
     { text: '── timing ────────────', fg: '#555555' },
@@ -504,7 +505,7 @@ function renderFrame(model: Model) {
     { text: `heap  ${mem.heapUsedMB.toFixed(1)}/${mem.heapTotalMB.toFixed(1)} MB`, fg: '#88aaff' },
     { text: `rss   ${mem.rssMB.toFixed(1)} MB`, fg: '#88aaff' },
     { text: `ext   ${mem.externalMB.toFixed(1)} MB`, fg: '#88aaff' },
-    { text: `gc    ${mem.gcCountSinceLastSample}/0.5s`, fg: mem.gcCountSinceLastSample > 5 ? '#ff6666' : '#88aaff' },
+    { text: `gc    ${String(mem.gcCountSinceLastSample)}/0.5s`, fg: mem.gcCountSinceLastSample > 5 ? '#ff6666' : '#88aaff' },
   ];
 
   const graphCharsW = 30; // braille chars wide (60 dot columns = 60 samples)
@@ -523,8 +524,7 @@ function renderFrame(model: Model) {
     }
 
     // Stats text
-    for (let i = 0; i < stats.length; i++) {
-      const s = stats[i]!;
+    for (const [i, s] of stats.entries()) {
       if (s.text.length > 0) {
         stampText(surface, 3, 2 + i, s.text, s.fg, BG);
       }
@@ -562,14 +562,12 @@ function renderFrame(model: Model) {
       maxVt > 16.7 ? 16.7 : undefined, // show 16.7ms ref line if in range
     );
 
-    // X axis label
-    const xLabel = `last ${GRAPH_SAMPLES}`;
+    const xLabel = `last ${String(GRAPH_SAMPLES)}`;
     stampText(surface, graphLeft, graphTop + graphCharsH, `╰${'─'.repeat(max(1, graphCharsW - xLabel.length - 1))} ${xLabel}`, '#555555', BG);
   }
 
-  // Controls hint
   const modeName = MODE_NAMES[model.mode] ?? '?';
-  const hint = ` space: cap │ 1-${MODE_COUNT}: mode (${modeName}) │ mouse: reverse │ q: quit `;
+  const hint = ` space: cap │ 1-${String(MODE_COUNT)}: mode (${modeName}) │ mouse: reverse │ q: quit `;
   if (rows > 2 && cols >= hint.length + 2) {
     const hintRow = rows - 1;
     const hintCol = round((cols - hint.length) / 2);
@@ -586,8 +584,8 @@ const app: App<Model, Msg> = {
     fps: 0,
     fpsAccum: 0,
     fpsSamples: 0,
-    cols: process.stdout.columns ?? 80,
-    rows: process.stdout.rows ?? 24,
+    cols: out.columns ?? 80,
+    rows: out.rows ?? 24,
     mouseDown: false,
     mode: 0,
     capped: true,
@@ -675,4 +673,4 @@ const app: App<Model, Msg> = {
     return surface;
   },
 };
-run(app, { mouse: true });
+await run(app, { mouse: true });
