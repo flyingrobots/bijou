@@ -1,10 +1,3 @@
-/**
- * Block-level renderer for parsed markdown elements.
- *
- * Handles mode-specific rendering (interactive, pipe, accessible) for each
- * block type and trims trailing blanks.
- */
-
 import type { BijouContext } from '../../ports/context.js';
 import { RESET_SGR } from '../ansi.js';
 import {
@@ -21,16 +14,6 @@ import { separator } from './separator.js';
 import { measureInteractiveTableWidth, table } from './table.js';
 import { renderByMode } from '../mode-render.js';
 
-/**
- * Render an array of parsed block elements into a final terminal string.
- *
- * Handles mode-specific rendering for each block type and trims trailing blanks.
- *
- * @param blocks - Parsed block-level elements.
- * @param ctx - Bijou context for styling and mode.
- * @param width - Column width for word wrapping.
- * @returns The fully rendered markdown string.
- */
 export function renderBlocks(
   blocks: BlockType[],
   ctx: BijouContext,
@@ -50,7 +33,7 @@ export function renderBlocks(
       case 'heading': {
         const text = parseInline(block.text, ctx);
         const headingLine = renderByMode(ctx.mode, {
-          accessible: () => `Heading level ${block.level}: ${text}`,
+          accessible: () => `Heading level ${String(block.level)}: ${text}`,
           pipe: () => '#'.repeat(block.level) + ' ' + text,
           interactive: () => {
             const styled = ctx.style.bold(text);
@@ -75,9 +58,10 @@ export function renderBlocks(
           const bullet = mode === 'pipe' ? '- ' : '  \u2022 ';
           const indentWidth = width - bullet.length;
           const wrapped = wrapInlineMarkdown(item, indentWidth > 0 ? indentWidth : width, ctx);
-          lines.push(bullet + wrapped[0]!);
-          for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(bullet.length) + wrapped[i]!);
+          const [first = '', ...rest] = wrapped;
+          lines.push(bullet + first);
+          for (const line of rest) {
+            lines.push(' '.repeat(bullet.length) + line);
           }
         }
         lines.push('');
@@ -87,16 +71,18 @@ export function renderBlocks(
       case 'numbered-list': {
         // Pre-compute max prefix width so all continuation lines align
         const lastNum = block.items.length;
-        const maxPrefix = mode === 'pipe' ? `${lastNum}. ` : `  ${lastNum}. `;
+        const maxPrefix = mode === 'pipe' ? `${String(lastNum)}. ` : `  ${String(lastNum)}. `;
         const uniformIndent = maxPrefix.length;
-        for (let n = 0; n < block.items.length; n++) {
-          const prefix = mode === 'pipe' ? `${n + 1}. ` : `  ${n + 1}. `;
+        for (const [n, item] of block.items.entries()) {
+          const itemNumber = String(n + 1);
+          const prefix = mode === 'pipe' ? `${itemNumber}. ` : `  ${itemNumber}. `;
           const paddedPrefix = prefix.padEnd(uniformIndent);
           const indentWidth = width - uniformIndent;
-          const wrapped = wrapInlineMarkdown(block.items[n]!, indentWidth > 0 ? indentWidth : width, ctx);
-          lines.push(paddedPrefix + wrapped[0]!);
-          for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(uniformIndent) + wrapped[i]!);
+          const wrapped = wrapInlineMarkdown(item, indentWidth > 0 ? indentWidth : width, ctx);
+          const [first = '', ...rest] = wrapped;
+          lines.push(paddedPrefix + first);
+          for (const line of rest) {
+            lines.push(' '.repeat(uniformIndent) + line);
           }
         }
         lines.push('');
@@ -198,7 +184,7 @@ function fitMarkdownTableWidths(
 
   const scale = targetExtraWidth / totalShrinkable;
   const fitted = desired.map((_columnWidth, index) => {
-    const exactExtra = shrinkable[index]! * scale;
+    const exactExtra = (shrinkable[index] ?? 0) * scale;
     return {
       width: 1 + Math.floor(exactExtra),
       remainder: exactExtra - Math.floor(exactExtra),
@@ -213,12 +199,14 @@ function fitMarkdownTableWidths(
       .map((column, index) => ({ index, remainder: column.remainder }))
       .sort((left, right) => {
         if (right.remainder !== left.remainder) return right.remainder - left.remainder;
-        return desired[right.index]! - desired[left.index]!;
+        return (desired[right.index] ?? 0) - (desired[left.index] ?? 0);
       });
 
     for (const column of byRemainder) {
       if (remainderBudget <= 0) break;
-      fitted[column.index]!.width++;
+      const fittedColumn = fitted[column.index];
+      if (fittedColumn === undefined) continue;
+      fittedColumn.width++;
       remainderBudget--;
     }
   }
@@ -280,8 +268,7 @@ function wrapVisibleRanges(text: string, width: number): VisibleRange[] {
   let lineEnd = 0;
   let lineWidth = 0;
 
-  for (let index = 0; index < words.length; index++) {
-    const word = words[index]!;
+  for (const [index, word] of words.entries()) {
     const wordStart = cursor;
     const wordWidth = graphemeWidth(word);
     const wordEnd = wordStart + wordWidth;
@@ -318,7 +305,7 @@ function tokenizeStyledInlineText(text: string): StyledInlineToken[] {
   let lastIndex = 0;
 
   for (const match of text.matchAll(INLINE_CONTROL_RE)) {
-    const index = match.index ?? 0;
+    const index = match.index;
     if (index > lastIndex) {
       const raw = text.slice(lastIndex, index);
       for (const grapheme of segmentGraphemes(raw)) {

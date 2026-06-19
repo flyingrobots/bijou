@@ -1,22 +1,11 @@
 #!/usr/bin/env npx tsx
-/**
- * Record all VHS demo tapes in parallel, with bijou-powered output.
- *
- * Usage:
- *   npx tsx scripts/record-gifs.ts              # record all
- *   npx tsx scripts/record-gifs.ts dag box      # specific examples
- *   JOBS=4 npx tsx scripts/record-gifs.ts       # limit parallelism
- */
-
 import { execSync, spawn } from 'node:child_process';
 import { readdirSync, existsSync } from 'node:fs';
-import { resolve, basename, dirname } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   headerBox,
-  badge,
-  separator,
   table,
   progressBar,
   alert,
@@ -32,8 +21,6 @@ interface RecordJob {
   kind: JobKind;
   path: string;
 }
-
-// ── Collect tapes ──────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
 let jobs: RecordJob[];
@@ -57,18 +44,17 @@ if (jobs.length === 0) {
   process.exit(1);
 }
 
-// ── Build ──────────────────────────────────────────────────────────
-
 const nativeCount = jobs.filter((job) => job.kind === 'native').length;
-console.log(headerBox('record-gifs', { detail: `${jobs.length} jobs · ${nativeCount} native · ${JOBS} parallel`, ctx }));
+console.log(headerBox('record-gifs', {
+  detail: `${String(jobs.length)} jobs · ${String(nativeCount)} native · ${String(JOBS)} parallel`,
+  ctx,
+}));
 console.log();
 
 process.stdout.write(`  Building packages...`);
 execSync('npx tsc -b', { cwd: ROOT, stdio: 'ignore' });
 console.log(' done');
 console.log();
-
-// ── Record in parallel ─────────────────────────────────────────────
 
 interface Result {
   name: string;
@@ -82,7 +68,7 @@ let completed = 0;
 function renderProgress(): void {
   const pct = jobs.length > 0 ? (completed / jobs.length) * 100 : 100;
   const bar = progressBar(pct, { width: 40, ctx });
-  process.stdout.write(`\r\x1b[K  ${bar}  ${completed}/${jobs.length}`);
+  process.stdout.write(`\r\x1b[K  ${bar}  ${String(completed)}/${String(jobs.length)}`);
 }
 
 function recordOne(job: RecordJob): Promise<Result> {
@@ -121,7 +107,6 @@ function recordOne(job: RecordJob): Promise<Result> {
   });
 }
 
-// Run with concurrency limit
 async function runAll(): Promise<void> {
   renderProgress();
 
@@ -130,7 +115,8 @@ async function runAll(): Promise<void> {
 
   async function next(): Promise<void> {
     while (queue.length > 0) {
-      const job = queue.shift()!;
+      const job = queue.shift();
+      if (job === undefined) break;
       await recordOne(job);
     }
   }
@@ -158,15 +144,26 @@ function buildJob(name: string): RecordJob | null {
   }
   return null;
 }
+
+type NativeRecorder = () => void | Promise<void>;
+
+function isNativeRecorder(value: unknown): value is NativeRecorder {
+  return typeof value === 'function';
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
 async function recordNative(entryPath: string): Promise<void> {
-  const module = await import(pathToFileURL(entryPath).href);
-  if (typeof module.default !== 'function') {
+  const module: unknown = await import(pathToFileURL(entryPath).href);
+  const recorder = isObjectRecord(module) ? module['default'] : undefined;
+  if (!isNativeRecorder(recorder)) {
     throw new Error(`${entryPath} does not export a default recorder function`);
   }
-  await module.default();
+  await recorder();
 }
 await runAll();
-// ── Summary ────────────────────────────────────────────────────────
 const successes = results.filter(r => r.status === 'success');
 const failures = results.filter(r => r.status === 'error');
 results.sort((a, b) => a.name.localeCompare(b.name));
@@ -187,7 +184,7 @@ console.log(table({
 console.log();
 if (failures.length > 0) {
   const names = failures.map(f => f.name);
-  const lines: string[] = [`${failures.length} failed:`];
+  const lines: string[] = [`${String(failures.length)} failed:`];
   let line = ' ';
   for (const name of names) {
     if (line.length + name.length + 2 > 70) {
@@ -202,7 +199,7 @@ if (failures.length > 0) {
 } else {
   const totalTime = results.reduce((s, r) => s + r.elapsed, 0);
   console.log(alert(
-    `All ${successes.length} GIFs recorded (${(totalTime / 1000).toFixed(1)}s total, ${(Math.max(...results.map(r => r.elapsed)) / 1000).toFixed(1)}s wall)`,
+    `All ${String(successes.length)} GIFs recorded (${(totalTime / 1000).toFixed(1)}s total, ${(Math.max(...results.map(r => r.elapsed)) / 1000).toFixed(1)}s wall)`,
     { variant: 'success', ctx },
   ));
 }
