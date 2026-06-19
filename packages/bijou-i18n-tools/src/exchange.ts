@@ -29,6 +29,10 @@ const COLUMNS = [
   'translatedValue',
 ] as const;
 
+const BAD_VAL = 'Invalid exchange value';
+const BAD_WB = 'Invalid translation workbook';
+const BAD_CAT = 'Invalid catalog bundle';
+
 export interface EncodedExchangeValue {
   readonly kind: ExchangeValueKind;
   readonly payload: string;
@@ -88,9 +92,9 @@ function isTranslationStatus(value: string): value is AuthoringTranslationStatus
   return value === 'current' || value === 'stale' || value === 'missing';
 }
 
-const EXCHANGE_VALUE_KINDS = new Set<string>(['string', 'number', 'boolean', 'null', 'object', 'array', 'reference']);
+const VALUE_KINDS = new Set<string>(['string', 'number', 'boolean', 'null', 'object', 'array', 'reference']);
 
-function isExchangeValueKind(value: string): value is ExchangeValueKind { return EXCHANGE_VALUE_KINDS.has(value); }
+function isExchangeValueKind(value: string): value is ExchangeValueKind { return VALUE_KINDS.has(value); }
 
 function assertObject(value: unknown, message: string): asserts value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -131,7 +135,7 @@ export function encodeExchangeValue(value: unknown): EncodedExchangeValue {
   if (typeof value === 'object') {
     return { kind: 'object', payload: JSON.stringify(value) };
   }
-  throw new Error(`Invalid exchange value: unsupported type ${typeof value}`);
+  throw new Error(`${BAD_VAL}: unsupported type ${typeof value}`);
 }
 
 export function decodeExchangeValue(encoded: EncodedExchangeValue): unknown {
@@ -141,7 +145,7 @@ export function decodeExchangeValue(encoded: EncodedExchangeValue): unknown {
     case 'number': {
       const value = Number(encoded.payload);
       if (Number.isNaN(value)) {
-        throw new Error(`Invalid exchange value: expected number payload, received ${encoded.payload}`);
+        throw new Error(`${BAD_VAL}: expected number, received ${encoded.payload}`);
       }
       return value;
     }
@@ -152,55 +156,55 @@ export function decodeExchangeValue(encoded: EncodedExchangeValue): unknown {
       if (encoded.payload === 'false') {
         return false;
       }
-      throw new Error(`Invalid exchange value: expected boolean payload, received ${encoded.payload}`);
+      throw new Error(`${BAD_VAL}: expected boolean, received ${encoded.payload}`);
     case 'null':
       return null;
     case 'array': {
-      const value = parseJson(encoded.payload, 'Invalid exchange value: expected array payload');
+      const value = parseJson(encoded.payload, `${BAD_VAL}: expected array`);
       if (!Array.isArray(value)) {
-        throw new Error('Invalid exchange value: expected array payload');
+        throw new Error(`${BAD_VAL}: expected array`);
       }
       return value;
     }
     case 'object': {
-      const value = parseJson(encoded.payload, 'Invalid exchange value: expected object payload');
+      const value = parseJson(encoded.payload, `${BAD_VAL}: expected object`);
       if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-        throw new Error('Invalid exchange value: expected object payload');
+        throw new Error(`${BAD_VAL}: expected object`);
       }
       return value;
     }
     case 'reference': {
-      const value = parseJson(encoded.payload, 'Invalid exchange value: expected reference payload');
-      assertObject(value, 'Invalid exchange value: expected reference payload');
+      const value = parseJson(encoded.payload, `${BAD_VAL}: expected reference`);
+      assertObject(value, `${BAD_VAL}: expected reference`);
       const namespace = value['namespace'];
       const id = value['id'];
       if (typeof namespace !== 'string' || typeof id !== 'string') {
-        throw new Error('Invalid exchange value: expected reference payload');
+        throw new Error(`${BAD_VAL}: expected reference`);
       }
       return { $ref: { namespace, id } } satisfies I18nReference;
     }
     default:
-      throw new Error('Invalid exchange value: unknown kind');
+      throw new Error(`${BAD_VAL}: unknown kind`);
   }
 }
 
 function rowToTranslationRow(row: TranslationWorkbookRow): TranslationRow {
   if (!isEntryKind(row.kind)) {
-    throw new Error(`Invalid translation workbook: unknown entry kind ${row.kind}`);
+    throw new Error(`${BAD_WB}: unknown entry kind ${row.kind}`);
   }
   if (!isTranslationStatus(row.status)) {
-    throw new Error(`Invalid translation workbook: unknown translation status ${row.status}`);
+    throw new Error(`${BAD_WB}: unknown translation status ${row.status}`);
   }
 
   if (!isExchangeValueKind(row.sourceValueKind)) {
-    throw new Error(`Invalid translation workbook: unknown source value kind ${row.sourceValueKind}`);
+    throw new Error(`${BAD_WB}: unknown source kind ${row.sourceValueKind}`);
   }
   const sourceValue = decodeExchangeValue({ kind: row.sourceValueKind, payload: row.sourceValue });
 
   let translatedValue: unknown;
   if (row.translatedValueKind !== '' || row.translatedValue !== '') {
     if (!isExchangeValueKind(row.translatedValueKind)) {
-      throw new Error(`Invalid translation workbook: unknown translated value kind ${row.translatedValueKind}`);
+      throw new Error(`${BAD_WB}: unknown target kind ${row.translatedValueKind}`);
     }
     translatedValue = decodeExchangeValue({ kind: row.translatedValueKind, payload: row.translatedValue });
   }
@@ -259,17 +263,21 @@ export function exportTranslationWorkbook(
 
 export function importTranslationWorkbook(workbook: ExchangeWorkbook): readonly TranslationRow[] {
   if (workbook.version !== 1) {
-    throw new Error('Invalid translation workbook: expected versioned workbook payload');
+    throw new Error(`${BAD_WB}: expected version 1`);
+  }
+  const sheets: unknown = workbook.sheets;
+  if (!Array.isArray(sheets)) {
+    throw new Error(`${BAD_WB}: expected sheets array`);
   }
 
   const rows: TranslationRow[] = [];
   for (const sheet of workbook.sheets) {
     if (!COLUMNS.every((column) => sheet.columns.includes(column))) {
-      throw new Error(`Invalid translation workbook: missing required columns in ${sheet.name}`);
+      throw new Error(`${BAD_WB}: missing columns in ${sheet.name}`);
     }
     for (const row of sheet.rows) {
       if (!COLUMNS.every((column) => typeof row[column] === 'string')) {
-        throw new Error(`Invalid translation workbook: row in ${sheet.name} contains non-string cells`);
+        throw new Error(`${BAD_WB}: non-string cells in ${sheet.name}`);
       }
       rows.push(rowToTranslationRow(row));
     }
@@ -305,21 +313,25 @@ export function exportCatalogBundle(catalogs: readonly AuthoringCatalog[]): Cata
 
 export function importCatalogBundle(bundle: CatalogBundle): readonly AuthoringCatalog[] {
   if (bundle.version !== 1) {
-    throw new Error('Invalid catalog bundle: expected versioned bundle payload');
+    throw new Error(`${BAD_CAT}: expected version 1`);
+  }
+  const catalogs: unknown = bundle.catalogs;
+  if (!Array.isArray(catalogs)) {
+    throw new Error(`${BAD_CAT}: expected catalogs array`);
   }
 
   return bundle.catalogs.map((catalog: SerializedAuthoringCatalog) => ({
     namespace: catalog.namespace,
     entries: (catalog.entries).map((entry: SerializedAuthoringCatalogEntry) => {
       if (!isEntryKind(entry.kind)) {
-        throw new Error(`Invalid catalog bundle: unknown entry kind ${entry.kind}`);
+        throw new Error(`${BAD_CAT}: unknown entry kind ${entry.kind}`);
       }
       const serializedTranslations = entry.translations as Record<string, SerializedAuthoringTranslation>;
       const translationEntries = Object.entries(serializedTranslations);
       const translations: Record<string, AuthoringTranslation> = Object.fromEntries(
         translationEntries.map(([locale, translation]: [string, SerializedAuthoringTranslation]) => {
           if (!isTranslationStatus(translation.status)) {
-            throw new Error(`Invalid catalog bundle: unknown translation status ${translation.status}`);
+            throw new Error(`${BAD_CAT}: unknown translation status ${translation.status}`);
           }
           return [
             locale,

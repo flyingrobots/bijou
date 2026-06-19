@@ -8,7 +8,7 @@ import { createResolved, type ResolvedTheme } from './core/theme/resolve.js';
 import { createThemeAccessors } from './core/theme/accessors.js';
 import { CYAN_MAGENTA } from './core/theme/presets.js';
 import { PRESETS } from './core/theme/presets.js';
-import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
+import { fromDTCG, parseDTCGDocument } from './core/theme/dtcg.js';
 import { detectColorScheme, detectOutputMode } from './core/detect/tty.js';
 import { systemClock } from './core/clock.js';
 import type { ClockPort } from './ports/clock.js';
@@ -61,9 +61,9 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     if (themeValue.endsWith('.json')) {
       try {
         const content = io.readFile(themeValue);
-        const doc = JSON.parse(content) as DTCGDocument;
+        const doc = parseDTCGDocument(JSON.parse(content));
         themeObj = fromDTCG(doc);
-      } catch (err) {
+      } catch {
         // Fallback if file read/parse fails
       }
     } else {

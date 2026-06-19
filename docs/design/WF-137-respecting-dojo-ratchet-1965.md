@@ -121,9 +121,9 @@ behavior.
 
 ## Retrospective
 
-Completed with aggregate Code Dojo debt reduced from `2,015` to `1,909`
-(`-106`). The stored ESLint baseline now records `1,497` live findings, down
-from `1,603`, and the next aggregate target is `1,859` or lower.
+Completed with aggregate Code Dojo debt reduced from `2,015` to `1,907`
+(`-108`). The stored ESLint baseline now records `1,495` live findings, down
+from `1,603`, and the next aggregate target is `1,857` or lower.
 
 The implementation cleaned six non-DOGFOOD files:
 
@@ -134,8 +134,11 @@ The implementation cleaned six non-DOGFOOD files:
   preserves packed-surface narrowing directly, computes UV denominators
   explicitly, and removes assertion-based Braille dot reads.
 - `packages/bijou-i18n-tools/src/exchange.ts` now validates serialized exchange
-  value kinds before decoding, keeps external version fields checkable, and
-  derives workbook row typing from the column manifest.
+  value kinds before decoding, validates external collection arrays before
+  iterating, keeps external version fields checkable, and derives workbook row
+  typing from the column manifest.
+- `packages/bijou/src/factory.ts` now shares the DTCG JSON document guard used
+  by file-based theme loading instead of asserting parsed environment payloads.
 - `packages/bijou-tui/src/overlay.ts` now guards resolved color records and
   packed-buffer reads without non-null assertions while preserving drawer and
   inherited-background behavior.
@@ -148,9 +151,9 @@ The implementation cleaned six non-DOGFOOD files:
   stringification.
 
 Touched file/context budgets held or shrank: `dtcg.ts` is now `314` lines /
-`10,484` bytes against a `347` / `12,346` baseline, `canvas.ts` is now `358`
+`10,491` bytes against a `347` / `12,346` baseline, `canvas.ts` is now `358`
 lines / `10,953` bytes against a `377` / `11,295` baseline, and `exchange.ts`
-is now `344` lines / `11,440` bytes against a `361` / `11,459` baseline.
+is now `356` lines / `11,390` bytes against a `361` / `11,459` baseline.
 The follow-on TUI slice held the same ratchet: `overlay.ts` is now `933` lines
 / `33,332` bytes against a `942` / `33,721` baseline, `pipeline.ts` is now
 `238` lines / `7,756` bytes against a `268` / `8,646` baseline, and

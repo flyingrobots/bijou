@@ -281,7 +281,7 @@ export function loadTheme(io: { readFile(path: string): string }, path: string):
   return fromDTCG(doc);
 }
 
-function parseDTCGDocument(value: unknown): DTCGDocument {
+export function parseDTCGDocument(value: unknown): DTCGDocument {
   if (!isObjectRecord(value)) {
     throw new Error('Invalid DTCG document: expected object payload');
   }
