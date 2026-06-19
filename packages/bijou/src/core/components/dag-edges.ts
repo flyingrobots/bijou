@@ -6,8 +6,6 @@
  * and the junction-character lookup table.
  */
 
-// ── Types ──────────────────────────────────────────────────────────
-
 /** Cardinal direction for edge routing through grid cells. */
 export type Dir = 'U' | 'D' | 'L' | 'R';
 
@@ -42,8 +40,6 @@ export interface EdgeRoute {
   /** Destination arrowhead cell. */
   readonly arrow: GridPoint;
 }
-
-// ── Arrow Position Encoding ───────────────────────────────────────
 
 /**
  * Encode a grid (row, col) pair into a single number for Set membership.
@@ -109,8 +105,6 @@ const JUNCTIONS: Record<EdgeGlyphStyle, Record<string, string>> = {
   dashed: DASHED_JUNCTION,
 };
 
-// ── Functions ──────────────────────────────────────────────────────
-
 /**
  * Select the Unicode box-drawing character for a cell based on its edge directions.
  *
@@ -161,7 +155,8 @@ export function createGrid(rows: number, cols: number): GridState {
  */
 function markDir(g: GridState, r: number, c: number, ...ds: Dir[]): void {
   if (r >= 0 && r < g.rows && c >= 0 && c < g.cols) {
-    const cell = g.dirs[r]![c]!;
+    const cell = g.dirs[r]?.[c];
+    if (cell === undefined) return;
     for (const d of ds) cell.add(d);
   }
 }
@@ -205,8 +200,9 @@ export function markEdge(
   );
 
   for (let i = 0; i < route.path.length - 1; i++) {
-    const current = route.path[i]!;
-    const next = route.path[i + 1]!;
+    const current = route.path[i];
+    const next = route.path[i + 1];
+    if (current === undefined || next === undefined) continue;
     if (current.row === next.row) {
       const forward: Dir = current.col < next.col ? 'R' : 'L';
       const reverse: Dir = forward === 'R' ? 'L' : 'R';

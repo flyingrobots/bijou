@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved, type Theme } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { FrameShellTheme, FrameShellThemeChange, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
 import { createKeyMap } from './keybindings.js';
 import {
@@ -57,12 +58,7 @@ describe('app-frame-overlays', () => {
   });
 
   it('flattens mode-aware shell themes into stable family and mode choices', () => {
-    const ctx = {
-      theme: {
-        noColor: false,
-        colorScheme: 'dark',
-      },
-    } as Parameters<typeof resolveFrameShellThemeChoices>[1];
+    const ctx = { theme: createResolved(CYAN_MAGENTA, false, 'dark') };
 
     const choices = resolveFrameShellThemeChoices([
       {
@@ -117,7 +113,7 @@ describe('app-frame-overlays', () => {
       shellThemeLabel: 'DOGFOOD',
       modeId: 'dark',
       modeLabel: 'Dark',
-      ctx: {} as FrameShellThemeChange['ctx'],
+      ctx: createTestContext(),
     } satisfies FrameShellThemeChange;
 
     expect(requireConcreteShellThemeTheme(concrete)).toBe(CYAN_MAGENTA);

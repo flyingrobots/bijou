@@ -62,10 +62,9 @@ export function renderNumberedOptions(
   options: readonly { label: string; description?: string }[],
   ctx: BijouContext,
 ): void {
-  for (let i = 0; i < options.length; i++) {
-    const opt = options[i]!;
+  for (const [i, opt] of options.entries()) {
     const desc = opt.description ? ` \u2014 ${opt.description}` : '';
-    ctx.io.write(`  ${i + 1}. ${opt.label}${desc}\n`);
+    ctx.io.write(`  ${String(i + 1)}. ${opt.label}${desc}\n`);
   }
 }
 
@@ -99,9 +98,7 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
   let cursorHandle: CursorHideHandle | null = null;
   return {
     hideCursor() {
-      if (cursorHandle === null) {
-        cursorHandle = cursorGuard(ctx.io).hide();
-      }
+      cursorHandle ??= cursorGuard(ctx.io).hide();
     },
     showCursor() {
       if (cursorHandle !== null) {
@@ -114,12 +111,12 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
     },
     moveUp(lines: number) {
       if (lines <= 0) return;
-      ctx.io.write(`\x1b[${lines}A`);
+      ctx.io.write(`\x1b[${String(lines)}A`);
     },
     clearBlock(lineCount: number) {
       if (lineCount <= 0) return;
       for (let i = 0; i < lineCount; i++) ctx.io.write('\x1b[K\n');
-      ctx.io.write(`\x1b[${lineCount}A`);
+      ctx.io.write(`\x1b[${String(lineCount)}A`);
     },
   };
 }

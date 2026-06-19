@@ -35,7 +35,6 @@ import {
   Msg,
   PageModel,
   PageTransition,
-  Surface,
 } from './app-frame.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
@@ -207,7 +206,8 @@ describe('createFramedApp', () => {
         layout: () => ({
           kind: 'pane',
           paneId: 'main',
-          render: () => 'string panes are no longer valid' as unknown as any,
+          // @ts-expect-error invalid pane fixture.
+          render: () => 'invalid pane',
         }),
       }],
     });
@@ -303,7 +303,7 @@ describe('createFramedApp', () => {
     expect(result.model.focusedPaneByPage.home).toBe('right');
   });
 
-  it('keeps the footer visible while repeated Tab gestures traverse panes', async () => {
+  it('keeps the footer visible while repeated Tab gestures traverse panes', () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

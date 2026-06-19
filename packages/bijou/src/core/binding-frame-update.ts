@@ -55,12 +55,12 @@ export function bindingFrameUpdateFromSnapshots(
     throw new Error('binding frame update: snapshots must be an array');
   }
 
-  input.snapshots.forEach((snapshot, index) => {
-    if (!isBindingSnapshot(snapshot)) {
-      throw new Error(
-        `binding frame update: snapshot at index ${index} was not created by bindingSnapshot()`,
-      );
-    }
+  const snapshots = input.snapshots.map((snapshot, index) => {
+    if (!isBindingSnapshot(snapshot)) throw new Error(
+      `binding frame update: snapshot ${String(index)} was not created by bindingSnapshot()`,
+    );
+
+    return snapshot;
   });
 
   const resolutions = resolveProviderRequirements(input.collection.requirements(), input.scope);
@@ -74,7 +74,7 @@ export function bindingFrameUpdateFromSnapshots(
   const effectiveResolutions = resolutions.filter(
     (resolution) => !mismatchedRequirementIds.has(resolution.requirementId),
   );
-  const effectiveSnapshots = input.snapshots.filter(
+  const effectiveSnapshots = snapshots.filter(
     (snapshot) => !mismatchedRequirementIds.has(snapshot.requirementId),
   );
   const assembly = bindingFrameFromSnapshots({
@@ -142,11 +142,9 @@ function invalidateUpdatedRecords(options: {
 
   return Object.freeze(
     options.records.map((record, index) => {
-      if (!isBindingLifecycleRecord(record)) {
-        throw new Error(
-          `binding frame update: record at index ${index} was not created by bindingLifecycleRecord()`,
-        );
-      }
+      if (!isBindingLifecycleRecord(record)) throw new Error(
+        `binding frame update: record ${String(index)} was not created by bindingLifecycleRecord()`,
+      );
 
       const snapshot = snapshotsByRequirementId.get(record.requirementId);
       const resolution = resolutionsByRequirementId.get(record.requirementId);

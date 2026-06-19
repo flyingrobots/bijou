@@ -242,7 +242,7 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
 
   const currentLine = clampedY + 1;
   const totalLines = state.scroll.totalLines;
-  const status = `  Line ${currentLine}/${totalLines}`;
+  const status = `  Line ${String(currentLine)}/${String(totalLines)}`;
 
   return body + '\n' + status;
 }
@@ -286,16 +286,14 @@ export function pagerSurface(
 
   const currentLine = clampedY + 1;
   const totalLines = content.height;
-  const status = stringToSurface(`  Line ${currentLine}/${totalLines}`, safeWidth, 1);
+  const status = stringToSurface(`  Line ${String(currentLine)}/${String(totalLines)}`, safeWidth, 1);
   const result = createSurface(safeWidth, safeHeight, { char: ' ', empty: false });
   result.blit(body, 0, 0);
   result.blit(status, 0, safeHeight - 1);
   return result;
 }
 
-// ---------------------------------------------------------------------------
 // Convenience keymap
-// ---------------------------------------------------------------------------
 
 /**
  * Create a preconfigured KeyMap for pager navigation.

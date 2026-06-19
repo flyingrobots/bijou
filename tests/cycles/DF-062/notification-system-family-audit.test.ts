@@ -20,12 +20,13 @@ import {
   renderNotificationHistory,
   renderNotificationStack,
   tickNotifications,
+  isFrameScopedMsg,
   type Cmd,
   type FramePage,
   type FramedAppMsg,
 } from '../../../packages/bijou-tui/src/index.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
-import { QUIT, isCmdCleanup } from '../../../packages/bijou-tui/src/types.js';
+import { isCmdCleanup } from '../../../packages/bijou-tui/src/types.js';
 import { readRepoFile } from '../repo.js';
 const NOTIFICATION_STORIES = [
   {
@@ -78,10 +79,16 @@ async function runFrameCommand<Msg>(
   now: number,
 ): Promise<unknown> {
   return cmd(() => undefined, {
-    onPulse: () => ({ dispose() {} }),
-    sleep: async () => undefined,
+    onPulse: () => ({ dispose: () => undefined }),
+    sleep: () => Promise.resolve(),
     now: () => now,
   });
+}
+function mustFrameMsg(value: unknown) {
+  expect(isCmdCleanup(value)).toBe(false);
+  expect(isFrameScopedMsg(value)).toBe(true);
+  if (!isFrameScopedMsg(value)) throw new Error('expected frame message');
+  return value;
 }
 function makeNotificationPage(): FramePage<SaveModel, SaveMsg> {
   return {
@@ -254,15 +261,12 @@ describe('DF-062 notification system family audit', () => {
       message: 'Command rejected: worker crashed during boot',
       atMs: 0,
     });
-    let cmds: Cmd<FramedAppMsg<SaveMsg>>[] = [];
-    [model, cmds] = app.update(must(runtimeMsg), model);
+    const [afterRuntimeIssue, runtimeCmds] = app.update(must(runtimeMsg), model);
+    model = afterRuntimeIssue;
     expect(model.runtimeNotifications.items).toHaveLength(1);
     expect(model.runtimeNotifications.items[0]?.message).toBe('Command rejected: worker crashed during boot');
-    const runtimeTick = await runFrameCommand(must(cmds[0]), 200);
-    expect(runtimeTick).toBeDefined();
-    expect(runtimeTick).not.toBe(QUIT);
-    expect(isCmdCleanup(runtimeTick)).toBe(false);
-    [model] = app.update(runtimeTick as FramedAppMsg<SaveMsg>, model);
+    const runtimeTick = mustFrameMsg(await runFrameCommand(must(runtimeCmds[0]), 200));
+    [model] = app.update(runtimeTick, model);
     const runtimeFrame = normalizeViewOutput(app.view(model), {
       width: model.columns,
       height: model.rows,
@@ -270,22 +274,18 @@ describe('DF-062 notification system family audit', () => {
     expect(stripAnsi(surfaceToString(runtimeFrame, createTestContext().style))).toContain(
       'Command rejected: worker crashed during boot',
     );
-    [model, cmds] = app.update({ type: 'save' }, model);
+    const [afterSave, saveCmds] = app.update({ type: 'save' }, model);
+    model = afterSave;
     expect(model.pageModels.home?.saved).toBe(true);
-    expect(cmds).toHaveLength(1);
-    const notifyMsg = await runFrameCommand(must(cmds[0]), 300);
-    expect(notifyMsg).toBeDefined();
-    expect(notifyMsg).not.toBe(QUIT);
-    expect(isCmdCleanup(notifyMsg)).toBe(false);
-    [model, cmds] = app.update(notifyMsg as FramedAppMsg<SaveMsg>, model);
+    expect(saveCmds).toHaveLength(1);
+    const notifyMsg = mustFrameMsg(await runFrameCommand(must(saveCmds[0]), 300));
+    const [afterNotify, notifyCmds] = app.update(notifyMsg, model);
+    model = afterNotify;
     expect(model.runtimeNotifications.items.some((item) => item.title === 'Saved draft')).toBe(true);
     expect(model.runtimeNotifications.items.some((item) => item.message === 'Frame-managed notification from the page update')).toBe(true);
-    if (cmds.length > 0) {
-      const notifyTick = await runFrameCommand(must(cmds[0]), 400);
-      expect(notifyTick).toBeDefined();
-      expect(notifyTick).not.toBe(QUIT);
-      expect(isCmdCleanup(notifyTick)).toBe(false);
-      [model] = app.update(notifyTick as FramedAppMsg<SaveMsg>, model);
+    if (notifyCmds.length > 0) {
+      const notifyTick = mustFrameMsg(await runFrameCommand(must(notifyCmds[0]), 400));
+      [model] = app.update(notifyTick, model);
     }
     const frame = normalizeViewOutput(app.view(model), {
       width: model.columns,
