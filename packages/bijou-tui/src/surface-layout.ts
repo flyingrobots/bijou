@@ -74,8 +74,7 @@ export function hstackSurface(gap: number, ...content: SurfaceContent[]): Surfac
   const result = createSurface(width, height);
   let xOffset = 0;
 
-  for (let i = 0; i < surfaces.length; i++) {
-    const s = surfaces[i]!;
+  for (const s of surfaces) {
     result.blit(s, xOffset, 0);
     xOffset += s.width + gap;
   }

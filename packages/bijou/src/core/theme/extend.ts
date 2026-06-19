@@ -25,9 +25,22 @@ export function extendTheme<
 }): Theme<BaseStatusKey | S, BaseUiKey | U, BaseGradientKey | G> {
   return {
     ...base,
-    status: { ...base.status, ...extensions.status } as Record<BaseStatusKey | S, TokenValue>,
-    ui: { ...base.ui, ...extensions.ui } as Record<BaseUiKey | U, TokenValue>,
-    gradient: { ...base.gradient, ...extensions.gradient } as Record<BaseGradientKey | G, GradientStop[]>,
+    status: mergeRecord(base.status, extensions.status),
+    ui: mergeRecord(base.ui, extensions.ui),
+    gradient: mergeRecord(base.gradient, extensions.gradient),
     surface: { ...base.surface, ...extensions.surface },
   };
+}
+
+function mergeRecord<V>(
+  base: Readonly<Record<string, V>>,
+  extension: Readonly<Partial<Record<string, V>>> | undefined,
+): Record<string, V> {
+  const merged: Record<string, V> = { ...base };
+  if (extension === undefined) return merged;
+  for (const key of Object.keys(extension)) {
+    const value = extension[key];
+    if (value !== undefined) merged[key] = value;
+  }
+  return merged;
 }

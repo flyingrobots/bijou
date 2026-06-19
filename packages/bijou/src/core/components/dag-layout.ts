@@ -33,7 +33,6 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
   const ignoredEdges = new Set<string>();
 
   for (const n of nodes) {
-    // Filter edges to only include targets that exist in the graph
     children.set(n.id, (n.edges ?? []).filter(e => nodeIds.has(e)));
   }
 
@@ -68,13 +67,12 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
 
   for (const n of nodes) {
     for (const childId of layerChildren.get(n.id) ?? []) {
-      if (!parents.has(childId)) parents.set(childId, []);
-      parents.get(childId)!.push(n.id);
+      const parentList = parents.get(childId);
+      if (parentList === undefined) parents.set(childId, [n.id]); else parentList.push(n.id);
       inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);
     }
   }
 
-  // Kahn's topological sort
   const queue: string[] = [];
   let head = 0;
   for (const [id, deg] of inDegree) {
@@ -85,7 +83,8 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
   // once (when its in-degree reaches 0), so no visited set is needed.
   const topoOrder: string[] = [];
   while (head < queue.length) {
-    const id = queue[head++]!;
+    const id = queue[head++];
+    if (id === undefined) break;
     topoOrder.push(id);
     for (const childId of layerChildren.get(id) ?? []) {
       const newDeg = (inDegree.get(childId) ?? 1) - 1;
@@ -142,7 +141,7 @@ export function buildLayerArrays(
   const layers: string[][] = Array.from({ length: maxLayer + 1 }, () => []);
   for (const n of nodes) {
     const l = layerMap.get(n.id);
-    if (l !== undefined) layers[l]!.push(n.id);
+    if (l !== undefined) layers[l]?.push(n.id);
   }
   return layers;
 }
@@ -165,19 +164,17 @@ export function orderColumns(layers: string[][], nodes: DagNode[]): void {
   }
   for (const n of nodes) {
     for (const c of n.edges ?? []) {
-      if (!parentsMap.has(c)) parentsMap.set(c, []);
-      parentsMap.get(c)!.push(n.id);
+      const parents = parentsMap.get(c);
+      if (parents === undefined) parentsMap.set(c, [n.id]); else parents.push(n.id);
     }
   }
 
   // Top-down pass
   for (let l = 1; l < layers.length; l++) {
-    const prevLayer = layers[l - 1]!;
-    const curLayer = layers[l]!;
+    const prevLayer = layers[l - 1] ?? [];
+    const curLayer = layers[l] ?? [];
     const prevIndex = new Map<string, number>();
-    for (let i = 0; i < prevLayer.length; i++) {
-      prevIndex.set(prevLayer[i]!, i);
-    }
+    prevLayer.forEach((id, i) => prevIndex.set(id, i));
 
     const bary = new Map<string, number>();
     for (const id of curLayer) {
@@ -194,12 +191,10 @@ export function orderColumns(layers: string[][], nodes: DagNode[]): void {
 
   // Bottom-up pass
   for (let l = layers.length - 2; l >= 0; l--) {
-    const nextLayer = layers[l + 1]!;
-    const curLayer = layers[l]!;
+    const nextLayer = layers[l + 1] ?? [];
+    const curLayer = layers[l] ?? [];
     const nextIndex = new Map<string, number>();
-    for (let i = 0; i < nextLayer.length; i++) {
-      nextIndex.set(nextLayer[i]!, i);
-    }
+    nextLayer.forEach((id, i) => nextIndex.set(id, i));
 
     const bary = new Map<string, number>();
     for (const id of curLayer) {
