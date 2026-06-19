@@ -1624,11 +1624,6 @@
       "bytes": 4738
     },
     {
-      "path": "bench/src/harnesses/wall-time/read-report.ts",
-      "lines": 158,
-      "bytes": 4826
-    },
-    {
       "path": "packages/bijou-i18n-tools-node/src/filesystem.test.ts",
       "lines": 158,
       "bytes": 4746

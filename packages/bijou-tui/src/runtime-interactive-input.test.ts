@@ -11,7 +11,6 @@ import {
   ENTER_ALT_SCREEN,
   EXIT_ALT_SCREEN,
   expect,
-  frame,
   getRenderStageTimings,
   HIDE_CURSOR,
   HOME,
@@ -77,7 +76,7 @@ describe('run', () => {
           }
           return [model, []];
         },
-        view: (model) => textView(`count: ${model}`),
+        view: (model) => textView(`count: ${model.toString()}`),
       };
       const { clock, ctx } = createInteractiveContext();
       scheduleKeys(ctx, clock, [
@@ -166,10 +165,10 @@ describe('run', () => {
       interface Msg { type: 'started' }
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'started' as const });
+          const cmd: Cmd<Msg> = () => ({ type: 'started' });
           return ['loading', [cmd]];
         },
-        update(msg, _model) {
+        update(msg) {
           if ('type' in msg && msg.type === 'started') return ['ready', [quit<Msg>()]];
           return ['loading', []];
         },
@@ -187,9 +186,7 @@ describe('run', () => {
       const seenIssues: string[] = [];
       const rejectingApp: App<string, Msg> = {
         init() {
-          const rejectCmd: Cmd<Msg> = async () => {
-            throw new Error('boom');
-          };
+          const rejectCmd: Cmd<Msg> = () => Promise.reject(new Error('boom'));
           return ['idle', [rejectCmd]];
         },
         update(msg, model) {
@@ -255,12 +252,12 @@ describe('run', () => {
       const order: string[] = [];
       const orderingApp: App<null, Msg> = {
         init() {
-          const initCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'init-cmd' });
+          const initCmd: Cmd<Msg> = () => ({ type: 'init-cmd' });
           return [null, [initCmd]];
         },
         update(msg, model) {
           if (msg.type === 'resize') {
-            const resizeCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'resize-cmd' });
+            const resizeCmd: Cmd<Msg> = () => ({ type: 'resize-cmd' });
             return [model, [resizeCmd]];
           }
           if (msg.type === 'init-cmd') order.push('init');

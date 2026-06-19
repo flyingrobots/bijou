@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1928,
-  "errors": 1928,
+  "total": 1877,
+  "errors": 1877,
   "warnings": 0,
   "rules": [
     {
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 441
+      "count": 421
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -114,7 +114,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 53
+      "count": 45
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -146,7 +146,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 37
+      "count": 33
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 427
+      "count": 408
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",

@@ -1,9 +1,3 @@
-/**
- * Command palette integration for `app-frame.ts`.
- *
- * Handles palette key routing, entry building, and palette state management.
- */
-
 import type { FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type {
   InternalFrameModel,
@@ -30,7 +24,6 @@ import {
   cpSelectedItem,
 } from './command-palette.js';
 
-/** Route a key press through the command palette, returning updated model and commands. */
 export function handlePaletteKey<PageModel, Msg>(
   msg: KeyMsg,
   model: InternalFrameModel<PageModel, Msg>,
@@ -42,7 +35,8 @@ export function handlePaletteKey<PageModel, Msg>(
     model: InternalFrameModel<PageModel, Msg>,
   ) => [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] | undefined,
 ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
-  const cp = model.commandPalette!;
+  const cp = model.commandPalette;
+  if (cp == null) return [model, []];
   const action = paletteKeys.handle(msg);
 
   if (action != null) {
@@ -118,7 +112,6 @@ export function handlePaletteKey<PageModel, Msg>(
   return [model, []];
 }
 
-/** Initialize the command palette with entries from frame, global, page key maps, and custom page command items. */
 export function openCommandPalette<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -134,15 +127,15 @@ export function openCommandPalette<PageModel, Msg>(
   );
 }
 
-/** Initialize a page-scoped search palette, falling back to page command items when needed. */
 export function openSearchPalette<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
-  const page = pagesById.get(model.activePageId)!;
-  const pageModel = model.pageModels[model.activePageId]!;
+  const page = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  if (page == null || pageModel === undefined) return model;
   const entries = buildSearchEntries(model, frameKeys, options, pagesById);
   const title = resolveFramePageText(page.searchTitle, pageModel)
     ?? frameMessage(options.i18n, 'search.title', 'Search');
@@ -165,7 +158,6 @@ function openPaletteModel<PageModel, Msg>(
   };
 }
 
-/** Collect all available commands from frame, global, page, and custom sources. */
 export function buildPaletteEntries<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -179,7 +171,7 @@ export function buildPaletteEntries<PageModel, Msg>(
     if (!b.enabled) continue;
     const action = frameKeys.handle(comboToMsg(b));
     if (action === undefined) continue;
-    const id = `frame:${seq++}`;
+    const id = `frame:${String(seq++)}`;
     entries.push({
       id,
       item: {
@@ -198,7 +190,7 @@ export function buildPaletteEntries<PageModel, Msg>(
       if (!b.enabled) continue;
       const action = global.handle(comboToMsg(b));
       if (action === undefined) continue;
-      const id = `global:${seq++}`;
+      const id = `global:${String(seq++)}`;
       entries.push({
         id,
         item: {
@@ -212,15 +204,16 @@ export function buildPaletteEntries<PageModel, Msg>(
     }
   }
 
-  const page = pagesById.get(model.activePageId)!;
-  const pageModel = model.pageModels[model.activePageId]!;
+  const page = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  if (page == null || pageModel === undefined) return entries;
   const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
   if (page.keyMap != null) {
     for (const b of page.keyMap.bindings()) {
       if (!b.enabled) continue;
       const action = page.keyMap.handle(comboToMsg(b));
       if (action === undefined) continue;
-      const id = `page:${seq++}`;
+      const id = `page:${String(seq++)}`;
       entries.push({
         id,
         item: {
@@ -236,8 +229,8 @@ export function buildPaletteEntries<PageModel, Msg>(
   }
 
   if (page.commandItems != null) {
-    for (const item of page.commandItems(model.pageModels[model.activePageId]!)) {
-      const id = `custom:${seq++}`;
+    for (const item of page.commandItems(pageModel)) {
+      const id = `custom:${String(seq++)}`;
       entries.push({
         id,
         item: {
@@ -254,25 +247,25 @@ export function buildPaletteEntries<PageModel, Msg>(
   return entries;
 }
 
-/** Collect page-scoped search items, falling back to page command items when search items are absent. */
 export function buildSearchEntries<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   _frameKeys: KeyMap<FrameAction>,
   _options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): readonly PaletteEntry<Msg>[] {
-  const page = pagesById.get(model.activePageId)!;
-  const pageModel = model.pageModels[model.activePageId]!;
+  const page = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  if (page == null || pageModel === undefined) return [];
   const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
   const items = page.searchItems?.(pageModel)
     ?? page.commandItems?.(pageModel)
     ?? [];
 
   return items.map((item, index) => ({
-    id: `search:${index}`,
+    id: `search:${String(index)}`,
     item: {
       ...item,
-      id: `search:${index}`,
+      id: `search:${String(index)}`,
       category: item.category ?? pageTitle,
     },
     msgAction: item.action,

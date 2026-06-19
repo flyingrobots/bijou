@@ -6,18 +6,6 @@ import type { Fingerprint, RunReport, ScenarioReport } from './runner.js';
 type ReportLikeScenario = ScenarioReport & { readonly tags?: readonly string[] };
 type ReportLike = RunReport & { readonly scenarios: readonly ReportLikeScenario[] };
 
-const REQUIRED_NS_METRICS = [
-  'ns_per_frame.count',
-  'ns_per_frame.mean',
-  'ns_per_frame.stddev',
-  'ns_per_frame.cov',
-  'ns_per_frame.min',
-  'ns_per_frame.max',
-  'ns_per_frame.p50',
-  'ns_per_frame.p90',
-  'ns_per_frame.p99',
-] as const;
-
 function isNestedRunReport(value: unknown): value is RunReport {
   return typeof value === 'object'
     && value !== null
@@ -37,24 +25,14 @@ function buildScenarioReport(
   scenarioId: string,
   records: readonly BenchMetricRecord[],
 ): ReportLikeScenario {
-  const first = records[0]!;
+  const first = records[0];
+  if (first == null) throw new Error(`flat bench report has no records for scenario ${scenarioId}`);
   const byMetric = new Map(records.map((record) => [record.metric, record.value] as const));
-
-  for (const metric of REQUIRED_NS_METRICS) {
-    if (!byMetric.has(metric)) {
-      throw new Error(`flat bench report is missing ${metric} for scenario ${scenarioId}`);
-    }
+  function metric(key: string): number {
+    const value = byMetric.get(key);
+    if (value === undefined) throw new Error(`flat bench report is missing ${key} for scenario ${scenarioId}`);
+    return value;
   }
-
-  const count = byMetric.get('ns_per_frame.count')!;
-  const mean = byMetric.get('ns_per_frame.mean')!;
-  const stddev = byMetric.get('ns_per_frame.stddev')!;
-  const cov = byMetric.get('ns_per_frame.cov')!;
-  const min = byMetric.get('ns_per_frame.min')!;
-  const max = byMetric.get('ns_per_frame.max')!;
-  const p50 = byMetric.get('ns_per_frame.p50')!;
-  const p90 = byMetric.get('ns_per_frame.p90')!;
-  const p99 = byMetric.get('ns_per_frame.p99')!;
 
   return {
     scenarioId,
@@ -66,15 +44,15 @@ function buildScenarioReport(
     measureFrames: first.measureFrames,
     samples: [],
     nsPerFrameStats: {
-      count,
-      mean,
-      stddev,
-      cov,
-      min,
-      max,
-      p50,
-      p90,
-      p99,
+      count: metric('ns_per_frame.count'),
+      mean: metric('ns_per_frame.mean'),
+      stddev: metric('ns_per_frame.stddev'),
+      cov: metric('ns_per_frame.cov'),
+      min: metric('ns_per_frame.min'),
+      max: metric('ns_per_frame.max'),
+      p50: metric('ns_per_frame.p50'),
+      p90: metric('ns_per_frame.p90'),
+      p99: metric('ns_per_frame.p99'),
     },
   };
 }
@@ -84,7 +62,8 @@ export function metricRecordsToRunReport(records: readonly BenchMetricRecord[]):
     throw new Error('flat bench report has no records');
   }
 
-  const first = records[0]!;
+  const first = records[0];
+  if (first == null) throw new Error('flat bench report has no records');
   const runId = first.runId;
   const generatedAt = first.generatedAt;
   const commit = first.commit;
@@ -107,7 +86,10 @@ export function metricRecordsToRunReport(records: readonly BenchMetricRecord[]):
     buildScenarioReport(scenarioId, scenarioRecords));
 
   const sampleCounts = new Set(scenarios.map((scenario) => scenario.nsPerFrameStats.count));
-  const paramsSamples = sampleCounts.size === 1 ? [...sampleCounts][0]! : computeStats([...sampleCounts]).max;
+  const [onlySampleCount] = sampleCounts;
+  const paramsSamples = sampleCounts.size === 1 && onlySampleCount !== undefined
+    ? onlySampleCount
+    : computeStats([...sampleCounts]).max;
 
   return {
     kind: 'bench.v2',
