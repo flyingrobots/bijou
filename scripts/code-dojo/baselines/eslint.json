@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2203,
-  "errors": 2203,
+  "total": 2144,
+  "errors": 2144,
   "warnings": 0,
   "rules": [
     {
@@ -14,7 +14,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 57
+      "count": 56
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -54,7 +54,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 24
+      "count": 23
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 512
+      "count": 500
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 138
+      "count": 133
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -82,7 +82,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
-      "count": 15
+      "count": 12
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 367
+      "count": 366
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -146,7 +146,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 62
+      "count": 61
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -154,11 +154,11 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 503
+      "count": 469
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
-      "count": 16
+      "count": 15
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",

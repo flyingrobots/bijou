@@ -190,16 +190,16 @@ export function defineBlock<Config = unknown, Output = unknown>(
   const commands = definition.commands ?? [];
   commands.forEach((command, index) => {
     if (!isCommandIntent(command)) {
-      throw new Error(`block definition: command at index ${index} must be created by commandIntent()`);
+      throw new Error(`block definition: command at index ${String(index)} must be created by commandIntent()`);
     }
   });
 
   const block = {
     ...definition,
     ...(definition.commands === undefined ? {} : { commands: Object.freeze([...commands]) }),
-  } as BlockDefinition<Config, Output>;
+  };
 
-  Object.defineProperty(block, BLOCK_DEFINITION_BRAND, { value: true });
+  brand(block);
   return Object.freeze(block);
 }
 
@@ -221,13 +221,13 @@ export function defineBlockPackage(manifest: BlockPackageManifest): BlockPackage
   return manifest;
 }
 
-interface BlockDefinitionBrandCarrier {
-  readonly [BLOCK_DEFINITION_BRAND]?: true;
-}
+interface BlockDefinitionBrandCarrier { readonly [BLOCK_DEFINITION_BRAND]?: true; }
+
+function brand<C, O>(b: BlockDefinitionInput<C, O> & BlockDefinitionBrandCarrier): asserts b is BlockDefinition<C, O> { Object.defineProperty(b, BLOCK_DEFINITION_BRAND, { value: true }); }
 
 export function validateBlockMetadata(metadata: BlockMetadata): BlockMetadataReport {
   const issues: BlockMetadataIssue[] = [];
-  const slots = metadata.slots ?? [];
+  const slots = metadata.slots;
   const variants = metadata.variants ?? [];
   const configOptions = metadata.configOptions ?? [];
   const examples = metadata.examples ?? [];
@@ -235,9 +235,9 @@ export function validateBlockMetadata(metadata: BlockMetadata): BlockMetadataRep
   pushRequiredTextIssue(issues, 'packageName', metadata.packageName);
   pushRequiredTextIssue(issues, 'blockName', metadata.blockName);
   pushRequiredTextIssue(issues, 'family', metadata.family);
-  pushRequiredTextIssue(issues, 'docs.summary', metadata.docs?.summary ?? '');
+  pushRequiredTextIssue(issues, 'docs.summary', metadata.docs.summary);
   pushScaleIssue(issues, metadata.scale);
-  pushModesIssues(issues, metadata.modes ?? []);
+  pushModesIssues(issues, metadata.modes);
   pushSlotsIssues(issues, slots);
   pushVariantIssues(issues, variants, slots);
   pushConfigOptionIssues(issues, configOptions);
@@ -376,7 +376,7 @@ function pushScaleIssue(issues: BlockMetadataIssue[], scale: BlockScale): void {
       kind: 'invalid-value',
       severity: 'error',
       path: 'scale',
-      message: `unsupported block scale ${String(scale)}`,
+      message: `unsupported block scale ${scale}`,
     });
   }
 }
@@ -403,8 +403,8 @@ function pushModesIssues(
     issues.push({
       kind: 'invalid-value',
       severity: 'error',
-      path: `modes[${index}]`,
-      message: `unsupported output mode ${String(mode)}`,
+      path: at('modes', index),
+      message: `unsupported output mode ${mode}`,
     });
   });
   pushDuplicateStringIssues(issues, modes, {
@@ -428,7 +428,7 @@ function pushSlotsIssues(
   }
 
   slots.forEach((slot, index) => {
-    pushRequiredTextIssue(issues, `slots[${index}].id`, slot.id);
+    pushRequiredTextIssue(issues, at('slots', index, 'id'), slot.id);
   });
   pushDuplicateStringIssues(issues, slots.map((slot) => slot.id), {
     label: 'slot id',
@@ -444,10 +444,11 @@ function pushVariantIssues(
 ): void {
   const slotIds = new Set(slots.map((slot) => slot.id).filter((id) => id.trim() !== ''));
   variants.forEach((variant, index) => {
-    pushRequiredTextIssue(issues, `variants[${index}].id`, variant.id);
-    pushRequiredTextIssue(issues, `variants[${index}].label`, variant.label);
-    pushSlotReferenceIssues(issues, `variants[${index}].requiredSlots`, variant.requiredSlots ?? [], slotIds);
-    pushSlotReferenceIssues(issues, `variants[${index}].optionalSlots`, variant.optionalSlots ?? [], slotIds);
+    const path = at('variants', index);
+    pushRequiredTextIssue(issues, `${path}.id`, variant.id);
+    pushRequiredTextIssue(issues, `${path}.label`, variant.label);
+    pushSlotReferenceIssues(issues, `${path}.requiredSlots`, variant.requiredSlots ?? [], slotIds);
+    pushSlotReferenceIssues(issues, `${path}.optionalSlots`, variant.optionalSlots ?? [], slotIds);
   });
   pushDuplicateStringIssues(issues, variants.map((variant) => variant.id), {
     label: 'variant id',
@@ -461,26 +462,27 @@ function pushConfigOptionIssues(
   options: readonly BlockConfigOption[],
 ): void {
   options.forEach((option, index) => {
-    pushRequiredTextIssue(issues, `configOptions[${index}].id`, option.id);
+    const path = at('configOptions', index);
+    pushRequiredTextIssue(issues, `${path}.id`, option.id);
     if (!CONFIG_OPTION_KINDS.includes(option.kind)) {
       issues.push({
         kind: 'invalid-value',
         severity: 'error',
-        path: `configOptions[${index}].kind`,
-        message: `unsupported config option kind ${String(option.kind)}`,
+        path: `${path}.kind`,
+        message: `unsupported config option kind ${option.kind}`,
       });
     }
     if (option.kind === 'enum' && (option.values ?? []).length === 0) {
       issues.push({
         kind: 'empty-list',
         severity: 'error',
-        path: `configOptions[${index}].values`,
+        path: `${path}.values`,
         message: 'enum config options must include values',
       });
     }
     pushDuplicateStringIssues(issues, option.values ?? [], {
       label: 'config enum value',
-      pathPrefix: `configOptions[${index}].values`,
+      pathPrefix: `${path}.values`,
     });
   });
   pushDuplicateStringIssues(issues, options.map((option) => option.id), {
@@ -495,8 +497,8 @@ function pushExampleIssues(
   examples: readonly BlockExample[],
 ): void {
   examples.forEach((example, index) => {
-    pushRequiredTextIssue(issues, `examples[${index}].id`, example.id);
-    pushRequiredTextIssue(issues, `examples[${index}].label`, example.label);
+    pushRequiredTextIssue(issues, at('examples', index, 'id'), example.id);
+    pushRequiredTextIssue(issues, at('examples', index, 'label'), example.label);
   });
   pushDuplicateStringIssues(issues, examples.map((example) => example.id), {
     label: 'example id',
@@ -514,11 +516,12 @@ function pushSlotReferenceIssues(
   references.forEach((reference, index) => {
     const normalized = reference.trim();
     if (normalized === '') {
+      const path = at(pathPrefix, index);
       issues.push({
         kind: 'missing-required-field',
         severity: 'error',
-        path: `${pathPrefix}[${index}]`,
-        message: `${pathPrefix}[${index}] is required`,
+        path,
+        message: `${path} is required`,
       });
       return;
     }
@@ -527,7 +530,7 @@ function pushSlotReferenceIssues(
       issues.push({
         kind: 'unknown-reference',
         severity: 'error',
-        path: `${pathPrefix}[${index}]`,
+        path: at(pathPrefix, index),
         message: `unknown slot reference ${normalized}`,
       });
     }
@@ -570,7 +573,7 @@ function pushDuplicateStringIssues(
     issues.push({
       kind: 'duplicate-id',
       severity: 'error',
-      path: indexedPath(options.pathPrefix, index, options.valuePath ?? ''),
+      path: at(options.pathPrefix, index, options.valuePath ?? ''),
       message: `duplicate ${options.label} ${normalized}`,
     });
   });
@@ -599,12 +602,9 @@ function factLabel(fact: ModeLoweringFact): string {
     : `${fact.kind}:${fact.key}=${String(fact.value)}`;
 }
 
-function indexedPath(pathPrefix: string, index: number, valuePath: string): string {
-  if (valuePath === '') {
-    return `${pathPrefix}[${index}]`;
-  }
-
-  return `${pathPrefix}[${index}].${valuePath}`;
+function at(prefix: string, index: number, suffix = ''): string {
+  const path = `${prefix}[${String(index)}]`;
+  return suffix === '' ? path : `${path}.${suffix}`;
 }
 
 function joinLabels(values: readonly string[]): string {
