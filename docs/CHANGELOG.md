@@ -23,7 +23,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
 - **Respecting the Dojo burndown** — WF-135/WF-146 lower live type-aware ESLint
-  findings from `4,517` to `981`, cutting `3,550` counted Code Dojo
+  findings from `4,517` to `960`, cutting `3,571` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -71,11 +71,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   multiselect option indexing, enumerated-list safe reads and explicit
   formatting, DOGFOOD smoke scenario/env narrowing, frame command typing, BCSS
   text/focus style token cleanup, driver runtime state narrowing, binding
-  lifecycle brand/guard cleanup, and DOGFOOD shell theme clone cleanup. The
-  aggregate debt ceiling now ratchets from `4,940` to `1,390`, with the next
-  goalpost target set to `1,340` or lower, while touched file/context budgets
-  remain held under their stored ceilings and three file/context exceptions are
-  removed.
+  lifecycle brand/guard cleanup, DOGFOOD shell theme clone/localization
+  cleanup, and DOGFOOD i18n debt scanner cleanup. The aggregate debt ceiling
+  now ratchets from `4,940` to `1,369`, with the next goalpost target set to
+  `1,319` or lower, while touched
+  file/context budgets remain held under their stored ceilings, three
+  file/context exceptions are removed, and the DOGFOOD raw-string debt baseline
+  drops from `2,772` to `2,766`.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe

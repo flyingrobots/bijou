@@ -68,12 +68,12 @@ Live counts on `main` at `5eccfb69`:
 
 Implemented counts on this branch before review:
 
-- aggregate Code Dojo debt: `1,390`
-- ESLint findings: `981`
+- aggregate Code Dojo debt: `1,369`
+- ESLint findings: `960`
 - file/context baseline: `332`
 - mock-ban baseline: `22`
 - code-size baseline: `55`, including `4` legacy hard-limit files
-- next aggregate target: `1,340` or lower
+- next aggregate target: `1,319` or lower
 
 Selected cleanup slice:
 
@@ -82,7 +82,9 @@ Selected cleanup slice:
 - `packages/bijou-tui/src/driver.ts`
 - `packages/bijou-tui/src/focus-area.ts`
 - `packages/bijou/src/core/binding-lifecycle.ts`
-- `examples/docs/dogfood-shell-themes.ts`
+- `examples/docs/dogfood-shell-themes.ts`, including its DOGFOOD raw-string
+  debt cleanup
+- `examples/docs/i18n-debt.ts`
 
 ## Playback Questions
 

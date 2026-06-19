@@ -118,6 +118,7 @@ const DOGFOOD_I18N_DEBT_SURFACE_NAMES: Readonly<Record<string, string>> = Object
   'examples/docs/storybook-workstation.ts': 'storybook-workstation',
   'examples/docs/storybook.ts': 'storybook-entrypoint',
 });
+const isTsSource = (path: string): boolean => path.endsWith('.tsx') || (path.endsWith('.ts') && !path.endsWith('.d.ts'));
 
 export function discoverDogfoodI18nDebtSources(
   options: {
@@ -130,7 +131,7 @@ export function discoverDogfoodI18nDebtSources(
   const paths = options.paths ?? listRepoTypescriptFiles(rootPath);
   return Object.freeze(paths
     .filter((path) => path.startsWith(`${rootPath}/`))
-    .filter((path) => /\.tsx?$/.test(path) && !/\.d\.ts$/.test(path))
+    .filter(isTsSource)
     .filter((path) => !excludedPaths.has(path))
     .sort()
     .map((path) => Object.freeze({
@@ -142,7 +143,7 @@ export function discoverDogfoodI18nDebtSources(
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2772,
+  total: 2766,
   bySurface: Object.freeze({
     'capture-main': 17,
     'component-stories': 1631,
@@ -151,7 +152,6 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'docs-app': 258,
     'dogfood-blocks': 681,
     'dogfood-locale': 12,
-    'dogfood-shell-themes': 6,
     'i18n-dogfood-authoring': 1,
     'i18n-dogfood-catalog': 3,
     'i18n-missing-localization': 3,
@@ -241,13 +241,13 @@ export function evaluateDogfoodI18nDebtRatchet(
 ): DogfoodI18nDebtRatchetResult {
   const violations: string[] = [];
   if (inventory.total > baseline.total) {
-    violations.push(`total ${inventory.total} exceeds baseline ${baseline.total}`);
+    violations.push(`total ${String(inventory.total)} exceeds baseline ${String(baseline.total)}`);
   }
 
   for (const surface of inventory.bySurface) {
-    const baselineCount = baseline.bySurface[surface.surface] ?? 0;
-    if (surface.count > baselineCount) {
-      violations.push(`${surface.surface} ${surface.count} exceeds baseline ${baselineCount}`);
+    const limit = baseline.bySurface[surface.surface] ?? 0;
+    if (surface.count > limit) {
+      violations.push(`${surface.surface} ${String(surface.count)} exceeds baseline ${String(limit)}`);
     }
   }
 
@@ -268,7 +268,7 @@ export function evaluateDogfoodTouchedI18nDebt(
     const entries = inventory.entries.filter((entry) => entry.surface === surface.surface);
     const path = entries[0]?.path;
     if (path == null || !touched.has(path) || entries.length === 0) return [];
-    return [`touched DOGFOOD source ${path} has ${entries.length} raw string debt entr${entries.length === 1 ? 'y' : 'ies'}`];
+    return [`touched DOGFOOD source ${path} has ${String(entries.length)} raw string debt entr${entries.length === 1 ? 'y' : 'ies'}`];
   });
 
   return Object.freeze({
@@ -355,7 +355,7 @@ function listRepoTypescriptFiles(rootPath: string): readonly string[] {
         visit(entryPath);
         continue;
       }
-      if (entry.isFile() && /\.tsx?$/.test(entry.name) && !/\.d\.ts$/.test(entry.name)) {
+      if (entry.isFile() && isTsSource(entry.name)) {
         files.push(entryPath);
       }
     }
@@ -380,13 +380,13 @@ export function evaluateDogfoodMarkdownLocalizationRatchet(
 ): DogfoodMarkdownLocalizationRatchetResult {
   const violations: string[] = [];
   if (inventory.total > baseline.total) {
-    violations.push(`markdown total ${inventory.total} exceeds baseline ${baseline.total}`);
+    violations.push(`markdown total ${String(inventory.total)} exceeds baseline ${String(baseline.total)}`);
   }
 
   for (const locale of inventory.byLocale) {
-    const baselineCount = baseline.byLocale[locale.locale] ?? 0;
-    if (locale.count > baselineCount) {
-      violations.push(`markdown ${locale.locale} ${locale.count} exceeds baseline ${baselineCount}`);
+    const limit = baseline.byLocale[locale.locale] ?? 0;
+    if (locale.count > limit) {
+      violations.push(`markdown ${locale.locale} ${String(locale.count)} exceeds baseline ${String(limit)}`);
     }
   }
 
@@ -454,7 +454,7 @@ function collectDogfoodMarkdownDocuments(
       const callName = callExpressionName(node, sourceFile);
       if (callName === 'readMarkdownDoc' || callName === 'readMarkdownDocExcerpt') {
         const rawPath = markdownPathArgumentText(node.arguments[0], sourceFile, templateValues);
-        if (rawPath != null && rawPath.endsWith('.md')) {
+        if (rawPath?.endsWith('.md') === true) {
           const position = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
           documents.push(Object.freeze({
             surface: source.surface,
@@ -555,7 +555,7 @@ function readDogfoodMarkdownLocalizationSpec(
 
 function markdownFrontmatterYaml(text: string): string | undefined {
   const withoutBom = text.replace(/^\uFEFF/, '');
-  const opening = withoutBom.match(/^---\r?\n/);
+  const opening = /^---\r?\n/.exec(withoutBom);
   if (opening == null) return undefined;
   const bodyStart = opening[0].length;
   const body = withoutBom.slice(bodyStart);
@@ -598,7 +598,7 @@ function stringValue(value: unknown): string | undefined {
 
 function objectValue(value: unknown): Record<string, unknown> | undefined {
   if (typeof value !== 'object' || value == null || Array.isArray(value)) return undefined;
-  return value as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(value));
 }
 
 function uniqueStringList(values: readonly string[]): readonly string[] {
@@ -677,7 +677,7 @@ function isThemeTokenFamilyIdentifier(node: ts.Node): boolean {
   if (!ts.isStringLiteralLike(node)) return false;
   if (!['semantic', 'surface', 'border', 'ui', 'status', 'gradient'].includes(node.text)) return false;
 
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (!ts.isArrayLiteralExpression(current)) continue;
     const expression = expressionUsedByParent(current);
     return ts.isForOfStatement(expression.parent)
@@ -689,7 +689,7 @@ function isThemeTokenFamilyIdentifier(node: ts.Node): boolean {
 }
 
 function isInsideNamedFunction(node: ts.Node, name: string): boolean {
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (ts.isFunctionDeclaration(current) && current.name?.text === name) return true;
     if (
       (ts.isFunctionExpression(current) || ts.isArrowFunction(current))
@@ -715,7 +715,7 @@ function expressionUsedByParent(node: ts.Expression): ts.Expression {
 }
 
 function nearestPropertyName(node: ts.Node): string | undefined {
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (ts.isPropertyAssignment(current)) {
       if (ts.isIdentifier(current.name) || ts.isStringLiteral(current.name) || ts.isNumericLiteral(current.name)) {
         return current.name.text;
@@ -727,7 +727,7 @@ function nearestPropertyName(node: ts.Node): string | undefined {
 }
 
 function nearestCallExpression(node: ts.Node): ts.CallExpression | undefined {
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (ts.isCallExpression(current)) return current;
   }
   return undefined;
@@ -778,7 +778,7 @@ function isDiscriminantProperty(name: string): boolean {
 }
 
 function isErrorConstructorArgument(node: ts.Node): boolean {
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (!ts.isNewExpression(current)) continue;
     if (current.expression.getText() !== 'Error') continue;
     return current.arguments?.some((argument) => argument === node || containsNode(argument, node)) ?? false;
@@ -802,7 +802,7 @@ function containsNode(parent: ts.Node, target: ts.Node): boolean {
 }
 
 function hasAncestor(node: ts.Node, predicate: (ancestor: ts.Node) => boolean): boolean {
-  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+  for (let current = node.parent; !ts.isSourceFile(current); current = current.parent) {
     if (predicate(current)) return true;
   }
   return false;
@@ -828,9 +828,9 @@ function repoUrl(path: string): URL {
 }
 
 function defaultMarkdownTemplateValues(): Readonly<Record<string, string>> {
-  const packageJson = JSON.parse(readRepoFile('packages/bijou/package.json')) as { readonly version?: string };
+  const packageJson = objectValue(JSON.parse(readRepoFile('packages/bijou/package.json')) as unknown);
   return Object.freeze({
-    BIJOU_VERSION: packageJson.version ?? '',
+    BIJOU_VERSION: stringValue(packageJson?.version) ?? '',
   });
 }
 

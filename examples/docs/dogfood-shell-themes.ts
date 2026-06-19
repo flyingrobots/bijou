@@ -5,6 +5,11 @@ import {
   type Theme,
 } from '../../packages/bijou/src/index.js';
 import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
+import { dogfoodLocalizedText } from './localization.js';
+
+function dogfoodText(id: string, fallback: string): string {
+  return dogfoodLocalizedText(undefined, id, fallback);
+}
 
 function cloneThemeWithName(theme: Theme, name: string): Theme {
   return {
@@ -69,19 +74,28 @@ export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 export const DOGFOOD_SHELL_THEMES: readonly FrameShellThemeSpec[] = Object.freeze([
   {
     id: 'dogfood',
-    label: 'DOGFOOD',
-    description: 'High-contrast neutral docs shell with dark and light modes.',
+    label: dogfoodText('shell.theme.dogfood.label', 'DOGFOOD'),
+    description: dogfoodText(
+      'shell.theme.dogfood.description',
+      'High-contrast neutral docs shell with dark and light modes.',
+    ),
     modes: [
       {
         id: 'dark',
-        label: 'Dark',
-        description: 'High-contrast neutral docs shell for dark terminals.',
+        label: dogfoodText('shell.theme.dogfood.dark.label', 'Dark'),
+        description: dogfoodText(
+          'shell.theme.dogfood.dark.description',
+          'High-contrast neutral docs shell for dark terminals.',
+        ),
         theme: DOGFOOD_DARK_THEME,
       },
       {
         id: 'light',
-        label: 'Light',
-        description: 'High-contrast neutral docs shell for light terminals.',
+        label: dogfoodText('shell.theme.dogfood.light.label', 'Light'),
+        description: dogfoodText(
+          'shell.theme.dogfood.light.description',
+          'High-contrast neutral docs shell for light terminals.',
+        ),
         theme: DOGFOOD_LIGHT_THEME,
       },
     ],
