@@ -7,7 +7,7 @@ Shaped.
 ## Tracker
 
 - Issue: [#419](https://github.com/flyingrobots/bijou/issues/419)
-- Pull request: TBD
+- Pull request: [#420](https://github.com/flyingrobots/bijou/pull/420)
 - Branch: `cycle/dogfood-blocks-capture-ratchet-792`
 
 ## Current Truth
