@@ -51,18 +51,22 @@ An agent needs a narrow, mechanically reviewable target that clears the next
 ## Hill
 
 Reduce aggregate Code Dojo debt from `2,068` to `2,018` or lower by eliminating
-the current `51` ESLint findings in:
+the current `53` ESLint findings in:
 
-- `examples/docs/capture-main.ts` (`30` findings)
 - `packages/bijou-node/src/worker/worker.ts` (`21` findings)
+- `packages/bijou/src/core/components/dag-render.ts` (`20` findings)
+- `packages/bijou/src/core/components/preference-list.ts` (`12` findings)
 
 ## Scope
 
 - Replace unsafe `any` and unsafe assertion handoffs with explicit message,
   command, and worker-data contracts.
 - Replace non-null assertions around worker IPC with local parent-port guards.
-- Remove stale unnecessary conditions and unnecessary type assertions.
-- Keep capture autoplay and worker-thread behavior stable.
+- Replace DAG renderer array assumptions with direct iteration, guarded reads,
+  and explicit string formatting.
+- Replace preference-list index assertions with value iteration and remove the
+  dead height assignment.
+- Keep worker-thread, DAG rendering, and preference-list behavior stable.
 - Lower `scripts/code-dojo/baselines/eslint.json`, `docs/code-dojo-exceptions.md`,
   and `package.json` only after live counts prove the reduction.
 
@@ -88,51 +92,62 @@ Focused ESLint findings:
 
 | File | Findings |
 | :--- | ---: |
-| `examples/docs/capture-main.ts` | 30 |
 | `packages/bijou-node/src/worker/worker.ts` | 21 |
-| **Total** | **51** |
+| `packages/bijou/src/core/components/dag-render.ts` | 20 |
+| `packages/bijou/src/core/components/preference-list.ts` | 12 |
+| **Total** | **53** |
 
 ## Playback Questions
 
 1. Did aggregate Code Dojo debt fall to `2,018` or lower?
 2. Did the stored ESLint baseline match the new live count?
 3. Did file/context and code-size debt hold or shrink?
-4. Did capture and worker focused tests pass?
+4. Did worker, DAG renderer, and preference-list focused tests pass?
 5. Did the repo gates pass before review?
 
 ## Tests To Write First
 
 The lint findings are the RED signal for pure type-safety rewrites. Add focused
-regression tests before changing worker lifecycle behavior, capture scheduling,
-message routing, or runtime viewport handling.
+regression tests before changing worker lifecycle behavior, message routing,
+DAG rendering behavior, or preference-list layout.
 
 ## Acceptance Criteria
 
-- `examples/docs/capture-main.ts` has zero ESLint findings.
 - `packages/bijou-node/src/worker/worker.ts` has zero ESLint findings.
+- `packages/bijou/src/core/components/dag-render.ts` has zero ESLint findings.
+- `packages/bijou/src/core/components/preference-list.ts` has zero ESLint
+  findings.
 - Aggregate Code Dojo debt is `2,018` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live ESLint count.
 - `docs/code-dojo-exceptions.md` and `package.json` report the lower ceiling.
-- Focused validation for the touched capture and worker surfaces passes.
+- Focused validation for the touched worker, DAG renderer, and preference-list
+  surfaces passes.
 - `npm run code-dojo:verify`, `npm run docs:inventory`, `npm run lint`, and
   `git diff --check` pass before review.
 
 ## Retrospective
 
-Completed with aggregate Code Dojo debt reduced from `2,068` to `2,017`
-(`-51`). The stored ESLint baseline now records `1,605` live findings, down
-from `1,656`, and the next aggregate target is `1,967` or lower.
+Completed with aggregate Code Dojo debt reduced from `2,068` to `2,015`
+(`-53`). The stored ESLint baseline now records `1,603` live findings, down
+from `1,656`, and the next aggregate target is `1,965` or lower.
 
-The implementation cleaned the targeted DOGFOOD capture and worker IPC files:
+The implementation cleaned the targeted worker IPC and component rendering
+files:
 
-- `examples/docs/capture-main.ts` now widens inner commands without `any` and
-  emits autoplay key messages through the wrapper app's typed message union.
 - `packages/bijou-node/src/worker/worker.ts` now reads worker data through a
   typed guard, narrows `parentPort` once, and validates raw worker IPC messages
   before dispatching them into proxy I/O handlers.
 - `packages/bijou-node/src/worker/worker-data.ts` keeps worker-data validation
   out of the already-baselined worker runtime file.
+- `packages/bijou/src/core/components/dag-render.ts` now iterates rendered
+  graphemes and layer arrays without non-null assertions and formats accessible
+  counts explicitly.
+- `packages/bijou/src/core/components/preference-list.ts` now iterates value,
+  description, section, row, and output character arrays directly without
+  assertion-based indexing.
 
-Touched file/context budgets held or shrank: `capture-main.ts` is now `189`
-lines / `5,610` bytes against a `192` / `5,633` baseline, and `worker.ts` is
-`318` lines / `10,676` bytes against a `334` / `11,496` baseline.
+Touched file/context budgets held or shrank: `worker.ts` is now `318` lines /
+`10,676` bytes against a `334` / `11,496` baseline, `dag-render.ts` is now
+`692` lines / `25,039` bytes against a `693` / `25,088` baseline, and
+`preference-list.ts` is now `420` lines / `13,876` bytes against a `425` /
+`14,249` baseline.
