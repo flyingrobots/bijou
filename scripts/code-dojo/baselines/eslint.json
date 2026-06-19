@@ -1,24 +1,20 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 215,
-  "errors": 215,
+  "total": 162,
+  "errors": 162,
   "warnings": 0,
   "rules": [
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 5
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
-      "count": 4
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-deprecated",
       "count": 4
-    },
-    {
-      "ruleId": "@typescript-eslint/no-dynamic-delete",
-      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
@@ -34,7 +30,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 39
+      "count": 24
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -42,7 +38,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 18
+      "count": 16
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -50,7 +46,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
-      "count": 7
+      "count": 5
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
@@ -70,7 +66,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 55
+      "count": 45
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -78,23 +74,19 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
-      "count": 6
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 13
+      "count": 12
     },
     {
       "ruleId": "@typescript-eslint/require-await",
       "count": 2
     },
     {
-      "ruleId": "@typescript-eslint/restrict-plus-operands",
-      "count": 1
-    },
-    {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 32
+      "count": 16
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -102,7 +94,7 @@
     },
     {
       "ruleId": "no-control-regex",
-      "count": 4
+      "count": 3
     }
   ]
 }

@@ -78,7 +78,7 @@ function shiftKey(key: string) {
 }
 
 function makeLongContent(label: string, lines = 40): string {
-  return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
+  return Array.from({ length: lines }, (_, i) => `${label} line ${String(i)}`).join('\n');
 }
 
 function textView(text: string) {
@@ -96,7 +96,7 @@ function createInteractiveContext(options: Parameters<typeof createTestContext>[
 async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[]): Promise<M[]> {
   const msgs: M[] = [];
   const hooks = new Set<(dt: number) => void>();
-  let done = false;
+  const state = { done: false };
   const run = Promise.resolve(cmd((msg) => msgs.push(msg), {
     onPulse(handler) {
       hooks.add(handler);
@@ -107,18 +107,18 @@ async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[])
       };
     },
   })).finally(() => {
-    done = true;
+    state.done = true;
   });
 
   for (const dt of pulses) {
-    if (done) break;
+    if (state.done) break;
     for (const handler of [...hooks]) {
       handler(dt);
     }
     await Promise.resolve();
   }
 
-  if (!done) throw new Error(`stuck ${String(pulses.length)} pulse`);
+  if (!state.done) throw new Error(`stuck ${String(pulses.length)} pulse`);
   await run;
   return msgs;
 }
@@ -212,7 +212,9 @@ function seedNotificationHistory<Msg>(
       variant: spec.variant ?? 'TOAST',
       durationMs: null,
     }, nowMs);
-    const id = state.items.at(-1)!.id;
+    const latest = state.items.at(-1);
+    if (latest === undefined) throw new Error('expected pushed notification');
+    const id = latest.id;
     nowMs += 20;
     state = dismissNotification(state, id, nowMs);
     nowMs += 500;

@@ -138,7 +138,7 @@ export function vstack(...blocks: string[]): string {
  */
 export function hstack(gap: number, ...blocks: string[]): string {
   if (blocks.length === 0) return '';
-  if (blocks.length === 1) return blocks[0]!;
+  if (blocks.length === 1) return blocks[0] ?? '';
 
   const split = blocks.map((b) => b.split('\n'));
   const maxRows = Math.max(...split.map((lines) => lines.length));
@@ -149,10 +149,12 @@ export function hstack(gap: number, ...blocks: string[]): string {
   for (let r = 0; r < maxRows; r++) {
     const parts: string[] = [];
     for (let c = 0; c < split.length; c++) {
-      const line = split[c]![r] ?? '';
+      const lines = split[c];
+      const line = lines?.[r] ?? '';
       // Last column doesn't need right-padding
       if (c < split.length - 1) {
-        parts.push(line + ' '.repeat(Math.max(0, widths[c]! - visualWidth(line))));
+        const width = widths[c] ?? 0;
+        parts.push(line + ' '.repeat(Math.max(0, width - visualWidth(line))));
       } else {
         parts.push(line);
       }

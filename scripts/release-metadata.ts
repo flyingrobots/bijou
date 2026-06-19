@@ -43,10 +43,6 @@ export interface ReleaseCommandIO {
 
 export type ReleaseCommandOutputs = Readonly<Record<string, string>>;
 
-interface RootWorkspaceManifest {
-  readonly workspaces?: readonly string[] | { readonly packages?: readonly string[] };
-}
-
 const SEMVER_INT = '(?:0|[1-9][0-9]*)';
 const VERSION_PATTERN = new RegExp(
   `^${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT}(?:-(rc|beta|alpha)\\.${SEMVER_INT})?$`,
@@ -55,19 +51,19 @@ const TAG_PATTERN = new RegExp(
   `^v(?<version>${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT})(?:-(?<channel>rc|beta|alpha)\\.(?<serial>${SEMVER_INT}))?$`,
 );
 const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies'];
-function readJsonFile<T>(filepath: string): T {
-  return JSON.parse(readFileSync(filepath, 'utf8')) as T;
-}
 
 export function readWorkspacePackages(root: string): readonly WorkspacePackage[] {
-  const rootManifest = readJsonFile<RootWorkspaceManifest>(join(root, 'package.json'));
-  const workspaces = rootManifest.workspaces;
+  const rootManifest = readJsonObject(join(root, 'package.json'));
+  const workspaces = rootManifest['workspaces'];
   let workspacePatterns: readonly string[] | undefined;
 
-  if (Array.isArray(workspaces)) {
+  if (Array.isArray(workspaces) && workspaces.every(isString)) {
     workspacePatterns = workspaces;
-  } else if (workspaces && 'packages' in workspaces) {
-    workspacePatterns = workspaces.packages;
+  } else if (isRecord(workspaces)) {
+    const packages = workspaces['packages'];
+    if (Array.isArray(packages) && packages.every(isString)) {
+      workspacePatterns = packages;
+    }
   }
 
   if (!workspacePatterns || workspacePatterns.length === 0) {
@@ -117,9 +113,56 @@ export function readWorkspacePackages(root: string): readonly WorkspacePackage[]
   return [...manifestPaths]
     .map((manifestPath) => ({
       manifestPath,
-      manifest: readJsonFile<PackageManifest>(manifestPath),
+      manifest: readPackageManifest(manifestPath),
     }))
     .sort((left, right) => left.manifest.name.localeCompare(right.manifest.name));
+}
+
+function readPackageManifest(filepath: string): PackageManifest {
+  const manifest = readJsonObject(filepath);
+  const name = manifest['name'];
+  const version = manifest['version'];
+  if (typeof name !== 'string' || typeof version !== 'string') {
+    throw new Error(`${filepath} is missing a string name or version`);
+  }
+  const dependencies = readDependencyMap(manifest['dependencies'], `${filepath} dependencies`);
+  const devDependencies = readDependencyMap(manifest['devDependencies'], `${filepath} devDependencies`);
+  const peerDependencies = readDependencyMap(manifest['peerDependencies'], `${filepath} peerDependencies`);
+  return {
+    name,
+    version,
+    ...(dependencies === undefined ? {} : { dependencies }),
+    ...(devDependencies === undefined ? {} : { devDependencies }),
+    ...(peerDependencies === undefined ? {} : { peerDependencies }),
+  };
+}
+
+function readDependencyMap(value: unknown, label: string): DependencyMap | undefined {
+  if (value === undefined) return undefined;
+  const record = requireJsonRecord(value, label);
+  const deps: DependencyMap = {};
+  for (const [name, version] of Object.entries(record)) {
+    if (typeof version !== 'string') throw new Error(`${label} has a non-string version for ${name}`);
+    deps[name] = version;
+  }
+  return deps;
+}
+
+function readJsonObject(filepath: string): Record<string, unknown> {
+  return requireJsonRecord(JSON.parse(readFileSync(filepath, 'utf8')), filepath);
+}
+
+function requireJsonRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!isRecord(value)) throw new Error(`${label} is not a JSON object`);
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
 }
 
 export function readCurrentWorkspaceVersion(root: string): string {
@@ -138,8 +181,17 @@ export function parseReleaseTag(tag: string): ReleaseMetadata {
     throw new Error(`Invalid tag format: ${tag}`);
   }
 
-  const tagVersion = match.groups.version + (match.groups.channel ? `-${match.groups.channel}.${match.groups.serial}` : '');
-  const channel = match.groups.channel as 'rc' | 'beta' | 'alpha' | undefined;
+  const version = match.groups['version'];
+  const channel = match.groups['channel'];
+  const serial = match.groups['serial'];
+  if (version === undefined) throw new Error(`Invalid tag format: ${tag}`);
+  if (channel !== undefined && (channel !== 'rc' && channel !== 'beta' && channel !== 'alpha')) {
+    throw new Error(`Invalid prerelease channel in tag: ${tag}`);
+  }
+  if (channel !== undefined && serial === undefined) {
+    throw new Error(`Invalid prerelease serial in tag: ${tag}`);
+  }
+  const tagVersion = channel === undefined ? version : `${version}-${channel}.${String(serial)}`;
 
   if (!channel) {
     return {
@@ -277,7 +329,9 @@ export function runReleaseMetadata(argv: readonly string[], io: ReleaseCommandIO
       };
       packageSummaryLabel = 'tag';
     } else {
-      expectedVersion = validateReleaseVersion(useCurrentVersion ? readCurrentWorkspaceVersion(root) : explicitVersion!);
+      const selectedVersion = useCurrentVersion ? readCurrentWorkspaceVersion(root) : explicitVersion;
+      if (selectedVersion == null) throw new Error('Missing release version');
+      expectedVersion = validateReleaseVersion(selectedVersion);
       const resolvedNotesTag = notesTagRunId ? `dry-run-v${expectedVersion}-${notesTagRunId}` : notesTag;
       outputs = {
         version: expectedVersion,

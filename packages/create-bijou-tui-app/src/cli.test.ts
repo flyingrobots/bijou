@@ -50,6 +50,15 @@ function withPlatform<T>(platform: NodeJS.Platform, run: () => T): T {
   }
 }
 
+function requireRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!isRecord(value)) throw new Error(`${label} is not an object`);
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function resolveInstalledCliCommand(runnerDir: string): string {
   const binDir = join(runnerDir, 'node_modules', '.bin');
   return process.platform === 'win32'
@@ -59,12 +68,9 @@ function resolveInstalledCliCommand(runnerDir: string): string {
 
 function resolveInstalledCliEntrypoint(runnerDir: string): string {
   const packageDir = join(runnerDir, 'node_modules', 'create-bijou-tui-app');
-  const packageJson = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8')) as {
-    readonly bin?: string | Record<string, string>;
-  };
-  const binRelative = typeof packageJson.bin === 'string'
-    ? packageJson.bin
-    : packageJson.bin?.['create-bijou-tui-app'];
+  const packageJson = requireRecord(JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8')), 'package.json');
+  const bin = packageJson['bin'];
+  const binRelative = typeof bin === 'string' ? bin : requireRecord(bin, 'package.json bin')['create-bijou-tui-app'];
   if (typeof binRelative !== 'string' || binRelative.length === 0) {
     throw new Error('Installed package does not declare a create-bijou-tui-app bin entry.');
   }
@@ -173,8 +179,11 @@ describe('create-bijou-tui-app cli', () => {
       const arrayEnd = packed.stdout.lastIndexOf(']');
       expect(arrayStart).toBeGreaterThanOrEqual(0);
       expect(arrayEnd).toBeGreaterThan(arrayStart);
-      const packOutput = JSON.parse(packed.stdout.slice(arrayStart, arrayEnd + 1)) as { filename?: string }[];
-      const tarball = resolve(packDir, packOutput[0]!.filename!);
+      const packOutput: unknown = JSON.parse(packed.stdout.slice(arrayStart, arrayEnd + 1));
+      if (!Array.isArray(packOutput)) throw new Error('npm pack output was not an array');
+      const filename = requireRecord(packOutput[0], 'npm pack output entry')['filename'];
+      if (typeof filename !== 'string' || filename.length === 0) throw new Error('npm pack output did not include a filename');
+      const tarball = resolve(packDir, filename);
 
       const installed = spawnSync(
         'npm',

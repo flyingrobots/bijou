@@ -87,7 +87,7 @@ describe('notification state', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 5; index++) {
       state = pushNotification(state, {
-        title: `Notice ${index + 1}`,
+        title: `Notice ${String(index + 1)}`,
         message: 'Stack trimming keeps the newest notifications visible.',
         variant: 'TOAST',
         placement: 'LOWER_RIGHT',
@@ -165,7 +165,7 @@ describe('notification state', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 3; index++) {
       state = pushNotification(state, {
-        title: `Archived ${index + 1}`,
+        title: `Archived ${String(index + 1)}`,
         message: 'Scrollable history entry.',
         variant: 'TOAST',
         durationMs: null,
@@ -605,7 +605,7 @@ describe('renderNotificationStack', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 5; index++) {
       state = pushNotification(state, {
-        title: `Overflow ${index + 1}`,
+        title: `Overflow ${String(index + 1)}`,
         message: 'Older notices should animate out when newer ones force them away.',
         variant: 'TOAST',
         placement: 'LOWER_RIGHT',
@@ -645,7 +645,7 @@ describe('renderNotificationStack', () => {
       ctx,
     });
     expect(overlay?.surface).toBeDefined();
-    const surface = must(overlay!.surface);
+    const surface = must(must(overlay).surface);
     const expectedBg = surface.get(1, 0).bg;
     expect(expectedBg).toBeDefined();
     for (let y = 0; y < surface.height; y++) {
