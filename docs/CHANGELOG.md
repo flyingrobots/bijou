@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-157 removes `52` more type-aware ESLint
+  findings across i18n catalog/freezing boundaries, MCP docs example coercion,
+  TUI key/navigation/drawer/motion/notification/pager/split-pane helpers,
+  runtime-support and subapp command mapping, binding-frame and DOGFOOD block
+  registry tests, and example app bootstraps, lowering aggregate Code Dojo debt
+  from `570` to `518` with the next goalpost target set to `468` or lower.
 - **Focused Code Dojo ratchet** — WF-156 removes `53` more type-aware ESLint
   findings across TUI runtime/list/notification/DAG/layout helpers, core
   block-tree/grapheme/timer utilities, create-app CLI parsing, release-readiness

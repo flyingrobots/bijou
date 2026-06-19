@@ -149,6 +149,10 @@ export function renderNotificationSurface<Msg>(
 
   const cardPacked = isPackedSurface(card);
   for (let y = 0; y < contentRows.length; y++) {
+    const contentRow = contentRows[y];
+    if (contentRow === undefined) {
+      continue;
+    }
     const accentRgb = cardPacked
       ? (() => {
           const accentHex = resolvedColorHex(accentStyle.fg);
@@ -176,12 +180,12 @@ export function renderNotificationSurface<Msg>(
       });
     }
     card.blit(
-      contentRows[y]!,
+      contentRow,
       2,
       y,
       0,
       0,
-      contentRows[y]!.width,
+      contentRow.width,
       1,
       {
         char: true,

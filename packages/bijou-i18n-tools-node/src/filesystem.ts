@@ -65,6 +65,10 @@ function sheetNameFromPath(path: string): string {
   return base.slice(0, base.length - extension.length);
 }
 
+function isJsonRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export async function writeExchangeSheetFile(
   path: string,
   sheet: ExchangeSheet,
@@ -254,12 +258,10 @@ function parseWorkbookManifest(input: string): WorkbookDirectoryManifest {
     throw new Error('Invalid workbook manifest: malformed json');
   }
 
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+  if (!isJsonRecord(parsed)) {
     throw new Error('Invalid workbook manifest: expected object');
   }
-  const version = (parsed as { version?: unknown }).version;
-  const format = (parsed as { format?: unknown }).format;
-  const sheets = (parsed as { sheets?: unknown }).sheets;
+  const { version, format, sheets } = parsed;
   if (version !== 1) {
     throw new Error(`Invalid workbook manifest: unsupported version ${String(version)}`);
   }
@@ -271,11 +273,10 @@ function parseWorkbookManifest(input: string): WorkbookDirectoryManifest {
   }
 
   const parsedSheets = sheets.map((sheet) => {
-    if (typeof sheet !== 'object' || sheet === null || Array.isArray(sheet)) {
+    if (!isJsonRecord(sheet)) {
       throw new Error('Invalid workbook manifest: sheet entry must be an object');
     }
-    const name = (sheet as { name?: unknown }).name;
-    const fileName = (sheet as { fileName?: unknown }).fileName;
+    const { name, fileName } = sheet;
     if (typeof name !== 'string' || typeof fileName !== 'string') {
       throw new Error('Invalid workbook manifest: sheet entry requires name and fileName');
     }
@@ -305,13 +306,45 @@ function parseRuntimeCatalog(input: string, context: string): I18nCatalog {
   } catch {
     throw new Error(`Invalid runtime catalog json: malformed json in ${context}`);
   }
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+  if (!isJsonRecord(parsed)) {
     throw new Error(`Invalid runtime catalog json: expected object in ${context}`);
   }
-  const namespace = (parsed as { namespace?: unknown }).namespace;
-  const entries = (parsed as { entries?: unknown }).entries;
+  const { namespace, entries } = parsed;
   if (typeof namespace !== 'string' || !Array.isArray(entries)) {
     throw new Error(`Invalid runtime catalog json: missing namespace or entries in ${context}`);
   }
-  return parsed as I18nCatalog;
+  return {
+    namespace,
+    entries: entries.map((entry, index) => parseRuntimeCatalogEntry(entry, `${context} entries[${String(index)}]`)),
+  };
+}
+
+function parseRuntimeCatalogEntry(value: unknown, context: string): I18nCatalog['entries'][number] {
+  if (!isJsonRecord(value)) {
+    throw new Error(`Invalid runtime catalog json: expected entry object in ${context}`);
+  }
+
+  const { key, kind, sourceLocale, values } = value;
+  if (!isJsonRecord(key)) {
+    throw new Error(`Invalid runtime catalog json: expected entry key object in ${context}`);
+  }
+  if (typeof key['namespace'] !== 'string' || typeof key['id'] !== 'string') {
+    throw new Error(`Invalid runtime catalog json: entry key requires namespace and id in ${context}`);
+  }
+  if (kind !== 'message' && kind !== 'resource' && kind !== 'data') {
+    throw new Error(`Invalid runtime catalog json: unsupported entry kind in ${context}`);
+  }
+  if (typeof sourceLocale !== 'string' || !isJsonRecord(values)) {
+    throw new Error(`Invalid runtime catalog json: entry requires sourceLocale and values in ${context}`);
+  }
+
+  const entry: I18nCatalog['entries'][number] = {
+    key: { namespace: key['namespace'], id: key['id'] },
+    kind,
+    sourceLocale,
+    values,
+  };
+  return Object.hasOwn(value, 'fallbackValue')
+    ? { ...entry, fallbackValue: value['fallbackValue'] }
+    : entry;
 }

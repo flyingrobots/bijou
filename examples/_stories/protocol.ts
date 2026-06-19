@@ -78,7 +78,11 @@ export function resolveStoryVariant<State>(
   if (story.variants.length === 0) {
     throw new Error(`ComponentStory "${story.id}" must define at least one variant`);
   }
-  return story.variants[clampIndex(index, story.variants.length)]!;
+  const variant = story.variants[clampIndex(index, story.variants.length)];
+  if (variant === undefined) {
+    throw new Error(`ComponentStory "${story.id}" variant index could not be resolved`);
+  }
+  return variant;
 }
 
 export function resolveStoryProfilePreset(
@@ -88,7 +92,11 @@ export function resolveStoryProfilePreset(
   if (story.profilePresets.length === 0) {
     throw new Error(`ComponentStory "${story.id}" must define at least one profile preset`);
   }
-  return story.profilePresets[clampIndex(index, story.profilePresets.length)]!;
+  const preset = story.profilePresets[clampIndex(index, story.profilePresets.length)];
+  if (preset === undefined) {
+    throw new Error(`ComponentStory "${story.id}" profile preset index could not be resolved`);
+  }
+  return preset;
 }
 
 export function findStoryProfileIndex(
@@ -132,7 +140,7 @@ export function storyDocsMarkdown<State>(
     '- **Family:** ' + story.family,
     '- **Package:** ' + `\`${story.package}\``,
     '- **Variant:** ' + variant.label,
-    '- **Profile:** ' + `${preset.label} (\`${preset.mode}\`, ${preset.width} cols)`,
+    '- **Profile:** ' + `${preset.label} (\`${preset.mode}\`, ${String(preset.width)} cols)`,
   ];
 
   if (variant.description != null) {

@@ -24,15 +24,13 @@ const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 function counterApp(quitKey = 'q'): App<number> {
   return {
     init: () => [0, []],
-    update(msg: KeyMsg | never, model: number) {
-      if (msg.type === 'key') {
-        if (msg.key === quitKey) return [model, [quit()]];
-        if (msg.key === 'up') return [model + 1, []];
-        if (msg.key === 'down') return [Math.max(0, model - 1), []];
-      }
+    update(msg: KeyMsg, model: number) {
+      if (msg.key === quitKey) return [model, [quit()]];
+      if (msg.key === 'up') return [model + 1, []];
+      if (msg.key === 'down') return [Math.max(0, model - 1), []];
       return [model, []];
     },
-    view: (model: number) => textView(`count: ${model}`),
+    view: (model: number) => textView(`count: ${String(model)}`),
   };
 }
 

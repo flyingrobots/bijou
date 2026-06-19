@@ -188,6 +188,9 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
   // All parts except the last are modifiers
   for (let i = 0; i < parts.length - 1; i++) {
     const mod = parts[i];
+    if (mod === undefined) {
+      throw new Error(`Missing modifier in key descriptor "${descriptor}"`);
+    }
     if (mod === 'ctrl') {
       if (ctrl) throw new Error(`Duplicate modifier "ctrl" in key descriptor "${descriptor}"`);
       ctrl = true;
@@ -202,9 +205,9 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
     }
   }
 
-  const key = parts[parts.length - 1]!;
+  const key = parts.at(-1);
 
-  if (key === '') {
+  if (key === undefined || key === '') {
     throw new Error(`Empty key in key descriptor "${descriptor}"`);
   }
 

@@ -1,12 +1,12 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 162,
-  "errors": 162,
+  "total": 110,
+  "errors": 110,
   "warnings": 0,
   "rules": [
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 4
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
@@ -22,23 +22,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 6
-    },
-    {
-      "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 24
-    },
-    {
-      "ruleId": "@typescript-eslint/no-redundant-type-constituents",
       "count": 1
     },
     {
+      "ruleId": "@typescript-eslint/no-non-null-assertion",
+      "count": 15
+    },
+    {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 16
+      "count": 14
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -54,11 +46,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 3
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 1
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
@@ -66,7 +54,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 45
+      "count": 27
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -74,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
-      "count": 4
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
@@ -86,7 +74,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 16
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -94,7 +82,7 @@
     },
     {
       "ruleId": "no-control-regex",
-      "count": 3
+      "count": 2
     }
   ]
 }

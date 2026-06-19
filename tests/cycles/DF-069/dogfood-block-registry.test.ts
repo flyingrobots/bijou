@@ -39,7 +39,6 @@ import {
   blockLabWorkbenchBlockRegistryEntry,
   titleScreenBlock,
   titleScreenBlockRegistryEntry,
-  type DogfoodBlockRegistryEntry,
 } from '../../../examples/docs/dogfood-blocks.js';
 
 describe('DF-069 DOGFOOD block registry primitives', () => {
@@ -79,11 +78,11 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       surfaceId: 'docs.article',
     })).toThrow();
 
-    expect(() => dogfoodBlockRegistryEntry({
-      block,
-      role: 'prop-soup' as never,
-      surfaceId: 'docs.article',
-    })).toThrow();
+    expect(() => {
+      Reflect.apply(dogfoodBlockRegistryEntry, undefined, [{
+        block, role: 'prop-soup', surfaceId: 'docs.article',
+      }]);
+    }).toThrow();
   });
 
   it('rejects duplicate block and surface ownership', () => {
@@ -115,10 +114,10 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       description: 'DOGFOOD settings menu surface.',
     });
     const registry = dogfoodBlockRegistry([entry]);
-    const entries = registry.entries() as DogfoodBlockRegistryEntry[];
+    const entries = registry.entries();
 
-    expect(() => entries.push(entry)).toThrow();
-    expect(() => (registry.surfaceIds() as string[]).push('docs.other')).toThrow();
+    expect(() => Reflect.apply(Array.prototype.push, entries, [entry])).toThrow();
+    expect(() => Reflect.apply(Array.prototype.push, registry.surfaceIds(), ['docs.other'])).toThrow();
     expect(Object.keys(entry)).not.toContain('provider');
     expect(Object.keys(entry)).not.toContain('providerHandle');
     expect(Object.keys(entry)).not.toContain('subscription');

@@ -67,5 +67,5 @@ export const app: App<Model> = {
 };
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app);
+  void run(app);
 }

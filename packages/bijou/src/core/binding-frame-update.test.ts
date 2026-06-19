@@ -214,11 +214,11 @@ describe('binding frame updates from provider snapshots', () => {
   });
 
   it('throws deterministic errors for non-object frame update inputs', () => {
-    expect(() => bindingFrameUpdateFromSnapshots(null as never)).toThrow(
-      'binding frame update: input must be an object',
-    );
-    expect(() => bindingFrameUpdateFromSnapshots([] as never)).toThrow(
-      'binding frame update: input must be an object',
-    );
+    expect(() => {
+      Reflect.apply(bindingFrameUpdateFromSnapshots, undefined, [null]);
+    }).toThrow('binding frame update: input must be an object');
+    expect(() => {
+      Reflect.apply(bindingFrameUpdateFromSnapshots, undefined, [[]]);
+    }).toThrow('binding frame update: input must be an object');
   });
 });

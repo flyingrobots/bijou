@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { composite, drawer } from './overlay.js';
-import type { DrawerOptions } from './overlay.js';
 import { visibleLength, stripAnsi } from './viewport.js';
 
 function expectSurfaceTextMatch(actualSurfaceText: string, expectedContent: string) {
@@ -51,21 +50,25 @@ describe('drawer', () => {
   });
 
   it('throws when left/right anchor is missing width', () => {
-    expect(() => drawer({
-      content: 'x',
-      anchor: 'left',
-      screenWidth: 80,
-      screenHeight: 10,
-    } as unknown as DrawerOptions)).toThrow(/width/);
+    expect(() => {
+      Reflect.apply(drawer, undefined, [{
+        content: 'x',
+        anchor: 'left',
+        screenWidth: 80,
+        screenHeight: 10,
+      }]);
+    }).toThrow(/width/);
   });
 
   it('throws when top/bottom anchor is missing height', () => {
-    expect(() => drawer({
-      content: 'x',
-      anchor: 'top',
-      screenWidth: 80,
-      screenHeight: 10,
-    } as unknown as DrawerOptions)).toThrow(/height/);
+    expect(() => {
+      Reflect.apply(drawer, undefined, [{
+        content: 'x',
+        anchor: 'top',
+        screenWidth: 80,
+        screenHeight: 10,
+      }]);
+    }).toThrow(/height/);
   });
 
   it('content fills exact screenHeight lines', () => {
@@ -129,7 +132,7 @@ describe('drawer', () => {
   });
 
   it('content longer than available height gets truncated', () => {
-    const manyLines = Array.from({ length: 50 }, (_, i) => `line ${i}`).join('\n');
+    const manyLines = Array.from({ length: 50 }, (_, i) => `line ${String(i)}`).join('\n');
     const d = drawer({ content: manyLines, width: 20, screenWidth: 80, screenHeight: 10 });
     const lines = d.content.split('\n');
     expect(lines).toHaveLength(10);

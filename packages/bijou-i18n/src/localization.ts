@@ -131,7 +131,10 @@ export function freezeLocalizedObject<Value>(
  * properties only; accessor-backed plain objects are rejected.
  */
 export function freezeLocalizedValue<Value>(value: Value): Value {
-  return cloneLocalizedValue(value, 'value', new WeakSet()) as Value;
+  validateLocalizedValue(value, 'value', new WeakSet());
+  const clone = structuredClone(value);
+  freezeLocalizedClone(clone, new WeakSet());
+  return clone;
 }
 
 /**
@@ -150,16 +153,16 @@ export function isJsonShapedLocalizedValue(value: unknown): boolean {
   }
 }
 
-function cloneLocalizedValue(
+function validateLocalizedValue(
   value: unknown,
   path: string,
   seen: WeakSet<object>,
-): unknown {
+): void {
   if (value == null || typeof value !== 'object') {
     if (typeof value === 'bigint' || typeof value === 'symbol' || typeof value === 'function') {
       throw new Error(`Localized value contains unsupported ${typeof value} at ${path}`);
     }
-    return value;
+    return;
   }
 
   const objectValue = value;
@@ -169,28 +172,30 @@ function cloneLocalizedValue(
   seen.add(objectValue);
 
   try {
-    return cloneLocalizedObjectValue(value, path, seen);
+    validateLocalizedObjectValue(value, path, seen);
   } finally {
     seen.delete(objectValue);
   }
 }
 
-function cloneLocalizedObjectValue(
+function validateLocalizedObjectValue(
   value: object,
   path: string,
   seen: WeakSet<object>,
-): unknown {
+): void {
   if (Array.isArray(value)) {
     validateLocalizedArray(value, path);
-    return Object.freeze(value.map((item, index) => cloneLocalizedValue(item, `${path}[${index}]`, seen)));
+    for (const [index, item] of value.entries()) {
+      validateLocalizedValue(item, `${path}[${String(index)}]`, seen);
+    }
+    return;
   }
 
-  const prototype = Object.getPrototypeOf(value);
+  const prototype: unknown = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null) {
     throw new Error(`Localized value contains unsupported ${objectKind(value)} at ${path}`);
   }
 
-  const output: Record<string, unknown> = {};
   const descriptors = Object.getOwnPropertyDescriptors(value);
   for (const key of Reflect.ownKeys(descriptors)) {
     if (typeof key === 'symbol') {
@@ -208,10 +213,9 @@ function cloneLocalizedObjectValue(
     if (!('value' in descriptor)) {
       throw new Error(`Localized value contains unsupported accessor property: ${propertyPath}`);
     }
-    output[key] = cloneLocalizedValue(descriptor.value, propertyPath, seen);
+    const descriptorValue: unknown = descriptor.value;
+    validateLocalizedValue(descriptorValue, propertyPath, seen);
   }
-
-  return Object.freeze(output);
 }
 
 function validateLocalizedArray(value: readonly unknown[], path: string): void {
@@ -266,4 +270,25 @@ function isArrayIndexKey(key: string): boolean {
 
 function objectKind(value: object): string {
   return Object.prototype.toString.call(value).slice(8, -1);
+}
+
+function freezeLocalizedClone(value: unknown, seen: WeakSet<object>): void {
+  if (value == null || typeof value !== 'object') {
+    return;
+  }
+
+  if (seen.has(value)) {
+    return;
+  }
+  seen.add(value);
+
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  for (const descriptor of Object.values(descriptors)) {
+    if ('value' in descriptor) {
+      const descriptorValue: unknown = descriptor.value;
+      freezeLocalizedClone(descriptorValue, seen);
+    }
+  }
+
+  Object.freeze(value);
 }

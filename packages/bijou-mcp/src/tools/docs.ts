@@ -11,6 +11,13 @@ import {
   stripAnsi,
   surfaceToString,
   timer,
+  type GuidedFlowOptions,
+  type GuidedFlowSection,
+  type GuidedFlowStep,
+  type PreferenceRow,
+  type PreferenceRowKind,
+  type PreferenceSection,
+  type StatsPanelEntry,
 } from '@flyingrobots/bijou';
 import { plainStyle } from '@flyingrobots/bijou/adapters/test';
 import { mcpContext } from '../context.js';
@@ -58,11 +65,11 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     return title ? `Note (${title}): ${message}` : `Note: ${message}`;
   },
   bijou_guided_flow: (args) => stripAnsi(guidedFlow({
-    ...(args as unknown as Parameters<typeof guidedFlow>[0]),
+    ...docsGuidedFlowOptions(args),
     ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
   })),
   bijou_preference_list: (args) => surfaceToString(preferenceListSurface(
-    args['sections'] as Parameters<typeof preferenceListSurface>[0],
+    docsPreferenceSections(args['sections']),
     {
       width: Number(args['width'] ?? 40),
       selectedRowId: typeof args['selectedRowId'] === 'string' ? args['selectedRowId'] : undefined,
@@ -123,7 +130,7 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     },
   ), plainStyle()),
   bijou_stats_panel: (args) => surfaceToString(statsPanelSurface(
-    args['entries'] as Parameters<typeof statsPanelSurface>[0],
+    docsStatsPanelEntries(args['entries']),
     {
       title: typeof args['title'] === 'string' ? args['title'] : undefined,
       width: Number(args['width'] ?? 28),
@@ -158,6 +165,77 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     ].join('\n');
   },
 };
+
+function docsGuidedFlowOptions(args: Record<string, unknown>): GuidedFlowOptions {
+  return {
+    title: text(args['title'], 'Guided flow'),
+    label: text(args['label']),
+    summary: text(args['summary']),
+    metadata: strings(args['metadata']),
+    steps: records(args['steps']).map((step): GuidedFlowStep => ({
+      title: text(step['title'], 'Step'),
+      detail: text(step['detail']),
+      status: guidedFlowStepStatus(step['status']),
+    })),
+    sections: records(args['sections']).map((section): GuidedFlowSection => ({
+      title: text(section['title'], 'Section'),
+      content: text(section['content']),
+      tone: section['tone'] === 'muted' ? 'muted' : 'normal',
+    })),
+    nextAction: text(args['nextAction']),
+    nextActionLabel: text(args['nextActionLabel']),
+    width: Number(args['width'] ?? 48),
+  };
+}
+
+function docsPreferenceSections(value: unknown): readonly PreferenceSection[] {
+  return records(value).map((section, sectionIndex) => ({
+    id: text(section['id'], `section-${String(sectionIndex)}`),
+    title: text(section['title'], 'Settings'),
+    rows: docsPreferenceRows(section['rows']),
+  }));
+}
+
+function docsPreferenceRows(value: unknown): readonly PreferenceRow[] {
+  return records(value).map((row, rowIndex) => {
+    const kind = preferenceRowKind(row['kind']);
+    return {
+      id: text(row['id'], `row-${String(rowIndex)}`),
+      label: text(row['label'], 'Setting'),
+      description: text(row['description']),
+      valueLabel: text(row['valueLabel']),
+      checked: row['checked'] === true,
+      enabled: row['enabled'] !== false,
+      ...(kind === undefined ? {} : { kind }),
+    };
+  });
+}
+
+function docsStatsPanelEntries(value: unknown): readonly StatsPanelEntry[] {
+  return records(value).map((entry) => ({
+    label: text(entry['label'], 'metric'),
+    value: text(entry['value']),
+    sparkline: numbers(entry['sparkline']),
+  }));
+}
+
+function records(value: unknown): readonly Readonly<Record<string, unknown>>[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is Readonly<Record<string, unknown>> => (
+      typeof item === 'object' && item !== null && !Array.isArray(item)
+    ))
+    : [];
+}
+
+function guidedFlowStepStatus(value: unknown): GuidedFlowStep['status'] {
+  return value === 'complete' || value === 'current' || value === 'pending' ? value : undefined;
+}
+
+function preferenceRowKind(value: unknown): PreferenceRowKind | undefined {
+  return value === 'toggle' || value === 'choice' || value === 'info' || value === 'action'
+    ? value
+    : undefined;
+}
 
 function normalizeDocsTerm(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();

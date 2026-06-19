@@ -57,4 +57,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

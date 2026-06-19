@@ -252,8 +252,9 @@ function resolveDividerChar(dividerChar: string | undefined, fallback: string): 
   if (dividerChar == null || dividerChar.length === 0) return fallback;
   const graphemes = segmentGraphemes(dividerChar);
   if (graphemes.length === 0) return fallback;
-  if (graphemes.length === 1 && graphemeClusterWidth(graphemes[0]!) === 1) {
-    return graphemes[0]!;
+  const first = graphemes[0];
+  if (first !== undefined && graphemes.length === 1 && graphemeClusterWidth(first) === 1) {
+    return first;
   }
   for (const grapheme of graphemes) {
     if (graphemeClusterWidth(grapheme) === 1) return grapheme;

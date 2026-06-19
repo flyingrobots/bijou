@@ -4,4 +4,4 @@ import { createShowcaseApp } from './app.js';
 
 const ctx = initDefaultContext();
 const app = createShowcaseApp(ctx);
-run(app);
+void run(app);

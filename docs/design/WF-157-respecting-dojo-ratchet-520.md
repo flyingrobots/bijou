@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Tracker
 
@@ -51,6 +51,32 @@ The DOGFOOD app entrypoint remains oversized after the WF-156 merge:
 
 - `examples/docs/app.ts`: `3,306` physical lines / `114,890` bytes
 - DOGFOOD raw-string debt: `2,373`
+
+## Implementation Notes
+
+WF-157 removes `52` live type-aware ESLint findings, lowering the ESLint
+baseline from `162` to `110` and the aggregate Code Dojo ceiling from `570` to
+`518`.
+
+Cleanup clusters:
+
+- i18n runtime-adjacent boundaries: story protocol index guards, catalog
+  filesystem parsing, authoring-tool record handling, and localized value
+  clone/freeze validation.
+- MCP docs examples: replace docs-only renderer assertions with local JSON-shape
+  coercion helpers for guided flow, preference list, and stats panel examples.
+- TUI/core tests and helpers: keybinding/action visibility checks, drawer
+  invalid-input coverage, runtime support typing, subapp command mapping,
+  binding-frame invalid input coverage, DOGFOOD block registry invalid-input
+  and immutability checks, flex/pager numeric formatting, navigable-table
+  repeat loops, notification row guards, motion reconciliation narrowing, and
+  split-pane grapheme guards.
+- Examples: mark top-level app launches as intentionally floated with `void`.
+
+Per the operator's temporary waiver for touched-file size ratchets, existing
+file/context entries for touched legacy-large files were refreshed to their
+current measured line/byte counts. No new counted file/context, mock-ban, or
+code-size entries were added.
 
 ## Scope
 
@@ -143,4 +169,4 @@ without re-running broad discovery first.
 - Aggregate Code Dojo debt is `520` or lower.
 - The ESLint baseline records the lower live count.
 - The Code Dojo exception ledger and `package.json` report the lower ceiling.
-- The next ratchet target is documented as `470` or lower.
+- The next ratchet target is documented as `468` or lower.

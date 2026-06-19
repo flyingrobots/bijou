@@ -8,7 +8,7 @@ import {
 } from '../spring.js';
 import type { MotionOptions, TrackedMotion } from './types.js';
 
-type MotionNode = LayoutNode & { motion?: MotionOptions };
+type MotionNode = LayoutNode & { readonly motion?: MotionOptions };
 
 /**
  * Registry of active motion components across frames.
@@ -30,10 +30,10 @@ export class MotionReconciler {
   }
 
   private reconcileNode(node: LayoutNode, dt: number, seenKeys: Set<string>): void {
-    const motionNode = node as MotionNode;
-    if (motionNode.motion != null) {
-      seenKeys.add(motionNode.motion.key);
-      this.processNode(motionNode, dt);
+    const motion = hasMotion(node) ? node.motion : undefined;
+    if (motion != null) {
+      seenKeys.add(motion.key);
+      this.processNode(node, motion, dt);
     }
 
     for (const child of node.children) {
@@ -41,8 +41,7 @@ export class MotionReconciler {
     }
   }
 
-  private processNode(node: MotionNode, dt: number): void {
-    const motion = node.motion!;
+  private processNode(node: LayoutNode, motion: MotionOptions, dt: number): void {
     const key = motion.key;
     const targetRect = { ...node.rect };
     let state = this.tracked.get(key);
@@ -62,7 +61,7 @@ export class MotionReconciler {
       this.tracked.set(key, state);
     }
 
-    const nextMode = motion.transition?.type ?? state.mode ?? 'spring';
+    const nextMode = motion.transition?.type ?? state.mode;
     const targetChanged = !isSameRect(state.targetRect, targetRect) || state.mode !== nextMode;
     if (targetChanged) {
       state.targetRect = targetRect;
@@ -136,6 +135,10 @@ export class MotionReconciler {
     const s = springStep({ value: curr, velocity: vel, done: false }, target, config, dt);
     return { val: s.value, vel: s.velocity, done: s.done };
   }
+}
+
+function hasMotion(node: LayoutNode): node is MotionNode {
+  return 'motion' in node;
 }
 
 function isSameRect(a: LayoutRect, b: LayoutRect): boolean {
