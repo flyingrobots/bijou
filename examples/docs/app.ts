@@ -3,23 +3,16 @@ import {
   BIJOU_DARK,
   BIJOU_LIGHT,
   boxSurface,
-  blockRenderNode,
   createSurface,
   inspector,
-  inspectorPanelBlock,
   markdown,
   progressBar,
-  readerSurfaceBlock,
   separatorSurface,
   standardBlocks,
-  standardBlockStories,
-  renderBlockTree,
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
   type Surface,
-  type StandardBlockStory,
-  type Theme,
   type TextModifier,
 } from '../../packages/bijou/src/index.js';
 import {
@@ -115,11 +108,8 @@ import {
 import {
   applyCounterDemoIntent,
   counterDemoBlock,
-  counterDemoBlockConfig,
-  counterDemoBlockSurface,
   counterDemoDocumentationText,
   counterDemoIntentForAction,
-  counterDemoLoweringPreviewText,
   createCounterDemoModel,
   tickCounterDemoModel,
   type CounterDemoIntentAction,
@@ -132,14 +122,11 @@ import {
 } from './release-title.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
-  defaultDogfoodBlockRegistry,
   documentationArticleBlock,
-  dogfoodDocsSurfacePreviewOutput,
   footerHintBlock,
   guideInspectorBlock,
   navigationListBlock,
   searchPanelBlock,
-  type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 import { formatFamilyRow, formatGuideRow } from './app-row-format.js';
 import { countMarkdownHeadings, readMarkdownDoc, readMarkdownDocExcerpt } from './app-markdown.js';
@@ -170,6 +157,12 @@ import {
   resolveLandingThemeIndexForShellThemeId as resolveLandingThemeIndexForShellThemeStateId,
 } from './app-docs-shell-theme.js';
 import {
+  renderBlocksPreviewPane,
+  renderCounterDemoPreviewPane,
+  type BlockPreviewPaneChrome,
+} from './app-block-preview-panes.js';
+import { dogfoodSurfaceBlockInventoryMarkdown } from './app-dogfood-surface-block-docs.js';
+import {
   docsThemeAccentToken,
   docsThemeBorderToken,
   docsThemeMutedBorderToken,
@@ -179,9 +172,23 @@ import {
   docsThemeUnfocusedGutterToken,
   resolveDocsThemeActiveHeaderTabToken,
 } from './app-docs-theme-tokens.js';
+import {
+  standardBlockDocumentationText,
+  standardBlockInventoryMarkdown,
+  standardBlockLoweringMarkdown,
+  standardBlockPreviewMarkdown,
+} from './app-standard-block-docs.js';
 import { dogfoodSafePairSummary, themeColorReuseSummary } from './app-theme-diagnostics.js';
+import {
+  clampThemeInspectorScroll,
+  resolveThemeInspectorScrollY,
+  shouldCloseThemeInspector,
+  shouldToggleThemeInspector,
+  themeInspectorDrawerWidth,
+  themeInspectorScrollTarget,
+  themeInspectorViewportHeight,
+} from './app-theme-inspector-state.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
-import { themePaletteRows } from './app-theme-token-model.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
 export { resolveDocsThemeActiveHeaderTabToken } from './app-docs-theme-tokens.js';
@@ -846,290 +853,12 @@ function shouldContinueFromLanding(msg: KeyMsg): boolean {
   return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'enter';
 }
 
-function shouldToggleThemeInspector(msg: KeyMsg): boolean {
-  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'f10';
-}
-
-function shouldCloseThemeInspector(msg: KeyMsg): boolean {
-  return !msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape';
-}
-
-function themeInspectorViewportHeight(model: RootModel): number {
-  const drawerHeight = Math.max(8, model.rows - 4);
-  return Math.max(1, drawerHeight - 2);
-}
-
-function themeInspectorContentHeight(theme: Theme): number {
-  return themePaletteRows(theme).length + 6;
-}
-
-function themeInspectorMaxScroll(model: RootModel): number {
-  const activeTheme = resolveDocsShellThemeById(model.docsModel.activeShellThemeId);
-  return Math.max(0, themeInspectorContentHeight(activeTheme.theme) - themeInspectorViewportHeight(model));
-}
-
-function clampThemeInspectorScroll(model: RootModel, scrollY: number): number {
-  if (!Number.isFinite(scrollY)) return 0;
-  return Math.max(0, Math.min(Math.floor(scrollY), themeInspectorMaxScroll(model)));
-}
-
-function themeInspectorDrawerWidth(columns: number): number {
-  const availableWidth = Math.max(1, columns - 2);
-  const preferredWidth = Math.min(64, Math.max(34, Math.floor(columns * 0.42)));
-  return Math.max(1, Math.min(availableWidth, preferredWidth));
-}
-
-function themeInspectorScrollTarget(msg: KeyMsg, viewportHeight: number): number | 'top' | 'bottom' | undefined {
-  if (msg.ctrl || msg.alt) return undefined;
-  if (!msg.shift && (msg.key === 'down' || msg.key === 'j')) return 1;
-  if (!msg.shift && (msg.key === 'up' || msg.key === 'k')) return -1;
-  if (!msg.shift && (msg.key === 'pagedown' || msg.key === 'd')) return Math.max(1, viewportHeight - 2);
-  if (!msg.shift && (msg.key === 'pageup' || msg.key === 'u')) return -Math.max(1, viewportHeight - 2);
-  if (!msg.shift && msg.key === 'g') return 'top';
-  if (msg.key === 'G' || (msg.shift && msg.key === 'g')) return 'bottom';
-  return undefined;
-}
-
-function standardBlockInventoryMarkdown(localization?: LocalizationPort): string {
-  const blockIndex = standardBlockCatalogIndexMarkdown();
-  const blockSections = standardBlocks
-    .map((block) => {
-      const metadata = block.metadata;
-      const requiredSlots = metadata.slots
-        .filter((slot) => slot.required === true)
-        .map((slot) => slot.id);
-      const optionalSlots = metadata.slots
-        .filter((slot) => slot.required !== true)
-        .map((slot) => slot.id);
-      const dataNames = block.data?.names() ?? [];
-      const commandIds = block.commands?.map((command) => command.id) ?? [];
-
-      return [
-        `## ${metadata.blockName}`,
-        '',
-        metadata.docs.summary,
-        '',
-        `- Family: ${metadata.family}`,
-        `- Scale: ${metadata.scale}`,
-        `- Modes: ${metadata.modes.join(', ')}`,
-        `- Required slots: ${formatDocsList(requiredSlots)}`,
-        `- Optional slots: ${formatDocsList(optionalSlots)}`,
-        `- Data requirements: ${formatDocsList(dataNames)}`,
-        `- Command intents: ${formatDocsList(commandIds)}`,
-      ].join('\n');
-    })
-    .join('\n\n');
-
-  return [
-    '# Pre-made Blocks',
-    '',
-    `First-party standard blocks shipped by @flyingrobots/bijou: ${String(standardBlocks.length)}.`,
-    '',
-    'These are public block authoring contracts with semantic slots, declared modes, data requirements, command intents, variants, and stories. Select a block under Block Preview for the live rendered example.',
-    '',
-    `## ${dogfoodText(localization, 'blocks.standard.catalogTitle', 'Catalog')}`,
-    '',
-    blockIndex,
-    '',
-    `## ${dogfoodText(localization, 'blocks.standard.detailsTitle', 'Details')}`,
-    '',
-    blockSections,
-  ].join('\n');
-}
-
-function standardBlockCatalogIndexMarkdown(): string {
-  const names = standardBlocks.map((block) => block.metadata.blockName);
-  if (names.length <= 18) {
-    return names.map((name) => `- ${name}`).join('\n');
-  }
-
-  const columns = 2;
-  const rows = Math.ceil(names.length / columns);
-  const leftColumnWidth = Math.max(...names.slice(0, rows).map((name) => name.length));
-  return Array.from({ length: rows }, (_, row) => {
-    const left = names[row] ?? '';
-    const right = names[row + rows];
-    if (right === undefined) {
-      return `- ${left}`;
-    }
-
-    return `- ${left.padEnd(leftColumnWidth)}    - ${right}`;
-  }).join('\n');
-}
-
-function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): string {
-  const entries = defaultDogfoodBlockRegistry.entries();
-  const surfaceIndex = entries
-    .map((entry) => `- ${entry.blockName} -> ${entry.surfaceId} (${entry.role})`)
-    .join('\n');
-  const label = (id: string, fallback: string) => dogfoodText(
-    localization,
-    `blocks.surfaceInventory.label.${id}`,
-    fallback,
-  );
-  const blockSections = entries
-    .map((entry) => {
-      const metadata = entry.block.metadata;
-      const dataNames = entry.block.data?.names() ?? [];
-      const commandIds = entry.block.commands?.map((command) => command.id) ?? [];
-
-      return [
-        `## ${metadata.blockName}`,
-        '',
-        dogfoodSurfaceBlockDescription(entry, localization),
-        '',
-        `- ${label('surface', 'Surface')}: ${entry.surfaceId}`,
-        `- ${label('role', 'Role')}: ${entry.role}`,
-        `- ${label('family', 'Family')}: ${metadata.family}`,
-        `- ${label('scale', 'Scale')}: ${metadata.scale}`,
-        `- ${label('modes', 'Modes')}: ${metadata.modes.join(', ')}`,
-        `- ${label('dataRequirements', 'Data requirements')}: ${formatDocsList(dataNames)}`,
-        `- ${label('commandIntents', 'Command intents')}: ${formatDocsList(commandIds)}`,
-        `- ${label('tags', 'Tags')}: ${formatDocsList(entry.tags)}`,
-        ...dogfoodSurfaceBlockPreviewMarkdown(entry, localization),
-      ].join('\n');
-    })
-    .join('\n\n');
-
-  return [
-    `# ${dogfoodText(localization, 'blocks.surfaceInventory.title', 'DOGFOOD Surface Blocks')}`,
-    '',
-    dogfoodText(
-      localization,
-      'blocks.surfaceInventory.count',
-      'DOGFOOD currently registers {count} semantic product surface Blocks.',
-      { count: entries.length },
-    ),
-    '',
-    dogfoodText(
-      localization,
-      'blocks.surfaceInventory.description',
-      'These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks.',
-    ),
-    '',
-    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceIndexTitle', 'Surface index')}`,
-    '',
-    surfaceIndex,
-    '',
-    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceDetailsTitle', 'Surface details')}`,
-    '',
-    blockSections,
-  ].join('\n');
-}
-
-function dogfoodSurfaceBlockPreviewMarkdown(
-  entry: DogfoodBlockRegistryEntry,
-  localization?: LocalizationPort,
-): readonly string[] {
-  if (entry.surfaceId !== 'docs.surface') {
-    return [];
-  }
-
-  return [
-    '',
-    `### ${dogfoodText(localization, 'blocks.surfaceInventory.renderedPreview', 'Rendered preview')}`,
-    '',
-    '```text',
-    dogfoodDocsSurfacePreviewOutput(),
-    '```',
-  ];
-}
-
-function dogfoodSurfaceBlockDescription(
-  entry: DogfoodBlockRegistryEntry,
-  localization?: LocalizationPort,
-): string {
-  const fallback = entry.description ?? entry.block.metadata.docs.summary;
-  return dogfoodText(
-    localization,
-    `blocks.surfaceInventory.entry.${entry.surfaceId}.description`,
-    fallback,
-  );
-}
-
-function standardBlockPreviewMarkdown(): string {
-  const storiesByBlock = new Map<string, StandardBlockStory[]>();
-  for (const story of standardBlockStories) {
-    const existing = storiesByBlock.get(story.blockName) ?? [];
-    storiesByBlock.set(story.blockName, [...existing, story]);
-  }
-
-  const blockSections = standardBlocks
-    .map((block) => {
-      const metadata = block.metadata;
-      const variants = metadata.variants ?? [];
-      const stories = storiesByBlock.get(metadata.blockName) ?? [];
-
-      return [
-        `## ${metadata.blockName}`,
-        '',
-        metadata.docs.summary,
-        '',
-        `Variants: ${formatDocsList(variants.map((variant) => `${variant.id} (${variant.label})`))}`,
-        '',
-        'Stories:',
-        stories.map((story) => `- ${story.id} - ${story.label} - ${story.state}`).join('\n'),
-      ].join('\n');
-    })
-    .join('\n\n');
-
-  return [
-    '# Block Preview',
-    '',
-    'Select a block in the side navigation to see its live TUI example, lowering preview, and documentation. The overview keeps the package inventory readable without rendering every block at once.',
-    '',
-    '## Available Blocks',
-    '',
-    blockSections,
-  ].join('\n');
-}
-
-function standardBlockLoweringMarkdown(localization?: LocalizationPort): string {
-  const declaredModes = Array.from(
-    new Set(standardBlocks.flatMap((block) => block.metadata.modes)),
-  ).sort();
-  const blockIndex = standardBlocks
-    .map((block) => `- ${block.metadata.blockName}`)
-    .join('\n');
-  const blockRows = standardBlocks
-    .map((block) => {
-      const metadata = block.metadata;
-      const semanticFacts = (metadata.semanticFacts ?? [])
-        .map((fact) => `${fact.kind}:${fact.key}=${String(fact.value ?? '')}`);
-      const variantFacts = (metadata.variants ?? [])
-        .flatMap((variant) => variant.facts ?? [])
-        .map((fact) => `${fact.kind}:${fact.key}=${String(fact.value ?? '')}`);
-
-      return [
-        `## ${metadata.blockName}`,
-        '',
-        `- Modes: ${metadata.modes.join(', ')}`,
-        `- Semantic facts: ${formatDocsList(semanticFacts)}`,
-        `- Variant facts: ${formatDocsList(variantFacts)}`,
-      ].join('\n');
-    })
-    .join('\n\n');
-
-  return [
-    '# How Blocks Lower',
-    '',
-    'Blocks lower by preserving declared modes, semantic facts, story states, data requirements, and command intents as inspectable contract data before rendered output exists.',
-    '',
-    `Declared modes: ${declaredModes.join(', ')}`,
-    '',
-    `## ${dogfoodText(localization, 'blocks.standard.catalogTitle', 'Catalog')}`,
-    '',
-    blockIndex,
-    '',
-    `## ${dogfoodText(localization, 'blocks.standard.detailsTitle', 'Details')}`,
-    '',
-    blockRows,
-  ].join('\n');
-}
-
-function formatDocsList(values: readonly string[]): string {
-  return values.length === 0 ? '-' : values.join(', ');
-}
+const BLOCK_PREVIEW_PANE_CHROME: BlockPreviewPaneChrome = {
+  resolvePaneInnerWidth,
+  insetPaneSurface,
+  themedSeparatorSurface,
+  paragraphSurface,
+};
 
 function blockPreviewGuideId(block: BlockDefinition): string {
   return `${BLOCK_PREVIEW_GUIDE_ID}-${slugify(block.metadata.blockName)}`;
@@ -1158,614 +887,6 @@ function counterDemoBlockPreviewGuideDoc(): GuideDoc {
 function standardBlockForPreviewGuide(doc: GuideDoc): BlockDefinition | undefined {
   if (doc.pageId !== BLOCKS_PAGE_ID) return undefined;
   return standardBlocks.find((block) => blockPreviewGuideId(block) === doc.id);
-}
-
-function renderBlocksPreviewPane(
-  block: BlockDefinition,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const paneWidth = resolvePaneInnerWidth(width);
-  const bodyWidth = Math.max(28, paneWidth - 6);
-
-  return insetPaneSurface(column([
-    themedSeparatorSurface(
-      dogfoodText(localization, 'blocks.preview.separator', 'blocks • live preview'),
-      paneWidth,
-      ctx,
-      theme,
-    ),
-    spacer(1, 1),
-    standardBlockLivePreviewSurface(block, bodyWidth, ctx, theme, localization),
-  ]), width);
-}
-
-function renderCounterDemoPreviewPane(
-  model: DocsExplorerModel,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const paneWidth = resolvePaneInnerWidth(width);
-  const bodyWidth = Math.max(28, paneWidth - 6);
-  const pageWidth = Math.max(30, bodyWidth);
-  const pageContentWidth = Math.max(24, pageWidth - 4);
-  const cardWidth = Math.max(30, Math.min(78, pageContentWidth));
-
-  return insetPaneSurface(column([
-    themedSeparatorSurface(
-      dogfoodText(localization, 'blocks.preview.separator', 'blocks • live preview'),
-      paneWidth,
-      ctx,
-      theme,
-    ),
-    spacer(1, 1),
-    boxSurface(column([
-      counterDemoBlockSurface(counterDemoBlockConfig(model.counterBlockDemo, ctx, cardWidth)),
-      spacer(1, 1),
-      boxSurface(paragraphSurface(counterDemoLoweringPreviewText(model.counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
-        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
-        width: cardWidth,
-        borderToken: docsThemeBorderToken(theme),
-        padding: { left: 1, right: 1 },
-        ctx,
-      }),
-      spacer(1, 1),
-      boxSurface(paragraphSurface(counterDemoDocumentationText(), cardWidth - 4), {
-        title: dogfoodText(localization, 'blocks.preview.documentationTitle', 'documentation'),
-        width: cardWidth,
-        borderToken: docsThemeBorderToken(theme),
-        padding: { left: 1, right: 1 },
-        ctx,
-      }),
-    ]), {
-      title: dogfoodText(
-        localization,
-        'blocks.preview.pageTitle',
-        '{blockName}',
-        { blockName: counterDemoBlock.metadata.blockName },
-      ),
-      width: pageWidth,
-      borderToken: docsThemeBorderToken(theme),
-      padding: { left: 1, right: 1 },
-      ctx,
-    }),
-  ]), width);
-}
-
-function standardBlockLivePreviewSurface(
-  block: BlockDefinition,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const safeWidth = Math.max(30, width);
-  const contentWidth = Math.max(24, safeWidth - 4);
-
-  return column([
-    standardBlockExampleSurface(block, contentWidth, ctx, localization),
-    spacer(1, 1),
-    standardBlockLoweringPreviewSurface(block, contentWidth, ctx, theme, localization),
-    spacer(1, 1),
-    standardBlockDocumentationSurface(block, contentWidth, ctx, theme, localization),
-  ]);
-}
-
-function standardBlockExampleSurface(
-  block: BlockDefinition,
-  width: number,
-  ctx: BijouContext,
-  localization: LocalizationPort,
-): Surface {
-  const cardWidth = Math.max(30, Math.min(78, width));
-  const rendered = renderBlockTree(blockRenderNode(block, {
-    mode: 'interactive',
-    slots: standardBlockExampleSlots(block.metadata.blockName, localization),
-    config: standardBlockExampleConfig(cardWidth, block.metadata.blockName),
-  }));
-
-  if (isSurfaceLike(rendered.output)) {
-    return rendered.output;
-  }
-
-  return boxSurface(contentSurface(blockRenderOutputText(rendered.output)), {
-    title: block.metadata.blockName,
-    width: cardWidth,
-    borderToken: ctx.border('primary'),
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
-}
-
-function standardBlockLoweringPreviewSurface(
-  block: BlockDefinition,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const safeWidth = Math.max(30, Math.min(78, width));
-  const innerWidth = Math.max(24, safeWidth - 4);
-  const slots = standardBlockExampleSlots(block.metadata.blockName, localization);
-  const modeLines = block.metadata.modes.map((mode) => {
-    const result = renderBlockTree(blockRenderNode(block, {
-      mode: mode,
-      slots,
-      config: standardBlockExampleConfig(innerWidth, block.metadata.blockName),
-    }));
-    const outputSummary = blockRenderOutputText(result.output, Math.max(36, innerWidth - 22));
-    const factsLine = dogfoodText(
-      localization,
-      'blocks.preview.loweringFacts',
-      '{count} facts',
-      { count: result.facts?.length ?? 0 },
-    );
-    const modeLabel = dogfoodText(
-      localization,
-      'blocks.preview.modeTitle',
-      '{mode} mode',
-      { mode },
-    );
-
-    return `${modeLabel}: ${outputSummary} (${factsLine})`;
-  });
-
-  return boxSurface(paragraphSurface(modeLines.join('\n'), innerWidth), {
-    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
-    width: safeWidth,
-    borderToken: docsThemeBorderToken(theme),
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
-}
-
-function standardBlockExampleConfig(width: number, blockName?: string): Readonly<Record<string, number>> {
-  return {
-    width,
-    sectionHeight: blockName === 'AppShell' ? 8 : 5,
-  };
-}
-
-function standardBlockExampleSlots(
-  blockName: string,
-  localization: LocalizationPort,
-): Readonly<Record<string, unknown>> {
-  switch (blockName) {
-    case 'AppShell':
-      return {
-        navigation: 'Guides / Components / Blocks',
-        content: blockRenderNode(readerSurfaceBlock, {
-          config: { width: 58, sectionHeight: 4 },
-          slots: {
-            content: 'ReaderSurface live content from DOGFOOD Blocks.',
-          },
-        }),
-        inspector: blockRenderNode(inspectorPanelBlock, {
-          config: { width: 58, sectionHeight: 4 },
-          slots: {
-            selection: 'ReaderSurface',
-            details: ['schema-bound', 'provider-ready', 'command-aware'],
-          },
-        }),
-        status: 'ready',
-        overlays: [],
-      };
-    case 'ReaderSurface':
-      return {
-        content: 'ReaderSurface live content from DOGFOOD Blocks.',
-        navigation: 'Blocks navigation',
-        outline: ['What are Blocks', 'How Blocks Lower'],
-      };
-    case 'InspectorPanel':
-      return {
-        selection: 'ReaderSurface',
-        details: ['schema-bound', 'provider-ready', 'command-aware'],
-        actions: ['Reveal selection', 'Focus source'],
-      };
-    case 'InlineStatusBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.inlineStatus.label', 'Docs inventory'),
-        status: dogfoodText(localization, 'blocks.preview.inlineStatus.status', 'ready'),
-        message: dogfoodText(localization, 'blocks.preview.inlineStatus.message', 'catalog synced'),
-      };
-    case 'InFlowStatusBlock':
-      return {
-        severity: dogfoodText(localization, 'blocks.preview.inFlowStatus.severity', 'warning'),
-        source: dogfoodText(localization, 'blocks.preview.inFlowStatus.source', 'DOGFOOD Blocks'),
-        message: dogfoodText(
-          localization,
-          'blocks.preview.inFlowStatus.message',
-          'Preview data should stay explicit.',
-        ),
-        action: dogfoodText(localization, 'blocks.preview.inFlowStatus.action', 'Open story'),
-      };
-    case 'TransientOverlayBlock':
-      return {
-        priority: dogfoodText(localization, 'blocks.preview.transientOverlay.priority', 'normal'),
-        message: dogfoodText(
-          localization,
-          'blocks.preview.transientOverlay.message',
-          'Saved DOGFOOD route',
-        ),
-        dismiss: dogfoodText(
-          localization,
-          'blocks.preview.transientOverlay.dismiss',
-          'Esc dismisses',
-        ),
-      };
-    case 'ActivityStreamBlock':
-      return {
-        events: [
-          dogfoodText(localization, 'blocks.preview.activityStream.event.testsPassed', '10:41 tests passed'),
-          dogfoodText(localization, 'blocks.preview.activityStream.event.prOpened', '10:42 PR opened'),
-        ],
-        selected: dogfoodText(
-          localization,
-          'blocks.preview.activityStream.selected',
-          '10:41 tests passed',
-        ),
-      };
-    case 'ShortcutCueBlock':
-      return {
-        shortcuts: [
-          dogfoodText(localization, 'blocks.preview.shortcutCue.search', '/ Search'),
-          dogfoodText(localization, 'blocks.preview.shortcutCue.help', '? Help'),
-          dogfoodText(localization, 'blocks.preview.shortcutCue.close', 'Esc Close'),
-        ],
-        scope: dogfoodText(localization, 'blocks.preview.shortcutCue.scope', 'Blocks page'),
-      };
-    case 'ProgressIndicatorBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.progressIndicator.label', 'Install packages'),
-        value: '3',
-        total: '5',
-        percent: '60%',
-      };
-    case 'FramedGroupBlock':
-      {
-        const testsGreen = dogfoodText(
-          localization,
-          'blocks.preview.framedGroup.item.testsGreen',
-          'tests green',
-        );
-        return {
-          title: dogfoodText(localization, 'blocks.preview.framedGroup.title', 'Release Checks'),
-          items: [
-            testsGreen,
-            dogfoodText(localization, 'blocks.preview.framedGroup.item.docsUpdated', 'docs updated'),
-            dogfoodText(localization, 'blocks.preview.framedGroup.item.prLinked', 'PR linked'),
-          ],
-          selected: testsGreen,
-          mode: dogfoodText(localization, 'blocks.preview.framedGroup.mode', 'review'),
-        };
-      }
-    case 'ExplainabilityWalkthroughBlock':
-      return {
-        title: dogfoodText(
-          localization,
-          'blocks.preview.explainabilityWalkthrough.title',
-          'Why this changed',
-        ),
-        steps: [
-          dogfoodText(
-            localization,
-            'blocks.preview.explainabilityWalkthrough.step.inputChanged',
-            'input changed',
-          ),
-          dogfoodText(
-            localization,
-            'blocks.preview.explainabilityWalkthrough.step.constraintTightened',
-            'constraint tightened',
-          ),
-          dogfoodText(
-            localization,
-            'blocks.preview.explainabilityWalkthrough.step.previewRerendered',
-            'preview re-rendered',
-          ),
-        ],
-        evidence: dogfoodText(
-          localization,
-          'blocks.preview.explainabilityWalkthrough.evidence',
-          'DF-040 playback',
-        ),
-        decision: dogfoodText(
-          localization,
-          'blocks.preview.explainabilityWalkthrough.decision',
-          'keep grouped proof visible',
-        ),
-        nextStep: dogfoodText(
-          localization,
-          'blocks.preview.explainabilityWalkthrough.nextStep',
-          'open lower-mode output',
-        ),
-      };
-    case 'FormattedDocumentBlock':
-      return {
-        heading: dogfoodText(
-          localization,
-          'blocks.preview.formattedDocument.heading',
-          'Blocks document',
-        ),
-        body: dogfoodText(
-          localization,
-          'blocks.preview.formattedDocument.body',
-          'Use prose for persistent product truth.',
-        ),
-        callout: dogfoodText(
-          localization,
-          'blocks.preview.formattedDocument.callout',
-          'Lower modes keep the same heading and body facts.',
-        ),
-        code: dogfoodText(
-          localization,
-          'blocks.preview.formattedDocument.code',
-          'block: FormattedDocumentBlock',
-        ),
-      };
-    case 'LinkDestinationBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.linkDestination.label', 'DOGFOOD.md'),
-        destination: dogfoodText(
-          localization,
-          'blocks.preview.linkDestination.destination',
-          'docs/DOGFOOD.md',
-        ),
-        kind: dogfoodText(localization, 'blocks.preview.linkDestination.kind', 'docs'),
-        status: dogfoodText(localization, 'blocks.preview.linkDestination.status', 'available'),
-      };
-    case 'DividerBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.divider.label', 'Release Evidence'),
-        style: dogfoodText(localization, 'blocks.preview.divider.style', 'rule'),
-        density: dogfoodText(localization, 'blocks.preview.divider.density', 'compact'),
-      };
-    case 'TextEntryBlock':
-      return {
-        field: dogfoodText(localization, 'blocks.preview.textEntry.field', 'Search docs'),
-        value: dogfoodText(localization, 'blocks.preview.textEntry.value', 'table'),
-        placeholder: dogfoodText(
-          localization,
-          'blocks.preview.textEntry.placeholder',
-          'type a query',
-        ),
-        validation: dogfoodText(localization, 'blocks.preview.textEntry.validation', '4 results'),
-        results: 4,
-      };
-    case 'SingleChoiceBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.singleChoice.label', 'Output mode'),
-        options: [
-          dogfoodText(localization, 'blocks.preview.singleChoice.option.interactive', 'interactive'),
-          dogfoodText(localization, 'blocks.preview.singleChoice.option.pipe', 'pipe'),
-          dogfoodText(localization, 'blocks.preview.singleChoice.option.accessible', 'accessible'),
-        ],
-        selected: dogfoodText(localization, 'blocks.preview.singleChoice.selected', 'pipe'),
-        mode: dogfoodText(localization, 'blocks.preview.singleChoice.mode', 'radio'),
-        validation: dogfoodText(localization, 'blocks.preview.singleChoice.validation', 'available'),
-      };
-    case 'MultipleChoiceBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.multipleChoice.label', 'Release proof'),
-        checked: [
-          dogfoodText(localization, 'blocks.preview.multipleChoice.checked.lint', 'lint'),
-          dogfoodText(localization, 'blocks.preview.multipleChoice.checked.tests', 'tests'),
-        ],
-        unchecked: [
-          dogfoodText(localization, 'blocks.preview.multipleChoice.unchecked.screenshots', 'screenshots'),
-        ],
-        selected: dogfoodText(localization, 'blocks.preview.multipleChoice.selected', 'lint; tests'),
-        validation: dogfoodText(localization, 'blocks.preview.multipleChoice.validation', '2 of 3 complete'),
-      };
-    case 'BinaryDecisionBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.binaryDecision.label', 'Merge gate'),
-        selected: dogfoodText(localization, 'blocks.preview.binaryDecision.selected', 'yes'),
-        consequence: dogfoodText(
-          localization,
-          'blocks.preview.binaryDecision.consequence',
-          'admin merge',
-        ),
-        confirmation: dogfoodText(localization, 'blocks.preview.binaryDecision.confirmation', 'CI green'),
-        disabledReason: dogfoodText(localization, 'blocks.preview.binaryDecision.disabledReason', 'none'),
-      };
-    case 'PeerNavigationBlock':
-      return {
-        previous: dogfoodText(localization, 'blocks.preview.peerNavigation.previous', 'Architecture'),
-        current: dogfoodText(localization, 'blocks.preview.peerNavigation.current', 'Blocks'),
-        next: dogfoodText(localization, 'blocks.preview.peerNavigation.next', 'Method'),
-        route: dogfoodText(localization, 'blocks.preview.peerNavigation.route', 'docs/blocks'),
-        status: dogfoodText(localization, 'blocks.preview.peerNavigation.status', 'available'),
-      };
-    case 'ProgressiveDisclosureBlock':
-      return {
-        label: dogfoodText(localization, 'blocks.preview.progressiveDisclosure.label', 'Advanced options'),
-        state: dogfoodText(localization, 'blocks.preview.progressiveDisclosure.state', 'closed'),
-        hiddenCount: 6,
-        summary: dogfoodText(localization, 'blocks.preview.progressiveDisclosure.summary', '6 options hidden'),
-        details: [
-          dogfoodText(localization, 'blocks.preview.progressiveDisclosure.detail.debugTraces', 'debug traces'),
-          dogfoodText(localization, 'blocks.preview.progressiveDisclosure.detail.layoutFacts', 'layout facts'),
-        ],
-      };
-    case 'PathProgressBlock':
-      return {
-        path: [
-          dogfoodText(localization, 'blocks.preview.pathProgress.path.setup', 'Setup'),
-          dogfoodText(localization, 'blocks.preview.pathProgress.path.blocks', 'Blocks'),
-          dogfoodText(localization, 'blocks.preview.pathProgress.path.preview', 'Preview'),
-        ],
-        current: dogfoodText(localization, 'blocks.preview.pathProgress.current', 'Blocks'),
-        step: 2,
-        total: 3,
-        status: dogfoodText(localization, 'blocks.preview.pathProgress.status', 'current'),
-      };
-    case 'BrandEmphasisBlock':
-      return {
-        brand: dogfoodText(localization, 'blocks.preview.brandEmphasis.brand', 'BIJOU'),
-        tagline: dogfoodText(
-          localization,
-          'blocks.preview.brandEmphasis.tagline',
-          'Terminal-native app blocks',
-        ),
-        decoration: dogfoodText(localization, 'blocks.preview.brandEmphasis.decoration', 'accent rule'),
-        role: dogfoodText(localization, 'blocks.preview.brandEmphasis.role', 'nonessential'),
-        selected: dogfoodText(localization, 'blocks.preview.brandEmphasis.selected', 'BIJOU'),
-      };
-    case 'ModeAwarePrimitiveBlock':
-      return {
-        primitive: dogfoodText(localization, 'blocks.preview.modeAwarePrimitive.primitive', 'metric badge'),
-        fact: dogfoodText(localization, 'blocks.preview.modeAwarePrimitive.fact', 'latency-ms'),
-        value: 42,
-        status: dogfoodText(localization, 'blocks.preview.modeAwarePrimitive.status', 'good'),
-        modeContract: dogfoodText(
-          localization,
-          'blocks.preview.modeAwarePrimitive.modeContract',
-          'visual and pipe',
-        ),
-        selected: dogfoodText(localization, 'blocks.preview.modeAwarePrimitive.selected', 'metric badge'),
-      };
-    case 'DenseComparisonBlock':
-      return {
-        title: dogfoodText(localization, 'blocks.preview.denseComparison.title', 'Compare packages'),
-        metric: dogfoodText(localization, 'blocks.preview.denseComparison.metric', 'tests'),
-        left: '1820',
-        right: '640',
-        delta: '+12',
-        selected: dogfoodText(localization, 'blocks.preview.denseComparison.selected', 'tests'),
-      };
-    case 'HierarchyBlock':
-      return {
-        root: dogfoodText(localization, 'blocks.preview.hierarchy.root', 'docs/'),
-        nodes: [
-          dogfoodText(localization, 'blocks.preview.hierarchy.node.design', 'design/'),
-          dogfoodText(localization, 'blocks.preview.hierarchy.node.dx031', 'DX-031.md'),
-          dogfoodText(localization, 'blocks.preview.hierarchy.node.method', 'METHOD.md'),
-        ],
-        selected: dogfoodText(localization, 'blocks.preview.hierarchy.selected', 'design/'),
-        parent: dogfoodText(localization, 'blocks.preview.hierarchy.parent', 'docs/'),
-        depth: 1,
-        expanded: dogfoodText(localization, 'blocks.preview.hierarchy.expanded', 'true'),
-      };
-    case 'ExplorationListBlock':
-      return {
-        title: dogfoodText(localization, 'blocks.preview.explorationList.title', 'Explore components'),
-        facet: dogfoodText(localization, 'blocks.preview.explorationList.facet', 'input'),
-        items: [
-          dogfoodText(
-            localization,
-            'blocks.preview.explorationList.item.textEntry',
-            'TextEntry field input',
-          ),
-          dogfoodText(
-            localization,
-            'blocks.preview.explorationList.item.singleChoice',
-            'SingleChoice radio/select',
-          ),
-        ],
-        selected: dogfoodText(localization, 'blocks.preview.explorationList.selected', 'TextEntry'),
-        preview: dogfoodText(localization, 'blocks.preview.explorationList.preview', 'field input'),
-      };
-    case 'TemporalDependencyBlock':
-      return {
-        title: dogfoodText(localization, 'blocks.preview.temporalDependency.title', 'Timeline'),
-        events: [
-          dogfoodText(localization, 'blocks.preview.temporalDependency.event.build', '09:00 build'),
-          dogfoodText(localization, 'blocks.preview.temporalDependency.event.test', '09:05 test'),
-          dogfoodText(localization, 'blocks.preview.temporalDependency.event.publish', '09:10 publish'),
-        ],
-        dependency: dogfoodText(
-          localization,
-          'blocks.preview.temporalDependency.dependency',
-          'publish waits for test',
-        ),
-        selected: dogfoodText(localization, 'blocks.preview.temporalDependency.selected', 'publish'),
-        dependsOn: dogfoodText(localization, 'blocks.preview.temporalDependency.dependsOn', 'test'),
-      };
-    default:
-      return {};
-  }
-}
-
-function standardBlockDocumentationText(block: BlockDefinition): string {
-  const metadata = block.metadata;
-  const stories = standardBlockStories.filter((story) => story.blockName === metadata.blockName);
-  const slots = metadata.slots.map((slot) => `${slot.id}${slot.required === true ? ' required' : ' optional'}`);
-  const variants = (metadata.variants ?? []).map((variant) => `${variant.id} (${variant.label})`);
-  const dataNames = block.data?.names() ?? [];
-  const commands = block.commands?.map((command) => command.id) ?? [];
-
-  return [
-    metadata.docs.summary,
-    `Family: ${metadata.family}`,
-    `Scale: ${metadata.scale}`,
-    `Modes: ${formatDocsList(metadata.modes)}`,
-    `Slots: ${formatDocsList(slots)}`,
-    `Variants: ${formatDocsList(variants)}`,
-    `Data requirements: ${formatDocsList(dataNames)}`,
-    `Command intents: ${formatDocsList(commands)}`,
-    `Stories: ${formatDocsList(stories.map((story) => `${story.id} (${story.state})`))}`,
-  ].join('\n');
-}
-
-function standardBlockDocumentationSurface(
-  block: BlockDefinition,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const cardWidth = Math.max(30, Math.min(78, width));
-  const innerWidth = Math.max(24, cardWidth - 4);
-
-  return boxSurface(paragraphSurface(standardBlockDocumentationText(block), innerWidth), {
-    title: dogfoodText(localization, 'blocks.preview.documentationTitle', 'documentation'),
-    width: cardWidth,
-    borderToken: docsThemeBorderToken(theme),
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
-}
-
-function blockRenderOutputText(output: unknown, maxLength = 120): string {
-  if (typeof output === 'string') {
-    return compactPreviewText(output, maxLength);
-  }
-  if (isSurfaceLike(output)) {
-    return `${String(output.width)}x${String(output.height)}`;
-  }
-  try {
-    return compactPreviewText(JSON.stringify(output), maxLength);
-  } catch {
-    return String(output);
-  }
-}
-
-function isSurfaceLike(value: unknown): value is Surface {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && 'width' in value
-      && typeof value.width === 'number'
-      && 'height' in value
-      && typeof value.height === 'number'
-      && 'get' in value
-      && typeof value.get === 'function',
-  );
-}
-
-function compactInlineText(value: string): string {
-  return value.replace(/\s+/g, ' ').trim() || '-';
-}
-
-function compactPreviewText(value: string, maxLength = 120): string {
-  const compacted = compactInlineText(value);
-  return compacted.length <= maxLength
-    ? compacted
-    : `${compacted.slice(0, Math.max(0, maxLength - 1))}…`;
 }
 
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
@@ -2491,7 +1612,11 @@ function renderThemeInspectorDrawer(
     width: bodyWidth,
     height: viewportHeight,
     content: body,
-    scrollY: clampThemeInspectorScroll(model, model.themeInspectorScrollY),
+    scrollY: clampThemeInspectorScroll(
+      model.rows,
+      activeTheme.theme,
+      model.themeInspectorScrollY,
+    ),
     showScrollbar: true,
     scrollbarMode: 'overlay',
     scrollbarTrackCell: {
@@ -2940,10 +2065,17 @@ function renderGuideReaderPane(
 
   const standardBlock = standardBlockForPreviewGuide(doc);
   if (standardBlock !== undefined) {
-    return renderBlocksPreviewPane(standardBlock, width, ctx, theme, localization);
+    return renderBlocksPreviewPane(standardBlock, width, ctx, theme, localization, BLOCK_PREVIEW_PANE_CHROME);
   }
   if (doc.id === COUNTER_DEMO_BLOCK_GUIDE_ID) {
-    return renderCounterDemoPreviewPane(model, width, ctx, theme, localization);
+    return renderCounterDemoPreviewPane(
+      model.counterBlockDemo,
+      width,
+      ctx,
+      theme,
+      localization,
+      BLOCK_PREVIEW_PANE_CHROME,
+    );
   }
   if (doc.id === THEME_LAB_GUIDE_ID) {
     return renderThemeLabPane(width, ctx, theme, localization);
@@ -3959,7 +3091,11 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         };
         return updateExplorer(msg, {
           ...resizedModel,
-          themeInspectorScrollY: clampThemeInspectorScroll(resizedModel, resizedModel.themeInspectorScrollY),
+          themeInspectorScrollY: clampThemeInspectorScroll(
+            resizedModel.rows,
+            resolveDocsShellThemeById(resizedModel.docsModel.activeShellThemeId).theme,
+            resizedModel.themeInspectorScrollY,
+          ),
         });
       }
 
@@ -4036,16 +3172,21 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           if (shouldToggleThemeInspector(msg) || shouldCloseThemeInspector(msg)) {
             return [{ ...model, themeInspectorOpen: false, themeInspectorScrollY: 0 }, []];
           }
-          const scrollTarget = themeInspectorScrollTarget(msg, themeInspectorViewportHeight(model));
+          const scrollTarget = themeInspectorScrollTarget(msg, themeInspectorViewportHeight(model.rows));
           if (scrollTarget !== undefined) {
-            const nextScrollY = scrollTarget === 'top'
-              ? 0
-              : scrollTarget === 'bottom'
-                ? themeInspectorMaxScroll(model)
-                : model.themeInspectorScrollY + scrollTarget;
+            const nextScrollY = resolveThemeInspectorScrollY(
+              model.themeInspectorScrollY,
+              scrollTarget,
+              model.rows,
+              resolveDocsShellThemeById(model.docsModel.activeShellThemeId).theme,
+            );
             return [{
               ...model,
-              themeInspectorScrollY: clampThemeInspectorScroll(model, nextScrollY),
+              themeInspectorScrollY: clampThemeInspectorScroll(
+                model.rows,
+                resolveDocsShellThemeById(model.docsModel.activeShellThemeId).theme,
+                nextScrollY,
+              ),
             }, []];
           }
           if (isShellQuitRequest(msg)) {

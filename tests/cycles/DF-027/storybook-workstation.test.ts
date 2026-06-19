@@ -56,10 +56,10 @@ describe('DF-027 BlockLab DOGFOOD workstation', () => {
     expect(index).toContain('Required modes: interactive, static, pipe, accessible');
     expect(index).toContain('## Feedback overlays and history');
     expect(index).toContain('- notification-system');
-    expect(index).toContain('package=bijou-tui');
-    expect(index).toContain('variants=live-stack,history-review,framed-routing');
-    expect(index).toContain('modes=interactive,static,pipe,accessible');
-    expect(index).toContain('source=examples/notifications/main.ts');
+    expect(index).toContain('package:bijou-tui');
+    expect(index).toContain('variants:live-stack,history-review,framed-routing');
+    expect(index).toContain('modes:interactive,static,pipe,accessible');
+    expect(index).toContain('source:examples/notifications/main.ts');
   });
   it('captures a selected story across every profile and variant', () => {
     const matrix = captureDogfoodStorybookMatrix({ storyId: 'notification-system' });

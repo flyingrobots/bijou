@@ -8,6 +8,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-155 removes `51` more type-aware ESLint
+  findings across Storybook/BlockLab fixtures, the counter block demo, TUI app
+  shell tests, focus-area and collection-surface helpers, surface primitive
+  tests, split-editor bootstrap, i18n localization fixtures, and Node IO resize
+  handling while keeping touched file/context ceilings flat or lower, lowering
+  aggregate Code Dojo debt from `674` to `623` with the next goalpost target set
+  to `573` or lower. The same pass also splits standard block docs, live block
+  preview rendering, and Theme Inspector state out of `examples/docs/app.ts`,
+  lowering that DOGFOOD entrypoint to `3,306` physical lines / `114,890` bytes
+  and DOGFOOD raw-string debt from `2,415` to `2,373`.
 - **DOGFOOD app landing extraction** — DF-077 splits the landing
   surface/theme/quality/rendering subsystem plus the docs shell theme and theme
   token diagnostics out of `examples/docs/app.ts` into focused sub-150-line

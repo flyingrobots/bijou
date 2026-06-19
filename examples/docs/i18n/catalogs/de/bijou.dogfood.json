@@ -31,6 +31,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.appShell.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Guides / Komponenten / Blocks"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.binaryDecision.confirmation"
       },
       "kind": "message",
@@ -560,6 +571,39 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inspectorPanel.action.focus"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Quelle fokussieren"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inspectorPanel.action.reveal"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Auswahl anzeigen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.inspectorPanel.selection"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "ReaderSurface"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "blocks.preview.linkDestination.destination"
       },
       "kind": "message",
@@ -922,6 +966,50 @@
       "sourceLocale": "en",
       "values": {
         "de": "6 Optionen ausgeblendet"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.readerSurface.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "ReaderSurface Live-Inhalt aus DOGFOOD Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.readerSurface.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Blocks Navigation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.readerSurface.outline.lowering"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Wie Blocks senken"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.readerSurface.outline.what"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Was sind Blocks"
       }
     },
     {

@@ -144,7 +144,7 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
      */
     onResize(callback: (cols: number, rows: number) => void): RawInputHandle {
       const handler = (): void => {
-        callback(process.stdout.columns ?? 80, process.stdout.rows ?? 24);
+        callback(process.stdout.columns, process.stdout.rows);
       };
       process.stdout.on('resize', handler);
       return {

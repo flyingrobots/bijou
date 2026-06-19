@@ -93,16 +93,16 @@ describe('surface-first primitives', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const surface = alertSurface('Watch this space', { ctx });
 
-    expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated')?.bg);
-    expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated')?.bg);
+    expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated').bg);
+    expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated').bg);
   });
 
   it('alertSurface preserves elevated background metadata in noColor contexts', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const surface = alertSurface('Watch this space', { ctx });
 
-    expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated')?.bg);
-    expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated')?.bg);
+    expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated').bg);
+    expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated').bg);
   });
 
   it('alertSurface accepts a custom borderToken override', () => {

@@ -1,12 +1,12 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 266,
-  "errors": 266,
+  "total": 215,
+  "errors": 215,
   "warnings": 0,
   "rules": [
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 8
+      "count": 5
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
@@ -30,11 +30,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 7
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 46
+      "count": 39
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -42,15 +42,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 28
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
-      "count": 6
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
-      "count": 2
+      "count": 18
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -66,7 +58,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 4
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
@@ -78,15 +70,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 60
+      "count": 55
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 5
-    },
-    {
-      "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
-      "count": 2
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
@@ -106,7 +94,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 44
+      "count": 32
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -115,10 +103,6 @@
     {
       "ruleId": "no-control-regex",
       "count": 4
-    },
-    {
-      "ruleId": "no-useless-assignment",
-      "count": 1
     }
   ]
 }

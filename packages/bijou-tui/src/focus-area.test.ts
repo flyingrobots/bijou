@@ -20,17 +20,13 @@ import {
   focusAreaKeyMap,
 } from './focus-area.js';
 
-// ── Test Data ──────────────────────────────────────────────────────
-
 const SHORT_CONTENT = 'line 1\nline 2\nline 3';
-const LONG_CONTENT = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`).join('\n');
-const WIDE_CONTENT = Array.from({ length: 10 }, (_, i) => `${'x'.repeat(80)} row ${i + 1}`).join('\n');
+const LONG_CONTENT = Array.from({ length: 50 }, (_, i) => `line ${String(i + 1)}`).join('\n');
+const WIDE_CONTENT = Array.from({ length: 10 }, (_, i) => `${'x'.repeat(80)} row ${String(i + 1)}`).join('\n');
 
 function keyMsg(key: string, mods?: Partial<KeyMsg>): KeyMsg {
   return { type: 'key', key, ctrl: false, alt: false, shift: false, ...mods };
 }
-
-// ── createFocusAreaState ──────────────────────────────────────────
 
 describe('createFocusAreaState', () => {
   it('creates state with scroll at 0', () => {
@@ -109,8 +105,6 @@ describe('createFocusAreaStateForSurface', () => {
   });
 });
 
-// ── Vertical scroll transformers ──────────────────────────────────
-
 describe('focusAreaScrollBy', () => {
   it('scrolls down', () => {
     const state = createFocusAreaState({ content: LONG_CONTENT, width: 40, height: 10 });
@@ -178,8 +172,6 @@ describe('focusAreaPageDown / focusAreaPageUp', () => {
   });
 });
 
-// ── Horizontal scroll transformers ────────────────────────────────
-
 describe('focusAreaScrollByX', () => {
   it('scrolls right when overflowX is scroll', () => {
     const state = createFocusAreaState({ content: WIDE_CONTENT, width: 40, height: 10, overflowX: 'scroll' });
@@ -214,15 +206,13 @@ describe('focusAreaScrollToX', () => {
   });
 });
 
-// ── focusAreaSetContent ───────────────────────────────────────────
-
 describe('focusAreaSetContent', () => {
   it('updates content and preserves scroll', () => {
     const state = focusAreaScrollBy(
       createFocusAreaState({ content: LONG_CONTENT, width: 40, height: 10 }),
       5,
     );
-    const newContent = Array.from({ length: 60 }, (_, i) => `new ${i}`).join('\n');
+    const newContent = Array.from({ length: 60 }, (_, i) => `new ${String(i)}`).join('\n');
     const next = focusAreaSetContent(state, newContent);
     expect(next.scroll.y).toBe(5);
     expect(next.scroll.totalLines).toBe(60);
@@ -238,8 +228,6 @@ describe('focusAreaSetContent', () => {
     expect(next.scroll.y).toBe(0); // 3 lines < viewport, maxY = 0
   });
 });
-
-// ── Render ─────────────────────────────────────────────────────────
 
 describe('focusArea', () => {
   it('renders exactly height lines', () => {
@@ -287,11 +275,10 @@ describe('focusArea', () => {
     focusArea(state, { focused: true, ctx, id: 'main' });
 
     const styledGutter = style.calls.find((call) => call.method === 'styled' && call.text === '▎');
-    expect(styledGutter?.token).toMatchObject({
-      hex: '#ff00ff',
-      bg: '#101010',
-      modifiers: expect.arrayContaining(['bold', 'underline']),
-    });
+    const token = styledGutter?.token;
+    if (token === undefined) throw new Error('expected styled gutter token');
+    expect(token).toMatchObject({ hex: '#ff00ff', bg: '#101010' });
+    expect(token.modifiers).toEqual(expect.arrayContaining(['bold', 'underline']));
   });
 
   it('defaults the focused gutter to the shell focus UI token', () => {
@@ -483,8 +470,6 @@ describe('focusAreaSurface', () => {
     expect(trackCall?.token).toMatchObject({ hex: '#654321' });
   });
 });
-
-// ── Keymap ──────────────────────────────────────────────────────────
 
 describe('focusAreaKeyMap', () => {
   interface Msg { type: string }

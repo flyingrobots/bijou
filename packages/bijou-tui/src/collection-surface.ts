@@ -58,7 +58,7 @@ export function collectionRowsSurface(
       surface.fill({ char: ' ', bg: selectedBg, empty: false }, 0, row, safeWidth, 1);
     }
 
-    const lineText = resolveRowText(lines[row]!, innerWidth, selected, options.selectedRowOverflow);
+    const lineText = resolveRowText(lines[row] ?? '', innerWidth, selected, options.selectedRowOverflow);
     const lineSurface = parseAnsiToSurface(lineText, innerWidth, 1);
     surface.blit(
       lineSurface,
@@ -94,9 +94,6 @@ function resolveRowText(
   if (!selected || overflow == null || overflow === 'clip') {
     return clipToWidth(line, innerWidth);
   }
-  if (overflow.mode !== 'marquee') {
-    return clipToWidth(line, innerWidth);
-  }
   return marqueeToWidth(line, innerWidth, overflow);
 }
 
@@ -119,17 +116,13 @@ function marqueeToWidth(
   const cycleLength = startPauseSteps + forwardSteps + endPauseSteps + reverseSteps;
   const stepIndex = Math.floor(Math.max(0, options.elapsedMs) / stepMs) % cycleLength;
 
-  let offset = 0;
-  if (stepIndex < startPauseSteps) {
-    offset = 0;
-  } else if (stepIndex < startPauseSteps + forwardSteps) {
-    offset = stepIndex - startPauseSteps + 1;
-  } else if (stepIndex < startPauseSteps + forwardSteps + endPauseSteps) {
-    offset = overflow;
-  } else {
-    const reverseIndex = stepIndex - startPauseSteps - forwardSteps - endPauseSteps;
-    offset = overflow - 1 - reverseIndex;
-  }
+  const offset = stepIndex < startPauseSteps
+    ? 0
+    : stepIndex < startPauseSteps + forwardSteps
+      ? stepIndex - startPauseSteps + 1
+      : stepIndex < startPauseSteps + forwardSteps + endPauseSteps
+        ? overflow
+        : overflow - 1 - (stepIndex - startPauseSteps - forwardSteps - endPauseSteps);
 
   return cached.cells.slice(offset, offset + width).join('');
 }
