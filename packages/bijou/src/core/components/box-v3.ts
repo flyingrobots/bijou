@@ -58,12 +58,13 @@ function withInheritedBackground(surface: Surface, background: ColorRef | undefi
       const size = next.width * next.height;
       for (let i = 0; i < size; i++) {
         const off = i * CELL_STRIDE;
-        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
-        if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+        const alpha = buf[off + OFF_ALPHA] ?? 0;
+        if ((buf[off + OFF_FLAGS] ?? 0) & FLAG_EMPTY) continue;
+        if (alpha & FLAG_BG_SET) continue;
         buf[off + 5] = bgR;
         buf[off + 6] = bgG;
         buf[off + 7] = bgB;
-        buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+        buf[off + OFF_ALPHA] = alpha | FLAG_BG_SET;
       }
       next.markAllDirty();
       return next;
@@ -140,14 +141,13 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     empty: false,
   });
 
-  const borderToken = options.borderToken || ctx?.border('primary');
+  const borderToken = options.borderToken ?? ctx?.border('primary');
   const borderStyle = applyBCSSCellTextStyles({
     fg: borderToken?.hex ?? '#ffffff',
     bg: borderToken?.bg,
-    modifiers: borderToken?.modifiers as any,
+    modifiers: borderToken?.modifiers,
   }, bcss);
 
-  // Fast path: use setRGB for borders when surface is packed
   const bRGB = isPackedSurface(surface) ? parseStyleRGB(borderStyle) : undefined;
   if (bRGB && isPackedSurface(surface)) {
     const { fgR, fgG, fgB, bgR, bgG, bgB, flags } = bRGB;
@@ -170,8 +170,8 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
       const titleText = clipToWidth(` ${safeTitle} `, available);
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
-      for (let i = 0; i < titleLen; i++) {
-        surface.setRGB(i + 2, 0, titleGs[i]!, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+        surface.setRGB(i + 2, 0, char, fgR, fgG, fgB, bgR, bgG, bgB, flags);
       }
     }
   } else {
@@ -199,8 +199,8 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
       const titleText = clipToWidth(` ${safeTitle} `, available);
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
-      for (let i = 0; i < titleLen; i++) {
-        surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
+      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+        surface.set(i + 2, 0, { ...borderCell, char });
       }
     }
   }
@@ -226,7 +226,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
  */
 export function headerBoxSurface(label: string, options: HeaderBoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  const safeLabel = sanitizePlainTerminalText(label ?? '');
+  const safeLabel = sanitizePlainTerminalText(label);
   const detail = sanitizePlainTerminalText(options.detail ?? '');
   const labelToken = options.labelToken ?? ctx?.semantic('primary');
   const mutedToken = ctx?.semantic('muted');

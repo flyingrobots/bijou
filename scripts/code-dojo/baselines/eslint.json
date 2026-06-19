@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 857,
-  "errors": 857,
+  "total": 807,
+  "errors": 807,
   "warnings": 0,
   "rules": [
     {
@@ -10,7 +10,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 16
+      "count": 15
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -34,7 +34,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 25
+      "count": 18
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
@@ -42,7 +42,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 32
+      "count": 30
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -50,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 146
+      "count": 131
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -58,7 +58,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 54
+      "count": 48
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -82,7 +82,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 12
+      "count": 11
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
@@ -98,7 +98,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 139
+      "count": 132
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -114,7 +114,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 18
+      "count": 17
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
@@ -130,11 +130,11 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 19
+      "count": 18
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
-      "count": 2
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
@@ -146,7 +146,7 @@
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",
-      "count": 8
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "no-control-regex",
-      "count": 9
+      "count": 7
     },
     {
       "ruleId": "no-restricted-imports",

@@ -1634,11 +1634,6 @@
       "bytes": 5154
     },
     {
-      "path": "packages/bijou-node/src/worker/worker.proxy.test.ts",
-      "lines": 156,
-      "bytes": 5095
-    },
-    {
       "path": "packages/bijou-tui/src/surface-budget.ts",
       "lines": 155,
       "bytes": 3941

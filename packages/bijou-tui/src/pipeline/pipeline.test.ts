@@ -45,7 +45,8 @@ describe('createPipeline', () => {
     });
 
     pipeline.use('Paint', (s, next) => {
-      s.data['greeting'] += ' world';
+      const greeting = s.data['greeting'];
+      s.data['greeting'] = typeof greeting === 'string' ? `${greeting} world` : greeting;
       next();
     });
 
@@ -59,7 +60,7 @@ describe('createPipeline', () => {
     const log: string[] = [];
 
     pipeline.use('Layout', (_, next) => { log.push('1'); next(); });
-    pipeline.use('Paint', () => { log.push('2'); /* HALT */ });
+    pipeline.use('Paint', () => { log.push('2'); });
     pipeline.use('PostProcess', (_, next) => { log.push('3'); next(); });
 
     pipeline.execute(createMockState());
@@ -70,7 +71,7 @@ describe('createPipeline', () => {
   it('catches and logs middleware errors without crashing', () => {
     const pipeline = createPipeline();
     const state = createMockState();
-    state.ctx.io.writeError = vi.fn();
+    const es: string[] = []; state.ctx.io.writeError = es.push.bind(es);
     const log: string[] = [];
 
     pipeline.use('Layout', (_, next) => { log.push('1'); next(); });
@@ -79,14 +80,14 @@ describe('createPipeline', () => {
 
     pipeline.execute(state);
 
-    expect(log).toEqual(['1', '3']); // Continued after error
-    expect(state.ctx.io.writeError).toHaveBeenCalledWith(expect.stringContaining('[Pipeline Error]'));
+    expect(log).toEqual(['1', '3']);
+    expect(es).toEqual([expect.stringContaining('[Pipeline Error]')]);
   });
 
   it('diagnoses async middleware and keeps the frame moving synchronously', async () => {
     const pipeline = createPipeline();
     const state = createMockState();
-    state.ctx.io.writeError = vi.fn();
+    const es: string[] = []; state.ctx.io.writeError = es.push.bind(es);
     const log: string[] = [];
     let releaseAsync: (() => void) | undefined;
     const asyncGate = new Promise<void>((resolve) => {
@@ -107,10 +108,7 @@ describe('createPipeline', () => {
     pipeline.execute(state);
 
     expect(log).toEqual(['async-start', 'post']);
-    expect(state.ctx.io.writeError).toHaveBeenCalledTimes(1);
-    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
-      expect.stringContaining('Async render middleware returned a Promise in Paint'),
-    );
+    expect(es).toEqual([expect.stringContaining('Async render middleware returned a Promise in Paint')]);
 
     releaseAsync?.();
     await asyncGate;
@@ -122,7 +120,7 @@ describe('createPipeline', () => {
   it('reports rejected async middleware promises without leaving an unhandled rejection', async () => {
     const pipeline = createPipeline();
     const state = createMockState();
-    state.ctx.io.writeError = vi.fn();
+    const es: string[] = []; state.ctx.io.writeError = es.push.bind(es);
     const log: string[] = [];
 
     pipeline.use('Layout', () => Promise.reject(new Error('async boom')));
@@ -135,10 +133,10 @@ describe('createPipeline', () => {
     await Promise.resolve();
 
     expect(log).toEqual(['paint']);
-    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
+    expect(es).toContainEqual(
       expect.stringContaining('Async render middleware returned a Promise in Layout'),
     );
-    expect(state.ctx.io.writeError).toHaveBeenCalledWith(
+    expect(es).toContainEqual(
       expect.stringContaining('Async render middleware rejected in Layout'),
     );
   });
@@ -216,7 +214,6 @@ describe('createPipeline', () => {
     });
     pipeline.use('Paint', () => {
       nowMs += 9;
-      // halt
     });
     pipeline.use('PostProcess', (_state, next) => {
       nowMs += 100;
