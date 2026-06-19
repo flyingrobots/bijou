@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Issue
 
@@ -23,26 +23,28 @@ toward that endpoint, not an exception shuffle.
 Reduce aggregate Code Dojo debt from `1,779` to `1,729` or lower by eliminating
 at least `50` live ESLint findings with behavior-preserving TypeScript fixes.
 
-## Candidate Slice
+## Final Slice
 
-Initial offender candidates:
+The implemented cleanup removes exactly 50 live ESLint findings:
 
 | File | Findings |
 | :--- | ---: |
-| `examples/docs/capture-main.ts` | 30 |
 | `examples/perf-gradient/main.ts` | 24 |
-| `packages/bijou/src/core/theme/builder.ts` | 13 |
-| **Candidate total** | **67** |
+| `packages/bijou/src/core/components/dag-edges.test.ts` | 12 |
+| `packages/bijou/src/core/components/box.test.ts` | 12 |
+| `packages/bijou/src/core/components/perf-overlay.ts` | 2 |
+| **Slice total** | **50** |
 
-The final slice may substitute equivalent compact offenders if a candidate
-exposes broader semantic work than this goalpost should carry.
+The DOGFOOD capture candidate is intentionally deferred because touching that
+source currently activates a broader DOGFOOD i18n raw-copy cleanup than this
+goalpost should carry.
 
 ## Scope
 
 - Replace non-null assertions, unsafe assertions, and `any` escapes with checked
   reads, typed helpers, or narrowed runtime guards.
 - Make numeric and unknown template interpolation explicit.
-- Preserve capture, perf-gradient, and theme behavior.
+- Preserve perf-gradient and component behavior.
 - Lower `scripts/code-dojo/baselines/eslint.json`,
   `docs/code-dojo-exceptions.md`, and `package.json` only after live counts
   prove the reduction.
@@ -65,6 +67,13 @@ Live counts on `main` at `7e029df7`:
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,729` or lower
 
+Implementation result:
+
+- aggregate Code Dojo debt: `1,729`
+- ESLint findings: `1,318`
+- live ESLint reduction: `50`
+- next aggregate target: `1,679` or lower
+
 ## Playback Questions
 
 1. Is aggregate Code Dojo debt at `1,729` or lower?
@@ -75,8 +84,7 @@ Live counts on `main` at `7e029df7`:
 ## Validation Plan
 
 - Run focused Code Dojo gates for the touched files.
-- Run focused tests for capture/perf/theme surfaces selected for the final
-  slice.
+- Run focused tests for the selected component surfaces.
 - Run `npm run code-dojo:debt`.
 - Run `npm run code-dojo:verify`.
 - Run `npm run lint` and `npm run lint:eslint`.

@@ -83,7 +83,7 @@ export function perfOverlaySurface(
   const entries: StatsPanelEntry[] = [
     { label: 'FPS', value: String(Math.round(stats.fps)) },
     { label: 'frame', value: fmt(stats.frameTimeMs, 2) + ' ms', sparkline: stats.frameTimeHistory },
-    { label: 'size', value: `${stats.width}×${stats.height}` },
+    { label: 'size', value: `${String(stats.width)}×${String(stats.height)}` },
   ];
 
   if (stats.heapUsedMB != null) {
