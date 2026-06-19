@@ -1,20 +1,3 @@
-/**
- * Bijou bench CLI — dispatches to harnesses.
- *
- * Subcommands:
- *   run       — wall-time bench. Spawns N children per scenario,
- *               aggregates stats, optionally writes a structured report.
- *   compare   — diff two bench reports (nested JSON or flat JSONL).
- *   list      — print the scenario registry with IDs and labels.
- *
- * Usage:
- *   node --import tsx bench/src/cli.ts run [--scenario=ID] [--samples=30]
- *                                          [--warmup=N] [--frames=N] [--format=summary|json|jsonl]
- *                                          [--out=path.json]
- *   node --import tsx bench/src/cli.ts compare <baseline.json> <current.json>
- *   node --import tsx bench/src/cli.ts list
- */
-
 import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import {
@@ -38,7 +21,8 @@ type BenchOutputFormat = 'summary' | 'json' | 'jsonl';
 function parseKv(argv: readonly string[]): Map<string, string> {
   const out = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i]!;
+    const arg = argv[i];
+    if (arg === undefined) continue;
     if (!arg.startsWith('--')) continue;
     const eq = arg.indexOf('=');
     if (eq !== -1) {
@@ -62,7 +46,8 @@ function flagValues(argv: readonly string[], key: string): string[] {
   const longFlag = `--${key}`;
 
   for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i]!;
+    const arg = argv[i];
+    if (arg === undefined) continue;
     if (arg === longFlag) {
       const next = argv[i + 1];
       if (next != null && !next.startsWith('--')) {
@@ -114,7 +99,8 @@ function positional(argv: readonly string[]): string[] {
   // consumption so positionals are identified correctly.
   const result: string[] = [];
   for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i]!;
+    const arg = argv[i];
+    if (arg === undefined) continue;
     if (!arg.startsWith('--')) {
       result.push(arg);
       continue;
@@ -141,7 +127,7 @@ function cmdList(argv: readonly string[]): void {
     process.stdout.write(`  ${s.id}\n`);
     process.stdout.write(`    ${s.label}\n`);
     process.stdout.write(`    tags: ${s.tags.join(', ')}\n`);
-    process.stdout.write(`    ${s.columns}×${s.rows}, warmup=${s.defaultWarmupFrames}, measure=${s.defaultMeasureFrames}\n`);
+    process.stdout.write(`    ${String(s.columns)}×${String(s.rows)}, warmup=${String(s.defaultWarmupFrames)}, measure=${String(s.defaultMeasureFrames)}\n`);
     process.stdout.write(`    ${s.description}\n`);
     process.stdout.write('\n');
   }
@@ -150,9 +136,10 @@ function cmdList(argv: readonly string[]): void {
 function cmdRun(argv: readonly string[]): void {
   const kv = parseKv(argv);
 
-  const samples = Number.parseInt(kv.get('samples') ?? '30', 10);
+  const rawSamples = kv.get('samples') ?? '30';
+  const samples = Number.parseInt(rawSamples, 10);
   if (!Number.isFinite(samples) || samples <= 0) {
-    throw new Error(`invalid --samples: ${kv.get('samples')}`);
+    throw new Error(`invalid --samples: ${rawSamples}`);
   }
 
   const warmupOverride = kv.get('warmup');
@@ -172,7 +159,7 @@ function cmdRun(argv: readonly string[]): void {
   }).map((scenario) => scenario.id);
 
   process.stderr.write(
-    `bench: scenarios=${scenarioIds.join(',')}, tags=${tagGroups.length > 0 ? formatTagGroups(tagGroups) : 'none'}, samples=${samples}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
+    `bench: scenarios=${scenarioIds.join(',')}, tags=${tagGroups.length > 0 ? formatTagGroups(tagGroups) : 'none'}, samples=${String(samples)}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
   );
 
   const report = runBench({
@@ -182,7 +169,7 @@ function cmdRun(argv: readonly string[]): void {
     ...(framesOverride != null ? { measureFramesOverride: Number.parseInt(framesOverride, 10) } : {}),
     onProgress: (event) => {
       if (event.kind === 'scenario-start') {
-        process.stderr.write(`  ${event.scenario.id}: ${event.total} samples... `);
+        process.stderr.write(`  ${event.scenario.id}: ${String(event.total)} samples... `);
       } else if (event.kind === 'scenario-done') {
         const { p50, cov } = event.stats;
         process.stderr.write(`done. p50=${formatNs(p50)}, CoV=${(cov * 100).toFixed(1)}%\n`);
@@ -217,9 +204,9 @@ function cmdRun(argv: readonly string[]): void {
 }
 
 function printSummary(report: RunReport): void {
-  process.stdout.write(`\nbench.v2 — ${report.scenarios.length} scenarios, ${report.params.samples} samples each\n`);
+  process.stdout.write(`\nbench.v2 — ${String(report.scenarios.length)} scenarios, ${String(report.params.samples)} samples each\n`);
   process.stdout.write(`commit: ${report.commit ?? 'unknown'}\n`);
-  process.stdout.write(`machine: ${report.fingerprint.cpuModel} (${report.fingerprint.arch}, ${report.fingerprint.cpuCount} cores), Node ${report.fingerprint.nodeVersion}\n\n`);
+  process.stdout.write(`machine: ${report.fingerprint.cpuModel} (${report.fingerprint.arch}, ${String(report.fingerprint.cpuCount)} cores), Node ${report.fingerprint.nodeVersion}\n\n`);
   process.stdout.write('| Scenario | P50 | P90 | P99 | Min | Max | CoV |\n');
   process.stdout.write('|---|---|---|---|---|---|---|\n');
   for (const s of report.scenarios) {
@@ -236,8 +223,12 @@ function cmdCompare(argv: readonly string[]): void {
   if (positionals.length < 2) {
     throw new Error('usage: bench compare <baseline.json> <current.json>');
   }
-  const baselinePath = resolve(process.cwd(), positionals[0]!);
-  const currentPath = resolve(process.cwd(), positionals[1]!);
+  const [baselineArg, currentArg] = positionals;
+  if (baselineArg === undefined || currentArg === undefined) {
+    throw new Error('usage: bench compare <baseline.json> <current.json>');
+  }
+  const baselinePath = resolve(process.cwd(), baselineArg);
+  const currentPath = resolve(process.cwd(), currentArg);
   const baseline = readBenchReport(baselinePath);
   const current = readBenchReport(currentPath);
   const comparison = compareReports(baseline, current);

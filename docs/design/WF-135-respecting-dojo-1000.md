@@ -136,27 +136,14 @@ visible rendering.
 ## Retrospective
 
 Completed with a measured aggregate Code Dojo debt reduction from `4,940` to
-`2,290` (`-2,650`). The stored ESLint baseline now records `1,877` live
-findings, down from `4,517` (`-2,640`), and the next aggregate target is
-`2,240` or lower. Follow-on passes removed fake async wrappers, dead DAG
-fixtures/imports, explicit script/example formatting debt, MCP docs payload
-parsing/coercion debt, flame typed-array non-null debt, app-frame render
-fixture assertion debt, app-frame settings shell-state assertion debt, and
-app-frame shell layer/notification shell-state assertion debt, render differ
-packed-byte/cell-path debt, DOGFOOD Blocks/BlockLab unsafe test accessors,
-AppFrame modal/tail shell-state test debt, schema-block and active-binding
-malformed-runtime test debt, shader middleware state fixtures, responsive
-DOGFOOD layout witnesses, release-title model access, grid-layout example
-bootstrap debt, docs-preview page-model helper typing debt, locale helper
-coercion debt, AppFrame routing/theme test harness debt, runtime interactive
-pipeline rejection cleanup, core surface packed-buffer safe-read debt,
-table/markdown parsing debt, small utility debt, compact component and example
-debt, runtime/example/TUI/i18n cycle debt, and surface-diff, timeline, and
-component-metadata typed-formatting debt, plus block-metadata and notification
-demo contract debt, plus small-file XLSX/localization/DOGFOOD coverage, log,
-canvas, input-routing, MCP output, benchmark, example, CSS, worker, chart, i18n
-runtime, MCP fake-async, example bootstrap, and smoke helper test hygiene, while
-image codec, table layout, grid geometry, bench report parsing, app-frame
-palette, runtime interactive command, and inspector style helper cleanup, while
-keeping touched file/context budgets below their stored ceilings and removing
-one file/context exception.
+`2,231` (`-2,709`). The stored ESLint baseline now records `1,819` live
+findings, down from `4,517` (`-2,698`), and the next aggregate target is
+`2,181` or lower. Follow-on passes covered mechanically reviewable clusters
+across tests, scripts, examples, MCP docs, DOGFOOD, app-frame surfaces,
+render/surface helpers, table/markdown parsing, geometry, benchmarks, runtime
+helpers, i18n helpers, and TUI input/action surfaces.
+
+The latest pass removed app-frame action/input-shell assertion debt, bench CLI
+formatting debt, focus-map text formatting debt, key parser regex/assertion
+debt, and node style test regex debt. Touched file/context budgets stayed below
+their stored ceilings, and two file/context exceptions have been removed.

@@ -1249,11 +1249,6 @@
       "bytes": 6291
     },
     {
-      "path": "packages/bijou-tui/src/keys.ts",
-      "lines": 208,
-      "bytes": 7251
-    },
-    {
       "path": "packages/bijou-tui/src/notification-card.ts",
       "lines": 208,
       "bytes": 6728

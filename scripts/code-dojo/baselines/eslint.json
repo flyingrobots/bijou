@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1877,
-  "errors": 1877,
+  "total": 1819,
+  "errors": 1819,
   "warnings": 0,
   "rules": [
     {
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 421
+      "count": 396
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -110,11 +110,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 349
+      "count": 348
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 45
+      "count": 44
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 408
+      "count": 390
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -174,7 +174,7 @@
     },
     {
       "ruleId": "no-control-regex",
-      "count": 23
+      "count": 10
     },
     {
       "ruleId": "no-restricted-imports",
