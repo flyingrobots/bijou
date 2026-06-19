@@ -16,11 +16,20 @@ export function motionMiddleware(): RenderMiddleware {
     // with a LayoutNode tree if it's not a raw Surface.
     // In our simplified V3, App.view might return a LayoutNode.
     
-    const root = (getRenderLayoutRoot(state) ?? (state as any).layoutRoot) as LayoutNode | undefined;
+    const root = getRenderLayoutRoot(state) ?? getLegacyLayoutRoot(state);
     if (root) {
       reconciler.reconcile(root, dt, ctx.io);
     }
 
     next();
   };
+}
+
+function getLegacyLayoutRoot(state: unknown): LayoutNode | undefined {
+  if (typeof state !== 'object' || state === null || !('layoutRoot' in state)) return undefined;
+  return isLayoutNode(state.layoutRoot) ? state.layoutRoot : undefined;
+}
+
+function isLayoutNode(value: unknown): value is LayoutNode {
+  return typeof value === 'object' && value !== null && 'rect' in value && 'children' in value;
 }

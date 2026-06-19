@@ -50,14 +50,14 @@ const app: App<Model, Msg> = {
         if (e.ctrl) parts.push(badgeSurface('CTRL', 'warning', ctx), ' ');
         if (e.alt) parts.push(badgeSurface('ALT', 'info', ctx), ' ');
         if (e.shift) parts.push(badgeSurface('SHIFT', 'accent', ctx), ' ');
-        parts.push(`${e.action} ${e.button} (${e.col}, ${e.row})`);
+        parts.push(`${e.action} ${e.button} (${String(e.col)}, ${String(e.row)})`);
         rows.push(row(parts));
       }
     }
 
     if (model.lastClick) {
       rows.push(spacer());
-      rows.push(contentSurface(box(`Last click: (${model.lastClick.col}, ${model.lastClick.row})`)));
+      rows.push(contentSurface(box(`Last click: (${String(model.lastClick.col)}, ${String(model.lastClick.row)})`)));
     }
 
     rows.push(spacer());
@@ -68,4 +68,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app, { mouse: true });
+void run(app, { mouse: true });

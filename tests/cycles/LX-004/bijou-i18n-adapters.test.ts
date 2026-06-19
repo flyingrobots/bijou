@@ -1,18 +1,17 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
-const RUNTIME_ENTRY = resolve(ROOT, 'packages/bijou-i18n/src/index.ts');
 
 describe('LX-004 provider adapters for workbook and bundle exchange cycle', () => {
   it('ships delimited-sheet and JSON-bundle adapter APIs', async () => {
     expect(existsSync(TOOLS_ENTRY)).toBe(true);
 
-    const mod: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const mod = await import('../../../packages/bijou-i18n-tools/src/index.js');
     expect(typeof mod.serializeExchangeSheet).toBe('function');
     expect(typeof mod.parseExchangeSheet).toBe('function');
     expect(typeof mod.serializeCatalogBundleJson).toBe('function');
@@ -20,8 +19,8 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
   });
 
   it('roundtrips exported workbook sheets through TSV and back into runtime-consumable catalogs', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-    const runtimeMod: typeof import('../../../packages/bijou-i18n/src/index.js') = await import(pathToFileURL(RUNTIME_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
+    const runtimeMod = await import('../../../packages/bijou-i18n/src/index.js');
 
     const staleCatalogs = tools.markStaleTranslations([
       {
@@ -67,7 +66,7 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
   });
 
   it('roundtrips CSV sheets with commas, quotes, and newlines intact', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     const workbook = tools.exportTranslationWorkbook([
       {
@@ -98,7 +97,7 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
   });
 
   it('roundtrips catalog bundles through JSON without losing refs or typed values', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     const catalogs = [
       {
@@ -137,7 +136,7 @@ describe('LX-004 provider adapters for workbook and bundle exchange cycle', () =
   });
 
   it('fails clearly on malformed delimited or JSON adapter payloads', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     expect(() => tools.parseExchangeSheet('translations-de', 'namespace,id\nshell', 'csv'))
       .toThrow(/Invalid delimited sheet/);

@@ -30,7 +30,7 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const variant = options.variant ?? 'info';
 
-  const safeText = sanitizePlainTerminalText(text ?? '');
+  const safeText = sanitizePlainTerminalText(text);
   const paddedText = ` ${safeText} `;
   const graphemes = segmentSurfaceText(paddedText, 'badge');
   const width = graphemes.length;
@@ -78,14 +78,18 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
       const bg = cell.bgRGB ?? colorRgb(cell.bg);
       if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
       const flags = encodeModifiers(cell.modifiers);
-      for (let i = 0; i < width; i++) {
-        packedSurface.setRGB(i, 0, graphemes[i]!, fR, fG, fB, bR, bG, bB, flags);
+      for (const [i, grapheme] of graphemes.entries()) {
+        packedSurface.setRGB(i, 0, grapheme, fR, fG, fB, bR, bG, bB, flags);
       }
     } else {
-      for (let i = 0; i < width; i++) surface.set(i, 0, { ...cell, char: graphemes[i]! });
+      for (const [i, grapheme] of graphemes.entries()) {
+        surface.set(i, 0, { ...cell, char: grapheme });
+      }
     }
   } else {
-    for (let i = 0; i < width; i++) surface.set(i, 0, { ...cell, char: graphemes[i]! });
+    for (const [i, grapheme] of graphemes.entries()) {
+      surface.set(i, 0, { ...cell, char: grapheme });
+    }
   }
 
   return surface;

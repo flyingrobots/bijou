@@ -17,10 +17,8 @@ export function motion(
   options: MotionOptions,
   content: Surface | LayoutNode
 ): LayoutNode {
-  const isSurface = (c: any): c is Surface => !!c.cells;
-
-  if (isSurface(content)) {
-    return {
+  if (isSurfaceContent(content)) {
+    const node: MotionNode = {
       id: options.key,
       type: 'Motion',
       classes: ['motion'],
@@ -28,13 +26,19 @@ export function motion(
       children: [],
       surface: content,
       motion: options,
-    } as MotionNode;
+    };
+    return node;
   }
 
   // If already a layout node, just ensure it has the correct ID
-  return {
+  const node: MotionNode = {
     ...content,
     id: options.key,
     motion: options,
-  } as MotionNode;
+  };
+  return node;
+}
+
+function isSurfaceContent(content: Surface | LayoutNode): content is Surface {
+  return 'cells' in content;
 }

@@ -3,12 +3,20 @@ import { mockClock } from '@flyingrobots/bijou/adapters/test';
 import { quit, tick, batch } from './commands.js';
 import { QUIT } from './types.js';
 
+function noop(): void {
+  void 0;
+}
+
+function disposable() {
+  return { dispose: noop };
+}
+
 function createClockCapabilities() {
   const clock = mockClock();
   return {
     clock,
     caps: {
-      onPulse: () => ({ dispose() {} }),
+      onPulse: disposable,
       sleep(ms: number) {
         return new Promise<void>((resolve) => {
           clock.setTimeout(resolve, ms);
@@ -22,7 +30,7 @@ describe('commands', () => {
   describe('quit', () => {
     it('returns a function that resolves to QUIT symbol', async () => {
       const cmd = quit();
-      const result = await cmd(() => {}, { onPulse: () => ({ dispose() {} }) });
+      const result = await cmd(noop, { onPulse: disposable });
       expect(result).toBe(QUIT);
     });
   });
@@ -32,7 +40,7 @@ describe('commands', () => {
       const { clock, caps } = createClockCapabilities();
       const msg = { type: 'tick' as const };
       const cmd = tick(100, msg);
-      const promise = cmd(() => {}, caps);
+      const promise = cmd(noop, caps);
       await clock.advanceByAsync(100);
       const result = await promise;
       expect(result).toBe(msg);
@@ -42,7 +50,7 @@ describe('commands', () => {
       const { clock, caps } = createClockCapabilities();
       const cmd = tick(500, 'done');
       let resolved = false;
-      void Promise.resolve(cmd(() => {}, caps)).then(() => {
+      void Promise.resolve(cmd(noop, caps)).then(() => {
         resolved = true;
       });
       await clock.advanceByAsync(499);
