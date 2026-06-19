@@ -5,10 +5,10 @@ import { must } from '@flyingrobots/bijou/adapters/test';
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
     const ctx = createTestContext();
-    expect(ctx.runtime.env).toBeTypeOf('function');
-    expect(ctx.io.write).toBeTypeOf('function');
-    expect(ctx.clock?.now).toBeTypeOf('function');
-    expect(ctx.style.bold).toBeTypeOf('function');
+    expect(typeof ctx.runtime.env).toBe('function');
+    expect(typeof ctx.io.write).toBe('function');
+    expect(typeof ctx.clock?.now).toBe('function');
+    expect(typeof ctx.style.bold).toBe('function');
     expect(ctx.theme.noColor).toBeTypeOf('boolean');
     expect(typeof ctx.mode).toBe('string');
   });

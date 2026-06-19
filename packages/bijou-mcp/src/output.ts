@@ -24,7 +24,8 @@ export function withOutputMode<Shape extends ZodShape>(inputShape: Shape): Shape
 }
 
 export function stripOutputMode(args: Record<string, unknown>): Record<string, unknown> {
-  const { output: _output, ...data } = args;
+  const data = { ...args };
+  delete data['output'];
   return data;
 }
 
@@ -49,14 +50,14 @@ export function withStructuredToolOutput(tool: ToolRegistration): ToolRegistrati
 
   return {
     ...tool,
-    inputSchema: withOutputMode(tool.inputSchema ?? {}),
+    inputSchema: withOutputMode(tool.inputSchema),
     outputSchema: structuredToolOutputShape,
     handler: async (args) => {
       const result = await tool.handler(args);
       if (result['isError'] || result.structuredContent !== undefined) return result;
 
-      const output = toolOutputModeSchema.optional().parse(args['output']) ?? 'text';
-      const rendered = result.content.find((block) => block.type === 'text')?.text ?? '';
+      const output = toolOutputModeSchema.optional().parse(args['output']);
+      const rendered = result.content[0]?.text ?? '';
       return buildStructuredToolResult(rendered, stripOutputMode(args), output, result.content);
     },
   };

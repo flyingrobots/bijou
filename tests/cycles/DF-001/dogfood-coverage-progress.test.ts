@@ -12,7 +12,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -49,8 +49,8 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const text = frameText(must(entered.frames[entered.frames.length - 1]));
 
     expect(text).toContain('Documentation coverage');
-    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
-    expect(text).toContain(`${coverage.percent}%`);
+    expect(text).toContain(`${String(coverage.documentedFamilies)}/${String(coverage.totalFamilies)}`);
+    expect(text).toContain(`${String(coverage.percent)}%`);
   });
 
   it('shows the DOGFOOD banner and expansion on the landing screen at a normal viewport size', async () => {

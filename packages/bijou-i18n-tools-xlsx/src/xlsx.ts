@@ -15,12 +15,17 @@ const REQUIRED_TRANSLATION_COLUMNS = [
   'translatedValueKind',
   'translatedValue',
 ] as const;
+type TranslationWorkbookColumn = typeof REQUIRED_TRANSLATION_COLUMNS[number];
+const TRANSLATION_COLUMN_SET = new Set<string>(REQUIRED_TRANSLATION_COLUMNS);
 
 function normalizeCell(value: unknown): string {
   if (value === undefined || value === null) {
     return '';
   }
-  return String(value);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value);
+  if (value instanceof Date) return value.toISOString();
+  return '';
 }
 
 function toWorkbookInput(input: Uint8Array | ArrayBuffer): Uint8Array {
@@ -35,7 +40,7 @@ function assertWorkbookHeaders(columns: readonly string[], sheetName: string): v
   const seen = new Set<string>();
   for (const [index, column] of columns.entries()) {
     if (column.trim() === '') {
-      throw new Error(`Invalid XLSX workbook sheet: missing required header at column ${index + 1} in ${sheetName}`);
+      throw new Error(`Invalid XLSX workbook sheet: missing required header at column ${String(index + 1)} in ${sheetName}`);
     }
     if (seen.has(column)) {
       throw new Error(`Invalid XLSX workbook sheet: duplicate header ${column} in ${sheetName}`);
@@ -54,12 +59,27 @@ function assertWorkbookRow(
   row: Record<string, string>,
   context: string,
 ): TranslationWorkbookRow {
-  for (const key of REQUIRED_TRANSLATION_COLUMNS) {
-    if (typeof row[key] !== 'string') {
-      throw new Error(`Invalid XLSX workbook sheet: missing ${key} in ${context}`);
-    }
+  const cell = (key: TranslationWorkbookColumn): string => {
+    const value = row[key];
+    if (typeof value === 'string') return value;
+    throw new Error(`Invalid XLSX workbook sheet: missing ${key} in ${context}`);
   }
-  return row as unknown as TranslationWorkbookRow;
+
+  return {
+    namespace: cell('namespace'), id: cell('id'), kind: cell('kind'),
+    sourceLocale: cell('sourceLocale'), targetLocale: cell('targetLocale'), status: cell('status'),
+    sourceHash: cell('sourceHash'), description: cell('description'),
+    sourceValueKind: cell('sourceValueKind'), sourceValue: cell('sourceValue'),
+    translatedValueKind: cell('translatedValueKind'), translatedValue: cell('translatedValue'),
+  };
+}
+
+function isTranslationWorkbookColumn(column: string): column is TranslationWorkbookColumn {
+  return TRANSLATION_COLUMN_SET.has(column);
+}
+
+function workbookCell(row: TranslationWorkbookRow, column: string): string {
+  return isTranslationWorkbookColumn(column) ? row[column] : '';
 }
 
 export function serializeExchangeWorkbookXlsx(workbook: ExchangeWorkbook): Uint8Array {
@@ -68,16 +88,16 @@ export function serializeExchangeWorkbookXlsx(workbook: ExchangeWorkbook): Uint8
   for (const sheet of workbook.sheets) {
     const rows = [
       [...sheet.columns],
-      ...sheet.rows.map((row) => sheet.columns.map((column) => {
-        const value = row[column as keyof TranslationWorkbookRow];
-        return typeof value === 'string' ? value : '';
-      })),
+      ...sheet.rows.map((row) => sheet.columns.map((column) => workbookCell(row, column))),
     ];
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     XLSX.utils.book_append_sheet(book, worksheet, sheet.name);
   }
 
-  return new Uint8Array(XLSX.write(book, { bookType: 'xlsx', type: 'array' }));
+  const output: unknown = XLSX.write(book, { bookType: 'xlsx', type: 'array' });
+  if (output instanceof Uint8Array) return new Uint8Array(output);
+  if (output instanceof ArrayBuffer) return new Uint8Array(output);
+  throw new Error('Invalid XLSX serializer output: expected binary workbook bytes');
 }
 
 export function parseExchangeWorkbookXlsx(input: Uint8Array | ArrayBuffer): ExchangeWorkbook {
@@ -110,7 +130,7 @@ export function parseExchangeWorkbookXlsx(input: Uint8Array | ArrayBuffer): Exch
       const record = Object.fromEntries(
         columns.map((column, index) => [column, normalizeCell(cells[index])]),
       ) as Record<string, string>;
-      return assertWorkbookRow(record, `${sheetName}:${rowIndex + 2}`);
+      return assertWorkbookRow(record, `${sheetName}:${String(rowIndex + 2)}`);
     });
 
     return {
@@ -120,8 +140,5 @@ export function parseExchangeWorkbookXlsx(input: Uint8Array | ArrayBuffer): Exch
     };
   });
 
-  return {
-    version: 1,
-    sheets,
-  };
+  return { version: 1, sheets };
 }

@@ -41,9 +41,9 @@ export function assertDogfoodCoverageFloor(
   const result = evaluateDogfoodCoverageFloor(coverage, options);
   if (!result.ok) {
     throw new Error(
-      `DOGFOOD documentation coverage floor not met: ${coverage.percent}% ` +
-      `(${coverage.documentedFamilies}/${coverage.totalFamilies} families) is below floor ${result.floorPercent}% ` +
-      `(next target ${result.nextTargetPercent}%)`,
+      `DOGFOOD documentation coverage floor not met: ${String(coverage.percent)}% ` +
+      `(${String(coverage.documentedFamilies)}/${String(coverage.totalFamilies)} families) is below floor ${String(result.floorPercent)}% ` +
+      `(next target ${String(result.nextTargetPercent)}%)`,
     );
   }
   return result;

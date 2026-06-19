@@ -1,17 +1,16 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
-const RUNTIME_ENTRY = resolve(ROOT, 'packages/bijou-i18n/src/index.ts');
 
 describe('LX-003 spreadsheet adapters and catalog exchange workflows cycle', () => {
   it('ships workbook and bundle exchange APIs from bijou-i18n-tools', async () => {
     expect(existsSync(TOOLS_ENTRY)).toBe(true);
 
-    const mod: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const mod = await import('../../../packages/bijou-i18n-tools/src/index.js');
     expect(typeof mod.exportTranslationWorkbook).toBe('function');
     expect(typeof mod.importTranslationWorkbook).toBe('function');
     expect(typeof mod.exportCatalogBundle).toBe('function');
@@ -21,8 +20,8 @@ describe('LX-003 spreadsheet adapters and catalog exchange workflows cycle', () 
   });
 
   it('roundtrips workbook exchange back into runtime-consumable catalogs', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-    const runtimeMod: typeof import('../../../packages/bijou-i18n/src/index.js') = await import(pathToFileURL(RUNTIME_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
+    const runtimeMod = await import('../../../packages/bijou-i18n/src/index.js');
 
     const staleCatalogs = tools.markStaleTranslations([
       {
@@ -70,7 +69,7 @@ describe('LX-003 spreadsheet adapters and catalog exchange workflows cycle', () 
   });
 
   it('roundtrips full authoring catalogs through a serializable bundle without losing refs or typed values', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     const catalogs = [
       {
@@ -120,7 +119,7 @@ describe('LX-003 spreadsheet adapters and catalog exchange workflows cycle', () 
   });
 
   it('fails clearly on malformed workbook payloads', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     expect(() => tools.importTranslationWorkbook({
       version: 1,
@@ -128,7 +127,7 @@ describe('LX-003 spreadsheet adapters and catalog exchange workflows cycle', () 
         {
           name: 'translations-de',
           columns: ['namespace', 'id'],
-          rows: [{ namespace: 'shell', id: 'help' }] as unknown as never[],
+          rows: [],
         },
       ],
     })).toThrow(/Invalid translation workbook/);

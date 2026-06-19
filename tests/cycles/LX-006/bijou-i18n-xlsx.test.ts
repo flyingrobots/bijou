@@ -1,12 +1,10 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const XLSX_TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools-xlsx/src/index.ts');
-const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
-const RUNTIME_ENTRY = resolve(ROOT, 'packages/bijou-i18n/src/index.ts');
 
 describe('LX-006 xlsx localization adapters cycle', () => {
   it('ships a dedicated XLSX helper package for workbook exchange', async () => {
@@ -14,15 +12,15 @@ describe('LX-006 xlsx localization adapters cycle', () => {
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools-xlsx/tsconfig.json'))).toBe(true);
     expect(existsSync(XLSX_TOOLS_ENTRY)).toBe(true);
 
-    const mod: typeof import('../../../packages/bijou-i18n-tools-xlsx/src/index.js') = await import(pathToFileURL(XLSX_TOOLS_ENTRY).href);
+    const mod = await import('../../../packages/bijou-i18n-tools-xlsx/src/index.js');
     expect(typeof mod.serializeExchangeWorkbookXlsx).toBe('function');
     expect(typeof mod.parseExchangeWorkbookXlsx).toBe('function');
   });
 
   it('roundtrips translated workbooks through XLSX bytes and back into runtime catalogs', async () => {
-    const xlsxTools: typeof import('../../../packages/bijou-i18n-tools-xlsx/src/index.js') = await import(pathToFileURL(XLSX_TOOLS_ENTRY).href);
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-    const runtimeMod: typeof import('../../../packages/bijou-i18n/src/index.js') = await import(pathToFileURL(RUNTIME_ENTRY).href);
+    const xlsxTools = await import('../../../packages/bijou-i18n-tools-xlsx/src/index.js');
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
+    const runtimeMod = await import('../../../packages/bijou-i18n/src/index.js');
 
     const staleCatalogs = tools.markStaleTranslations([
       {

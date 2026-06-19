@@ -63,7 +63,7 @@ export function appendInputRoutingRecord<
 export function inputRoutingInspectorText(
   history: InputRoutingInspectorHistory,
 ): string {
-  const lines = [`input routing: ${history.records.length} events`];
+  const lines = [`input routing: ${String(history.records.length)} events`];
 
   history.records.forEach((record, index) => {
     lines.push(inputRoutingRecordLine(record, index));
@@ -100,7 +100,7 @@ function inputRoutingRecordLine(
     : result.visitedViewIds.join(PATH_SEPARATOR);
 
   return [
-    `[${index + 1}]`,
+    `[${String(index + 1)}]`,
     `${inputEventLabel(record.event)}${raw}`,
     `handled=${String(result.handled)}`,
     `visited=${visited}`,
@@ -120,7 +120,7 @@ function inputEventLabel(event: RuntimeInputEvent): string {
     return `key ${event.key}`;
   }
 
-  return `pointer ${event.action} ${event.button ?? EMPTY_LABEL} ${event.x},${event.y}`;
+  return `pointer ${event.action} ${event.button ?? EMPTY_LABEL} ${String(event.x)},${String(event.y)}`;
 }
 
 function labelsOrCount(labels: readonly string[] | undefined, count: number): string {

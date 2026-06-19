@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import { resolveClock } from '../clock.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { badge } from './badge.js';
+import type { BadgeVariant } from './badge.js';
 import { renderByMode } from '../mode-render.js';
 import { surfaceToString } from '../render/differ.js';
 
@@ -28,7 +29,7 @@ const LABELS: Record<LogLevel, string> = {
 };
 
 /** Badge variant mapping for each log level used in interactive/static mode. */
-const BADGE_VARIANTS: Record<LogLevel, string> = {
+const BADGE_VARIANTS: Record<LogLevel, BadgeVariant> = {
   debug: 'muted',
   info: 'info',
   warn: 'warning',
@@ -111,7 +112,7 @@ export function log(level: LogLevel, message: string, options?: LogOptions): str
         parts.push(tsStyled);
       }
       if (showPrefix) {
-        const variant = BADGE_VARIANTS[level] as any;
+        const variant = BADGE_VARIANTS[level];
         parts.push(surfaceToString(badge(LABELS[level], { variant, ctx }), ctx.style));
       }
       parts.push(message);

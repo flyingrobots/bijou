@@ -3,7 +3,7 @@ import { canvas, type ShaderFn } from './canvas.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 describe('canvas()', () => {
   it('calls shader with normalized UV and time', () => {
-    const calls: any[] = [];
+    const calls: { u: number; v: number; time: number }[] = [];
     const shader: ShaderFn = ({ u, v, time }) => {
       calls.push({ u, v, time });
       return '.';
@@ -29,20 +29,18 @@ describe('canvas()', () => {
     expect(surface.get(1, 0).fg).toBe('#ff0000');
   });
   it('supports quad resolution (2x2 sub-pixels)', () => {
-    const calls: any[] = [];
+    const calls: { u: number; v: number }[] = [];
     const shader: ShaderFn = ({ u, v }) => {
       calls.push({ u, v });
-      // Top-left and bottom-right on
       if ((u < 0.5 && v < 0.5) || (u > 0.5 && v > 0.5)) return 'X';
       return ' ';
     };
     const surface = canvas(1, 1, shader, { resolution: 'quad' });
     expect(calls).toHaveLength(4); // 2x2
-    // ▚ is top-left + bottom-right
     expect(surface.get(0, 0).char).toBe('▚');
   });
   it('supports braille resolution (2x4 sub-pixels)', () => {
-    const calls: any[] = [];
+    const calls: { u: number; v: number }[] = [];
     const shader: ShaderFn = ({ u, v }) => {
       calls.push({ u, v });
       // Only top-left dot on
@@ -141,7 +139,10 @@ describe('canvas()', () => {
     expect(surface.get(0, 0).fgRGB).toEqual([28, 56, 84]);
   });
   it('handles uniforms', () => {
-    const shader: ShaderFn = ({ uniforms }) => uniforms.value;
+    const shader: ShaderFn = ({ uniforms }) => {
+      const value: unknown = uniforms.value;
+      return typeof value === 'string' ? value : ' ';
+    };
     const surface = canvas(1, 1, shader, { uniforms: { value: 'Z' } });
     expect(surface.get(0, 0).char).toBe('Z');
   });
