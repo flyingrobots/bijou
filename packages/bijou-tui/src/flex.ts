@@ -1,29 +1,7 @@
-/**
- * Flexbox-style layout for terminal UIs.
- *
- * Distributes available space among children using flex-grow factors,
- * fixed basis sizes, and min/max constraints. Children can be static
- * strings or render functions that receive their allocated dimensions.
- *
- * ```ts
- * flex({ direction: 'row', width: 80, height: 24 },
- *   { basis: 20, content: sidebar },
- *   { flex: 1, content: (w, h) => viewport({ width: w, height: h, content: body }) },
- * )
- * ```
- */
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 import type { BijouContext, TokenValue, Surface } from '@flyingrobots/bijou';
 import { createSurface, isPackedSurface, makeBgFill, parseAnsiToSurface, shouldApplyBg } from '@flyingrobots/bijou';
 import { parseHex, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, FLAG_EMPTY } from '@flyingrobots/bijou/perf';
 
-/**
- * Configuration for the flex layout container.
- */
 export interface FlexOptions {
   /** Layout direction. Default: 'row'. */
   readonly direction?: 'row' | 'column';
@@ -39,9 +17,6 @@ export interface FlexOptions {
   readonly ctx?: BijouContext;
 }
 
-/**
- * Descriptor for a single child within a flex layout.
- */
 export interface FlexChild {
   /**
    * Content to render. Either a static string, or a function that
@@ -62,17 +37,11 @@ export interface FlexChild {
   readonly bgToken?: TokenValue;
 }
 
-/**
- * Surface-aware content accepted by {@link flexSurface}.
- */
 export type SurfaceFlexRenderable =
   | string
   | Surface
   | ((width: number, height: number) => string | Surface);
 
-/**
- * Descriptor for a surface-native flex child.
- */
 export interface SurfaceFlexChild {
   /** Content to render for this allocated region. */
   readonly content: SurfaceFlexRenderable;
@@ -92,27 +61,10 @@ export interface SurfaceFlexChild {
 
 import { visibleLength, clipToWidth } from './viewport.js';
 
-// ---------------------------------------------------------------------------
-// ANSI helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Compute the terminal display width of a string.
- *
- * @param s - Input string possibly containing ANSI escapes.
- * @returns Number of visible terminal columns.
- */
 function visualWidth(s: string): number {
   return visibleLength(s);
 }
 
-// ---------------------------------------------------------------------------
-// Size computation
-// ---------------------------------------------------------------------------
-
-/**
- * Internal representation of a child after size allocation.
- */
 interface ResolvedChild {
   /** Allocated size along the main axis. */
   allocatedSize: number;
@@ -122,9 +74,6 @@ interface ResolvedChild {
   child: FlexChild;
 }
 
-/**
- * Shared flex-child shape for sizing/layout logic.
- */
 interface FlexChildLike {
   readonly content: string | Surface | ((width: number, height: number) => string | Surface);
   readonly flex?: number;
@@ -141,19 +90,6 @@ interface ResolvedFlexChild<T extends FlexChildLike> {
   child: T;
 }
 
-/**
- * Distribute available main-axis space among children.
- *
- * Fixed-size children (basis or auto-measured) consume space first,
- * then remaining space is divided proportionally among flex children.
- *
- * @param children - Child descriptors to allocate sizes for.
- * @param mainAxisTotal - Total available size along the main axis.
- * @param crossAxisTotal - Total available size along the cross axis.
- * @param gap - Gap size between children on the main axis.
- * @param isRow - True for row direction (main axis = width), false for column.
- * @returns Resolved children with allocated sizes.
- */
 function computeSizes<T extends FlexChildLike>(
   children: readonly T[],
   mainAxisTotal: number,
@@ -192,29 +128,21 @@ function computeSizes<T extends FlexChildLike>(
   // Second pass: distribute remaining space to flex children
   const remaining = Math.max(0, available - usedByFixed);
 
-  for (let i = 0; i < children.length; i++) {
-    const flexGrow = children[i]!.flex ?? 0;
+  for (const [i, child] of children.entries()) {
+    const flexGrow = child.flex ?? 0;
     if (flexGrow > 0) {
       const raw = totalFlex > 0 ? Math.floor((flexGrow / totalFlex) * remaining) : 0;
-      sizes[i] = clampSize(raw, children[i]!.minSize, children[i]!.maxSize);
+      sizes[i] = clampSize(raw, child.minSize, child.maxSize);
     }
   }
 
   return children.map((child, i) => ({
-    allocatedSize: sizes[i]!,
+    allocatedSize: sizes[i] ?? 0,
     crossSize: crossAxisTotal,
     child,
   }));
 }
 
-/**
- * Clamp a size value within optional min/max bounds, flooring at 0.
- *
- * @param size - Raw size value.
- * @param min - Minimum allowed size (inclusive).
- * @param max - Maximum allowed size (inclusive).
- * @returns Clamped size, never negative.
- */
 function clampSize(size: number, min?: number, max?: number): number {
   let result = size;
   if (min !== undefined) result = Math.max(result, min);
@@ -222,15 +150,6 @@ function clampSize(size: number, min?: number, max?: number): number {
   return Math.max(0, result);
 }
 
-/**
- * Measure the intrinsic size of static content along the main axis.
- *
- * Return 0 for render functions (they must use flex or basis).
- *
- * @param content - Static string or render function.
- * @param isRow - True to measure width, false to measure height.
- * @returns Measured size in the main-axis direction.
- */
 function measureContent(
   content: string | Surface | ((width: number, height: number) => string | Surface),
   isRow: boolean,
@@ -251,18 +170,6 @@ function measureContent(
   return lines.length;
 }
 
-// ---------------------------------------------------------------------------
-// Rendering
-// ---------------------------------------------------------------------------
-
-/**
- * Render a child's content, invoking its render function if applicable.
- *
- * @param child - Child descriptor whose content to render.
- * @param width - Allocated width in columns.
- * @param height - Allocated height in rows.
- * @returns Rendered content string.
- */
 function renderContent(
   child: FlexChild,
   width: number,
@@ -285,16 +192,6 @@ function renderSurfaceContent(
   return child.content;
 }
 
-/**
- * Clip or pad each content line to an exact visible width.
- *
- * Does NOT pad height — that is handled by {@link alignCross}.
- *
- * @param content - Rendered content string (newline-delimited).
- * @param width - Target visible width in columns.
- * @param align - Horizontal alignment for lines shorter than width. Default: 'start'.
- * @returns Array of lines, each exactly `width` visible columns wide.
- */
 function fitWidth(content: string, width: number, align: 'start' | 'center' | 'end' = 'start'): string[] {
   const lines = content.split('\n');
   return lines.map((line) => {
@@ -314,25 +211,10 @@ function fitWidth(content: string, width: number, align: 'start' | 'center' | 'e
         const after = padding - before;
         return ' '.repeat(before) + line + ' '.repeat(after);
       }
-      default: {
-        const _exhaustive: never = align;
-        throw new Error(`Unknown alignment: ${_exhaustive}`);
-      }
     }
   });
 }
 
-/**
- * Align content lines along the cross axis by padding with empty lines.
- *
- * Truncate if content exceeds `totalCrossSize`; pad otherwise.
- *
- * @param lines - Rendered lines to align.
- * @param totalCrossSize - Total cross-axis size in lines (height for row layout, character width for column layout).
- * @param align - Cross-axis alignment ('start', 'center', or 'end').
- * @param width - Width of each empty padding line.
- * @returns Array of exactly `totalCrossSize` lines.
- */
 function alignCross(
   lines: string[],
   totalCrossSize: number,
@@ -386,10 +268,10 @@ function inheritBackground(surface: Surface, bg: string | undefined): Surface {
     const size = next.width * next.height;
     for (let i = 0; i < size; i++) {
       const off = i * CELL_STRIDE;
-      if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
-      if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+      if ((buf[off + OFF_FLAGS] ?? 0) & FLAG_EMPTY) continue;
+      if ((buf[off + OFF_ALPHA] ?? 0) & FLAG_BG_SET) continue;
       buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+      buf[off + OFF_ALPHA] = (buf[off + OFF_ALPHA] ?? 0) | FLAG_BG_SET;
     }
     packedSurface.markAllDirty();
     return next;
@@ -437,8 +319,7 @@ function renderTextSurface(
     .slice(0, height);
 
   const yOffset = alignOffset(height, lines.length, vAlign);
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
+  for (const [i, line] of lines.entries()) {
     const lineWidth = visualWidth(line);
     if (lineWidth <= 0) continue;
     const lineSurface = parseAnsiToSurface(line, lineWidth, 1);
@@ -486,35 +367,6 @@ function renderChildSurface(
   return region;
 }
 
-// ---------------------------------------------------------------------------
-// flex() — main API
-// ---------------------------------------------------------------------------
-
-/**
- * Lay out children using flexbox-style rules.
- *
- * Row direction: children are placed side-by-side horizontally.
- * Column direction: children are stacked vertically.
- *
- * ```ts
- * // Sidebar + main content
- * flex({ direction: 'row', width: 80, height: 24, gap: 1 },
- *   { basis: 20, content: sidebarContent },
- *   { flex: 1, content: (w, h) => renderMain(w, h) },
- * )
- *
- * // Header + body + footer
- * flex({ direction: 'column', width: 80, height: 24 },
- *   { basis: 1, content: headerLine },
- *   { flex: 1, content: (w, h) => renderBody(w, h) },
- *   { basis: 1, content: statusLine },
- * )
- * ```
- *
- * @param options - Layout container configuration (direction, dimensions, gap).
- * @param children - Child descriptors with content, flex factors, and constraints.
- * @returns Composed layout string with lines joined by newlines. Empty string if no children.
- */
 export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const { direction = 'row' } = options;
   const width = Math.max(0, Math.floor(options.width));
@@ -536,16 +388,6 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   return renderColumn(resolved, width, height, gap, containerBg, options.ctx);
 }
 
-/**
- * Lay out children using flexbox-style rules and return a Surface directly.
- *
- * This is the surface-native companion to {@link flex}. It accepts string,
- * surface, or render-function content and keeps the layout boundary structured.
- *
- * @param options - Layout container configuration (direction, dimensions, gap).
- * @param children - Child descriptors with string/surface content.
- * @returns Surface sized to the requested container rectangle.
- */
 export function flexSurface(options: FlexOptions, ...children: SurfaceFlexChild[]): Surface {
   const { direction = 'row' } = options;
   const width = Math.max(0, Math.floor(options.width));
@@ -580,16 +422,6 @@ export function flexSurface(options: FlexOptions, ...children: SurfaceFlexChild[
   return surface;
 }
 
-/**
- * Compose resolved children side-by-side in a horizontal row layout.
- *
- * @param items - Resolved children with allocated widths.
- * @param totalHeight - Total available height in rows.
- * @param gap - Horizontal gap between children in columns.
- * @param containerBg - Optional background fill function for container regions (gaps, padding).
- * @param ctx - Bijou context, used to resolve per-child bgToken fills.
- * @returns Composed row string with lines joined by newlines.
- */
 function renderRow(
   items: ResolvedChild[],
   totalHeight: number,
@@ -618,25 +450,14 @@ function renderRow(
   const rows: string[] = [];
   for (let r = 0; r < totalHeight; r++) {
     const parts: string[] = [];
-    for (let c = 0; c < columns.length; c++) {
-      parts.push(columns[c]![r]!);
+    for (const column of columns) {
+      parts.push(column[r] ?? '');
     }
     rows.push(parts.join(spacer));
   }
   return rows.join('\n');
 }
 
-/**
- * Stack resolved children vertically in a column layout.
- *
- * @param items - Resolved children with allocated heights.
- * @param totalWidth - Total available width in columns.
- * @param totalHeight - Total available height in rows.
- * @param gap - Vertical gap between children in rows.
- * @param containerBg - Optional background fill function for container regions (gaps, padding).
- * @param ctx - Bijou context, used to resolve per-child bgToken fills.
- * @returns Composed column string with lines joined by newlines.
- */
 function renderColumn(
   items: ResolvedChild[],
   totalWidth: number,
@@ -647,8 +468,7 @@ function renderColumn(
 ): string {
   const lines: string[] = [];
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]!;
+  for (const [i, item] of items.entries()) {
     const childHeight = item.allocatedSize;
     const rendered = renderContent(item.child, totalWidth, childHeight);
     const widthFitted = fitWidth(rendered, totalWidth, item.child.align ?? 'start');

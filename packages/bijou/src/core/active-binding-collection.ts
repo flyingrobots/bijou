@@ -15,6 +15,7 @@ import {
 
 const ACTIVE_BINDING_ENTRY_BRAND: unique symbol = Symbol('ActiveBindingEntry');
 const ACTIVE_BINDING_COLLECTION_BRAND: unique symbol = Symbol('ActiveBindingCollection');
+const SCOPE = 'active binding collection';
 
 export interface ActiveBindingEntryInput {
   readonly owner: BindingLifecycleOwner;
@@ -52,7 +53,7 @@ export class ActiveBindingCollection {
 
   constructor(entries: readonly ActiveBindingEntry[]) {
     if (!Array.isArray(entries)) {
-      throw new Error('active binding collection: entries must be an array');
+      throw new Error(`${SCOPE}: entries must be an array`);
     }
 
     Object.defineProperty(this, ACTIVE_BINDING_COLLECTION_BRAND, { value: true });
@@ -64,7 +65,7 @@ export class ActiveBindingCollection {
     entries.forEach((entry, index) => {
       if (!isActiveBindingEntry(entry)) {
         throw new Error(
-          `active binding collection: entry at index ${index} was not created by activeBindingEntry()`,
+          `${SCOPE}: entry at index ${String(index)} was not created by activeBindingEntry()`,
         );
       }
 
@@ -75,8 +76,7 @@ export class ActiveBindingCollection {
         const existingIndex = entryIndexesByKey.get(key);
         if (existingIndex === undefined) {
           throw new Error(
-            `active binding collection: missing index for owner ${entry.owner.id} `
-            + `requirement ${entry.requirement.id}`,
+            `${SCOPE}: missing index for owner ${entry.owner.id} requirement ${entry.requirement.id}`,
           );
         }
 
@@ -135,12 +135,12 @@ export class ActiveBindingCollection {
   get(ownerId: string, requirementId: string): ActiveBindingEntry | undefined {
     return this.#entriesByKey.get(activeBindingKey(
       normalizeRequiredText({
-        scope: 'active binding collection',
+        scope: SCOPE,
         field: 'ownerId',
         value: ownerId,
       }),
       normalizeRequiredText({
-        scope: 'active binding collection',
+        scope: SCOPE,
         field: 'requirementId',
         value: requirementId,
       }),
@@ -153,7 +153,7 @@ export class ActiveBindingCollection {
 
   byOwner(ownerId: string): readonly ActiveBindingEntry[] {
     const normalizedOwnerId = normalizeRequiredText({
-      scope: 'active binding collection',
+      scope: SCOPE,
       field: 'ownerId',
       value: ownerId,
     });
@@ -165,7 +165,7 @@ export class ActiveBindingCollection {
 
   byRequirement(requirementId: string): readonly ActiveBindingEntry[] {
     const normalizedRequirementId = normalizeRequiredText({
-      scope: 'active binding collection',
+      scope: SCOPE,
       field: 'requirementId',
       value: requirementId,
     });
@@ -192,15 +192,17 @@ export function activeBindingEntry(input: ActiveBindingEntryInput): ActiveBindin
     );
   }
 
-  const entry = {
+  const providerId = optionalRequiredText({
+    scope: 'active binding entry',
+    field: 'providerId',
+    value: input.providerId,
+  });
+  const entry: ActiveBindingEntry = {
+    [ACTIVE_BINDING_ENTRY_BRAND]: true,
     owner: input.owner,
     requirement: input.requirement,
-    providerId: optionalRequiredText({
-      scope: 'active binding entry',
-      field: 'providerId',
-      value: input.providerId,
-    }),
-  } as ActiveBindingEntry;
+    ...(providerId === undefined ? {} : { providerId }),
+  };
 
   Object.defineProperty(entry, ACTIVE_BINDING_ENTRY_BRAND, { value: true });
   return Object.freeze(entry);
@@ -233,56 +235,58 @@ export function isActiveBindingCollection(value: unknown): value is ActiveBindin
 export function collectActiveBindings(
   input: CollectActiveBindingsInput,
 ): ActiveBindingCollection {
-  if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) {
-    throw new Error('active binding collection: input must be an object');
+  const source: unknown = input;
+  if (!isObjectRecord(source)) {
+    throw new Error(`${SCOPE}: input must be an object`);
   }
-  if (input.entries !== undefined && !Array.isArray(input.entries)) {
-    throw new Error('active binding collection: entries must be an array');
+  const entriesInput = source['entries'];
+  const contractsInput = source['contracts'];
+  if (entriesInput !== undefined && !isArray(entriesInput)) {
+    throw new Error(`${SCOPE}: entries must be an array`);
   }
-  if (input.contracts !== undefined && !Array.isArray(input.contracts)) {
-    throw new Error('active binding collection: contracts must be an array');
+  if (contractsInput !== undefined && !isArray(contractsInput)) {
+    throw new Error(`${SCOPE}: contracts must be an array`);
   }
-
-  const entries = [...(input.entries ?? [])];
-  (input.contracts ?? []).forEach((source, index) => {
-    entries.push(...activeBindingEntriesFromContract(source, index));
-  });
+  const entries: ActiveBindingEntry[] = [];
+  for (const entry of entriesInput ?? []) {
+    if (!isActiveBindingEntry(entry)) {
+      throw new Error(`${SCOPE}: entries must contain active binding entries`);
+    }
+    entries.push(entry);
+  }
+  for (const [index, contractInput] of (contractsInput ?? []).entries()) {
+    entries.push(...activeBindingEntriesFromContract(contractInput, index));
+  }
 
   return new ActiveBindingCollection(entries);
 }
 
-function activeBindingEntriesFromContract(
-  source: ActiveBindingContractInput,
-  index: number,
-): readonly ActiveBindingEntry[] {
+function activeBindingEntriesFromContract(source: unknown, index: number): readonly ActiveBindingEntry[] {
+  const i = String(index);
   if (!isObjectRecord(source)) {
-    throw new Error(`active binding collection: contract ${index} must be an object`);
+    throw new Error(`${SCOPE}: contract ${i} must be an object`);
   }
-  if (!isBindingLifecycleOwner(source.owner)) {
-    throw new Error(
-      `active binding collection: contract ${index} owner was not created by defineBindingLifecycleOwner()`,
-    );
+  const { owner, contract } = source;
+  if (!isBindingLifecycleOwner(owner)) {
+    throw new Error(`${SCOPE}: contract ${i} owner was not created by defineBindingLifecycleOwner()`);
   }
-  if (!isViewDataContract(source.contract)) {
-    throw new Error(
-      `active binding collection: contract ${index} was not created by defineViewData()`,
-    );
+  if (!isViewDataContract(contract)) {
+    throw new Error(`${SCOPE}: contract ${i} was not created by defineViewData()`);
   }
-
-  const providerIds = providerAssignmentsByRequirementId(source.providerIds);
-  const requirementIds = new Set(source.contract.requirementIds());
+  const providerIds = providerAssignmentsByRequirementId(source['providerIds']);
+  const requirementIds = new Set(contract.requirementIds());
   providerIds.forEach((_, requirementId) => {
     if (!requirementIds.has(requirementId)) {
       throw new Error(
-        `active binding collection: provider assignment ${requirementId} `
-        + `does not match contract ${index}`,
+        `${SCOPE}: provider assignment ${requirementId} does not match contract ${i}`,
       );
     }
   });
-  const requirements = source.contract.requirements().map((requirement, requirementIndex) => {
+  const requirements = contract.requirements().map((requirement, requirementIndex) => {
+    const n = String(requirementIndex);
     if (!isDataRequirement(requirement)) {
       throw new Error(
-        `active binding collection: contract ${index} requirement ${requirementIndex} `
+        `${SCOPE}: contract ${i} requirement ${n} `
         + 'was not created by defineDataRequirement()',
       );
     }
@@ -292,21 +296,19 @@ function activeBindingEntriesFromContract(
 
   return Object.freeze(
     requirements.map((requirement) => activeBindingEntry({
-      owner: source.owner,
+      owner,
       requirement,
       providerId: providerIds.get(requirement.id),
     })),
   );
 }
 
-function providerAssignmentsByRequirementId(
-  assignments: readonly ActiveBindingProviderAssignment[] | undefined,
-): ReadonlyMap<RequirementId, ProviderId> {
+function providerAssignmentsByRequirementId(assignments: unknown): ReadonlyMap<RequirementId, ProviderId> {
   if (assignments === undefined) {
     return new Map();
   }
-  if (!Array.isArray(assignments)) {
-    throw new Error('active binding collection: providerIds must be an array');
+  if (!isArray(assignments)) {
+    throw new Error(`${SCOPE}: providerIds must be an array`);
   }
   if (assignments.length === 0) {
     return new Map();
@@ -314,36 +316,30 @@ function providerAssignmentsByRequirementId(
 
   const providerIds = new Map<RequirementId, ProviderId>();
   assignments.forEach((assignment, index) => {
+    const i = String(index);
     if (!isObjectRecord(assignment)) {
-      throw new Error(
-        `active binding collection: provider assignment ${index} must be an object`,
-      );
+      throw new Error(`${SCOPE}: provider assignment ${i} must be an object`);
     }
     if (typeof assignment['requirementId'] !== 'string') {
-      throw new Error(
-        `active binding collection: provider assignment ${index} `
-        + 'requirementId must be a string',
-      );
+      throw new Error(`${SCOPE}: provider assignment ${i} requirementId must be a string`);
     }
     if (typeof assignment['providerId'] !== 'string') {
-      throw new Error(
-        `active binding collection: provider assignment ${index} providerId must be a string`,
-      );
+      throw new Error(`${SCOPE}: provider assignment ${i} providerId must be a string`);
     }
 
     const requirementId = normalizeRequiredText({
-      scope: 'active binding collection',
+      scope: SCOPE,
       field: 'requirementId',
       value: assignment['requirementId'],
     });
     if (providerIds.has(requirementId)) {
       throw new Error(
-        `active binding collection: duplicate provider assignment ${requirementId}`,
+        `${SCOPE}: duplicate provider assignment ${requirementId}`,
       );
     }
 
     providerIds.set(requirementId, normalizeRequiredText({
-      scope: 'active binding collection',
+      scope: SCOPE,
       field: 'providerId',
       value: assignment['providerId'],
     }));
@@ -360,6 +356,10 @@ function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
+function isArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function mergeDuplicateEntry(
   existingEntry: ActiveBindingEntry,
   incomingEntry: ActiveBindingEntry,
@@ -370,7 +370,7 @@ function mergeDuplicateEntry(
     && existingEntry.providerId !== incomingEntry.providerId
   ) {
     throw new Error(
-      `active binding collection: conflicting providers for owner ${incomingEntry.owner.id} `
+      `${SCOPE}: conflicting providers for owner ${incomingEntry.owner.id} `
       + `requirement ${incomingEntry.requirement.id}`,
     );
   }

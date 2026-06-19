@@ -69,7 +69,6 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou-tui-app/src/index.ts', lines: 693 },
   { path: 'packages/bijou/src/core/components/dag-render.ts', lines: 692 },
   { path: 'packages/bijou-tui/src/app-frame-render.test.ts', lines: 691 },
-  { path: 'packages/bijou-tui/src/flex.ts', lines: 680 },
   { path: 'examples/perf-gradient/main.ts', lines: 680 },
   { path: 'packages/bijou-tui/src/eventbus.test.ts', lines: 666 },
   { path: 'packages/bijou-tui/src/viewport.ts', lines: 654 },
