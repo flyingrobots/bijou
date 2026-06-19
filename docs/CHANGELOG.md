@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-156 removes `53` more type-aware ESLint
+  findings across TUI runtime/list/notification/DAG/layout helpers, core
+  block-tree/grapheme/timer utilities, create-app CLI parsing, release-readiness
+  tracker parsing, release metadata tag handling, and smoke canary package/env
+  handling, lowering aggregate Code Dojo debt from `623` to `570` with the next
+  goalpost target set to `520` or lower.
 - **Focused Code Dojo ratchet** — WF-155 removes `51` more type-aware ESLint
   findings across Storybook/BlockLab fixtures, the counter block demo, TUI app
   shell tests, focus-area and collection-surface helpers, surface primitive

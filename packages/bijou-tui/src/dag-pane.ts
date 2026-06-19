@@ -187,7 +187,8 @@ function computeHighlightPath(
   let rootFound: string | undefined;
 
   while (queue.length > 0) {
-    const current = queue.shift()!;
+    const current = queue.shift();
+    if (current === undefined) break;
     const parents = adjacency.parents.get(current) ?? [];
     if (parents.length === 0) {
       rootFound = current;
@@ -259,8 +260,9 @@ function nodesOnSameRow(
     if (pos.row === row) result.push(id);
   }
   return result.sort((a, b) => {
-    const pa = positions.get(a)!;
-    const pb = positions.get(b)!;
+    const pa = positions.get(a);
+    const pb = positions.get(b);
+    if (pa === undefined || pb === undefined) return 0;
     return pa.col - pb.col;
   });
 }

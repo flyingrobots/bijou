@@ -93,8 +93,10 @@ function discoverPublishableUnits(): readonly PublishableUnit[] {
     .sort()
     .map((dir) => {
       const packageJsonPath = resolve(dir, 'package.json');
-      const manifest = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { name: string; private?: boolean };
-      return { name: manifest.name, dir, private: manifest.private === true };
+      const manifest = parseJsonRecord(readFileSync(packageJsonPath, 'utf8'), packageJsonPath);
+      const name = manifest['name'];
+      if (typeof name !== 'string') throw new Error(`${packageJsonPath} is missing package name`);
+      return { name, dir, private: manifest['private'] === true };
     })
     .filter((entry) => !entry.private)
     .map(({ name, dir }) => ({ name, dir }));
@@ -308,9 +310,9 @@ function parsePackResult(stdout: string, packageName: string): { filename: strin
     throw new Error(`could not parse npm pack output for ${packageName}\n${trimmed}`);
   }
 
-  const parsed = JSON.parse(trimmed.slice(arrayStart, arrayEnd + 1)) as { filename?: string }[];
-  const filename = parsed[0]?.filename;
-  if (filename == null || filename === '') {
+  const parsed = parseJsonArray(trimmed.slice(arrayStart, arrayEnd + 1), `npm pack output for ${packageName}`);
+  const filename = requireJsonRecord(parsed[0], `npm pack output for ${packageName}`)['filename'];
+  if (typeof filename !== 'string' || filename === '') {
     throw new Error(`npm pack did not report a filename for ${packageName}\n${trimmed}`);
   }
 
@@ -453,7 +455,7 @@ function formatFailure(
 ): string {
   const combined = [stdout.trim(), stderr.trim()].filter(Boolean).join('\n');
   return [
-    `${label} failed (${status ?? 'null'})`,
+    `${label} failed (${String(status ?? 'null')})`,
     `command: ${command} ${args.join(' ')}`,
     tail(stripAnsi(combined), 120),
   ].filter(Boolean).join('\n');
@@ -463,16 +465,31 @@ function mergeEnv(
   base: NodeJS.ProcessEnv,
   overrides: Record<string, string | null | undefined> | undefined,
 ): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { ...base };
+  let env: NodeJS.ProcessEnv = { ...base };
   if (overrides == null) return env;
   for (const [key, value] of Object.entries(overrides)) {
     if (value == null) {
-      delete env[key];
+      env = Object.fromEntries(Object.entries(env).filter(([envKey]) => envKey !== key));
     } else {
       env[key] = value;
     }
   }
   return env;
+}
+
+function parseJsonArray(text: string, label: string): readonly unknown[] {
+  const parsed: unknown = JSON.parse(text);
+  if (!Array.isArray(parsed)) throw new Error(`${label} is not an array`);
+  return parsed;
+}
+
+function parseJsonRecord(text: string, label: string): Record<string, unknown> {
+  return requireJsonRecord(JSON.parse(text), label);
+}
+
+function requireJsonRecord(value: unknown, label: string): Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new Error(`${label} is not an object`);
+  return value;
 }
 
 main();

@@ -61,7 +61,7 @@ describe('browsableList', () => {
 
     it('focusNext wraps around', () => {
       let state = createBrowsableListState({ items });
-      for (let i = 0; i < items.length; i++) state = listFocusNext(state);
+      for (let remaining = items.length; remaining > 0; remaining -= 1) state = listFocusNext(state);
       expect(state.focusIndex).toBe(0);
     });
 
@@ -115,7 +115,7 @@ describe('browsableList', () => {
 
     it('scrollY adjusts when focus wraps to top', () => {
       let state = createBrowsableListState({ items, height: 2 });
-      for (let i = 0; i < items.length; i++) state = listFocusNext(state);
+      for (let remaining = items.length; remaining > 0; remaining -= 1) state = listFocusNext(state);
       expect(state.focusIndex).toBe(0);
       expect(state.scrollY).toBe(0);
     });
@@ -202,7 +202,7 @@ describe('browsableList', () => {
       const rendered = surfaceToString(
         browsableListSurface(state, {
           width: 20,
-          renderItem: ({ item, focused }) => focused ? `> ${item.value}` : String(item.value),
+          renderItem: ({ item, focused }) => focused ? `> ${String(item.value)}` : String(item.value),
         }),
         ctx.style,
       );

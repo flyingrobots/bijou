@@ -27,10 +27,18 @@ Current count:
 | File/context baseline | 331 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 22 | Existing test mock/spy violations. |
 | Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 215 | Type-aware ESLint findings after the WF-155 focused cleanup pass. |
-| **Total** | **623** | Aggregate Code Dojo standards debt. |
+| ESLint baseline | 162 | Type-aware ESLint findings after the WF-156 focused cleanup pass. |
+| **Total** | **570** | Aggregate Code Dojo standards debt. |
 
-WF-155 lowers ESLint debt from `266` to `215` by cleaning focused Storybook,
+WF-156 lowers ESLint debt from `215` to `162` by cleaning focused TUI runtime,
+notification, list, DAG, layout, timer, grapheme, block-tree, create-app CLI,
+release-readiness, release metadata, and canary smoke-runner clusters. The
+aggregate Code Dojo ceiling falls from `623` to `570`. Per the operator's
+temporary waiver for touched-file size ratchets during this slice, existing
+file/context and code-size entries for touched legacy-large files were refreshed
+without adding new counted file/context or code-size violations.
+
+WF-155 lowered ESLint debt from `266` to `215` by cleaning focused Storybook,
 counter fixture, TUI app, focus-area, collection-surface, surface primitive,
 split-editor, i18n localization, and Node IO clusters while keeping touched
 file/context ceilings flat or lower. The aggregate Code Dojo ceiling falls from
@@ -66,8 +74,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `623`. The next met goalpost must lower the ceiling to
-`573` or lower.
+The current ceiling is `570`. The next met goalpost must lower the ceiling to
+`520` or lower.
 
 ## Updating The Ceiling
 

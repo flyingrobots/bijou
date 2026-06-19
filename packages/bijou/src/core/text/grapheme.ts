@@ -18,9 +18,7 @@ let _segmenter: Intl.Segmenter | undefined;
  * @returns The shared `Intl.Segmenter` configured for English grapheme granularity.
  */
 function segmenter(): Intl.Segmenter {
-  if (!_segmenter) {
-    _segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-  }
+  _segmenter ??= new Intl.Segmenter('en', { granularity: 'grapheme' });
   return _segmenter;
 }
 
@@ -205,9 +203,7 @@ export function sanitizeTerminalText(
     text = stashTerminalSequences(text, new RegExp(ANSI_SGR_RE, 'g'), placeholders);
   }
 
-  text = text
-    .replace(ANSI_CONTROL_SEQUENCE_RE, '')
-    .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '');
+  text = stripUnsafeControlChars(text.replace(ANSI_CONTROL_SEQUENCE_RE, ''));
 
   return restoreTerminalSequences(text, placeholders);
 }
@@ -254,7 +250,7 @@ function stashTerminalSequences(
 ): string {
   return text.replace(pattern, (match) => {
     const index = placeholders.push(match) - 1;
-    return `\uE000${index}\uE001`;
+    return `\uE000${String(index)}\uE001`;
   });
 }
 
@@ -263,6 +259,17 @@ function restoreTerminalSequences(text: string, placeholders: readonly string[])
     const index = Number.parseInt(rawIndex, 10);
     return placeholders[index] ?? '';
   });
+}
+
+function stripUnsafeControlChars(text: string): string {
+  let result = '';
+  for (const ch of text) {
+    const cp = ch.codePointAt(0);
+    if (cp === undefined) continue;
+    if ((cp >= 0 && cp <= 8) || (cp >= 11 && cp <= 31) || cp === 127) continue;
+    result += ch;
+  }
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -287,7 +294,8 @@ export function graphemeClusterWidth(grapheme: string): number {
   let maxWidth = 1;
   let hasEmojiPresentation = false;
   for (const ch of grapheme) {
-    const cp = ch.codePointAt(0)!;
+    const cp = ch.codePointAt(0);
+    if (cp === undefined) continue;
     // Detect emoji presentation selector (U+FE0F) — forces base char to 2-wide
     if (cp === 0xFE0F) {
       hasEmojiPresentation = true;

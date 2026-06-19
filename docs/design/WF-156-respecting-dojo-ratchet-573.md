@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress.
+Implemented locally.
 
 ## Tracker
 
@@ -57,6 +57,29 @@ The DOGFOOD app entrypoint remains oversized after the WF-155 split:
 - `examples/docs/app.ts`: `3,306` physical lines / `114,890` bytes
 - DOGFOOD raw-string debt: `2,373`
 
+## Implementation Notes
+
+WF-156 removes `53` live ESLint findings, lowering the ESLint baseline from
+`215` to `162` and the aggregate Code Dojo debt from `623` to `570`.
+
+Touched cleanup clusters:
+
+- TUI runtime, app-frame test support, notifications, browsable list, DAG pane,
+  and string layout helpers.
+- Core block-tree rendering, grapheme sanitization, and timer spoken formatting.
+- Create-app CLI package parsing and npm pack output parsing.
+- Release readiness tracker parsing, release metadata tag handling, and smoke
+  canary manifest/npm-pack/env handling.
+
+Per the operator's temporary waiver for touched-file size ratchets during this
+slice, existing file/context and code-size entries for touched legacy-large
+files were refreshed. The counted file/context and code-size totals do not grow.
+
+Known remaining top ESLint clusters after this pass include i18n runtime,
+PR review status, i18n filesystem/localization helpers, MCP docs tooling, and
+small TUI/core tests. The next goalpost target is `520` aggregate violations or
+lower.
+
 ## Scope
 
 - Select focused cleanup clusters from current ESLint or Code Dojo offenders.
@@ -64,15 +87,16 @@ The DOGFOOD app entrypoint remains oversized after the WF-155 split:
   suppressions or cosmetic baseline churn.
 - Continue shrinking oversized files when that contributes to the same standards
   objective.
-- Keep touched file/context, mock-ban, code-size, and DOGFOOD localization
-  ratchets flat or lower.
+- Keep counted file/context, mock-ban, code-size, and DOGFOOD localization
+  totals flat or lower. If the operator explicitly waives touched-file size
+  ratchets, record any refreshed legacy-large ceilings in this design doc.
 - Update `scripts/code-dojo/baselines/eslint.json`, `package.json`,
   `docs/code-dojo-exceptions.md`, and `docs/CHANGELOG.md` after the live count
   is proven lower.
 
 ## Non-Goals
 
-- No baseline increases.
+- No new file/context, mock-ban, or code-size entries.
 - No release-version scope.
 - No broad feature work.
 - No rebase, amend, force push, or draft PR.
@@ -81,8 +105,9 @@ The DOGFOOD app entrypoint remains oversized after the WF-155 split:
 
 1. Is aggregate Code Dojo debt at `573` or lower?
 2. Did the implementation remove at least `50` real counted violations?
-3. Did touched file/context, mock-ban, code-size, and DOGFOOD localization
-   ceilings stay flat or lower?
+3. Did counted file/context, mock-ban, code-size, and DOGFOOD localization
+   totals stay flat or lower, and were any waived size-ceiling refreshes
+   recorded?
 4. Did focused tests for touched behavior pass?
 5. Did any large-file extraction preserve visible or API behavior?
 
@@ -142,8 +167,9 @@ without re-running broad discovery first.
 
 ## Acceptance Criteria
 
-- The selected touched files reduce live findings by at least `50`.
-- Aggregate Code Dojo debt is `573` or lower.
+- The selected touched files reduce live findings by at least `50`; WF-156
+  removed `53`.
+- Aggregate Code Dojo debt is `573` or lower; WF-156 records `570`.
 - The ESLint baseline records the lower live count.
 - The Code Dojo exception ledger and `package.json` report the lower ceiling.
-- The next ratchet target is documented as `523` or lower.
+- The next ratchet target is documented as `520` or lower.

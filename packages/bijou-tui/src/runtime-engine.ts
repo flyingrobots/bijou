@@ -132,8 +132,9 @@ export function replaceTopRuntimeView<Model = unknown>(
 export function clearRuntimeViewsToRoot<Model = unknown>(
   stack: RuntimeViewStack<Model>,
 ): RuntimeViewStack<Model> {
+  const root = stack.layers[0];
   return {
-    layers: stack.layers.length === 0 ? [] : [stack.layers[0]!],
+    layers: root === undefined ? [] : [root],
   };
 }
 
@@ -586,11 +587,14 @@ export function hitTestRuntimeLayout<Node extends LayoutNode = LayoutNode>(
     return undefined;
   }
 
+  const target = path.at(-1);
+  if (target === undefined) return undefined;
+
   return {
     viewId,
     point: { x, y },
     path,
-    target: path[path.length - 1]!,
+    target,
   };
 }
 
@@ -611,7 +615,8 @@ export function routeRuntimeInput<
   let lastHit: RuntimeLayoutHit<Node> | undefined;
 
   for (let index = stack.layers.length - 1; index >= 0; index -= 1) {
-    const layer = stack.layers[index]!;
+    const layer = stack.layers[index];
+    if (layer === undefined) continue;
     visitedViewIds.push(layer.id);
 
     const retainedLayout = getRuntimeRetainedLayout(layouts, layer.id);
@@ -733,13 +738,12 @@ export function appendRuntimeEffects<Effect = unknown>(
 export function bufferRuntimeRouteResult<
   Command = unknown,
   Effect = unknown,
-  Result extends {
-    readonly commands: readonly Command[];
-    readonly effects: readonly Effect[];
-  } = RuntimeInputRouteResult<Command, Effect>,
 >(
   buffers: RuntimeBuffers<Command, Effect>,
-  result: Result,
+  result: RuntimeInputRouteResult<Command, Effect> | {
+    readonly commands: readonly Command[];
+    readonly effects: readonly Effect[];
+  },
 ): RuntimeBuffers<Command, Effect> {
   const nextCommands = appendRuntimeCommands(buffers.commands, result.commands);
   const nextEffects = appendRuntimeEffects(buffers.effects, result.effects);
@@ -933,7 +937,8 @@ function hitTestLayoutPath<Node extends LayoutNode = LayoutNode>(
   }
 
   for (let index = node.children.length - 1; index >= 0; index -= 1) {
-    const child = node.children[index] as Node;
+    const child = node.children[index];
+    if (!isLayoutPathNode(node, child)) continue;
     const childPath = hitTestLayoutPath(child, x, y);
     if (childPath != null) {
       return [node, ...childPath];
@@ -941,6 +946,13 @@ function hitTestLayoutPath<Node extends LayoutNode = LayoutNode>(
   }
 
   return [node];
+}
+
+function isLayoutPathNode<Node extends LayoutNode>(
+  parent: Node,
+  node: LayoutNode | undefined,
+): node is Node {
+  return node !== undefined && parent.children.includes(node);
 }
 
 function pointInRect(

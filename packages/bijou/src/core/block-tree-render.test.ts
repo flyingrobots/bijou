@@ -53,7 +53,10 @@ describe('block tree rendering', () => {
     });
     const parent = defineBlock({
       metadata: childMetadata('ModeSpyParent'),
-      render: ({ slots }) => ({ output: String(slots?.content ?? '') }),
+      render: ({ slots }) => {
+        const content = slots?.content;
+        return { output: typeof content === 'string' ? content : '' };
+      },
     });
 
     const rendered = renderBlockTree(blockRenderNode(parent, {
@@ -71,10 +74,12 @@ describe('block tree rendering', () => {
       render: () => ({ output: 'not branded' }),
     };
 
-    expect(() => blockRenderNode(looseBlock as never)).toThrow(
+    // @ts-expect-error runtime guard coverage for loose block-shaped input.
+    expect(() => blockRenderNode(looseBlock)).toThrow(
       'block render node: block must be created by defineBlock()',
     );
-    expect(() => renderBlockTree({ block: appShellBlock, input: {} } as never)).toThrow(
+    // @ts-expect-error runtime guard coverage for loose render-node-shaped input.
+    expect(() => renderBlockTree({ block: appShellBlock, input: {} })).toThrow(
       'block tree render: target must be a BlockDefinition or BlockRenderNode',
     );
     expect(isBlockRenderNode({ block: appShellBlock, input: {} })).toBe(false);

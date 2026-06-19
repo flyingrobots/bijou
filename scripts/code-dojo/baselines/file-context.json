@@ -35,8 +35,8 @@
     },
     {
       "path": "packages/bijou-tui/src/runtime-engine.ts",
-      "lines": 964,
-      "bytes": 25048
+      "lines": 976,
+      "bytes": 25353
     },
     {
       "path": "packages/bijou-tui/src/overlay.ts",
@@ -125,8 +125,8 @@
     },
     {
       "path": "packages/bijou-tui/src/dag-pane.ts",
-      "lines": 711,
-      "bytes": 22657
+      "lines": 713,
+      "bytes": 22748
     },
     {
       "path": "packages/bijou/src/core/binding.test.ts",
@@ -166,7 +166,7 @@
     {
       "path": "packages/bijou-tui/src/notification.test.ts",
       "lines": 658,
-      "bytes": 25464
+      "bytes": 25493
     },
     {
       "path": "packages/bijou-tui/src/viewport.ts",
@@ -295,8 +295,8 @@
     },
     {
       "path": "scripts/smoke-canaries.ts",
-      "lines": 479,
-      "bytes": 14662
+      "lines": 496,
+      "bytes": 15504
     },
     {
       "path": "packages/bijou-tui/src/viewport.test.ts",
@@ -610,8 +610,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame.test-support.ts",
-      "lines": 348,
-      "bytes": 8708
+      "lines": 350,
+      "bytes": 8852
     },
     {
       "path": "packages/bijou/src/core/theme/dtcg.ts",
@@ -675,8 +675,8 @@
     },
     {
       "path": "packages/bijou/src/core/text/grapheme.ts",
-      "lines": 335,
-      "bytes": 11761
+      "lines": 343,
+      "bytes": 12038
     },
     {
       "path": "packages/bijou-tui/src/overlay-drawer.test.ts",
@@ -710,8 +710,8 @@
     },
     {
       "path": "scripts/release-metadata.ts",
-      "lines": 317,
-      "bytes": 10713
+      "lines": 371,
+      "bytes": 12957
     },
     {
       "path": "scripts/dogfood-i18n-completeness.ts",
@@ -725,8 +725,8 @@
     },
     {
       "path": "scripts/release-readiness.ts",
-      "lines": 315,
-      "bytes": 11972
+      "lines": 350,
+      "bytes": 13401
     },
     {
       "path": "tests/cycles/DF-030/dogfood-docs-surface-block.test.ts",
@@ -741,7 +741,7 @@
     {
       "path": "packages/bijou/src/core/components/timer.ts",
       "lines": 314,
-      "bytes": 10657
+      "bytes": 10681
     },
     {
       "path": "tests/cycles/DF-062/notification-system-family-audit.test.ts",
@@ -981,7 +981,7 @@
     {
       "path": "packages/bijou-tui/src/browsable-list.test.ts",
       "lines": 260,
-      "bytes": 9239
+      "bytes": 9301
     },
     {
       "path": "packages/bijou/src/core/block-metadata.test.ts",
@@ -1150,8 +1150,8 @@
     },
     {
       "path": "packages/create-bijou-tui-app/src/cli.test.ts",
-      "lines": 225,
-      "bytes": 8344
+      "lines": 234,
+      "bytes": 8934
     },
     {
       "path": "packages/bijou/src/core/binding-frame-update.test.ts",
@@ -1500,8 +1500,8 @@
     },
     {
       "path": "packages/bijou-tui/src/layout.ts",
-      "lines": 176,
-      "bytes": 5510
+      "lines": 178,
+      "bytes": 5576
     },
     {
       "path": "packages/bijou/src/core/forms/multiselect.ts",
@@ -1525,8 +1525,8 @@
     },
     {
       "path": "packages/bijou/src/core/block-tree-render.test.ts",
-      "lines": 172,
-      "bytes": 5569
+      "lines": 177,
+      "bytes": 5789
     },
     {
       "path": "packages/bijou/src/core/components/inspector.ts",

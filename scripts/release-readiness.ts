@@ -110,7 +110,7 @@ export function buildReleaseReadinessReport(options: {
       status: openTrackerItems.length === 0 ? 'pass' : 'fail',
       summary: openTrackerItems.length === 0
         ? `${milestone} has zero open tracker issues`
-        : `${milestone} has ${openTrackerItems.length} open tracker issue(s): ${formatTrackerItems(openTrackerItems)}`,
+        : `${milestone} has ${String(openTrackerItems.length)} open tracker issue(s): ${formatTrackerItems(openTrackerItems)}`,
     },
     {
       label: 'tracker-wip-labels',
@@ -210,7 +210,7 @@ export function runReleaseReadiness(io: ReleaseReadinessIO = {}): number {
       return 1;
     }
     if (result.status !== 0) {
-      stderr(`release-readiness: ${step.label} exited with status ${result.status ?? 'null'}\n`);
+      stderr(`release-readiness: ${step.label} exited with status ${String(result.status ?? 'null')}\n`);
       return result.status ?? 1;
     }
   }
@@ -237,7 +237,7 @@ export function parseReleaseReadinessArgs(args: readonly string[]): { readonly m
       if (milestone === '') throw new Error('--milestone requires a value');
       continue;
     }
-    throw new Error(`unknown release:readiness option: ${arg}`);
+    throw new Error(`unknown release:readiness option: ${String(arg)}`);
   }
   return milestone == null ? {} : { milestone };
 }
@@ -261,17 +261,10 @@ function readMilestoneTrackerItems(milestone: string, cwd: string): readonly Rel
 
   if (result.error) throw result.error;
   if (result.status !== 0) {
-    throw new Error(`gh issue list exited with status ${result.status ?? 'null'}: ${result.stderr.trim()}`);
+    throw new Error(`gh issue list exited with status ${String(result.status ?? 'null')}: ${result.stderr.trim()}`);
   }
 
-  const parsed = JSON.parse(result.stdout) as ReleaseReadinessTrackerItem[];
-  return Object.freeze(parsed.map((item) => Object.freeze({
-    number: item.number,
-    title: item.title,
-    state: item.state,
-    labels: Object.freeze([...(item.labels ?? [])]),
-    url: item.url,
-  })));
+  return parseTrackerItems(result.stdout);
 }
 
 function readReleaseReadinessDocs(cwd: string, milestone: string): ReleaseReadinessDocsSnapshot {
@@ -292,7 +285,49 @@ function trackerItemLabelNames(item: ReleaseReadinessTrackerItem): readonly stri
 }
 
 function formatTrackerItems(items: readonly ReleaseReadinessTrackerItem[]): string {
-  return items.map((item) => `#${item.number}`).join(', ');
+  return items.map((item) => `#${String(item.number)}`).join(', ');
+}
+
+function parseTrackerItems(stdout: string): readonly ReleaseReadinessTrackerItem[] {
+  const parsed: unknown = JSON.parse(stdout);
+  if (!Array.isArray(parsed)) throw new Error('gh issue list did not return an array');
+  return Object.freeze(parsed.map((value) => {
+    const item = requireJsonRecord(value, 'gh issue list item');
+    const number = item['number'];
+    const title = item['title'];
+    const state = item['state'];
+    const url = item['url'];
+    if (typeof number !== 'number' || typeof title !== 'string' || typeof state !== 'string') {
+      throw new Error('gh issue list returned an item with an unexpected shape');
+    }
+    const base = {
+      number,
+      title,
+      state,
+      labels: parseTrackerLabels(item['labels']),
+    };
+    return Object.freeze(typeof url === 'string' ? { ...base, url } : base);
+  }));
+}
+
+function parseTrackerLabels(value: unknown): readonly (string | ReleaseReadinessTrackerLabel)[] {
+  if (!Array.isArray(value)) return Object.freeze([]);
+  return Object.freeze(value.map((label) => {
+    if (typeof label === 'string') return label;
+    const record = requireJsonRecord(label, 'gh issue label');
+    const name = record['name'];
+    if (typeof name !== 'string') throw new Error('gh issue label is missing name');
+    return { name };
+  }));
+}
+
+function requireJsonRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!isRecord(value)) throw new Error(`${label} is not an object`);
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function escapeMarkdownTableCell(text: string): string {
