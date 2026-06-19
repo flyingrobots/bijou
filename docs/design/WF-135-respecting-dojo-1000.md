@@ -136,9 +136,9 @@ visible rendering.
 ## Retrospective
 
 Completed with a measured aggregate Code Dojo debt reduction from `4,940` to
-`2,891` (`-2,049`). The stored ESLint baseline now records `2,475` live
-findings, down from `4,517` (`-2,042`), and the next aggregate target is
-`2,841` or lower. Follow-on passes removed fake async wrappers, dead DAG
+`2,617` (`-2,323`). The stored ESLint baseline now records `2,203` live
+findings, down from `4,517` (`-2,314`), and the next aggregate target is
+`2,567` or lower. Follow-on passes removed fake async wrappers, dead DAG
 fixtures/imports, explicit script/example formatting debt, MCP docs payload
 parsing/coercion debt, flame typed-array non-null debt, app-frame render
 fixture assertion debt, app-frame settings shell-state assertion debt, and
@@ -149,6 +149,8 @@ malformed-runtime test debt, shader middleware state fixtures, responsive
 DOGFOOD layout witnesses, release-title model access, grid-layout example
 bootstrap debt, docs-preview page-model helper typing debt, locale helper
 coercion debt, AppFrame routing/theme test harness debt, runtime interactive
-pipeline rejection cleanup, core surface packed-buffer safe-read debt, and eight
-file/context baseline entries while keeping touched file/context budgets below
-their stored ceilings.
+pipeline rejection cleanup, core surface packed-buffer safe-read debt,
+table/markdown parsing debt, small utility debt, compact component and example
+debt, runtime/example/TUI/i18n cycle debt, and surface-diff, timeline, and
+component-metadata typed-formatting debt while keeping touched file/context
+budgets below their stored ceilings.

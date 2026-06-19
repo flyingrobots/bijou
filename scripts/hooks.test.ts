@@ -18,7 +18,7 @@ describe('git hooks', () => {
     const fullPushIndex = hook.indexOf('BIJOU_FULL_PUSH');
     const codeSizeIndex = hook.indexOf('npm run code:size');
     const typecheckIndex = hook.indexOf('npm run typecheck:test');
-    const testIndex = hook.indexOf('npm test');
+    const testIndex = hook.indexOf('npm run test:run');
     const interactiveSmokeIndex = hook.indexOf('npm run verify:interactive-examples');
 
     expect(pathGateIndex).toBeGreaterThanOrEqual(0);
@@ -33,6 +33,7 @@ describe('git hooks', () => {
     expect(typecheckIndex).toBeGreaterThan(codeSizeIndex);
     expect(typecheckIndex).toBeGreaterThanOrEqual(0);
     expect(testIndex).toBeGreaterThan(typecheckIndex);
+    expect(hook).not.toContain('npm test');
     expect(interactiveSmokeIndex).toBeGreaterThan(testIndex);
   });
 

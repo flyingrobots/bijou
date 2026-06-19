@@ -122,7 +122,7 @@ npm run typecheck:test
 # Test suite
 # ---------------------------------------------------------------------------
 echo "pre-push: running test suite"
-npm test
+npm run test:run
 
 # ---------------------------------------------------------------------------
 # Interactive example smoke

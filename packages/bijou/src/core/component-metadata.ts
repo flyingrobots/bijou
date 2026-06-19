@@ -160,8 +160,8 @@ function pushArgsIssues(
   args: readonly ComponentMetadataArg[],
 ): void {
   args.forEach((arg, index) => {
-    pushRequiredTextIssue(issues, `args[${index}].name`, arg.name);
-    pushRequiredTextIssue(issues, `args[${index}].type`, arg.type);
+    pushRequiredTextIssue(issues, at('args', index, 'name'), arg.name);
+    pushRequiredTextIssue(issues, at('args', index, 'type'), arg.type);
   });
   pushDuplicateIssues(issues, args.map((arg) => arg.name), {
     label: 'arg name',
@@ -175,8 +175,8 @@ function pushVariantIssues(
   variants: readonly ComponentMetadataVariant[],
 ): void {
   variants.forEach((variant, index) => {
-    pushRequiredTextIssue(issues, `variants[${index}].id`, variant.id);
-    pushRequiredTextIssue(issues, `variants[${index}].label`, variant.label);
+    pushRequiredTextIssue(issues, at('variants', index, 'id'), variant.id);
+    pushRequiredTextIssue(issues, at('variants', index, 'label'), variant.label);
   });
   pushDuplicateIssues(issues, variants.map((variant) => variant.id), {
     label: 'variant id',
@@ -190,8 +190,8 @@ function pushInvariantIssues(
   invariants: readonly ComponentMetadataInvariant[],
 ): void {
   invariants.forEach((invariant, index) => {
-    pushRequiredTextIssue(issues, `invariants[${index}].id`, invariant.id);
-    pushRequiredTextIssue(issues, `invariants[${index}].description`, invariant.description);
+    pushRequiredTextIssue(issues, at('invariants', index, 'id'), invariant.id);
+    pushRequiredTextIssue(issues, at('invariants', index, 'description'), invariant.description);
   });
   pushDuplicateIssues(issues, invariants.map((invariant) => invariant.id), {
     label: 'invariant id',
@@ -205,8 +205,8 @@ function pushExampleIssues(
   examples: readonly ComponentMetadataExample[],
 ): void {
   examples.forEach((example, index) => {
-    pushRequiredTextIssue(issues, `examples[${index}].id`, example.id);
-    pushRequiredTextIssue(issues, `examples[${index}].label`, example.label);
+    pushRequiredTextIssue(issues, at('examples', index, 'id'), example.id);
+    pushRequiredTextIssue(issues, at('examples', index, 'label'), example.label);
   });
   pushDuplicateIssues(issues, examples.map((example) => example.id), {
     label: 'example id',
@@ -247,7 +247,7 @@ function pushDuplicateIssues(
     issues.push({
       kind: 'duplicate-id',
       severity: 'error',
-      path: indexedPath(options.pathPrefix, index, options.valuePath),
+      path: at(options.pathPrefix, index, options.valuePath),
       message: `duplicate ${options.label} ${normalized}`,
     });
   });
@@ -270,12 +270,9 @@ function pushRequiredTextIssue(
   });
 }
 
-function indexedPath(pathPrefix: string, index: number, valuePath: string): string {
-  if (valuePath === '') {
-    return `${pathPrefix}[${index}]`;
-  }
-
-  return `${pathPrefix}[${index}].${valuePath}`;
+function at(prefix: string, index: number, suffix: string): string {
+  const path = `${prefix}[${String(index)}]`;
+  return suffix === '' ? path : `${path}.${suffix}`;
 }
 
 function joinLabels(values: readonly string[]): string {

@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 2253,
-  "errors": 2253,
+  "total": 2203,
+  "errors": 2203,
   "warnings": 0,
   "rules": [
     {
@@ -62,11 +62,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 526
+      "count": 512
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
-      "count": 13
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 534
+      "count": 503
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
