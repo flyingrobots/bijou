@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Implemented.
 
 ## Tracker
 
@@ -33,6 +33,18 @@ Live counts on `main` at `d1ecced7`:
   bytes
 - DOGFOOD raw-string debt: `2,656`
 - `docs-app` raw-string debt: `258`
+- missing Markdown localizations: `78`
+
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `792`
+- next aggregate Code Dojo target: `742` or lower
+- ESLint findings: `384`
+- `examples/docs/app.ts` ESLint findings: `0`
+- `examples/docs/app.ts` file-context baseline: `5,793` lines and `201,982`
+  bytes
+- DOGFOOD raw-string debt: `2,654`
+- `docs-app` raw-string debt: `256`
 - missing Markdown localizations: `78`
 
 Target for this cycle:
@@ -131,6 +143,12 @@ through the full DOGFOOD app file.
 - `npm run docs:inventory`
 - `npm run lint`
 - `git diff --check`
+
+Implemented validation:
+
+- `npx eslint examples/docs/app.ts examples/docs/app-row-format.ts examples/docs/app-markdown.ts`
+- `npm run code-dojo:changed`
+- `npm run dogfood:i18n:debt`
 
 ## Acceptance Criteria
 

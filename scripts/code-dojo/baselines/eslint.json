@@ -1,20 +1,16 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 502,
-  "errors": 502,
+  "total": 384,
+  "errors": 384,
   "warnings": 0,
   "rules": [
-    {
-      "ruleId": "@typescript-eslint/array-type",
-      "count": 3
-    },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
       "count": 9
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
-      "count": 4
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
@@ -42,7 +38,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 20
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -50,7 +46,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 77
+      "count": 66
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -58,7 +54,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 36
+      "count": 30
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -66,11 +62,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
-      "count": 26
+      "count": 10
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
-      "count": 9
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
@@ -78,11 +74,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 16
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 8
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
@@ -94,11 +90,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 96
+      "count": 74
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 12
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -114,11 +110,11 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
-      "count": 4
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/prefer-regexp-exec",
-      "count": 3
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/require-await",
@@ -130,11 +126,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 98
-    },
-    {
-      "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
-      "count": 5
+      "count": 86
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",

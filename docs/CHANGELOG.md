@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD app main ratchet** — LX-022 starts breaking up
+  `examples/docs/app.ts` by extracting row-format and Markdown document helpers
+  into small focused modules, removes all `118` current ESLint findings from
+  the primary DOGFOOD app file, lowers the app file-context baseline from
+  `5,794` lines / `203,093` bytes to `5,793` lines / `201,982` bytes, lowers
+  DOGFOOD raw-string debt from `2,656` to `2,654`, lowers `docs-app` raw-string
+  debt from `258` to `256`, and ratchets aggregate Code Dojo debt from `910` to
+  `792` with the next goalpost target set to `742` or lower.
 - **DOGFOOD string-debt ratchet** — LX-021 makes partial cleanup of large
   DOGFOOD TypeScript sources possible by changing the touched-file i18n debt
   gate from all-or-nothing cleanup to a merge-base ratchet: newly touched

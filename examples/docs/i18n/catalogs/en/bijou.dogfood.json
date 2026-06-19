@@ -1995,6 +1995,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Bijou Docs"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "guide.info.currentPostureTitle"
       },
       "kind": "message",
@@ -2034,6 +2045,17 @@
       "sourceLocale": "en",
       "values": {
         "en": "Block authoring inventory preview and lowering path published directly inside DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.components"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Component story exploration path for DOGFOOD."
       }
     },
     {
