@@ -101,7 +101,7 @@ export interface Scenario<State = unknown> {
 }
 
 /** A scenario that erases its generic State parameter, for registries. */
-export type AnyScenario = Scenario<unknown>;
+export type AnyScenario = Scenario;
 
 /** One comma-separated AND clause from `--tag=...`. */
 export type ScenarioTagGroup = readonly string[];

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { brailleChartSurface } from './braille-chart.js';
 import { createTestContext } from '../../adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const ctx = createTestContext();
 
@@ -16,7 +17,7 @@ describe('brailleChartSurface', () => {
     for (let y = 0; y < surface.height; y++) {
       for (let x = 0; x < surface.width; x++) {
         const cell = surface.get(x, y);
-        const code = cell.char.codePointAt(0)!;
+        const code = must(cell.char.codePointAt(0));
         expect(code).toBeGreaterThanOrEqual(0x2800);
         expect(code).toBeLessThanOrEqual(0x28ff);
       }
@@ -33,8 +34,8 @@ describe('brailleChartSurface', () => {
     const surface = brailleChartSurface([5, 5, 5, 5], { width: 2, height: 4, ctx });
     const countBits = (n: number) => { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; };
     // Bottom rows should have more dots filled than top rows.
-    const bottomBits = countBits(surface.get(0, 3).char.codePointAt(0)! - 0x2800);
-    const topBits = countBits(surface.get(0, 0).char.codePointAt(0)! - 0x2800);
+    const bottomBits = countBits(must(surface.get(0, 3).char.codePointAt(0)) - 0x2800);
+    const topBits = countBits(must(surface.get(0, 0).char.codePointAt(0)) - 0x2800);
     expect(bottomBits).toBeGreaterThanOrEqual(topBits);
   });
 
@@ -52,8 +53,8 @@ describe('brailleChartSurface', () => {
 
   it('bottom row has more dots than top row for ascending values', () => {
     const surface = brailleChartSurface([0, 100], { width: 1, height: 4, ctx });
-    const bottomCode = surface.get(0, 3).char.codePointAt(0)! - 0x2800;
-    const topCode = surface.get(0, 0).char.codePointAt(0)! - 0x2800;
+    const bottomCode = must(surface.get(0, 3).char.codePointAt(0)) - 0x2800;
+    const topCode = must(surface.get(0, 0).char.codePointAt(0)) - 0x2800;
     const countBits = (n: number) => { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; };
     expect(countBits(bottomCode)).toBeGreaterThanOrEqual(countBits(topCode));
   });
@@ -64,7 +65,7 @@ describe('brailleChartSurface', () => {
     // Should not throw, and all cells should be valid braille
     for (let y = 0; y < surface.height; y++) {
       for (let x = 0; x < surface.width; x++) {
-        const code = surface.get(x, y).char.codePointAt(0)!;
+        const code = must(surface.get(x, y).char.codePointAt(0));
         expect(code).toBeGreaterThanOrEqual(0x2800);
         expect(code).toBeLessThanOrEqual(0x28ff);
       }
@@ -76,7 +77,7 @@ describe('brailleChartSurface', () => {
     expect(surface.width).toBe(2);
     for (let y = 0; y < surface.height; y++) {
       for (let x = 0; x < surface.width; x++) {
-        const code = surface.get(x, y).char.codePointAt(0)!;
+        const code = must(surface.get(x, y).char.codePointAt(0));
         expect(code).toBeGreaterThanOrEqual(0x2800);
       }
     }

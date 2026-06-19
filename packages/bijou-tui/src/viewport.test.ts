@@ -17,6 +17,7 @@ import {
   stripAnsi,
   visibleLength,
 } from './viewport.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 function surfaceLines(surface: { width: number; height: number; get(x: number, y: number): { char: string } }): string[] {
   const lines: string[] = [];
@@ -36,13 +37,11 @@ function surfaceLines(surface: { width: number; height: number; get(x: number, y
 
 describe('viewport', () => {
   const content = ['line 1', 'line 2', 'line 3', 'line 4', 'line 5'].join('\n');
-
   it('renders visible lines within the viewport height', () => {
     const result = viewport({ width: 10, height: 3, content });
     const lines = result.split('\n');
     expect(lines).toHaveLength(3);
   });
-
   it('shows lines starting from scrollY', () => {
     const result = viewport({
       width: 10,
@@ -52,11 +51,10 @@ describe('viewport', () => {
       showScrollbar: false,
     });
     const lines = result.split('\n');
-    expect(lines[0]!.trimEnd()).toBe('line 3');
-    expect(lines[1]!.trimEnd()).toBe('line 4');
-    expect(lines[2]!.trimEnd()).toBe('line 5');
+    expect(lines[0]?.trimEnd()).toBe('line 3');
+    expect(lines[1]?.trimEnd()).toBe('line 4');
+    expect(lines[2]?.trimEnd()).toBe('line 5');
   });
-
   it('clamps scrollY to valid range', () => {
     const result = viewport({
       width: 10,
@@ -67,9 +65,8 @@ describe('viewport', () => {
     });
     const lines = result.split('\n');
     // Should clamp to maxScroll = 5 - 3 = 2
-    expect(lines[0]!.trimEnd()).toBe('line 3');
+    expect(lines[0]?.trimEnd()).toBe('line 3');
   });
-
   it('clamps negative scrollY to 0', () => {
     const result = viewport({
       width: 10,
@@ -79,9 +76,8 @@ describe('viewport', () => {
       showScrollbar: false,
     });
     const lines = result.split('\n');
-    expect(lines[0]!.trimEnd()).toBe('line 1');
+    expect(lines[0]?.trimEnd()).toBe('line 1');
   });
-
   it('pads short content to fill viewport height', () => {
     const shortContent = 'only one line';
     const result = viewport({
@@ -92,10 +88,9 @@ describe('viewport', () => {
     });
     const lines = result.split('\n');
     expect(lines).toHaveLength(3);
-    expect(lines[0]!.trimEnd()).toBe('only one line');
-    expect(lines[1]!.trimEnd()).toBe('');
+    expect(lines[0]?.trimEnd()).toBe('only one line');
+    expect(lines[1]?.trimEnd()).toBe('');
   });
-
   it('clips long lines to viewport width', () => {
     const wideContent = 'a'.repeat(50);
     const result = viewport({
@@ -104,11 +99,10 @@ describe('viewport', () => {
       content: wideContent,
       showScrollbar: false,
     });
-    const line = result.split('\n')[0]!;
+    const line = must(result.split('\n')[0]);
     // After stripping ANSI, visible length should be ≤ 10
     expect(stripAnsi(line).length).toBeLessThanOrEqual(10);
   });
-
   it('shows scrollbar when content exceeds viewport', () => {
     const result = viewport({
       width: 12,
@@ -123,7 +117,6 @@ describe('viewport', () => {
       expect(['█', '│']).toContain(lastChar);
     }
   });
-
   it('supports overlay scrollbars without reserving an extra gutter column', () => {
     const result = viewport({
       width: 5,
@@ -132,10 +125,8 @@ describe('viewport', () => {
       showScrollbar: true,
       scrollbarMode: 'overlay',
     });
-
     expect(result.split('\n')).toEqual(['abcd█', 'fghi│']);
   });
-
   it('hides scrollbar when content fits', () => {
     const shortContent = 'a\nb\nc';
     const result = viewport({
@@ -152,7 +143,6 @@ describe('viewport', () => {
       expect(stripped).not.toContain('│');
     }
   });
-
   it('hides scrollbar when showScrollbar is false', () => {
     const result = viewport({
       width: 10,
@@ -168,7 +158,6 @@ describe('viewport', () => {
     }
   });
 });
-
 describe('viewportSurface', () => {
   it('renders string content into a surface with the same viewport clipping', () => {
     const result = viewportSurface({
@@ -178,17 +167,14 @@ describe('viewportSurface', () => {
       scrollY: 1,
       showScrollbar: false,
     });
-
     expect(surfaceLines(result)).toEqual(['beta  ', 'gamma ']);
   });
-
   it('clips and scrolls existing surfaces without flattening them', () => {
     const content = createSurface(4, 3);
     content.set(0, 0, { char: 'A', fg: '#ff0000', empty: false });
     content.set(1, 0, { char: 'B', empty: false });
     content.set(2, 1, { char: 'C', fg: '#00ff00', empty: false });
     content.set(3, 2, { char: 'D', fg: '#0000ff', empty: false });
-
     const result = viewportSurface({
       width: 2,
       height: 2,
@@ -197,11 +183,9 @@ describe('viewportSurface', () => {
       scrollY: 1,
       showScrollbar: false,
     });
-
     expect(surfaceLines(result)).toEqual([' C', '  ']);
     expect(result.get(1, 0)).toMatchObject({ char: 'C', fg: '#00ff00' });
   });
-
   it('accepts layout-node content and masks the painted result', () => {
     const nodeSurface = createSurface(5, 4, { char: '.', empty: false });
     nodeSurface.set(2, 3, { char: 'Z', fg: '#ff00ff', empty: false });
@@ -210,7 +194,6 @@ describe('viewportSurface', () => {
       children: [],
       surface: nodeSurface,
     };
-
     const result = viewportSurface({
       width: 3,
       height: 2,
@@ -218,11 +201,9 @@ describe('viewportSurface', () => {
       scrollY: 2,
       showScrollbar: false,
     });
-
     expect(surfaceLines(result)).toEqual(['...', '..Z']);
     expect(result.get(2, 1)).toMatchObject({ char: 'Z', fg: '#ff00ff' });
   });
-
   it('re-roots non-zero-origin layout-node content before masking', () => {
     const nodeSurface = createSurface(3, 1, { char: ' ', empty: false });
     nodeSurface.set(0, 0, { char: 'A', empty: false });
@@ -233,17 +214,14 @@ describe('viewportSurface', () => {
       children: [],
       surface: nodeSurface,
     };
-
     const result = viewportSurface({
       width: 3,
       height: 1,
       content: layout,
       showScrollbar: false,
     });
-
     expect(surfaceLines(result)).toEqual(['ABC']);
   });
-
   it('supports overlay scrollbars for structured surfaces without shrinking the body width', () => {
     const content = createSurface(5, 4, { char: ' ', empty: false });
     for (const [y, row] of ['abcde', 'fghij', 'klmno', 'pqrst'].entries()) {
@@ -251,7 +229,6 @@ describe('viewportSurface', () => {
         content.set(x, y, { char, empty: false });
       }
     }
-
     const result = viewportSurface({
       width: 5,
       height: 2,
@@ -259,15 +236,12 @@ describe('viewportSurface', () => {
       showScrollbar: true,
       scrollbarMode: 'overlay',
     });
-
     expect(surfaceLines(result)).toEqual(['abcd█', 'fghi│']);
   });
 });
-
 // ---------------------------------------------------------------------------
 // Scroll state management
 // ---------------------------------------------------------------------------
-
 describe('createScrollState', () => {
   it('initializes at y=0 with correct bounds', () => {
     const content = 'a\nb\nc\nd\ne\nf\ng\nh\ni\nj';
@@ -277,13 +251,11 @@ describe('createScrollState', () => {
     expect(state.totalLines).toBe(10);
     expect(state.visibleLines).toBe(5);
   });
-
   it('sets maxY to 0 when content fits', () => {
     const state = createScrollState('a\nb', 5);
     expect(state.maxY).toBe(0);
   });
 });
-
 describe('createScrollStateForContent', () => {
   it('derives bounds from structured surface content', () => {
     const content = createSurface(10, 8);
@@ -293,7 +265,6 @@ describe('createScrollStateForContent', () => {
     expect(state.maxX).toBe(6);
     expect(state.totalLines).toBe(8);
   });
-
   it('derives bounds from layout-node content', () => {
     const childSurface = createSurface(6, 1, { char: 'x', empty: false });
     const layout: LayoutNode = {
@@ -306,13 +277,11 @@ describe('createScrollStateForContent', () => {
         },
       ],
     };
-
     const state = createScrollStateForContent(layout, 2, 4);
     expect(state.maxY).toBe(3);
     expect(state.maxX).toBe(2);
     expect(state.totalLines).toBe(5);
   });
-
   it('ignores absolute root offsets when deriving layout-node bounds', () => {
     const surface = createSurface(3, 1, { char: 'x', empty: false });
     const layout: LayoutNode = {
@@ -320,48 +289,41 @@ describe('createScrollStateForContent', () => {
       children: [],
       surface,
     };
-
     const state = createScrollStateForContent(layout, 1, 3);
     expect(state.maxY).toBe(0);
     expect(state.maxX).toBe(0);
     expect(state.totalLines).toBe(1);
   });
 });
-
 describe('scrollBy', () => {
   it('scrolls down', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     const next = scrollBy(state, 2);
     expect(next.y).toBe(2);
   });
-
   it('clamps to maxY', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     const next = scrollBy(state, 999);
     expect(next.y).toBe(3); // 6 lines - 3 visible
   });
-
   it('clamps to 0', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     const next = scrollBy(state, -5);
     expect(next.y).toBe(0);
   });
 });
-
 describe('scrollTo', () => {
   it('scrolls to an absolute position', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     const next = scrollTo(state, 2);
     expect(next.y).toBe(2);
   });
-
   it('clamps to valid range', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     expect(scrollTo(state, -1).y).toBe(0);
     expect(scrollTo(state, 999).y).toBe(3);
   });
 });
-
 describe('scrollToTop / scrollToBottom', () => {
   it('scrollToTop goes to 0', () => {
     let state = createScrollState('a\nb\nc\nd\ne\nf', 3);
@@ -369,52 +331,43 @@ describe('scrollToTop / scrollToBottom', () => {
     state = scrollToTop(state);
     expect(state.y).toBe(0);
   });
-
   it('scrollToBottom goes to maxY', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf', 3);
     const next = scrollToBottom(state);
     expect(next.y).toBe(3);
   });
 });
-
 describe('pageDown / pageUp', () => {
   it('pageDown scrolls by viewport height', () => {
     const state = createScrollState('a\nb\nc\nd\ne\nf\ng\nh\ni\nj', 3);
     const next = pageDown(state);
     expect(next.y).toBe(3);
   });
-
   it('pageUp scrolls up by viewport height', () => {
     let state = createScrollState('a\nb\nc\nd\ne\nf\ng\nh\ni\nj', 3);
     state = scrollTo(state, 5);
     state = pageUp(state);
     expect(state.y).toBe(2);
   });
-
   it('pageDown clamps at bottom', () => {
     const state = createScrollState('a\nb\nc', 3);
     const next = pageDown(state);
     expect(next.y).toBe(0); // content fits, maxY = 0
   });
 });
-
 // ---------------------------------------------------------------------------
 // sliceAnsi
 // ---------------------------------------------------------------------------
-
 describe('sliceAnsi', () => {
   it('slices plain text', () => {
     expect(sliceAnsi('hello world', 3, 8)).toBe('lo wo');
   });
-
   it('returns empty for empty string', () => {
     expect(sliceAnsi('', 0, 5)).toBe('');
   });
-
   it('returns empty when startCol beyond length', () => {
     expect(sliceAnsi('short', 10, 20)).toBe('');
   });
-
   it('preserves ANSI style crossing startCol', () => {
     const styled = '\x1b[31mhello world\x1b[0m';
     const result = sliceAnsi(styled, 3, 8);
@@ -423,7 +376,6 @@ describe('sliceAnsi', () => {
     const visible = stripAnsi(result);
     expect(visible).toBe('lo wo');
   });
-
   it('appends reset when clipped at endCol mid-style', () => {
     const styled = '\x1b[31mhello world\x1b[0m';
     const result = sliceAnsi(styled, 0, 5);
@@ -431,80 +383,67 @@ describe('sliceAnsi', () => {
     const visible = stripAnsi(result);
     expect(visible).toBe('hello');
   });
-
   it('startCol=0 equivalence to clipToWidth for plain text', () => {
     const text = 'abcdefghij';
     const sliced = sliceAnsi(text, 0, 5);
     expect(sliced).toBe('abcde');
   });
 });
-
 // ---------------------------------------------------------------------------
 // scrollByX / scrollToX
 // ---------------------------------------------------------------------------
-
 describe('scrollByX', () => {
   it('scrolls right', () => {
     const state = createScrollState('a long line here!!!', 1, 5);
     const next = scrollByX(state, 3);
     expect(next.x).toBe(3);
   });
-
   it('clamps to maxX', () => {
     const state = createScrollState('1234567890', 1, 5);
     // maxX = 10 - 5 = 5
     const next = scrollByX(state, 999);
     expect(next.x).toBe(5);
   });
-
   it('clamps to 0', () => {
     const state = createScrollState('1234567890', 1, 5);
     const next = scrollByX(state, -5);
     expect(next.x).toBe(0);
   });
 });
-
 describe('scrollToX', () => {
   it('scrolls to absolute X', () => {
     const state = createScrollState('1234567890', 1, 5);
     const next = scrollToX(state, 3);
     expect(next.x).toBe(3);
   });
-
   it('clamps to valid range', () => {
     const state = createScrollState('1234567890', 1, 5);
     expect(scrollToX(state, -1).x).toBe(0);
     expect(scrollToX(state, 999).x).toBe(5);
   });
 });
-
 // ---------------------------------------------------------------------------
 // createScrollState with viewportWidth
 // ---------------------------------------------------------------------------
-
 describe('createScrollState with viewportWidth', () => {
   it('computes maxX from widest line', () => {
     const content = 'short\na much longer line here\nmed';
     const state = createScrollState(content, 3, 10);
     expect(state.maxX).toBe(visibleLength('a much longer line here') - 10);
   });
-
   it('sets maxX=0 when all lines fit', () => {
     const state = createScrollState('hi\nbye', 2, 20);
     expect(state.maxX).toBe(0);
   });
-
   it('backward compat without viewportWidth', () => {
     const state = createScrollState('hello', 1);
     expect(state.x).toBe(0);
     expect(state.maxX).toBe(0);
   });
 });
-
 // ---------------------------------------------------------------------------
 // viewport with scrollX
 // ---------------------------------------------------------------------------
-
 describe('viewport with scrollX', () => {
   it('shifts content right', () => {
     const wideContent = 'abcdefghijklmnop';
@@ -518,7 +457,6 @@ describe('viewport with scrollX', () => {
     const visible = stripAnsi(result).trimEnd();
     expect(visible).toBe('defgh');
   });
-
   it('scrollX=0 matches default behavior', () => {
     const content = 'abcdefghij';
     const withoutX = viewport({

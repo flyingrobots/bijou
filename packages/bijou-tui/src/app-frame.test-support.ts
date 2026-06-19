@@ -1,5 +1,5 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
-import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock, must, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import {
   colorHex,
   createSurface,
@@ -126,10 +126,10 @@ async function collectCommandMessages<M>(cmd: Cmd<M>, pulses: readonly number[])
 function scheduleKeys(
   ctx: ReturnType<typeof createTestContext>,
   clock: ReturnType<typeof mockClock>,
-  events: Array<{ at: number; key: string }>,
+  events: { at: number; key: string }[],
 ): void {
   ctx.io.rawInput = (onKey) => {
-    const handles = events.map(({ at, key }) => clock.setTimeout(() => onKey(key), at));
+    const handles = events.map(({ at, key }) => clock.setTimeout(() => { onKey(key); }, at));
     return {
       dispose() {
         handles.forEach((handle) => {
@@ -194,18 +194,16 @@ function surfaceHasBg(surface: Surface, bg: string): boolean {
   }
   return false;
 }
-
 function seedNotificationHistory<Msg>(
-  specs: ReadonlyArray<{
+  specs: readonly {
     readonly title: string;
     readonly message?: string;
     readonly tone?: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
     readonly variant?: 'TOAST' | 'INLINE' | 'ACTIONABLE';
-  }>,
+  }[],
 ): NotificationState<Msg> {
   let state = createNotificationState<Msg>();
   let nowMs = 0;
-
   for (const spec of specs) {
     state = pushNotification(state, {
       title: spec.title,
@@ -220,10 +218,8 @@ function seedNotificationHistory<Msg>(
     nowMs += 500;
     state = tickNotifications(state, nowMs);
   }
-
   return state;
 }
-
 function makePage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
   return {
     id,
@@ -242,7 +238,6 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
       .bind('x', 'Increment', { type: 'inc' }),
   };
 }
-
 function makeModalPage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
   return {
     id,
@@ -266,7 +261,6 @@ function makeModalPage(id: string, title: string, paneId: string): FramePage<Pag
       : undefined,
   };
 }
-
 export {
   activeFrameLayer,
   activeRuntimeView,
@@ -308,6 +302,7 @@ export {
   makeModalPage,
   makePage,
   mockClock,
+  must,
   mouseMove,
   mousePress,
   mouseRelease,
@@ -333,7 +328,6 @@ export {
   wrapFrameMsg,
   _resetDefaultContextForTesting,
 };
-
 export type {
   BijouContext,
   Cmd,

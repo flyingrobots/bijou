@@ -20,7 +20,7 @@ interface PullRequestView {
 
 interface CheckEntry {
   readonly name: string;
-  readonly bucket: 'pass' | 'fail' | 'pending' | 'skipping' | 'cancel' | string;
+  readonly bucket: string;
   readonly state: string;
   readonly link?: string;
   readonly workflow?: string;
@@ -107,10 +107,10 @@ export interface ReviewSummary {
   readonly comments: number;
   readonly byState: Readonly<Record<string, number>>;
 }
-
 type CodeRabbitEventKind = 'rate_limit' | 'clean' | 'actionable' | 'other';
 type SubmittedReview = PullRequestReview & { readonly submittedAt: string };
-
+const S = String;
+const staleNote = (count: number): string => `${S(count)} stale rate-limit comment${count === 1 ? '' : 's'} ignored`;
 export interface CodeRabbitStatus {
   readonly state: 'missing' | 'pass' | 'pending' | 'failing' | 'rate_limited' | 'actionable' | 'clean' | 'commented';
   readonly detail: string;
@@ -136,15 +136,15 @@ export function assertUntruncatedPullRequestData(input: {
   const truncated: string[] = [];
 
   if (input.comments?.pageInfo.hasNextPage) {
-    truncated.push(`comments=${input.comments.totalCount}`);
+    truncated.push(`comments=${S(input.comments.totalCount)}`);
   }
 
   if (input.reviews?.pageInfo.hasNextPage) {
-    truncated.push(`reviews=${input.reviews.totalCount}`);
+    truncated.push(`reviews=${S(input.reviews.totalCount)}`);
   }
 
   if (input.reviewThreads?.pageInfo.hasNextPage) {
-    truncated.push(`reviewThreads=${input.reviewThreads.totalCount}`);
+    truncated.push(`reviewThreads=${S(input.reviewThreads.totalCount)}`);
   }
 
   if (truncated.length > 0) {
@@ -164,9 +164,9 @@ export function summarizeChecks(checks: readonly CheckEntry[]): CheckSummary {
 
   for (const check of checks) {
     if (check.bucket in counts) {
-      counts[check.bucket] += 1;
+      counts[check.bucket] = (counts[check.bucket] ?? 0) + 1;
     } else {
-      counts.other += 1;
+      counts.other = (counts.other ?? 0) + 1;
     }
   }
 
@@ -254,7 +254,7 @@ export function summarizeCodeRabbitStatus(
     return {
       state: 'pass',
       detail: staleRateLimitCount > 0
-        ? `pass (${staleRateLimitCount} stale rate-limit comment${staleRateLimitCount === 1 ? '' : 's'} ignored)`
+        ? `pass (${staleNote(staleRateLimitCount)})`
         : 'pass',
       latestKind: latestEvent?.kind ?? 'none',
       staleRateLimitCount,
@@ -296,7 +296,7 @@ export function summarizeCodeRabbitStatus(
     return {
       state: 'clean',
       detail: staleRateLimitCount > 0
-        ? `no actionable comments (${staleRateLimitCount} stale rate-limit comment${staleRateLimitCount === 1 ? '' : 's'} ignored)`
+        ? `no actionable comments (${staleNote(staleRateLimitCount)})`
         : 'no actionable comments',
       latestKind: latestEvent.kind,
       staleRateLimitCount,
@@ -308,7 +308,7 @@ export function summarizeCodeRabbitStatus(
     return {
       state: 'actionable',
       detail: staleRateLimitCount > 0
-        ? `actionable comments (${staleRateLimitCount} stale rate-limit comment${staleRateLimitCount === 1 ? '' : 's'} ignored)`
+        ? `actionable comments (${staleNote(staleRateLimitCount)})`
         : 'actionable comments',
       latestKind: latestEvent.kind,
       staleRateLimitCount,
@@ -320,7 +320,7 @@ export function summarizeCodeRabbitStatus(
     return {
       state: 'commented',
       detail: staleRateLimitCount > 0
-        ? `commented (${staleRateLimitCount} stale rate-limit comment${staleRateLimitCount === 1 ? '' : 's'} ignored)`
+        ? `commented (${staleNote(staleRateLimitCount)})`
         : 'commented',
       latestKind: latestEvent.kind,
       staleRateLimitCount,
@@ -368,23 +368,23 @@ export function computeMergeReadiness(input: {
   }
 
   if (input.checks.failing.length > 0) {
-    reasons.push(`${input.checks.failing.length} failing check${input.checks.failing.length === 1 ? '' : 's'}`);
+    reasons.push(`${S(input.checks.failing.length)} failing check${input.checks.failing.length === 1 ? '' : 's'}`);
   }
 
   if (input.checks.canceled.length > 0) {
-    reasons.push(`${input.checks.canceled.length} canceled check${input.checks.canceled.length === 1 ? '' : 's'}`);
+    reasons.push(`${S(input.checks.canceled.length)} canceled check${input.checks.canceled.length === 1 ? '' : 's'}`);
   }
 
   if (input.unresolvedCount > 0) {
-    reasons.push(`${input.unresolvedCount} unresolved review thread${input.unresolvedCount === 1 ? '' : 's'}`);
+    reasons.push(`${S(input.unresolvedCount)} unresolved review thread${input.unresolvedCount === 1 ? '' : 's'}`);
   }
 
   if (input.reviews.changesRequested > 0) {
-    reasons.push(`${input.reviews.changesRequested} change-request review${input.reviews.changesRequested === 1 ? '' : 's'}`);
+    reasons.push(`${S(input.reviews.changesRequested)} change-request review${input.reviews.changesRequested === 1 ? '' : 's'}`);
   }
 
   if (input.reviews.total < input.minReviews) {
-    reasons.push(`needs at least ${input.minReviews} review${input.minReviews === 1 ? '' : 's'} (found ${input.reviews.total})`);
+    reasons.push(`needs at least ${S(input.minReviews)} review${input.minReviews === 1 ? '' : 's'} (found ${S(input.reviews.total)})`);
   }
 
   if (reasons.length > 0) {
@@ -398,7 +398,7 @@ export function computeMergeReadiness(input: {
   }
 
   if (input.checks.pending.length > 0) {
-    pendingReasons.push(`${input.checks.pending.length} pending check${input.checks.pending.length === 1 ? '' : 's'}`);
+    pendingReasons.push(`${S(input.checks.pending.length)} pending check${input.checks.pending.length === 1 ? '' : 's'}`);
   }
 
   if (input.codeRabbit.state === 'pending') {
@@ -443,7 +443,7 @@ function main(): void {
   const checks = ghJson<CheckEntry[]>([
     'pr',
     'checks',
-    String(pr.number),
+    S(pr.number),
     '--json',
     'name,bucket,state,link,workflow',
   ]);
@@ -461,7 +461,7 @@ function main(): void {
     minReviews: options.minReviews,
   });
 
-  process.stdout.write(`PR #${pr.number}: ${pr.title}\n`);
+  process.stdout.write(`PR #${S(pr.number)}: ${pr.title}\n`);
   process.stdout.write(`State: ${pr.state}${pr.isDraft ? ' (draft)' : ''}\n`);
   process.stdout.write(`Branch: ${pr.headRefName} -> ${pr.baseRefName}\n`);
   if (pr.reviewDecision) {
@@ -473,17 +473,17 @@ function main(): void {
   process.stdout.write(`URL: ${pr.url}\n\n`);
 
   process.stdout.write(
-    `Checks: pass=${summary.counts.pass} pending=${summary.counts.pending} fail=${summary.counts.fail} skipping=${summary.counts.skipping} cancel=${summary.counts.cancel}\n`,
+    `Checks: pass=${S(summary.counts.pass ?? 0)} pending=${S(summary.counts.pending ?? 0)} fail=${S(summary.counts.fail ?? 0)} skipping=${S(summary.counts.skipping ?? 0)} cancel=${S(summary.counts.cancel ?? 0)}\n`,
   );
-  process.stdout.write(`Unresolved threads: ${unresolved.length}\n`);
+  process.stdout.write(`Unresolved threads: ${S(unresolved.length)}\n`);
   process.stdout.write(
-    `Reviews: total=${reviewSummary.total} approvals=${reviewSummary.approvals} changes_requested=${reviewSummary.changesRequested} comments=${reviewSummary.comments}\n`,
+    `Reviews: total=${S(reviewSummary.total)} approvals=${S(reviewSummary.approvals)} changes_requested=${S(reviewSummary.changesRequested)} comments=${S(reviewSummary.comments)}\n`,
   );
   process.stdout.write(`CodeRabbit: ${codeRabbitStatus.detail}\n`);
 
   if (options.mergeReady) {
     process.stdout.write(`Merge readiness: ${mergeReadiness.status.toUpperCase()}\n`);
-    process.stdout.write(`Review gate: ${reviewSummary.total}/${options.minReviews}\n`);
+    process.stdout.write(`Review gate: ${S(reviewSummary.total)}/${S(options.minReviews)}\n`);
   }
 
   if (summary.failing.length > 0) {
@@ -554,7 +554,7 @@ query($prNumber: Int!) {
 }
 `;
 
-  const payload = ghGraphql<ReviewThreadsResponse>(query, { prNumber: String(prNumber) });
+  const payload = ghGraphql<ReviewThreadsResponse>(query, { prNumber: S(prNumber) });
   const reviewThreads = payload.data.repository.pullRequest.reviewThreads;
   assertUntruncatedPullRequestData({ reviewThreads });
   return reviewThreads.nodes;
@@ -689,7 +689,7 @@ query($prNumber: Int!) {
   }
 }
 `;
-  const payload = ghGraphql<PullRequestGraphqlResponse>(query, { prNumber: String(prNumber) });
+  const payload = ghGraphql<PullRequestGraphqlResponse>(query, { prNumber: S(prNumber) });
   const pullRequest = payload.data.repository.pullRequest;
   if (pullRequest == null) {
     throw new Error(`no pull request found for ${selector ?? 'current branch'}`);
@@ -745,7 +745,7 @@ function parseArgs(args: readonly string[]): { readonly mergeReady: boolean; rea
   let prArg: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index];
+    const arg = args[index] ?? '';
     if (arg === '--merge-ready') {
       mergeReady = true;
       continue;

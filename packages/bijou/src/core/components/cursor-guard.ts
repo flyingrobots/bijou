@@ -39,7 +39,7 @@ const guards = new WeakMap<WritePort, CursorGuard>();
  * @returns The shared cursor guard for this port.
  */
 export function cursorGuard(io: WritePort): CursorGuard {
-  let existing = guards.get(io);
+  const existing = guards.get(io);
   if (existing) return existing;
 
   let count = 0;

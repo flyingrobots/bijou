@@ -7,12 +7,21 @@ import type { LayoutNode, Surface } from '@flyingrobots/bijou';
  */
 export function paintMiddleware(): RenderMiddleware {
   return (state, next) => {
-    const root = (getRenderLayoutRoot(state) ?? (state as any).layoutRoot) as LayoutNode | undefined;
+    const root = getRenderLayoutRoot(state) ?? getLegacyLayoutRoot(state);
     if (root) {
       paintNode(state.targetSurface, root);
     }
     next();
   };
+}
+
+function getLegacyLayoutRoot(state: unknown): LayoutNode | undefined {
+  if (typeof state !== 'object' || state === null || !('layoutRoot' in state)) return undefined;
+  return isLayoutNode(state.layoutRoot) ? state.layoutRoot : undefined;
+}
+
+function isLayoutNode(value: unknown): value is LayoutNode {
+  return typeof value === 'object' && value !== null && 'rect' in value && 'children' in value;
 }
 
 function paintNode(target: Surface, node: LayoutNode) {

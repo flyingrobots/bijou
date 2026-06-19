@@ -37,6 +37,11 @@ export {
 export { COLOR_OPTIONS, FRUIT_OPTIONS, MANY_OPTIONS } from './fixtures.js';
 export { _resetDefaultContextForTesting } from '../../context.js';
 
+export function must<T>(value: T, label = 'value'): NonNullable<T> {
+  if (value == null) throw new Error(`Expected ${label} to be present`);
+  return value;
+}
+
 /**
  * Configuration for {@link createTestContext}.
  */

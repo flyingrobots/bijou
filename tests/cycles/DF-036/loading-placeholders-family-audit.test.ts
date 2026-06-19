@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { stripAnsi, surfaceToString, type OutputMode } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, _resetDefaultContextForTesting, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import {
   createStoryProfileContext,
   storyPreviewSurface,
@@ -16,7 +16,7 @@ const CONSTRAINED_MODES: readonly OutputMode[] = ['pipe', 'accessible'];
 function getSkeletonStory() {
   const story = COMPONENT_STORIES.find((candidate) => candidate.id === SKELETON_STORY_ID);
   expect(story).toBeDefined();
-  return story!;
+  return must(story);
 }
 
 function renderSkeletonVariantText(variantId: string, mode: OutputMode): string {
@@ -28,14 +28,14 @@ function renderSkeletonVariantText(variantId: string, mode: OutputMode): string 
   expect(preset).toBeDefined();
 
   const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-  const previewCtx = createStoryProfileContext(baseCtx, preset!, {
-    width: preset!.width,
+  const previewCtx = createStoryProfileContext(baseCtx, must(preset), {
+    width: must(preset).width,
     height: 14,
   });
-  const preview = storyPreviewSurface(variant!.render({
-    width: preset!.width,
+  const preview = storyPreviewSurface(must(variant).render({
+    width: must(preset).width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: must(variant).initialState,
     timeMs: 0,
   }));
 
@@ -43,7 +43,7 @@ function renderSkeletonVariantText(variantId: string, mode: OutputMode): string 
 }
 
 describe('DF-036 loading placeholders family audit', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md');

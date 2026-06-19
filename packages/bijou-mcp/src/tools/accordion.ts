@@ -19,7 +19,7 @@ export const accordionTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_accordion',
   description: 'Render collapsible accordion sections with expand/collapse indicators. Returns plain-text with Unicode arrow characters.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = accordion(input.sections, { ctx });

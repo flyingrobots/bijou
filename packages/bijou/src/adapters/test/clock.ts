@@ -52,7 +52,7 @@ function normalizeDelay(ms: number): number {
 export function mockClock(options: MockClockOptions = {}): MockClock {
   let nowMs = options.nowMs ?? 0;
   let nextId = 1;
-  const microtasks: Array<() => void> = [];
+  const microtasks: (() => void)[] = [];
   const tasks: ScheduledTask[] = [];
 
   function sortTasks(): void {

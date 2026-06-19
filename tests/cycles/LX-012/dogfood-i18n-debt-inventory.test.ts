@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
@@ -48,7 +48,7 @@ describe('LX-012 DOGFOOD i18n debt inventory', () => {
     const result = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'guides-i18n-workflow' } } },
     ], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
     const pageModel = result.model.docsModel.pageModels.guides;
 
     expect(pageModel.selectedGuideId).toBe('guides-i18n-workflow');

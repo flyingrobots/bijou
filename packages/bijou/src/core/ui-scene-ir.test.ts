@@ -10,7 +10,7 @@ import {
   type UiSceneIr,
   type UiTargetProfile,
 } from './ui-scene-ir.js';
-
+import { must } from '@flyingrobots/bijou/adapters/test';
 const fixtureScene: UiSceneIr = {
   irVersion: 'ui-scene-ir/1',
   id: 'dogfood.start-pane',
@@ -81,7 +81,6 @@ const fixtureScene: UiSceneIr = {
   ],
   portability: { level: 'portable' },
 };
-
 describe('ui-scene-ir/1', () => {
   it('serializes and hashes deterministic scene data', () => {
     const withDifferentObjectKeyOrder = {
@@ -91,7 +90,6 @@ describe('ui-scene-ir/1', () => {
         c: 3,
       },
     };
-
     expect(stableUiSceneStringify(withDifferentObjectKeyOrder)).toBe('{"a":{"c":3,"d":4},"b":2}');
     expect(stableUiSceneStringify({ a: 1, Z: 2, _: 3 })).toBe('{"Z":2,"_":3,"a":1}');
     expect(hashUiSceneValue({ a: 1 })).toBe(
@@ -106,10 +104,8 @@ describe('ui-scene-ir/1', () => {
       'ui-scene-ir/1 JSON value cannot be top-level undefined',
     );
   });
-
   it('validates node, action, binding, token, i18n, and root references', () => {
     expect(validateUiSceneIr(fixtureScene)).toEqual({ ok: true, issues: [] });
-
     const broken: UiSceneIr = {
       ...fixtureScene,
       rootNodeId: 'missing-root',
@@ -134,7 +130,6 @@ describe('ui-scene-ir/1', () => {
       tokenUses: [...fixtureScene.tokenUses, { nodeId: 'missing-token-node', slot: 'fg', token: 'semantic.missing' }],
       i18nUses: [...fixtureScene.i18nUses, { nodeId: 'missing-i18n-node', key: 'missing.key' }],
     };
-
     expect(validateUiSceneIr(broken).issues.map((issue) => issue.code)).toEqual([
       'root-node-missing',
       'duplicate-node-id',
@@ -145,7 +140,6 @@ describe('ui-scene-ir/1', () => {
       'i18n-node-missing',
     ]);
   });
-
   it('validates duplicate action and binding ids', () => {
     const broken: UiSceneIr = {
       ...fixtureScene,
@@ -166,13 +160,11 @@ describe('ui-scene-ir/1', () => {
         },
       ],
     };
-
     expect(validateUiSceneIr(broken).issues.map((issue) => issue.code)).toEqual([
       'duplicate-action-id',
       'duplicate-binding-id',
     ]);
   });
-
   it('validates terminal target profile dimensions', () => {
     const broken: UiSceneIr = {
       ...fixtureScene,
@@ -182,20 +174,17 @@ describe('ui-scene-ir/1', () => {
         { kind: 'geordi-packed-bijou-cells', cols: 80, rows: -1 },
       ],
     };
-
     expect(validateUiSceneIr(broken).issues.map((issue) => issue.code)).toEqual([
       'invalid-target-profile',
       'invalid-target-profile',
       'invalid-target-profile',
     ]);
   });
-
   it('requires known terminal target profiles to include dimensions at compile time', () => {
-    // @ts-expect-error Known terminal targets must include cols and rows.
-    const invalidKnownProfile: UiTargetProfile = { kind: 'bijou-terminal' };
-    expect(invalidKnownProfile.kind).toBe('bijou-terminal');
+    // @ts-expect-error missing cols rows
+    const p:UiTargetProfile={kind:'bijou-terminal'};
+    void p;
   });
-
   it('creates a structural receipt from portable scene facts', () => {
     expect(createUiSceneReceipt(fixtureScene)).toEqual({
       receiptVersion: 'ui-scene-receipt/1',
@@ -214,14 +203,12 @@ describe('ui-scene-ir/1', () => {
       outputs: {},
     });
   });
-
   it('derives receipt dependency refs from inline token and i18n facts', () => {
     const receipt = createUiSceneReceipt({
       ...fixtureScene,
       tokenUses: [],
       i18nUses: [],
     });
-
     expect(receipt.i18nKeys).toEqual([
       'dogfood.action.openDoc',
       'dogfood.nav.startHere',
@@ -233,7 +220,6 @@ describe('ui-scene-ir/1', () => {
       'semantic.nav.title.fg',
     ]);
   });
-
   it('lowers a text-only scene to a Bijou Surface with source-map facts', () => {
     const lowered = lowerUiSceneToSurface(fixtureScene, {
       tokenColors: {
@@ -242,7 +228,6 @@ describe('ui-scene-ir/1', () => {
         'semantic.nav.item.active.bg': '#a7c7ff',
       },
     });
-
     expect(lowered.surface.width).toBe(32);
     expect(lowered.surface.height).toBe(4);
     expect(lowered.surface.get(0, 0)).toMatchObject({ char: 'G', fg: '#f7d774', empty: false });
@@ -265,17 +250,16 @@ describe('ui-scene-ir/1', () => {
     });
     expect(lowered.surfaceHash).toMatch(/^sha256:[0-9a-f]{64}$/);
   });
-
   it('hashes actual rendered Surface cell state', () => {
     const one = lowerUiSceneToSurface({
       ...fixtureScene,
       nodes: [
         {
-          ...fixtureScene.nodes[0]!,
+          ...must(fixtureScene.nodes[0]),
           children: ['text'],
         },
         {
-          ...fixtureScene.nodes[1]!,
+          ...must(fixtureScene.nodes[1]),
           id: 'text',
           parentId: 'root',
           text: { kind: 'literal', value: 'A' },
@@ -291,11 +275,11 @@ describe('ui-scene-ir/1', () => {
       ...fixtureScene,
       nodes: [
         {
-          ...fixtureScene.nodes[0]!,
+          ...must(fixtureScene.nodes[0]),
           children: ['text'],
         },
         {
-          ...fixtureScene.nodes[1]!,
+          ...must(fixtureScene.nodes[1]),
           id: 'text',
           parentId: 'root',
           text: { kind: 'literal', value: 'B' },
@@ -307,18 +291,16 @@ describe('ui-scene-ir/1', () => {
       i18nUses: [],
       sourceMap: [],
     });
-
     expect(one.surface.get(0, 0).char).toBe('A');
     expect(two.surface.get(0, 0).char).toBe('B');
     expect(one.surfaceHash).not.toBe(two.surfaceHash);
   });
-
   it('fails loudly before drawing unsupported visible node kinds', () => {
     const unsupported: UiSceneIr = {
       ...fixtureScene,
       nodes: [
         {
-          ...fixtureScene.nodes[0]!,
+          ...must(fixtureScene.nodes[0]),
           children: ['markdown-doc'],
         },
         {
@@ -335,18 +317,16 @@ describe('ui-scene-ir/1', () => {
       i18nUses: [],
       sourceMap: [],
     };
-
     expect(() => lowerUiSceneToSurface(unsupported)).toThrow(
       'Cannot lower ui-scene-ir/1 node markdown-doc (markdown) to bijou-terminal text Surface.',
     );
   });
-
   it('records source-map facts only for visible rendered cells', () => {
     const lowered = lowerUiSceneToSurface({
       ...fixtureScene,
       nodes: [
         {
-          ...fixtureScene.nodes[0]!,
+          ...must(fixtureScene.nodes[0]),
           children: ['partial', 'offscreen'],
         },
         {
@@ -370,7 +350,6 @@ describe('ui-scene-ir/1', () => {
       i18nUses: [],
       sourceMap: [],
     });
-
     expect(lowered.surface.get(30, 0).char).toBe('a');
     expect(lowered.surface.get(31, 0).char).toBe('b');
     expect(lowered.cellSourceMap).toEqual([
@@ -383,13 +362,12 @@ describe('ui-scene-ir/1', () => {
       },
     ]);
   });
-
   it('clips negative text layouts without shifting hidden graphemes on screen', () => {
     const lowered = lowerUiSceneToSurface({
       ...fixtureScene,
       nodes: [
         {
-          ...fixtureScene.nodes[0]!,
+          ...must(fixtureScene.nodes[0]),
           children: ['partial'],
         },
         {
@@ -406,7 +384,6 @@ describe('ui-scene-ir/1', () => {
       i18nUses: [],
       sourceMap: [],
     });
-
     expect(lowered.surface.get(0, 0).char).toBe('c');
     expect(lowered.surface.get(1, 0).char).toBe('d');
     expect(lowered.cellSourceMap).toEqual([
@@ -419,7 +396,6 @@ describe('ui-scene-ir/1', () => {
       },
     ]);
   });
-
   it('creates a terminal receipt from lowered Surface output', () => {
     const proof = lowerUiSceneToTerminalProof(fixtureScene, {
       tokenColors: {
@@ -429,7 +405,6 @@ describe('ui-scene-ir/1', () => {
       },
     });
     const directReceipt = createUiSceneTerminalReceipt(fixtureScene, proof.lowering);
-
     expect(proof.lowering.sceneHash).toBe(hashUiSceneValue(fixtureScene));
     expect(proof.receipt).toEqual(directReceipt);
     expect(proof.receipt.outputs.terminal).toEqual({
@@ -439,27 +414,22 @@ describe('ui-scene-ir/1', () => {
       }),
       surfaceHash: proof.lowering.surfaceHash,
     });
-
     const unrelatedLowering = lowerUiSceneToSurface({
       ...fixtureScene,
       id: 'other.scene',
     });
-
     expect(() => createUiSceneTerminalReceipt(fixtureScene, unrelatedLowering)).toThrow(
       'Terminal lowering was created for a different ui-scene-ir/1 scene.',
     );
   });
-
   it('renders deterministic lower modes for agent inspection', () => {
     const nodeMode = lowerUiSceneToSurface(fixtureScene, { lowerMode: 'node-ids' });
     const i18nMode = lowerUiSceneToSurface(fixtureScene, { lowerMode: 'i18n-keys' });
     const tokenMode = lowerUiSceneToSurface(fixtureScene, { lowerMode: 'token-refs' });
-
     expect(rowText(nodeMode.surface, 2)).toContain('nav.start');
     expect(rowText(i18nMode.surface, 2)).toContain('dogfood.nav.startHere');
     expect(rowText(tokenMode.surface, 2)).toContain('semantic.nav.item.active.fg');
   });
-
   it('fails loudly before drawing unsupported target requirements', () => {
     const unsupported: UiSceneIr = {
       ...fixtureScene,
@@ -472,13 +442,11 @@ describe('ui-scene-ir/1', () => {
         },
       ],
     };
-
     expect(() => lowerUiSceneToSurface(unsupported, {
       supportedRequirements: ['ui-scene/core/1'],
     })).toThrow('Unsupported ui-scene-ir/1 requirement for bijou-terminal: ui-scene/markdown/1');
   });
 });
-
 function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean }; width: number }, y: number): string {
   let text = '';
   for (let x = 0; x < surface.width; x++) {

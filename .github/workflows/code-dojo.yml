@@ -30,4 +30,4 @@ jobs:
         run: npm ci
 
       - name: Code Dojo
-        run: npm run code-dojo:ci
+        run: npm run code-dojo:verify

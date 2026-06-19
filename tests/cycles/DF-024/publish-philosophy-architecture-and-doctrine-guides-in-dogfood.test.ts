@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
-import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
+import {
+  createScriptTestContext as createTestContext,
+  runScriptDeterministic as runScript,
+} from '../../helpers/scripted.js';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -33,7 +36,7 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'philosophy' });
     const opened = await runScript(app, [], { ctx });
-    const overviewText = frameText(opened.frames.at(-1)!);
+    const overviewText = frameText(must(opened.frames.at(-1)));
 
     expect(opened.model.docsModel.activePageId).toBe('philosophy');
     expect(overviewText).toContain('System-Style JavaScript');
@@ -45,14 +48,14 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
     const systemStyle = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'philosophy-system-style-javascript' } } },
     ], { ctx });
-    const systemStyleText = frameText(systemStyle.frames.at(-1)!);
+    const systemStyleText = frameText(must(systemStyle.frames.at(-1)));
     expect(systemStyleText).toContain('Bijou Adaptation');
     expect(systemStyleText).toContain('TypeScript is a useful dialect');
 
     const architecture = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'philosophy-architecture' } } },
     ], { ctx });
-    const architectureText = frameText(architecture.frames.at(-1)!);
+    const architectureText = frameText(must(architecture.frames.at(-1)));
     expect(architectureText).toContain('Architecture');
     expect(architectureText).toContain('Bijou is a nine-package monorepo');
   });

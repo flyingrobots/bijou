@@ -23,6 +23,12 @@ interface State {
 const PALETTE_FG = ['#9ba9ff', '#c8c7ea', '#f4c389', '#f67f65', '#f2c572'];
 const PALETTE_BG = ['#111320', '#151927', '#181d2d'];
 
+function paletteValue(palette: readonly string[], index: number): string {
+  const value = palette[index % palette.length];
+  if (value == null) throw new Error('paint-set-hex-palette index out of range');
+  return value;
+}
+
 export const paintThemeSet: Scenario<State> = {
   id: 'paint-set-hex-palette',
   label: 'Paint: rotating small hex palettes via surface.set (220×58)',
@@ -46,8 +52,8 @@ export const paintThemeSet: Scenario<State> = {
     const { surface, cols, rows } = state;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const fg = PALETTE_FG[(x + y + frameIndex) % PALETTE_FG.length]!;
-        const bg = PALETTE_BG[(x + y * 2) % PALETTE_BG.length]!;
+        const fg = paletteValue(PALETTE_FG, x + y + frameIndex);
+        const bg = paletteValue(PALETTE_BG, x + y * 2);
         surface.set(x, y, { char: '█', fg, bg, empty: false });
       }
     }

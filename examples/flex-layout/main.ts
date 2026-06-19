@@ -11,7 +11,14 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
+
+function terminalSize(): Model {
+  return {
+    cols: Number.isFinite(process.stdout.columns) ? process.stdout.columns : 80,
+    rows: Number.isFinite(process.stdout.rows) ? process.stdout.rows : 24,
+  };
+}
 
 const sidebarContent = tree([
   { label: 'src', children: [
@@ -24,7 +31,7 @@ const sidebarContent = tree([
 ]);
 
 const app: App<Model, Msg> = {
-  init: () => [{ cols: process.stdout.columns ?? 80, rows: process.stdout.rows ?? 24 }, []],
+  init: () => [terminalSize(), []],
 
   update: (msg, model) => {
     if (isResizeMsg(msg)) {
@@ -41,7 +48,7 @@ const app: App<Model, Msg> = {
       { direction: 'column', width: model.cols, height: model.rows },
       // Header
       { basis: 3, content: (w) => {
-        const header = `  [bijou]  Dashboard  [${model.cols}×${model.rows}]`;
+        const header = `  [bijou]  Dashboard  [${String(model.cols)}×${String(model.rows)}]`;
         return vstack(separator({ width: w }), header, separator({ width: w }));
       }},
       // Body: sidebar + main
@@ -57,7 +64,7 @@ const app: App<Model, Msg> = {
             const mainContent = box([
               'Main content area',
               '',
-              `Available: ${mw} cols`,
+              `Available: ${String(mw)} cols`,
               '',
               'Resize the terminal to see',
               'the layout reflow.',
@@ -74,4 +81,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

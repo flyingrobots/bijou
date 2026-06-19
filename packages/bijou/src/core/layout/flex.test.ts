@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateFlex } from './flex.js';
 import type { FlexChildProps } from './flex.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('calculateFlex', () => {
   it('splits space between fixed and flex children in row mode', () => {
@@ -14,8 +15,8 @@ describe('calculateFlex', () => {
     );
 
     expect(root.children).toHaveLength(2);
-    expect(root.children[0]!.rect).toEqual({ x: 0, y: 0, width: 20, height: 10 });
-    expect(root.children[1]!.rect).toEqual({ x: 20, y: 0, width: 80, height: 10 });
+    expect(must(root.children[0]).rect).toEqual({ x: 0, y: 0, width: 20, height: 10 });
+    expect(must(root.children[1]).rect).toEqual({ x: 20, y: 0, width: 80, height: 10 });
   });
 
   it('handles gaps in column mode', () => {
@@ -29,8 +30,8 @@ describe('calculateFlex', () => {
     );
 
     expect(root.children).toHaveLength(2);
-    expect(root.children[0]!.rect).toEqual({ x: 0, y: 0, width: 20, height: 2 });
-    expect(root.children[1]!.rect).toEqual({ x: 0, y: 3, width: 20, height: 2 });
+    expect(must(root.children[0]).rect).toEqual({ x: 0, y: 0, width: 20, height: 2 });
+    expect(must(root.children[1]).rect).toEqual({ x: 0, y: 3, width: 20, height: 2 });
   });
 
   it('respects min/max constraints', () => {
@@ -43,8 +44,8 @@ describe('calculateFlex', () => {
       { x: 0, y: 0, width: 100, height: 10 }
     );
 
-    expect(root.children[0]!.rect.width).toBe(30);
-    expect(root.children[1]!.rect.width).toBe(70);
+    expect(must(root.children[0]).rect.width).toBe(30);
+    expect(must(root.children[1]).rect.width).toBe(70);
   });
 
   it('allocates leftover units after integer rounding', () => {
@@ -58,7 +59,7 @@ describe('calculateFlex', () => {
     );
 
     const total = root.children.reduce((sum, child) => sum + child.rect.width, 0);
-    const last = root.children[root.children.length - 1]!;
+    const last = must(root.children[root.children.length - 1]);
 
     expect(total).toBe(3);
     expect(last.rect.x + last.rect.width).toBe(3);

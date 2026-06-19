@@ -124,12 +124,12 @@ function fitTableSurfaceColumnWidths(
   const preferredTotal = preferred.reduce((sum, width) => sum + width, 0);
   if (preferredTotal <= contentTarget) return preferred;
 
-  const minimum = columns.map((column, index) => columnMinWidth(column, preferred[index]!));
+  const minimum = columns.map((column, index) => columnMinWidth(column, preferred[index] ?? 0));
   const minimumTotal = minimum.reduce((sum, width) => sum + width, 0);
   if (minimumTotal >= contentTarget) return minimum;
 
   const widths = [...minimum];
-  const remainingCapacity = preferred.map((width, index) => Math.max(0, width - minimum[index]!));
+  const remainingCapacity = preferred.map((width, index) => Math.max(0, width - (minimum[index] ?? 0)));
   let remainingBudget = contentTarget - minimumTotal;
 
   while (remainingBudget > 0) {
@@ -142,21 +142,21 @@ function fitTableSurfaceColumnWidths(
       sum + Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight))
     ), 0);
     let used = 0;
-    const remainders: Array<{ readonly index: number; readonly remainder: number; readonly capacity: number }> = [];
+    const remainders: { readonly index: number; readonly remainder: number; readonly capacity: number }[] = [];
 
     for (const entry of active) {
       const weight = Math.max(1, normalizePositiveWeight(columns[entry.index]?.weight));
       const exact = (remainingBudget * weight) / totalWeight;
       const add = Math.min(entry.capacity, Math.floor(exact));
       if (add > 0) {
-        widths[entry.index]! += add;
-        remainingCapacity[entry.index]! -= add;
+        widths[entry.index] = (widths[entry.index] ?? 0) + add;
+        remainingCapacity[entry.index] = (remainingCapacity[entry.index] ?? 0) - add;
         used += add;
       }
       remainders.push({
         index: entry.index,
         remainder: exact - Math.floor(exact),
-        capacity: remainingCapacity[entry.index]!,
+        capacity: remainingCapacity[entry.index] ?? 0,
       });
     }
 
@@ -165,11 +165,11 @@ function fitTableSurfaceColumnWidths(
         .filter((entry) => entry.capacity > 0)
         .sort((left, right) => {
           if (right.remainder !== left.remainder) return right.remainder - left.remainder;
-          return remainingCapacity[right.index]! - remainingCapacity[left.index]!;
+          return (remainingCapacity[right.index] ?? 0) - (remainingCapacity[left.index] ?? 0);
         })[0];
       if (!next) break;
-      widths[next.index]!++;
-      remainingCapacity[next.index]!--;
+      widths[next.index] = (widths[next.index] ?? 0) + 1;
+      remainingCapacity[next.index] = (remainingCapacity[next.index] ?? 0) - 1;
       used = 1;
     }
 
@@ -181,7 +181,7 @@ function fitTableSurfaceColumnWidths(
 
 function resolveColumns(
   columns: NonNullable<TableOptions['columns']>,
-  rows: readonly TableSurfaceCell[][],
+  rows: readonly TableSurfaceRow[],
 ): NonNullable<TableOptions['columns']> {
   if (columns.length > 0) return [...columns];
 
@@ -236,9 +236,8 @@ export function tableSurface(
     options.overflow,
     ctx?.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }) ?? {},
   );
-  const rawRows = (options.rows ?? []).map((row) => (row ?? []).map((cell) => cell ?? ''));
-  const columns = resolveColumns(options.columns ?? [], rawRows);
-  const rows = rawRows;
+  const rows = options.rows;
+  const columns = resolveColumns(options.columns ?? [], rows);
   const headerToken = options.headerToken ?? ctx?.ui('tableHeader');
   const headerStyle = tokenToCellStyle(headerToken);
   const borderStyle = tokenToCellStyle(options.borderToken ?? ctx?.border('muted'));
@@ -247,7 +246,7 @@ export function tableSurface(
     ...headerStyle,
     bg: headerBg?.bg ?? headerStyle.bg,
   };
-  const headerCells = columns.map((column) => createPreparedTextCell(column.header ?? '', headerCellStyle));
+  const headerCells = columns.map((column) => createPreparedTextCell(column.header, headerCellStyle));
   const headerSurfaces = headerCells.map((cell) => cell.surface);
   const preparedCells = rows.map((row) => row.map((cell) => createPreparedSurfaceCell(cell)));
   const cellSurfaces = preparedCells.map((row) => row.map((cell) => cell.surface));
@@ -260,9 +259,9 @@ export function tableSurface(
     layout,
     resolveTargetWidth(options, ctx, layout),
   );
-  const fittedHeaderSurfaces = headerSurfaces.map((_cell, index) => {
+  const fittedHeaderSurfaces = headerCells.map((cell, index) => {
     const cellWidth = colWidths[index] ?? 0;
-    return fitPreparedCell(headerCells[index]!, cellWidth, overflow, wrapMode);
+    return fitPreparedCell(cell, cellWidth, overflow, wrapMode);
   });
   const headerHeight = fittedHeaderSurfaces.reduce((max, cell) => Math.max(max, cell.height), 1);
   const fittedCellSurfaces = preparedCells.map((row) => row.map((cell, index) => {
@@ -323,7 +322,7 @@ export function tableSurface(
     let x = 0;
     setBorder(x++, y, left);
     for (let i = 0; i < colWidths.length; i++) {
-      for (let j = 0; j < colWidths[i]! + 2; j++) setBorder(x++, y, '\u2500');
+      for (let j = 0; j < (colWidths[i] ?? 0) + 2; j++) setBorder(x++, y, '\u2500');
       setBorder(x++, y, i === colWidths.length - 1 ? right : mid);
     }
   };
@@ -342,9 +341,8 @@ export function tableSurface(
 
   for (let headerLine = 0; headerLine < headerHeight; headerLine++) {
     let headerX = 1;
-    for (let i = 0; i < columns.length; i++) {
-      const cellWidth = colWidths[i]!;
-      const headerSurface = fittedHeaderSurfaces[i]!;
+    for (const [i, headerSurface] of fittedHeaderSurfaces.entries()) {
+      const cellWidth = colWidths[i] ?? 0;
       for (let x = headerX; x < headerX + cellWidth + 2; x++) setSpace(x, 1 + headerLine);
       setBorder(headerX - 1, 1 + headerLine, '\u2502', headerBg?.bg);
       surface.blit(headerSurface, headerX + 1, 1 + headerLine, 0, headerLine, cellWidth, 1);
@@ -356,13 +354,12 @@ export function tableSurface(
   drawBorderRow(1 + headerHeight, '\u251c', '\u253c', '\u2524');
 
   let y = 2 + headerHeight;
-  for (let rowIndex = 0; rowIndex < fittedCellSurfaces.length; rowIndex++) {
-    const row = fittedCellSurfaces[rowIndex]!;
-    const rowHeight = rowHeights[rowIndex]!;
+  for (const [rowIndex, row] of fittedCellSurfaces.entries()) {
+    const rowHeight = rowHeights[rowIndex] ?? 1;
     for (let line = 0; line < rowHeight; line++) {
       let x = 1;
       for (let colIndex = 0; colIndex < columns.length; colIndex++) {
-        const cellWidth = colWidths[colIndex]!;
+        const cellWidth = colWidths[colIndex] ?? 0;
         setBorder(x - 1, y + line, '\u2502');
         for (let fillX = x; fillX < x + cellWidth + 2; fillX++) {
           if (packedSurface) packedSurface.setRGB(fillX, y + line, 0x20, -1, 0, 0, -1, 0, 0);
@@ -374,7 +371,7 @@ export function tableSurface(
     }
     let x = 1;
     for (let colIndex = 0; colIndex < columns.length; colIndex++) {
-      const cellWidth = colWidths[colIndex]!;
+      const cellWidth = colWidths[colIndex] ?? 0;
       const cellSurface = row[colIndex] ?? createTextSurface('');
       surface.blit(cellSurface, x + 1, y, 0, 0, cellWidth, rowHeight);
       x += cellWidth + 3;

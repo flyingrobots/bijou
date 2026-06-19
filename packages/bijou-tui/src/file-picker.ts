@@ -203,7 +203,7 @@ export function fpFocusPrev(state: FilePickerState): FilePickerState {
 export function fpEnter(state: FilePickerState, io: IOPort): FilePickerState {
   if (state.entries.length === 0) return state;
   const entry = state.entries[state.focusIndex];
-  if (!entry || !entry.isDirectory) return state;
+  if (!entry?.isDirectory) return state;
 
   const newCwd = io.joinPath(state.cwd, entry.name);
   const entries = safeReadEntries(io, newCwd, state.filter);

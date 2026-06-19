@@ -108,13 +108,13 @@ describe('createGrid', () => {
     expect(g.rows).toBe(3);
     expect(g.cols).toBe(5);
     expect(g.dirs.length).toBe(3);
-    expect(g.dirs[0]!.length).toBe(5);
+    expect(g.dirs[0]?.length).toBe(5);
   });
 
   it('cells start with empty direction sets', () => {
     const g = createGrid(2, 2);
-    expect(g.dirs[0]![0]!.size).toBe(0);
-    expect(g.dirs[1]![1]!.size).toBe(0);
+    expect(g.dirs[0]![0]?.size).toBe(0);
+    expect(g.dirs[1]![1]?.size).toBe(0);
   });
 
   it('arrows set starts empty', () => {
@@ -131,9 +131,9 @@ describe('markEdge', () => {
     markEdge(g, 0, 0, 0, 1, RS, colCenter, 8, 3);
     // sRow = 0*6+3 = 3, dRow = 1*6-1 = 5
     // Vertical from row 3 through row 5, arrow at row 5
-    expect(g.dirs[3]![5]!.has('D')).toBe(true);
-    expect(g.dirs[4]![5]!.has('D')).toBe(true);
-    expect(g.dirs[4]![5]!.has('U')).toBe(true);
+    expect(g.dirs[3]![5]?.has('D')).toBe(true);
+    expect(g.dirs[4]![5]?.has('D')).toBe(true);
+    expect(g.dirs[4]![5]?.has('U')).toBe(true);
     expect(g.arrows.get(encodeArrowPos(5, 5))).toBe(1);
   });
 
@@ -145,8 +145,8 @@ describe('markEdge', () => {
     // mid = sRow+1 = 4, horizontal from col 7 to col 22
     // Check horizontal segment has L and R
     const midRow = 4;
-    expect(g.dirs[midRow]![10]!.has('L')).toBe(true);
-    expect(g.dirs[midRow]![10]!.has('R')).toBe(true);
+    expect(g.dirs[midRow]![10]?.has('L')).toBe(true);
+    expect(g.dirs[midRow]![10]?.has('R')).toBe(true);
   });
 
   it('detours same-column skip edges around intermediate node columns', () => {
@@ -157,13 +157,13 @@ describe('markEdge', () => {
 
     // The middle layer's center column should remain untouched so the edge
     // does not disappear under the intermediate node box.
-    expect(g.dirs[6]![8]!.size).toBe(0);
-    expect(g.dirs[7]![8]!.size).toBe(0);
-    expect(g.dirs[8]![8]!.size).toBe(0);
+    expect(g.dirs[6]![8]?.size).toBe(0);
+    expect(g.dirs[7]![8]?.size).toBe(0);
+    expect(g.dirs[8]![8]?.size).toBe(0);
 
     // The detour path should run in the gap to the right.
-    expect(g.dirs[7]![17]!.has('D')).toBe(true);
-    expect(g.dirs[7]![17]!.has('U')).toBe(true);
+    expect(g.dirs[7]![17]?.has('D')).toBe(true);
+    expect(g.dirs[7]![17]?.has('U')).toBe(true);
   });
 });
 

@@ -174,7 +174,7 @@ describe('createPipeline', () => {
     let nowMs = 100;
     const pipeline = createPipeline({ now: () => nowMs });
     const state = createMockState();
-    const seen: Array<{ stage: string; durationMs: number }> = [];
+    const seen: { stage: string; durationMs: number }[] = [];
 
     pipeline.use('Layout', (_state, next) => {
       nowMs += 5;

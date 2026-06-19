@@ -163,11 +163,13 @@ const BINDING_STATUSES: readonly BindingStatus[] = [
   'stale',
   'error',
 ];
+const BINDING_STATUS_VALUES: ReadonlySet<string> = new Set(BINDING_STATUSES);
 const BINDING_ISSUE_SEVERITIES: readonly BindingIssueSeverity[] = [
   'info',
   'warning',
   'error',
 ];
+const BINDING_ISSUE_SEVERITY_VALUES: ReadonlySet<string> = new Set(BINDING_ISSUE_SEVERITIES);
 const EMPTY_BINDING_ISSUES = Object.freeze([]) as readonly BindingIssue[];
 const EMPTY_BINDING_FACTS = Object.freeze([]) as readonly BindingFact[];
 
@@ -264,7 +266,7 @@ export class ProviderScope {
     entries.forEach((entry, index) => {
       if (!isProviderScopeEntry(entry)) {
         throw new Error(
-          `provider scope: entry at index ${index} was not created by provide()`,
+          `provider scope: entry at index ${String(index)} was not created by provide()`,
         );
       }
 
@@ -324,7 +326,7 @@ export class BindingFrame {
     snapshots.forEach((snapshot, index) => {
       if (!isBindingSnapshot(snapshot)) {
         throw new Error(
-          `binding frame: snapshot at index ${index} was not created by bindingSnapshot()`,
+          `binding frame: snapshot at index ${String(index)} was not created by bindingSnapshot()`,
         );
       }
 
@@ -343,16 +345,15 @@ export class BindingFrame {
     return Object.freeze([...this.#snapshotsByRequirementId.keys()]);
   }
 
-  snapshot<Data = unknown>(requirementId: RequirementId): BindingSnapshot<Data> | undefined {
+  snapshot<Data = unknown>(requirementId: RequirementId): BindingSnapshot<Data> | undefined;
+  snapshot(requirementId: RequirementId): BindingSnapshot | undefined {
     const normalizedRequirementId = normalizeRequiredText({
       scope: 'binding frame',
       field: 'requirementId',
       value: requirementId,
     });
 
-    return this.#snapshotsByRequirementId.get(normalizedRequirementId) as
-      | BindingSnapshot<Data>
-      | undefined;
+    return this.#snapshotsByRequirementId.get(normalizedRequirementId);
   }
 
   get<Data = unknown>(requirementId: RequirementId): DeepReadonly<Data> | undefined {
@@ -405,18 +406,14 @@ export function defineDataRequirement(input: DataRequirementInput): DataRequirem
     description: optionalTrimmedText(input.description),
     optional: input.optional,
     facts: freezeFacts(input.facts),
-  } as DataRequirement;
+  };
 
-  Object.defineProperty(requirement, DATA_REQUIREMENT_BRAND, { value: true });
+  brand(requirement, DATA_REQUIREMENT_BRAND);
   return Object.freeze(requirement);
 }
 
 export function isDataRequirement(value: unknown): value is DataRequirement {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as DataRequirementBrandCarrier)[DATA_REQUIREMENT_BRAND] === true,
-  );
+  return hasBrand(value, DATA_REQUIREMENT_BRAND);
 }
 
 export function defineViewData(input: ViewDataInput): ViewDataContract {
@@ -424,11 +421,7 @@ export function defineViewData(input: ViewDataInput): ViewDataContract {
 }
 
 export function isViewDataContract(value: unknown): value is ViewDataContract {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as ViewDataContractBrandCarrier)[VIEW_DATA_CONTRACT_BRAND] === true,
-  );
+  return hasBrand(value, VIEW_DATA_CONTRACT_BRAND);
 }
 
 export function defineDataProvider(input: DataProviderInput): DataProvider {
@@ -446,9 +439,9 @@ export function defineDataProvider(input: DataProviderInput): DataProvider {
     label: optionalTrimmedText(input.label),
     description: optionalTrimmedText(input.description),
     facts: freezeFacts(input.facts),
-  } as DataProvider;
+  };
 
-  Object.defineProperty(provider, DATA_PROVIDER_BRAND, { value: true });
+  brand(provider, DATA_PROVIDER_BRAND);
   return Object.freeze(provider);
 }
 
@@ -460,9 +453,9 @@ export function provide(provider: DataProvider): ProviderScopeEntry {
   const entry = {
     resource: provider.resource,
     provider,
-  } as ProviderScopeEntry;
+  };
 
-  Object.defineProperty(entry, PROVIDER_SCOPE_ENTRY_BRAND, { value: true });
+  brand(entry, PROVIDER_SCOPE_ENTRY_BRAND);
   return Object.freeze(entry);
 }
 
@@ -559,9 +552,9 @@ export function bindingSnapshot<Data = unknown>(
     ...(input.data === undefined ? {} : { data: freezeSnapshotData(input.data) }),
     issues: freezeIssues(input.issues),
     facts: freezeFacts(input.facts),
-  } as BindingSnapshot<Data>;
+  };
 
-  Object.defineProperty(snapshot, BINDING_SNAPSHOT_BRAND, { value: true });
+  brand(snapshot, BINDING_SNAPSHOT_BRAND);
   return Object.freeze(snapshot);
 }
 
@@ -576,7 +569,7 @@ export function bindingFrameFromSnapshots(input: BindingFrameFromSnapshotsInput)
   input.resolutions.forEach((resolution, index) => {
     if (!isProviderResolution(resolution)) {
       throw new Error(
-        `binding frame assembly: resolution at index ${index} was not created by resolveProviderRequirement()`,
+        `binding frame assembly: resolution at index ${String(index)} was not created by resolveProviderRequirement()`,
       );
     }
     if (resolutionsByRequirementId.has(resolution.requirementId)) {
@@ -589,7 +582,7 @@ export function bindingFrameFromSnapshots(input: BindingFrameFromSnapshotsInput)
   input.snapshots.forEach((snapshot, index) => {
     if (!isBindingSnapshot(snapshot)) {
       throw new Error(
-        `binding frame assembly: snapshot at index ${index} was not created by bindingSnapshot()`,
+        `binding frame assembly: snapshot at index ${String(index)} was not created by bindingSnapshot()`,
       );
     }
     if (!resolutionsByRequirementId.has(snapshot.requirementId)) {
@@ -625,11 +618,12 @@ export function bindingFrameFromSnapshots(input: BindingFrameFromSnapshotsInput)
       continue;
     }
 
-    if (snapshot.providerId !== resolution.providerId) {
+    const expectedProviderId = resolution.providerId;
+    if (snapshot.providerId !== expectedProviderId) {
       issues.push({
         severity: 'error',
         code: 'snapshot.provider-mismatch',
-        message: `Snapshot for requirement ${resolution.requirementId} came from provider ${snapshot.providerId}; expected ${resolution.providerId}`,
+        message: `Snapshot for requirement ${resolution.requirementId} came from provider ${snapshot.providerId}; expected ${String(expectedProviderId)}`,
         path: resolution.requirementId,
       });
       continue;
@@ -659,90 +653,49 @@ export function commandIntent<Payload = unknown>(
     label: optionalTrimmedText(options.label),
     description: optionalTrimmedText(options.description),
     facts: freezeFacts(options.facts),
-  } as CommandIntent<Payload>;
+  };
 
-  Object.defineProperty(intent, COMMAND_INTENT_BRAND, { value: true });
+  brand(intent, COMMAND_INTENT_BRAND);
   return Object.freeze(intent);
 }
 
 export function isBindingSnapshot(value: unknown): value is BindingSnapshot {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as BindingSnapshotBrandCarrier)[BINDING_SNAPSHOT_BRAND] === true,
-  );
+  return hasBrand(value, BINDING_SNAPSHOT_BRAND);
 }
 
 export function isDataProvider(value: unknown): value is DataProvider {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as DataProviderBrandCarrier)[DATA_PROVIDER_BRAND] === true,
-  );
+  return hasBrand(value, DATA_PROVIDER_BRAND);
 }
 
 export function isProviderScope(value: unknown): value is ProviderScope {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as ProviderScopeBrandCarrier)[PROVIDER_SCOPE_BRAND] === true,
-  );
+  return hasBrand(value, PROVIDER_SCOPE_BRAND);
 }
 
 export function isCommandIntent(value: unknown): value is CommandIntent {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as CommandIntentBrandCarrier)[COMMAND_INTENT_BRAND] === true,
-  );
+  return hasBrand(value, COMMAND_INTENT_BRAND);
 }
 
 export function isProviderResolution(value: unknown): value is ProviderResolution {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as ProviderResolutionBrandCarrier)[PROVIDER_RESOLUTION_BRAND] === true,
-  );
+  return hasBrand(value, PROVIDER_RESOLUTION_BRAND);
 }
 
 function isProviderScopeEntry(value: unknown): value is ProviderScopeEntry {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as ProviderScopeEntryBrandCarrier)[PROVIDER_SCOPE_ENTRY_BRAND] === true,
-  );
+  return hasBrand(value, PROVIDER_SCOPE_ENTRY_BRAND);
 }
 
-interface BindingSnapshotBrandCarrier {
-  readonly [BINDING_SNAPSHOT_BRAND]?: true;
+function brand<Brand extends symbol, Value extends object>(
+  value: Value,
+  brandSymbol: Brand,
+): asserts value is Value & Readonly<Record<Brand, true>> {
+  Object.defineProperty(value, brandSymbol, { value: true });
 }
 
-interface DataRequirementBrandCarrier {
-  readonly [DATA_REQUIREMENT_BRAND]?: true;
-}
+function hasBrand(value: unknown, brand: symbol): boolean {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
 
-interface ViewDataContractBrandCarrier {
-  readonly [VIEW_DATA_CONTRACT_BRAND]?: true;
-}
-
-interface DataProviderBrandCarrier {
-  readonly [DATA_PROVIDER_BRAND]?: true;
-}
-
-interface ProviderScopeEntryBrandCarrier {
-  readonly [PROVIDER_SCOPE_ENTRY_BRAND]?: true;
-}
-
-interface ProviderScopeBrandCarrier {
-  readonly [PROVIDER_SCOPE_BRAND]?: true;
-}
-
-interface ProviderResolutionBrandCarrier {
-  readonly [PROVIDER_RESOLUTION_BRAND]?: true;
-}
-
-interface CommandIntentBrandCarrier {
-  readonly [COMMAND_INTENT_BRAND]?: true;
+  return brand in value && Reflect.get(value, brand) === true;
 }
 
 interface RequiredTextOptions {
@@ -770,11 +723,11 @@ function optionalTrimmedText(value: string | undefined): string | undefined {
 }
 
 function isBindingStatus(value: string): value is BindingStatus {
-  return BINDING_STATUSES.includes(value as BindingStatus);
+  return BINDING_STATUS_VALUES.has(value);
 }
 
 function isBindingIssueSeverity(value: string): value is BindingIssueSeverity {
-  return BINDING_ISSUE_SEVERITIES.includes(value as BindingIssueSeverity);
+  return BINDING_ISSUE_SEVERITY_VALUES.has(value);
 }
 
 function freezeIssues(issues: readonly BindingIssue[] | undefined): readonly BindingIssue[] {
@@ -787,19 +740,19 @@ function freezeIssues(issues: readonly BindingIssue[] | undefined): readonly Bin
 
 function normalizeIssue(issue: BindingIssue, index: number): BindingIssue {
   if (!isBindingIssueSeverity(issue.severity)) {
-    throw new Error(`binding issue: unsupported severity ${String(issue.severity)} at index ${index}`);
+    throw new Error(`binding issue: unsupported severity ${String(issue.severity)} at index ${String(index)}`);
   }
 
   return {
     severity: issue.severity,
     code: normalizeRequiredText({
       scope: 'binding issue',
-      field: `issues[${index}].code`,
+      field: `issues[${String(index)}].code`,
       value: issue.code,
     }),
     message: normalizeRequiredText({
       scope: 'binding issue',
-      field: `issues[${index}].message`,
+      field: `issues[${String(index)}].message`,
       value: issue.message,
     }),
     path: optionalTrimmedText(issue.path),
@@ -816,9 +769,9 @@ function providerResolution(input: Omit<ProviderResolution, typeof PROVIDER_RESO
     providerId: input.providerId,
     issues: input.issues,
     facts: input.facts,
-  } as ProviderResolution;
+  };
 
-  Object.defineProperty(resolution, PROVIDER_RESOLUTION_BRAND, { value: true });
+  brand(resolution, PROVIDER_RESOLUTION_BRAND);
   return Object.freeze(resolution);
 }
 
@@ -834,7 +787,8 @@ function freezeSnapshotData<T>(value: T): DeepReadonly<T> {
   return deepFreeze(cloneSnapshotData(value, 'data'));
 }
 
-function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = new WeakSet<object>()): T {
+function cloneSnapshotData<T>(value: T, path: string, seen?: WeakSet<object>): T;
+function cloneSnapshotData(value: unknown, path: string, seen = new WeakSet()): unknown {
   if (
     value === null
     || typeof value === 'string'
@@ -856,22 +810,25 @@ function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = ne
     throw new Error(`binding data: unsupported ${typeof value} at ${path}`);
   }
 
-  const objectValue = value as object;
+  const objectValue = value;
   if (seen.has(objectValue)) {
     throw new Error(`binding data: circular reference at ${path}`);
   }
   seen.add(objectValue);
 
   try {
-    if (Array.isArray(value)) {
-      return value.map((item, index) => cloneSnapshotData(item, `${path}[${index}]`, seen)) as T;
+    if (isSnapshotDataArray(value)) {
+      return value.map((item, index) => cloneSnapshotData(item, `${path}[${String(index)}]`, seen));
     }
 
     if (!isPlainObject(value)) {
       throw new Error(`binding data: unsupported ${objectKind(value)} at ${path}`);
     }
 
-    const clone = Object.create(Object.getPrototypeOf(value)) as SnapshotDataObject;
+    const clone: SnapshotDataObject = {};
+    if (Reflect.getPrototypeOf(value) === null) {
+      Object.setPrototypeOf(clone, null);
+    }
     const descriptors = Object.getOwnPropertyDescriptors(value);
     for (const key of Reflect.ownKeys(descriptors)) {
       if (typeof key === 'symbol') {
@@ -890,46 +847,48 @@ function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = ne
         throw new Error(`binding data: unsupported accessor at ${propertyPath}`);
       }
 
-      clone[key] = cloneSnapshotData(descriptor.value, propertyPath, seen);
+      clone[key] = cloneSnapshotData(descriptor.value as unknown, propertyPath, seen);
     }
 
-    return clone as T;
+    return clone;
   } finally {
     seen.delete(objectValue);
   }
 }
 
-interface SnapshotDataObject {
-  [key: string]: unknown;
-}
+type SnapshotDataObject = Record<string, unknown>;
 
 function isPlainObject(value: object): boolean {
-  const prototype = Object.getPrototypeOf(value);
+  const prototype = Reflect.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
+}
+
+function isSnapshotDataArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 function objectKind(value: object): string {
   return Object.prototype.toString.call(value).slice(8, -1);
 }
 
-function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet<object>()): DeepReadonly<T> {
+function deepFreeze<T>(value: T, seen?: WeakSet<object>): DeepReadonly<T>;
+function deepFreeze(value: unknown, seen = new WeakSet()): unknown {
   if (value === null || typeof value !== 'object') {
-    return value as DeepReadonly<T>;
+    return value;
   }
 
-  const objectValue = value as object;
-  if (seen.has(objectValue)) {
-    return value as DeepReadonly<T>;
+  if (seen.has(value)) {
+    return value;
   }
 
-  seen.add(objectValue);
+  seen.add(value);
 
-  for (const key of Reflect.ownKeys(objectValue)) {
-    const descriptor = Object.getOwnPropertyDescriptor(objectValue, key);
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (descriptor !== undefined && 'value' in descriptor) {
       deepFreeze(descriptor.value, seen);
     }
   }
 
-  return Object.freeze(value) as DeepReadonly<T>;
+  return Object.freeze(value);
 }

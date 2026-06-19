@@ -13,8 +13,6 @@ import {
 import {
   appendRuntimeCommands,
   type RuntimeCommandBuffer,
-} from './runtime-engine.js';
-import type {
   RuntimeStackLayer,
   RuntimeViewStack,
 } from './runtime-engine.js';
@@ -88,14 +86,15 @@ export function runtimeViewBindingSource(
       'runtime binding source: contract was not created by defineViewData()',
     );
   }
+  const providerIds = freezeProviderAssignments(input.providerIds);
 
   const source = {
     owner: input.owner,
     contract: input.contract,
-    providerIds: freezeProviderAssignments(input.providerIds),
-  } as RuntimeViewBindingSource;
+    ...(providerIds === undefined ? {} : { providerIds }),
+  };
 
-  Object.defineProperty(source, RUNTIME_VIEW_BINDING_SOURCE_BRAND, { value: true });
+  brand(source, RUNTIME_VIEW_BINDING_SOURCE_BRAND);
   return Object.freeze(source);
 }
 
@@ -117,7 +116,8 @@ export function runtimeCommandIntentEmission<Payload>(
   if (!isCommandIntent(intent)) {
     throw new Error('runtime command intent emission: intent was not created by commandIntent()');
   }
-  if (options.owner !== undefined && !isBindingLifecycleOwner(options.owner)) {
+  const owner = options['owner'];
+  if (owner !== undefined && !isBindingLifecycleOwner(owner)) {
     throw new Error(
       'runtime command intent emission: owner was not created by defineBindingLifecycleOwner()',
     );
@@ -126,22 +126,17 @@ export function runtimeCommandIntentEmission<Payload>(
   const emission = {
     intent,
     payload: freezeRuntimePayload(payload),
-    owner: options.owner,
-  } as RuntimeCommandIntentEmission<Payload | undefined>;
+    owner,
+  };
 
-  Object.defineProperty(emission, RUNTIME_COMMAND_INTENT_EMISSION_BRAND, { value: true });
+  brand(emission, RUNTIME_COMMAND_INTENT_EMISSION_BRAND);
   return Object.freeze(emission);
 }
 
 export function isRuntimeCommandIntentEmission(
   value: unknown,
 ): value is RuntimeCommandIntentEmission {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && Object.prototype.hasOwnProperty.call(value, RUNTIME_COMMAND_INTENT_EMISSION_BRAND)
-      && (value as RuntimeCommandIntentEmissionBrandCarrier)[RUNTIME_COMMAND_INTENT_EMISSION_BRAND] === true,
-  );
+  return hasOwnBrand(value, RUNTIME_COMMAND_INTENT_EMISSION_BRAND);
 }
 
 export function runtimeCommandIntentRoute<Payload, Command>(
@@ -159,19 +154,14 @@ export function runtimeCommandIntentRoute<Payload, Command>(
   const route = {
     intent: input.intent,
     toCommand: input.toCommand,
-  } as RuntimeCommandIntentRoute<Payload, Command>;
+  };
 
-  Object.defineProperty(route, RUNTIME_COMMAND_INTENT_ROUTE_BRAND, { value: true });
+  brand(route, RUNTIME_COMMAND_INTENT_ROUTE_BRAND);
   return Object.freeze(route);
 }
 
 export function isRuntimeCommandIntentRoute(value: unknown): value is RuntimeCommandIntentRoute {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && Object.prototype.hasOwnProperty.call(value, RUNTIME_COMMAND_INTENT_ROUTE_BRAND)
-      && (value as RuntimeCommandIntentRouteBrandCarrier)[RUNTIME_COMMAND_INTENT_ROUTE_BRAND] === true,
-  );
+  return hasOwnBrand(value, RUNTIME_COMMAND_INTENT_ROUTE_BRAND);
 }
 
 export function dispatchRuntimeCommandIntent<Payload, Command>(
@@ -184,21 +174,24 @@ export function dispatchRuntimeCommandIntent<Payload, Command>(
       'runtime command intent dispatch: emission was not created by runtimeCommandIntentEmission()',
     );
   }
-  if (!Array.isArray(input.routes)) {
+  if (!isRuntimeCommandIntentRouteList(input.routes)) {
     throw new Error('runtime command intent dispatch: routes must be an array');
   }
   if (!isRuntimeCommandBuffer(input.buffer)) {
     throw new Error('runtime command intent dispatch: buffer must be a RuntimeCommandBuffer');
   }
 
-  const route = input.routes.find((candidate, index) => {
-    if (!isRuntimeCommandIntentRoute(candidate)) {
+  let route: RuntimeCommandIntentRoute<Payload, Command> | undefined;
+  input.routes.forEach((candidate, index) => {
+    if (!hasOwnBrand(candidate, RUNTIME_COMMAND_INTENT_ROUTE_BRAND)) {
       throw new Error(
-        `runtime command intent dispatch: route at index ${index} was not created by runtimeCommandIntentRoute()`,
+        `runtime command intent dispatch: route at index ${String(index)} was not created by runtimeCommandIntentRoute()`,
       );
     }
 
-    return candidate.intent.id === input.emission.intent.id;
+    if (route === undefined && candidate.intent.id === input.emission.intent.id) {
+      route = candidate;
+    }
   });
   if (route === undefined) {
     throw new Error(
@@ -216,12 +209,7 @@ export function dispatchRuntimeCommandIntent<Payload, Command>(
 export function isRuntimeViewBindingSource(
   value: unknown,
 ): value is RuntimeViewBindingSource {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && Object.prototype.hasOwnProperty.call(value, RUNTIME_VIEW_BINDING_SOURCE_BRAND)
-      && (value as RuntimeViewBindingSourceBrandCarrier)[RUNTIME_VIEW_BINDING_SOURCE_BRAND] === true,
-  );
+  return hasOwnBrand(value, RUNTIME_VIEW_BINDING_SOURCE_BRAND);
 }
 
 export function runtimeActiveBindingLayers<Model extends RuntimeBindingLayerModel>(
@@ -261,7 +249,7 @@ export function collectRuntimeViewBindings<Model extends RuntimeBindingLayerMode
     return bindingSources.map((source, index) => {
       if (!isRuntimeViewBindingSource(source)) {
         throw new Error(
-          `runtime binding collection: source at layer ${layer.id} index ${index} `
+          `runtime binding collection: source at layer ${layer.id} index ${String(index)} `
           + 'was not created by runtimeViewBindingSource()',
         );
       }
@@ -277,23 +265,11 @@ export function collectRuntimeViewBindings<Model extends RuntimeBindingLayerMode
   return collectActiveBindings({ contracts });
 }
 
-interface RuntimeViewBindingSourceBrandCarrier {
-  readonly [RUNTIME_VIEW_BINDING_SOURCE_BRAND]?: true;
-}
-
-interface RuntimeCommandIntentEmissionBrandCarrier {
-  readonly [RUNTIME_COMMAND_INTENT_EMISSION_BRAND]?: true;
-}
-
-interface RuntimeCommandIntentRouteBrandCarrier {
-  readonly [RUNTIME_COMMAND_INTENT_ROUTE_BRAND]?: true;
-}
-
 function isRuntimeViewStack(value: unknown): value is RuntimeViewStack {
   return Boolean(
     value
       && typeof value === 'object'
-      && Array.isArray((value as RuntimeViewStack).layers),
+      && Array.isArray(Reflect.get(value, 'layers')),
   );
 }
 
@@ -301,9 +277,27 @@ function isRuntimeCommandBuffer(value: unknown): value is RuntimeCommandBuffer {
   return Boolean(
     value
       && typeof value === 'object'
-      && Array.isArray((value as RuntimeCommandBuffer).items),
+      && Array.isArray(Reflect.get(value, 'items')),
   );
 }
+
+function brand<Brand extends symbol, Value extends object>(
+  value: Value,
+  brandSymbol: Brand,
+): asserts value is Value & Readonly<Record<Brand, true>> {
+  Object.defineProperty(value, brandSymbol, { value: true });
+}
+
+function hasOwnBrand(value: unknown, brandSymbol: symbol): boolean {
+  return (
+    value !== null
+    && typeof value === 'object'
+    && Object.prototype.hasOwnProperty.call(value, brandSymbol)
+    && Reflect.get(value, brandSymbol) === true
+  );
+}
+
+function isRuntimeCommandIntentRouteList<Payload, Command>(value: readonly RuntimeCommandIntentRoute<Payload, Command>[]): value is readonly RuntimeCommandIntentRoute<Payload, Command>[] { return Array.isArray(value); }
 
 function freezeProviderAssignments(
   assignments: readonly ActiveBindingProviderAssignment[] | undefined,
@@ -320,12 +314,12 @@ function freezeProviderAssignments(
     assertObjectRecord(
       assignment,
       'runtime binding source',
-      `provider assignment ${index}`,
+      `provider assignment ${String(index)}`,
     );
     const requirementId = normalizeRequiredText({
       scope: 'runtime binding source',
-      field: `provider assignment ${index} requirementId`,
-      value: assignment.requirementId,
+      field: `provider assignment ${String(index)} requirementId`,
+      value: assignment['requirementId'],
     });
     if (seenRequirementIds.has(requirementId)) {
       throw new Error(
@@ -338,8 +332,8 @@ function freezeProviderAssignments(
       requirementId,
       providerId: normalizeRequiredText({
         scope: 'runtime binding source',
-        field: `provider assignment ${index} providerId`,
-        value: assignment.providerId,
+        field: `provider assignment ${String(index)} providerId`,
+        value: assignment['providerId'],
       }),
     });
   }));
@@ -358,8 +352,9 @@ function freezeRuntimePayload<Payload>(
 function cloneRuntimePayload<Payload>(
   value: Payload,
   path: string,
-  seen = new WeakSet(),
-): Payload {
+  seen?: WeakSet<object>,
+): Payload;
+function cloneRuntimePayload(value: unknown, path: string, seen = new WeakSet()): unknown {
   if (
     value === null
     || typeof value === 'string'
@@ -379,19 +374,19 @@ function cloneRuntimePayload<Payload>(
     throw new Error(`runtime command intent payload: unsupported ${typeof value} at ${path}`);
   }
 
-  const objectValue = value as object;
+  const objectValue = value;
   if (seen.has(objectValue)) {
     throw new Error(`runtime command intent payload: circular reference at ${path}`);
   }
   seen.add(objectValue);
 
   try {
-    if (Array.isArray(value)) {
+    if (isRuntimePayloadArray(value)) {
       return value.map((item, index) => cloneRuntimePayload(
         item,
-        `${path}[${index}]`,
+        `${path}[${String(index)}]`,
         seen,
-      )) as Payload;
+      ));
     }
     if (!isPlainObject(value)) {
       throw new Error(
@@ -399,7 +394,10 @@ function cloneRuntimePayload<Payload>(
       );
     }
 
-    const clone = Object.create(Object.getPrototypeOf(value)) as Record<string, unknown>;
+    const clone: Record<string, unknown> = {};
+    if (Reflect.getPrototypeOf(value) === null) {
+      Object.setPrototypeOf(clone, null);
+    }
     const descriptors = Object.getOwnPropertyDescriptors(value);
     for (const key of Reflect.ownKeys(descriptors)) {
       if (typeof key === 'symbol') {
@@ -422,44 +420,41 @@ function cloneRuntimePayload<Payload>(
         );
       }
 
-      clone[key] = cloneRuntimePayload(descriptor.value, propertyPath, seen);
+      clone[key] = cloneRuntimePayload(descriptor.value as unknown, propertyPath, seen);
     }
 
-    return clone as Payload;
+    return clone;
   } finally {
     seen.delete(objectValue);
   }
 }
 
-function deepFreeze<Payload>(
-  value: Payload,
-  seen = new WeakSet(),
-): DeepReadonly<Payload> {
+function deepFreeze<Payload>(value: Payload, seen?: WeakSet<object>): DeepReadonly<Payload>;
+function deepFreeze(value: unknown, seen = new WeakSet()): unknown {
   if (value === null || typeof value !== 'object') {
-    return value as DeepReadonly<Payload>;
+    return value;
   }
 
-  const objectValue = value as object;
-  if (seen.has(objectValue)) {
-    return value as DeepReadonly<Payload>;
+  if (seen.has(value)) {
+    return value;
   }
 
-  seen.add(objectValue);
-  for (const key of Reflect.ownKeys(objectValue)) {
-    const descriptor = Object.getOwnPropertyDescriptor(objectValue, key);
+  seen.add(value);
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (descriptor !== undefined && 'value' in descriptor) {
       deepFreeze(descriptor.value, seen);
     }
   }
 
-  return Object.freeze(value) as DeepReadonly<Payload>;
+  return Object.freeze(value);
 }
 
 function assertObjectRecord(
   value: unknown,
   scope: string,
   label = 'input',
-): asserts value {
+): asserts value is Record<string, unknown> {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error(`${scope}: ${label} must be an object`);
   }
@@ -483,8 +478,12 @@ function normalizeRequiredText(options: {
 }
 
 function isPlainObject(value: object): boolean {
-  const prototype = Object.getPrototypeOf(value);
+  const prototype = Reflect.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
+}
+
+function isRuntimePayloadArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 function objectKind(value: object): string {

@@ -487,7 +487,7 @@ describe('focusAreaSurface', () => {
 // ── Keymap ──────────────────────────────────────────────────────────
 
 describe('focusAreaKeyMap', () => {
-  type Msg = { type: string };
+  interface Msg { type: string }
 
   const km = focusAreaKeyMap<Msg>({
     scrollUp: { type: 'up' },
@@ -519,11 +519,9 @@ describe('focusAreaKeyMap', () => {
     expect(km.handle(keyMsg('h'))).toEqual({ type: 'left' });
     expect(km.handle(keyMsg('l'))).toEqual({ type: 'right' });
   });
-
   it('returns undefined for unbound keys', () => {
     expect(km.handle(keyMsg('x'))).toBeUndefined();
   });
-
   it('does not bind arrow keys (reserved for content navigation)', () => {
     expect(km.handle(keyMsg('up'))).toBeUndefined();
     expect(km.handle(keyMsg('down'))).toBeUndefined();

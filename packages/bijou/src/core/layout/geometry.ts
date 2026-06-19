@@ -95,7 +95,7 @@ export function solveGridRects(options: GridRectOptions): ReadonlyMap<string, La
 
   if (options.areas.length !== options.rows.length) {
     throw new Error(
-      `solveGridRects: areas row count (${options.areas.length}) must match rows track count (${options.rows.length})`,
+      `solveGridRects: areas row count (${String(options.areas.length)}) must match rows track count (${String(options.rows.length)})`,
     );
   }
 
@@ -103,7 +103,7 @@ export function solveGridRects(options: GridRectOptions): ReadonlyMap<string, La
     const tokens = row.trim().length === 0 ? [] : row.trim().split(/\s+/);
     if (tokens.length !== options.columns.length) {
       throw new Error(
-        `solveGridRects: area row ${rowIndex} has ${tokens.length} columns, expected ${options.columns.length}`,
+        `solveGridRects: area row ${String(rowIndex)} has ${String(tokens.length)} columns, expected ${String(options.columns.length)}`,
       );
     }
     return tokens;
@@ -114,10 +114,9 @@ export function solveGridRects(options: GridRectOptions): ReadonlyMap<string, La
   const colStarts = trackStarts(colSizes, gap);
   const rowStarts = trackStarts(rowSizes, gap);
 
-  const areaCells = new Map<string, Array<{ readonly row: number; readonly col: number }>>();
-  for (let rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
-    for (let colIndex = 0; colIndex < matrix[rowIndex]!.length; colIndex++) {
-      const area = matrix[rowIndex]![colIndex]!;
+  const areaCells = new Map<string, { readonly row: number; readonly col: number }[]>();
+  for (const [rowIndex, row] of matrix.entries()) {
+    for (const [colIndex, area] of row.entries()) {
       if (area === '.') continue;
       const cells = areaCells.get(area) ?? [];
       cells.push({ row: rowIndex, col: colIndex });
@@ -136,9 +135,9 @@ export function solveGridRects(options: GridRectOptions): ReadonlyMap<string, La
 
     for (let rowIndex = minRow; rowIndex <= maxRow; rowIndex++) {
       for (let colIndex = minCol; colIndex <= maxCol; colIndex++) {
-        if (matrix[rowIndex]![colIndex] !== name) {
+        if (matrix[rowIndex]?.[colIndex] !== name) {
           throw new Error(
-            `solveGridRects: area "${name}" must form a contiguous rectangle; gap at row ${rowIndex}, column ${colIndex}`,
+            `solveGridRects: area "${name}" must form a contiguous rectangle; gap at row ${String(rowIndex)}, column ${String(colIndex)}`,
           );
         }
       }
@@ -186,8 +185,7 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   let fixed = 0;
   let frTotal = 0;
 
-  for (let i = 0; i < tracks.length; i++) {
-    const track = tracks[i]!;
+  for (const [i, track] of tracks.entries()) {
     if (typeof track === 'number') {
       const size = Math.max(0, Math.floor(track));
       sizes[i] = size;
@@ -212,9 +210,8 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   const remaining = Math.max(0, available - fixed);
   if (frTotal > 0) {
     let assigned = 0;
-    const fractionalShares: Array<{ readonly index: number; readonly remainder: number }> = [];
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i]!;
+    const fractionalShares: { readonly index: number; readonly remainder: number }[] = [];
+    for (const [i, track] of tracks.entries()) {
       if (typeof track === 'number') continue;
       const fr = parseFr(track);
       const rawShare = (remaining * fr) / frTotal;
@@ -225,8 +222,8 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
     }
     let leftover = remaining - assigned;
     fractionalShares.sort((left, right) => right.remainder - left.remainder || left.index - right.index);
-    for (let i = 0; i < fractionalShares.length && leftover > 0; i++) {
-      const index = fractionalShares[i]!.index;
+    for (const { index } of fractionalShares) {
+      if (leftover <= 0) break;
       sizes[index] = (sizes[index] ?? 0) + 1;
       leftover -= 1;
     }
@@ -247,9 +244,9 @@ function parseFr(track: `${number}fr`): number {
 function trackStarts(sizes: readonly number[], gap: number): number[] {
   const starts: number[] = [];
   let cursor = 0;
-  for (let i = 0; i < sizes.length; i++) {
+  for (const [i, size] of sizes.entries()) {
     starts.push(cursor);
-    cursor += sizes[i]! + (i < sizes.length - 1 ? gap : 0);
+    cursor += size + (i < sizes.length - 1 ? gap : 0);
   }
   return starts;
 }

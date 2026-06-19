@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice, dagLayout } from './dag.js';
+import { dag } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { arraySource, isDagSource, isSlicedDagSource } from './dag-source.js';
+import type { DagSource } from './dag-source.js';
+import { createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -19,19 +19,6 @@ const diamond: DagNode[] = [
   { id: 'd', label: 'End' },
 ];
 
-const compactDiamond: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b', 'c'] },
-  { id: 'b', label: 'B', edges: ['d'] },
-  { id: 'c', label: 'C', edges: ['d'] },
-  { id: 'd', label: 'D' },
-];
-
-const linear: DagNode[] = [
-  { id: 'a', label: 'First', edges: ['b'] },
-  { id: 'b', label: 'Second', edges: ['c'] },
-  { id: 'c', label: 'Third' },
-];
-
 const fanOut: DagNode[] = [
   { id: 'root', label: 'Root', edges: ['a', 'b', 'c', 'd'] },
   { id: 'a', label: 'A' },
@@ -44,25 +31,6 @@ const withBadges: DagNode[] = [
   { id: 'a', label: 'Build', edges: ['b'], badge: 'DONE' },
   { id: 'b', label: 'Test', edges: ['c'], badge: 'WIP' },
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
-];
-
-const cyclic: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b'] },
-  { id: 'b', label: 'B', edges: ['a'] },
-];
-
-const selfLoop: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['a'] },
-];
-
-const largeGraph: DagNode[] = [
-  { id: 'root', label: 'Root', edges: ['a', 'b'] },
-  { id: 'a', label: 'A', edges: ['c', 'd'] },
-  { id: 'b', label: 'B', edges: ['d', 'e'] },
-  { id: 'c', label: 'C', edges: ['f'] },
-  { id: 'd', label: 'D', edges: ['f'] },
-  { id: 'e', label: 'E', edges: ['f'] },
-  { id: 'f', label: 'F' },
 ];
 
 // ── Basic Tests ────────────────────────────────────────────────────
@@ -99,14 +67,14 @@ describe('DagSource adapter', () => {
 
     it('parents() returns computed parent IDs', () => {
       const src = arraySource(diamond);
-      expect(src.parents!('d')).toEqual(['b', 'c']);
-      expect(src.parents!('a')).toEqual([]);
+      expect(src.parents?.('d')).toEqual(['b', 'c']);
+      expect(src.parents?.('a')).toEqual([]);
     });
 
     it('badge() returns badge text', () => {
       const src = arraySource(withBadges);
-      expect(src.badge!('a')).toBe('DONE');
-      expect(src.badge!('b')).toBe('WIP');
+      expect(src.badge?.('a')).toBe('DONE');
+      expect(src.badge?.('b')).toBe('WIP');
     });
 
     it('token() returns per-node token', () => {
@@ -114,7 +82,7 @@ describe('DagSource adapter', () => {
         { id: 'x', label: 'X', token: { hex: '#ff0000' } },
       ];
       const src = arraySource(tokenNode);
-      expect(src.token!('x')).toEqual({ hex: '#ff0000' });
+      expect(src.token?.('x')).toEqual({ hex: '#ff0000' });
     });
 
     it('ghost() returns false for normal nodes', () => {
@@ -182,34 +150,29 @@ describe('DagSource adapter', () => {
       const fromSource = dag(arraySource(diamond), { ctx });
       expect(fromSource).toBe(fromArray);
     });
-
     it('works with pipe mode', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const fromArray = dag(twoNodes, { ctx });
       const fromSource = dag(arraySource(twoNodes), { ctx });
       expect(fromSource).toBe(fromArray);
     });
-
     it('works with accessible mode', () => {
       const ctx = createTestContext({ mode: 'accessible' });
       const fromArray = dag(diamond, { ctx });
       const fromSource = dag(arraySource(diamond), { ctx });
       expect(fromSource).toBe(fromArray);
     });
-
     it('handles empty source', () => {
       const ctx = createTestContext({ mode: 'interactive' });
       const src = arraySource([]);
       expect(dag(src, { ctx })).toBe('');
     });
-
     it('works with badges', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const fromArray = dag(withBadges, { ctx });
       const fromSource = dag(arraySource(withBadges), { ctx });
       expect(fromSource).toBe(fromArray);
     });
-
     it('works with fan-out', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200 } });
       const fromArray = dag(fanOut, { ctx });

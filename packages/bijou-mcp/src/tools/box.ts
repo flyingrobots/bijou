@@ -28,7 +28,7 @@ export const boxTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_box',
   description: 'Render text inside a Unicode bordered box. Returns plain-text with box-drawing characters.',
   inputSchema: boxShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = boxSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const pad = input.padding ?? 1;
@@ -46,7 +46,7 @@ export const headerBoxTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_header_box',
   description: 'Render a labeled box with an optional detail line. Returns plain-text with box-drawing characters.',
   inputSchema: headerBoxShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = headerBoxSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const pad = input.padding ?? 1;

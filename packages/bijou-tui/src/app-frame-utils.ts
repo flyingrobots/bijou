@@ -122,7 +122,7 @@ export function fitLine(line: string, width: number): string {
 }
 
 /** Combine multiple binding sources into a single source for help display. */
-export function mergeBindingSources(...sources: Array<BindingSource | undefined>): BindingSource {
+export function mergeBindingSources(...sources: (BindingSource | undefined)[]): BindingSource {
   return {
     bindings(): readonly BindingInfo[] {
       const merged: BindingInfo[] = [];

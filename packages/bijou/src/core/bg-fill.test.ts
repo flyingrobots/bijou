@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { shouldApplyBg, makeBgFill } from './bg-fill.js';
 import { createTestContext } from '../adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('shouldApplyBg', () => {
   it('returns true for interactive mode', () => {
@@ -39,7 +40,7 @@ describe('makeBgFill', () => {
     const token = { hex: '#ffffff', bg: '#000000' };
     const fill = makeBgFill(token, ctx);
     expect(fill).toBeTypeOf('function');
-    expect(fill!('hello')).toBe('hello'); // plainStyle identity
+    expect(must(fill)('hello')).toBe('hello'); // plainStyle identity
   });
 
   it('returns a fill function for static mode with bg token', () => {

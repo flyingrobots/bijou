@@ -8,13 +8,18 @@ import type { StylePort } from '../../ports/style.js';
  * @returns Interpolated RGB color at position `t`.
  */
 export function lerp3(stops: GradientStop[], t: number): RGB {
-  if (stops.length === 0) return [0, 0, 0];
-  if (stops.length === 1 || t <= stops[0]!.pos) return stops[0]!.color;
-  if (t >= stops[stops.length - 1]!.pos) return stops[stops.length - 1]!.color;
+  const first = stops[0];
+  if (first === undefined) return [0, 0, 0];
+
+  const last = stops.at(-1) ?? first;
+  if (stops.length === 1 || t <= first.pos) return first.color;
+  if (t >= last.pos) return last.color;
 
   for (let s = 0; s < stops.length - 1; s++) {
-    const a = stops[s]!;
-    const b = stops[s + 1]!;
+    const a = stops[s];
+    const b = stops[s + 1];
+    if (a === undefined || b === undefined) continue;
+
     if (t >= a.pos && t <= b.pos) {
       if (a.pos === b.pos) return a.color;
       const local = (t - a.pos) / (b.pos - a.pos);
@@ -26,7 +31,7 @@ export function lerp3(stops: GradientStop[], t: number): RGB {
     }
   }
 
-  return stops[stops.length - 1]!.color;
+  return last.color;
 }
 
 /** Options for rendering gradient-colored text. */
@@ -49,7 +54,7 @@ export function gradientText(text: string, stops: GradientStop[], options: Gradi
 
   let result = '';
   for (let i = 0; i < text.length; i++) {
-    const ch = text[i]!;
+    const ch = text.charAt(i);
     if (ch === ' ' || ch === '\n') {
       result += ch;
       continue;

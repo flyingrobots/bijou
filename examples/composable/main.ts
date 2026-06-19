@@ -1,4 +1,3 @@
-import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   headerBox, alert, separator, kbd,
   tabs, table, tree, progressBar, timeline,
@@ -7,8 +6,6 @@ import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flexSurface, vstack,
 } from '@flyingrobots/bijou-tui';
-
-const ctx = initDefaultContext();
 
 const TAB_ITEMS = [
   { label: 'Overview' },
@@ -22,7 +19,7 @@ interface Model {
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 function overviewTab(): string {
   return vstack(
@@ -82,8 +79,8 @@ function timelineTab(): string {
 const app: App<Model, Msg> = {
   init: () => [{
     activeTab: 0,
-    cols: process.stdout.columns ?? 80,
-    rows: process.stdout.rows ?? 24,
+    cols: process.stdout.columns,
+    rows: process.stdout.rows,
   }, []],
 
   update: (msg, model) => {
@@ -124,4 +121,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

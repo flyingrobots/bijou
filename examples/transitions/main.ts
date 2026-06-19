@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, enumeratedList, kbd, separator } from '@flyingrobots/bijou';
+import { box, enumeratedList, kbd } from '@flyingrobots/bijou';
 import {
   run,
   createKeyMap,
@@ -9,7 +9,7 @@ import {
 } from '@flyingrobots/bijou-tui';
 import { contentSurface } from '../_shared/example-surfaces.ts';
 
-const ctx = initDefaultContext();
+initDefaultContext();
 
 type Msg = 
   | { type: 'set-transition', transition: PageTransition };
@@ -21,17 +21,14 @@ interface PageModel {
 const TRANSITIONS: PageTransition[] = ['none', 'wipe', 'dissolve', 'grid', 'fade', 'melt', 'matrix', 'scramble'];
 
 function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
-  if (msg.type === 'set-transition') {
-    return [{ ...model, selectedTransition: msg.transition }, []];
-  }
-  return [model, []];
+  return [{ ...model, selectedTransition: msg.transition }, []];
 }
 
 function createPageKeyMap() {
   const km = createKeyMap<Msg>();
   // Bind 1-8 to set transition
   TRANSITIONS.forEach((t, i) => {
-    km.bind((i + 1).toString(), `Use ${t}`, { type: 'set-transition', transition: t });
+    km.bind(String(i + 1), `Use ${String(t)}`, { type: 'set-transition', transition: t });
   });
   return km;
 }
@@ -39,7 +36,10 @@ function createPageKeyMap() {
 function renderContent(pageName: string, model: PageModel, width: number, height: number): string {
   void height;
   const list = enumeratedList(
-    TRANSITIONS.map((transition) => transition === model.selectedTransition ? `${transition} [active]` : transition),
+    TRANSITIONS.map((transition) => {
+      const label = String(transition);
+      return transition === model.selectedTransition ? `${label} [active]` : label;
+    }),
     { style: 'arabic', indent: 2 }
   );
 
@@ -83,4 +83,4 @@ const app = createFramedApp<PageModel, Msg>({
   enableCommandPalette: true,
 });
 
-run(app);
+void run(app);

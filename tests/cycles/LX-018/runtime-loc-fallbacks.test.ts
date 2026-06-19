@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
@@ -18,7 +18,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 
 describe('LX-018 runtime localization fallback behavior', () => {
   it('keeps non-English generated runtime catalogs language-specific', () => {
-    const catalog = dogfoodI18nCatalogsForLocale('fr')[0]!;
+    const catalog = must(dogfoodI18nCatalogsForLocale('fr')[0]);
     const translatedEntry = catalog.entries.find((entry) => entry.key.id === 'settings.language.label');
     const missingEntry = catalog.entries.find((entry) => entry.key.id === 'docs.empty.coverage.title');
 
@@ -34,7 +34,7 @@ describe('LX-018 runtime localization fallback behavior', () => {
       showMissingLocalizationMarkers: true,
     });
     const result = await runScript(app, [], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('<MISSING LOC STRING KEY=bijou.dogfood:docs.page.guides>');
     expect(text).not.toContain('[Guides]');
@@ -48,7 +48,7 @@ describe('LX-018 runtime localization fallback behavior', () => {
       showMissingLocalizationMarkers: false,
     });
     const result = await runScript(app, [], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('[Guides]');
     expect(text).not.toContain('<MISSING LOC STRING KEY=');

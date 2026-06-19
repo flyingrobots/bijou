@@ -51,22 +51,14 @@ export const FRAME_SHELL_THEME_ROW_ID = '__frame-shell-theme__';
 type SettingsRowBehavior = 'cycle-shell-theme';
 
 export interface ResolvedFrameShellTheme {
-  /** Stable concrete choice id. Mode-aware entries use `familyId:modeId`. */
   readonly id: string;
-  /** Visible concrete choice label. */
   readonly label: string;
   readonly description?: string;
-  /** Selected concrete shell theme choice. */
   readonly shellTheme: FrameShellTheme;
-  /** Original shell theme spec that produced this choice. */
   readonly shellThemeSpec: FrameShellThemeSpec;
-  /** Stable shell theme family id. */
   readonly shellThemeId: string;
-  /** Visible shell theme family label. */
   readonly shellThemeLabel: string;
-  /** Stable mode id, when this choice resolves a mode-aware shell theme. */
   readonly modeId?: string;
-  /** Visible mode label, when this choice resolves a mode-aware shell theme. */
   readonly modeLabel?: string;
   readonly resolvedTheme: ResolvedTheme;
 }
@@ -209,7 +201,7 @@ export function resolveFrameShellThemeChoices(
         shellThemeId: shellTheme.id,
         shellThemeLabel: shellTheme.label,
         resolvedTheme: createResolved(
-          shellTheme.theme!,
+          shellTheme.theme,
           ctx.theme.noColor,
           ctx.theme.colorScheme,
         ),
@@ -347,17 +339,16 @@ export function mergeShellThemeSettings<Msg>(
     };
   }
 
-  const shellSectionIndex = settings.sections.findIndex((section) => section.id === 'shell');
-  if (shellSectionIndex >= 0) {
-    const shellSection = settings.sections[shellSectionIndex]!;
+  const shellSection = settings.sections.find((section) => section.id === 'shell');
+  if (shellSection != null) {
     const existingRowIndex = shellSection.rows.findIndex((existingRow) => existingRow.id === FRAME_SHELL_THEME_ROW_ID);
     const nextRows = existingRowIndex >= 0
       ? shellSection.rows.map((existingRow, index) => (index === existingRowIndex ? row : existingRow))
       : [...shellSection.rows, row];
     return {
       ...settings,
-      sections: settings.sections.map((section, index) => (
-        index === shellSectionIndex
+      sections: settings.sections.map((section) => (
+        section === shellSection
           ? { ...shellSection, rows: nextRows }
           : section
       )),
@@ -379,12 +370,11 @@ export function resolveFrameSettings<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   shellThemes: readonly ResolvedFrameShellTheme[],
 ): FrameSettings<Msg> | undefined {
-  const activePage = pagesById.get(model.activePageId)!;
-  const provided = options.settings?.({
-    model,
-    activePage,
-    pageModel: model.pageModels[model.activePageId]!,
-  });
+  const activePage = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  const provided = activePage == null || pageModel === undefined
+    ? undefined
+    : options.settings?.({ model, activePage, pageModel });
   return mergeShellThemeSettings(provided, shellThemes, model.activeShellThemeId, options.i18n);
 }
 
@@ -393,14 +383,16 @@ export function resolveFrameNotificationCenter<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): ResolvedFrameNotificationCenter<Msg> | undefined {
-  const activePage = pagesById.get(model.activePageId)!;
-  const pageModel = model.pageModels[model.activePageId]!;
-  const provided = options.notificationCenter?.({
-    model,
-    activePage,
-    pageModel,
-    runtimeNotifications: model.runtimeNotifications,
-  });
+  const activePage = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  const provided = activePage == null || pageModel === undefined
+    ? undefined
+    : options.notificationCenter?.({
+      model,
+      activePage,
+      pageModel,
+      runtimeNotifications: model.runtimeNotifications,
+    });
 
   if (provided != null) {
     const filters = provided.filters != null && provided.filters.length > 0
@@ -408,7 +400,7 @@ export function resolveFrameNotificationCenter<PageModel, Msg>(
       : DEFAULT_NOTIFICATION_CENTER_FILTERS;
     const activeFilter = filters.includes(provided.activeFilter ?? 'ALL')
       ? (provided.activeFilter ?? 'ALL')
-      : filters[0]!;
+      : filters[0] ?? 'ALL';
     return {
       title: provided.title ?? frameMessage(options.i18n, 'notifications.title', 'Notifications'),
       state: provided.state,
@@ -422,7 +414,7 @@ export function resolveFrameNotificationCenter<PageModel, Msg>(
 
   return {
     title: frameMessage(options.i18n, 'notifications.title', 'Notifications'),
-    state: model.runtimeNotifications as NotificationState<Msg>,
+    state: model.runtimeNotifications,
     filters: DEFAULT_NOTIFICATION_CENTER_FILTERS,
     activeFilter: model.runtimeNotificationHistoryFilter,
   };
@@ -448,16 +440,17 @@ export function resolveSettingsLayout<PageModel, Msg>(
   const rows: FlatSettingsRow<Msg>[] = [];
   let line = 0;
 
-  for (let sectionIndex = 0; sectionIndex < preferenceSections.length; sectionIndex++) {
-    const section = preferenceSections[sectionIndex]!;
+  for (const [sectionIndex, section] of preferenceSections.entries()) {
+    const sourceSection = sections[sectionIndex];
+    if (sourceSection === undefined) continue;
     if (sectionIndex > 0) {
       line += 1;
     }
     line += 1;
     line += 1;
-    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const preparedRow = section.rows[rowIndex]!;
-      const row = sections[sectionIndex]!.rows[rowIndex]!;
+    for (const [rowIndex, preparedRow] of section.rows.entries()) {
+      const row = sourceSection.rows[rowIndex];
+      if (row === undefined) continue;
       const rowLayout = resolvePreferenceRowLayout(preparedRow, contentWidth);
       rows.push({
         index: rows.length,
@@ -556,7 +549,8 @@ export function moveSettingsFocus<PageModel, Msg>(
 ): InternalFrameModel<PageModel, Msg> {
   if (layout.rows.length === 0) return model;
   const nextFocus = Math.max(0, Math.min(clampSettingsFocus(model, layout) + delta, layout.rows.length - 1));
-  const focusedRow = layout.rows[nextFocus]!;
+  const focusedRow = layout.rows[nextFocus];
+  if (focusedRow === undefined) return model;
   return {
     ...model,
     settingsFocusIndex: nextFocus,
@@ -599,7 +593,8 @@ export function cycleNotificationCenterFilter<PageModel, Msg>(
   const filters = layout.center.filters;
   if (filters.length < 2) return [model, []];
   const currentIndex = Math.max(0, filters.indexOf(layout.center.activeFilter));
-  const nextFilter = filters[(currentIndex + 1) % filters.length]!;
+  const nextFilter = filters[(currentIndex + 1) % filters.length] ?? filters[0];
+  if (nextFilter === undefined) return [model, []];
   if (layout.center.onFilterChange != null) {
     const action = layout.center.onFilterChange(nextFilter);
     return [{
@@ -857,11 +852,13 @@ function renderNotificationCenterSurface<Msg>(
     ));
     rows.push(createSurface(width, 1));
     for (let index = 0; index < liveItems.length; index++) {
-      rows.push(renderNotificationReviewEntrySurface(liveItems[index]!, {
+      const item = liveItems[index];
+      if (item === undefined) continue;
+      rows.push(renderNotificationReviewEntrySurface(item, {
         width,
         ctx,
         actionLabel: historyLabels.actionLabel,
-        metaLabel: `${liveItems[index]!.variant} • live`,
+        metaLabel: `${item.variant} • live`,
       }));
       if (index < liveItems.length - 1) rows.push(createSurface(width, 1));
     }

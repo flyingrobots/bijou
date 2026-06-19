@@ -47,6 +47,12 @@ const PALETTE: readonly [number, number, number][] = [
   [0xf2, 0xc5, 0x72],
 ];
 
+function paletteColor(index: number): readonly [number, number, number] {
+  const color = PALETTE[index % PALETTE.length];
+  if (color == null) throw new Error('diff-sparse palette index out of range');
+  return color;
+}
+
 export const diffSparse: Scenario<State> = {
   id: 'diff-sparse',
   label: 'Diff: sparse ~10% dirty (220×58)',
@@ -69,7 +75,7 @@ export const diffSparse: Scenario<State> = {
     const cols = columns;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const [r, g, b] = PALETTE[(x + y) % PALETTE.length]!;
+        const [r, g, b] = paletteColor(x + y);
         current.setRGB(x, y, BLOCK, r, g, b, 0x11, 0x13, 0x20);
         target.setRGB(x, y, BLOCK, r, g, b, 0x11, 0x13, 0x20);
       }
@@ -95,11 +101,10 @@ export const diffSparse: Scenario<State> = {
     // Mutate the ~10% dirty cells with a new theme-driven color.
     // Animation via frame index so cells actually change between frames.
     const phase = frameIndex % PALETTE.length;
-    for (let i = 0; i < dirtyIndices.length; i++) {
-      const idx = dirtyIndices[i]!;
+    for (const [i, idx] of dirtyIndices.entries()) {
       const x = idx % cols;
       const y = (idx / cols) | 0;
-      const [r, g, b] = PALETTE[(i + phase) % PALETTE.length]!;
+      const [r, g, b] = paletteColor(i + phase);
       target.setRGB(x, y, BLOCK, r, g, b, 0x11, 0x13, 0x20);
     }
 

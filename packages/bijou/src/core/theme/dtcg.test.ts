@@ -35,8 +35,8 @@ describe('DTCG interop', () => {
       expect(surface).toBeDefined();
       for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted']) {
         expect(surface[key], `surface.${key}`).toBeDefined();
-        expect(surface[key]!.$type).toBe('color');
-        expect(surface[key]!.$value).toBeDefined();
+        expect(surface[key]?.$type).toBe('color');
+        expect(surface[key]?.$value).toBeDefined();
       }
     });
 
@@ -44,8 +44,8 @@ describe('DTCG interop', () => {
       const doc = toDTCG(CYAN_MAGENTA);
       const gradient = doc['gradient'] as Record<string, { $type: string; $value: unknown }>;
       const brand = gradient['brand'];
-      expect(brand!.$type).toBe('gradient');
-      expect(Array.isArray(brand!.$value)).toBe(true);
+      expect(brand?.$type).toBe('gradient');
+      expect(Array.isArray(brand?.$value)).toBe(true);
     });
   });
 
@@ -107,7 +107,7 @@ describe('DTCG interop', () => {
       expect(theme.status.success.hex).toBe('#00ff00');
       expect(theme.ui.cursor.hex).toBe('#00ffff');
       expect(theme.gradient.brand).toHaveLength(2);
-      expect(theme.gradient.brand[0]!.color).toEqual([0, 255, 255]);
+      expect(theme.gradient.brand[0]?.color).toEqual([0, 255, 255]);
       expect(theme.surface.primary.hex).toBe('#ffffff');
       expect(theme.surface.primary.bg).toBe('#1a1a2e');
     });
@@ -116,7 +116,7 @@ describe('DTCG interop', () => {
       const doc: DTCGDocument = {
         color: {
           primary: { $type: 'color', $value: '#3bcfd4' },
-        } as DTCGDocument['string'],
+        },
         name: { $type: 'string', $value: 'ref-test' },
         status: {
           success: { $type: 'color', $value: '#00ff00' },
@@ -178,8 +178,8 @@ describe('DTCG interop', () => {
       // Status tokens with simple hex should match
       const origStatus = original['status'] as Record<string, { $value: unknown }>;
       const rtStatus = roundTripped['status'] as Record<string, { $value: unknown }>;
-      expect(rtStatus['success']!.$value).toBe(origStatus['success']!.$value);
-      expect(rtStatus['error']!.$value).toBe(origStatus['error']!.$value);
+      expect(rtStatus['success']?.$value).toBe(origStatus['success']?.$value);
+      expect(rtStatus['error']?.$value).toBe(origStatus['error']?.$value);
     });
 
     it('fromDTCG(toDTCG(theme)) preserves theme values', () => {
@@ -344,7 +344,7 @@ describe('DTCG interop', () => {
       const doc = toDTCG(CYAN_MAGENTA);
       const gradient = doc['gradient'] as Record<string, { $value: unknown }>;
       expect(gradient['brand']).toBeDefined();
-      const stops = gradient['brand'].$value as Array<{ pos: number; color: string }>;
+      const stops = gradient['brand'].$value as { pos: number; color: string }[];
       expect(stops.length).toBeGreaterThan(0);
       for (const stop of stops) {
         expect(stop.color).toMatch(/^#[0-9a-f]{6}$/);
@@ -455,8 +455,8 @@ describe('DTCG interop', () => {
       expect(rt.ui.sectionHeader.modifiers).toEqual(['bold']);
       expect(rt.gradient.brand).toHaveLength(4);
       expect(rt.gradient.progress).toHaveLength(3);
-      expect(rt.gradient.brand[1]!.pos).toBe(0.33);
-      expect(rt.gradient.brand[1]!.color).toEqual([0, 255, 0]);
+      expect(rt.gradient.brand[1]?.pos).toBe(0.33);
+      expect(rt.gradient.brand[1]?.color).toEqual([0, 255, 0]);
       expect(rt.surface.primary.hex).toBe('#ffffff');
       expect(rt.surface.primary.bg).toBe('#1a1a2e');
       expect(rt.surface.muted.bg).toBe('#0a0a14');

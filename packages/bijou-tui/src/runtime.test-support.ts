@@ -21,7 +21,7 @@ import {
 const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
-function counterApp(quitKey = 'q'): App<number, never> {
+function counterApp(quitKey = 'q'): App<number> {
   return {
     init: () => [0, []],
     update(msg: KeyMsg | never, model: number) {
@@ -92,10 +92,10 @@ function createInteractiveContext(options: Parameters<typeof createTestContext>[
 function scheduleKeys(
   ctx: ReturnType<typeof createTestContext>,
   clock: ReturnType<typeof mockClock>,
-  events: Array<{ at: number; key: string }>,
+  events: { at: number; key: string }[],
 ): void {
   ctx.io.rawInput = (onKey) => {
-    const handles = events.map(({ at, key }) => clock.setTimeout(() => onKey(key), at));
+    const handles = events.map(({ at, key }) => clock.setTimeout(() => { onKey(key); }, at));
     return {
       dispose() {
         handles.forEach((handle) => {
@@ -109,11 +109,11 @@ function scheduleKeys(
 function scheduleResizes(
   ctx: ReturnType<typeof createTestContext>,
   clock: ReturnType<typeof mockClock>,
-  events: Array<{ at: number; columns: number; rows: number }>,
+  events: { at: number; columns: number; rows: number }[],
 ): void {
   ctx.io.onResize = (onResize) => {
     const handles = events.map(({ at, columns, rows }) =>
-      clock.setTimeout(() => onResize(columns, rows), at)
+      clock.setTimeout(() => { onResize(columns, rows); }, at)
     );
     return {
       dispose() {

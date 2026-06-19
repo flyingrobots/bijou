@@ -14,6 +14,7 @@ import {
 } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
+import type { DocsPageModel, DocsRootModel, LocaleCatalog } from './docs-preview-model-types.js';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
@@ -40,9 +41,17 @@ import { wrapPageMsg } from '../packages/bijou-tui/src/app-frame-types.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
 
-const BIJOU_VERSION: string = JSON.parse(
+const PKG: unknown = JSON.parse(
   readFileSync(resolve(import.meta.dirname, '..', 'packages', 'bijou', 'package.json'), 'utf8'),
-).version;
+);
+const BIJOU_VERSION = (
+  typeof PKG === 'object'
+  && PKG !== null
+  && 'version' in PKG
+  && typeof PKG.version === 'string'
+)
+  ? PKG.version
+  : '0.0.0';
 
 const KEY_ENTER = '\r';
 const KEY_UP = '\x1b[A';
@@ -81,15 +90,15 @@ function assertContrast(
   minRatio = 4.5,
 ): void {
   const ratio = themeContrastRatio(foreground, background);
-  expect(ratio, `${theme.name} ${label}`).toBeDefined();
-  expect(ratio!, `${theme.name} ${label}`).toBeGreaterThanOrEqual(minRatio);
+  if (ratio == null) throw new Error(`Missing contrast: ${theme.name} ${label}`);
+  expect(ratio, `${theme.name} ${label}`).toBeGreaterThanOrEqual(minRatio);
 }
 
 function assertReadableDogfoodTheme(theme: Theme): void {
   const surfaceBackgrounds = Object.entries(theme.surface).map(([name, token]) => {
-    expect(token.bg, `${theme.name} surface.${name}.bg`).toBeDefined();
-    assertContrast(theme, token.hex, token.bg!, `surface.${name} text on fill`);
-    return token.bg!;
+    if (token.bg == null) throw new Error(`Missing ${theme.name} surface.${name}.bg`);
+    assertContrast(theme, token.hex, token.bg, `surface.${name} text on fill`);
+    return token.bg;
   });
 
   expect(new Set(surfaceBackgrounds).size, `${theme.name} surface backgrounds`).toBeGreaterThanOrEqual(4);
@@ -125,7 +134,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -295,7 +304,8 @@ function landingWakeLayer(
   }
 
   for (let index = edges.length - 1; index >= 0; index--) {
-    if (x > edges[index]!) return index + 1;
+    const edge = edges[index];
+    if (edge !== undefined && x > edge) return index + 1;
   }
 
   return 0;
@@ -325,7 +335,7 @@ function matchingBijouSvgOverlayGlyphCount(frame: {
 
   for (let y = 0; y < overlay.mask.height; y++) {
     for (let x = 0; x < overlay.mask.width; x++) {
-      const expectedChar = overlay.mask.get(x, y).char ?? ' ';
+      const expectedChar = overlay.mask.get(x, y).char;
       if (expectedChar === ' ') continue;
       expected++;
 
@@ -349,52 +359,42 @@ function cellsWithoutBackground(frame: {
     for (let x = 0; x < frame.width; x++) {
       const cell = frame.get(x, y);
       if (cell.bg == null && cell.bgRGB == null) {
-        missing.push(`${x},${y}`);
+        missing.push(`${String(x)},${String(y)}`);
       }
     }
   }
   return missing;
 }
 
-function activeDocsPageModel(model: any) {
-  return model.docsModel.pageModels[model.docsModel.activePageId];
+function docsPageModel(model: DocsRootModel, pageId: string): DocsPageModel {
+  const pageModel = model.docsModel.pageModels[pageId];
+  if (pageModel == null) throw new Error(`Missing docs page: ${pageId}`);
+  return pageModel;
 }
 
-function docsPageModel(model: any, pageId: string) {
-  return model.docsModel.pageModels[pageId];
+function activeDocsPageModel(model: DocsRootModel): DocsPageModel {
+  return docsPageModel(model, model.docsModel.activePageId);
 }
 
 function withLocaleValues(
-  catalog: {
-    namespace: string;
-    entries: readonly {
-      key: { namespace: string; id: string };
-      kind: 'message' | 'resource' | 'data';
-      sourceLocale: string;
-      values: Readonly<Record<string, unknown>>;
-      fallbackValue?: unknown;
-    }[];
-  },
+  catalog: LocaleCatalog,
   locale: string,
   translate: (value: string, key: string) => string,
-) {
+): LocaleCatalog {
   return {
     namespace: catalog.namespace,
-    entries: catalog.entries.map((entry) => ({
-      ...entry,
-      values: Object.fromEntries(
-        Object.entries(entry.values).map(([lang, value]) => {
-          if (lang !== entry.sourceLocale || typeof value !== 'string') {
-            return [lang, value];
-          }
-          return [lang, value];
-        }).concat(
-          Object.entries(entry.values)
-            .filter(([lang, value]) => lang === entry.sourceLocale && typeof value === 'string')
-            .map(([, value]) => [locale, translate(value as string, entry.key.id)]),
-        ),
-      ),
-    })),
+    entries: catalog.entries.map((entry) => {
+      const source = entry.values[entry.sourceLocale];
+      return {
+        ...entry,
+        values: {
+          ...entry.values,
+          ...(typeof source === 'string'
+            ? { [locale]: translate(source, entry.key.id) }
+            : {}),
+        },
+      };
+    }),
   };
 }
 

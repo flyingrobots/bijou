@@ -75,6 +75,11 @@ const app: App<Model, Msg> = {
       case 'card3': return [{ ...model, card3Opacity: msg.value }, []];
       case 'bar': return [{ ...model, barPercent: msg.value }, []];
       case 'all-done': return [{ ...model, phase: 'done' }, [tick(3000, { type: 'quit' })]];
+      case 'quit': return [model, [quit()]];
+      case 'key':
+      case 'mouse':
+      case 'pulse':
+      case 'resize': return [model, []];
     }
 
     return [model, []];
@@ -120,4 +125,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

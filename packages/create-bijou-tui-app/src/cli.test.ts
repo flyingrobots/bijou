@@ -173,7 +173,7 @@ describe('create-bijou-tui-app cli', () => {
       const arrayEnd = packed.stdout.lastIndexOf(']');
       expect(arrayStart).toBeGreaterThanOrEqual(0);
       expect(arrayEnd).toBeGreaterThan(arrayStart);
-      const packOutput = JSON.parse(packed.stdout.slice(arrayStart, arrayEnd + 1)) as Array<{ filename?: string }>;
+      const packOutput = JSON.parse(packed.stdout.slice(arrayStart, arrayEnd + 1)) as { filename?: string }[];
       const tarball = resolve(packDir, packOutput[0]!.filename!);
 
       const installed = spawnSync(

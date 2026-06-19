@@ -1,12 +1,8 @@
 /**
  * Scenario: doom flame — oldschool fire effect.
  *
- * A classic demoscene flame: value noise seeds the floor, heat
- * propagates upward with random lateral drift and decay. Every cell
- * is painted every frame with smooth gradient interpolation between
- * palette stops. This is the "every cell changes every frame, each
- * with a unique color" worst case for the differ, and it looks
- * spectacular in the soak runner.
+ * Value noise seeds the floor, heat propagates upward with random
+ * drift and decay, and every cell gets a smooth palette color.
  *
  * Algorithm adapted from ertdfgcvb's play.ertdfgcvb.xyz doom flame.
  *
@@ -29,9 +25,7 @@ interface State {
   readonly noise: (x: number, y: number) => number;
 }
 
-// Palette stops for smooth interpolation.
-// Each stop is [r, g, b] at a normalized position along the heat range.
-const STOPS: readonly { pos: number; r: number; g: number; b: number }[] = [
+const STOPS = [
   { pos: 0.00, r: 0x00, g: 0x00, b: 0x00 }, // black
   { pos: 0.10, r: 0x30, g: 0x00, b: 0x30 }, // deep purple
   { pos: 0.25, r: 0x8b, g: 0x00, b: 0x00 }, // darkred
@@ -40,7 +34,8 @@ const STOPS: readonly { pos: number; r: number; g: number; b: number }[] = [
   { pos: 0.70, r: 0xff, g: 0xd7, b: 0x00 }, // gold
   { pos: 0.85, r: 0xff, g: 0xfa, b: 0xcd }, // lemonchiffon
   { pos: 1.00, r: 0xff, g: 0xff, b: 0xff }, // white
-];
+] as const;
+type PaletteStop = (typeof STOPS)[number];
 
 /** Background brightness factor for depth effect. */
 const BG_FACTOR = 0.4;
@@ -49,12 +44,14 @@ const BG_FACTOR = 0.4;
 function samplePalette(t: number): [number, number, number] {
   const clamped = Math.max(0, Math.min(1, t));
   // Find the two stops we're between.
-  let lo = STOPS[0]!;
-  let hi = STOPS[STOPS.length - 1]!;
+  let lo: PaletteStop = STOPS[0];
+  let hi: PaletteStop = STOPS.at(-1) ?? lo;
   for (let i = 0; i < STOPS.length - 1; i++) {
-    if (clamped >= STOPS[i]!.pos && clamped <= STOPS[i + 1]!.pos) {
-      lo = STOPS[i]!;
-      hi = STOPS[i + 1]!;
+    const current = STOPS[i] ?? lo;
+    const next = STOPS[i + 1] ?? hi;
+    if (clamped >= current.pos && clamped <= next.pos) {
+      lo = current;
+      hi = next;
       break;
     }
   }
@@ -95,12 +92,12 @@ function createValueNoise(): (px: number, py: number) => number {
   }
   for (let k = tableSize - 1; k > 0; k--) {
     const i = (rng() * (k + 1)) | 0;
-    const tmp = perm[k]!;
-    perm[k] = perm[i]!;
+    const tmp = perm[k] ?? 0;
+    perm[k] = perm[i] ?? 0;
     perm[i] = tmp;
-    perm[k + tableSize] = perm[k]!;
+    perm[k + tableSize] = perm[k] ?? 0;
   }
-  perm[tableSize] = perm[0]!;
+  perm[tableSize] = perm[0] ?? 0;
 
   return function noise(px: number, py: number): number {
     const xi = Math.floor(px);
@@ -113,10 +110,10 @@ function createValueNoise(): (px: number, py: number) => number {
     const ry0 = ((yi % tableSize) + tableSize) % tableSize;
     const ry1 = (ry0 + 1) % tableSize;
 
-    const c00 = r[perm[perm[rx0]! + ry0]!]!;
-    const c10 = r[perm[perm[rx1]! + ry0]!]!;
-    const c01 = r[perm[perm[rx0]! + ry1]!]!;
-    const c11 = r[perm[perm[rx1]! + ry1]!]!;
+    const c00 = r[perm[(perm[rx0] ?? 0) + ry0] ?? 0] ?? 0;
+    const c10 = r[perm[(perm[rx1] ?? 0) + ry0] ?? 0] ?? 0;
+    const c01 = r[perm[(perm[rx0] ?? 0) + ry1] ?? 0] ?? 0;
+    const c11 = r[perm[(perm[rx1] ?? 0) + ry1] ?? 0] ?? 0;
 
     // Smoothstep interpolation.
     const sx = tx * tx * (3 - 2 * tx);
@@ -161,7 +158,7 @@ export const flame: Scenario<State> = {
     const last = cols * (rows - 1);
     for (let x = 0; x < cols; x++) {
       const val = noise(x * 0.04, t) * MAX_HEAT * 0.9 + MAX_HEAT * 0.1;
-      heat[last + x] = Math.min(MAX_HEAT, Math.max(heat[last + x]!, val));
+      heat[last + x] = Math.min(MAX_HEAT, Math.max(heat[last + x] ?? 0, val));
     }
 
     // Propagate upward: each cell pulls heat from below with random
@@ -172,14 +169,14 @@ export const flame: Scenario<State> = {
         const srcX = Math.max(0, Math.min(cols - 1, x + drift));
         const srcY = y + 1;
         const decay = Math.random() * 1.8;
-        heat[y * cols + x] = Math.max(0, heat[srcY * cols + srcX]! - decay);
+        heat[y * cols + x] = Math.max(0, (heat[srcY * cols + srcX] ?? 0) - decay);
       }
     }
 
     // Paint every cell: smooth palette interpolation from heat value.
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const h = heat[y * cols + x]!;
+        const h = heat[y * cols + x] ?? 0;
         const heatNorm = h / MAX_HEAT;
         const [r, g, b] = samplePalette(heatNorm);
         const bgR = Math.round(r * BG_FACTOR);

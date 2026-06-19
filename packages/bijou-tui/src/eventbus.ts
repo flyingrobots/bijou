@@ -409,7 +409,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
           return;
         }
         if (result !== undefined) {
-          emit(result as M);
+          emit(result);
         }
       }).catch((err: unknown) => {
         if (disposed) return;

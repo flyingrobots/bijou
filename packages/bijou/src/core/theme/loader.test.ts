@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { loadTheme, loadThemesFromDir, toDTCG } from './dtcg.js';
 import { CYAN_MAGENTA } from './presets.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('Theme loader', () => {
   const mockIO = {
@@ -15,7 +16,7 @@ describe('Theme loader', () => {
     },
     readDir(path: string) {
       if (path === 'themes') {
-        return Object.keys(this.files).map(k => k.split('/')[1]!);
+        return Object.keys(this.files).map(k => must(k.split('/')[1]));
       }
       return [];
     },

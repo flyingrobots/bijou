@@ -1,54 +1,47 @@
 import { describe, expect, it } from 'vitest';
 import type {
-  I18nCatalogKey,
-  LocalizedObject,
   LocalizationPort,
   LocalizationRequest,
+} from '@flyingrobots/bijou-i18n';
+import {
+  createI18nRuntime,
+  createRuntimeLocalizationPort,
+  type LocalizedObject,
 } from '@flyingrobots/bijou-i18n';
 import {
   dogfoodLocalizedText,
   formatLocalizedList,
 } from '../../../examples/docs/localization.js';
 
-function localizedObject<Value>(
-  key: I18nCatalogKey,
-  value: Value,
-): LocalizedObject<Value> {
-  return Object.freeze({
-    key,
-    locale: 'fr',
-    fallbackLocale: 'en',
-    direction: 'ltr',
-    kind: 'message',
-    status: 'translated',
-    value,
-    issues: Object.freeze([]),
-    facts: Object.freeze([]),
+function dogfoodLocalizationPort(): LocalizationPort {
+  const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
+  runtime.loadCatalog({
+    namespace: 'bijou.dogfood',
+    entries: [{
+      key: { namespace: 'bijou.dogfood', id: 'example.title' },
+      kind: 'message',
+      sourceLocale: 'en',
+      values: { fr: 'value:example.title:{name}' },
+    }],
   });
+  return createRuntimeLocalizationPort(runtime);
 }
 
 describe('LX-019 DOGFOOD localization port usage', () => {
   it('resolves DOGFOOD text through a LocalizationPort', () => {
     const requests: LocalizationRequest[] = [];
+    const base = dogfoodLocalizationPort();
     const localization: LocalizationPort = {
-      locale: 'fr',
-      direction: 'ltr',
+      locale: base.locale,
+      direction: base.direction,
       resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
         requests.push(request);
-        return localizedObject(request.key, `value:${request.key.id}:${request.values?.name ?? ''}`) as LocalizedObject<Value>;
+        return base.resolve<Value>(request);
       },
-      formatNumber(value) {
-        return String(value);
-      },
-      formatDate(value) {
-        return value.toISOString();
-      },
-      formatTime(value) {
-        return value.toISOString();
-      },
-      formatList(values) {
-        return values.join(' / ');
-      },
+      formatNumber(value) { return base.formatNumber(value); },
+      formatDate(value) { return base.formatDate(value); },
+      formatTime(value) { return base.formatTime(value); },
+      formatList(values) { return values.join(' / '); },
     };
 
     expect(dogfoodLocalizedText(localization, 'example.title', 'Example {name}', { name: 'Ada' }))
@@ -61,21 +54,14 @@ describe('LX-019 DOGFOOD localization port usage', () => {
   });
 
   it('falls back when localized list formatting fails', () => {
+    const base = dogfoodLocalizationPort();
     const localization: LocalizationPort = {
-      locale: 'fr',
-      direction: 'ltr',
-      resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
-        return localizedObject(request.key, undefined) as LocalizedObject<Value>;
-      },
-      formatNumber(value) {
-        return String(value);
-      },
-      formatDate(value) {
-        return value.toISOString();
-      },
-      formatTime(value) {
-        return value.toISOString();
-      },
+      locale: base.locale,
+      direction: base.direction,
+      resolve<Value = unknown>(request: LocalizationRequest) { return base.resolve<Value>(request); },
+      formatNumber(value) { return base.formatNumber(value); },
+      formatDate(value) { return base.formatDate(value); },
+      formatTime(value) { return base.formatTime(value); },
       formatList() {
         throw new Error('formatter unavailable');
       },

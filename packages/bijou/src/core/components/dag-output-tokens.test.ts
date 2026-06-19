@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice, dagLayout } from './dag.js';
+import { dag, dagSlice } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
-import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { auditStyle, createTestContext } from '../../adapters/test/index.js';
+import { arraySource } from './dag-source.js';
+import { auditStyle, createTestContext, type StyledCall } from '../../adapters/test/index.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -17,13 +17,6 @@ const diamond: DagNode[] = [
   { id: 'b', label: 'Left', edges: ['d'] },
   { id: 'c', label: 'Right', edges: ['d'] },
   { id: 'd', label: 'End' },
-];
-
-const compactDiamond: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b', 'c'] },
-  { id: 'b', label: 'B', edges: ['d'] },
-  { id: 'c', label: 'C', edges: ['d'] },
-  { id: 'd', label: 'D' },
 ];
 
 const linear: DagNode[] = [
@@ -46,15 +39,6 @@ const withBadges: DagNode[] = [
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
 ];
 
-const cyclic: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['b'] },
-  { id: 'b', label: 'B', edges: ['a'] },
-];
-
-const selfLoop: DagNode[] = [
-  { id: 'a', label: 'A', edges: ['a'] },
-];
-
 const largeGraph: DagNode[] = [
   { id: 'root', label: 'Root', edges: ['a', 'b'] },
   { id: 'a', label: 'A', edges: ['c', 'd'] },
@@ -64,6 +48,11 @@ const largeGraph: DagNode[] = [
   { id: 'e', label: 'E', edges: ['f'] },
   { id: 'f', label: 'F' },
 ];
+
+function styledCallMatches(call: StyledCall, token: TokenValue, text: string): boolean {
+  if (call.method !== 'styled' || call.token == null) return false;
+  return call.token.hex === token.hex && call.token.bg === token.bg && call.text.includes(text);
+}
 
 // ── Basic Tests ────────────────────────────────────────────────────
 
@@ -129,9 +118,7 @@ describe('render output stability', () => {
     expect(output).toMatchSnapshot();
   });
 });
-
 // ── labelToken / badgeToken Tests ──────────────────────────────────
-
 describe('DagNode labelToken / badgeToken', () => {
   it('labelToken renders node without error', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
@@ -142,7 +129,6 @@ describe('DagNode labelToken / badgeToken', () => {
     expect(result).toContain('Alpha');
     expect(result).toContain('╭');
   });
-
   it('badgeToken colors badge differently from border', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -152,7 +138,6 @@ describe('DagNode labelToken / badgeToken', () => {
     expect(result).toContain('Build');
     expect(result).toContain('DONE');
   });
-
   it('both labelToken and badgeToken together', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -168,7 +153,6 @@ describe('DagNode labelToken / badgeToken', () => {
     expect(result).toContain('Deploy');
     expect(result).toContain('WIP');
   });
-
   it('falls back to node token when labelToken/badgeToken omitted', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -182,14 +166,13 @@ describe('DagNode labelToken / badgeToken', () => {
     ];
     const src = arraySource(nodes);
     // arraySource should return undefined for missing token overrides
-    expect(src.labelToken!('a')).toBeUndefined();
-    expect(src.badgeToken!('a')).toBeUndefined();
+    expect(src.labelToken?.('a')).toBeUndefined();
+    expect(src.badgeToken?.('a')).toBeUndefined();
     // Should still render without error using the base token
     const result = dag(nodes, { ctx });
     expect(result).toContain('Deploy');
     expect(result).toContain('OK');
   });
-
   it('works with selectedId — selectedToken takes precedence for border', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -206,7 +189,6 @@ describe('DagNode labelToken / badgeToken', () => {
     expect(result).toContain('Selected');
     expect(result).toContain('TAG');
   });
-
   it('works through arraySource', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -221,17 +203,16 @@ describe('DagNode labelToken / badgeToken', () => {
       { id: 'b', label: 'B', badgeToken: { hex: '#ff0000' }, badge: 'X' },
     ];
     const src = arraySource(nodes);
-    expect(src.bgToken!('a')).toEqual({ hex: '#111111', bg: '#222222' });
-    expect(src.compactShape!('a')).toBe('round');
-    expect(src.labelToken!('a')).toEqual({ hex: '#00ff00' });
-    expect(src.badgeToken!('b')).toEqual({ hex: '#ff0000' });
-    expect(src.labelToken!('b')).toBeUndefined();
-    expect(src.badgeToken!('a')).toBeUndefined();
+    expect(src.bgToken?.('a')).toEqual({ hex: '#111111', bg: '#222222' });
+    expect(src.compactShape?.('a')).toBe('round');
+    expect(src.labelToken?.('a')).toEqual({ hex: '#00ff00' });
+    expect(src.badgeToken?.('b')).toEqual({ hex: '#ff0000' });
+    expect(src.labelToken?.('b')).toBeUndefined();
+    expect(src.badgeToken?.('a')).toBeUndefined();
     const result = dag(src, { nodeStyle: 'compact', nodeWidth: 3, ctx });
     expect(result).toContain('(A)');
     expect(result).toContain('B');
   });
-
   it('works through dagSlice', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
@@ -249,16 +230,15 @@ describe('DagNode labelToken / badgeToken', () => {
     const src = arraySource(nodes);
     const sliced = dagSlice(src, 'b', { direction: 'both', depth: 1 });
     // labelToken should be preserved for 'a'
-    expect(sliced.labelToken!('a')).toEqual({ hex: '#00ff00' });
-    expect(sliced.bgToken!('a')).toEqual({ hex: '#111111', bg: '#222222' });
-    expect(sliced.compactShape!('a')).toBe('round');
+    expect(sliced.labelToken?.('a')).toEqual({ hex: '#00ff00' });
+    expect(sliced.bgToken?.('a')).toEqual({ hex: '#111111', bg: '#222222' });
+    expect(sliced.compactShape?.('a')).toBe('round');
     // badgeToken should be preserved for 'b'
-    expect(sliced.badgeToken!('b')).toEqual({ hex: '#ff0000' });
+    expect(sliced.badgeToken?.('b')).toEqual({ hex: '#ff0000' });
     const result = dag(sliced, { nodeStyle: 'compact', nodeWidth: 3, ctx });
     expect(result).toContain('(A)');
     expect(result).toContain('B');
   });
-
   it('styles node border, background, label, badge, and edges independently in interactive mode', () => {
     const style = auditStyle();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80 }, style });
@@ -267,7 +247,6 @@ describe('DagNode labelToken / badgeToken', () => {
     const labelToken = { hex: '#33cc33' };
     const badgeToken = { hex: '#ff5555' };
     const edgeToken = { hex: '#4488ff' };
-
     const result = dag([
       {
         id: 'a',
@@ -284,32 +263,19 @@ describe('DagNode labelToken / badgeToken', () => {
       edgeToken,
       ctx,
     });
-
     expect(result).toContain('Build');
     expect(result).toContain('HOT');
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === borderToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('╭'),
+      (call) => styledCallMatches(call, { ...borderToken, bg: bgToken.bg }, '╭'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === labelToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('Build'),
+      (call) => styledCallMatches(call, { ...labelToken, bg: bgToken.bg }, 'Build'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === badgeToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes('HOT'),
+      (call) => styledCallMatches(call, { ...badgeToken, bg: bgToken.bg }, 'HOT'),
     )).toBe(true);
     expect(style.calls.some(
-      (call) => call.method === 'styled'
-        && call.token?.hex === bgToken.hex
-        && call.token?.bg === bgToken.bg
-        && call.text.includes(' '),
+      (call) => styledCallMatches(call, bgToken, ' '),
     )).toBe(true);
     expect(style.calls.some(
       (call) => call.method === 'styled'
@@ -317,7 +283,6 @@ describe('DagNode labelToken / badgeToken', () => {
         && /[│▼]/.test(call.text),
     )).toBe(true);
   });
-
   it('pipe mode ignores tokens (no ANSI output)', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const nodes: DagNode[] = [

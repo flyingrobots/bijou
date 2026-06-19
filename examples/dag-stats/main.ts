@@ -40,6 +40,6 @@ console.log(table({
 console.log();
 
 console.log(box(
-  `Graph has ${stats.nodes} nodes across ${stats.depth} layers, widest layer has ${stats.width} nodes.`,
+  `Graph has ${String(stats.nodes)} nodes across ${String(stats.depth)} layers, widest layer has ${String(stats.width)} nodes.`,
   { ctx },
 ));

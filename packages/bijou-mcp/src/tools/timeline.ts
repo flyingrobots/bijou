@@ -20,7 +20,7 @@ export const timelineTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_timeline',
   description: 'Render a vertical timeline with status-colored dots and connector lines. Returns plain-text with Unicode characters.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = timeline(input.events, { ctx });

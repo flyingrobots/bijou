@@ -32,7 +32,7 @@ export const counterApp: App<CounterModel, CounterMsg> = {
     if (msg.type === 'dec') return [{ count: model.count - 1 }, []];
     return [model, []];
   },
-  view: (model) => badge(`Count ${model.count}`, { variant: model.count >= 0 ? 'success' : 'error' }),
+  view: (model) => badge(`Count ${String(model.count)}`, { variant: model.count >= 0 ? 'success' : 'error' }),
 };
 
 interface Model {
@@ -125,5 +125,5 @@ function ensureSurface(view: Surface | string | { cells?: unknown }): Surface {
 }
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app);
+  void run(app);
 }

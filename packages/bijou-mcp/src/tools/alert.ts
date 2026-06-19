@@ -17,7 +17,7 @@ export const alertTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_alert',
   description: 'Render an alert box with an icon and message. Variants: success (✓), error (✗), warning (⚠), info (ℹ). Returns plain-text with box-drawing characters.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = alert(input.message, { variant: input.variant, ctx });

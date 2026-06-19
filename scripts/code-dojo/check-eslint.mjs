@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readFileSync } from "node:fs";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import { repoRoot } from "./git.mjs";
+import { runEslintJson, summarizeEslintResults } from "./eslint-results.mjs";
 
 const baselinePath = "scripts/code-dojo/baselines/eslint.json";
 const schema = "code-dojo.eslint-baseline.v1";
@@ -21,49 +20,6 @@ function readBaseline(root) {
   };
 }
 
-function summarize(results) {
-  const rules = new Map();
-  let total = 0;
-  let errors = 0;
-  let warnings = 0;
-
-  for (const result of results) {
-    errors += result.errorCount ?? 0;
-    warnings += result.warningCount ?? 0;
-    for (const message of result.messages ?? []) {
-      total += 1;
-      const ruleId = message.ruleId ?? "fatal";
-      rules.set(ruleId, (rules.get(ruleId) ?? 0) + 1);
-    }
-  }
-
-  return { total, errors, warnings, rules };
-}
-
-function runEslint(root) {
-  const directory = mkdtempSync(path.join(tmpdir(), "bijou-eslint-"));
-  const outputPath = path.join(directory, "eslint.json");
-  try {
-    const result = spawnSync(
-      "eslint",
-      ["--format", "json", "--output-file", outputPath, "."],
-      {
-        cwd: root,
-        encoding: "utf8",
-        shell: process.platform === "win32",
-      },
-    );
-    if (result.status !== 0 && result.status !== 1) {
-      process.stderr.write(result.stderr ?? "");
-      process.stderr.write(result.stdout ?? "");
-      process.exit(result.status ?? 1);
-    }
-    return JSON.parse(readFileSync(outputPath, "utf8"));
-  } finally {
-    rmSync(directory, { force: true, recursive: true });
-  }
-}
-
 function formatRule(ruleId, count, baselineCount) {
   return `${ruleId}: ${count} > ${baselineCount}`;
 }
@@ -71,7 +27,7 @@ function formatRule(ruleId, count, baselineCount) {
 function main() {
   const root = repoRoot();
   const baseline = readBaseline(root);
-  const summary = summarize(runEslint(root));
+  const summary = summarizeEslintResults(runEslintJson(root));
   const failures = [];
 
   if (summary.total > baseline.total) failures.push(`total: ${summary.total} > ${baseline.total}`);

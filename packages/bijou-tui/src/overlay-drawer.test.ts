@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { composite, compositeSurface, compositeSurfaceInto, modal, toast, drawer, tooltip } from './overlay.js';
-import type { Overlay, DrawerOptions } from './overlay.js';
-import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
+import { composite, drawer } from './overlay.js';
+import type { DrawerOptions } from './overlay.js';
 import { visibleLength, stripAnsi } from './viewport.js';
 
 function expectSurfaceTextMatch(actualSurfaceText: string, expectedContent: string) {
@@ -122,7 +121,7 @@ describe('drawer', () => {
     const lines = d.content.split('\n');
     expect(lines).toHaveLength(10);
     // Lines 2..8 (body lines after the first content line) should be padded with spaces inside borders
-    const bodyLine = stripAnsi(lines[5]!);
+    const bodyLine = stripAnsi(must(lines[5]));
     expect(bodyLine).toContain('\u2502');
     // Inner content should be spaces (trimmed)
     const inner = bodyLine.replace(/[│]/g, '').trim();
@@ -135,13 +134,13 @@ describe('drawer', () => {
     const lines = d.content.split('\n');
     expect(lines).toHaveLength(10);
     // Only first 8 content lines should appear (screenHeight 10 - 2 borders = 8)
-    expect(stripAnsi(lines[1]!)).toContain('line 0');
-    expect(stripAnsi(lines[8]!)).toContain('line 7');
+    expect(stripAnsi(must(lines[1]))).toContain('line 0');
+    expect(stripAnsi(must(lines[8]))).toContain('line 7');
   });
 
   it('title renders in top border', () => {
     const d = drawer({ content: 'hi', width: 30, screenWidth: 80, screenHeight: 10, title: 'Info' });
-    const topLine = stripAnsi(d.content.split('\n')[0]!);
+    const topLine = stripAnsi(must(d.content.split('\n')[0]));
     expect(topLine).toContain('Info');
     expect(topLine).toContain('\u250c');
     expect(topLine).toContain('\u2510');
@@ -149,7 +148,7 @@ describe('drawer', () => {
 
   it('no title renders plain top border', () => {
     const d = drawer({ content: 'hi', width: 20, screenWidth: 80, screenHeight: 10 });
-    const topLine = stripAnsi(d.content.split('\n')[0]!);
+    const topLine = stripAnsi(must(d.content.split('\n')[0]));
     expect(topLine).not.toContain(' ');
     expect(topLine).toContain('\u250c');
     expect(topLine).toContain('\u2510');
@@ -161,9 +160,9 @@ describe('drawer', () => {
   it('border characters are correct', () => {
     const d = drawer({ content: 'x', width: 10, screenWidth: 80, screenHeight: 5 });
     const lines = d.content.split('\n');
-    const top = stripAnsi(lines[0]!);
-    const bottom = stripAnsi(lines[lines.length - 1]!);
-    const body = stripAnsi(lines[1]!);
+    const top = stripAnsi(must(lines[0]));
+    const bottom = stripAnsi(must(lines[lines.length - 1]));
+    const body = stripAnsi(must(lines[1]));
 
     expect(top[0]).toBe('\u250c');                   // ┌
     expect(top[top.length - 1]).toBe('\u2510');       // ┐
@@ -256,7 +255,7 @@ describe('drawer', () => {
     const lines = result.split('\n');
     expect(lines).toHaveLength(10);
     // Drawer top border should appear at row 0, col 60
-    expect(stripAnsi(lines[0]!)).toContain('\u250c');
+    expect(stripAnsi(must(lines[0]))).toContain('\u250c');
   });
 
   it('drawer width matches requested width (visibleLength of each line equals width)', () => {
@@ -278,14 +277,14 @@ describe('drawer', () => {
     const lines4 = d4.content.split('\n');
     expect(lines4).toHaveLength(3);
     // Top border: ┌  ┐ (2 spaces for padding)
-    expect(visibleLength(stripAnsi(lines4[0]!))).toBe(4);
+    expect(visibleLength(stripAnsi(must(lines4[0])))).toBe(4);
   });
 
   it('provides a surface that matches its rendered content', () => {
     const ctx = createTestContext();
     const result = drawer({ content: 'panel', width: 20, screenWidth: 80, screenHeight: 5, ctx });
     expect(result.surface).toBeDefined();
-    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+    expectSurfaceTextMatch(surfaceToString(must(result.surface), ctx.style), result.content);
   });
 
   it('accepts structured surface content', () => {
@@ -299,7 +298,7 @@ describe('drawer', () => {
     });
     expect(stripAnsi(result.content)).toContain('first');
     expect(stripAnsi(result.content)).toContain('second');
-    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+    expectSurfaceTextMatch(surfaceToString(must(result.surface), ctx.style), result.content);
   });
 
   it('clips structured surface content to the drawer inner width', () => {
@@ -324,8 +323,8 @@ describe('drawer', () => {
       ctx,
     });
     expect(result.surface).toBeDefined();
-    expect(result.surface!.get(2, 1).char).toBe('p');
-    expect(result.surface!.get(2, 1).bg).toBe('#003366');
+    expect(must(result.surface).get(2, 1).char).toBe('p');
+    expect(must(result.surface).get(2, 1).bg).toBe('#003366');
   });
 });
 

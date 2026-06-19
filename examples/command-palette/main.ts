@@ -63,6 +63,7 @@ const app: App<Model, Msg> = {
           case 'prev': return [{ ...model, cp: cpFocusPrev(model.cp) }, []];
           case 'page-down': return [{ ...model, cp: cpPageDown(model.cp) }, []];
           case 'page-up': return [{ ...model, cp: cpPageUp(model.cp) }, []];
+          case 'key': return [model, []];
         }
       }
 
@@ -99,4 +100,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

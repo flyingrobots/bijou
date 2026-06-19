@@ -20,6 +20,14 @@ export function detectRefreshRate(): number {
   return 60;
 }
 
+function streamIsTTY(stream: { isTTY?: boolean }): boolean {
+  return stream.isTTY ?? false;
+}
+
+function streamDimension(value: number | undefined, fallback: number): number {
+  return value ?? fallback;
+}
+
 /**
  * Create a {@link RuntimePort} backed by Node.js `process` globals.
  *
@@ -41,19 +49,19 @@ export function nodeRuntime(): RuntimePort {
     },
     /** Whether `process.stdout` is attached to a TTY. Falls back to `false`. */
     get stdoutIsTTY(): boolean {
-      return process.stdout.isTTY ?? false;
+      return streamIsTTY(process.stdout);
     },
     /** Whether `process.stdin` is attached to a TTY. Falls back to `false`. */
     get stdinIsTTY(): boolean {
-      return process.stdin.isTTY ?? false;
+      return streamIsTTY(process.stdin);
     },
     /** Terminal width in columns from `process.stdout`. Falls back to `80`. */
     get columns(): number {
-      return process.stdout.columns ?? 80;
+      return streamDimension(process.stdout.columns, 80);
     },
     /** Terminal height in rows from `process.stdout`. Falls back to `24`. */
     get rows(): number {
-      return process.stdout.rows ?? 24;
+      return streamDimension(process.stdout.rows, 24);
     },
     /** Refresh rate in FPS. Defaults to 60, or BIJOU_FPS if set. */
     get refreshRate(): number {

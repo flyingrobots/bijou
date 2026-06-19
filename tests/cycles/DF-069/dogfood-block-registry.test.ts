@@ -74,7 +74,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     const block = testBlock('DocumentationArticleBlock');
 
     expect(() => dogfoodBlockRegistryEntry({
-      block: { ...block } as BlockDefinition,
+      block: { ...block },
       role: 'article',
       surfaceId: 'docs.article',
     })).toThrow();

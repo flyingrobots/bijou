@@ -46,13 +46,7 @@ import {
 
 /** Position in the timeline — controls when a track/callback starts. */
 export type Position =
-  | number    // absolute time in ms
-  | '<'       // same start as previous item
-  | `<+=${string}`  // offset from previous start (ms)
-  | `+=${string}`   // offset from previous end
-  | `-=${string}`   // overlap: start before previous ends
-  | `>${string}`    // explicit: offset from previous end
-  | string;  // label name, or 'label+=offset'
+  number | '<' | `<+=${string}` | `+=${string}` | `-=${string}` | `>${string}` | (string & {});
 
 /** Spring track configuration. */
 export interface SpringTrackDef {
@@ -223,32 +217,32 @@ function resolvePosition(
   // '<+=N' — offset from previous start
   const ltPlusMatch = /^<\+=(\d+(?:\.\d+)?)$/.exec(pos);
   if (ltPlusMatch) {
-    return cursor.prevStartMs + parseFloat(ltPlusMatch[1]!);
+    return cursor.prevStartMs + parseFloat(must(ltPlusMatch[1]));
   }
 
   // '+=N' — offset from previous end
   const plusMatch = /^\+=(\d+(?:\.\d+)?)$/.exec(pos);
   if (plusMatch) {
-    return cursor.prevEndMs + parseFloat(plusMatch[1]!);
+    return cursor.prevEndMs + parseFloat(must(plusMatch[1]));
   }
 
   // '-=N' — overlap with previous
   const minusMatch = /^-=(\d+(?:\.\d+)?)$/.exec(pos);
   if (minusMatch) {
-    return Math.max(0, cursor.prevEndMs - parseFloat(minusMatch[1]!));
+    return Math.max(0, cursor.prevEndMs - parseFloat(must(minusMatch[1])));
   }
 
   // '>N' or '>=N' — explicit offset from previous end
   const gtMatch = /^>=?(\d+(?:\.\d+)?)$/.exec(pos);
   if (gtMatch) {
-    return cursor.prevEndMs + parseFloat(gtMatch[1]!);
+    return cursor.prevEndMs + parseFloat(must(gtMatch[1]));
   }
 
   // 'label' or 'label+=N'
   const labelMatch = /^([a-zA-Z_]\w*)(?:\+=(\d+(?:\.\d+)?))?$/.exec(pos);
   if (labelMatch) {
-    const labelName = labelMatch[1]!;
-    const offset = labelMatch[2] ? parseFloat(labelMatch[2]) : 0;
+    const labelName = must(labelMatch[1]);
+    const offset = labelMatch[2] === undefined ? 0 : parseFloat(labelMatch[2]);
     const labelMs = cursor.labels.get(labelName);
     if (labelMs === undefined) {
       throw new Error(`Timeline: unknown label "${labelName}"`);
@@ -258,6 +252,8 @@ function resolvePosition(
 
   throw new Error(`Timeline: invalid position "${pos}"`);
 }
+
+function must<T>(value: T | undefined): T { if (value === undefined) throw new Error('Timeline: missing state'); return value; }
 
 // ---------------------------------------------------------------------------
 // Builder
@@ -525,14 +521,14 @@ function compile(entries: BuilderEntry[]): Timeline {
 
     step(state: TimelineState, dt: number): TimelineState {
       if (!Number.isFinite(dt) || dt < 0) {
-        throw new Error(`Timeline: dt must be a finite non-negative number, got ${dt}`);
+        throw new Error(`Timeline: dt must be a finite non-negative number, got ${String(dt)}`);
       }
       const dtMs = dt * 1000;
       const elapsedMs = state.elapsedMs + dtMs;
       const nextTracks: Record<string, TrackState> = {};
 
       for (const t of tracks) {
-        const prev = state.tracks[t.name]!;
+        const prev = must(state.tracks[t.name]);
 
         // Not started yet
         if (elapsedMs < t.startMs) {
@@ -550,7 +546,7 @@ function compile(entries: BuilderEntry[]): Timeline {
         if (!prev.started) {
           if (t.trackType === 'spring') {
             const spring = createSpringState(t.from);
-            const stepped = springStep(spring, t.to, t.springConfig!, dt);
+            const stepped = springStep(spring, t.to, must(t.springConfig), dt);
             nextTracks[t.name] = {
               type: 'spring',
               started: true,
@@ -563,7 +559,7 @@ function compile(entries: BuilderEntry[]): Timeline {
             const config = resolveTweenConfig({
               from: t.from,
               to: t.to,
-              duration: t.tweenDuration!,
+              duration: must(t.tweenDuration),
               ease: t.tweenEase,
             });
             const stepped = tweenStep(tween, config, dtMs);
@@ -580,7 +576,7 @@ function compile(entries: BuilderEntry[]): Timeline {
 
         // Ongoing — step the animation
         if (t.trackType === 'spring') {
-          const stepped = springStep(prev.spring!, t.to, t.springConfig!, dt);
+          const stepped = springStep(must(prev.spring), t.to, must(t.springConfig), dt);
           nextTracks[t.name] = {
             ...prev,
             spring: stepped,
@@ -591,10 +587,10 @@ function compile(entries: BuilderEntry[]): Timeline {
           const config = resolveTweenConfig({
             from: t.from,
             to: t.to,
-            duration: t.tweenDuration!,
+            duration: must(t.tweenDuration),
             ease: t.tweenEase,
           });
-          const stepped = tweenStep(prev.tween!, config, dtMs);
+          const stepped = tweenStep(must(prev.tween), config, dtMs);
           nextTracks[t.name] = {
             ...prev,
             tween: stepped,
@@ -610,13 +606,13 @@ function compile(entries: BuilderEntry[]): Timeline {
     values(state: TimelineState): Record<string, number> {
       const result: Record<string, number> = {};
       for (const name of trackNames) {
-        result[name] = state.tracks[name]!.currentValue;
+        result[name] = must(state.tracks[name]).currentValue;
       }
       return result;
     },
 
     done(state: TimelineState): boolean {
-      return trackNames.every((name) => state.tracks[name]!.done);
+      return trackNames.every((name) => must(state.tracks[name]).done);
     },
 
     firedCallbacks(prev: TimelineState, next: TimelineState): string[] {

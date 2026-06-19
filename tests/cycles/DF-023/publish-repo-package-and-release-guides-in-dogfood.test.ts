@@ -5,16 +5,16 @@ import { createTestContext } from '../../../packages/bijou/src/adapters/test/ind
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
-const BIJOU_VERSION: string = JSON.parse(
-  readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8'),
-).version;
+const PACKAGE_JSON = readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8');
+const BIJOU_VERSION = must(/"version":\s*"([^"]+)"/u.exec(PACKAGE_JSON)?.[1], 'bijou package version');
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -41,7 +41,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const result = await runScript(app, [{
       msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'documentation-map' } },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(result.model.docsModel.activePageId).toBe('guides');
     expect(text).toContain('Documentation Map');
@@ -53,7 +53,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'packages' });
     const opened = await runScript(app, [], { ctx });
-    const packagesText = frameText(opened.frames.at(-1)!);
+    const packagesText = frameText(must(opened.frames.at(-1)));
 
     expect(opened.model.docsModel.activePageId).toBe('packages');
     expect(packagesText).toContain('Packages Overview');
@@ -66,7 +66,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const packageDoc = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'package-bijou' } } },
     ], { ctx });
-    const packageText = frameText(packageDoc.frames.at(-1)!);
+    const packageText = frameText(must(packageDoc.frames.at(-1)));
 
     expect(packageText).toContain('The pure, zero-dependency core of Bijou.');
     expect(packageText).toContain('Surface primitives without abandoning');
@@ -77,7 +77,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const opened = await runScript(app, [], { ctx });
-    const releaseText = frameText(opened.frames.at(-1)!);
+    const releaseText = frameText(must(opened.frames.at(-1)));
 
     expect(opened.model.docsModel.activePageId).toBe('release');
     expect(releaseText).toContain(`What's New in v${BIJOU_VERSION}`);
@@ -86,12 +86,12 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const whatsNew = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-whats-new-${versionSlug}` } } },
     ], { ctx });
-    expect(frameText(whatsNew.frames.at(-1)!)).toContain(`New in Bijou ${BIJOU_VERSION}`);
+    expect(frameText(must(whatsNew.frames.at(-1)))).toContain(`New in Bijou ${BIJOU_VERSION}`);
 
     const migration = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-migration-${versionSlug}` } } },
     ], { ctx });
-    expect(frameText(migration.frames.at(-1)!)).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);
+    expect(frameText(must(migration.frames.at(-1)))).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);
   });
 
   it('moves DF-023 out of the active 4.1.0 blocker list', () => {

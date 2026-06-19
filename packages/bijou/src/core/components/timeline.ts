@@ -23,7 +23,7 @@ export interface TimelineOptions {
 }
 
 /** Set of status keys that render as filled dots (`●`) rather than hollow (`○`). */
-const FILLED_STATUSES: Set<string> = new Set(['success', 'error', 'warning', 'info', 'active']);
+const FILLED_STATUSES = new Set<string>(['success', 'error', 'warning', 'info', 'active']);
 
 /**
  * Capitalize a status key for accessible/human-readable output.

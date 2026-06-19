@@ -163,7 +163,7 @@ describe('runtime active binding collection', () => {
 
 describe('runtime command intent dispatch proof', () => {
   it('buffers command intent emissions without executing business logic in the view', () => {
-    type Command = { readonly type: 'reader.selectHeading'; readonly headingId: string };
+    interface Command { readonly type: 'reader.selectHeading'; readonly headingId: string }
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const selectHeading = commandIntent<{ readonly headingId: string }>('reader.selectHeading');
     const emission = runtimeCommandIntentEmission(selectHeading, {
@@ -213,7 +213,6 @@ describe('runtime command intent dispatch proof', () => {
   it('rejects command intent emissions without an explicit runtime route', () => {
     const intent = commandIntent('reader.refreshRequested');
     const emission = runtimeCommandIntentEmission(intent);
-
     expect(() => dispatchRuntimeCommandIntent({
       emission,
       routes: [],
@@ -222,10 +221,9 @@ describe('runtime command intent dispatch proof', () => {
       'runtime command intent dispatch: no route for intent reader.refreshRequested',
     );
   });
-
   it('copies and freezes command intent payloads before routing', () => {
-    type Payload = { readonly heading: { readonly id: string } };
-    type Command = { readonly type: 'reader.selectHeading'; readonly headingId: string };
+    interface Payload { readonly heading: { readonly id: string } }
+    interface Command { readonly type: 'reader.selectHeading'; readonly headingId: string }
     const selectHeading = commandIntent<Payload>('reader.selectHeading');
     const payload = { heading: { id: 'intro' } };
     const emission = runtimeCommandIntentEmission(selectHeading, payload);
@@ -237,21 +235,17 @@ describe('runtime command intent dispatch proof', () => {
       }),
     });
     payload.heading.id = 'mutated';
-
     const dispatched = dispatchRuntimeCommandIntent({
       emission,
       routes: [route],
       buffer: createRuntimeCommandBuffer<Command>(),
     });
-
     expect(Object.isFrozen(emission.payload)).toBe(true);
     expect(Object.isFrozen(emission.payload.heading)).toBe(true);
     expect(dispatched.command.headingId).toBe('intro');
   });
-
   it('throws deterministic errors for non-object command routing inputs', () => {
     const intent = commandIntent('reader.refreshRequested');
-
     expect(() => runtimeCommandIntentEmission(
       intent,
       undefined,

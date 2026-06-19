@@ -11,8 +11,8 @@ import {
 
 
 describe('DL-005 inspector and guided-flow rhythm cycle', () => {
-  beforeAll(() => setDefaultContext(createTestContext({ mode: 'interactive' })));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(createTestContext({ mode: 'interactive' })); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('creates an active cycle doc with the required workflow sections', () => {
     const cycle = readRepoFile('docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');

@@ -7,6 +7,7 @@ import {
   serializeCatalogBundleJson,
   serializeExchangeSheet,
 } from './index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('bijou-i18n-tools adapters', () => {
   it('serializes CSV cells with correct quoting and escaping', () => {
@@ -20,13 +21,13 @@ describe('bijou-i18n-tools adapters', () => {
           sourceValue: 'Help, "now"',
         } as unknown as never,
       ],
-    } as Parameters<typeof serializeExchangeSheet>[0], 'csv');
+    }, 'csv');
 
     expect(csv).toContain('"Help, ""now"""');
   });
 
   it('roundtrips TSV cells with tabs and newlines intact', () => {
-    const sheet = exportTranslationWorkbook([
+    const sheet = must(exportTranslationWorkbook([
       {
         namespace: 'shell',
         entries: [
@@ -39,7 +40,7 @@ describe('bijou-i18n-tools adapters', () => {
           },
         ],
       },
-    ], 'de').sheets[0]!;
+    ], 'de').sheets[0]);
 
     const tsv = serializeExchangeSheet(sheet, 'tsv');
     const parsed = parseExchangeSheet(sheet.name, tsv, 'tsv');

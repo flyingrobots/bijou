@@ -69,8 +69,8 @@ interface Model {
 
 const app: App<Model, Msg> = {
   init: () => {
-    const cols = process.stdout.columns ?? 80;
-    const rows = process.stdout.rows ?? 24;
+    const cols = process.stdout.columns;
+    const rows = process.stdout.rows;
     return [{
       pane: createDagPaneState({
         source: nodes,
@@ -132,4 +132,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

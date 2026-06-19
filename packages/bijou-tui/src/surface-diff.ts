@@ -120,16 +120,16 @@ export function surfaceDiffText(
 ): string {
   const diff = diffSurfaces(before, after);
   const lines = [
-    summaryLine(diff),
-    boundsLine(diff),
+    summary(diff),
+    bounds(diff),
     `mode: ${options.mode ?? 'side-by-side'}`,
   ];
 
   for (const cell of diff.cells) {
     if (cell.kind === 'char') {
-      lines.push(`(${cell.x},${cell.y}) char ${quoteChar(cell.before)} -> ${quoteChar(cell.after)}`);
+      lines.push(`(${xy(cell.x, cell.y)}) char ${quoteChar(cell.before)} -> ${quoteChar(cell.after)}`);
     } else {
-      lines.push(`(${cell.x},${cell.y}) style ${styleLabel(cell.before)} -> ${styleLabel(cell.after)}`);
+      lines.push(`(${xy(cell.x, cell.y)}) style ${styleLabel(cell.before)} -> ${styleLabel(cell.after)}`);
     }
   }
 
@@ -162,8 +162,8 @@ function sideBySideLines(diff: SurfaceDiff, before: Surface, after: Surface): re
   const beforeWidth = Math.max(6, before.width);
   const afterWidth = Math.max(5, after.width);
   const lines = [
-    summaryLine(diff),
-    boundsLine(diff),
+    summary(diff),
+    bounds(diff),
     `${'before'.padEnd(beforeWidth)} | ${'after'.padEnd(afterWidth)}`,
   ];
 
@@ -177,18 +177,18 @@ function sideBySideLines(diff: SurfaceDiff, before: Surface, after: Surface): re
 function overlayLines(diff: SurfaceDiff, after: Surface): readonly string[] {
   const overlayWidth = Math.max(1, diff.width);
   const lines = [
-    summaryLine(diff),
-    boundsLine(diff),
+    summary(diff),
+    bounds(diff),
     'overlay',
   ];
-  const changed = new Map(diff.cells.map((cell) => [`${cell.x},${cell.y}`, cell.kind]));
+  const changed = new Map(diff.cells.map((c) => [xy(c.x, c.y), c.kind]));
 
   for (let y = 0; y < diff.height; y++) {
     let row = '';
     let markers = '';
     for (let x = 0; x < overlayWidth; x++) {
-      row += displayChar(cellAt(after, x, y));
-      const kind = changed.get(`${x},${y}`);
+      row += glyph(cellAt(after, x, y));
+      const kind = changed.get(xy(x, y));
       markers += kind === 'char' ? '!' : kind === 'style' ? '~' : '.';
     }
     lines.push(row, markers);
@@ -200,14 +200,14 @@ function overlayLines(diff: SurfaceDiff, after: Surface): readonly string[] {
 function linesToSurface(lines: readonly string[], diff: SurfaceDiff): Surface {
   const width = Math.max(1, ...lines.map((line) => line.length));
   const surface = createSurface(width, lines.length);
-  const changed = new Map(diff.cells.map((cell) => [`${cell.x},${cell.y}`, cell.kind]));
+  const changed = new Map(diff.cells.map((c) => [xy(c.x, c.y), c.kind]));
   const overlayStart = lines.indexOf('overlay') + 1;
 
   for (let y = 0; y < lines.length; y++) {
     const line = lines[y] ?? '';
     for (let x = 0; x < line.length; x++) {
       const style = overlayStart > 0 && y >= overlayStart && ((y - overlayStart) % 2 === 0)
-        ? changedStyle(changed.get(`${x},${Math.floor((y - overlayStart) / 2)}`))
+        ? markerStyle(changed.get(xy(x, Math.floor((y - overlayStart) / 2))))
         : {};
       surface.set(x, y, { char: line[x] ?? ' ', empty: false, ...style });
     }
@@ -216,41 +216,35 @@ function linesToSurface(lines: readonly string[], diff: SurfaceDiff): Surface {
   return surface;
 }
 
-function changedStyle(kind: SurfaceDiffCellKind | undefined): Pick<Cell, 'fg' | 'bg'> {
-  if (kind === 'char') {
-    return { fg: '#111111', bg: '#ffcc00' };
-  }
-  if (kind === 'style') {
-    return { fg: '#111111', bg: '#66ccff' };
-  }
+function markerStyle(kind: SurfaceDiffCellKind | undefined): Pick<Cell, 'fg' | 'bg'> {
+  if (kind === 'char') return { fg: '#111111', bg: '#ffcc00' };
+  if (kind === 'style') return { fg: '#111111', bg: '#66ccff' };
   return {};
 }
 
 function surfaceRow(surface: Surface, y: number, width: number): string {
   let row = '';
   for (let x = 0; x < width; x++) {
-    row += displayChar(cellAt(surface, x, y));
+    row += glyph(cellAt(surface, x, y));
   }
   return row;
 }
 
-function displayChar(cell: Cell): string {
+function glyph(cell: Cell): string {
   return cell.empty === true || cell.char === '' ? ' ' : cell.char;
 }
 
-function summaryLine(diff: SurfaceDiff): string {
-  return `surface diff: ${diff.changedCells} changed, ${diff.charChanges} char, ${diff.styleOnlyChanges} style`;
+function summary(diff: SurfaceDiff): string {
+  return ['surface diff:', diff.changedCells, 'changed,', diff.charChanges, 'char,', diff.styleOnlyChanges, 'style'].join(' ');
 }
 
-function boundsLine(diff: SurfaceDiff): string {
-  if (diff.bounds === undefined) {
-    return 'bounds: none';
-  }
-  return `bounds: x=${diff.bounds.x} y=${diff.bounds.y} w=${diff.bounds.width} h=${diff.bounds.height}`;
+function bounds(diff: SurfaceDiff): string {
+  if (diff.bounds === undefined) return 'bounds: none';
+  return ['bounds: x=', diff.bounds.x, ' y=', diff.bounds.y, ' w=', diff.bounds.width, ' h=', diff.bounds.height].join('');
 }
 
 function quoteChar(cell: Cell): string {
-  return JSON.stringify(displayChar(cell));
+  return JSON.stringify(glyph(cell));
 }
 
 function styleLabel(cell: Cell): string {
@@ -260,9 +254,11 @@ function styleLabel(cell: Cell): string {
     `fgRGB=${rgbLabel(cell.fgRGB)}`,
     `bgRGB=${rgbLabel(cell.bgRGB)}`,
     `modifiers=${cell.modifiers?.join('+') ?? 'none'}`,
-    `opacity=${cell.opacity ?? 'default'}`,
+    `opacity=${cell.opacity?.toString() ?? 'default'}`,
   ].join(' ');
 }
+
+function xy(x: number, y: number): string { return [x, y].join(','); }
 
 function colorLabel(value: Cell['fg']): string {
   if (value == null) return 'default';

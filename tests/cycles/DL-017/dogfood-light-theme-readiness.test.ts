@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { doctorTheme, type Surface } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { must, _resetDefaultContextForTesting  } from '@flyingrobots/bijou/adapters/test';
 import { parseKey } from '@flyingrobots/bijou-tui';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { createScriptTestContext as createTestContext } from '../../helpers/scripted.js';
@@ -22,7 +22,7 @@ const MSG_CTRL_T = { type: 'key', key: 't', ctrl: true, alt: false, shift: false
 const MSG_F10 = { type: 'key', key: 'f10', ctrl: false, alt: false, shift: false } as const;
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
@@ -117,7 +117,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
       expect(chromePairs).toContain(pair);
     }
 
-    const report = doctorTheme(lightTheme!, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
+    const report = doctorTheme(must(lightTheme), { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
     expect(report.issues.filter((issue) => issue.kind === 'low-contrast')).toEqual([]);
   });
 
@@ -136,8 +136,8 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     assertTokenTextColors(
       labFrame,
       'semantic.success',
-      lightTheme!.surface.primary.hex,
-      lightTheme!.surface.muted.hex,
+      must(lightTheme).surface.primary.hex,
+      must(lightTheme).surface.muted.hex,
       'Theme Lab',
     );
 
@@ -149,8 +149,8 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     assertTokenTextColors(
       inspectorFrame,
       'semantic.success',
-      lightTheme!.surface.primary.hex,
-      lightTheme!.surface.muted.hex,
+      must(lightTheme).surface.primary.hex,
+      must(lightTheme).surface.muted.hex,
       'Theme Inspector',
     );
   });

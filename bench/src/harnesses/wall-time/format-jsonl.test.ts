@@ -98,7 +98,7 @@ describe('flat bench report formatting', () => {
       label: 'Paint gradient',
       tags: ['paint', 'gradient'],
     });
-    expect(parsed.scenarios[0]!.nsPerFrameStats).toMatchObject({
+    expect(parsed.scenarios[0]?.nsPerFrameStats).toMatchObject({
       count: 30,
       p50: 900000,
       p99: 949000,

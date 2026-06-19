@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext, auditStyle, mockClock } from './index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
     const ctx = createTestContext();
-    expect(ctx.runtime.env).toBeTypeOf('function');
-    expect(ctx.io.write).toBeTypeOf('function');
-    expect(ctx.clock?.now).toBeTypeOf('function');
-    expect(ctx.style.bold).toBeTypeOf('function');
+    expect(typeof ctx.runtime.env).toBe('function');
+    expect(typeof ctx.io.write).toBe('function');
+    expect(typeof ctx.clock?.now).toBe('function');
+    expect(typeof ctx.style.bold).toBe('function');
     expect(ctx.theme.noColor).toBeTypeOf('boolean');
     expect(typeof ctx.mode).toBe('string');
   });
@@ -78,9 +79,9 @@ describe('createTestContext()', () => {
     expect(brandGradient.length).toBeGreaterThan(0);
     expect(brandGradient[0]).toHaveProperty('pos');
     expect(brandGradient[0]).toHaveProperty('color');
-    expect(brandGradient[0]!.pos).toBeTypeOf('number');
-    expect(Array.isArray(brandGradient[0]!.color)).toBe(true);
-    expect(brandGradient).toEqual(ctx.theme.theme.gradient['brand']);
+    expect(must(brandGradient[0]).pos).toBeTypeOf('number');
+    expect(Array.isArray(must(brandGradient[0]).color)).toBe(true);
+    expect(brandGradient).toEqual(ctx.theme.theme.gradient.brand);
   });
 
   it('status() falls back to muted for unknown keys', () => {
@@ -104,7 +105,7 @@ describe('createTestContext()', () => {
     expect(ctx.style).toBe(style);
     ctx.style.bold('hello');
     expect(style.calls).toHaveLength(1);
-    expect(style.calls[0]!.method).toBe('bold');
+    expect(must(style.calls[0]).method).toBe('bold');
   });
 
 });

@@ -10,7 +10,7 @@
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { BijouContext } from '@flyingrobots/bijou';
 
-export function mcpContext(columns: number = 80): BijouContext {
+export function mcpContext(columns = 80): BijouContext {
   return createTestContext({
     mode: 'interactive',
     runtime: { columns },

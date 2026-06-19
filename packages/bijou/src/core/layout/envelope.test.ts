@@ -242,7 +242,7 @@ describe('stack layout', () => {
       { inlineStart: 25, blockStart: 0, inlineSize: 52, blockSize: 24 },
       { inlineStart: 78, blockStart: 0, inlineSize: 18, blockSize: 24 },
     ]);
-    expect(resolved.children[1]!.reason).toContain('stack inline flex track');
+    expect(resolved.children[1]?.reason).toContain('stack inline flex track');
   });
 
   it('distributes leftover flexible cells with a stable source-order policy', () => {

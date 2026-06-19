@@ -3,6 +3,7 @@ import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
 } from '../../helpers/scripted.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import { createDocsApp } from '../../../examples/docs/app.js';
 
 const MISSING_MARKER = '<MISSING LOC STRING KEY=';
@@ -28,7 +29,7 @@ describe('LX-020 DOGFOOD locale demo readiness', () => {
     });
 
     const result = await runScript(app, [], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('CounterDemoBlock');
     expect(text).not.toContain(MISSING_MARKER);
@@ -45,7 +46,7 @@ describe('LX-020 DOGFOOD locale demo readiness', () => {
     const result = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'start-here' } } },
     ], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('Documentation source en anglais');
     expect(text).toContain('Start Here');

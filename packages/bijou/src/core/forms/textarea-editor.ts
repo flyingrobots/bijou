@@ -55,7 +55,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   const showLineNumbers = options.showLineNumbers ?? false;
   const term = terminalRenderer(ctx);
 
-  let lines: string[] = [''];
+  const lines: string[] = [''];
   let cursorRow = 0;
   let cursorCol = 0;
   let scrollY = 0;
@@ -191,7 +191,6 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         render();
         return;
       }
-
       // Arrow keys
       if (isKey(key, 'up')) { // Up
         if (cursorRow > 0) {
@@ -237,7 +236,6 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         render();
         return;
       }
-
       // Printable character
       if (isPrintableKey(key)) {
         if (maxLength != null && totalLength >= maxLength) return;

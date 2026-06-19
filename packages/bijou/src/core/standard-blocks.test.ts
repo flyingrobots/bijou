@@ -707,7 +707,7 @@ describe('first-party standard block definitions', () => {
 });
 
 function isSurfaceOutput(
-  result: BlockRenderResult<unknown>,
+  result: BlockRenderResult,
 ): result is BlockRenderResult<{ width: number; height: number; get(x: number, y: number): { char?: string } }> {
   const output = result.output;
   return Boolean(

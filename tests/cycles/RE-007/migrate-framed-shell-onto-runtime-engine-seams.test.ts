@@ -79,8 +79,8 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(types).toContain("readonly type: 'apply-frame-action'");
     expect(types).toContain("readonly type: 'quit'");
 
-    // Handler table interprets commands inside createFramedApp
-    expect(appFrame).toContain('shellCommandHandlers');
+    // Command dispatcher interprets shell commands inside createFramedApp
+    expect(appFrame).toContain('applyShellCommand');
     expect(appFrame).toContain('drainShellCommandBuffer');
 
     // Buffer infrastructure wired

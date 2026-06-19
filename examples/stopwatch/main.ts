@@ -69,9 +69,10 @@ const app: App<Model, Msg> = {
 
     if (model.laps.length > 0) {
       lines.push(separator({ label: 'laps', width: 40 }));
-      for (let i = 0; i < model.laps.length; i++) {
-        const lapTime = i === 0 ? model.laps[i] : model.laps[i] - model.laps[i - 1];
-        lines.push(`  Lap ${i + 1}  ${formatTime(model.laps[i])}  (+${formatTime(lapTime)})`);
+      for (const [i, lap] of model.laps.entries()) {
+        const previous = model.laps[i - 1] ?? 0;
+        const lapTime = i === 0 ? lap : lap - previous;
+        lines.push(`  Lap ${String(i + 1)}  ${formatTime(lap)}  (+${formatTime(lapTime)})`);
       }
       lines.push('');
     }
@@ -83,4 +84,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

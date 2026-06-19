@@ -491,7 +491,7 @@ export function dagPaneSelectLeft(state: DagPaneState, ctx?: BijouContext): DagP
   const idx = siblings.indexOf(state.selectedId);
   if (idx <= 0) return state; // already leftmost
 
-  return updateSelection(state, siblings[idx - 1]!, adjacency, ctx);
+  return updateSelection(state, siblings[idx - 1], adjacency, ctx);
 }
 
 /**
@@ -517,7 +517,7 @@ export function dagPaneSelectRight(state: DagPaneState, ctx?: BijouContext): Dag
   const idx = siblings.indexOf(state.selectedId);
   if (idx < 0 || idx >= siblings.length - 1) return state; // already rightmost
 
-  return updateSelection(state, siblings[idx + 1]!, adjacency, ctx);
+  return updateSelection(state, siblings[idx + 1], adjacency, ctx);
 }
 
 /**

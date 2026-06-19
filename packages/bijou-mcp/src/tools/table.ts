@@ -19,7 +19,7 @@ export const tableTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_table',
   description: 'Render a table with Unicode box-drawing borders. Returns a plain-text string with box-drawing characters that displays correctly in monospace contexts.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.width);
     const result = table({ columns: input.columns, rows: input.rows, ctx });

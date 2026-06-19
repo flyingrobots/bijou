@@ -225,7 +225,7 @@ function shadeCellSurface(
 }
 
 function shadeHex(hex: string, factor: number): string {
-  if (hex.length !== 7 || hex[0] !== '#') return hex;
+  if (hex.length !== 7 || !hex.startsWith('#')) return hex;
 
   const digits = hex.slice(1);
   if (!/^[0-9A-Fa-f]{6}$/.test(digits)) return hex;
@@ -241,28 +241,22 @@ function shadeHex(hex: string, factor: number): string {
     shadeChannel(b, factor),
   );
 }
-
 function shadeChannel(value: number, factor: number): number {
   return Math.max(0, Math.min(255, Math.round(value * factor)));
 }
-
 function rgbToHex(r: number, g: number, b: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
-
 function toHex(value: number): string {
   return value.toString(16).padStart(2, '0');
 }
-
 function clampFactor(value: number): number {
   if (!Number.isFinite(value)) return 1;
   return Math.max(0, Math.min(value, 2));
 }
-
 function lerp(start: number, end: number, t: number): number {
   return start + (end - start) * t;
 }
-
 function normalizedNoise(x: number, y: number, frame: number): number {
   let value = Math.imul(x + 1, 374761393);
   value = (value + Math.imul(y + 1, 668265263)) >>> 0;

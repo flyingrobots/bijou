@@ -61,7 +61,7 @@ describe('mockClock()', () => {
     const clock = mockClock();
     clock.setInterval(() => {}, 5);
 
-    expect(() => clock.runAll()).toThrow(/active interval timers/i);
+    expect(() => { clock.runAll(); }).toThrow(/active interval timers/i);
   });
 
   it('still allows runAll() when an interval disposes itself', () => {

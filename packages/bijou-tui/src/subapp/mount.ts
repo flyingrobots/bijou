@@ -151,6 +151,6 @@ function mapSingleCmd<SubMsg, ParentMsg>(
     if (result === undefined) return undefined;
     if (typeof result === 'symbol') return result as QuitSignal; // QUIT
     if (isCmdCleanup(result)) return result;
-    return mapper(result as SubMsg);
+    return mapper(result);
   };
 }

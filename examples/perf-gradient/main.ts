@@ -177,7 +177,7 @@ interface Model {
   memSampleFrame: number;
 }
 
-type Msg = { type: 'tick'; gen: number };
+interface Msg { type: 'tick'; gen: number }
 
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
@@ -668,7 +668,6 @@ const app: App<Model, Msg> = {
     }
     return [model, []];
   },
-
   view: (model) => {
     const viewStart = performance.now();
     const surface = renderFrame(model);
@@ -676,5 +675,4 @@ const app: App<Model, Msg> = {
     return surface;
   },
 };
-
 run(app, { mouse: true });

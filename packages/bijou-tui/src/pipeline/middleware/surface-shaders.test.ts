@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createSurface } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import type { RenderMiddleware, RenderState } from '../pipeline.js';
 import {
   flicker,
   noise,
@@ -8,6 +10,27 @@ import {
   vignette,
 } from './surface-shaders.js';
 
+function renderState(targetSurface: RenderState['targetSurface']): RenderState {
+  return {
+    model: {},
+    ctx: createTestContext(),
+    dt: 0.016,
+    currentSurface: createSurface(targetSurface.width, targetSurface.height),
+    targetSurface,
+    layoutMap: new Map(),
+    data: {},
+  };
+}
+
+function runMiddleware(middleware: RenderMiddleware, targetSurface: RenderState['targetSurface']): boolean {
+  let called = false;
+  const result = middleware(renderState(targetSurface), () => {
+    called = true;
+  });
+  expect(result).toBeUndefined();
+  return called;
+}
+
 describe('surfaceShaderFilter', () => {
   it('applies scanlines as a post-process brightness pass', () => {
     const middleware = surfaceShaderFilter(scanlines({ dimFactor: 0.5 }));
@@ -15,12 +38,7 @@ describe('surfaceShaderFilter', () => {
     targetSurface.set(0, 0, { char: 'A', fg: '#808080', bg: '#404040', empty: false });
     targetSurface.set(0, 1, { char: 'B', fg: '#808080', bg: '#404040', empty: false });
 
-    let called = false;
-    middleware({ dt: 0.016, targetSurface } as any, () => {
-      called = true;
-    });
-
-    expect(called).toBe(true);
+    expect(runMiddleware(middleware, targetSurface)).toBe(true);
     expect(targetSurface.get(0, 0).fg).toBe('#808080');
     expect(targetSurface.get(0, 1).fg).toBe('#404040');
     expect(targetSurface.get(0, 1).bg).toBe('#202020');
@@ -33,8 +51,8 @@ describe('surfaceShaderFilter', () => {
     first.set(0, 0, { char: 'A', fg: '#808080', empty: false });
     second.set(0, 0, { char: 'A', fg: '#808080', empty: false });
 
-    middleware({ dt: 0.016, targetSurface: first } as any, () => {});
-    middleware({ dt: 0.016, targetSurface: second } as any, () => {});
+    runMiddleware(middleware, first);
+    runMiddleware(middleware, second);
 
     expect(first.get(0, 0).fg).not.toBe(second.get(0, 0).fg);
   });
@@ -45,7 +63,7 @@ describe('surfaceShaderFilter', () => {
     targetSurface.set(0, 0, { char: 'A', fg: '#808080', empty: false });
     targetSurface.set(1, 0, { char: 'B', fg: '#808080', empty: false });
 
-    middleware({ dt: 0.016, targetSurface } as any, () => {});
+    runMiddleware(middleware, targetSurface);
 
     expect(targetSurface.get(0, 0).fg).not.toBe('#808080');
     expect(targetSurface.get(0, 0).fg).not.toBe(targetSurface.get(1, 0).fg);
@@ -60,7 +78,7 @@ describe('surfaceShaderFilter', () => {
       }
     }
 
-    middleware({ dt: 0.016, targetSurface } as any, () => {});
+    runMiddleware(middleware, targetSurface);
 
     expect(targetSurface.get(1, 1).fg).toBe('#808080');
     expect(targetSurface.get(0, 0).fg).toBe('#404040');

@@ -170,8 +170,8 @@ export function defineSelectionOwner(input: SelectionOwnerInput): SelectionOwner
     throw new Error(`selection owner ${id}: unsupported policy ${String(policy)}`);
   }
 
-  return Object.freeze({
-    [SELECTION_OWNER_BRAND]: true as true,
+  return Object.freeze<SelectionOwner>({
+    [SELECTION_OWNER_BRAND]: true,
     id,
     layoutNodeId,
     rect,
@@ -559,37 +559,29 @@ function rectContainsPoint(rect: LayoutRect, point: SelectionPoint): boolean {
     && point.y < normalizedRect.y + normalizedRect.height
   );
 }
-
 function comparePoints(a: SelectionPoint, b: SelectionPoint): number {
   if (a.y !== b.y) {
     return a.y - b.y;
   }
-
   return a.x - b.x;
 }
-
 function sliceInclusive(text: string, start: number, end: number): string {
   if (text.length === 0 || end < 0 || start > end || start >= text.length) {
     return '';
   }
-
   const safeStart = Math.max(0, start);
   const safeEnd = clamp(end, 0, text.length - 1);
   if (safeStart > safeEnd) {
     return '';
   }
-
   return text.slice(safeStart, safeEnd + 1);
 }
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
-
 function normalizeInt(value: number | undefined, fallback: number): number {
   if (value == null || !Number.isFinite(value)) {
     return fallback;
   }
-
   return Math.floor(value);
 }

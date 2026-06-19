@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { box, headerBox } from './box.js';
 import { createTestContext } from '../../adapters/test/index.js';
 import { graphemeWidth } from '../text/grapheme.js';
-
+import { must } from '@flyingrobots/bijou/adapters/test';
 describe('box', () => {
   it('renders box in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
@@ -10,18 +10,15 @@ describe('box', () => {
     expect(result).toContain('Hello World');
     expect(result).toContain('─'); // border chars
   });
-
   it('returns content only in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(box('Hello World', { ctx })).toBe('Hello World');
   });
-
   it('returns content only in accessible mode', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     expect(box('Hello World', { ctx })).toBe('Hello World');
   });
 });
-
 describe('headerBox', () => {
   it('renders header box with detail in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
@@ -29,26 +26,21 @@ describe('headerBox', () => {
     expect(result).toContain('Title');
     expect(result).toContain('some detail');
   });
-
   it('renders pipe format', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(headerBox('Title', { detail: 'detail', ctx })).toBe('Title  detail');
   });
-
   it('renders accessible format', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     expect(headerBox('Title', { detail: 'detail', ctx })).toBe('Title: detail');
   });
-
   it('renders label only when no detail', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(headerBox('Title', { ctx })).toBe('Title');
   });
 });
-
 describe('box() with bgToken', () => {
   const bgToken = { hex: '#ffffff', bg: '#1e1e2e' };
-
   it('applies bg fill in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hello', { bgToken, ctx });
@@ -56,27 +48,23 @@ describe('box() with bgToken', () => {
     expect(result).toContain('Hello');
     expect(result).toContain('─');
   });
-
   it('applies bg fill in static mode', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = box('Hello', { bgToken, ctx });
     expect(result).toContain('Hello');
     expect(result).toContain('─');
   });
-
   it('skips bg fill in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = box('Hello', { bgToken, ctx });
     // pipe mode returns raw content without borders
     expect(result).toBe('Hello');
   });
-
   it('skips bg fill in accessible mode', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     const result = box('Hello', { bgToken, ctx });
     expect(result).toBe('Hello');
   });
-
   it('skips bg fill when noColor is true', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const result = box('Hello', { bgToken, ctx });
@@ -84,7 +72,6 @@ describe('box() with bgToken', () => {
     expect(result).toContain('Hello');
     expect(result).toContain('─');
   });
-
   it('is a no-op when bgToken has no bg field', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff' };
@@ -93,28 +80,23 @@ describe('box() with bgToken', () => {
     expect(result).toContain('─');
   });
 });
-
 describe('box() with width override', () => {
   it('wraps long content lines by default when a fixed width is provided', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('ABCDEFGHIJ', { width: 8, ctx });
     const lines = result.split('\n');
-
     expect(lines[1]).toContain('ABCD');
     expect(lines[2]).toContain('EFGH');
     expect(lines[3]).toContain('IJ');
   });
-
   it('supports per-instance truncate overflow overrides', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('ABCDEFGHIJ', { width: 8, overflow: 'truncate', ctx });
     const lines = result.split('\n');
-
     expect(lines).toHaveLength(3);
     expect(lines[1]).toContain('ABCD');
     expect(lines[1]).not.toContain('EFGH');
   });
-
   it('outer width matches specified width exactly', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hi', { width: 20, ctx });
@@ -123,15 +105,13 @@ describe('box() with width override', () => {
       expect(graphemeWidth(line)).toBe(20);
     }
   });
-
   it('short content lines right-padded to fill interior', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hi', { width: 20, ctx });
     const lines = result.split('\n');
     // Content line (middle) should be padded to width 20
-    expect(graphemeWidth(lines[1]!)).toBe(20);
+    expect(graphemeWidth(must(lines[1]))).toBe(20);
   });
-
   it('long content lines clip to interior width when overflow is truncate', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('This is a very long line of text', { width: 12, overflow: 'truncate', ctx });
@@ -140,7 +120,6 @@ describe('box() with width override', () => {
       expect(graphemeWidth(line)).toBe(12);
     }
   });
-
   it('padding subtracted from width for interior', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     // width=10, padding left=2, right=2 → inner=8, content=4
@@ -153,7 +132,6 @@ describe('box() with width override', () => {
     expect(lines[1]).toContain('ABCD');
     expect(lines[1]).not.toContain('ABCDE');
   });
-
   it('width < minimum (border + padding) results in zero-width interior', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     // width=2 → inner=0, content=0
@@ -163,7 +141,6 @@ describe('box() with width override', () => {
       expect(graphemeWidth(line)).toBe(2);
     }
   });
-
   it('visibleLength of every output line equals specified width', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Line 1\nLonger Line 2\nL3', { width: 30, ctx });
@@ -172,17 +149,14 @@ describe('box() with width override', () => {
       expect(graphemeWidth(line)).toBe(30);
     }
   });
-
   it('pipe mode ignores width', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(box('Hello', { width: 20, ctx })).toBe('Hello');
   });
-
   it('accessible mode ignores width', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     expect(box('Hello', { width: 20, ctx })).toBe('Hello');
   });
-
   it('headerBox() with width passes through to box', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = headerBox('Title', { width: 30, detail: 'info', ctx });
@@ -191,76 +165,63 @@ describe('box() with width override', () => {
       expect(graphemeWidth(line)).toBe(30);
     }
   });
-
 });
-
 describe('box() with fillChar', () => {
   it('renders fill character in padding areas', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hi', { fillChar: '.', padding: { left: 2, right: 2 }, ctx });
     const lines = result.split('\n');
     // Content line should have dots for padding
-    const contentLine = lines[1]!;
+    const contentLine = must(lines[1]);
     expect(contentLine).toContain('..Hi..');
   });
-
   it('renders fill character in empty padding lines', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hi', { fillChar: '.', padding: { top: 1, bottom: 1, left: 1, right: 1 }, ctx });
     const lines = result.split('\n');
     // Top padding line (line 1) should be all dots inside border
-    expect(lines[1]!).toMatch(/│\.+│/);
+    expect(must(lines[1])).toMatch(/│\.+│/);
   });
-
   it('falls back to space for wide characters', () => {
     const ctx = createTestContext({ mode: 'interactive' });
-    // CJK character is 2 columns wide — should be rejected
     const result = box('Hi', { fillChar: '漢', padding: { left: 2, right: 2 }, ctx });
     const lines = result.split('\n');
-    // Should use spaces, not the wide character
-    expect(lines[1]!).toContain('  Hi  ');
+    expect(must(lines[1])).toContain('  Hi  ');
   });
-
   it('falls back to space for empty fillChar', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = box('Hi', { fillChar: '', padding: { left: 2, right: 2 }, ctx });
     const lines = result.split('\n');
-    expect(lines[1]!).toContain('  Hi  ');
+    expect(must(lines[1])).toContain('  Hi  ');
   });
-
   it('passthrough in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(box('Hello', { fillChar: '.', ctx })).toBe('Hello');
   });
-
   it('passthrough in accessible mode', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     expect(box('Hello', { fillChar: '.', ctx })).toBe('Hello');
   });
-
   it('renders fill character in static mode', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = box('Hi', { fillChar: '.', padding: { left: 2, right: 2 }, ctx });
     const lines = result.split('\n');
-    expect(lines[1]!).toContain('..Hi..');
+    expect(must(lines[1])).toContain('..Hi..');
   });
-
   it('headerBox inherits fillChar', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = headerBox('Title', { fillChar: '.', padding: { left: 2, right: 2 }, ctx });
     const lines = result.split('\n');
-    const contentLine = lines[1]!;
+    const contentLine = must(lines[1]);
     expect(contentLine).toContain('..');
   });
 });
-
 describe('defensive input handling', () => {
   it('handles null/undefined content gracefully', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(box(null as any, { ctx })).toBe('');
     expect(box(undefined as any, { ctx })).toBe('');
   });
-
   it('handles null/undefined label in headerBox gracefully', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(headerBox(null as any, { ctx })).toBe('');

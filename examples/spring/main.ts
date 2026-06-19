@@ -29,7 +29,7 @@ function launchAll(from: number, to: number): ReturnType<typeof animate>[] {
       to,
       spring: preset,
       onFrame: (value: number) => ({ type: 'frame' as const, preset, value }),
-      onComplete: () => ({ type: 'done' as const }),
+      onComplete: (): Msg => ({ type: 'done' }),
     })
   );
 }
@@ -64,7 +64,7 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const rows = [spacer(), line('  Spring Physics Comparison'), spacer()] as Surface[];
+    const rows: Surface[] = [spacer(), line('  Spring Physics Comparison'), spacer()];
 
     for (const preset of PRESETS) {
       const pos = Math.round(model.positions[preset] ?? 0);
@@ -85,4 +85,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

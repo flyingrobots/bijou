@@ -68,7 +68,7 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const allDone = model.downloads.every(d => d.done);
 
-    const rows = [spacer(), line('  Installing packages...'), spacer()] as Surface[];
+    const rows: Surface[] = [spacer(), line('  Installing packages...'), spacer()];
 
     for (const d of model.downloads) {
       const name = d.name.padEnd(16);
@@ -100,4 +100,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

@@ -36,9 +36,10 @@ import {
   _resetDefaultContextForTesting,
   Theme,
 } from './docs-preview.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -55,7 +56,7 @@ describe('docs preview app', () => {
     expect((model).landingQuitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]!(() => {}, {
+    const returned = await cmds[0]?.(() => {}, {
       onPulse() {
         return { dispose() {} };
       },
@@ -83,7 +84,7 @@ describe('docs preview app', () => {
     const [, cmds] = app.update(keyMsg('escape'), model);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]!(() => {}, {
+    const returned = await cmds[0]?.(() => {}, {
       onPulse() {
         return { dispose() {} };
       },
@@ -99,7 +100,7 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
 
     expect((pulsed.model).route).toBe('landing');
-    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(pulsed.frames[pulsed.frames.length - 1])));
   });
 
   it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
@@ -109,20 +110,20 @@ describe('docs preview app', () => {
     const initial = await runScript(app, [], { ctx });
     const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
 
-    const initialText = frameText(initial.frames[0]!);
-    const pulsedText = frameText(pulsed.frames[pulsed.frames.length - 1]!);
+    const initialText = frameText(must(initial.frames[0]));
+    const pulsedText = frameText(must(pulsed.frames[pulsed.frames.length - 1]));
 
     expect(titleBackgroundGlyphCount(initialText)).toBeGreaterThan(1000);
     expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
-    expect(stackedWakeRowCount(initial.frames[0]!)).toBeGreaterThan(12);
-    expect(stackedWakeRowCount(pulsed.frames[pulsed.frames.length - 1]!)).toBeGreaterThan(12);
-    const overlay = matchingBijouSvgOverlayGlyphCount(initial.frames[0]!, 0);
+    expect(stackedWakeRowCount(must(initial.frames[0]))).toBeGreaterThan(12);
+    expect(stackedWakeRowCount(must(pulsed.frames[pulsed.frames.length - 1]))).toBeGreaterThan(12);
+    const overlay = matchingBijouSvgOverlayGlyphCount(must(initial.frames[0]), 0);
     expect(overlay.expected).toBeGreaterThan(450);
     expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
-    const metrics = bijouSvgOverlayMetrics(initial.frames[0]!.width, initial.frames[0]!.height);
+    const metrics = bijouSvgOverlayMetrics(initial.frames[0]?.width, initial.frames[0]?.height);
     let sameColorWakeCells = 0;
-    for (let y = 0; y < initial.frames[0]!.height; y++) {
-      for (let x = 0; x < initial.frames[0]!.width; x++) {
+    for (let y = 0; y < initial.frames[0]?.height; y++) {
+      for (let x = 0; x < initial.frames[0]?.width; x++) {
         if (
           x >= metrics.left
           && x < metrics.left + metrics.columns
@@ -131,7 +132,7 @@ describe('docs preview app', () => {
         ) {
           continue;
         }
-        const cell = initial.frames[0]!.get(x, y);
+        const cell = initial.frames[0]?.get(x, y);
         if (!V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')) continue;
         if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
         if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
@@ -139,7 +140,7 @@ describe('docs preview app', () => {
       }
     }
     expect(sameColorWakeCells).toBeGreaterThan(400);
-    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(pulsed.frames[pulsed.frames.length - 1])));
   });
 
   it('uses the Bijou SVG as a transparent-background title mask', async () => {
@@ -147,7 +148,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
+    const frame = must(initial.frames[0]);
     const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
     const paintedPathCell = { x: overlay.left, y: overlay.top };
     const transparentMaskCell = { x: overlay.left + 15, y: overlay.top };
@@ -169,8 +170,8 @@ describe('docs preview app', () => {
 
     const initial = await runScript(app, [], { ctx });
     const pulsed = await runScript(app, [{ pulse: { dt: pulseMs / 1000 } }], { ctx });
-    const initialFrame = initial.frames[0]!;
-    const pulsedFrame = pulsed.frames.at(-1)!;
+    const initialFrame = must(initial.frames[0]);
+    const pulsedFrame = must(pulsed.frames.at(-1));
     const overlay = expectedBijouSvgOverlay(initialFrame.width, initialFrame.height);
     const sampleX = 0;
     const sampleY = 0;
@@ -195,9 +196,9 @@ describe('docs preview app', () => {
     const tinyPulse = await runScript(app, [{ pulse: { dt: 1 / 60 } }], { ctx });
     const steppedPulse = await runScript(app, [{ pulse: { dt: 0.12 } }], { ctx });
 
-    expect(serializeFrame(initial.frames[0]!)).toEqual(serializeFrame(tinyPulse.frames[tinyPulse.frames.length - 1]!));
-    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(steppedPulse.frames[steppedPulse.frames.length - 1]!));
-    const footer = frameText(initial.frames[0]!).split('\n')[initial.frames[0]!.height - 1] ?? '';
+    expect(serializeFrame(must(initial.frames[0]))).toEqual(serializeFrame(must(tinyPulse.frames[tinyPulse.frames.length - 1])));
+    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(steppedPulse.frames[steppedPulse.frames.length - 1])));
+    const footer = frameText(must(initial.frames[0])).split('\n')[initial.frames[0]?.height - 1] ?? '';
     expect(footer).toContain('60 fps • auto/performance');
   });
 
@@ -208,7 +209,7 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
     expect((pulsed.model).landingFps).toBe(54);
-    const footer = frameText(pulsed.frames[pulsed.frames.length - 1]!).split('\n')[pulsed.frames[pulsed.frames.length - 1]!.height - 1] ?? '';
+    const footer = frameText(must(pulsed.frames[pulsed.frames.length - 1])).split('\n')[pulsed.frames[pulsed.frames.length - 1]?.height - 1] ?? '';
     expect(footer).toContain('54 fps • auto/full');
   });
 
@@ -219,7 +220,7 @@ describe('docs preview app', () => {
     const opened = await runScript(app, [{ key: KEY_BACKTICK }], { ctx });
     expect((opened.model).route).toBe('landing');
     expect((opened.model).docsModel.perfHudOpen).toBe(true);
-    const openedText = frameText(opened.frames.at(-1)!);
+    const openedText = frameText(must(opened.frames.at(-1)));
     expect(openedText).toContain('Perf HUD');
     expect(openedText).toContain('view');
     expect(openedText).toContain('diff');
@@ -243,7 +244,7 @@ describe('docs preview app', () => {
     const closed = await runScript(app, [{ key: KEY_BACKTICK }, { key: KEY_BACKTICK }], { ctx });
     expect((closed.model).route).toBe('landing');
     expect((closed.model).docsModel.perfHudOpen).toBe(false);
-    expect(frameText(closed.frames.at(-1)!)).not.toContain('Perf HUD');
+    expect(frameText(must(closed.frames.at(-1)))).not.toContain('Perf HUD');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {
@@ -263,8 +264,8 @@ describe('docs preview app', () => {
     expect(activeDocsPageModel(cycledLeft.model).landingThemeIndex).toBe(5);
     expect((cycledLeft.model).docsModel.activeShellThemeId).toBe('verdant-plum');
 
-    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
-    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
+    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(numbered.frames[numbered.frames.length - 1])));
+    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(cycledRight.frames[cycledRight.frames.length - 1])));
   });
 
   it('ships one DogFood shell theme family with readable dark and light modes', () => {
@@ -280,17 +281,17 @@ describe('docs preview app', () => {
     expect(dark?.theme.name).toBe('dogfood-dark');
     expect(light?.theme.name).toBe('dogfood-light');
 
-    assertReadableDogfoodTheme(dark!.theme);
-    assertReadableDogfoodTheme(light!.theme);
+    assertReadableDogfoodTheme(must(dark).theme);
+    assertReadableDogfoodTheme(must(light).theme);
 
-    expect(dark!.theme.semantic.primary.hex).toBe(BIJOU_DARK.semantic.primary.hex);
-    expect(dark!.theme.surface.primary.bg).toBe(BIJOU_DARK.surface.primary.bg);
-    expect(light!.theme.semantic.primary.hex).toBe(BIJOU_LIGHT.semantic.primary.hex);
-    expect(light!.theme.surface.primary.bg).toBe(BIJOU_LIGHT.surface.primary.bg);
-    expect(dark!.theme.semantic.primary.hex).not.toBe(dark!.theme.semantic.accent.hex);
-    expect(dark!.theme.ui.cursor.hex).not.toBe(dark!.theme.status.info.hex);
-    expect(light!.theme.semantic.primary.hex).not.toBe(light!.theme.semantic.accent.hex);
-    expect(light!.theme.ui.cursor.hex).not.toBe(light!.theme.status.info.hex);
+    expect(dark?.theme.semantic.primary.hex).toBe(BIJOU_DARK.semantic.primary.hex);
+    expect(dark?.theme.surface.primary.bg).toBe(BIJOU_DARK.surface.primary.bg);
+    expect(light?.theme.semantic.primary.hex).toBe(BIJOU_LIGHT.semantic.primary.hex);
+    expect(light?.theme.surface.primary.bg).toBe(BIJOU_LIGHT.surface.primary.bg);
+    expect(dark?.theme.semantic.primary.hex).not.toBe(dark?.theme.semantic.accent.hex);
+    expect(dark?.theme.ui.cursor.hex).not.toBe(dark?.theme.status.info.hex);
+    expect(light?.theme.semantic.primary.hex).not.toBe(light?.theme.semantic.accent.hex);
+    expect(light?.theme.ui.cursor.hex).not.toBe(light?.theme.status.info.hex);
   });
 
   it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () => {
@@ -298,7 +299,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
-    const openedText = frameText(opened.frames.at(-1)!);
+    const openedText = frameText(must(opened.frames.at(-1)));
 
     expect((opened.model).route).toBe('docs');
     expect((opened.model).themeInspectorOpen).toBe(true);
@@ -307,51 +308,40 @@ describe('docs preview app', () => {
     expect(openedText).toContain('semantic.primary');
     expect(openedText).toContain('surface.primary');
     expect(openedText).toContain('safe pairs pass');
-
     const closed = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: KEY_F10 }], { ctx });
     expect((closed.model).themeInspectorOpen).toBe(false);
-    expect(frameText(closed.frames.at(-1)!)).not.toContain('Theme Inspector');
+    expect(frameText(must(closed.frames.at(-1)))).not.toContain('Theme Inspector');
   });
-
   it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30, rows: 18 } });
     const app = createDocsApp(ctx);
-
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
-    const frame = opened.frames.at(-1)!;
-
+    const frame = must(opened.frames.at(-1));
     expect((opened.model).themeInspectorOpen).toBe(true);
     expect(frame.width).toBe(30);
     expect(frame.height).toBe(18);
     expect(frameText(frame)).toContain('Theme Inspector');
   });
-
   it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
     const app = createDocsApp(ctx);
-
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: 'q' }], { ctx });
-
     expect((opened.model).themeInspectorOpen).toBe(false);
     expect((opened.model).docsModel.quitConfirmOpen).toBe(true);
-    expect(frameText(opened.frames.at(-1)!)).toContain('Quit?');
+    expect(frameText(must(opened.frames.at(-1)))).toContain('Quit?');
   });
-
   it('scrolls the Theme Inspector drawer without closing it', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 118, rows: 20 } });
     const app = createDocsApp(ctx);
-
     const scrolled = await runScript(app, [
       { key: KEY_ENTER },
       { key: KEY_F10 },
       { key: KEY_DOWN },
       { key: KEY_DOWN },
     ], { ctx });
-
     expect((scrolled.model).themeInspectorOpen).toBe(true);
     expect((scrolled.model).themeInspectorScrollY).toBeGreaterThan(0);
-    expect(frameText(scrolled.frames.at(-1)!)).toContain('Theme Inspector');
-
+    expect(frameText(must(scrolled.frames.at(-1)))).toContain('Theme Inspector');
     const restored = await runScript(app, [
       { key: KEY_ENTER },
       { key: KEY_F10 },
@@ -359,21 +349,17 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
       { key: KEY_UP },
     ], { ctx });
-
     expect((restored.model).themeInspectorOpen).toBe(true);
     expect((restored.model).themeInspectorScrollY).toBeLessThan((scrolled.model).themeInspectorScrollY);
   });
-
   it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 44 } });
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
       initialPageId: 'themes',
     });
-
     const result = await runScript(app, [], { ctx });
-    const text = frameText(result.frames.at(-1)!);
-
+    const text = frameText(must(result.frames.at(-1)));
     expect((result.model).docsModel.activePageId).toBe('themes');
     expect(text).toContain('Theme Lab');
     expect(text).toContain('Default dark preset: bijou-dark');

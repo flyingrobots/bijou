@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { accordion } from './accordion.js';
 import { createTestContext, auditStyle } from '../../adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const sections: Parameters<typeof accordion>[0] = [
   { title: 'Section A', content: 'Content A', expanded: true },
@@ -73,7 +74,7 @@ describe('accordion', () => {
       accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
-      expect(bgCalls[0]!.color).toBe('#001122');
+      expect(must(bgCalls[0]).color).toBe('#001122');
     });
 
     it('no default bg (opt-in only)', () => {

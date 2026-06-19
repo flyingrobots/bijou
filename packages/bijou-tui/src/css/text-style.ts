@@ -189,7 +189,7 @@ export function paintStyledTextSurfaceWithBCSS(
   const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
 
   // Need a new surface if none exists or width changed.
-  if (surface == null || surface.width !== safeWidth || surface.height !== 1) {
+  if (surface?.width !== safeWidth || surface.height !== 1) {
     return createStyledTextSurfaceWithBCSS(text, width, ctx, identity, base);
   }
 

@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { grayscaleFilter } from './grayscale.js';
 import { createSurface } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import type { RenderState } from '../pipeline.js';
 
 describe('grayscaleFilter', () => {
   it('converts colors to grayscale luminance', () => {
@@ -12,10 +14,19 @@ describe('grayscaleFilter', () => {
     // Blue cell
     targetSurface.set(1, 0, { char: 'B', fg: '#0000ff', bg: '#ffffff' });
 
-    const state: any = { targetSurface };
+    const state: RenderState = {
+      model: {},
+      ctx: createTestContext(),
+      dt: 0,
+      currentSurface: createSurface(2, 1),
+      targetSurface,
+      layoutMap: new Map(),
+      data: {},
+    };
     
     let called = false;
-    mw(state, () => { called = true; });
+    const result = mw(state, () => { called = true; });
+    expect(result).toBeUndefined();
 
     expect(called).toBe(true);
 

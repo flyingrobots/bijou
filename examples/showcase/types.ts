@@ -23,7 +23,7 @@ export interface ComponentEntry {
 
 /** Shared page model used by all showcase category pages. */
 export interface ShowcasePageModel {
-  readonly listState: BrowsableListState<string>;
+  readonly listState: BrowsableListState;
   readonly quitConfirmOpen: boolean;
   readonly drawerOpen: boolean;
   readonly drawerProgress: number;

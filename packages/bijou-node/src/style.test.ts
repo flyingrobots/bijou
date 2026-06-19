@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { chalkStyle } from './style.js';
 
+const ESC = '\x1b[';
+
 describe('chalkStyle()', () => {
   describe('ambient color mode', () => {
     const style = chalkStyle(false);
@@ -60,11 +62,11 @@ describe('chalkStyle()', () => {
     const style = chalkStyle({ level: 3 });
 
     it('styled() emits ANSI for hex color deterministically', () => {
-      expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ff0000' }, 'red')).toContain(ESC);
     });
 
     it('styled() emits ANSI for underline modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toContain(ESC);
     });
 
     it('styled() emits SGR 4:3 for curly-underline', () => {
@@ -84,32 +86,32 @@ describe('chalkStyle()', () => {
     });
 
     it('styled() emits ANSI for bold modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toContain(ESC);
     });
 
     it('styled() emits ANSI for dim modifier', () => {
-      expect(style.styled({ hex: '#808080', modifiers: ['dim'] }, 'muted')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#808080', modifiers: ['dim'] }, 'muted')).toContain(ESC);
     });
 
     it('styled() emits ANSI for strikethrough modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['strikethrough'] }, 'gone')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ffffff', modifiers: ['strikethrough'] }, 'gone')).toContain(ESC);
     });
 
     it('styled() emits ANSI for inverse modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toContain(ESC);
     });
 
     it('bgRgb() emits ANSI for background color', () => {
-      expect(style.bgRgb(0, 0, 255, 'blue')).toMatch(/\x1b\[/);
+      expect(style.bgRgb(0, 0, 255, 'blue')).toContain(ESC);
     });
 
     it('bgHex() emits ANSI for background color', () => {
-      expect(style.bgHex('#0000ff', 'blue')).toMatch(/\x1b\[/);
+      expect(style.bgHex('#0000ff', 'blue')).toContain(ESC);
     });
 
     it('styled() applies bg field from token', () => {
       const result = style.styled({ hex: '#ffffff', bg: '#0000ff' }, 'bg-test');
-      expect(result).toMatch(/\x1b\[/);
+      expect(result).toContain(ESC);
       expect(result).toContain('bg-test');
     });
   });
@@ -126,8 +128,6 @@ describe('chalkStyle()', () => {
     });
 
     it('styled() passes text through without modification', () => {
-      // In noColor mode, styled uses base chalk (no hex call),
-      // so without modifiers the text should pass through exactly
       expect(style.styled({ hex: '#ff0000' }, 'plain')).toBe('plain');
     });
 

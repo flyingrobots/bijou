@@ -96,7 +96,7 @@ export function wrapViewOutputAsLayoutRoot(
 }
 
 function prepareNormalizedSurface(width: number, height: number, scratch?: Surface): Surface {
-  if (scratch != null && scratch.width === width && scratch.height === height) {
+  if (scratch?.width === width && scratch.height === height) {
     scratch.clear();
     return scratch;
   }

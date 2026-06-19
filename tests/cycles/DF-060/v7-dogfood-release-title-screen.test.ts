@@ -7,21 +7,28 @@ import {
   V7_LAUNCH_DOGFOOD_RELEASE_TITLE,
   V7_DOGFOOD_RELEASE_TITLE,
 } from '../../../examples/docs/release-title.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
 } from '../../helpers/scripted.js';
 
+type DocsRootModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];
+
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
   return text;
+}
+
+function releasePageModel(model: DocsRootModel) {
+  return model.docsModel.pageModels.release;
 }
 
 describe('DF-060 v7 DOGFOOD release title screen', () => {
@@ -87,15 +94,15 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
 
   it('renders the post-release title as the first DOGFOOD Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
         msg: { type: 'select-guide', guideId: 'release-title-v7-launch' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
-    const releaseModel = (result.model as any).docsModel.pageModels.release;
+    const text = frameText(must(result.frames.at(-1)));
+    const releaseModel = releasePageModel(result.model);
 
     expect(releaseModel.guideState.items[0].value).toBe('release-title-v7-launch');
     expect(releaseModel.guideState.items[1].value).toBe('release-title-v7');
@@ -110,15 +117,15 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
 
   it('keeps the original v7 title selectable as a historical Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
         msg: { type: 'select-guide', guideId: 'release-title-v7' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
-    const releaseModel = (result.model as any).docsModel.pageModels.release;
+    const text = frameText(must(result.frames.at(-1)));
+    const releaseModel = releasePageModel(result.model);
 
     expect(releaseModel.selectedGuideId).toBe('release-title-v7');
     expect(text).toContain('V7 Product Truth');

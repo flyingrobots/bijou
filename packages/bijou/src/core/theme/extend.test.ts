@@ -22,7 +22,7 @@ describe('extendTheme', () => {
     const extended = extendTheme(CYAN_MAGENTA, {
       status: { DONE: { hex: '#00ff00' } },
     });
-    expect(extended.status['DONE']).toEqual({ hex: '#00ff00' });
+    expect(extended.status.DONE).toEqual({ hex: '#00ff00' });
     expect(extended.status.success).toEqual(CYAN_MAGENTA.status.success);
   });
 
@@ -30,7 +30,7 @@ describe('extendTheme', () => {
     const extended = extendTheme(CYAN_MAGENTA, {
       ui: { customWidget: { hex: '#abcdef' } },
     });
-    expect(extended.ui['customWidget']).toEqual({ hex: '#abcdef' });
+    expect(extended.ui.customWidget).toEqual({ hex: '#abcdef' });
     expect(extended.ui.cursor).toEqual(CYAN_MAGENTA.ui.cursor);
   });
 
@@ -43,7 +43,7 @@ describe('extendTheme', () => {
         ],
       },
     });
-    expect(extended.gradient['custom']).toEqual([
+    expect(extended.gradient.custom).toEqual([
       { pos: 0, color: [255, 0, 0] },
       { pos: 1, color: [0, 0, 255] },
     ]);
@@ -53,7 +53,7 @@ describe('extendTheme', () => {
   it('overrides existing keys when specified', () => {
     const override = { hex: '#111111' };
     const extended = extendTheme(CYAN_MAGENTA, {
-      status: { success: override } as any,
+      status: { success: override },
     });
     expect(extended.status.success).toEqual(override);
   });

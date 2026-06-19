@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { animate, sequence } from './animate.js';
 import type { CmdCapabilities } from './types.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const sourcePath = resolve(dirname(fileURLToPath(import.meta.url)), 'animate.ts');
 
@@ -47,7 +48,6 @@ describe('animate', () => {
           return v;
         },
       });
-
       const emitted: number[] = [];
       const caps = createMockCaps();
       await cmd((msg) => emitted.push(msg), caps);
@@ -55,7 +55,6 @@ describe('animate', () => {
       expect(emitted).toEqual([100]);
     });
   });
-
   describe('spring mode', () => {
     it('produces frames and settles at the target', async () => {
       const frames: number[] = [];
@@ -68,31 +67,25 @@ describe('animate', () => {
           return v;
         },
       });
-
       const emitted: number[] = [];
       const caps = createMockCaps();
-      
       let settled = false;
       const promise = Promise.resolve(cmd((msg) => emitted.push(msg), caps)).then(() => {
         settled = true;
       });
-      
       // Manually pulse until done (or safety limit)
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
-      
       await promise;
-
       expect(frames.length).toBeGreaterThan(1);
       expect(emitted.length).toBeGreaterThan(1);
       expect(emitted).toEqual(frames);
       // Values should start near 0 and end at 100
-      expect(frames[0]!).toBeGreaterThan(0);
-      expect(frames[0]!).toBeLessThan(50);
+      expect(must(frames[0])).toBeGreaterThan(0);
+      expect(must(frames[0])).toBeLessThan(50);
     });
-
     it('defaults to spring type', async () => {
       const frames: number[] = [];
       const cmd = animate({
@@ -103,21 +96,17 @@ describe('animate', () => {
           return v;
         },
       });
-
       const caps = createMockCaps();
       let settled = false;
       const promise = Promise.resolve(cmd(() => {}, caps)).then(() => { settled = true; });
-      
       // Pulse
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
-      
       await promise;
       expect(frames.length).toBeGreaterThan(1);
     });
-
     it('keeps critically damped springs bounded under slow pulse frames', async () => {
       const frames: number[] = [];
       const target = 100;
@@ -135,29 +124,25 @@ describe('animate', () => {
           return v;
         },
       });
-
       const caps = createMockCaps();
       let settled = false;
       const promise = Promise.resolve(cmd(() => {}, caps)).then(() => {
         settled = true;
       });
-
       for (let i = 0; i < 240 && !settled; i++) {
         caps.pulse(1);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
-
       expect(settled).toBe(true);
       await promise;
       expect(frames.length).toBeGreaterThan(1);
-      expect(frames[0]!).toBeGreaterThan(0);
-      expect(frames[0]!).toBeLessThan(target);
+      expect(must(frames[0])).toBeGreaterThan(0);
+      expect(must(frames[0])).toBeLessThan(target);
       expect(frames.every((value) => Number.isFinite(value))).toBe(true);
       expect(frames.every((value) => value >= 0 && value <= target)).toBe(true);
       expect(frames.at(-1)).toBe(target);
     });
   });
-
   describe('tween mode', () => {
     it('produces frames over the specified duration', async () => {
       const frames: number[] = [];
@@ -171,19 +156,15 @@ describe('animate', () => {
           return v;
         },
       });
-
       const caps = createMockCaps();
       const promise = cmd(() => {}, caps);
-      
       // Pulse 10 times (10 * 20ms = 200ms)
       for (let i = 0; i < 11; i++) {
         caps.pulse(0.02);
       }
-
       await promise;
       expect(frames.length).toBeGreaterThan(1);
     });
-
     it('respects immediate flag in tween mode too', async () => {
       const frames: number[] = [];
       const cmd = animate({
@@ -197,7 +178,6 @@ describe('animate', () => {
           return v;
         },
       });
-
       const emitted: number[] = [];
       const caps = createMockCaps();
       await cmd((msg) => emitted.push(msg), caps);
@@ -206,19 +186,16 @@ describe('animate', () => {
     });
   });
 });
-
 describe('animation command docs', () => {
   it('documents pulse-driven spring and tween commands', () => {
     const source = readFileSync(sourcePath, 'utf8');
     const springDocs = docsForInternalCommand(source, 'createSpringCmd');
     const tweenDocs = docsForInternalCommand(source, 'createTweenCmd');
-
     expect(springDocs).toContain('runtime pulses');
     expect(springDocs).toContain('fixed-step');
     expect(springDocs).toContain('maxPulseSeconds');
     expect(tweenDocs).toContain('pulse');
     expect(tweenDocs).toContain('dt');
-
     for (const docs of [springDocs, tweenDocs]) {
       expect(docs).not.toContain('setInterval');
       expect(docs).not.toContain('Date.now');
@@ -226,12 +203,10 @@ describe('animation command docs', () => {
     }
   });
 });
-
 describe('sequence', () => {
   it('runs commands in order', async () => {
     const order: string[] = [];
     const caps = createMockCaps();
-
     const cmd = sequence(
       async (emit) => {
         order.push('first');
@@ -242,7 +217,6 @@ describe('sequence', () => {
         emit('b');
       },
     );
-
     const emitted: string[] = [];
     await cmd((msg) => emitted.push(msg as string), caps);
     expect(order).toEqual(['first', 'second']);

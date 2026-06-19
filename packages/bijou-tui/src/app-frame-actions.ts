@@ -1,10 +1,3 @@
-/**
- * State reducers for `app-frame.ts`.
- *
- * Tab switching, pane cycling, scroll actions, minimize/maximize/dock,
- * page frame state sync, and transition tick command.
- */
-
 import type { FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type {
   FramePaneScroll,
@@ -69,7 +62,6 @@ function renderPaneSurfaceForMeasurement(output: ViewOutput, width: number, heig
   return focusedPaneMeasureScratch;
 }
 
-/** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette, help toggle, transitions). */
 export function applyFrameAction<PageModel, Msg>(
   action: FrameAction,
   model: InternalFrameModel<PageModel, Msg>,
@@ -84,11 +76,13 @@ export function applyFrameAction<PageModel, Msg>(
     case 'toggle-footer':
       return toggleFooter(model);
     case 'toggle-settings': {
-      const activePage = pagesById.get(model.activePageId)!;
+      const activePage = pagesById.get(model.activePageId);
+      const pageModel = model.pageModels[model.activePageId];
+      if (activePage == null || pageModel === undefined) return [model, []];
       const settings = options.settings?.({
         model,
         activePage,
-        pageModel: model.pageModels[model.activePageId]!,
+        pageModel,
       });
       const shellThemes = options.shellThemes ?? [];
       const hasStockShellThemeSettings = shellThemes.length > 1
@@ -146,22 +140,19 @@ export function applyFrameAction<PageModel, Msg>(
       return [cyclePane(model, -1, pagesById), []];
     case 'open-palette':
     case 'open-search':
-      // Palette opening is gated by `enableCommandPalette` and handled in the
-      // key-handler path of app-frame.ts → openCommandPalette(). This no-op
-      // covers the recursive case (e.g., a palette frame-action entry that
-      // would re-trigger palette opening while the palette is already open).
       return [model, []];
     case 'toggle-minimize':
       return [applyToggleMinimize(model, pagesById), []];
     case 'toggle-maximize':
-      return [applyToggleMaximize(model, pagesById), []];
+      return [applyToggleMaximize(model), []];
     case 'dock-up':
+      return [applyDockMove(model, 'up', pagesById), []];
     case 'dock-down':
+      return [applyDockMove(model, 'down', pagesById), []];
     case 'dock-left':
-    case 'dock-right': {
-      const dir = action.type.replace('dock-', '') as DockDirection;
-      return [applyDockMove(model, dir, pagesById), []];
-    }
+      return [applyDockMove(model, 'left', pagesById), []];
+    case 'dock-right':
+      return [applyDockMove(model, 'right', pagesById), []];
     case 'scroll-up':
     case 'scroll-down':
     case 'page-up':
@@ -235,7 +226,8 @@ function hasNotificationCenter<PageModel, Msg>(
 ): boolean {
   const activePage = pagesById.get(model.activePageId);
   if (activePage == null) return options.runtimeNotifications !== false;
-  const pageModel = model.pageModels[model.activePageId]!;
+  const pageModel = model.pageModels[model.activePageId];
+  if (pageModel === undefined) return options.runtimeNotifications !== false;
   const provided = options.notificationCenter?.({
     model,
     activePage,
@@ -245,7 +237,6 @@ function hasNotificationCenter<PageModel, Msg>(
   return provided != null || options.runtimeNotifications !== false;
 }
 
-/** Cycle the active tab by `delta` positions, optionally starting a transition. */
 export function switchTab<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
@@ -255,11 +246,13 @@ export function switchTab<PageModel, Msg>(
   const idx = model.pageOrder.indexOf(model.activePageId);
   if (idx < 0) return [model, []];
   const nextIdx = (idx + delta + model.pageOrder.length) % model.pageOrder.length;
-  const nextId = model.pageOrder[nextIdx]!;
+  const nextId = model.pageOrder[nextIdx];
+  if (nextId === undefined) return [model, []];
 
   if (nextId === model.activePageId) return [model, []];
 
-  const activePageModel = model.pageModels[model.activePageId]!;
+  const activePageModel = model.pageModels[model.activePageId];
+  if (activePageModel === undefined) return [model, []];
   const activeTransition = options.transitionOverride
     ? options.transitionOverride(activePageModel)
     : options.transition;
@@ -267,8 +260,6 @@ export function switchTab<PageModel, Msg>(
   const hasTransition = activeTransition != null && activeTransition !== 'none';
   const nextGeneration = model.transitionGeneration + 1;
 
-  // Use the user-supplied timeline if provided, otherwise build a default.
-  // The timeline MUST contain a 'progress' track (0 → 1).
   const tl = hasTransition
     ? (options.transitionTimeline ?? timeline()
       .add('progress', {
@@ -297,8 +288,6 @@ export function switchTab<PageModel, Msg>(
   }, nextId, pagesById);
 
   if (hasTransition) {
-    // Schedule render ticks at ~60fps for the duration of the transition.
-    // Each tick advances the timeline using wall-clock elapsed time.
     const cmd: Cmd<FramedAppMsg<Msg>> = createTransitionTickCmd(durationMs, nextGeneration);
     return [nextModel, [cmd]];
   }
@@ -306,14 +295,15 @@ export function switchTab<PageModel, Msg>(
   return [nextModel, []];
 }
 
-/** Move focus to the next or previous pane in the active page's layout. */
 export function cyclePane<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
-  const page = pagesById.get(model.activePageId)!;
-  const paneIds = collectPaneIds(page.layout(model.pageModels[model.activePageId]!));
+  const page = pagesById.get(model.activePageId);
+  const pageModel = model.pageModels[model.activePageId];
+  if (page == null || pageModel === undefined) return model;
+  const paneIds = collectPaneIds(page.layout(pageModel));
   if (paneIds.length === 0) return model;
 
   const curr = model.focusedPaneByPage[model.activePageId];
@@ -321,7 +311,8 @@ export function cyclePane<PageModel, Msg>(
   const nextIdx = idx < 0
     ? 0
     : (idx + delta + paneIds.length) % paneIds.length;
-  const next = paneIds[nextIdx]!;
+  const next = paneIds[nextIdx];
+  if (next === undefined) return model;
   return {
     ...model,
     focusedPaneByPage: {
@@ -331,7 +322,6 @@ export function cyclePane<PageModel, Msg>(
   };
 }
 
-/** Apply a scroll action to the currently focused pane. */
 export function scrollFocusedPane<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   action: Extract<
@@ -345,8 +335,10 @@ export function scrollFocusedPane<PageModel, Msg>(
   const focusedPaneId = model.focusedPaneByPage[pageId];
   if (focusedPaneId == null) return model;
 
-  const page = pagesById.get(pageId)!;
-  const layoutTree = page.layout(model.pageModels[pageId]!);
+  const page = pagesById.get(pageId);
+  const pageModel = model.pageModels[pageId];
+  if (page == null || pageModel === undefined) return model;
+  const layoutTree = page.layout(pageModel);
   const bodyRect = frameBodyRect(
     model.columns,
     model.rows,
@@ -422,7 +414,6 @@ export function scrollFocusedPane<PageModel, Msg>(
   };
 }
 
-/** Toggle minimize on the focused pane of the active page. */
 export function applyToggleMinimize<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
@@ -431,12 +422,13 @@ export function applyToggleMinimize<PageModel, Msg>(
   const focusedPaneId = model.focusedPaneByPage[pageId];
   if (focusedPaneId == null) return model;
 
-  const page = pagesById.get(pageId)!;
-  const allPaneIds = collectPaneIds(page.layout(model.pageModels[pageId]!));
+  const page = pagesById.get(pageId);
+  const pageModel = model.pageModels[pageId];
+  if (page == null || pageModel === undefined) return model;
+  const allPaneIds = collectPaneIds(page.layout(pageModel));
   const current = model.minimizedByPage[pageId] ?? createPanelVisibilityState();
   const next = toggleMinimized(current, focusedPaneId, allPaneIds);
 
-  // If we just minimized the focused pane, move focus to a non-minimized sibling
   let newFocused = focusedPaneId;
   if (isMinimized(next, focusedPaneId)) {
     const visible = allPaneIds.filter((id) => !isMinimized(next, id));
@@ -450,10 +442,8 @@ export function applyToggleMinimize<PageModel, Msg>(
   };
 }
 
-/** Toggle maximize on the focused pane of the active page. */
 export function applyToggleMaximize<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
-  _pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
   const pageId = model.activePageId;
   const focusedPaneId = model.focusedPaneByPage[pageId];
@@ -462,7 +452,6 @@ export function applyToggleMaximize<PageModel, Msg>(
   const current = model.maximizedPaneByPage[pageId] ?? createPanelMaximizeState();
   const next = toggleMaximize(current, focusedPaneId);
 
-  // If maximizing a minimized pane, restore it first
   let visibility = model.minimizedByPage[pageId] ?? createPanelVisibilityState();
   if (next.maximizedPaneId && isMinimized(visibility, next.maximizedPaneId)) {
     visibility = restorePane(visibility, next.maximizedPaneId);
@@ -475,7 +464,6 @@ export function applyToggleMaximize<PageModel, Msg>(
   };
 }
 
-/** Move the focused pane within its container in the given direction. */
 export function applyDockMove<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   direction: DockDirection,
@@ -485,8 +473,10 @@ export function applyDockMove<PageModel, Msg>(
   const focusedPaneId = model.focusedPaneByPage[pageId];
   if (focusedPaneId == null) return model;
 
-  const page = pagesById.get(pageId)!;
-  const layoutTree = page.layout(model.pageModels[pageId]!);
+  const page = pagesById.get(pageId);
+  const pageModel = model.pageModels[pageId];
+  if (page == null || pageModel === undefined) return model;
+  const layoutTree = page.layout(pageModel);
   const container = findPaneContainer(layoutTree, focusedPaneId);
   if (container == null) return model;
 
@@ -500,14 +490,15 @@ export function applyDockMove<PageModel, Msg>(
   };
 }
 
-/** Reconcile pane IDs, scroll offsets, and focus for a page after init, tab switches, or window resizes. */
 export function syncPageFrameState<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   pageId: string,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
-  const page = pagesById.get(pageId)!;
-  const paneIds = collectPaneIds(page.layout(model.pageModels[pageId]!));
+  const page = pagesById.get(pageId);
+  const pageModel = model.pageModels[pageId];
+  if (page == null || pageModel === undefined) return model;
+  const paneIds = collectPaneIds(page.layout(pageModel));
   assertUniquePaneIds(paneIds, `page "${pageId}" layout`);
 
   const prevScroll = model.scrollByPage[pageId] ?? {};
@@ -534,9 +525,6 @@ export function syncPageFrameState<PageModel, Msg>(
   };
 }
 
-/**
- * Create a TEA command that drives transition re-renders from the shared pulse.
- */
 export function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<FramedAppMsg<Msg>> {
   return (emit, caps) =>
     new Promise<void>((resolve) => {

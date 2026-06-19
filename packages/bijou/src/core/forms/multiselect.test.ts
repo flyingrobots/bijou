@@ -162,10 +162,10 @@ describe('multiselect()', () => {
       });
       const output = ctx.io.written.join('');
 
-      expect(result).toEqual([MANY_OPTIONS[3]!.value]);
+      expect(result).toEqual([MANY_OPTIONS[3]?.value]);
       expect(output).toContain('\x1b[4A');
-      expect(output).toContain(MANY_OPTIONS[3]!.label);
-      expect(output).not.toContain(MANY_OPTIONS[9]!.label);
+      expect(output).toContain(MANY_OPTIONS[3]?.label);
+      expect(output).not.toContain(MANY_OPTIONS[9]?.label);
     });
 
     it('wrap-around scrolling from first to last item', async () => {
@@ -181,8 +181,8 @@ describe('multiselect()', () => {
       });
       const output = ctx.io.written.join('');
 
-      expect(result).toEqual([MANY_OPTIONS[MANY_OPTIONS.length - 1]!.value]);
-      expect(output).toContain(MANY_OPTIONS[MANY_OPTIONS.length - 1]!.label);
+      expect(result).toEqual([MANY_OPTIONS[MANY_OPTIONS.length - 1]?.value]);
+      expect(output).toContain(MANY_OPTIONS[MANY_OPTIONS.length - 1]?.label);
     });
 
     it('sanitizes non-finite maxVisible values', async () => {

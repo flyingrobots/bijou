@@ -34,9 +34,11 @@ import {
   NotificationState,
   PageModel,
 } from './app-frame.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
+  const commandHooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
   beforeAll(() => { setDefaultContext(testCtx); });
   afterAll(() => { _resetDefaultContextForTesting(); });
 
@@ -54,7 +56,7 @@ describe('createFramedApp', () => {
         count: 0,
         notifications: seedNotificationHistory<MsgWithMouse>(
           Array.from({ length: 20 }, (_, index) => ({
-            title: `Notice ${index}`,
+            title: `Notice ${String(index)}`,
             tone: index % 2 === 0 ? 'SUCCESS' : 'WARNING',
           })),
         ),
@@ -95,7 +97,7 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel, model);
-    const scrolledY = (model as any).notificationCenterScrollY;
+    const scrolledY = model.notificationCenterScrollY;
 
     const outsideWheel: MouseMsg = {
       type: 'mouse',
@@ -121,12 +123,12 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click, model);
 
-    expect((model as any).notificationCenterScrollY).toBe(scrolledY);
+    expect(model.notificationCenterScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
 
-  it('keeps drawer mouse interactions from leaking through to the underlying page', async () => {
+  it('keeps drawer mouse interactions from leaking through to the underlying page', () => {
     type MsgWithMouse = Msg | MouseMsg;
 
     const page: FramePage<PageModel, MsgWithMouse> = {
@@ -156,8 +158,8 @@ describe('createFramedApp', () => {
           id: 'shell',
           title: 'Shell',
           rows: Array.from({ length: 24 }, (_, index) => ({
-            id: `setting-${index}`,
-            label: `Setting ${index}`,
+            id: `setting-${String(index)}`,
+            label: `Setting ${String(index)}`,
             valueLabel: index % 2 === 0 ? 'On' : 'Off',
           })),
         }],
@@ -178,7 +180,7 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel, model);
-    const scrolledY = (model as any).settingsScrollY;
+    const scrolledY = model.settingsScrollY;
 
     const outsideWheel: MouseMsg = {
       type: 'mouse',
@@ -204,7 +206,7 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click, model);
 
-    expect((model as any).settingsScrollY).toBe(scrolledY);
+    expect(model.settingsScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
@@ -299,10 +301,10 @@ describe('createFramedApp', () => {
     app.view(model);
 
     expect(captured).toBeDefined();
-    expect(captured!.paneRects.has('left')).toBe(true);
-    expect(captured!.paneRects.has('right')).toBe(true);
+    expect(captured?.paneRects.has('left')).toBe(true);
+    expect(captured?.paneRects.has('right')).toBe(true);
     // Body starts below the single-line header and above the footer
-    expect(captured!.paneRects.get('left')!.row).toBeGreaterThanOrEqual(1);
+    expect(must(captured).paneRects.get('left')?.row).toBeGreaterThanOrEqual(1);
   });
 
   it('renders mode and focused pane in the frame footer line', () => {
@@ -334,19 +336,17 @@ describe('createFramedApp', () => {
       atMs: 0,
     });
 
-    expect(runtimeMsg).toBeDefined();
+    if (runtimeMsg == null) throw new Error('expected runtime issue message');
 
-    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
-    const tickMsg = await cmds[0]!(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 200,
-    });
+    const [nextModel, cmds] = app.update(runtimeMsg, model);
+    const tickMsg = await must(cmds[0])(() => undefined, commandHooks(200));
 
     expect(nextModel.runtimeNotifications.items).toHaveLength(1);
     expect(tickMsg).toBeDefined();
 
-    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) throw new Error('expected msg');
+
+    const [visibleModel] = app.update(tickMsg, nextModel);
     const frame = app.view(visibleModel);
     if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
     const rendered = surfaceToString(frame, testCtx.style);
@@ -389,22 +389,16 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    let cmds: Cmd<FramedAppMsg<Msg>>[];
     [model, cmds] = app.update({ type: 'inc' }, model);
 
     expect(model.pageModels.home?.count).toBe(1);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]!(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 123,
-    });
+    const returned = await must(cmds[0])(() => undefined, commandHooks(123));
 
     expect(returned).not.toBeUndefined();
-    if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) {
-      throw new Error('expected a frame notification message');
-    }
+    if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) throw new Error('expected msg');
 
     [model, cmds] = app.update(returned, model);
 
@@ -418,15 +412,9 @@ describe('createFramedApp', () => {
     });
     expect(cmds).toHaveLength(1);
 
-    const tickMsg = await cmds[0]!(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
-      now: () => 200,
-    });
+    const tickMsg = await must(cmds[0])(() => undefined, commandHooks(200));
     expect(tickMsg).not.toBeUndefined();
-    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) {
-      throw new Error('expected a notification tick message');
-    }
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) throw new Error('expected msg');
 
     const [visibleModel] = app.update(tickMsg, model);
     const frame = app.view(visibleModel);

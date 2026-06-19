@@ -6,6 +6,71 @@ set -euo pipefail
 # Warn (don't block) when pushing more than BIJOU_PUSH_COMMIT_LIMIT commits.
 # ---------------------------------------------------------------------------
 COMMIT_LIMIT="${BIJOU_PUSH_COMMIT_LIMIT:-10}"
+DOGFOOD_RELEVANT=false
+
+is_dogfood_relevant_path() {
+  case "$1" in
+    .github/workflows/*) return 0 ;;
+    package.json|package-lock.json) return 0 ;;
+    packages/*) return 0 ;;
+    examples/docs/*) return 0 ;;
+    scripts/dogfood-*) return 0 ;;
+    scripts/smoke-dogfood*) return 0 ;;
+    tests/cycles/DF-*) return 0 ;;
+    tests/cycles/*dogfood*) return 0 ;;
+    docs/DOGFOOD.md) return 0 ;;
+    docs/design/DF-*) return 0 ;;
+    docs/legends/DF-*) return 0 ;;
+    docs/method/legends/DF-*) return 0 ;;
+  esac
+
+  return 1
+}
+
+changed_paths_for_push() {
+  local local_oid="$1"
+  local remote_oid="$2"
+  local zero_oid="0000000000000000000000000000000000000000"
+  local commits
+
+  if [ "$remote_oid" = "$zero_oid" ]; then
+    commits=$(git rev-list "$local_oid" --not --remotes 2>/dev/null || true)
+    if [ -n "$commits" ]; then
+      git diff-tree --no-commit-id --name-only -r -m $commits
+    fi
+    return 0
+  fi
+
+  git diff --name-only "$remote_oid" "$local_oid"
+}
+
+mark_dogfood_relevance() {
+  local local_oid="$1"
+  local remote_oid="$2"
+  local zero_oid="0000000000000000000000000000000000000000"
+
+  if [ "$local_oid" = "$zero_oid" ]; then
+    return 0
+  fi
+
+  while IFS= read -r path; do
+    if is_dogfood_relevant_path "$path"; then
+      DOGFOOD_RELEVANT=true
+      return 0
+    fi
+  done < <(changed_paths_for_push "$local_oid" "$remote_oid")
+}
+
+run_dogfood_i18n_gates() {
+  echo "pre-push: running DOGFOOD i18n completeness gate"
+  npm run dogfood:i18n:complete
+
+  echo "pre-push: checking generated DOGFOOD i18n catalogs"
+  npm run dogfood:i18n:check
+
+  echo "pre-push: running DOGFOOD i18n debt ratchet"
+  npm run dogfood:i18n:debt
+}
 
 while read -r local_ref local_oid remote_ref remote_oid; do
   # Skip delete pushes
@@ -24,19 +89,22 @@ while read -r local_ref local_oid remote_ref remote_oid; do
     echo "pre-push: ⚠ pushing $count commits on ${local_ref} (limit: $COMMIT_LIMIT)"
     echo "          Consider splitting into smaller pushes."
   fi
+
+  mark_dogfood_relevance "$local_oid" "$remote_oid"
 done
 
 # ---------------------------------------------------------------------------
 # DOGFOOD localization gates
 # ---------------------------------------------------------------------------
-echo "pre-push: running DOGFOOD i18n completeness gate"
-npm run dogfood:i18n:complete
+if [ "${BIJOU_FULL_PUSH:-0}" = "1" ]; then
+  DOGFOOD_RELEVANT=true
+fi
 
-echo "pre-push: checking generated DOGFOOD i18n catalogs"
-npm run dogfood:i18n:check
-
-echo "pre-push: running DOGFOOD i18n debt ratchet"
-npm run dogfood:i18n:debt
+if [ "$DOGFOOD_RELEVANT" = "true" ]; then
+  run_dogfood_i18n_gates
+else
+  echo "pre-push: skipping DOGFOOD i18n gates; no DOGFOOD-relevant pushed paths"
+fi
 
 # ---------------------------------------------------------------------------
 # Code size gate
@@ -54,7 +122,7 @@ npm run typecheck:test
 # Test suite
 # ---------------------------------------------------------------------------
 echo "pre-push: running test suite"
-npm test
+npm run test:run
 
 # ---------------------------------------------------------------------------
 # Interactive example smoke

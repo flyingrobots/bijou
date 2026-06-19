@@ -36,7 +36,7 @@ export const SCENARIOS: readonly AnyScenario[] = [
   componentApp,
   flame,
   soak,
-] as unknown as readonly AnyScenario[]; // Scenario<T> is invariant on T; cast required for the heterogeneous registry
+]; // Scenario<T> is invariant on T; cast required for the heterogeneous registry
 
 const SCENARIO_ALIASES: Readonly<Record<string, string>> = {
   'paint-theme-set': 'paint-set-hex-palette',

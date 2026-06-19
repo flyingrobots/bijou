@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, must } from '@flyingrobots/bijou/adapters/test';
 import type { DagNode } from '@flyingrobots/bijou';
 import type { KeyMsg } from './types.js';
 import {
@@ -308,9 +308,7 @@ describe('dagPaneSetSource', () => {
     expect(next.highlightPath).toEqual([]);
   });
 });
-
 // ── Render ─────────────────────────────────────────────────────────
-
 describe('dagPane', () => {
   it('renders a string', () => {
     const state = createDagPaneState({ source: LINEAR_NODES, width: 60, height: 20, ctx });
@@ -318,19 +316,16 @@ describe('dagPane', () => {
     expect(typeof output).toBe('string');
     expect(output.length).toBeGreaterThan(0);
   });
-
   it('renders exactly height lines', () => {
     const state = createDagPaneState({ source: LINEAR_NODES, width: 60, height: 10, ctx });
     const output = dagPane(state, { ctx });
     expect(output.split('\n')).toHaveLength(10);
   });
-
   it('includes gutter in interactive mode', () => {
     const state = createDagPaneState({ source: LINEAR_NODES, width: 60, height: 10, ctx });
     const output = dagPane(state, { ctx });
     expect(output).toContain('▎');
   });
-
   it('pipe mode omits gutter', () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     const state = createDagPaneState({ source: LINEAR_NODES, width: 60, height: 10, ctx: pipeCtx });
@@ -338,9 +333,7 @@ describe('dagPane', () => {
     expect(output).not.toContain('▎');
   });
 });
-
 // ── Auto-scroll to selection ──────────────────────────────────────
-
 describe('auto-scroll to selection', () => {
   it('scrolls to bring selected node into view', () => {
     // Use a small viewport height to ensure the last node in a tall graph
@@ -352,16 +345,13 @@ describe('auto-scroll to selection', () => {
     expect(nodePos).toBeDefined();
     // Scroll should have adjusted so the node is within the viewport
     const scrollY = next.focusArea.scroll.y;
-    expect(scrollY).toBeLessThanOrEqual(nodePos!.row);
-    expect(scrollY + next.focusArea.height).toBeGreaterThanOrEqual(nodePos!.row);
+    expect(scrollY).toBeLessThanOrEqual(must(nodePos).row);
+    expect(scrollY + next.focusArea.height).toBeGreaterThanOrEqual(must(nodePos).row);
   });
 });
-
 // ── Keymap ──────────────────────────────────────────────────────────
-
 describe('dagPaneKeyMap', () => {
-  type Msg = { type: string };
-
+  interface Msg { type: string }
   const km = dagPaneKeyMap<Msg>({
     selectParent: { type: 'parent' },
     selectChild: { type: 'child' },
@@ -378,43 +368,35 @@ describe('dagPaneKeyMap', () => {
     confirm: { type: 'ok' },
     quit: { type: 'quit' },
   });
-
   it('handles arrow keys for node selection', () => {
     expect(km.handle(keyMsg('up'))).toEqual({ type: 'parent' });
     expect(km.handle(keyMsg('down'))).toEqual({ type: 'child' });
     expect(km.handle(keyMsg('left'))).toEqual({ type: 'left' });
     expect(km.handle(keyMsg('right'))).toEqual({ type: 'right' });
   });
-
   it('handles j/k for scroll', () => {
     expect(km.handle(keyMsg('j'))).toEqual({ type: 'down' });
     expect(km.handle(keyMsg('k'))).toEqual({ type: 'up' });
   });
-
   it('handles h/l for horizontal scroll', () => {
     expect(km.handle(keyMsg('h'))).toEqual({ type: 'sleft' });
     expect(km.handle(keyMsg('l'))).toEqual({ type: 'sright' });
   });
-
   it('handles page keys', () => {
     expect(km.handle(keyMsg('d'))).toEqual({ type: 'pd' });
     expect(km.handle(keyMsg('u'))).toEqual({ type: 'pu' });
   });
-
   it('handles top/bottom', () => {
     expect(km.handle(keyMsg('g'))).toEqual({ type: 'top' });
     expect(km.handle(keyMsg('g', { shift: true }))).toEqual({ type: 'bot' });
   });
-
   it('handles enter for confirm', () => {
     expect(km.handle(keyMsg('enter'))).toEqual({ type: 'ok' });
   });
-
   it('handles quit', () => {
     expect(km.handle(keyMsg('q'))).toEqual({ type: 'quit' });
     expect(km.handle(keyMsg('c', { ctrl: true }))).toEqual({ type: 'quit' });
   });
-
   it('returns undefined for unbound keys', () => {
     expect(km.handle(keyMsg('x'))).toBeUndefined();
   });

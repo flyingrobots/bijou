@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { stripAnsi, surfaceToString, type OutputMode } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, _resetDefaultContextForTesting, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import {
   createStoryProfileContext,
   storyPreviewSurface,
@@ -10,7 +10,7 @@ import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 function getStory(storyId: string) {
   const story = COMPONENT_STORIES.find((candidate) => candidate.id === storyId);
   expect(story).toBeDefined();
-  return story!;
+  return must(story);
 }
 
 function renderStoryPreviewText(
@@ -26,14 +26,14 @@ function renderStoryPreviewText(
   expect(preset).toBeDefined();
 
   const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-  const previewCtx = createStoryProfileContext(baseCtx, preset!, {
-    width: preset!.width,
+  const previewCtx = createStoryProfileContext(baseCtx, must(preset), {
+    width: must(preset).width,
     height: 14,
   });
-  const preview = storyPreviewSurface(variant!.render({
-    width: preset!.width,
+  const preview = storyPreviewSurface(must(variant).render({
+    width: must(preset).width,
     ctx: previewCtx,
-    state: variant!.initialState as never,
+    state: must(variant).initialState,
     timeMs: 0,
   }));
 
@@ -41,7 +41,7 @@ function renderStoryPreviewText(
 }
 
 describe('DF-020 DOGFOOD data-viz lowering', () => {
-  afterEach(() => _resetDefaultContextForTesting());
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('keeps data-viz story docs honest about current lowerings', () => {
     for (const storyId of ['sparkline', 'braille-chart', 'stats-panel', 'perf-overlay'] as const) {

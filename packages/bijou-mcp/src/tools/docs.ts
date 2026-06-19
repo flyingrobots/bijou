@@ -20,6 +20,7 @@ import {
   withOutputMode,
 } from '../output.js';
 import type { ToolRegistration, ToolResult } from '../types.js';
+import { numbers, strings, text } from './docs-values.js';
 import {
   DEFAULT_DOCS_ONLY_INTERACTION_PROFILES,
   DEFAULT_INTERACTION_PROFILES,
@@ -46,15 +47,14 @@ interface SerializedToolDocsEntry {
 }
 
 type DocsOnlyExampleRenderer = (args: Record<string, unknown>) => string;
-
 const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRenderer>> = {
-  bijou_markdown: (args) => stripAnsi(markdown(String(args['source'] ?? ''), {
+  bijou_markdown: (args) => stripAnsi(markdown(text(args['source']), {
     width: typeof args['width'] === 'number' ? args['width'] : undefined,
     ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
   })),
   bijou_note: (args) => {
     const title = typeof args['title'] === 'string' ? args['title'] : undefined;
-    const message = String(args['message'] ?? '');
+    const message = text(args['message']);
     return title ? `Note (${title}): ${message}` : `Note: ${message}`;
   },
   bijou_guided_flow: (args) => stripAnsi(guidedFlow({
@@ -70,39 +70,37 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     },
   ), plainStyle()),
   bijou_text_entry: (args) => {
-    const inputTitle = String(args['inputTitle'] ?? 'Cluster name');
-    const inputDefault = String(args['inputDefault'] ?? '');
-    const textareaTitle = String(args['textareaTitle'] ?? 'Details');
-    const textareaValue = String(args['textareaValue'] ?? '');
+    const inputTitle = text(args['inputTitle'], 'Cluster name');
+    const inputDefault = text(args['inputDefault']);
+    const textareaTitle = text(args['textareaTitle'], 'Details');
+    const textareaValue = text(args['textareaValue']);
     return `${inputTitle}? [${inputDefault}]\n${textareaTitle}?\n${textareaValue}`;
   },
   bijou_single_choice: (args) => {
-    const title = String(args['title'] ?? 'Select one');
-    const options = Array.isArray(args['options']) ? args['options'].map(String) : [];
-    const selected = String(args['selected'] ?? options[0] ?? '');
-    const numbered = options.map((option, index) => `${index + 1}. ${option}`).join('\n');
+    const title = text(args['title'], 'Select one');
+    const options = strings(args['options']);
+    const selected = text(args['selected'], options[0] ?? '');
+    const numbered = options.map((option, index) => `${String(index + 1)}. ${option}`).join('\n');
     const selectedIndex = Math.max(options.findIndex((option) => option === selected), 0) + 1;
-    return `${title}?\n${numbered}\n> ${selectedIndex}\nSelected: ${selected}`;
+    return `${title}?\n${numbered}\n> ${String(selectedIndex)}\nSelected: ${selected}`;
   },
   bijou_multiple_choice: (args) => {
-    const title = String(args['title'] ?? 'Select one or more');
-    const options = Array.isArray(args['options']) ? args['options'].map(String) : [];
-    const selected = new Set(
-      Array.isArray(args['selected']) ? args['selected'].map(String) : [],
-    );
+    const title = text(args['title'], 'Select one or more');
+    const options = strings(args['options']);
+    const selected = new Set(strings(args['selected']));
     const lines = options.map((option) => `[${selected.has(option) ? 'x' : ' '}] ${option}`);
     return `${title}?\n${lines.join('\n')}\nSelected: ${Array.from(selected).join(', ')}`;
   },
   bijou_binary_decision: (args) => {
-    const title = String(args['title'] ?? 'Continue');
+    const title = text(args['title'], 'Continue');
     const defaultValue = args['defaultValue'] === false ? '[y/N]' : '[Y/n]';
-    const answer = String(args['answer'] ?? '');
+    const answer = text(args['answer']);
     return `${title}? ${defaultValue}\n> ${answer}`;
   },
   bijou_multi_field_forms: (args) => {
-    const stepLabel = String(args['stepLabel'] ?? 'Step 1 of 1');
-    const stepTitle = String(args['stepTitle'] ?? 'Details');
-    const fields = Array.isArray(args['fields']) ? args['fields'].map(String) : [];
+    const stepLabel = text(args['stepLabel'], 'Step 1 of 1');
+    const stepTitle = text(args['stepTitle'], 'Details');
+    const fields = strings(args['fields']);
     return `${stepLabel}: ${stepTitle}\n${fields.join('\n')}`;
   },
   bijou_spinner: (args) => spinnerFrame(Number(args['tick'] ?? 0), {
@@ -113,11 +111,11 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     ctx: mcpContext(),
   })),
   bijou_sparkline: (args) => sparkline(
-    (args['values'] as readonly number[] | undefined) ?? [],
+    numbers(args['values']),
     { width: typeof args['width'] === 'number' ? args['width'] : undefined },
   ),
   bijou_braille_chart: (args) => surfaceToString(brailleChartSurface(
-    (args['values'] as readonly number[] | undefined) ?? [],
+    numbers(args['values']),
     {
       width: Number(args['width'] ?? 0),
       height: Number(args['height'] ?? 0),
@@ -125,7 +123,7 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     },
   ), plainStyle()),
   bijou_stats_panel: (args) => surfaceToString(statsPanelSurface(
-    (args['entries'] as Parameters<typeof statsPanelSurface>[0]) ?? [],
+    args['entries'] as Parameters<typeof statsPanelSurface>[0],
     {
       title: typeof args['title'] === 'string' ? args['title'] : undefined,
       width: Number(args['width'] ?? 28),
@@ -136,7 +134,7 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     {
       fps: Number(args['fps'] ?? 0),
       frameTimeMs: Number(args['frameTimeMs'] ?? 0),
-      frameTimeHistory: (args['frameTimeHistory'] as readonly number[] | undefined) ?? [],
+      frameTimeHistory: numbers(args['frameTimeHistory']),
       width: Number(args['width'] ?? 80),
       height: Number(args['height'] ?? 24),
     },
@@ -146,17 +144,17 @@ const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRender
     },
   ), plainStyle()),
   bijou_branding: (args) => {
-    const logo = String(args['logo'] ?? 'BIJOU');
-    const headline = String(args['headline'] ?? '');
+    const logo = text(args['logo'], 'BIJOU');
+    const headline = text(args['headline']);
     return `${logo}\n${headline}`.trimEnd();
   },
   bijou_mode_aware_authoring: (args) => {
-    const semanticThing = String(args['semanticThing'] ?? 'semantic thing');
+    const semanticThing = text(args['semanticThing'], 'semantic thing');
     return [
       `${semanticThing}:`,
-      `interactive -> ${String(args['interactive'] ?? '[rich output]')}`,
-      `pipe -> ${String(args['pipe'] ?? 'plain fallback')}`,
-      `accessible -> ${String(args['accessible'] ?? 'explicit reading-order fallback')}`,
+      `interactive -> ${text(args['interactive'], '[rich output]')}`,
+      `pipe -> ${text(args['pipe'], 'plain fallback')}`,
+      `accessible -> ${text(args['accessible'], 'explicit reading-order fallback')}`,
     ].join('\n');
   },
 };
@@ -191,7 +189,7 @@ function scoreDocsEntry(entry: ToolDocsCatalogEntry, normalizedQuery: string): n
 }
 
 function exampleText(result: ToolResult): string {
-  return result.content.find((block) => block.type === 'text')?.text
+  return result.content[0]?.text
     ?? (typeof result.structuredContent?.['rendered'] === 'string'
       ? result.structuredContent['rendered']
       : '');
@@ -227,7 +225,7 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
 
   return {
     name: 'bijou_docs',
-    description: 'Query machine-readable documentation for the bijou-mcp render-tool surface plus the full public first-party Bijou component-family surface, including docs-only families that do not yet have dedicated MCP renderers. Returns usage guidance, interaction-profile notes, related tools, sample input, and optional rendered example output.',
+    description: 'Query machine-readable docs for bijou-mcp render tools and public first-party Bijou component families, including docs-only families before dedicated MCP renderers exist. Returns usage guidance, interaction profiles, related tools, sample input, and optional rendered example output.',
     inputSchema: inputShape,
     outputSchema: structuredToolOutputShape,
     handler: async (args) => {
@@ -262,13 +260,13 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
           aliases: entry.aliases,
         };
         if (entry.exampleArgs !== undefined) {
-          result['exampleInput'] = entry.exampleArgs;
+          result.exampleInput = entry.exampleArgs;
         }
         if (includeExamples && entry.exampleArgs !== undefined) {
           if (tool !== undefined) {
-            result['exampleOutput'] = exampleText(await tool.handler(entry.exampleArgs));
+            result.exampleOutput = exampleText(await tool.handler(entry.exampleArgs));
           } else if (docsOnlyRenderer !== undefined) {
-            result['exampleOutput'] = docsOnlyRenderer(entry.exampleArgs);
+            result.exampleOutput = docsOnlyRenderer(entry.exampleArgs);
           }
         }
         return result;

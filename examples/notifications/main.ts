@@ -147,25 +147,14 @@ function createInitialPageModel(): PageModel {
   };
 }
 
-function currentVariant(model: PageModel): NotificationVariant {
-  return VARIANTS[model.variantIndex]!;
-}
-
-function currentTone(model: PageModel): NotificationTone {
-  return TONES[model.toneIndex]!;
-}
-
-function currentPlacement(model: PageModel): NotificationPlacement {
-  return PLACEMENTS[model.placementIndex]!;
-}
-
-function currentDuration(model: PageModel) {
-  return DURATION_OPTIONS[model.durationIndex]!;
-}
-
-function currentHistoryFilter(model: PageModel): NotificationHistoryFilter {
-  return HISTORY_FILTERS[model.historyFilterIndex]!;
-}
+function currentVariant(model: PageModel) { return at(VARIANTS, model.variantIndex); }
+function currentTone(model: PageModel) { return at(TONES, model.toneIndex); }
+function currentPlacement(model: PageModel) { return at(PLACEMENTS, model.placementIndex); }
+function currentDuration(model: PageModel) { return at(DURATION_OPTIONS, model.durationIndex); }
+function currentHistoryFilter(model: PageModel) { return at(HISTORY_FILTERS, model.historyFilterIndex); }
+function n(value: number) { return String(value); }
+function at<T>(v: readonly T[], i: number) { const value = v[i]; if (value === undefined) throw new Error('Bad notification state.'); return value; }
+function mouse(msg: MouseMsg) { return `mouse:${n(msg.col)},${n(msg.row)}`; }
 
 function toneCopy(tone: NotificationTone): { readonly title: string; readonly message: string } {
   switch (tone) {
@@ -226,28 +215,20 @@ function recordInput(model: PageModel, key: string, message: string): PageModel 
 }
 
 function renderControlsPane(model: PageModel, width: number, notificationCtx = ctx): string {
-  const activeVariant = currentVariant(model);
-  const activeTone = currentTone(model);
-  const activePlacement = currentPlacement(model);
-  const nextPlacement = PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!;
-  const activeDuration = currentDuration(model);
-  const historyFilter = currentHistoryFilter(model);
-  const focused = model.notifications.focusedId == null
-    ? 'none'
-    : `#${model.notifications.focusedId}`;
+  const focused = model.notifications.focusedId == null ? 'none' : `#${n(model.notifications.focusedId)}`;
   const lines = [
     'Notification Lab',
     '',
-    `Variant : ${activeVariant}`,
-    `Tone    : ${activeTone}`,
-    `Next at : ${activePlacement}`,
-    `Cycle   : ${nextPlacement}`,
-    `Stay    : ${activeDuration.label}`,
+    `Variant : ${currentVariant(model)}`,
+    `Tone    : ${currentTone(model)}`,
+    `Next at : ${currentPlacement(model)}`,
+    `Cycle   : ${at(PLACEMENTS, (model.placementIndex + 1) % PLACEMENTS.length)}`,
+    `Stay    : ${currentDuration(model).label}`,
     `Action  : ${model.actionEnabled ? 'enabled' : 'disabled'}`,
     `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
-    `Stack   : ${model.notifications.items.length}`,
-    `History : ${model.notifications.history.length}`,
-    `Review  : shift+n (${historyFilter})`,
+    `Stack   : ${n(model.notifications.items.length)}`,
+    `History : ${n(model.notifications.history.length)}`,
+    `Review  : shift+n (${currentHistoryFilter(model)})`,
     `Focus   : ${focused}`,
     `Last key: ${model.lastHandledInput}`,
     '',
@@ -337,7 +318,7 @@ function spawnConfiguredNotification(
   const duration = currentDuration(model);
   const copy = toneCopy(tone);
   const spec: NotificationSpec<Msg> = {
-    title: `${copy.title} #${ordinal}`,
+    title: `${copy.title} #${n(ordinal)}`,
     message: `${copy.message} ${variant} @ ${placement} • ${duration.label}`,
     variant,
     tone,
@@ -358,7 +339,7 @@ function spawnConfiguredNotification(
     lastHandledInput: 'n',
     notifications,
     nextOrdinal: ordinal + 1,
-  }, `[n] Spawned ${variant} #${ordinal} at ${placement} (${formatDurationLabel(duration.value)}).`);
+  }, `[n] Spawned ${variant} #${n(ordinal)} at ${placement} (${formatDurationLabel(duration.value)}).`);
 
   return applyNotificationState(nextModel, notifications, notificationCtx);
 }
@@ -406,8 +387,7 @@ function resolveDemoNotificationMouseTarget(
     ctx: notificationCtx,
   });
 
-  for (let index = overlays.length - 1; index >= 0; index--) {
-    const overlay = overlays[index]!;
+  for (const overlay of [...overlays].reverse()) {
     const surface = overlay.surface;
     if (
       surface == null
@@ -455,27 +435,28 @@ function handleNotificationMouse(
     const nextModel = appendLog({
       ...model,
       notifications,
-      lastHandledInput: `mouse:${msg.col},${msg.row}`,
-    }, `[mouse] Dismissed notification #${target.item.id}.`);
+      lastHandledInput: mouse(msg),
+    }, `[mouse] Dismissed notification #${n(target.item.id)}.`);
     return applyNotificationState(nextModel, notifications, notificationCtx);
   }
 
   if (target.kind === 'action') {
     const nowMs = resolveClock(notificationCtx).now();
     const notifications = dismissNotification(model.notifications, target.item.id, nowMs);
+    const action = target.item.action;
     const nextModel = appendLog({
       ...model,
       notifications,
-      lastHandledInput: `mouse:${msg.col},${msg.row}`,
-    }, target.item.action == null
-      ? `[mouse] Dismissed notification #${target.item.id}.`
-      : `[mouse] Activated notification #${target.item.id}.`);
+      lastHandledInput: mouse(msg),
+    }, action == null
+      ? `[mouse] Dismissed notification #${n(target.item.id)}.`
+      : `[mouse] Activated notification #${n(target.item.id)}.`);
 
-    if (target.item.action == null) {
+    if (action == null) {
       return applyNotificationState(nextModel, notifications, notificationCtx);
     }
 
-    const actionCmd: Cmd<Msg> = async () => target.item.action!.payload;
+    const actionCmd: Cmd<Msg> = () => action.payload;
     return applyNotificationState(nextModel, notifications, notificationCtx, [actionCmd]);
   }
 
@@ -517,18 +498,18 @@ function seedDemoNotifications(model: PageModel, notificationCtx = ctx): PageMod
   for (const entry of entries) {
     const ordinal = next.nextOrdinal;
     const notifications = pushNotification(next.notifications, {
-      title: `${entry.title} #${ordinal}`,
+      title: `${entry.title} #${n(ordinal)}`,
       message: entry.message,
       variant: entry.variant,
       tone: entry.tone,
       placement: entry.placement,
       durationMs: entry.durationMs,
-      action: !('actionLabel' in entry) || entry.actionLabel == null
-        ? undefined
-        : {
+      action: 'actionLabel' in entry
+        ? {
           label: entry.actionLabel,
           payload: { type: 'notification-action', ordinal },
-        },
+        }
+        : undefined,
       overflow: next.wrapText ? 'wrap' : 'truncate',
     }, nowMs);
 
@@ -536,7 +517,7 @@ function seedDemoNotifications(model: PageModel, notificationCtx = ctx): PageMod
       ...next,
       notifications,
       nextOrdinal: ordinal + 1,
-    }, `Seeded ${entry.variant} #${ordinal} for automated smoke rendering.`);
+    }, `Seeded ${entry.variant} #${n(ordinal)} for automated smoke rendering.`);
 
     nowMs += 60;
   }
@@ -577,16 +558,16 @@ export function createNotificationDemoApp(
         return [recordInput({
           ...model,
           variantIndex: (model.variantIndex + 1) % VARIANTS.length,
-        }, 'v', `Variant -> ${VARIANTS[(model.variantIndex + 1) % VARIANTS.length]!}.`), []];
+        }, 'v', `Variant -> ${at(VARIANTS, (model.variantIndex + 1) % VARIANTS.length)}.`), []];
       case 'cycle-tone':
         return [recordInput({
           ...model,
           toneIndex: (model.toneIndex + 1) % TONES.length,
-        }, 't', `Tone -> ${TONES[(model.toneIndex + 1) % TONES.length]!}.`), []];
+        }, 't', `Tone -> ${at(TONES, (model.toneIndex + 1) % TONES.length)}.`), []];
       case 'cycle-placement':
       {
         const nextPlacementIndex = (model.placementIndex + 1) % PLACEMENTS.length;
-        const nextPlacement = PLACEMENTS[nextPlacementIndex]!;
+        const nextPlacement = at(PLACEMENTS, nextPlacementIndex);
         const notifications = relocateNotifications(
           model.notifications,
           nextPlacement,
@@ -604,7 +585,7 @@ export function createNotificationDemoApp(
         return [recordInput({
           ...model,
           durationIndex: (model.durationIndex + 1) % DURATION_OPTIONS.length,
-        }, 'd', `Duration -> ${DURATION_OPTIONS[(model.durationIndex + 1) % DURATION_OPTIONS.length]!.label}.`), []];
+        }, 'd', `Duration -> ${at(DURATION_OPTIONS, (model.durationIndex + 1) % DURATION_OPTIONS.length).label}.`), []];
       case 'toggle-action':
         return [recordInput({
           ...model,
@@ -641,13 +622,13 @@ export function createNotificationDemoApp(
         };
 
         if (result.payload?.type === 'notification-action') {
-          nextModel = recordInput(nextModel, 'enter', `Action fired from notification #${result.payload.ordinal}.`);
+          nextModel = recordInput(nextModel, 'enter', `Action fired from notification #${n(result.payload.ordinal)}.`);
         }
 
         return applyNotificationState(nextModel, nextModel.notifications, notificationCtx);
       }
       case 'notification-action':
-        return [appendLog(model, `Notification #${msg.ordinal} delivered its action payload.`), []];
+        return [appendLog(model, `Notification #${n(msg.ordinal)} delivered its action payload.`), []];
       case 'notification-tick': {
         const notifications = tickNotifications(model.notifications, resolveClock(notificationCtx).now());
         return applyNotificationState({
@@ -662,6 +643,8 @@ export function createNotificationDemoApp(
         }, `[key ${msg.key}] route=${msg.route}`), []];
       case 'quit-app':
         return [model, [quit()]];
+      case 'pulse':
+        return [model, []];
       default:
         return [model, []];
     }
@@ -738,5 +721,5 @@ export function createNotificationDemoApp(
 export const app = createNotificationDemoApp();
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app, { mouse: true });
+  void run(app, { mouse: true });
 }

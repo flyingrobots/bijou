@@ -53,9 +53,7 @@ const MIN_POSITIVE_INTEGER = 1;
 const UNORDERED_TAB_INDEX = Number.POSITIVE_INFINITY;
 const EMPTY_LABEL = '-';
 const FOCUSED_PREFIX = '*';
-const COORD_SEPARATOR = ',';
-const SIZE_SEPARATOR = 'x';
-const LIST_SEPARATOR = ',';
+const SEP = ',';
 
 export function inspectFocusMap(nodes: readonly FocusMapNode[]): FocusMapReport {
   const orderedNodes = [...nodes].sort(compareFocusMapNodes);
@@ -75,7 +73,7 @@ export function inspectFocusMap(nodes: readonly FocusMapNode[]): FocusMapReport 
     issues.push({
       kind: 'multiple-focused',
       nodeIds: focusedNodeIds,
-      message: `multiple focused nodes: ${focusedNodeIds.join(LIST_SEPARATOR)}`,
+      message: `multiple focused nodes: ${focusedNodeIds.join(SEP)}`,
     });
   }
 
@@ -107,8 +105,8 @@ export function focusMapText(
   const report = inspectFocusMap(nodes);
   const focused = report.focusedNodeIds.length === 0
     ? EMPTY_LABEL
-    : report.focusedNodeIds.join(LIST_SEPARATOR);
-  const lines = [`focus map: ${report.nodes.length} nodes, focused=${focused}`];
+    : report.focusedNodeIds.join(SEP);
+  const lines = [`focus map: ${String(report.nodes.length)} nodes, focused=${focused}`];
 
   report.nodes.forEach((node, index) => {
     lines.push(focusMapNodeLine(node, index));
@@ -138,11 +136,11 @@ export function focusMapSurface(
 function focusMapNodeLine(node: FocusMapNode, index: number): string {
   const id = node.focused === true ? `${FOCUSED_PREFIX}${node.id}` : node.id;
   return [
-    `[${index + 1}]`,
+    `[${String(index + 1)}]`,
     id,
     `owner=${node.owner ?? EMPTY_LABEL}`,
     `role=${node.role ?? EMPTY_LABEL}`,
-    `tabIndex=${node.tabIndex ?? EMPTY_LABEL}`,
+    `tabIndex=${node.tabIndex === undefined ? EMPTY_LABEL : String(node.tabIndex)}`,
     `rect=${rectLabel(node.rect)}`,
     `focusable=${String(node.focusable === true)}`,
     `focused=${String(node.focused === true)}`,
@@ -155,7 +153,7 @@ function rectLabel(rect: FocusMapRect | undefined): string {
     return EMPTY_LABEL;
   }
 
-  return `${rect.x}${COORD_SEPARATOR}${rect.y} ${rect.width}${SIZE_SEPARATOR}${rect.height}`;
+  return `${String(rect.x)},${String(rect.y)} ${String(rect.width)}x${String(rect.height)}`;
 }
 
 function compareFocusMapNodes(a: FocusMapNode, b: FocusMapNode): number {
@@ -193,7 +191,7 @@ function duplicateTabIndexes(nodes: readonly FocusMapNode[]): readonly FocusMapI
       kind: 'duplicate-tab-index',
       tabIndex,
       nodeIds,
-      message: `duplicate tab index ${tabIndex}: ${nodeIds.join(LIST_SEPARATOR)}`,
+      message: `duplicate tab index ${String(tabIndex)}: ${nodeIds.join(SEP)}`,
     });
   }
 

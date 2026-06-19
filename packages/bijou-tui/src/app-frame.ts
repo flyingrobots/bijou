@@ -846,9 +846,9 @@ export function createFramedApp<PageModel, Msg>(
   }
 
   const pageOrder = options.pages.map((p) => p.id);
-  const defaultPageId = options.defaultPageId ?? pageOrder[0]!;
-  if (!pagesById.has(defaultPageId)) {
-    throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
+  const defaultPageId = options.defaultPageId ?? pageOrder.at(0);
+  if (defaultPageId === undefined || !pagesById.has(defaultPageId)) {
+    throw new Error(`createFramedApp: defaultPageId "${String(defaultPageId)}" not found in pages`);
   }
 
   const shellThemeSpecs = options.shellThemes ?? [];
@@ -870,7 +870,7 @@ export function createFramedApp<PageModel, Msg>(
       );
     }
     defaultFrameCtx ??= baseCtx;
-    resolvedShellThemes = resolveFrameShellThemeChoices(shellThemeSpecs, defaultFrameCtx!);
+    resolvedShellThemes = resolveFrameShellThemeChoices(shellThemeSpecs, defaultFrameCtx);
   }
 
   if (frameCtx != null) {
@@ -958,14 +958,14 @@ export function createFramedApp<PageModel, Msg>(
 
   function bindingComboKey(binding: BindingInfo): string {
     const combo = binding.combo;
-    return `${combo.key}|${combo.ctrl ? 1 : 0}|${combo.alt ? 1 : 0}|${combo.shift ? 1 : 0}`;
+    return [combo.key, combo.ctrl ? '1' : '0', combo.alt ? '1' : '0', combo.shift ? '1' : '0'].join('|');
   }
 
   function findBindingForMessage(
     bindings: readonly BindingInfo[],
     msg: KeyMsg,
   ): BindingInfo | undefined {
-    const comboKey = `${msg.key}|${msg.ctrl ? 1 : 0}|${msg.alt ? 1 : 0}|${msg.shift ? 1 : 0}`;
+    const comboKey = [msg.key, msg.ctrl ? '1' : '0', msg.alt ? '1' : '0', msg.shift ? '1' : '0'].join('|');
     return bindings.find((binding) => binding.enabled && bindingComboKey(binding) === comboKey);
   }
 
@@ -984,7 +984,7 @@ export function createFramedApp<PageModel, Msg>(
     const frameBinding = findBindingForMessage(frameKeys.bindings(), msg);
     if (pageBinding == null || frameBinding == null) return model;
 
-    const warningCmd: Cmd<FramedAppMsg<Msg>> = async () => wrapFrameMsg({
+    const warningCmd: Cmd<FramedAppMsg<Msg>> = () => wrapFrameMsg({
       type: 'runtime-issue',
       issue: {
         level: 'warning',
@@ -1010,8 +1010,7 @@ export function createFramedApp<PageModel, Msg>(
 
   function getComposedFrameScratch(width: number, height: number): Surface {
     if (
-      composedFrameScratch == null
-      || composedFrameScratch.width !== width
+      composedFrameScratch?.width !== width
       || composedFrameScratch.height !== height
     ) {
       composedFrameScratch = createSurface(width, height);
@@ -1031,232 +1030,165 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
-  // ---------------------------------------------------------------------------
-  // Shell command handler table — interprets plain FrameShellCommand facts
-  // emitted by routing handlers.  Each handler receives the current model
-  // and returns the next model; TEA commands are pushed into a mutable
-  // accumulator captured by the drain function.
-  // ---------------------------------------------------------------------------
-
-  type ShellCommandHandler = (
+  function applyShellCommand(
     model: InternalFrameModel<PageModel, Msg>,
     cmd: FrameShellCommand<Msg>,
     teaCmds: Cmd<FramedAppMsg<Msg>>[],
-  ) => InternalFrameModel<PageModel, Msg>;
-
-  const shellCommandHandlers: Record<FrameShellCommand<Msg>['type'], ShellCommandHandler> = {
-    // --- overlay lifecycle ---
-    'close-help': (model) =>
-      ({ ...model, helpOpen: false, helpScrollY: 0 }),
-    'close-settings': (model) =>
-      ({ ...model, settingsOpen: false }),
-    'close-notification-center': (model) =>
-      ({ ...model, notificationCenterOpen: false, notificationCenterScrollY: 0 }),
-    'close-palette': (model) => closeCommandPalette(model),
-    'close-quit-confirm': (model) =>
-      ({ ...model, quitConfirmOpen: false }),
-    'open-help': (model) =>
-      ({ ...model, helpOpen: true }),
-    'open-quit-confirm': (model) => {
-      if (!shouldUseShellQuitConfirm()) return model;
-      if (model.quitConfirmOpen) return model;
-      return {
-        ...model,
-        quitConfirmOpen: true,
-        helpOpen: false,
-        helpScrollY: 0,
-        settingsOpen: false,
-        notificationCenterOpen: false,
-        commandPalette: undefined,
-        commandPaletteEntries: undefined,
-        commandPaletteTitle: undefined,
-        commandPaletteKind: undefined,
-      };
-    },
-    'open-search-palette': (model) =>
-      openSearchPalette(model, frameKeys, options, pagesById),
-    'open-command-palette': (model) =>
-      openCommandPalette(model, frameKeys, options, pagesById),
-
-    // --- settings ---
-    'settings-focus-move': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-focus-move' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
-      return layout != null ? moveSettingsFocus(model, layout, c.delta) : model;
-    },
-    'settings-scroll': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
-      return layout != null ? scrollSettingsBy(model, layout, c.delta) : model;
-    },
-    'settings-scroll-to': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll-to' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
-      if (layout == null) return model;
-      return { ...model, settingsScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
-    },
-    'activate-settings-row': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'activate-settings-row' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
-      if (layout == null) return model;
-      const hitRow = layout.rows.find((r) => r.index === c.rowIndex);
-      if (hitRow == null) return model;
-      const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
-      if (hitRow.behavior === 'cycle-shell-theme') {
-        const [nextModel, cmds] = cycleShellThemeSetting(focusedModel, hitRow.row);
+  ): InternalFrameModel<PageModel, Msg> {
+    switch (cmd.type) {
+      case 'close-help':
+        return { ...model, helpOpen: false, helpScrollY: 0 };
+      case 'close-settings':
+        return { ...model, settingsOpen: false };
+      case 'close-notification-center':
+        return { ...model, notificationCenterOpen: false, notificationCenterScrollY: 0 };
+      case 'close-palette':
+        return closeCommandPalette(model);
+      case 'close-quit-confirm':
+        return { ...model, quitConfirmOpen: false };
+      case 'open-help':
+        return { ...model, helpOpen: true };
+      case 'open-quit-confirm': {
+        if (!shouldUseShellQuitConfirm() || model.quitConfirmOpen) return model;
+        return {
+          ...model,
+          quitConfirmOpen: true,
+          helpOpen: false,
+          helpScrollY: 0,
+          settingsOpen: false,
+          notificationCenterOpen: false,
+          commandPalette: undefined,
+          commandPaletteEntries: undefined,
+          commandPaletteTitle: undefined,
+          commandPaletteKind: undefined,
+        };
+      }
+      case 'open-search-palette':
+        return openSearchPalette(model, frameKeys, options, pagesById);
+      case 'open-command-palette':
+        return openCommandPalette(model, frameKeys, options, pagesById);
+      case 'settings-focus-move': {
+        const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
+        return layout != null ? moveSettingsFocus(model, layout, cmd.delta) : model;
+      }
+      case 'settings-scroll': {
+        const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
+        return layout != null ? scrollSettingsBy(model, layout, cmd.delta) : model;
+      }
+      case 'settings-scroll-to': {
+        const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
+        if (layout == null) return model;
+        return { ...model, settingsScrollY: cmd.position === 'top' ? 0 : layout.maxScrollY };
+      }
+      case 'activate-settings-row': {
+        const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
+        if (layout == null) return model;
+        const hitRow = layout.rows.find((row) => row.index === cmd.rowIndex);
+        if (hitRow == null) return model;
+        const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
+        if (hitRow.behavior === 'cycle-shell-theme') {
+          const [nextModel, cmds] = cycleShellThemeSetting(focusedModel, hitRow.row);
+          teaCmds.push(...cmds);
+          return nextModel;
+        }
+        if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
+          return focusedModel;
+        }
+        const [nextModel, cmds] = activateSettingsRow(focusedModel, hitRow.row);
         teaCmds.push(...cmds);
         return nextModel;
       }
-      if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
-        return focusedModel;
+      case 'toggle-shell-theme-mode': {
+        const [nextModel, cmds] = toggleShellThemeMode(model);
+        teaCmds.push(...cmds);
+        return nextModel;
       }
-      const [nextModel, cmds] = activateSettingsRow(focusedModel, hitRow.row);
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-    'toggle-shell-theme-mode': (model, _cmd, teaCmds) => {
-      const [nextModel, cmds] = toggleShellThemeMode(model);
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-
-    // --- notification center ---
-    'notification-center-scroll': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll' }>;
-      const layout = resolveNotificationCenterLayout(
-        model,
-        options,
-        pagesById,
-        resolveFrameThemeCtx(model.activeShellThemeId),
-      );
-      return layout != null ? scrollNotificationCenterBy(model, layout, c.delta) : model;
-    },
-    'notification-center-scroll-to': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll-to' }>;
-      const layout = resolveNotificationCenterLayout(
-        model,
-        options,
-        pagesById,
-        resolveFrameThemeCtx(model.activeShellThemeId),
-      );
-      if (layout == null) return model;
-      return { ...model, notificationCenterScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
-    },
-    'cycle-notification-filter': (model, _cmd, teaCmds) => {
-      const layout = resolveNotificationCenterLayout(
-        model,
-        options,
-        pagesById,
-        resolveFrameThemeCtx(model.activeShellThemeId),
-      );
-      if (layout == null) return model;
-      const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-    'warn-frame-key-collision': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'warn-frame-key-collision' }>;
-      return queueFrameKeyCollisionWarning(model, c.msg, teaCmds);
-    },
-
-    // --- help ---
-    'help-scroll': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
-      const helpSource = resolvePresentedLayerContext(model).controlProjection.helpSource;
-      if (helpSource == null) {
+      case 'notification-center-scroll': {
+        const layout = resolveNotificationCenterLayout(model, options, pagesById, resolveFrameThemeCtx(model.activeShellThemeId));
+        return layout != null ? scrollNotificationCenterBy(model, layout, cmd.delta) : model;
+      }
+      case 'notification-center-scroll-to': {
+        const layout = resolveNotificationCenterLayout(model, options, pagesById, resolveFrameThemeCtx(model.activeShellThemeId));
+        if (layout == null) return model;
+        return { ...model, notificationCenterScrollY: cmd.position === 'top' ? 0 : layout.maxScrollY };
+      }
+      case 'cycle-notification-filter': {
+        const layout = resolveNotificationCenterLayout(model, options, pagesById, resolveFrameThemeCtx(model.activeShellThemeId));
+        if (layout == null) return model;
+        const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
+      case 'warn-frame-key-collision':
+        return queueFrameKeyCollisionWarning(model, cmd.msg, teaCmds);
+      case 'help-scroll': {
+        const helpSource = resolvePresentedLayerContext(model).controlProjection.helpSource;
+        if (helpSource == null) return model;
+        const overlay = renderHelpOverlay(model, helpSource, options.i18n);
+        const viewportHeight = Math.max(1, overlay.body.height - 1);
+        const delta = cmd.action === 'down' ? 3
+          : cmd.action === 'up' ? -3
+          : cmd.action === 'page-down' ? viewportHeight
+          : cmd.action === 'page-up' ? -viewportHeight
+          : cmd.action === 'bottom' ? Infinity
+          : -Infinity;
+        return { ...model, helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)) };
+      }
+      case 'focus-pane':
+        return focusPane(model, cmd.paneId);
+      case 'scroll-focused-pane':
+        return scrollFocusedPane(model, { type: cmd.direction === 'down' ? 'scroll-down' : 'scroll-up' }, pagesById, options);
+      case 'switch-tab': {
+        const [nextModel, cmds] = switchTab(model, cmd.delta, pagesById, options);
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
+      case 'apply-frame-action': {
+        const [nextModel, cmds] = applyFrameAction(cmd.action, model, options, pagesById);
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
+      case 'palette-key': {
+        const [nextModel, cmds] = handlePaletteKey(
+          cmd.msg,
+          model,
+          paletteKeys,
+          options,
+          pagesById,
+          (action, closedModel) => action.type === 'toggle-shell-theme-mode'
+            ? toggleShellThemeMode(closedModel)
+            : undefined,
+        );
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
+      case 'emit-page-msg':
+        teaCmds.push(emitMsgForPage(cmd.pageId, cmd.msg));
+        return model;
+      case 'emit-global-msg':
+        teaCmds.push(emitMsg(cmd.msg));
+        return model;
+      case 'quit':
+        teaCmds.push(quit());
+        return model;
+      case 'dismiss-notification': {
+        if (!frameNotificationOptions.enabled) return model;
+        const nowMs = resolveClock(resolveFrameCtx()).now();
+        const [nextModel, cmds] = applyFrameNotificationState(
+          model,
+          dismissNotification(model.runtimeNotifications, cmd.notificationId, nowMs),
+          nowMs,
+        );
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
+      case 'observed-key': {
+        const observed = options.observeKey?.(cmd.msg, cmd.route);
+        if (observed !== undefined) teaCmds.push(emitMsgForPage(model.activePageId, observed));
         return model;
       }
-      const overlay = renderHelpOverlay(model, helpSource, options.i18n);
-      const viewportHeight = Math.max(1, overlay.body.height - 1);
-      const delta = c.action === 'down' ? 3
-        : c.action === 'up' ? -3
-        : c.action === 'page-down' ? viewportHeight
-        : c.action === 'page-up' ? -viewportHeight
-        : c.action === 'bottom' ? Infinity
-        : /* top */ -Infinity;
-      return {
-        ...model,
-        helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)),
-      };
-    },
-
-    // --- workspace ---
-    'focus-pane': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'focus-pane' }>;
-      return focusPane(model, c.paneId);
-    },
-    'scroll-focused-pane': (model, cmd) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'scroll-focused-pane' }>;
-      return scrollFocusedPane(model, { type: c.direction === 'down' ? 'scroll-down' : 'scroll-up' }, pagesById, options);
-    },
-    'switch-tab': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'switch-tab' }>;
-      const [nextModel, cmds] = switchTab(model, c.delta, pagesById, options);
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-
-    // --- delegation ---
-    'apply-frame-action': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'apply-frame-action' }>;
-      const [nextModel, cmds] = applyFrameAction(c.action, model, options, pagesById);
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-    'palette-key': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'palette-key' }>;
-      const [nextModel, cmds] = handlePaletteKey(
-        c.msg,
-        model,
-        paletteKeys,
-        options,
-        pagesById,
-        (action, closedModel) => action.type === 'toggle-shell-theme-mode'
-          ? toggleShellThemeMode(closedModel)
-          : undefined,
-      );
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-
-    // --- TEA command emissions ---
-    'emit-page-msg': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'emit-page-msg' }>;
-      teaCmds.push(emitMsgForPage(c.pageId, c.msg));
-      return model;
-    },
-    'emit-global-msg': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'emit-global-msg' }>;
-      teaCmds.push(emitMsg(c.msg));
-      return model;
-    },
-    'quit': (_model, _cmd, teaCmds) => {
-      teaCmds.push(quit());
-      return _model;
-    },
-    'dismiss-notification': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'dismiss-notification' }>;
-      if (!frameNotificationOptions.enabled) return model;
-      const nowMs = resolveClock(resolveFrameCtx()).now();
-      const [nextModel, cmds] = applyFrameNotificationState(
-        model,
-        dismissNotification(model.runtimeNotifications, c.notificationId, nowMs),
-        nowMs,
-      );
-      teaCmds.push(...cmds);
-      return nextModel;
-    },
-
-    // --- observation ---
-    'observed-key': (model, cmd, teaCmds) => {
-      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'observed-key' }>;
-      const observed = options.observeKey?.(c.msg, c.route);
-      if (observed !== undefined) {
-        teaCmds.push(emitMsgForPage(model.activePageId, observed));
-      }
-      return model;
-    },
-  };
+    }
+  }
 
   function drainShellCommandBuffer(
     model: InternalFrameModel<PageModel, Msg>,
@@ -1270,7 +1202,7 @@ export function createFramedApp<PageModel, Msg>(
     const { state } = applyRuntimeCommandBuffer(
       model,
       buffers.commands,
-      (s, cmd) => shellCommandHandlers[cmd.type](s, cmd, teaCmds),
+      (s, cmd) => applyShellCommand(s, cmd, teaCmds),
     );
     return [state, teaCmds];
   }
@@ -1278,8 +1210,11 @@ export function createFramedApp<PageModel, Msg>(
   function resolveLayerContext(
     model: InternalFrameModel<PageModel, Msg>,
   ) {
-    const activePage = pagesById.get(model.activePageId)!;
-    const activePageModel = model.pageModels[model.activePageId]!;
+    const activePage = pagesById.get(model.activePageId);
+    const activePageModel = model.pageModels[model.activePageId];
+    if (activePage == null || activePageModel === undefined) {
+      throw new Error(`createFramedApp: active page "${model.activePageId}" is missing`);
+    }
     const inputAreas = resolveInputAreas(activePage, activePageModel);
     const activeInputArea = findInputAreaByPaneId(
       inputAreas,
@@ -1738,9 +1673,13 @@ export function createFramedApp<PageModel, Msg>(
     readonly tree: SurfaceLayoutNode;
   } {
     const activePageId = model.activePageId;
+    const activePageModel = model.pageModels[activePageId];
+    if (activePageModel === undefined) {
+      throw new Error(`createFramedApp: active page model "${activePageId}" is missing`);
+    }
     const next = {
       activePageId,
-      activePageModel: model.pageModels[activePageId]!,
+      activePageModel,
       columns: model.columns,
       rows: model.rows,
       visibilityState: model.minimizedByPage[activePageId],
@@ -1784,7 +1723,8 @@ export function createFramedApp<PageModel, Msg>(
     readonly tree: SurfaceLayoutNode;
   } {
     if (matchesWorkspaceLayoutCache(model)) {
-      return workspaceLayoutCache!;
+      const cached = workspaceLayoutCache;
+      if (cached !== undefined) return cached;
     }
     const bodyRect = resolveBodyRect(model, options);
     const maxState = model.maximizedPaneByPage[model.activePageId];
@@ -1821,7 +1761,7 @@ export function createFramedApp<PageModel, Msg>(
       const clippedTop = Math.max(viewportTop, screenRow);
       const clippedBottom = Math.min(viewportBottom, screenRow + flatRow.height);
       if (clippedTop >= clippedBottom) continue;
-      children.push(createShellRetainedLayoutNode(`settings-row:${flatRow.index}`, {
+      children.push(createShellRetainedLayoutNode(`settings-row:${String(flatRow.index)}`, {
         row: clippedTop,
         col: layout.startCol,
         width: layout.drawerWidth,
@@ -1829,6 +1769,11 @@ export function createFramedApp<PageModel, Msg>(
       }));
     }
     return children;
+  }
+
+  function nodeIdSuffix(node: SurfaceLayoutNode, prefix: string): string | undefined {
+    const id = node.id;
+    return id?.startsWith(prefix) === true ? id.slice(prefix.length) : undefined;
   }
 
   function resolveFrameMouseRuntimeLayouts(
@@ -1928,8 +1873,8 @@ export function createFramedApp<PageModel, Msg>(
           if (msg.action === 'press' && msg.button === 'left') {
             const rowNode = hit.path.find((n) => n.id?.startsWith('settings-row:'));
             if (rowNode != null) {
-              const rowIndex = parseInt(rowNode.id!.slice('settings-row:'.length), 10);
-              cmds.push({ type: 'activate-settings-row', rowIndex });
+              const rowId = nodeIdSuffix(rowNode, 'settings-row:');
+              if (rowId !== undefined) cmds.push({ type: 'activate-settings-row', rowIndex: Number.parseInt(rowId, 10) });
             }
             return { handled: true, commands: cmds };
           }
@@ -1967,8 +1912,8 @@ export function createFramedApp<PageModel, Msg>(
 
           // tab click
           const tabNode = hit?.path.find((n) => n.id?.startsWith('tab:'));
-          if (tabNode != null) {
-            const pageId = tabNode.id!.slice('tab:'.length);
+          const pageId = tabNode == null ? undefined : nodeIdSuffix(tabNode, 'tab:');
+          if (pageId !== undefined) {
             const currentIndex = model.pageOrder.indexOf(model.activePageId);
             const nextIndex = model.pageOrder.indexOf(pageId);
             if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
@@ -1982,18 +1927,20 @@ export function createFramedApp<PageModel, Msg>(
 
           // pane click
           const clickedPaneNode = hit?.path.find((n) => n.id?.startsWith('pane:'));
-          if (clickedPaneNode != null) {
-            const paneId = clickedPaneNode.id!.slice('pane:'.length);
+          const clickedPaneId = clickedPaneNode == null ? undefined : nodeIdSuffix(clickedPaneNode, 'pane:');
+          if (clickedPaneId !== undefined) {
             const paneRects = resolveWorkspacePaneRects(model);
-            const paneRect = paneRects.get(paneId);
+            const paneRect = paneRects.get(clickedPaneId);
             if (paneRect != null) {
-              cmds.push({ type: 'focus-pane', paneId });
-              const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+              cmds.push({ type: 'focus-pane', paneId: clickedPaneId });
+              const inputArea = findInputAreaByPaneId(inputAreas, clickedPaneId);
               const areaMsg = inputArea?.mouse?.({ msg, model: activePageModel, rect: paneRect });
+              let routedMsg: Msg | MouseMsg = msg;
+              if (areaMsg !== undefined) routedMsg = areaMsg;
               cmds.push({
                 type: 'emit-page-msg',
                 pageId: model.activePageId,
-                msg: areaMsg !== undefined ? areaMsg : msg,
+                msg: routedMsg,
               });
               return { handled: true, commands: cmds };
             }
@@ -2002,13 +1949,13 @@ export function createFramedApp<PageModel, Msg>(
 
         if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
           const scrollPaneNode = hit?.path.find((n) => n.id?.startsWith('pane:'));
-          if (scrollPaneNode != null) {
-            const paneId = scrollPaneNode.id!.slice('pane:'.length);
+          const scrollPaneId = scrollPaneNode == null ? undefined : nodeIdSuffix(scrollPaneNode, 'pane:');
+          if (scrollPaneId !== undefined) {
             const paneRects = resolveWorkspacePaneRects(model);
-            const paneRect = paneRects.get(paneId);
+            const paneRect = paneRects.get(scrollPaneId);
             if (paneRect != null) {
-              cmds.push({ type: 'focus-pane', paneId });
-              const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+              cmds.push({ type: 'focus-pane', paneId: scrollPaneId });
+              const inputArea = findInputAreaByPaneId(inputAreas, scrollPaneId);
               const areaMsg = inputArea?.mouse?.({ msg, model: activePageModel, rect: paneRect });
               if (areaMsg !== undefined) {
                 cmds.push({ type: 'emit-page-msg', pageId: model.activePageId, msg: areaMsg });
@@ -2184,9 +2131,10 @@ export function createFramedApp<PageModel, Msg>(
     const targetPage = pagesById.get(targetPageId);
     if (targetPage == null) return [model, []];
 
-    const pageModel = model.pageModels[targetPageId]!;
+    const pageModel = model.pageModels[targetPageId];
+    if (pageModel === undefined) return [model, []];
     const updateResult = targetPage.update(targetMsg, pageModel);
-    const [nextPageModel, cmds = []] = updateResult;
+    const [nextPageModel, cmds] = updateResult;
 
     const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
     const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
@@ -2645,9 +2593,13 @@ export function createFramedApp<PageModel, Msg>(
 
       const overlays: Overlay[] = [];
       if (options.overlayFactory != null) {
+        const activePageModel = model.pageModels[model.activePageId];
+        if (activePageModel === undefined) {
+          throw new Error(`createFramedApp: active page model "${model.activePageId}" is missing`);
+        }
         overlays.push(...options.overlayFactory({
           activePageId: model.activePageId,
-          pageModel: model.pageModels[model.activePageId]!,
+          pageModel: activePageModel,
           paneRects: activeResult.paneRects,
           screenRect: { row: 0, col: 0, width: model.columns, height: model.rows },
         }));
@@ -2773,9 +2725,33 @@ export function createFramedApp<PageModel, Msg>(
     },
   };
 
-  const framedApp = app as unknown as FramedApp<PageModel, Msg>;
+  function isInternalFrameModel(model: FrameModel<PageModel>): model is InternalFrameModel<PageModel, Msg> {
+    return 'helpScrollY' in model && 'warnedFrameKeyCollisionPages' in model;
+  }
+
+  function requireInternalFrameModel(model: FrameModel<PageModel>): InternalFrameModel<PageModel, Msg> {
+    if (isInternalFrameModel(model)) return model;
+    throw new Error('createFramedApp: framed runtime received a non-frame model');
+  }
+
   let hostedRunActive = false;
-  framedApp.run = async (runOptions?: FramedAppRunOptions<Msg>) => {
+  const framedApp: FramedApp<PageModel, Msg> = {
+    init() {
+      return app.init();
+    },
+    update(msg, model) {
+      return app.update(msg, requireInternalFrameModel(model));
+    },
+    view(model) {
+      return app.view(requireInternalFrameModel(model));
+    },
+    routeRuntimeIssue(issue) {
+      return app.routeRuntimeIssue?.(issue);
+    },
+    run: runHostedFramedApp,
+  };
+
+  async function runHostedFramedApp(runOptions?: FramedAppRunOptions<Msg>): Promise<void> {
     if (hostedRunActive) {
       throw new Error('createFramedApp: concurrent app.run() calls on the same framed app are not supported');
     }
@@ -2807,7 +2783,7 @@ export function createFramedApp<PageModel, Msg>(
         beforeRender(model) {
           if (pendingTimingSnapshot == null) return model;
           return applyFrameTimingSnapshot(
-            model as InternalFrameModel<PageModel, Msg>,
+            requireInternalFrameModel(model),
             pendingTimingSnapshot,
           );
         },
@@ -2826,7 +2802,7 @@ export function createFramedApp<PageModel, Msg>(
       defaultFrameCtx = previousDefaultFrameCtx;
       resolvedShellThemes = previousResolvedShellThemes;
     }
-  };
+  }
 
   return framedApp;
 }

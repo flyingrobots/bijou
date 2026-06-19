@@ -1,5 +1,3 @@
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
 import {
@@ -7,8 +5,6 @@ import {
   serializeExchangeWorkbookXlsx,
 } from './index.js';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
 const TRANSLATION_COLUMNS = [
   'namespace',
   'id',
@@ -23,6 +19,13 @@ const TRANSLATION_COLUMNS = [
   'translatedValueKind',
   'translatedValue',
 ] as const;
+
+function writeWorkbookBytes(workbook: XLSX.WorkBook): Uint8Array {
+  const output: unknown = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+  if (output instanceof Uint8Array) return new Uint8Array(output);
+  if (output instanceof ArrayBuffer) return new Uint8Array(output);
+  throw new Error('Expected XLSX workbook bytes');
+}
 
 describe('xlsx workbook adapters', () => {
   it('preserves workbook sheet order and columns through serialization', () => {
@@ -70,13 +73,13 @@ describe('xlsx workbook adapters', () => {
     ]);
     XLSX.utils.book_append_sheet(workbook, sheet, 'translated-de');
 
-    const bytes = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }) as Uint8Array;
+    const bytes = writeWorkbookBytes(workbook);
     expect(() => parseExchangeWorkbookXlsx(bytes))
       .toThrow(/missing required header/i);
   });
 
   it('normalizes non-string cells back into the exchange row shape', async () => {
-    const tools: typeof import('../../bijou-i18n-tools/src/index.js') = await import(TOOLS_ENTRY);
+    const tools = await import('../../bijou-i18n-tools/src/index.js');
 
     const workbook = XLSX.utils.book_new();
     const sourceHash = tools.hashSourceValue('Help');
@@ -112,7 +115,7 @@ describe('xlsx workbook adapters', () => {
     ]);
     XLSX.utils.book_append_sheet(workbook, sheet, 'translated-de');
 
-    const bytes = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }) as Uint8Array;
+    const bytes = writeWorkbookBytes(workbook);
     const parsed = parseExchangeWorkbookXlsx(bytes);
     expect(parsed.sheets[0]?.rows[0]?.description).toBe('42');
     expect(parsed.sheets[0]?.rows[0]?.translatedValue).toBe('7');

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { stripAnsi } from './viewport.js';
 import {
@@ -18,11 +18,9 @@ import {
   trimNotificationsToViewport,
   tickNotifications,
 } from './notification.js';
-
 type Msg =
   | { type: 'retry'; id: number }
   | { type: 'ignore' };
-
 describe('notification state', () => {
   it('honors an explicit persistent duration override', () => {
     let state = createNotificationState<Msg>();
@@ -31,35 +29,28 @@ describe('notification state', () => {
       variant: 'TOAST',
       durationMs: null,
     }, 0);
-
     state = tickNotifications(state, 200);
     expect(state.items[0]?.phase).toBe('visible');
-
     state = tickNotifications(state, 25_000);
     expect(state.items).toHaveLength(1);
     expect(state.items[0]?.phase).toBe('visible');
     expect(notificationsNeedTick(state)).toBe(false);
   });
-
   it('auto-dismisses toast notifications after the default duration', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
       title: 'Build complete',
       variant: 'TOAST',
     }, 0);
-
     state = tickNotifications(state, 200);
     expect(state.items[0]?.phase).toBe('visible');
-
     state = tickNotifications(state, 4_300);
     expect(state.items[0]?.phase).toBe('exiting');
-
     state = tickNotifications(state, 4_700);
     expect(state.items).toHaveLength(0);
     expect(state.history).toHaveLength(1);
     expect(state.history[0]?.title).toBe('Build complete');
   });
-
   it('cycles actionable focus and activates the focused action payload', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -72,17 +63,13 @@ describe('notification state', () => {
       variant: 'ACTIONABLE',
       action: { label: 'Retry second', payload: { type: 'retry', id: 2 } },
     }, 10);
-
     expect(state.focusedId).toBe(2);
-
     state = cycleNotificationFocus(state, -1);
     expect(state.focusedId).toBe(1);
-
     const result = activateFocusedNotification(state, 100);
     expect(result.payload).toEqual({ type: 'retry', id: 1 });
     expect(result.state.items.find((item) => item.id === 1)?.phase).toBe('exiting');
   });
-
   it('can relocate the active stack to a new placement', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -93,12 +80,9 @@ describe('notification state', () => {
       title: 'Second',
       placement: 'LOWER_RIGHT',
     }, 10);
-
     state = relocateNotifications(state, 'TOP_CENTER');
-
     expect(state.items.every((item) => item.placement === 'TOP_CENTER')).toBe(true);
   });
-
   it('trims the oldest active notifications when the viewport runs out of room', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 5; index++) {
@@ -110,7 +94,6 @@ describe('notification state', () => {
         durationMs: null,
       }, index * 10);
     }
-
     state = tickNotifications(state, 500);
     state = trimNotificationsToViewport(state, {
       screenWidth: 48,
@@ -118,15 +101,12 @@ describe('notification state', () => {
       margin: 1,
       gap: 1,
     }, 500);
-
     expect(state.items.length).toBeLessThan(5);
     expect(state.items.some((item) => item.title === 'Notice 5')).toBe(true);
     expect(state.overflowExits.some((item) => item.title === 'Notice 1')).toBe(true);
-
     state = tickNotifications(state, 900);
     expect(state.history.some((item) => item.title === 'Notice 1')).toBe(true);
   });
-
   it('counts and renders archived notification history with filters', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -144,28 +124,23 @@ describe('notification state', () => {
       durationMs: null,
       action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
     }, 10);
-
     state = tickNotifications(state, 250);
-    state = dismissNotification(state, state.items[0]!.id, 300);
-    state = dismissNotification(state, state.items[1]!.id, 310);
+    state = dismissNotification(state, state.items[0]?.id, 300);
+    state = dismissNotification(state, state.items[1]?.id, 310);
     state = tickNotifications(state, 900);
-
     expect(countNotificationHistory(state)).toBe(2);
     expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
     expect(countNotificationHistory(state, 'ERROR')).toBe(1);
-
     const body = renderNotificationHistory(state, {
       width: 34,
       height: 8,
       filter: 'ACTIONABLE',
     });
-
     expect(stripAnsi(body)).toContain('History • Actionable • 1-1 of 1');
     expect(stripAnsi(body)).toContain('Archived action');
     expect(stripAnsi(body)).toContain('Retry deploy');
     expect(stripAnsi(body)).not.toContain('Archived info');
   });
-
   it('treats actionable history as the variant, not action presence', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -175,22 +150,17 @@ describe('notification state', () => {
       tone: 'WARNING',
       durationMs: null,
     }, 0);
-
     state = tickNotifications(state, 250);
-    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[0]?.id, 300);
     state = tickNotifications(state, 900);
-
     expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
-
     const body = renderNotificationHistory(state, {
       width: 28,
       height: 8,
       filter: 'ACTIONABLE',
     });
-
     expect(stripAnsi(body)).toMatch(/Dismiss-only\s*actionable/);
   });
-
   it('supports scrolling through archived notification history', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 3; index++) {
@@ -201,24 +171,20 @@ describe('notification state', () => {
         durationMs: null,
       }, index * 10);
     }
-
     state = tickNotifications(state, 250);
     for (const item of state.items) {
       state = dismissNotification(state, item.id, 300 + item.id);
     }
     state = tickNotifications(state, 900);
-
     const body = renderNotificationHistory(state, {
       width: 28,
       height: 7,
       scroll: 1,
     });
-
     expect(stripAnsi(body)).toContain('History • All • 2-2 of 3');
     expect(stripAnsi(body)).toContain('Archived 2');
     expect(stripAnsi(body)).not.toContain('Archived 3');
   });
-
   it('renders archived multilingual history content through the review path without dropping wrapped fields', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -229,24 +195,20 @@ describe('notification state', () => {
       durationMs: null,
       action: { label: 'Weiter prüfen', payload: { type: 'ignore' } },
     }, 0);
-
     state = tickNotifications(state, 250);
-    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[0]?.id, 300);
     state = tickNotifications(state, 900);
-
     const body = renderNotificationHistory(state, {
       width: 20,
       height: 10,
       filter: 'ALL',
     });
-
     const plain = stripAnsi(body);
     expect(plain).toContain('History • All • 1-1 of 1');
     expect(plain).toContain('選択中 😀');
     expect(plain).toContain('history');
     expect(plain).toContain('Lokalisierte');
   });
-
   it('renders archived notification history as inset review rows in the surface path', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -257,11 +219,9 @@ describe('notification state', () => {
       durationMs: null,
       action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
     }, 0);
-
     state = tickNotifications(state, 250);
-    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[0]?.id, 300);
     state = tickNotifications(state, 900);
-
     const ctx = createTestContext({ mode: 'interactive' });
     const surface = renderNotificationHistorySurface(state, {
       width: 34,
@@ -273,14 +233,12 @@ describe('notification state', () => {
     const titleLine = lines.findIndex((line) => line.includes('Archived action'));
     const metaLine = lines.findIndex((line) => line.includes('ACTIONABLE'));
     const actionLine = lines.findIndex((line) => line.includes('Retry deploy'));
-
     expect(titleLine).toBeGreaterThan(1);
-    expect(lines[titleLine]!.indexOf('Archived action')).toBeGreaterThan(0);
+    expect(lines[titleLine]?.indexOf('Archived action')).toBeGreaterThan(0);
     expect(metaLine).toBe(titleLine + 1);
     expect(actionLine).toBeGreaterThan(metaLine);
   });
 });
-
 describe('renderNotificationStack', () => {
   it('stacks lower placements upward while keeping the newest notice nearest the anchor', () => {
     let state = createNotificationState<Msg>();
@@ -295,19 +253,14 @@ describe('renderNotificationStack', () => {
       placement: 'LOWER_RIGHT',
     }, 100);
     state = tickNotifications(state, 400);
-
     const overlays = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
     const older = overlays.find((overlay) => stripAnsi(overlay.content).includes('Older'));
     const newer = overlays.find((overlay) => stripAnsi(overlay.content).includes('Newer'));
-    expect(older).toBeDefined();
-    expect(newer).toBeDefined();
-    expect(newer!.row).toBeGreaterThan(older!.row);
+    expect(must(newer).row).toBeGreaterThan(must(older).row);
   });
-
   it('renders actionable notifications with a focused action affordance', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -317,15 +270,12 @@ describe('renderNotificationStack', () => {
       action: { label: 'Retry deploy', payload: { type: 'retry', id: 7 } },
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
     });
-
-    expect(stripAnsi(overlay!.content)).toContain('[ Retry deploy ]');
+    expect(stripAnsi(overlay?.content)).toContain('[ Retry deploy ]');
   });
-
   it('preserves leading padding for unfocused actionable buttons', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -343,7 +293,6 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 10);
     state = tickNotifications(state, 250);
-
     const overlays = renderNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
@@ -352,18 +301,15 @@ describe('renderNotificationStack', () => {
     if (unfocused == null) {
       throw new Error('expected unfocused actionable notification overlay');
     }
-
     const actionLine = stripAnsi(unfocused.content).split('\n')
       .find((line) => line.includes('Retry deploy'));
     if (actionLine == null) {
       throw new Error('expected unfocused actionable notification action row');
     }
-
     const labelStart = actionLine.indexOf('Retry deploy');
     expect(actionLine).not.toContain('[ Retry deploy ]');
     expect(actionLine.slice(labelStart - 2, labelStart)).toBe('  ');
   });
-
   it('renders multilingual actionable stack entries without losing wrapped title or action text', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -375,18 +321,15 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 44,
       screenHeight: 14,
     });
-
-    const plain = stripAnsi(overlay!.content);
+    const plain = stripAnsi(overlay?.content);
     expect(plain).toContain('選択中 😀');
     expect(plain).toContain('deploy');
     expect(plain).toContain('Weiter prüfen');
   });
-
   it('honors an explicit toast width so stacked shell feedback stays uniform', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -406,12 +349,10 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 10);
     state = tickNotifications(state, 250);
-
     const overlays = renderNotificationStack(state, {
       screenWidth: 120,
       screenHeight: 32,
     });
-
     expect(overlays).toHaveLength(2);
     const first = overlays[0];
     const second = overlays[1];
@@ -425,7 +366,6 @@ describe('renderNotificationStack', () => {
     expect(firstWidth).toBe(secondWidth);
     expect(firstWidth).toBe(43);
   });
-
   it('hit-tests dismiss and action targets inside the rendered stack', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -437,26 +377,24 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
     });
-
+    const overlayBounds = must(overlay);
+    const overlaySurface = must(overlayBounds.surface);
     const dismiss = hitTestNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
-    }, overlay!.col + overlay!.surface!.width - 2, overlay!.row);
+    }, overlayBounds.col + overlaySurface.width - 2, overlayBounds.row);
     expect(dismiss?.kind).toBe('dismiss');
-
     const action = hitTestNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
-    }, overlay!.col + 3, overlay!.row + overlay!.surface!.height - 1);
+    }, overlayBounds.col + 3, overlayBounds.row + overlaySurface.height - 1);
     expect(action?.kind).toBe('action');
     expect(action?.item.title).toBe('Deploy failed');
   });
-
   it('renders toast timestamps and inline notifications in their distinct layouts', () => {
     let toastState = createNotificationState<Msg>();
     toastState = pushNotification(toastState, {
@@ -465,13 +403,11 @@ describe('renderNotificationStack', () => {
       variant: 'TOAST',
     }, 0);
     toastState = tickNotifications(toastState, 250);
-
     const [toastOverlay] = renderNotificationStack(toastState, {
       screenWidth: 80,
       screenHeight: 24,
     });
-    expect(stripAnsi(toastOverlay!.content)).toMatch(/\d{2}:\d{2}:\d{2} [AP]M/);
-
+    expect(stripAnsi(toastOverlay?.content)).toMatch(/\d{2}:\d{2}:\d{2} [AP]M/);
     let inlineState = createNotificationState<Msg>();
     inlineState = pushNotification(inlineState, {
       title: 'Inline notice',
@@ -480,17 +416,15 @@ describe('renderNotificationStack', () => {
       placement: 'TOP_CENTER',
     }, 0);
     inlineState = tickNotifications(inlineState, 250);
-
     const [inlineOverlay] = renderNotificationStack(inlineState, {
       screenWidth: 100,
       screenHeight: 28,
     });
-    const lines = stripAnsi(inlineOverlay!.content).split('\n');
+    const lines = stripAnsi(inlineOverlay?.content).split('\n');
     expect(lines).toHaveLength(1);
-    expect(lines[0]!).toContain('Inline notice');
-    expect(lines[0]!).toContain('Rendered as one row');
+    expect(must(lines[0])).toContain('Inline notice');
+    expect(must(lines[0])).toContain('Rendered as one row');
   });
-
   it('wraps long notification copy by default instead of truncating it', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -499,18 +433,15 @@ describe('renderNotificationStack', () => {
       variant: 'TOAST',
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 48,
       screenHeight: 20,
     });
-    const lines = stripAnsi(overlay!.content).split('\n');
-
+    const lines = stripAnsi(overlay?.content).split('\n');
     expect(lines.length).toBeGreaterThan(3);
     expect(lines.join('\n')).toContain('diagnostic');
     expect(lines.join('\n')).toContain('text.');
   });
-
   it('wraps live notification body copy at word boundaries', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -521,19 +452,16 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
     });
-    const lines = stripAnsi(overlay!.content).split('\n')
+    const lines = stripAnsi(overlay?.content).split('\n')
       .map((line) => line.replace(/^\s*\S?\s*/, '').trimEnd());
-
     expect(lines).toContain('command: Undo must be submitted as explicit causal');
     expect(lines).toContain('input before production use.');
     expect(lines.join('\n')).not.toContain('causal i\nnput');
   });
-
   it('supports per-notification truncate overflow overrides', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -543,16 +471,13 @@ describe('renderNotificationStack', () => {
       overflow: 'truncate',
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 48,
       screenHeight: 20,
     });
-    const lines = stripAnsi(overlay!.content).split('\n');
-
+    const lines = stripAnsi(overlay?.content).split('\n');
     expect(lines.join('\n')).not.toContain('requested.');
   });
-
   it('anchors stacks inside an explicit render region', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -562,19 +487,16 @@ describe('renderNotificationStack', () => {
       placement: 'TOP_CENTER',
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 120,
       screenHeight: 40,
       region: { col: 12, row: 6, width: 48, height: 16 },
     });
-
     expect(overlay).toBeDefined();
-    expect(overlay!.row).toBeGreaterThanOrEqual(6);
-    expect(overlay!.col).toBeGreaterThanOrEqual(12);
-    expect(overlay!.col).toBeLessThan(60);
+    expect(overlay?.row).toBeGreaterThanOrEqual(6);
+    expect(overlay?.col).toBeGreaterThanOrEqual(12);
+    expect(overlay?.col).toBeLessThan(60);
   });
-
   it('moves existing overlays when the stack placement changes', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -583,23 +505,19 @@ describe('renderNotificationStack', () => {
       placement: 'LOWER_RIGHT',
     }, 0);
     state = tickNotifications(state, 250);
-
     const [before] = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
     const moved = relocateNotifications(state, 'UPPER_LEFT', 300);
     const [after] = renderNotificationStack(moved, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
-    expect(after!.row).toBeLessThan(before!.row);
-    expect(after!.col).toBeLessThan(before!.col);
+    expect(after?.row).toBeLessThan(before?.row);
+    expect(after?.col).toBeLessThan(before?.col);
     expect(moved.items[0]?.phase).toBe('entering');
   });
-
   it('starts entry animations fully off-screen for edge-anchored placements', () => {
     let leftState = createNotificationState<Msg>();
     leftState = pushNotification(leftState, {
@@ -608,16 +526,13 @@ describe('renderNotificationStack', () => {
       placement: 'UPPER_LEFT',
       durationMs: null,
     }, 0);
-
     const [leftOverlay] = renderNotificationStack(leftState, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
-    expect(leftOverlay).toBeDefined();
-    expect(leftOverlay!.surface).toBeDefined();
-    expect(leftOverlay!.col + leftOverlay!.surface!.width).toBeLessThanOrEqual(0);
-
+    expect(leftOverlay?.surface).toBeDefined();
+    const leftOverlayBounds = must(leftOverlay);
+    expect(leftOverlayBounds.col + must(leftOverlayBounds.surface).width).toBeLessThanOrEqual(0);
     let rightState = createNotificationState<Msg>();
     rightState = pushNotification(rightState, {
       title: 'Off-screen right',
@@ -625,16 +540,13 @@ describe('renderNotificationStack', () => {
       placement: 'LOWER_RIGHT',
       durationMs: null,
     }, 0);
-
     const [rightOverlay] = renderNotificationStack(rightState, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
     expect(rightOverlay).toBeDefined();
-    expect(rightOverlay!.col).toBeGreaterThanOrEqual(90);
+    expect(rightOverlay?.col).toBeGreaterThanOrEqual(90);
   });
-
   it('keeps a dismissed notification on-screen long enough to animate out', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -645,27 +557,23 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 0);
     state = tickNotifications(state, 250);
-
     const [visible] = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
-    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[0]?.id, 300);
     const [dismissed] = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
     expect(dismissed).toBeDefined();
-
     state = tickNotifications(state, 360);
     const [animating] = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
     expect(animating).toBeDefined();
-    expect(animating!.col).toBeGreaterThanOrEqual(visible!.col);
-
+    expect(animating?.col).toBeGreaterThanOrEqual(visible?.col);
     state = tickNotifications(state, 700);
     const overlays = renderNotificationStack(state, {
       screenWidth: 90,
@@ -673,7 +581,6 @@ describe('renderNotificationStack', () => {
     });
     expect(overlays).toHaveLength(0);
   });
-
   it('slides dismissed notifications fully off-screen before archiving them', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -684,20 +591,16 @@ describe('renderNotificationStack', () => {
       durationMs: null,
     }, 0);
     state = tickNotifications(state, 250);
-
-    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[0]?.id, 300);
     state = tickNotifications(state, 619);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
-
     expect(overlay).toBeDefined();
-    expect(overlay!.col).toBeGreaterThanOrEqual(90);
+    expect(overlay?.col).toBeGreaterThanOrEqual(90);
     expect(state.items[0]?.phase).toBe('exiting');
   });
-
   it('renders overflowed notifications through an exit lane before archiving them', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 5; index++) {
@@ -716,19 +619,15 @@ describe('renderNotificationStack', () => {
       margin: 1,
       gap: 1,
     }, 500);
-
     const overlays = renderNotificationStack(state, {
       screenWidth: 48,
       screenHeight: 12,
     });
-
     expect(state.overflowExits.length).toBeGreaterThan(0);
     expect(overlays.some((overlay) => stripAnsi(overlay.content).includes('Overflow 1'))).toBe(true);
-
     state = tickNotifications(state, 900);
     expect(state.history.some((item) => item.title === 'Overflow 1')).toBe(true);
   });
-
   it('keeps the card background applied across the full notification surface', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     let state = createNotificationState<Msg>();
@@ -740,17 +639,14 @@ describe('renderNotificationStack', () => {
       action: { label: 'Retry deploy', payload: { type: 'retry', id: 7 } },
     }, 0);
     state = tickNotifications(state, 250);
-
     const [overlay] = renderNotificationStack(state, {
       screenWidth: 80,
       screenHeight: 24,
       ctx,
     });
-
     expect(overlay?.surface).toBeDefined();
-    const surface = overlay!.surface!;
+    const surface = must(overlay!.surface);
     const expectedBg = surface.get(1, 0).bg;
-
     expect(expectedBg).toBeDefined();
     for (let y = 0; y < surface.height; y++) {
       expect(surface.get(1, y).bg).toBe(expectedBg);

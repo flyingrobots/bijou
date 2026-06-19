@@ -37,11 +37,12 @@ import {
   PageTransition,
   Surface,
 } from './app-frame.test-support.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
-  beforeAll(() => setDefaultContext(testCtx));
-  afterAll(() => _resetDefaultContextForTesting());
+  beforeAll(() => { setDefaultContext(testCtx); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
   it('switches tabs with [ and ]', async () => {
     const app = createFramedApp({
@@ -72,7 +73,7 @@ describe('createFramedApp', () => {
     });
 
     const result = await runScript(app, []);
-    expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('surface-pane');
+    expect(surfaceToString(must(result.frames.at(-1)), testCtx.style)).toContain('surface-pane');
   });
 
   it('supports pane renderers that return a LayoutNode', async () => {
@@ -96,7 +97,7 @@ describe('createFramedApp', () => {
     });
 
     const result = await runScript(app, []);
-    expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('layout-pane');
+    expect(surfaceToString(must(result.frames.at(-1)), testCtx.style)).toContain('layout-pane');
   });
 
   it('preserves framed message typing through shell composition', () => {

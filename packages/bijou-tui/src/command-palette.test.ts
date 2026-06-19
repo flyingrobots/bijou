@@ -70,14 +70,14 @@ describe('cpFilter', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'save');
     expect(filtered.filteredItems).toHaveLength(1);
-    expect(filtered.filteredItems[0]!.id).toBe('save');
+    expect(filtered.filteredItems[0]?.id).toBe('save');
   });
 
   it('matches by description', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'disk');
     expect(filtered.filteredItems).toHaveLength(1);
-    expect(filtered.filteredItems[0]!.id).toBe('open');
+    expect(filtered.filteredItems[0]?.id).toBe('open');
   });
 
   it('matches by category', () => {
@@ -90,14 +90,14 @@ describe('cpFilter', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'split');
     expect(filtered.filteredItems).toHaveLength(1);
-    expect(filtered.filteredItems[0]!.id).toBe('split');
+    expect(filtered.filteredItems[0]?.id).toBe('split');
   });
 
   it('matches by shortcut', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'ctrl+o');
     expect(filtered.filteredItems).toHaveLength(1);
-    expect(filtered.filteredItems[0]!.id).toBe('open');
+    expect(filtered.filteredItems[0]?.id).toBe('open');
   });
 
   it('matches hidden search text', () => {
@@ -108,7 +108,7 @@ describe('cpFilter', () => {
     const filtered = cpFilter(state, 'migration');
 
     expect(filtered.filteredItems).toHaveLength(1);
-    expect(filtered.filteredItems[0]!.id).toBe('release');
+    expect(filtered.filteredItems[0]?.id).toBe('release');
   });
 
   it('ranks label matches before incidental description matches', () => {

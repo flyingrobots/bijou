@@ -22,7 +22,7 @@ function resolvedColorRgb(ref: unknown): Rgb | undefined {
   if (!('kind' in ref) || (ref as { kind?: unknown }).kind !== 'resolved-color') return undefined;
   if (!('rgb' in ref)) return undefined;
   const rgb = (ref as { rgb: readonly [number, number, number] }).rgb;
-  return { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! };
+  return { r: rgb[0], g: rgb[1], b: rgb[2] };
 }
 
 function normalizeRgb(rgb: Rgb | readonly [number, number, number]): Rgb {

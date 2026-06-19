@@ -10,9 +10,7 @@ interface Model {
   count: number;
 }
 
-type Msg = never;
-
-export const app: App<Model, Msg> = {
+export const app: App<Model> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
@@ -27,8 +25,8 @@ export const app: App<Model, Msg> = {
     const hero = badge('BIJOU V3', { variant: 'primary' });
     const metrics = hstackSurface(
       2,
-      badge(`Count ${model.count}`, { variant: 'accent' }),
-      badge(`${ctx.runtime.columns}x${ctx.runtime.rows}`, { variant: 'info' }),
+      badge(`Count ${String(model.count)}`, { variant: 'accent' }),
+      badge(`${String(ctx.runtime.columns)}x${String(ctx.runtime.rows)}`, { variant: 'info' }),
       badge(ctx.mode, { variant: 'success' }),
     );
     const metricsDivider = separatorSurface({
@@ -59,5 +57,5 @@ export const app: App<Model, Msg> = {
 };
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app);
+  void run(app);
 }

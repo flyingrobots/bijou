@@ -5,7 +5,7 @@ import {
   lintModeLowering,
   validateBlockMetadata,
 } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
@@ -271,17 +271,15 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     expect(defaultDogfoodBlockRegistry.forSurface('docs.surface')).toBe(
       dogfoodDocsSurfaceBlockRegistryEntry,
     );
-
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 140 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
       msg: {
         type: 'docs',
         msg: { type: 'select-guide', guideId: 'blocks-dogfood-surfaces' },
       },
     }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
-
+    const text = frameText(must(result.frames.at(-1)));
     expect(text).toContain('DogfoodDocsSurfaceBlock');
     expect(text).toContain('-> docs.surface (app-shell)');
     expect(text).toContain('DOGFOOD docs, navigation, search, reader, and proof artifact surface.');
@@ -290,7 +288,6 @@ describe('DF-030 DOGFOOD docs surface Block', () => {
     expect(text).toContain('proof: table-demo.gif available');
   });
 });
-
 function dogfoodDocsFixture() {
   return {
     docsTree: ['Guides', 'Blocks', 'Packages'],
@@ -305,7 +302,6 @@ function dogfoodDocsFixture() {
     }],
   };
 }
-
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {

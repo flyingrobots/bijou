@@ -49,7 +49,7 @@ export function systemClock(): ClockPort {
 export function resolveClock(value?: ClockPort | { clock?: ClockPort }): ClockPort {
   if (value === undefined) return SYSTEM_CLOCK;
   if (typeof value === 'object' && value !== null && 'now' in value) {
-    return value as ClockPort;
+    return value;
   }
   return value.clock ?? SYSTEM_CLOCK;
 }

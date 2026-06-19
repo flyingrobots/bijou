@@ -1,4 +1,4 @@
-import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface } from '../../ports/surface.js';
 import { FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
 import { colorRgb } from '../theme/color.js';
 import type { TokenValue } from '../theme/tokens.js';
@@ -85,7 +85,7 @@ function isPreparedPreferenceRow(row: PreferenceRow | PreparedPreferenceRow): ro
 function isPreparedPreferenceSection(
   section: PreferenceSection | PreparedPreferenceSection,
 ): section is PreparedPreferenceSection {
-  return section.rows.length === 0 || isPreparedPreferenceRow(section.rows[0] as PreferenceRow | PreparedPreferenceRow);
+  return section.rows.length === 0 || isPreparedPreferenceRow(section.rows[0]!);
 }
 
 export function preparePreferenceRow(row: PreferenceRow): PreparedPreferenceRow {
@@ -151,7 +151,7 @@ export function preferenceRowSurface(
           for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
             const char = valueChars[offset]!;
             if (char === ' ') continue;
-            (surface as PackedSurface).setRGB(startX + valueStart + offset, 0, char, fR, fG, fB, bR, bG, bB, FLAG_BOLD);
+            (surface).setRGB(startX + valueStart + offset, 0, char, fR, fG, fB, bR, bG, bB, FLAG_BOLD);
           }
         } else {
           for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
@@ -403,7 +403,7 @@ function writePreferenceLine(
       for (let x = 0; x < chars.length && x < surface.width; x++) {
         const char = chars[x]!;
         if (char === ' ') continue;
-        (surface as PackedSurface).setRGB(x, y, char, fR, fG, fB, bR, bG, bB, flags);
+        (surface).setRGB(x, y, char, fR, fG, fB, bR, bG, bB, flags);
       }
       return;
     }

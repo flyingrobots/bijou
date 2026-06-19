@@ -3,17 +3,24 @@ import { box, kbd } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, isResizeMsg, type App } from '@flyingrobots/bijou-tui';
 import { ansiSurface } from '../_shared/example-surfaces.ts';
 
-const ctx = initDefaultContext();
+initDefaultContext();
 
 interface Model {
   cols: number;
   rows: number;
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
+
+function terminalSize(): Model {
+  return {
+    cols: Number.isFinite(process.stdout.columns) ? process.stdout.columns : 80,
+    rows: Number.isFinite(process.stdout.rows) ? process.stdout.rows : 24,
+  };
+}
 
 const app: App<Model, Msg> = {
-  init: () => [{ cols: process.stdout.columns ?? 80, rows: process.stdout.rows ?? 24 }, []],
+  init: () => [terminalSize(), []],
 
   update: (msg, model) => {
     if (isResizeMsg(msg)) {
@@ -31,7 +38,7 @@ const app: App<Model, Msg> = {
     const content = [
       'You are in the alternate screen.',
       '',
-      `Terminal: ${model.cols}×${model.rows}`,
+      `Terminal: ${String(model.cols)}×${String(model.rows)}`,
       '',
       `Press ${kbd('q')} or ${kbd('Enter')} to return.`,
     ].join('\n');
@@ -46,4 +53,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

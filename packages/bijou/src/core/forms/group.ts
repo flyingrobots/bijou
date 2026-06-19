@@ -31,7 +31,7 @@ export async function group<T extends Record<string, unknown>>(
 ): Promise<GroupFieldResult<T>> {
   const values = {} as T;
 
-  for (const key of Object.keys(fields) as Array<keyof T>) {
+  for (const key of Object.keys(fields) as (keyof T)[]) {
     const fieldFn = fields[key];
     values[key] = await fieldFn();
   }

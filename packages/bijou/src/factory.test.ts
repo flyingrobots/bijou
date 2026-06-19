@@ -18,7 +18,7 @@ describe('createBijou()', () => {
   it('loads theme from .json path in BIJOU_THEME', () => {
     const custom = { ...TEAL_ORANGE_PINK, name: 'json-theme' };
     const ports = basePorts({ BIJOU_THEME: 'theme.json' });
-    const mock = ports.io as ReturnType<typeof mockIO>;
+    const mock = ports.io;
     mock.files['theme.json'] = JSON.stringify(toDTCG(custom));
 
     const ctx = createBijou(ports);

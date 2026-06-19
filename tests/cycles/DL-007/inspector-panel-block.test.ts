@@ -5,6 +5,7 @@ import { inspectorDrawer } from '../../../packages/bijou-tui/src/index.js';
 import { createCanonicalWorkbenchApp } from '../../../examples/_shared/canonical-app.js';
 import { createAppFrameDemo } from '../../../examples/app-frame/main.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
@@ -58,7 +59,7 @@ describe('DL-007 inspector panel block cycle', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80, rows: 20 } });
     const app = createAppFrameDemo(ctx);
     const result = await runScript(app, [{ key: 'o' }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('Inspector');
     expect(text).toContain('Current selection');
@@ -71,7 +72,7 @@ describe('DL-007 inspector panel block cycle', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 96, rows: 24 } });
     const app = createCanonicalWorkbenchApp(ctx);
     const result = await runScript(app, [{ key: 'o' }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('Panel Inspector');
     expect(text).toContain('Current selection');

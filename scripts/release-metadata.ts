@@ -41,9 +41,7 @@ export interface ReleaseCommandIO {
   readonly stderr?: (text: string) => void;
 }
 
-export interface ReleaseCommandOutputs {
-  readonly [key: string]: string;
-}
+export type ReleaseCommandOutputs = Readonly<Record<string, string>>;
 
 interface RootWorkspaceManifest {
   readonly workspaces?: readonly string[] | { readonly packages?: readonly string[] };

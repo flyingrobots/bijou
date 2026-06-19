@@ -40,6 +40,12 @@ function parseHex(hex: string): RGB {
   return [r, g, b] as const;
 }
 
+function paletteEntry<T>(palette: readonly T[], index: number): T {
+  const value = palette[index % palette.length];
+  if (value == null) throw new Error('paint-set-preparsed-palette index out of range');
+  return value;
+}
+
 export const paintThemeSetFast: Scenario<State> = {
   id: 'paint-set-preparsed-palette',
   label: 'Paint: rotating small pre-parsed palettes via surface.set (220×58)',
@@ -67,8 +73,8 @@ export const paintThemeSetFast: Scenario<State> = {
     const { surface, cols, rows, palette, bgPalette } = state;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const fg = palette[(x + y + frameIndex) % palette.length]!;
-        const bg = bgPalette[(x + y * 2) % bgPalette.length]!;
+        const fg = paletteEntry(palette, x + y + frameIndex);
+        const bg = paletteEntry(bgPalette, x + y * 2);
         surface.set(x, y, {
           char: '█',
           fg: fg.hex,

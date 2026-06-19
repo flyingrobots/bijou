@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
+import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -29,12 +31,12 @@ describe('DF-022 build prose docs reader and top-level DOGFOOD nav cycle', () =>
     expect(cycle).toContain('## Non-goals');
   });
 
-  it('defaults the docs route to Guides and renders the new top-level docs shell', async () => {
+  it('defaults the docs route to Guides and renders the new top-level docs shell', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
     const [model] = app.init();
-    const initialFrame = app.view(model);
-    const text = frameText(initialFrame as any);
+    const initialFrame = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
+    const text = frameText(initialFrame);
 
     expect(model.docsModel.activePageId).toBe('guides');
     expect(text).toContain('Guides');
@@ -50,7 +52,7 @@ describe('DF-022 build prose docs reader and top-level DOGFOOD nav cycle', () =>
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
     const result = await runScript(app, [{ key: ']' }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(must(result.frames.at(-1)));
 
     expect(result.model.docsModel.activePageId).toBe('components');
     expect(text).toContain('component families');

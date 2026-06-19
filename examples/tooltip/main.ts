@@ -47,7 +47,7 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     const { cols, rows, selectedRow, selectedCol, dirIndex } = model;
-    const dir = directions[dirIndex]!;
+    const dir = directions[dirIndex] ?? 'top';
 
     const header = separator({ label: 'tooltip demo', width: cols, ctx });
     const background = screenSurface(cols, rows, column([
@@ -69,7 +69,7 @@ const app: App<Model, Msg> = {
     const tip = tooltip({
       content: column([
         line(`Direction: ${dir}`),
-        line(`Row: ${selectedRow} Col: ${selectedCol}`),
+        line(`Row: ${String(selectedRow)} Col: ${String(selectedCol)}`),
       ]),
       row: selectedRow,
       col: selectedCol,
@@ -84,4 +84,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

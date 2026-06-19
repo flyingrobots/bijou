@@ -16,7 +16,7 @@ interface Model {
   history: KeyEntry[];
 }
 
-type Msg = { type: 'quit' };
+interface Msg { type: 'quit' }
 
 const MAX_HISTORY = 12;
 

@@ -5,13 +5,14 @@ import { createDocsApp, resolveDocsThemeActiveHeaderTabToken } from '../../../ex
 import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -45,11 +46,11 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const entered = await runScript(app, [{ key: '\r' }, { key: ']' }], { ctx });
-    const text = frameText(entered.frames[entered.frames.length - 1]!);
+    const text = frameText(must(entered.frames[entered.frames.length - 1]));
 
     expect(text).toContain('Documentation coverage');
-    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
-    expect(text).toContain(`${coverage.percent}%`);
+    expect(text).toContain(`${String(coverage.documentedFamilies)}/${String(coverage.totalFamilies)}`);
+    expect(text).toContain(`${String(coverage.percent)}%`);
   });
 
   it('shows the DOGFOOD banner and expansion on the landing screen at a normal viewport size', async () => {
@@ -57,7 +58,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const app = createDocsApp(ctx);
 
     const landing = await runScript(app, [], { ctx });
-    const initialFrame = landing.frames[landing.frames.length - 1]!;
+    const initialFrame = must(landing.frames[landing.frames.length - 1]);
     const text = frameText(initialFrame);
     const expansion = 'Documentation Of Good Foundational Onboarding and Discovery';
     const prompt = 'Press [Enter]';
@@ -70,9 +71,9 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(text).toContain(prompt);
     expect(expansionLine).toBeDefined();
 
-    const contentStart = expansionLine!.indexOf(expansion);
-    const leftBorder = expansionLine!.lastIndexOf('│', contentStart);
-    const rightBorder = expansionLine!.indexOf('│', contentStart + expansion.length);
+    const contentStart = must(expansionLine).indexOf(expansion);
+    const leftBorder = must(expansionLine).lastIndexOf('│', contentStart);
+    const rightBorder = must(expansionLine).indexOf('│', contentStart + expansion.length);
     expect(leftBorder).toBeGreaterThanOrEqual(0);
     expect(rightBorder).toBeGreaterThan(contentStart + expansion.length);
 
@@ -84,13 +85,13 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(promptRow).toBeGreaterThan(expansionRow);
     expect(promptRow - expansionRow).toBeGreaterThanOrEqual(3);
 
-    const promptStart = lines[promptRow]!.indexOf(prompt);
+    const promptStart = must(lines[promptRow]).indexOf(prompt);
     const enterCellBefore = initialFrame.get(promptStart + 'Press ['.length, promptRow);
     expect(enterCellBefore.char).toBe('E');
     expect(enterCellBefore.fg).toBeDefined();
 
     const pulsed = await runScript(app, [{ pulse: { dt: 0.6 } }], { ctx });
-    const pulsedFrame = pulsed.frames[pulsed.frames.length - 1]!;
+    const pulsedFrame = must(pulsed.frames[pulsed.frames.length - 1]);
     const enterCellAfter = pulsedFrame.get(promptStart + 'Press ['.length, promptRow);
     expect(enterCellAfter.char).toBe('E');
     expect(enterCellAfter.fg).toBeDefined();
@@ -106,7 +107,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
       route: string;
       docsModel: { perfHudOpen: boolean };
     };
-    const text = frameText(toggled.frames.at(-1)!);
+    const text = frameText(must(toggled.frames.at(-1)));
 
     expect(model.route).toBe('landing');
     expect(model.docsModel.perfHudOpen).toBe(true);

@@ -8,13 +8,13 @@ import { inspector } from './inspector.js';
 
 function ansiStyle(): StylePort {
   function fg(color: string, text: string): string {
-    const [r, g, b] = hexToRgb(color);
-    return `\x1b[38;2;${r};${g};${b}m${text}\x1b[39m`;
+    const rgb = hexToRgb(color).join(';');
+    return `\x1b[38;2;${rgb}m${text}\x1b[39m`;
   }
 
   function bg(color: string, text: string): string {
-    const [r, g, b] = hexToRgb(color);
-    return `\x1b[48;2;${r};${g};${b}m${text}\x1b[49m`;
+    const rgb = hexToRgb(color).join(';');
+    return `\x1b[48;2;${rgb}m${text}\x1b[49m`;
   }
 
   function bold(text: string): string {
@@ -34,13 +34,13 @@ function ansiStyle(): StylePort {
       return result;
     },
     rgb(r, g, b, text) {
-      return `\x1b[38;2;${r};${g};${b}m${text}\x1b[39m`;
+      return `\x1b[38;2;${[r,g,b].join(';')}m${text}\x1b[39m`;
     },
     hex(color, text) {
       return fg(color, text);
     },
     bgRgb(r, g, b, text) {
-      return `\x1b[48;2;${r};${g};${b}m${text}\x1b[49m`;
+      return `\x1b[48;2;${[r,g,b].join(';')}m${text}\x1b[49m`;
     },
     bgHex(color, text) {
       return bg(color, text);
@@ -147,9 +147,9 @@ describe('inspector', () => {
     const plainLines = stripAnsi(rendered).split('\n');
     const width = Math.max(...plainLines.map((line) => line.length));
     const surface = parseAnsiToSurface(rendered, width, plainLines.length);
-    const currentSelectionRow = plainLines.findIndex((line) => line.includes('Current selection'));
+    const row = plainLines.findIndex((line) => line.includes('Current selection'));
 
-    expect(currentSelectionRow).toBeGreaterThanOrEqual(0);
-    expect(surface.get(width - 2, currentSelectionRow).bg).toBe(bgToken.bg);
+    expect(row).toBeGreaterThanOrEqual(0);
+    expect(surface.get(width - 2, row).bg).toBe(bgToken.bg);
   });
 });

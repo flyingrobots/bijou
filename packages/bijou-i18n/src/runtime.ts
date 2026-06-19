@@ -294,7 +294,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     }
     return {
       status: candidateStatus,
-      value: candidate as T,
+      value: candidate,
       issues: [],
     };
   }

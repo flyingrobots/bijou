@@ -179,7 +179,6 @@ export function runInWorker(
     mouse: options.mouse,
     css: options.css,
   };
-
   const worker = bindings.createWorker(resolvePath(options.entry), {
     workerData: {
       isBijouWorker: true,
@@ -189,21 +188,17 @@ export function runInWorker(
     execArgv: options.execArgv,
     // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
   });
-
   // 1. Pipe Main Stdin -> Worker IPC
   const inputHandle = ctx.io.rawInput((data: string) => {
     worker.postMessage({ type: 'io:data', data } satisfies WorkerMessage);
   });
-
   const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
     const nextViewport = updateRuntimeViewport(ctx.runtime, columns, rows);
     worker.postMessage({ type: 'io:resize', ...nextViewport } satisfies WorkerMessage);
   });
-
   const onExit = new Promise<void>((resolve, reject) => {
     let requestedQuit = false;
     let forcedTerminate = false;
-
     // 2. Pipe Worker IPC -> Main Stdout
     worker.on('message', (msg: MainMessage) => {
       if (msg.type === 'render:frame') {
@@ -223,12 +218,10 @@ export function runInWorker(
         }, 50);
       }
     });
-
     worker.on('error', (err) => {
       cleanup();
       reject(err);
     });
-
     worker.on('exit', (code) => {
       cleanup();
       if (requestedQuit && (code === 0 || forcedTerminate)) {
@@ -238,11 +231,9 @@ export function runInWorker(
       if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
       else resolve();
     });
-
     function cleanup() {
       inputHandle.dispose();
       resizeHandle.dispose();
-
       if (useMouse) {
         ctx.io.write('\x1b[?1000l\x1b[?1002l\x1b[?1006l'); // DISABLE_MOUSE
       }
@@ -252,18 +243,15 @@ export function runInWorker(
       }
     }
   });
-
   return {
-    send: (payload: unknown) => worker.postMessage({ type: 'data', payload } satisfies WorkerMessage),
+    send: (payload: unknown) => { worker.postMessage({ type: 'data', payload } satisfies WorkerMessage); },
     terminate: async () => { await worker.terminate(); },
     onExit
   };
 }
-
 // ---------------------------------------------------------------------------
 // Worker Thread Logic
 // ---------------------------------------------------------------------------
-
 /**
  * The entry point for the worker thread. Must be called in the file
  * specified by `options.entry` in `runInWorker()`.
@@ -279,9 +267,7 @@ export async function startWorkerApp<Model, M>(
   if (bindings.isMainThread || !bindings.parentPort) {
     throw new Error('startWorkerApp must be called from within a worker thread.');
   }
-
   const initData = bindings.workerData as BijouWorkerData;
-
   // Create a proxy Context that speaks IPC instead of true I/O
   const proxyCtx = bindings.createNodeContext();
   installRuntimeViewportOverlay(proxyCtx);
@@ -300,7 +286,6 @@ export async function startWorkerApp<Model, M>(
   proxyCtx.io.writeError = (data: string) => {
     bindings.parentPort!.postMessage({ type: 'error', message: data } satisfies MainMessage);
   };
-
   // We need to bypass the standard run() setup since the main thread 
   // already handled alt screen and mouse modes. We tell run() to do nothing.
   const proxyOptions: RunOptions<M> = {
@@ -310,7 +295,6 @@ export async function startWorkerApp<Model, M>(
     hideCursor: false,
     mouse: false,
   };
-
   // Override the io.rawInput to listen to IPC messages instead of process.stdin
   proxyCtx.io.rawInput = (handler) => {
     const listener = (msg: WorkerMessage) => {
@@ -318,10 +302,9 @@ export async function startWorkerApp<Model, M>(
     };
     bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => bindings.parentPort!.off('message', listener)
+      dispose: () => { bindings.parentPort!.off('message', listener); }
     };
   };
-
   proxyCtx.io.onResize = (handler) => {
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:resize') {
@@ -331,23 +314,20 @@ export async function startWorkerApp<Model, M>(
     };
     bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => bindings.parentPort!.off('message', listener)
+      dispose: () => { bindings.parentPort!.off('message', listener); }
     };
   };
-
   proxyCtx.io.onData = (handler) => {
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'data') handler(msg.payload);
     };
     bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => bindings.parentPort!.off('message', listener)
+      dispose: () => { bindings.parentPort!.off('message', listener); }
     };
   };
-
   // Run the app using the proxy context
   await bindings.runApp(app, proxyOptions);
-
   // Signal main thread to shut down
   bindings.parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
 }

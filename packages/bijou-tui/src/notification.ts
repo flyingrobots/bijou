@@ -2,7 +2,6 @@ import type {
   BijouContext,
   OverflowBehavior,
   Surface,
-  PackedSurface,
   TokenValue,
 } from '@flyingrobots/bijou';
 import {
@@ -781,7 +780,7 @@ export function createSegmentSurface(segments: readonly { readonly text: string;
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
       const fl = s.modifiers ? encodeModifiers(s.modifiers) : 0;
       for (const char of segment.graphemes) {
-        (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB, fl);
+        (surface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB, fl);
         x++;
       }
     } else {

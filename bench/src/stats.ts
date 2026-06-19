@@ -22,13 +22,15 @@ export interface SampleStats {
 /** Linear-interpolated percentile of a sorted, ascending array. */
 export function percentile(sorted: readonly number[], p: number): number {
   if (sorted.length === 0) return NaN;
-  if (sorted.length === 1) return sorted[0]!;
+  if (sorted.length === 1) return sorted[0] ?? NaN;
   const rank = (p / 100) * (sorted.length - 1);
   const lo = Math.floor(rank);
   const hi = Math.ceil(rank);
-  if (lo === hi) return sorted[lo]!;
+  if (lo === hi) return sorted[lo] ?? NaN;
   const frac = rank - lo;
-  return sorted[lo]! * (1 - frac) + sorted[hi]! * frac;
+  const low = sorted[lo];
+  const high = sorted[hi];
+  return low === undefined || high === undefined ? NaN : low * (1 - frac) + high * frac;
 }
 
 /** Compute mean, stddev, CoV, min, max, p50/p90/p99 for a set of samples. */
@@ -48,8 +50,8 @@ export function computeStats(values: readonly number[]): SampleStats {
     mean,
     stddev,
     cov: mean !== 0 ? stddev / mean : 0,
-    min: sorted[0]!,
-    max: sorted[sorted.length - 1]!,
+    min: sorted[0] ?? NaN,
+    max: sorted.at(-1) ?? NaN,
     p50: percentile(sorted, 50),
     p90: percentile(sorted, 90),
     p99: percentile(sorted, 99),

@@ -18,7 +18,7 @@ export const logTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_log',
   description: 'Render a styled log line with level icon and optional timestamp. Levels: debug, info, warn, error.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = log(input.level, input.message, {

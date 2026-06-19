@@ -27,14 +27,14 @@ export function runDogfoodCoverageGate(io: DogfoodCoverageGateIO = {}): number {
       nextTargetPercent: io.nextTargetPercent,
     });
     stdout(
-      `dogfood-coverage: ok (${coverage.percent}% = ${coverage.documentedFamilies}/${coverage.totalFamilies} families; ` +
-      `floor ${result.floorPercent}%; next target ${result.nextTargetPercent}%)\n`,
+      `dogfood-coverage: ok (${String(coverage.percent)}% = ${String(coverage.documentedFamilies)}/${String(coverage.totalFamilies)} families; ` +
+      `floor ${String(result.floorPercent)}%; next target ${String(result.nextTargetPercent)}%)\n`,
     );
     return 0;
   } catch (error) {
     const message = error instanceof Error
       ? error.message
-      : `DOGFOOD documentation coverage floor not met (floor ${io.floorPercent ?? DOGFOOD_COVERAGE_FLOOR_PERCENT}%; next target ${io.nextTargetPercent ?? DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT}%)`;
+      : `DOGFOOD documentation coverage floor not met (floor ${String(io.floorPercent ?? DOGFOOD_COVERAGE_FLOOR_PERCENT)}%; next target ${String(io.nextTargetPercent ?? DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT)}%)`;
     stderr(`${message}\n`);
     return 1;
   }

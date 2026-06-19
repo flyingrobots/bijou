@@ -134,7 +134,7 @@ function logScenarioStats(model: SoakModel): void {
 function renderScenarioSurface(model: SoakModel, width: number, height: number): Surface {
   const scenario = currentScenario(model);
   const surface = scenario.getDisplaySurface(model.scenarioState);
-  if (surface && surface.width === width && surface.height === height) {
+  if (surface?.width === width && surface.height === height) {
     return surface;
   }
   // Scenario surface doesn't match pane — blit what we have into a

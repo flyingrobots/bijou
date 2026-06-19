@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext  } from '@flyingrobots/bijou/adapters/test';
 import { stripAnsi } from '@flyingrobots/bijou';
 import { renderShellQuitOverlay } from './shell-quit.js';
 
@@ -22,16 +22,16 @@ describe('shell quit confirmation', () => {
     const overlay = renderShellQuitOverlay(80, 24, undefined, ctx);
 
     expect(overlay.surface).toBeDefined();
-    expect(overlay.surface!.width).toBeGreaterThanOrEqual(36);
-    expect(overlay.surface!.width).toBeLessThanOrEqual(44);
-    expect(overlay.surface!.height).toBeLessThanOrEqual(7);
-    expect(overlay.surface!.get(2, 3).bg).toBe(ctx.surface('elevated').bg);
+    expect(must(overlay.surface).width).toBeGreaterThanOrEqual(36);
+    expect(must(overlay.surface).width).toBeLessThanOrEqual(44);
+    expect(must(overlay.surface).height).toBeLessThanOrEqual(7);
+    expect(must(overlay.surface).get(2, 3).bg).toBe(ctx.surface('elevated').bg);
   });
 
   it('styles quit action keys so they are not muted into the body copy', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const overlay = renderShellQuitOverlay(80, 24, undefined, ctx);
-    const surface = overlay.surface!;
+    const surface = must(overlay.surface);
 
     const actionCells: { char: string; modifiers?: readonly string[]; fg?: unknown; fgRGB?: unknown }[] = [];
     for (let y = 0; y < surface.height; y++) {

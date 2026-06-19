@@ -10,7 +10,6 @@ import {
   validateUiSceneIr,
   type UiSceneIr,
 } from './ui-scene-ir.js';
-
 const releaseTitleSdl = `
 type ReleaseTitle
   @bijouBlock(id: "release.title", component: "ReleaseTitleBlock")
@@ -27,7 +26,6 @@ type ReleaseTitle
     @bijouToken(fg: "semantic.action.fg", bg: "semantic.action.bg")
 }
 `;
-
 const releaseTitleSdlWithDifferentWhitespace = `
 type   ReleaseTitle
   @bijouBlock( id: "release.title", component: "ReleaseTitleBlock" )
@@ -44,7 +42,6 @@ type   ReleaseTitle
     @bijouToken( fg: "semantic.action.fg", bg: "semantic.action.bg" )
 }
 `;
-
 const releaseCardSdl = `
 type ReleaseCard
   @bijouBlock(id: "release.card", component: "ReleaseCardBlock")
@@ -64,7 +61,6 @@ type ReleaseCard
     @bijouToken(fg: "semantic.action.fg", bg: "semantic.action.bg")
 }
 `;
-
 const releaseCardSdlWithDifferentWhitespace = `
 type   ReleaseCard
   @bijouBlock( id: "release.card", component: "ReleaseCardBlock" )
@@ -84,13 +80,11 @@ type   ReleaseCard
     @bijouToken( fg: "semantic.action.fg", bg: "semantic.action.bg" )
 }
 `;
-
 describe('GraphQL-authored Bijou block artifacts', () => {
   it('compiles constrained GraphQL SDL into a terminal scene proof', () => {
     const artifact = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
     });
-
     expect(artifact).toMatchObject({
       artifactVersion: 'bijou-block/1',
       id: 'release.title',
@@ -127,7 +121,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       ],
       targetProfiles: [{ kind: 'bijou-terminal', cols: 40, rows: 5 }],
     });
-
     const scene = lowerBijouBlockToUiScene(artifact);
     expect(validateUiSceneIr(scene)).toEqual({ ok: true, issues: [] });
     expect(scene).toMatchObject<Partial<UiSceneIr>>({
@@ -155,7 +148,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
         targetNodeId: 'open-notes',
       },
     ]);
-
     const proof = lowerUiSceneToTerminalProof(scene, {
       tokenColors: {
         'semantic.action.bg': '#1f2937',
@@ -163,7 +155,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
         'semantic.title.fg': '#f7d774',
       },
     });
-
     expect(rowText(proof.lowering.surface, 1)).toContain('Bijou');
     expect(rowText(proof.lowering.surface, 3)).toContain('Open release notes');
     expect(proof.lowering.cellSourceMap.find((entry) => entry.nodeId === 'open-notes')).toMatchObject({
@@ -184,7 +175,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       'semantic.title.fg',
     ]);
   });
-
   it('keeps semantic artifact and scene hashes stable across whitespace-only SDL variants', () => {
     const one = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
@@ -192,12 +182,10 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     const two = compileGraphqlBijouBlock(releaseTitleSdlWithDifferentWhitespace, {
       sourceName: 'release-title.graphql',
     });
-
     expect(one.sourceHash).toBe(two.sourceHash);
     expect(hashUiSceneValue(one)).toBe(hashUiSceneValue(two));
     expect(hashUiSceneValue(lowerBijouBlockToUiScene(one))).toBe(hashUiSceneValue(lowerBijouBlockToUiScene(two)));
   });
-
   it('parses quoted directive arguments containing closing parentheses', () => {
     const artifact = compileGraphqlBijouBlock(`
       type ParenText
@@ -208,7 +196,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouI18n(key: "heading", fallback: "Open (beta)")
       }
     `);
-
     expect(artifact.fields[0]?.text).toEqual({
       kind: 'i18n',
       key: 'heading',
@@ -217,7 +204,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     expect(rowText(lowerUiSceneToTerminalProof(lowerBijouBlockToUiScene(artifact)).lowering.surface, 0))
       .toContain('Open (beta)');
   });
-
   it('fails loudly when the SDL omits the block directive', () => {
     expect(() => compileGraphqlBijouBlock(`
       type MissingBlock {
@@ -227,7 +213,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       }
     `)).toThrow('GraphQL Bijou block source must include @bijouBlock(id:, component:).');
   });
-
   it('rejects absolute and UNC source names', () => {
     const backslash = String.fromCharCode(92);
     for (const sourceName of [
@@ -240,7 +225,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
         .toThrow('GraphQL Bijou block sourceName must be a relative or logical name.');
     }
   });
-
   it('rejects duplicate scene identities before lowering', () => {
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateNode
@@ -254,7 +238,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouI18n(key: "two", fallback: "Two")
       }
     `)).toThrow('Duplicate GraphQL Bijou block node id: same-node');
-
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateAction
         @bijouBlock(id: "duplicate.action", component: "DuplicateActionBlock")
@@ -269,7 +252,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouAction(id: "same.action", command: "two")
       }
     `)).toThrow('Duplicate GraphQL Bijou block action id: same.action');
-
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateBinding
         @bijouBlock(id: "duplicate.binding", component: "DuplicateBindingBlock")
@@ -284,7 +266,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouBind(id: "same.binding", kind: "state", path: "two")
       }
     `)).toThrow('Duplicate GraphQL Bijou block binding id: same.binding');
-
     const validArtifact = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
     });
@@ -301,12 +282,10 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     expect(() => lowerBijouBlockToUiScene(invalidArtifact))
       .toThrow('Duplicate GraphQL Bijou block node id: heading');
   });
-
   it('compiles grouped GraphQL SDL into grouped block and scene facts', () => {
     const artifact = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
     });
-
     expect(artifact.groups).toEqual([
       {
         id: 'release.card.header',
@@ -325,7 +304,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       ['heading', 'release.card.header'],
       ['open-notes', 'release.card.footer'],
     ]);
-
     const scene = lowerBijouBlockToUiScene(artifact);
     expect(validateUiSceneIr(scene)).toEqual({ ok: true, issues: [] });
     expect(scene.nodes.map((node) => [node.id, node.kind, node.parentId, node.children])).toEqual([
@@ -353,7 +331,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
         source: 'release-card.graphql#type.ReleaseCard.field.openNotes',
       },
     ]);
-
     const proof = lowerUiSceneToTerminalProof(scene, {
       tokenColors: {
         'semantic.action.bg': '#1f2937',
@@ -372,7 +349,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     ]);
     expect(proof.receipt.bindingIds).toEqual(['release.openNotes.label']);
   });
-
   it('emits deterministic debug summary facts for grouped SDL', () => {
     const artifact = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
@@ -385,7 +361,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
         'semantic.title.fg': '#f7d774',
       },
     });
-
     expect(summary).toMatchObject({
       summaryVersion: 'graphql-bijou-block-debug/1',
       artifactId: 'release.card',
@@ -442,7 +417,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     expect(summary.lowerModes.find((mode) => mode.mode === 'token-refs')?.rows.join('\n'))
       .toContain('semantic.action.fg semantic.action.bg');
   });
-
   it('keeps grouped artifact, scene, and debug hashes stable across whitespace-only SDL variants', () => {
     const one = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
@@ -450,14 +424,12 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     const two = compileGraphqlBijouBlock(releaseCardSdlWithDifferentWhitespace, {
       sourceName: 'release-card.graphql',
     });
-
     expect(one.sourceHash).toBe(two.sourceHash);
     expect(hashUiSceneValue(one)).toBe(hashUiSceneValue(two));
     expect(hashUiSceneValue(lowerBijouBlockToUiScene(one))).toBe(hashUiSceneValue(lowerBijouBlockToUiScene(two)));
     expect(createGraphqlBijouBlockDebugSummary(one).summaryHash)
       .toBe(createGraphqlBijouBlockDebugSummary(two).summaryHash);
   });
-
   it('rejects duplicate group ids and missing field group references before lowering', () => {
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateGroup
@@ -470,7 +442,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
           @bijouI18n(key: "one", fallback: "One")
       }
     `)).toThrow('Duplicate GraphQL Bijou block group id: same.group');
-
     expect(() => compileGraphqlBijouBlock(`
       type MissingGroup
         @bijouBlock(id: "missing.group", component: "MissingGroupBlock")
@@ -482,7 +453,6 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     `)).toThrow('GraphQL Bijou block field one references missing group: missing.group');
   });
 });
-
 function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean }; width: number }, y: number): string {
   let text = '';
   for (let x = 0; x < surface.width; x++) {

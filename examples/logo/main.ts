@@ -6,7 +6,7 @@ const ctx = initDefaultContext();
 console.log(separator({ label: 'Bijou Random Logos', ctx }));
 console.log();
 
-const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large'];
+const sizes: ('small' | 'medium' | 'large')[] = ['small', 'medium', 'large'];
 
 for (const size of sizes) {
   const logo = loadRandomLogo('logos', 'bijou', size, undefined, { ctx });

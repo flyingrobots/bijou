@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { stepper } from './stepper.js';
 import { createTestContext, auditStyle } from '../../adapters/test/index.js';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 const steps = [
   { label: 'Account' },
@@ -64,7 +65,7 @@ describe('stepper', () => {
       stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
-      expect(bgCalls[0]!.color).toBe('#001122');
+      expect(must(bgCalls[0]).color).toBe('#001122');
     });
 
     it('no default bg (opt-in only)', () => {

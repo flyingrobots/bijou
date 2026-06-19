@@ -37,16 +37,16 @@ describe('bijou-i18n-tools service adapters', () => {
     let pushedSheetName: string | undefined;
 
     const adapter: ExchangeWorkbookServiceAdapter = {
-      async pull() {
-        throw new Error('not used');
+      pull() {
+        return Promise.reject(new Error('not used'));
       },
-      async push(snapshot) {
+      push(snapshot) {
         pushedRevision = snapshot.revision;
         pushedSheetName = snapshot.value.sheets[0]?.name;
-        return {
+        return Promise.resolve({
           ...snapshot,
           revision: 'sheet-rev-2',
-        };
+        });
       },
     };
 
@@ -63,17 +63,17 @@ describe('bijou-i18n-tools service adapters', () => {
     const adapter: ExchangeWorkbookServiceAdapter = {
       async pull() {
         const pushed = await pushTranslationWorkbookToService({
-          async pull() {
-            throw new Error('not used');
+          pull() {
+            return Promise.reject(new Error('not used'));
           },
-          async push(snapshot) {
-            return snapshot;
+          push(snapshot) {
+            return Promise.resolve(snapshot);
           },
         }, authoringCatalogs, 'de', { revision: 'sheet-rev-9' });
         return pushed;
       },
-      async push(snapshot) {
-        return snapshot;
+      push(snapshot) {
+        return Promise.resolve(snapshot);
       },
     };
 
@@ -96,15 +96,15 @@ describe('bijou-i18n-tools service adapters', () => {
       value: { version: 1 as const, catalogs: [] },
     };
     const adapter: CatalogBundleServiceAdapter = {
-      async pull() {
-        return stored;
+      pull() {
+        return Promise.resolve(stored);
       },
-      async push(snapshot) {
+      push(snapshot) {
         stored = {
           ...snapshot,
           revision: 'bundle-rev-2',
         };
-        return stored;
+        return Promise.resolve(stored);
       },
     };
 

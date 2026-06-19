@@ -13,8 +13,8 @@ const ctx = initDefaultContext();
 // Generate some content to page through
 const CONTENT = Array.from({ length: 80 }, (_, i) => {
   if (i === 0) return '  Welcome to the bijou pager!';
-  if (i % 10 === 0) return `  ── Section ${i / 10} ──`;
-  return `  Line ${i}: ${'Lorem ipsum dolor sit amet'.repeat(Math.ceil(Math.random() * 2))}`;
+  if (i % 10 === 0) return `  ── Section ${String(i / 10)} ──`;
+  return `  Line ${String(i)}: ${'Lorem ipsum dolor sit amet'.repeat(Math.ceil(Math.random() * 2))}`;
 }).join('\n');
 const CONTENT_SURFACE = contentSurface(CONTENT);
 
@@ -90,4 +90,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

@@ -25,7 +25,7 @@ export interface CodeSizeGateOptions {
   readonly files?: readonly CodeSizeFile[];
   readonly baseline?: readonly CodeSizeBaselineEntry[];
 }
-
+const S = String;
 const CODE_SIZE_HARD_LIMIT = 1_000;
 const CODE_SIZE_RATCHET_LIMIT = 500;
 const SOURCE_EXTENSIONS = new Set(['.cjs', '.js', '.mjs', '.ts', '.tsx']);
@@ -41,7 +41,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'examples/docs/stories.ts', lines: 5007 },
   { path: 'packages/bijou-tui/src/app-frame.ts', lines: 2871 },
   { path: 'examples/docs/dogfood-blocks.ts', lines: 2639 },
-  { path: 'packages/bijou/src/core/components/table.ts', lines: 993 },
+  { path: 'packages/bijou/src/core/components/table.ts', lines: 990 },
   { path: 'packages/bijou-tui/src/notification.ts', lines: 966 },
   { path: 'packages/bijou-tui/src/runtime-engine.ts', lines: 965 },
   { path: 'packages/bijou-tui/src/overlay.ts', lines: 941 },
@@ -54,7 +54,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou-tui/src/runtime-engine.test.ts', lines: 859 },
   { path: 'examples/docs/i18n-debt.ts', lines: 857 },
   { path: 'packages/bijou/src/core/graphql-bijou-block.ts', lines: 839 },
-  { path: 'packages/bijou/src/ports/surface.ts', lines: 827 },
+  { path: 'packages/bijou/src/ports/surface.ts', lines: 823 },
   { path: 'scripts/pr-review-status.ts', lines: 778 },
   { path: 'packages/bijou-tui/src/app-frame-render.ts', lines: 775 },
   { path: 'packages/bijou-tui/src/notification.test.ts', lines: 761 },
@@ -88,12 +88,10 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou-i18n/src/runtime.test.ts', lines: 553 },
   { path: 'packages/bijou-i18n/src/runtime.ts', lines: 552 },
   { path: 'tests/cycles/DF-054/dogfood-late-family-six-pack.test.ts', lines: 544 },
-  { path: 'packages/bijou-tui/src/viewport.test.ts', lines: 539 },
   { path: 'packages/bijou/src/core/theme/dtcg.test.ts', lines: 537 },
   { path: 'packages/bijou-tui/src/eventbus.ts', lines: 535 },
   { path: 'packages/bijou-tui/src/focus-area.test.ts', lines: 533 },
   { path: 'packages/bijou-tui/src/transition-shaders.ts', lines: 517 },
-  { path: 'packages/bijou/src/core/components/table.test.ts', lines: 511 },
   { path: 'tests/cycles/DF-069/dogfood-block-registry.test.ts', lines: 509 },
 ]);
 
@@ -108,22 +106,22 @@ export function evaluateCodeSizeGate(options: CodeSizeGateOptions = {}): CodeSiz
 
     if (file.lines > CODE_SIZE_HARD_LIMIT) {
       if (allowedLines == null) {
-        violations.push(`${file.path} has ${file.lines} lines; hard limit is ${CODE_SIZE_HARD_LIMIT}`);
+        violations.push(`${file.path} has ${S(file.lines)} lines; hard limit ${S(CODE_SIZE_HARD_LIMIT)}`);
         continue;
       }
       if (file.lines > allowedLines) {
-        violations.push(`${file.path} has ${file.lines} lines; legacy hard-limit baseline is ${allowedLines}`);
+        violations.push(`${file.path} has ${S(file.lines)} lines; legacy ${S(allowedLines)}`);
       }
       continue;
     }
 
     if (file.lines <= CODE_SIZE_RATCHET_LIMIT) continue;
     if (allowedLines == null) {
-      violations.push(`${file.path} has ${file.lines} lines; files over ${CODE_SIZE_RATCHET_LIMIT} require an explicit ratchet baseline`);
+      violations.push(`${file.path} has ${S(file.lines)} lines; over ${S(CODE_SIZE_RATCHET_LIMIT)} needs ratchet`);
       continue;
     }
     if (file.lines > allowedLines) {
-      violations.push(`${file.path} has ${file.lines} lines; ratchet baseline is ${allowedLines}`);
+      violations.push(`${file.path} has ${S(file.lines)} lines; ratchet ${S(allowedLines)}`);
     }
   }
 
@@ -163,11 +161,11 @@ export function formatCodeSizeGateResult(result: CodeSizeGateResult): string {
   if (result.ok) {
     const ratcheted = result.files.filter((file) => file.lines > CODE_SIZE_RATCHET_LIMIT).length;
     const legacyHardLimit = result.files.filter((file) => file.lines > CODE_SIZE_HARD_LIMIT).length;
-    return `code-size-gate: ok (${ratcheted} files over ${CODE_SIZE_RATCHET_LIMIT} lines; ${legacyHardLimit} legacy files over hard limit ${CODE_SIZE_HARD_LIMIT})\n`;
+    return `code-size-gate: ok (${S(ratcheted)} files over ${S(CODE_SIZE_RATCHET_LIMIT)} lines; ${S(legacyHardLimit)} legacy hard-limit files over ${S(CODE_SIZE_HARD_LIMIT)})\n`;
   }
 
   return [
-    `code-size-gate: failed (${result.violations.length} violation${result.violations.length === 1 ? '' : 's'})`,
+    `code-size-gate: failed (${S(result.violations.length)} violation${result.violations.length === 1 ? '' : 's'})`,
     ...result.violations.map((violation) => `- ${violation}`),
     '',
   ].join('\n');

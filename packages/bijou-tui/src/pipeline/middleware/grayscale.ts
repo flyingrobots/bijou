@@ -30,12 +30,12 @@ function grayscalePackedBuffer(surface: PackedSurface): void {
 
   for (let i = 0; i < size; i++) {
     const off = i * CELL_STRIDE;
-    const alpha = buf[off + OFF_ALPHA]!;
+    const alpha = byteAt(buf, off + OFF_ALPHA);
 
     if (alpha & FLAG_FG_SET) {
-      const r = buf[off + OFF_FG_R]!;
-      const g = buf[off + OFF_FG_R + 1]!;
-      const b = buf[off + OFF_FG_R + 2]!;
+      const r = byteAt(buf, off + OFF_FG_R);
+      const g = byteAt(buf, off + OFF_FG_R + 1);
+      const b = byteAt(buf, off + OFF_FG_R + 2);
       const lum = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
       buf[off + OFF_FG_R] = lum;
       buf[off + OFF_FG_R + 1] = lum;
@@ -43,9 +43,9 @@ function grayscalePackedBuffer(surface: PackedSurface): void {
     }
 
     if (alpha & FLAG_BG_SET) {
-      const r = buf[off + OFF_BG_R]!;
-      const g = buf[off + OFF_BG_R + 1]!;
-      const b = buf[off + OFF_BG_R + 2]!;
+      const r = byteAt(buf, off + OFF_BG_R);
+      const g = byteAt(buf, off + OFF_BG_R + 1);
+      const b = byteAt(buf, off + OFF_BG_R + 2);
       const lum = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
       buf[off + OFF_BG_R] = lum;
       buf[off + OFF_BG_R + 1] = lum;
@@ -53,14 +53,16 @@ function grayscalePackedBuffer(surface: PackedSurface): void {
     }
 
     // Sync the Cell object from the buffer
-    const cell = surface.cells[i]!;
+    const cell = surface.cells[i];
+    if (cell === undefined) continue;
+
     if (alpha & FLAG_FG_SET) {
-      const lum = buf[off + OFF_FG_R]!;
+      const lum = byteAt(buf, off + OFF_FG_R);
       const h = lum.toString(16).padStart(2, '0');
       cell.fg = `#${h}${h}${h}`;
     }
     if (alpha & FLAG_BG_SET) {
-      const lum = buf[off + OFF_BG_R]!;
+      const lum = byteAt(buf, off + OFF_BG_R);
       const h = lum.toString(16).padStart(2, '0');
       cell.bg = `#${h}${h}${h}`;
     }
@@ -84,8 +86,12 @@ function grayscaleCellFallback(surface: Surface): void {
   }
 }
 
+function byteAt(buf: Uint8Array, index: number): number {
+  return buf[index] ?? 0;
+}
+
 function hexToGrayscale(hex: string): string {
-  if (hex.length !== 7 || hex[0] !== '#') return hex;
+  if (hex.length !== 7 || !hex.startsWith('#')) return hex;
 
   const digits = hex.slice(1);
   if (!/^[0-9A-Fa-f]{6}$/.test(digits)) return hex;

@@ -11,12 +11,12 @@ export type UiTextRef =
   | { readonly kind: 'literal'; readonly value: string }
   | { readonly kind: 'i18n'; readonly key: string; readonly fallback?: string };
 
-export type UiStyleRef = {
+export interface UiStyleRef {
   readonly fg?: { readonly token: string };
   readonly bg?: { readonly token: string };
   readonly border?: { readonly token: string };
   readonly modifiers?: readonly string[];
-};
+}
 
 export interface UiLayoutIntent {
   readonly x?: number;
@@ -788,7 +788,7 @@ function hashSurface(surface: Surface): string {
 }
 
 function sanitizeLayoutCoordinate(value: number | undefined): number {
-  return Number.isFinite(value) ? Math.trunc(value as number) : 0;
+  return Number.isFinite(value) ? Math.trunc(value!) : 0;
 }
 
 function sortedUnique(values: readonly string[]): readonly string[] {

@@ -15,6 +15,7 @@ export interface ToolResult {
 
 /** Zod raw shape: keys mapping to Zod types, as MCP SDK expects. */
 export type ZodShape = Record<string, z.ZodTypeAny>;
+export type MaybePromise<T> = T | Promise<T>;
 
 /** A tool registration combining name, description, Zod input shape, and handler. */
 export interface ToolRegistration {
@@ -22,5 +23,5 @@ export interface ToolRegistration {
   readonly description: string;
   readonly inputSchema: ZodShape;
   readonly outputSchema?: ZodShape;
-  readonly handler: (args: Record<string, unknown>) => Promise<ToolResult>;
+  readonly handler: (args: Record<string, unknown>) => MaybePromise<ToolResult>;
 }

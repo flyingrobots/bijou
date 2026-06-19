@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { must, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { createSurface, stringToSurface } from '@flyingrobots/bijou';
 import { flex, flexSurface } from './flex.js';
 
@@ -149,7 +149,7 @@ describe('flex column', () => {
     // 2 + 1 gap + 2 = 5 content lines, padded to totalHeight 10
     expect(lines).toHaveLength(10);
     expect(lines[0]).toContain('top');
-    expect(lines[2]!.trim()).toBe(''); // gap row is blank
+    expect(lines[2]?.trim()).toBe(''); // gap row is blank
     expect(lines[3]).toContain('bot');
   });
 
@@ -174,8 +174,8 @@ describe('cross-axis alignment (row)', () => {
       { basis: 10, content: 'hello', align: 'start' },
     );
     const lines = result.split('\n');
-    expect(lines[0]!.trimEnd()).toBe('hello');
-    expect(lines[3]!.trimEnd()).toBe('');
+    expect(lines[0]?.trimEnd()).toBe('hello');
+    expect(lines[3]?.trimEnd()).toBe('');
   });
 
   it('align end — content at bottom', () => {
@@ -184,8 +184,8 @@ describe('cross-axis alignment (row)', () => {
       { basis: 10, content: 'hello', align: 'end' },
     );
     const lines = result.split('\n');
-    expect(lines[0]!.trimEnd()).toBe('');
-    expect(lines[3]!.trimEnd()).toBe('hello');
+    expect(lines[0]?.trimEnd()).toBe('');
+    expect(lines[3]?.trimEnd()).toBe('hello');
   });
 
   it('align center — content in middle', () => {
@@ -195,7 +195,7 @@ describe('cross-axis alignment (row)', () => {
     );
     const lines = result.split('\n');
     // 5 rows, 1 line content → 2 blank before, 1 content, 2 blank after
-    expect(lines[2]!.trimEnd()).toBe('hi');
+    expect(lines[2]?.trimEnd()).toBe('hi');
   });
 });
 
@@ -259,7 +259,7 @@ describe('edge cases', () => {
       { direction: 'row', width: 10, height: 1 },
       { basis: 5, content: 'toolongword' },
     );
-    const line = result.split('\n')[0]!;
+    const line = must(result.split('\n')[0]);
     expect(visWidth(line)).toBeLessThanOrEqual(10);
   });
 });
@@ -273,33 +273,27 @@ describe('flexSurface', () => {
       { basis: 2, content: left, align: 'center' },
       { basis: 2, content: right, align: 'end' },
     );
-
     const lines = surfaceLines(result);
-    expect(lines[1]![0]).toBe('L');
-    expect(lines[2]![3]).toBe('R');
+    expect(lines[1]?.[0]).toBe('L');
+    expect(lines[2]?.[3]).toBe('R');
   });
-
   it('supports column layouts with horizontal alignment for surface children', () => {
     const child = createSurface(2, 1);
     child.set(0, 0, { char: 'O', empty: false });
     child.set(1, 0, { char: 'K', empty: false });
-
     const result = flexSurface(
       { direction: 'column', width: 6, height: 3 },
       { basis: 1, content: child, align: 'center' },
       { basis: 1, content: stringToSurface('x', 1, 1), align: 'end' },
     );
-
     const lines = surfaceLines(result);
     expect(lines[0]).toBe('  OK  ');
     expect(lines[1]).toBe('     x');
   });
 });
-
 // ---------------------------------------------------------------------------
 // Resize scenario
 // ---------------------------------------------------------------------------
-
 describe('resize reflow', () => {
   it('produces different layouts for different widths', () => {
     const renderApp = (width: number, height: number): string =>
@@ -308,20 +302,16 @@ describe('resize reflow', () => {
         { basis: 15, content: 'sidebar' },
         { flex: 1, content: (w) => `main(${w})` },
       );
-
     const wide = renderApp(80, 24);
     const narrow = renderApp(40, 24);
-
     // Wide should allocate more to main
     expect(wide).toContain('main(64)');   // 80 - 15 - 1 gap
     expect(narrow).toContain('main(24)'); // 40 - 15 - 1 gap
   });
 });
-
 // ---------------------------------------------------------------------------
 // Background token
 // ---------------------------------------------------------------------------
-
 describe('background token', () => {
   it('container bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
@@ -335,7 +325,6 @@ describe('background token', () => {
     expect(result).toContain('A');
     expect(result).toContain('B');
   });
-
   it('child bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
@@ -347,7 +336,6 @@ describe('background token', () => {
     expect(result).toContain('filled');
     expect(result).toContain('plain');
   });
-
   it('bgToken without ctx is no-op (strict equality)', () => {
     const token = { hex: '#ffffff', bg: '#003366' };
     const withToken = flex(
@@ -360,7 +348,6 @@ describe('background token', () => {
     );
     expect(withToken).toBe(withoutToken);
   });
-
   it('bgToken with noColor is no-op (strict equality)', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const token = { hex: '#ffffff', bg: '#003366' };

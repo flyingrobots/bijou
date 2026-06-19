@@ -17,12 +17,10 @@ interface Model {
   rows: number;
 }
 
-type Msg = never;
-
-const app: App<Model, Msg> = {
+const app: App<Model> = {
   init: () => [{
-    cols: process.stdout.columns ?? 80,
-    rows: process.stdout.rows ?? 24,
+    cols: process.stdout.columns,
+    rows: process.stdout.rows,
   }, []],
 
   update(msg, model) {
@@ -52,9 +50,9 @@ const app: App<Model, Msg> = {
       gap: 1,
       cells: {
         header: (w) => boxSurface('Grid layout primitive (fixed + fr tracks)', { width: w }),
-        nav: (w, h) => boxSurface(`Navigation\n\n- Inbox\n- Build\n- Deploy\n\n${w}x${h}`, { width: w }),
-        logs: (w, h) => boxSurface(`Logs\n\n[ok] build passed\n[ok] tests passed\n\n${w}x${h}`, { width: w }),
-        main: (w, h) => boxSurface(`Main View\n\nUse this as a page body in appFrame()\n\n${w}x${h}`, { width: w }),
+        nav: (w, h) => boxSurface(`Navigation\n\n- Inbox\n- Build\n- Deploy\n\n${String(w)}x${String(h)}`, { width: w }),
+        logs: (w, h) => boxSurface(`Logs\n\n[ok] build passed\n[ok] tests passed\n\n${String(w)}x${String(h)}`, { width: w }),
+        main: (w, h) => boxSurface(`Main View\n\nUse this as a page body in appFrame()\n\n${String(w)}x${String(h)}`, { width: w }),
       },
     });
 
@@ -62,4 +60,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

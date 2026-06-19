@@ -28,7 +28,7 @@ export const dagTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_dag',
   description: 'Render a directed graph with boxed nodes and edge lines. Returns plain-text with Unicode box-drawing characters.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const tw = input.terminalWidth ?? input.maxWidth ?? 80;
     const ctx = mcpContext(tw);

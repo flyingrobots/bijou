@@ -1,11 +1,10 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
-const RUNTIME_ENTRY = resolve(ROOT, 'packages/bijou-i18n/src/index.ts');
 
 describe('LX-002 bijou-i18n tools cycle', () => {
   it('ships a dedicated tooling package entrypoint', async () => {
@@ -13,7 +12,7 @@ describe('LX-002 bijou-i18n tools cycle', () => {
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools/tsconfig.json'))).toBe(true);
     expect(existsSync(TOOLS_ENTRY)).toBe(true);
 
-    const mod: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const mod = await import('../../../packages/bijou-i18n-tools/src/index.js');
     expect(typeof mod.markStaleTranslations).toBe('function');
     expect(typeof mod.exportTranslationRows).toBe('function');
     expect(typeof mod.importTranslationRows).toBe('function');
@@ -22,7 +21,7 @@ describe('LX-002 bijou-i18n tools cycle', () => {
   });
 
   it('marks changed source strings stale and exports only stale or missing rows', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     const catalogs = tools.markStaleTranslations([
       {
@@ -59,8 +58,8 @@ describe('LX-002 bijou-i18n tools cycle', () => {
   });
 
   it('imports translated rows and compiles them into runtime catalogs consumable by bijou-i18n', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-    const runtimeMod: typeof import('../../../packages/bijou-i18n/src/index.js') = await import(pathToFileURL(RUNTIME_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
+    const runtimeMod = await import('../../../packages/bijou-i18n/src/index.js');
 
     const staleCatalogs = tools.markStaleTranslations([
       {
@@ -101,7 +100,7 @@ describe('LX-002 bijou-i18n tools cycle', () => {
   });
 
   it('pseudolocalizes text for layout stress', async () => {
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
+    const tools = await import('../../../packages/bijou-i18n-tools/src/index.js');
 
     const pseudo = tools.pseudoLocalize('Landing quality');
     expect(pseudo.length).toBeGreaterThan('Landing quality'.length);

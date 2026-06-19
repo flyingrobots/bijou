@@ -54,7 +54,7 @@ export function bindStandardSectionSchemaData(
   ];
 
   for (const section of sections) {
-    const value = ownDataProperty(data as Record<string, unknown>, section.id);
+    const value = ownDataProperty(data, section.id);
     if (value === undefined) {
       continue;
     }

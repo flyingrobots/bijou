@@ -326,12 +326,12 @@ export function importCatalogBundle(bundle: CatalogBundle): readonly AuthoringCa
 
   return bundle.catalogs.map((catalog: SerializedAuthoringCatalog) => ({
     namespace: catalog.namespace,
-    entries: (catalog.entries as readonly SerializedAuthoringCatalogEntry[]).map((entry: SerializedAuthoringCatalogEntry) => {
+    entries: (catalog.entries).map((entry: SerializedAuthoringCatalogEntry) => {
       if (!isEntryKind(entry.kind)) {
         throw new Error(`Invalid catalog bundle: unknown entry kind ${entry.kind}`);
       }
       const serializedTranslations = entry.translations as Record<string, SerializedAuthoringTranslation>;
-      const translationEntries = Object.entries(serializedTranslations) as Array<[string, SerializedAuthoringTranslation]>;
+      const translationEntries = Object.entries(serializedTranslations);
       const translations: Record<string, AuthoringTranslation> = Object.fromEntries(
         translationEntries.map(([locale, translation]: [string, SerializedAuthoringTranslation]) => {
           if (!isTranslationStatus(translation.status)) {

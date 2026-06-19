@@ -31,15 +31,17 @@ export function paginator(options: PaginatorOptions): string {
   const total = sanitizePositiveInt(options.total, 1);
   const current = Math.min(sanitizeNonNegativeInt(options.current, 0), total - 1);
   const page = current + 1; // convert 0-indexed to 1-indexed for display
+  const pageLabel = String(page);
+  const totalLabel = String(total);
 
   return renderByMode(ctx.mode, {
-    pipe: () => `[${page}/${total}]`,
-    accessible: () => `Page ${page} of ${total}`,
+    pipe: () => `[${pageLabel}/${totalLabel}]`,
+    accessible: () => `Page ${pageLabel} of ${totalLabel}`,
     interactive: () => {
       // interactive + static
       const style = options.style ?? 'dots';
 
-      if (style === 'text') return `Page ${page} of ${total}`;
+      if (style === 'text') return `Page ${pageLabel} of ${totalLabel}`;
 
       // dots style
       const dots: string[] = [];

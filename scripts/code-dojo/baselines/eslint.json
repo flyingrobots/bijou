@@ -1,56 +1,40 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 4517,
-  "errors": 4513,
-  "warnings": 4,
+  "total": 1656,
+  "errors": 1656,
+  "warnings": 0,
   "rules": [
     {
       "ruleId": "@typescript-eslint/array-type",
-      "count": 39
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/ban-ts-comment",
       "count": 1
     },
     {
-      "ruleId": "@typescript-eslint/consistent-generic-constructors",
-      "count": 1
-    },
-    {
-      "ruleId": "@typescript-eslint/consistent-indexed-object-style",
-      "count": 3
-    },
-    {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 97
+      "count": 36
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
-      "count": 26
-    },
-    {
-      "ruleId": "@typescript-eslint/dot-notation",
-      "count": 8
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-base-to-string",
-      "count": 27
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-non-null-assertion",
-      "count": 3
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-void-expression",
-      "count": 62
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-deprecated",
-      "count": 16
-    },
-    {
-      "ruleId": "@typescript-eslint/no-duplicate-type-constituents",
-      "count": 2
+      "count": 5
     },
     {
       "ruleId": "@typescript-eslint/no-dynamic-delete",
@@ -58,23 +42,19 @@
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 59
+      "count": 30
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
-      "count": 9
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 204
+      "count": 60
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 40
-    },
-    {
-      "ruleId": "@typescript-eslint/no-inferrable-types",
-      "count": 3
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/no-invalid-void-type",
@@ -82,35 +62,27 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 1408
+      "count": 371
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
-      "count": 18
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-boolean-literal-compare",
-      "count": 4
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 181
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unnecessary-template-expression",
-      "count": 2
+      "count": 122
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
-      "count": 27
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
-      "count": 100
+      "count": 26
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
-      "count": 20
+      "count": 11
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
@@ -118,55 +90,47 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 81
+      "count": 34
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 130
+      "count": 42
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
-      "count": 9
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 178
+      "count": 17
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 20
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 584
+      "count": 280
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 157
-    },
-    {
-      "ruleId": "@typescript-eslint/no-useless-default-assignment",
-      "count": 1
+      "count": 44
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
-      "count": 9
-    },
-    {
-      "ruleId": "@typescript-eslint/prefer-as-const",
-      "count": 1
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
-      "count": 18
+      "count": 13
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 36
+      "count": 27
     },
     {
       "ruleId": "@typescript-eslint/prefer-optional-chain",
-      "count": 16
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/prefer-promise-reject-errors",
@@ -174,31 +138,31 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-regexp-exec",
-      "count": 10
-    },
-    {
-      "ruleId": "@typescript-eslint/prefer-string-starts-ends-with",
       "count": 4
     },
     {
+      "ruleId": "@typescript-eslint/prefer-string-starts-ends-with",
+      "count": 2
+    },
+    {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 112
+      "count": 32
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
-      "count": 11
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 664
+      "count": 361
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
-      "count": 16
+      "count": 11
     },
     {
       "ruleId": "@typescript-eslint/unbound-method",
-      "count": 15
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/unified-signatures",
@@ -206,19 +170,11 @@
     },
     {
       "ruleId": "@typescript-eslint/use-unknown-in-catch-callback-variable",
-      "count": 5
-    },
-    {
-      "ruleId": "fatal",
-      "count": 4
+      "count": 1
     },
     {
       "ruleId": "no-control-regex",
-      "count": 26
-    },
-    {
-      "ruleId": "no-regex-spaces",
-      "count": 1
+      "count": 10
     },
     {
       "ruleId": "no-restricted-imports",
@@ -226,7 +182,7 @@
     },
     {
       "ruleId": "no-useless-assignment",
-      "count": 12
+      "count": 5
     },
     {
       "ruleId": "no-useless-escape",
@@ -234,7 +190,7 @@
     },
     {
       "ruleId": "prefer-const",
-      "count": 10
+      "count": 1
     },
     {
       "ruleId": "preserve-caught-error",

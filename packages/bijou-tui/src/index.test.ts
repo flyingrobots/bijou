@@ -42,19 +42,19 @@ describe('package root export ergonomics', () => {
     const wrapped = wrapPageMsg('home', { type: 'local' });
     expect(wrapped[PAGE_MSG_TOKEN]).toBe(true);
     expect(isPageScopedMsg(wrapped)).toBe(true);
-    expectTypeOf(wrapped).toMatchTypeOf<FramedAppMsg<{ type: string }>>();
+    expectTypeOf(wrapped).toExtend<FramedAppMsg<{ type: string }>>();
 
-    const emitted = await emitMsgForPage('home', { type: 'from-command' })(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
+    const emitted = await emitMsgForPage('home', { type: 'from-command' })(() => { void 0; }, {
+      onPulse: () => ({ dispose: () => { void 0; } }),
+      sleep: () => Promise.resolve(),
       now: () => 0,
     });
     expect(isPageScopedMsg(emitted)).toBe(true);
 
-    const cmd = wrapCmdForPage('home', async () => ({ type: 'wrapped' as const }));
-    const result = await cmd(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
+    const cmd = wrapCmdForPage('home', () => Promise.resolve({ type: 'wrapped' as const }));
+    const result = await cmd(() => { void 0; }, {
+      onPulse: () => ({ dispose: () => { void 0; } }),
+      sleep: () => Promise.resolve(),
       now: () => 0,
     });
     expect(isPageScopedMsg(result)).toBe(true);

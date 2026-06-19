@@ -35,9 +35,16 @@ export const app: App<Model> = {
   ),
 };
 
+function pipelineModel(model: unknown): Model {
+  if (typeof model !== 'object' || model === null || !('scanlineOn' in model) || typeof model.scanlineOn !== 'boolean') {
+    throw new Error('v3-pipeline expected scanline model');
+  }
+  return model;
+}
+
 export function configureScanlinePipeline(pipeline: RenderPipeline): void {
   pipeline.use('PostProcess', (state, next) => {
-    const enabled = (state.model as Model).scanlineOn;
+    const enabled = pipelineModel(state.model).scanlineOn;
     if (enabled) {
       for (let y = 1; y < state.targetSurface.height; y += 2) {
         for (let x = 0; x < state.targetSurface.width; x++) {
@@ -54,7 +61,7 @@ export function configureScanlinePipeline(pipeline: RenderPipeline): void {
 }
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app, {
+  void run(app, {
     ctx,
     configurePipeline: configureScanlinePipeline,
   });

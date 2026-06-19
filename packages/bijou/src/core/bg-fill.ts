@@ -44,20 +44,21 @@ export function makeBgFill(
   token: TokenValue | undefined,
   ctx: BijouContext | undefined,
 ): ((text: string) => string) | undefined {
-  if (!token?.bg || !shouldApplyBg(ctx)) return undefined;
+  if (!token?.bg || ctx === undefined || !shouldApplyBg(ctx)) return undefined;
 
-  const wrappedMarker = ctx!.style.bgHex(token.bg!, MARKER);
+  const bg = token.bg;
+  const wrappedMarker = ctx.style.bgHex(bg, MARKER);
   const markerIndex = wrappedMarker.indexOf(MARKER);
 
   if (markerIndex < 0 || wrappedMarker === MARKER) {
-    return (text: string) => ctx!.style.bgHex(token.bg!, text);
+    return (text: string) => ctx.style.bgHex(bg, text);
   }
 
   const prefix = wrappedMarker.slice(0, markerIndex);
   const suffix = wrappedMarker.slice(markerIndex + MARKER.length);
 
   if (prefix.length === 0 || suffix.length === 0) {
-    return (text: string) => ctx!.style.bgHex(token.bg!, text);
+    return (text: string) => ctx.style.bgHex(bg, text);
   }
 
   return (text: string) => wrapPreservingBackground(text, prefix, suffix);

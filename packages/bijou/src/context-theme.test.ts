@@ -9,7 +9,7 @@ import { plainStyle } from './adapters/test/style.js';
 describe('observeTheme()', () => {
   it('observes test-context token graph changes through the public context', () => {
     const ctx = createTestContext();
-    const seen: Array<{ path: string, fullReload: boolean }> = [];
+    const seen: { path: string, fullReload: boolean }[] = [];
     const subscription = observeTheme(ctx, (change) => {
       seen.push({ path: change.path, fullReload: change.fullReload });
       expect(change.ctx).toBe(ctx);
@@ -28,7 +28,7 @@ describe('observeTheme()', () => {
 
   it('marks graph imports as full reloads', () => {
     const ctx = createTestContext();
-    const seen: Array<{ path: string, fullReload: boolean }> = [];
+    const seen: { path: string, fullReload: boolean }[] = [];
 
     const subscription = observeTheme(ctx, (change) => {
       seen.push({ path: change.path, fullReload: change.fullReload });

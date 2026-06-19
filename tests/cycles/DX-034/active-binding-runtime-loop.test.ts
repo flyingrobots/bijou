@@ -146,7 +146,7 @@ describe('DX-034G/H/I active binding runtime loop', () => {
   });
 
   it('routes command intent emissions into the runtime command buffer for later business logic', () => {
-    type Command = { readonly type: 'reader.selectHeading'; readonly headingId: string };
+    interface Command { readonly type: 'reader.selectHeading'; readonly headingId: string }
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const selectHeading = commandIntent<{ readonly headingId: string }>('reader.selectHeading');
     const emission = runtimeCommandIntentEmission(
@@ -186,11 +186,9 @@ describe('DX-034G/H/I active binding runtime loop', () => {
     expect('subscribe' in emission).toBe(false);
     expect('dispatch' in emission).toBe(false);
   });
-
   it('documents DX-034G through DX-034I without claiming subscriptions or rendering', () => {
     const cycle = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
-
     expect(cycle).toContain('### DX-034G Active View Binding Collection');
     expect(cycle).toContain('### DX-034H Provider Update Invalidation Flow');
     expect(cycle).toContain('### DX-034I Command Intent Dispatch Proof');

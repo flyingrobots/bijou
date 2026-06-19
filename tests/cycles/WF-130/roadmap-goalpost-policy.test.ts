@@ -211,7 +211,7 @@ describe('WF-130 roadmap goalpost policy', () => {
 
   it('keeps the Beyond open snapshot count aligned with the Open Beyond Issues table', () => {
     const roadmap = read('docs/ROADMAP.md');
-    const beyondRow = roadmap.match(/\| `Beyond` \| \[Beyond\]\([^)]+\) \| (?<open>\d+) \| (?<closed>\d+) \|/);
+    const beyondRow = /\| `Beyond` \| \[Beyond\]\([^)]+\) \| (?<open>\d+) \| (?<closed>\d+) \|/.exec(roadmap);
     expect(beyondRow?.groups?.closed).toBe('6');
 
     const openBeyondIssues = sectionBetween(

@@ -8,6 +8,50 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Code Dojo iteration loop** — PR verification avoids duplicate test builds
+  by using `npm run test:run` after explicit build steps, the Code Dojo workflow
+  now runs the standards-only `code-dojo:verify` lane while the full local
+  `code-dojo:ci` lane remains available on demand, and local pre-push skips
+  DOGFOOD i18n gates when pushed paths do not affect DOGFOOD policy and runs
+  the full Vitest suite through `npm run test:run` to avoid the `pretest`
+  rebuild. Set `BIJOU_FULL_PUSH=1` to force the full pre-push DOGFOOD gate.
+  The local burndown loop also exposes `code-dojo:eslint:offenders` and
+  `code-dojo:slice` for focused standards cleanup, adds cached
+  `code-dojo:fast` and `code-dojo:changed` lanes for edit-loop and
+  changed-file cleanup, lets local Vitest runs raise
+  `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
+  removes duplicate pre-commit lint and code-size checks that were already
+  covered by `code-dojo:precommit`.
+- **Respecting the Dojo burndown** — WF-135 lowers live type-aware ESLint
+  findings from `4,517` to `1,656`, cutting `2,872` counted Code Dojo
+  violations across the initial 1000-count pass and follow-on fake-async,
+  dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
+  app-frame render/settings/shell-layer/notification fixture cleanups, plus
+  render differ packed-byte and legacy cell-path cleanup and typed DOGFOOD
+  Blocks/BlockLab, AppFrame modal/tail, schema-block, and active-binding test
+  accessors, shader middleware state fixtures, responsive DOGFOOD layout
+  witnesses, release-title model access, and grid-layout example bootstrap
+  cleanup, plus docs-preview page-model helper typing and locale helper
+  cleanup, AppFrame routing/theme test harness cleanup, runtime interactive
+  pipeline rejection cleanup, core surface packed-buffer safe-read cleanup,
+  table/markdown parsing cleanup, small utility cleanup, compact component and
+  example cleanup, runtime/example/TUI/i18n cycle cleanup,
+  surface-diff/timeline/component-metadata typed formatting cleanup, and
+  block-metadata plus notification demo contract cleanup, small benchmark,
+  example, CSS, worker, chart, i18n runtime cleanup, and MCP fake-async plus
+  example bootstrap cleanup, plus image codec, table layout, and grid geometry
+  safe-indexing cleanup, bench report parsing, app-frame palette, runtime
+  interactive command, inspector style helper cleanup, app-frame action/input
+  shell assertion cleanup, bench CLI formatting cleanup, focus-map text
+  formatting cleanup, key parser regex/assertion cleanup, and node style test
+  regex cleanup, plus app-frame core/overlay retained-layout and shell-command
+  narrowing cleanup, plus core binding runtime-brand, snapshot clone, and
+  unchecked fixture cleanup, plus TUI runtime binding brand/dispatch cleanup and
+  core schema-block inert-data, brand, and bind-output cleanup. The aggregate
+  debt ceiling now ratchets from `4,940` to `2,068`, with the next goalpost
+  target set to `2,018` or lower, while touched
+  file/context budgets remain held under their stored ceilings and two
+  file/context exceptions are removed.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe

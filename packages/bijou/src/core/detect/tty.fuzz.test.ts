@@ -40,7 +40,7 @@ describe('detectOutputMode fuzz (property-based)', () => {
           key,
           fc.constantFrom(...ENV_VALUES),
         ]),
-      ) as Record<string, fc.Arbitrary<typeof ENV_VALUES[number]>>,
+      ),
     );
 
     fc.assert(
