@@ -156,6 +156,7 @@ Implemented validation:
 - `examples/docs/app.ts` has fewer than `5,794` lines and fewer than `203,093`
   bytes.
 - New extracted files are below normal file/context limits.
+- DOGFOOD raw-string debt is `2,656` or lower.
 - `docs-app` raw-string debt is `258` or lower.
 - Missing Markdown localization debt remains `78` or lower.
 - Issue #417 and the pull request are cross-linked.
