@@ -9,11 +9,25 @@ Implemented.
 - Issue: [#405](https://github.com/flyingrobots/bijou/issues/405)
 - Pull request: [#406](https://github.com/flyingrobots/bijou/pull/406)
 
-## Context
+## Legend
+
+- Linked legend: WF, Workflow and Delivery
+- Sponsor human: James Ross
+- Sponsor agent: Codex
+
+## Hill
 
 Respectful Repo: Enter the Code Dojo remains the active goalpost before the
 next `v7.2.0` product pull. WF-149 landed at `321bb2b0` with aggregate Code
 Dojo debt at `1,215`.
+
+The current goalpost is not a release version. It is:
+
+```text
+Respectful Repo: Enter the Code Dojo
+```
+
+## Current Truth
 
 Live counts on `main` at `321bb2b0`:
 
@@ -49,7 +63,10 @@ Implemented counts on this branch before review:
 
 - Select a focused cleanup slice from current ESLint or Code Dojo offenders.
 - Remove at least `50` counted violations with real fixes.
-- Keep touched files under existing file/context and code-size ceilings.
+- Prefer real type, data-shape, and control-flow fixes over suppressions or
+  cosmetic baseline churn.
+- Keep touched file/context, mock-ban, code-size, and DOGFOOD localization
+  ratchets flat or lower.
 - Ratchet stale baseline entries down or out when touched files fall below
   thresholds.
 - Update the Code Dojo exception ledger, ESLint baseline, package ceiling, and
@@ -62,7 +79,57 @@ Implemented counts on this branch before review:
 - Do not return to `v7.2.0` product work in this cycle.
 - Do not treat exceptions as adherence.
 
-## Validation
+## Playback Questions
+
+1. Is aggregate Code Dojo debt at `1,165` or lower?
+2. Did the implementation remove at least `50` real counted violations?
+3. Did touched file/context, mock-ban, code-size, and DOGFOOD localization
+   ceilings stay flat or lower?
+4. Did focused tests for touched behavior pass?
+
+## Accessibility And Assistive Posture
+
+This is standards cleanup. Any touched rendered or terminal output must preserve
+existing text, focus, lower-mode, and screen-reader semantics unless a test
+explicitly proves an accessibility improvement.
+
+## Localization And Directionality Posture
+
+Avoid DOGFOOD copy edits unless the slice intentionally updates localization
+catalogs. If DOGFOOD-facing strings are touched, run the DOGFOOD i18n gates and
+hold the raw-string and missing-localization ratchets flat or lower.
+
+## Agent Inspectability And Explainability Posture
+
+The selected files, rule deltas, and validation commands must be captured in
+this design doc or the PR summary so the next agent can audit what changed
+without re-running broad discovery first.
+
+## Linked Invariants
+
+- TypeScript standards: `docs/typescript-code-standards.editors-edition.md`
+- Code Dojo exception ledger: `docs/code-dojo-exceptions.md`
+- Work doctrine: `docs/METHOD.md`
+
+## Implementation Outline
+
+1. Use `npm run code-dojo:eslint:offenders` and focused ESLint probes to select
+   a slice that can remove at least `50` findings.
+2. Write focused regressions only where cleanup exposes a behavior or module
+   boundary risk.
+3. Replace unsafe assertions, non-null assertions, implicit coercions, and fake
+   async shapes with typed helpers and explicit control flow.
+4. Ratchet the ESLint baseline and aggregate Code Dojo ceiling after the live
+   count is proven lower.
+5. Update docs and changelog with final counts and the next target.
+
+## Tests To Write First
+
+- Add focused regressions for any behavior-bearing cleanup.
+- For pure typing cleanup, run focused ESLint and existing tests for the touched
+  package or surface before updating baselines.
+
+## Validation Plan
 
 - `npm run code-dojo:slice -- <touched files>`
 - focused tests covering touched behavior
@@ -73,7 +140,7 @@ Implemented counts on this branch before review:
 - `git diff --check`
 - full pre-push gate before merge
 
-## Acceptance
+## Acceptance Criteria
 
 - Aggregate debt is `1,165` or lower.
 - ESLint baseline is lowered by at least `50` unless other real Dojo debt is
