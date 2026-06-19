@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD block/capture ratchet** — LX-023 cleans the next DOGFOOD
+  standards cluster by removing all `67` current ESLint findings from
+  `examples/docs/dogfood-blocks.ts` and `examples/docs/capture-main.ts`,
+  tightening their file/context baselines to `2,638` lines / `92,020` bytes
+  and `188` lines / `5,472` bytes respectively, lowering DOGFOOD raw-string
+  debt from `2,654` to `2,644`, lowering `dogfood-blocks` raw-string debt from
+  `681` to `679`, lowering `capture-main` raw-string debt from `17` to `9`,
+  and ratcheting aggregate Code Dojo debt from `792` to `725` with the next
+  goalpost target set to `675` or lower.
 - **DOGFOOD app main ratchet** — LX-022 starts breaking up
   `examples/docs/app.ts` by extracting row-format and Markdown document helpers
   into small focused modules, removes all `118` current ESLint findings from
