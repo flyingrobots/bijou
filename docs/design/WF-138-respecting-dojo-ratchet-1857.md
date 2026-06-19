@@ -51,19 +51,26 @@ clear the next goalpost while preserving touched-file size ratchets.
 Reduce aggregate Code Dojo debt from `1,907` to `1,857` or lower by eliminating
 at least `50` live ESLint findings with real fixes.
 
-Current non-DOGFOOD candidates from the offender list:
+Final non-DOGFOOD slice from the offender list:
 
 | File | Findings |
 | :--- | ---: |
-| `packages/bijou/src/core/ui-scene-ir.ts` | 17 |
 | `bench/src/soak-runner.ts` | 16 |
-| `packages/bijou/src/core/active-binding-collection.ts` | 16 |
 | `packages/bijou/src/core/components/markdown-render.ts` | 16 |
-| `packages/bijou/src/core/layout/envelope.ts` | 16 |
-| **Candidate total** | **81** |
+| `packages/bijou/src/core/forms/textarea-editor.ts` | 14 |
+| `scripts/record-gifs.ts` | 15 |
+| **Slice total** | **61** |
 
-The final slice may substitute equivalent files if a candidate exposes broader
-semantic work than this goalpost should carry.
+The initial broader candidate list stayed flexible so this goalpost could avoid
+larger semantic work in layout IR and active-binding contracts.
+
+## Implementation Result
+
+The final slice lowered live type-aware ESLint findings from `1,495` to
+`1,434`, reducing aggregate Code Dojo debt from `1,907` to `1,846`. The cleanup
+kept file/context and code-size counts flat while replacing unchecked scenario,
+wrapped-line, editor-line, queue, and dynamic-recorder reads with checked
+access.
 
 ## Scope
 
@@ -95,6 +102,15 @@ Live counts on `main` at `52230bc5`:
 - code-size baseline: `56`, including `4` legacy hard-limit files
 - next aggregate target: `1,857` or lower
 
+Live counts after the implementation slice:
+
+- aggregate Code Dojo debt: `1,846`
+- ESLint findings: `1,434`
+- file/context baseline: `333`
+- mock-ban baseline: `23`
+- code-size baseline: `56`, including `4` legacy hard-limit files
+- next aggregate target: `1,796` or lower
+
 ## Playback Questions
 
 1. Is aggregate Code Dojo debt at `1,857` or lower?
@@ -113,10 +129,9 @@ or benchmark execution.
 
 - The selected touched TypeScript files have zero new ESLint findings and reduce
   live findings by at least `50`.
-- Aggregate Code Dojo debt is `1,857` or lower.
+- Aggregate Code Dojo debt is `1,846` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live ESLint count.
 - `docs/code-dojo-exceptions.md` and `package.json` report the lower ceiling.
 - Focused validation for the touched surfaces passes.
 - `npm run code-dojo:verify`, `npm run docs:inventory`, `npm run lint`, and
   `git diff --check` pass before review.
-

@@ -1,11 +1,3 @@
-/**
- * Interactive textarea editor state machine.
- *
- * Renders a scrollable multi-line editor with cursor navigation,
- * optional line numbers, placeholder text, and max-length guard.
- * Ctrl+D submits; Ctrl+C or Escape cancels.
- */
-
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import {
@@ -18,9 +10,6 @@ import {
 } from './form-utils.js';
 import { sanitizeOptionalNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
 
-/**
- * Options for the multi-line textarea field.
- */
 export interface TextareaOptions extends FieldOptions<string> {
   /** Placeholder text shown when the textarea is empty. */
   placeholder?: string;
@@ -36,17 +25,6 @@ export interface TextareaOptions extends FieldOptions<string> {
   ctx?: BijouContext;
 }
 
-/**
- * Render a full interactive textarea editor using raw terminal input.
- *
- * Supports arrow-key cursor movement, scrolling, line wrapping,
- * optional line numbers, placeholder text, and a max-length guard.
- * Ctrl+D submits; Ctrl+C or Escape cancels.
- *
- * @param options - Textarea field configuration.
- * @param ctx - Bijou context.
- * @returns The entered text (newline-joined), or the default value on cancel.
- */
 export async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
   const styledFn = createStyledFn(ctx);
   const height = sanitizePositiveInt(options.height, 6);
@@ -59,20 +37,21 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   let cursorRow = 0;
   let cursorCol = 0;
   let scrollY = 0;
-  let totalLength = 0;  // running counter for lines.join('\n').length
+  let totalLength = 0;
 
-  /** Return the slice of lines currently visible in the editor viewport. */
+  function lineAt(index: number): string {
+    return lines[index] ?? '';
+  }
+
   function visibleLines(): string[] {
     return lines.slice(scrollY, scrollY + height);
   }
 
-  /** Adjust the vertical scroll so the cursor row is within the viewport. */
   function ensureCursorVisible(): void {
     if (cursorRow < scrollY) scrollY = cursorRow;
     if (cursorRow >= scrollY + height) scrollY = cursorRow - height + 1;
   }
 
-  /** Write the editor UI (title, visible lines, status bar) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     const hint = styledFn(ctx.semantic('muted'), ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
@@ -98,18 +77,16 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     }
 
     // Status line
-    const pos = `Ln ${cursorRow + 1}, Col ${cursorCol + 1}`;
-    const lenInfo = maxLength != null ? ` | ${totalLength}/${maxLength}` : '';
+    const pos = `Ln ${String(cursorRow + 1)}, Col ${String(cursorCol + 1)}`;
+    const lenInfo = maxLength != null ? ` | ${String(totalLength)}/${String(maxLength)}` : '';
     ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
   }
 
-  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = height + 2; // header + visible lines + status
     term.moveUp(totalLines);
   }
 
-  /** Erase the editor UI and print a one-line summary of the result. */
   function cleanup(value: string, cancelled: boolean): void {
     clearRender();
     const totalLines = height + 2;
@@ -118,7 +95,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     const summary = cancelled
       ? '(cancelled)'
       : (value
-        ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
+        ? (value.includes('\n') ? `${String(value.split('\n').length)} lines` : value)
         : '(empty)');
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), summary);
     ctx.io.write(`\x1b[K${label}\n`);
@@ -155,7 +132,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       if (isKey(key, 'enter')) {
         // Enter — newline (counts as 1 character for maxLength)
         if (maxLength != null && totalLength >= maxLength) return;
-        const currentLine = lines[cursorRow]!;
+        const currentLine = lineAt(cursorRow);
         const before = currentLine.slice(0, cursorCol);
         const after = currentLine.slice(cursorCol);
         lines[cursorRow] = before;
@@ -172,14 +149,14 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       if (isKey(key, 'backspace')) {
         // Backspace
         if (cursorCol > 0) {
-          const line = lines[cursorRow]!;
+          const line = lineAt(cursorRow);
           lines[cursorRow] = line.slice(0, cursorCol - 1) + line.slice(cursorCol);
           cursorCol--;
           totalLength--;  // removed one character
         } else if (cursorRow > 0) {
           // Merge with previous line
-          const prevLine = lines[cursorRow - 1]!;
-          const currentLine = lines[cursorRow]!;
+          const prevLine = lineAt(cursorRow - 1);
+          const currentLine = lineAt(cursorRow);
           cursorCol = prevLine.length;
           lines[cursorRow - 1] = prevLine + currentLine;
           lines.splice(cursorRow, 1);
@@ -195,7 +172,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       if (isKey(key, 'up')) { // Up
         if (cursorRow > 0) {
           cursorRow--;
-          cursorCol = Math.min(cursorCol, lines[cursorRow]!.length);
+          cursorCol = Math.min(cursorCol, lineAt(cursorRow).length);
           ensureCursorVisible();
         }
         clearRender();
@@ -205,7 +182,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       if (isKey(key, 'down')) { // Down
         if (cursorRow < lines.length - 1) {
           cursorRow++;
-          cursorCol = Math.min(cursorCol, lines[cursorRow]!.length);
+          cursorCol = Math.min(cursorCol, lineAt(cursorRow).length);
           ensureCursorVisible();
         }
         clearRender();
@@ -213,7 +190,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         return;
       }
       if (isKey(key, 'right')) { // Right
-        if (cursorCol < lines[cursorRow]!.length) {
+        if (cursorCol < lineAt(cursorRow).length) {
           cursorCol++;
         } else if (cursorRow < lines.length - 1) {
           cursorRow++;
@@ -229,7 +206,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
           cursorCol--;
         } else if (cursorRow > 0) {
           cursorRow--;
-          cursorCol = lines[cursorRow]!.length;
+          cursorCol = lineAt(cursorRow).length;
           ensureCursorVisible();
         }
         clearRender();
@@ -239,7 +216,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       // Printable character
       if (isPrintableKey(key)) {
         if (maxLength != null && totalLength >= maxLength) return;
-        const line = lines[cursorRow]!;
+        const line = lineAt(cursorRow);
         lines[cursorRow] = line.slice(0, cursorCol) + key.text + line.slice(cursorCol);
         cursorCol++;
         totalLength++;  // added one character

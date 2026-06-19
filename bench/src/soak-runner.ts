@@ -1,24 +1,3 @@
-/**
- * Soak runner — HEADED visual demo of the rendering pipeline.
- *
- * Cycles through bench scenarios and RENDERS their output to the
- * actual terminal via the real byte-pipeline differ. You see the
- * gradient animating, cells flickering, the dogfood layout composing.
- * A status bar shows the current scenario, frame time, and cycle.
- *
- * Scenarios run at the actual terminal dimensions — resize the window
- * and the scenario re-initializes at the new size.
- *
- * Built on createFramedApp — the frame shell handles alt-screen,
- * raw mode, resize, keyboard input, and quit confirmation.
- *
- * Usage:
- *   npm run soak                       # run until quit
- *   npm run soak -- --cycles=5         # stop after N cycles
- *   npm run soak -- --fps=30           # throttle frame rate
- *   npm run soak -- --dwell=3          # seconds per scenario
- */
-
 import { appendFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createSurface, perfOverlaySurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
@@ -35,20 +14,20 @@ import { SCENARIOS } from './scenarios/index.js';
 import type { AnyScenario } from './scenarios/types.js';
 import { computeStats, formatNs } from './stats.js';
 
-// ---------------------------------------------------------------------------
-// CLI args
-// ---------------------------------------------------------------------------
-
 const argv = process.argv.slice(2);
+function argValue(name: string): string | undefined {
+  const prefix = `--${name}=`;
+  const match = argv.find((a) => a.startsWith(prefix));
+  return match?.slice(prefix.length);
+}
 function argNum(name: string, fallback: number): number {
-  const match = argv.find((a) => a.startsWith(`--${name}=`));
-  if (!match) return fallback;
-  const n = parseFloat(match.split('=')[1]!);
+  const raw = argValue(name);
+  if (raw === undefined) return fallback;
+  const n = Number.parseFloat(raw);
   return Number.isFinite(n) ? n : fallback;
 }
 function argStr(name: string, fallback: string): string {
-  const match = argv.find((a) => a.startsWith(`--${name}=`));
-  return match ? match.split('=')[1]! : fallback;
+  return argValue(name) ?? fallback;
 }
 
 const MAX_CYCLES = argNum('cycles', Infinity);
@@ -56,7 +35,6 @@ const TARGET_FPS = argNum('fps', 30);
 const DWELL_SECS = argNum('dwell', 4);
 const LOG_PATH = resolve(argStr('out', 'bench/soak.jsonl'));
 
-// Scenarios that have a display surface to show.
 const displayScenarios = SCENARIOS.filter(
   (s): s is AnyScenario & { getDisplaySurface: NonNullable<AnyScenario['getDisplaySurface']> } =>
     s.getDisplaySurface !== undefined,
@@ -66,12 +44,7 @@ if (displayScenarios.length === 0) {
   throw new Error('No display scenarios found — at least one scenario must define getDisplaySurface');
 }
 
-// Ensure log file exists.
 if (!existsSync(LOG_PATH)) writeFileSync(LOG_PATH, '');
-
-// ---------------------------------------------------------------------------
-// Model & Messages
-// ---------------------------------------------------------------------------
 
 interface SoakModel {
   readonly scenarioIndex: number;
@@ -89,16 +62,18 @@ type SoakMsg =
   | { readonly type: 'advance-scenario' }
   | { readonly type: 'toggle-perf' };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
 // Matches both ASCII 'x' and Unicode '×' (U+00D7) in dimension suffixes like "(220×58)".
 const SCENARIO_LABEL_DIMENSION_SUFFIX = /\s*\(\d+[×x]\d+\)\s*$/;
 
+function scenarioAt(index: number): (typeof displayScenarios)[number] {
+  const scenario = displayScenarios[index];
+  if (scenario === undefined) throw new Error(`Invalid scenario index ${String(index)}`);
+  return scenario;
+}
+
 function currentScenario(model: SoakModel): (typeof displayScenarios)[number] {
-  return displayScenarios[model.scenarioIndex]!;
+  return scenarioAt(model.scenarioIndex);
 }
 
 function scenarioShortLabel(model: SoakModel): string {
@@ -148,7 +123,7 @@ function renderScenarioSurface(model: SoakModel, width: number, height: number):
 }
 
 function initScenario(scenarioIndex: number, cycle: number, width: number, height: number, prev?: SoakModel): SoakModel {
-  const scenario = displayScenarios[scenarioIndex]!;
+  const scenario = scenarioAt(scenarioIndex);
   const state = scenario.setup(undefined, width, height);
   runWarmup(scenario, state);
   return {
@@ -166,7 +141,7 @@ function initScenario(scenarioIndex: number, cycle: number, width: number, heigh
 
 function reinitAtSize(model: SoakModel, width: number, height: number): SoakModel {
   currentScenario(model).teardown?.(model.scenarioState);
-  const scenario = displayScenarios[model.scenarioIndex]!;
+  const scenario = currentScenario(model);
   const state = scenario.setup(undefined, width, height);
   runWarmup(scenario, state);
   return {
@@ -187,10 +162,6 @@ function logAndAdvanceCmd(model: SoakModel): Cmd<SoakMsg> {
     return { type: 'advance-scenario' } satisfies SoakMsg;
   };
 }
-
-// ---------------------------------------------------------------------------
-// App
-// ---------------------------------------------------------------------------
 
 // The pane render callback tells us the actual terminal content area.
 // We track the latest dimensions so the update loop can detect resizes.
@@ -300,7 +271,7 @@ function createSoakApp(appCtx: BijouContext) {
             let avgNs = 0;
             if (windowSize > 0) {
               let sum = 0;
-              for (let i = recent.length - windowSize; i < recent.length; i++) sum += recent[i]!;
+              for (const ns of recent.slice(recent.length - windowSize)) sum += ns;
               avgNs = sum / windowSize;
             }
             const mem = process.memoryUsage();
@@ -317,7 +288,10 @@ function createSoakApp(appCtx: BijouContext) {
               extras: [
                 { label: 'scenario', value: scenarioShortLabel(model) },
                 { label: 'frame', value: String(model.frameIndex) },
-                { label: 'cycle', value: `${model.cycle} [${model.scenarioIndex + 1}/${displayScenarios.length}]` },
+                {
+                  label: 'cycle',
+                  value: `${String(model.cycle)} [${String(model.scenarioIndex + 1)}/${String(displayScenarios.length)}]`,
+                },
               ],
             }, {
               title: 'Perf',
@@ -346,22 +320,18 @@ function createSoakApp(appCtx: BijouContext) {
       if (windowSize > 0) {
         let sum = 0;
         for (let i = recent.length - windowSize; i < recent.length; i++) {
-          sum += recent[i]!;
+          sum += recent[i] ?? 0;
         }
         avg = sum / windowSize;
       }
       const ft = formatNs(avg);
-      const dims = `${pageModel.paneWidth}×${pageModel.paneHeight}`;
-      const left = `${scenarioShortLabel(pageModel)}  ${dims}  frame ${pageModel.frameIndex}  ${ft}/frame`;
-      const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
+      const dims = `${String(pageModel.paneWidth)}×${String(pageModel.paneHeight)}`;
+      const left = `${scenarioShortLabel(pageModel)}  ${dims}  frame ${String(pageModel.frameIndex)}  ${ft}/frame`;
+      const right = `cycle ${String(pageModel.cycle)}  [${String(pageModel.scenarioIndex + 1)}/${String(displayScenarios.length)}]`;
       return `${left}  |  ${right}  |  \` perf`;
     },
   });
 }
-
-// ---------------------------------------------------------------------------
-// Bootstrap
-// ---------------------------------------------------------------------------
 
 const ctx = initDefaultContext();
 await run(createSoakApp(ctx), { ctx });
