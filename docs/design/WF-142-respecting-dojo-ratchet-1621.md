@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Issue
 
@@ -24,23 +24,26 @@ shuffle exceptions.
 Reduce aggregate Code Dojo debt from `1,671` to `1,621` or lower by eliminating
 at least `50` live ESLint findings with behavior-preserving TypeScript fixes.
 
-## Candidate Slice
+## Final Slice
 
-The current highest-yield ESLint offenders are clustered in DOGFOOD
-docs/example surfaces:
+The implemented cleanup removes 54 live ESLint findings without touching
+DOGFOOD docs source files:
 
 | File | Findings |
 | :--- | ---: |
-| `examples/docs/app.ts` | 118 |
-| `examples/docs/stories.ts` | 41 |
-| `examples/docs/dogfood-blocks.ts` | 37 |
-| `examples/docs/capture-main.ts` | 30 |
-| `examples/_shared/canonical-app.ts` | 25 |
-| `tests/cycles/LX-008/localized-shell-and-dogfood.test.ts` | 24 |
+| `packages/bijou-tui/src/notification.ts` | 13 |
+| `packages/bijou/src/core/components/dag-layout.ts` | 10 |
+| `packages/bijou/src/core/layout/flex.ts` | 10 |
+| `packages/bijou/src/core/theme/color.ts` | 10 |
+| `packages/bijou/src/core/theme/extend.ts` | 6 |
+| `packages/bijou-tui/src/panel-dock.ts` | 3 |
+| `packages/bijou-tui/src/surface-layout.ts` | 2 |
+| **Slice total** | **54** |
 
-The implementation should choose the smallest coherent cluster that can remove
-at least `50` live findings while keeping touched files at or below their
-stored file/context ceilings.
+The initial DOGFOOD docs candidate cluster was rejected because touching those
+source files activates the DOGFOOD i18n raw-string debt gate. This slice stays
+in package/core files and keeps touched file/context and code-size ceilings
+flat or lower.
 
 ## Scope
 
@@ -73,6 +76,13 @@ Live counts on `main` at `082342b3`:
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,621` or lower
 
+Implementation result:
+
+- aggregate Code Dojo debt: `1,617`
+- ESLint findings: `1,206`
+- live ESLint reduction: `54`
+- next aggregate target: `1,567` or lower
+
 ## Playback Questions
 
 1. Is aggregate Code Dojo debt at `1,621` or lower?
@@ -84,7 +94,7 @@ Live counts on `main` at `082342b3`:
 ## Validation Plan
 
 - Probe the selected files with focused Code Dojo gates.
-- Run focused tests for touched DOGFOOD docs/example surfaces.
+- Run focused tests for touched package/core surfaces.
 - Check aggregate debt with `npm run code-dojo:debt`.
 - Confirm standards gates with `npm run code-dojo:verify`.
 - Validate documentation inventory with `npm run docs:inventory`.

@@ -28,14 +28,12 @@ export function color(hex: string): ColorRef {
   return hex;
 }
 
-/** Narrow an unknown value to a pre-resolved color reference. */
 export function isResolvedColor(value: unknown): value is ResolvedColor {
-  return typeof value === 'object'
-    && value !== null
-    && 'kind' in value
-    && (value as ResolvedColor).kind === 'resolved-color'
-    && typeof (value as ResolvedColor).hex === 'string'
-    && Array.isArray((value as ResolvedColor).rgb);
+  if (typeof value !== 'object' || value === null || !('kind' in value) || value.kind !== 'resolved-color') return false;
+  if (!('hex' in value) || typeof value.hex !== 'string' || !('rgb' in value)) return false;
+  const rgb = value.rgb;
+  return Array.isArray(rgb) && rgb.length === 3
+    && typeof rgb[0] === 'number' && typeof rgb[1] === 'number' && typeof rgb[2] === 'number';
 }
 
 /** Resolve a color reference into its eager `{ hex, rgb }` form. */
@@ -73,8 +71,6 @@ export function colorRgb(ref: ColorRef | undefined): RGB | undefined {
   return tryResolveColor(ref)?.rgb;
 }
 
-// ── Conversion ─────────────────────────────────────────────────────
-
 /**
  * Parse a hex color string to an RGB tuple. Supports `#RGB` and `#RRGGBB` (with or without `#`).
  * @param hex - Hex color string to parse.
@@ -84,7 +80,7 @@ export function colorRgb(ref: ColorRef | undefined): RGB | undefined {
 export function hexToRgb(hex: string): RGB {
   let h = hex.startsWith('#') ? hex.slice(1) : hex;
   if (h.length === 3) {
-    h = h[0]! + h[0]! + h[1]! + h[1]! + h[2]! + h[2]!;
+    h = h.split('').map((ch) => ch + ch).join('');
   }
   if (h.length !== 6 || !/^[0-9a-f]{6}$/i.test(h)) {
     throw new Error(`Invalid hex color: "${hex}"`);

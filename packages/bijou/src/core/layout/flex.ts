@@ -30,7 +30,7 @@ export interface FlexChildProps {
 export function calculateFlex(
   options: FlexOptions,
   children: FlexChildProps[],
-  bounds: LayoutRect
+  bounds: LayoutRect,
 ): LayoutNode {
   const direction = options.direction ?? 'row';
   const gap = options.gap ?? 0;
@@ -75,13 +75,12 @@ export function calculateFlex(
     let spaceDistributed = false;
     const perFlexUnit = remaining / activeFlex;
 
-    for (let i = 0; i < children.length; i++) {
+    for (const [i, child] of children.entries()) {
       if (isConstrained[i]) continue;
-      const child = children[i]!;
       const flexGrow = child.flex ?? 0;
       if (flexGrow <= 0) continue;
 
-      const currentSize = sizes[i]!;
+      const currentSize = sizes[i] ?? 0;
       const targetSize = currentSize + (flexGrow * perFlexUnit);
       const clamped = clamp(targetSize, child.minSize, child.maxSize);
 
@@ -99,21 +98,21 @@ export function calculateFlex(
       // Final pass: distribute the last remaining bits without constraints (they are already satisfied)
       const fractionalShares: { index: number; remainder: number }[] = [];
       let assigned = 0;
-      for (let i = 0; i < children.length; i++) {
-        if (!isConstrained[i] && (children[i]!.flex ?? 0) > 0) {
-          const flexGrow = children[i]!.flex!;
+      for (const [i, child] of children.entries()) {
+        if (!isConstrained[i] && (child.flex ?? 0) > 0) {
+          const flexGrow = child.flex ?? 0;
           const share = (flexGrow / activeFlex) * remaining;
           const whole = Math.floor(share);
-          sizes[i]! += whole;
+          sizes[i] = (sizes[i] ?? 0) + whole;
           assigned += whole;
           fractionalShares.push({ index: i, remainder: share - whole });
         }
       }
 
-      let leftover = remaining - assigned;
+      const leftover = Math.max(0, Math.ceil(remaining - assigned));
       fractionalShares.sort((a, b) => b.remainder - a.remainder || a.index - b.index);
-      for (let i = 0; i < fractionalShares.length && leftover > 0; i++, leftover--) {
-        sizes[fractionalShares[i]!.index]! += 1;
+      for (const { index } of fractionalShares.slice(0, leftover)) {
+        sizes[index] = (sizes[index] ?? 0) + 1;
       }
 
       remaining = 0; // All done
@@ -124,28 +123,27 @@ export function calculateFlex(
   const childNodes: LayoutNode[] = [];
   let offset = 0;
 
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i]!;
-    const size = sizes[i]!;
+  for (const [i, child] of children.entries()) {
+    const size = sizes[i] ?? 0;
     
     const childRect: LayoutRect = isRow 
       ? {
           x: bounds.x + offset,
           y: bounds.y,
           width: size,
-          height: crossAxisTotal
+          height: crossAxisTotal,
         }
       : {
           x: bounds.x,
           y: bounds.y + offset,
           width: crossAxisTotal,
-          height: size
+          height: size,
         };
 
     childNodes.push({
       id: child.id,
       rect: childRect,
-      children: []
+      children: [],
     });
 
     offset += size + gap;
@@ -153,7 +151,7 @@ export function calculateFlex(
 
   return {
     rect: bounds,
-    children: childNodes
+    children: childNodes,
   };
 }
 

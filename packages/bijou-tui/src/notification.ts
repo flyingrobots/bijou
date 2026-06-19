@@ -16,24 +16,19 @@ import type { LayoutRect } from './layout-rect.js';
 import { vstackSurface } from './surface-layout.js';
 
 export function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
-  return typeof ref === 'object'
-    && ref !== null
-    && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'rgb' in ref
-    ? (ref as { rgb: readonly [number, number, number] }).rgb
+  if (typeof ref !== 'object' || ref === null || !('kind' in ref) || ref.kind !== 'resolved-color' || !('rgb' in ref)) return undefined;
+  const rgb = ref.rgb;
+  if (!Array.isArray(rgb) || rgb.length !== 3) return undefined;
+  const r: unknown = rgb[0], g: unknown = rgb[1], b: unknown = rgb[2];
+  return typeof r === 'number' && typeof g === 'number' && typeof b === 'number'
+    ? [r, g, b]
     : undefined;
 }
 
 export function resolvedColorHex(ref: unknown): string | undefined {
   if (typeof ref === 'string') return ref;
-  return typeof ref === 'object'
-    && ref !== null
-    && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'hex' in ref
-    ? (ref as { hex: string }).hex
-    : undefined;
+  if (typeof ref !== 'object' || ref === null || !('kind' in ref) || ref.kind !== 'resolved-color') return undefined;
+  return 'hex' in ref && typeof ref.hex === 'string' ? ref.hex : undefined;
 }
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
@@ -312,7 +307,7 @@ export function renderNotificationHistory<Msg>(
     start: start + 1,
     end,
     total: filtered.length,
-  }) ?? `History • ${filterName} • ${start + 1}-${end} of ${filtered.length}`;
+  }) ?? `History • ${filterName} • ${String(start + 1)}-${String(end)} of ${String(filtered.length)}`;
   return [
     header,
     '',
@@ -369,6 +364,8 @@ export function renderNotificationHistorySurface<Msg>(
   const maxBodyLines = Math.max(1, safeHeight - 2);
   const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
 
+  const first = start + 1;
+  const last = Math.min(filtered.length, first);
   const rows: Surface[] = [
     ...renderInsetWrappedSurface(createSegmentSurface([
       { text: filtered.length === 0
@@ -380,10 +377,10 @@ export function renderNotificationHistorySurface<Msg>(
         }) ?? `History • ${filterName} • 0 items`)
         : (options.labels?.headerLabel?.({
           filterLabel: filterName,
-          start: start + 1,
-          end: Math.min(filtered.length, start + 1),
+          start: first,
+          end: last,
           total: filtered.length,
-        }) ?? `History • ${filterName} • ${start + 1}-${Math.min(filtered.length, start + 1)} of ${filtered.length}`),
+        }) ?? `History • ${filterName} • ${String(first)}-${String(last)} of ${String(filtered.length)}`),
         style: withModifiers({}, ['bold']) },
     ]), safeWidth),
     createBlankLineSurface(safeWidth),
@@ -419,16 +416,17 @@ export function renderNotificationHistorySurface<Msg>(
     if (clipped.height < entry.height || bodyLines >= maxBodyLines) break;
   }
 
-  // Rewrite header with the actual rendered end range.
-  rows[0] = renderInsetWrappedSurface(createSegmentSurface([
+  const actualEnd = Math.max(first, end);
+  const headerRow = renderInsetWrappedSurface(createSegmentSurface([
     { text: options.labels?.headerLabel?.({
       filterLabel: filterName,
-      start: start + 1,
-      end: Math.max(start + 1, end),
+      start: first,
+      end: actualEnd,
       total: filtered.length,
-    }) ?? `History • ${filterName} • ${start + 1}-${Math.max(start + 1, end)} of ${filtered.length}`,
+    }) ?? `History • ${filterName} • ${String(first)}-${String(actualEnd)} of ${String(filtered.length)}`,
       style: withModifiers({}, ['bold']) },
-  ]), safeWidth)[0]!;
+  ]), safeWidth)[0];
+  if (headerRow !== undefined) rows[0] = headerRow;
 
   return vstackSurface(...rows);
 }
@@ -734,9 +732,6 @@ export function formatTimeLabel(ms: number): string {
 
 export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
   if (token == null) return {};
-  // Pass pre-parsed RGB alongside hex so encodeCellIntoBuf can skip
-  // inlineHexRGB on the hot path. Build the object with conditional
-  // spreads so readonly fields stay readonly.
   return {
     fg: token.hex,
     bg: token.bg,
@@ -759,7 +754,7 @@ export function withModifiers(style: CellTextStyle, modifiers: readonly string[]
 
 export function createSegmentSurface(segments: readonly { readonly text: string; readonly style?: CellTextStyle }[]): Surface {
   const graphemeSegments = segments.map((segment) => ({
-    graphemes: segmentGraphemes(segment.text ?? ''),
+    graphemes: segmentGraphemes(segment.text),
     style: segment.style,
   }));
   const width = graphemeSegments.reduce((sum, segment) => sum + segment.graphemes.length, 0);
@@ -768,7 +763,6 @@ export function createSegmentSurface(segments: readonly { readonly text: string;
 
   const packed = isPackedSurface(surface);
   for (const segment of graphemeSegments) {
-    // Pre-parse style once per segment for setRGB fast path
     const s = segment.style;
     if (packed && s) {
       let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;

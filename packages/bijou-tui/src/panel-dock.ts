@@ -50,7 +50,9 @@ export function movePaneInContainer(
 
   const next = [...currentOrder];
   // Swap positions
-  next[idx] = currentOrder[targetIdx]!;
+  const targetPaneId = currentOrder[targetIdx];
+  if (targetPaneId === undefined) return state;
+  next[idx] = targetPaneId;
   next[targetIdx] = paneId;
 
   return {
@@ -115,18 +117,12 @@ export function findPaneContainer(
     return findPaneContainer(node.paneA, paneId) ?? findPaneContainer(node.paneB, paneId);
   }
 
-  // Grid — derive childIds from node IDs, not area names
-  const areaNames = Object.keys(node.cells);
-  const gridChildIds = areaNames.map((name) => getNodeId(node.cells[name]!));
-  for (let i = 0; i < areaNames.length; i++) {
-    if (gridChildIds[i] === paneId) {
-      return { containerId: node.gridId, childIds: gridChildIds };
-    }
-  }
+  const gridChildren = Object.values(node.cells);
+  const gridChildIds = gridChildren.map(getNodeId);
+  if (gridChildIds.includes(paneId)) return { containerId: node.gridId, childIds: gridChildIds };
 
   // Recurse into grid children
-  for (const areaName of areaNames) {
-    const child = node.cells[areaName]!;
+  for (const child of gridChildren) {
     const found = findPaneContainer(child, paneId);
     if (found) return found;
   }
