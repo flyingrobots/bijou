@@ -29,8 +29,9 @@ Current offender evidence from `npm run code-dojo:eslint:offenders`:
 - `examples/docs/capture-main.ts`: `30` ESLint findings
 
 The selected files can clear the required 50-count ratchet if fixed rather than
-waived. `dogfood-blocks.ts` also carries legacy DOGFOOD raw strings, so any
-touch to that file must respect the DOGFOOD i18n ratchet.
+waived. Both selected files also carry legacy DOGFOOD raw strings:
+`dogfood-blocks.ts` starts at `681`, and `capture-main.ts` starts at `17`.
+Touches to either file must reduce the touched-file DOGFOOD i18n count.
 
 Implemented counts on this branch before review:
 
