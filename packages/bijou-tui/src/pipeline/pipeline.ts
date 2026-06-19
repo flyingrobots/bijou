@@ -1,54 +1,19 @@
 import type { Surface, BijouContext, LayoutNode } from '@flyingrobots/bijou';
 
-/**
- * The state passed through the rendering pipeline.
- */
 export interface RenderState {
-  /** The model being rendered. */
-  model: any;
-  /** The Bijou context (ports, theme, mode). */
+  model: unknown;
   ctx: BijouContext;
-  /** Time delta in seconds since the last frame. */
   dt: number;
-  /**
-   * The surface currently visible on the terminal.
-   * This should NOT be modified by pipeline stages.
-   */
   readonly currentSurface: Surface;
-  /**
-   * The target surface being painted.
-   * Middleware in the `Paint` and `PostProcess` stages modify this surface.
-   */
   targetSurface: Surface;
-  /**
-   * Pooled byte buffer owned by the runtime for direct UTF-8 emission
-   * from the Diff stage. The buffer is sized to the current viewport and
-   * reused across frames. Absent only in non-interactive modes or custom
-   * pipelines that do not drive the default Diff middleware.
-   */
+  /** Pooled byte buffer owned by the runtime for direct UTF-8 emission. */
   outBuf?: Uint8Array;
-  /**
-   * Layout geometry calculated during the `Layout` stage.
-   * Keyed by component ID.
-   */
-  layoutMap: Map<string, any>;
-  /**
-   * Custom data bag for middleware to pass state between stages.
-   */
-  data: Record<string, any>;
+  layoutMap: Map<string, unknown>;
+  data: Record<string, unknown>;
 }
 
-/**
- * A middleware function in the rendering pipeline.
- *
- * @param state - The current render state.
- * @param next - Function to yield control to the next middleware.
- */
 export type RenderMiddleware = (state: RenderState, next: () => void) => void | Promise<void>;
 
-/**
- * A stage in the rendering pipeline.
- */
 export type RenderStage = 'Layout' | 'Paint' | 'PostProcess' | 'Diff' | 'Output';
 
 /** Per-stage timing sample captured during a single pipeline execution. */
@@ -77,27 +42,16 @@ export const RENDER_STAGE_TIMINGS_KEY = '__pipelineStageTimings';
 /** Key used to pass the resolved layout root between middleware stages. */
 export const RENDER_LAYOUT_ROOT_KEY = '__bijou:layoutRoot';
 
-/**
- * Read the resolved layout root from a render-state data bag.
- * Built-in layout middleware writes this value in `Layout`.
- */
 export function getRenderLayoutRoot(state: Pick<RenderState, 'data'>): LayoutNode | undefined {
-  return state.data[RENDER_LAYOUT_ROOT_KEY] as LayoutNode | undefined;
+  const root = state.data[RENDER_LAYOUT_ROOT_KEY];
+  return isLayoutNode(root) ? root : undefined;
 }
 
-/**
- * Read per-stage timings captured during the current pipeline execution.
- *
- * The returned array is replaced on each `pipeline.execute(state)` call.
- */
 export function getRenderStageTimings(state: Pick<RenderState, 'data'>): readonly RenderStageTiming[] {
   const timings = state.data[RENDER_STAGE_TIMINGS_KEY];
   return Array.isArray(timings) ? timings as readonly RenderStageTiming[] : [];
 }
 
-/**
- * The rendering pipeline registry.
- */
 export interface RenderPipeline {
   /** Register middleware for a specific stage. */
   use(stage: RenderStage, middleware: RenderMiddleware): void;
@@ -113,11 +67,32 @@ export interface CreatePipelineOptions {
   now?: () => number;
 }
 
-function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
-  return typeof value === 'object'
+function isLayoutNode(value: unknown): value is LayoutNode {
+  return typeof value === 'object' && value !== null && 'rect' in value && 'children' in value;
+}
+
+interface ThenableCandidate {
+  then: unknown;
+}
+
+function isThenableCandidate(value: unknown): value is ThenableCandidate {
+  return (typeof value === 'object' || typeof value === 'function')
     && value !== null
-    && 'then' in value
-    && typeof (value as PromiseLike<unknown>).then === 'function';
+    && 'then' in value;
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return isThenableCandidate(value) && typeof value.then === 'function';
+}
+
+function formatUnknownDetail(value: unknown): string {
+  if (value instanceof Error) return value.stack ?? value.message;
+  if (value == null || typeof value !== 'object') return String(value);
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return Object.prototype.toString.call(value);
+  }
 }
 
 /**
@@ -141,7 +116,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
   }
   let cachedPlan: StagePlanEntry[] = [];
   let chainDirty = true;
-  const readNow = options.now ?? (() => globalThis.performance?.now?.() ?? Date.now());
+  const readNow = options.now ?? (() => globalThis.performance.now());
 
   function use(stage: RenderStage, middleware: RenderMiddleware): void {
     stages[stage].push(middleware);
@@ -182,20 +157,17 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
       try {
         handler(stage, durationMs, state);
       } catch (err) {
-        if (state.ctx.io.writeError) {
-          state.ctx.io.writeError(`[Pipeline Observer Error] ${err instanceof Error ? err.stack : err}\n`);
-        }
+        state.ctx.io.writeError(`[Pipeline Observer Error] ${formatUnknownDetail(err)}\n`);
       }
     }
   }
 
   function writePipelineError(state: RenderState, message: string, detail?: unknown): void {
-    if (!state.ctx.io.writeError) return;
     const suffix = detail == null
       ? ''
       : detail instanceof Error
         ? ` ${detail.stack ?? detail.message}`
-        : ` ${String(detail)}`;
+        : ` ${formatUnknownDetail(detail)}`;
     state.ctx.io.writeError(`${message}${suffix}\n`);
   }
 
@@ -207,15 +179,18 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
     const runStage = (stageIndex: number, middlewareIndex: number, stageStartMs: number): void => {
       if (stageIndex >= plan.length) return;
 
-      const entry = plan[stageIndex]!;
+      const entry = plan[stageIndex];
+      if (entry === undefined) return;
       if (middlewareIndex >= entry.middlewares.length) {
         recordStageTiming(state, timings, entry.stage, readNow() - stageStartMs);
         runStage(stageIndex + 1, 0, readNow());
         return;
       }
 
-      const middleware = entry.middlewares[middlewareIndex]!;
+      const middleware = entry.middlewares[middlewareIndex];
+      if (middleware === undefined) return;
       let advanced = false;
+      const hasAdvanced = () => advanced;
       const next = () => {
         if (advanced) return;
         advanced = true;
@@ -234,7 +209,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
             );
           }
 
-          Promise.resolve(result).catch((err) => {
+          Promise.resolve(result).catch((err: unknown) => {
             writePipelineError(
               state,
               `[Pipeline Error] Async render middleware rejected in ${entry.stage}:`,
@@ -245,9 +220,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
           // Async middleware is unsupported because it can resume out of frame
           // order. Keep the current frame moving and let the guarded `next`
           // ignore any late continuation.
-          if (!advanced) {
-            next();
-          }
+          next();
         }
       } catch (err) {
         // Log and continue if a specific middleware fails, preventing full crash
@@ -255,9 +228,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
         next();
       }
 
-      // A middleware that does not call next() halts the pipeline. Record the
-      // current stage timing so callers can still observe partial execution.
-      if (!advanced) {
+      if (!hasAdvanced()) {
         recordStageTiming(state, timings, entry.stage, readNow() - stageStartMs);
       }
     };

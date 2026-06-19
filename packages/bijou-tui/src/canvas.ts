@@ -1,10 +1,3 @@
-/**
- * Rich shader-based canvas primitive for procedural character art.
- * 
- * Supports high-resolution plotting via Braille and Quad characters,
- * with normalized UV mapping and full color/styling support.
- */
-
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import { fitCellGlyph, type CellGlyphFitOptions } from './cell-glyph-fit.js';
@@ -24,24 +17,31 @@ interface StyleAccumulator {
 }
 
 function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
-  return typeof ref === 'object'
-    && ref !== null
-    && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'rgb' in ref
-    ? (ref as { rgb: readonly [number, number, number] }).rgb
+  const rgb = isResolvedColorRecord(ref) ? ref['rgb'] : undefined;
+  return isRgbTuple(rgb)
+    ? rgb
     : undefined;
 }
 
 function resolvedColorHex(ref: unknown): string | undefined {
   if (typeof ref === 'string') return ref;
+  const hex = isResolvedColorRecord(ref) ? ref['hex'] : undefined;
+  return typeof hex === 'string'
+    ? hex
+    : undefined;
+}
+
+function isResolvedColorRecord(ref: unknown): ref is Record<string, unknown> {
   return typeof ref === 'object'
     && ref !== null
     && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'hex' in ref
-    ? (ref as { hex: string }).hex
-    : undefined;
+    && ref.kind === 'resolved-color';
+}
+
+function isRgbTuple(value: unknown): value is readonly [number, number, number] {
+  return Array.isArray(value)
+    && value.length === 3
+    && value.every((channel) => typeof channel === 'number');
 }
 
 function resolveCellColor(rgb: RGB | undefined, ref: Cell['fg']  ): RGB | undefined {
@@ -100,9 +100,6 @@ function averagedCellStyle(accumulator: StyleAccumulator): Pick<Cell, 'fgRGB' | 
   return style;
 }
 
-/**
- * Parameters passed to the shader function.
- */
 export interface ShaderParams {
   /** Normalized horizontal coordinate (0.0 to 1.0). */
   u: number;
@@ -111,7 +108,7 @@ export interface ShaderParams {
   /** Animation time value in seconds. */
   time: number;
   /** Custom data bag passed to the shader. */
-  uniforms: Record<string, any>;
+  uniforms: Record<string, unknown>;
 }
 
 export interface ShaderCell extends Cell {
@@ -119,44 +116,21 @@ export interface ShaderCell extends Cell {
   readonly coverage?: number;
 }
 
-/**
- * Shader function called per "pixel" (cell or sub-pixel).
- * 
- * Returns a Cell defining the character and style. 
- * In high-res modes (Braille/Quad), the character is treated as a boolean 
- * (non-space = on) and available foreground/background colors are averaged
- * across sampled sub-pixels.
- */
 export type ShaderFn = (params: ShaderParams) => ShaderCell | string;
 
-/**
- * Resolution modes for the canvas.
- */
 export type CanvasResolution = 'cell' | 'quad' | 'braille' | 'glyph';
 
-/**
- * Options for the {@link canvas} renderer.
- */
 export interface CanvasOptions {
   /** Animation time value passed to the shader. Default: 0. */
   time?: number;
   /** Plotting resolution. Default: 'cell'. */
   resolution?: CanvasResolution;
   /** Custom data passed to the shader. */
-  uniforms?: Record<string, any>;
+  uniforms?: Record<string, unknown>;
   /** Glyph fitting options used when resolution is 'glyph'. */
   glyphFit?: CellGlyphFitOptions;
 }
 
-/**
- * Render procedural art using a fragment shader.
- * 
- * @param cols - Grid width in columns.
- * @param rows - Grid height in rows.
- * @param shader - Function called for every pixel/sub-pixel.
- * @param options - Canvas configuration.
- * @returns A Surface containing the rendered art.
- */
 export function canvas(
   cols: number,
   rows: number,
@@ -186,7 +160,7 @@ export function canvas(
   return surface;
 }
 
-function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
+function setCellFast(surface: Surface, packed: PackedSurface | undefined, x: number, y: number, cell: Cell): void {
   if (packed && (cell.fgRGB != null || cell.fg != null || cell.bgRGB != null || cell.bg != null)) {
     let fR = -1, fG = 0, fB = 0;
     const fg = resolveCellColor(cell.fgRGB, cell.fg);
@@ -197,21 +171,23 @@ function setCellFast(surface: Surface, packed: boolean, x: number, y: number, ce
     if (bg) { [bR, bG, bB] = bg; }
 
     if (fg || bg) {
-      (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
+      packed.setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;
     }
   }
   surface.set(x, y, cell);
 }
 
-function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, unknown>) {
   const { width, height } = surface;
-  const packed = isPackedSurface(surface);
+  const packed = isPackedSurface(surface) ? surface : undefined;
+  const uDenominator = Math.max(1, width - 1);
+  const vDenominator = Math.max(1, height - 1);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const result = shader({
-        u: x / (width - 1 || 1),
-        v: y / (height - 1 || 1),
+        u: x / uDenominator,
+        v: y / vDenominator,
         time,
         uniforms
       });
@@ -221,11 +197,13 @@ function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, 
   }
 }
 
-function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, unknown>) {
   const { width, height } = surface;
-  const packed = isPackedSurface(surface);
+  const packed = isPackedSurface(surface) ? surface : undefined;
   const subW = width * 2;
   const subH = height * 2;
+  const uDenominator = Math.max(1, subW - 1);
+  const vDenominator = Math.max(1, subH - 1);
 
   const QUAD_CHARS: Record<number, string> = {
     0: ' ', 1: '▘', 2: '▝', 3: '▀',
@@ -245,8 +223,8 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
           const px = x * 2 + sx;
           const py = y * 2 + sy;
           const result = shader({
-            u: px / (subW - 1 || 1),
-            v: py / (subH - 1 || 1),
+            u: px / uDenominator,
+            v: py / vDenominator,
             time,
             uniforms
           });
@@ -255,25 +233,27 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
           
           if (cell.char !== ' ') {
             mask |= (1 << (sy * 2 + sx));
-            if (!firstStyledCell) firstStyledCell = cell;
+            firstStyledCell ??= cell;
           }
         }
       }
 
       setCellFast(surface, packed, x, y, {
-        ...(firstStyledCell || { char: ' ' }),
+        ...(firstStyledCell ?? { char: ' ' }),
         ...averagedCellStyle(styleAccumulator),
-        char: QUAD_CHARS[mask] || ' '
+        char: QUAD_CHARS[mask] ?? ' '
       });
     }
   }
 }
 
-function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, unknown>) {
   const { width, height } = surface;
-  const packed = isPackedSurface(surface);
+  const packed = isPackedSurface(surface) ? surface : undefined;
   const subW = width * 2;
   const subH = height * 4;
+  const uDenominator = Math.max(1, subW - 1);
+  const vDenominator = Math.max(1, subH - 1);
 
   const DOT_MAP = [
     [0x01, 0x08],
@@ -293,8 +273,8 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
           const px = x * 2 + sx;
           const py = y * 4 + sy;
           const result = shader({
-            u: px / (subW - 1 || 1),
-            v: py / (subH - 1 || 1),
+            u: px / uDenominator,
+            v: py / vDenominator,
             time,
             uniforms
           });
@@ -302,14 +282,14 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
           accumulateCellStyle(styleAccumulator, cell);
           
           if (cell.char !== ' ') {
-            code |= DOT_MAP[sy]![sx]!;
-            if (!firstStyledCell) firstStyledCell = cell;
+            code |= DOT_MAP[sy]?.[sx] ?? 0;
+            firstStyledCell ??= cell;
           }
         }
       }
 
       setCellFast(surface, packed, x, y, {
-        ...(firstStyledCell || { char: ' ' }),
+        ...(firstStyledCell ?? { char: ' ' }),
         ...averagedCellStyle(styleAccumulator),
         char: String.fromCharCode(0x2800 + code)
       });
@@ -321,13 +301,15 @@ function renderGlyphResolution(
   surface: Surface,
   shader: ShaderFn,
   time: number,
-  uniforms: Record<string, any>,
+  uniforms: Record<string, unknown>,
   glyphFit: CellGlyphFitOptions | undefined,
 ) {
   const { width, height } = surface;
-  const packed = isPackedSurface(surface);
+  const packed = isPackedSurface(surface) ? surface : undefined;
   const subW = width * 2;
   const subH = height * 4;
+  const uDenominator = Math.max(1, subW - 1);
+  const vDenominator = Math.max(1, subH - 1);
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -340,8 +322,8 @@ function renderGlyphResolution(
           const px = x * 2 + sx;
           const py = y * 4 + sy;
           const result = shader({
-            u: px / (subW - 1 || 1),
-            v: py / (subH - 1 || 1),
+            u: px / uDenominator,
+            v: py / vDenominator,
             time,
             uniforms
           });
@@ -356,7 +338,7 @@ function renderGlyphResolution(
       }
 
       setCellFast(surface, packed, x, y, {
-        ...(firstStyledCell || { char: ' ' }),
+        ...(firstStyledCell ?? { char: ' ' }),
         ...averagedCellStyle(styleAccumulator),
         char: fitCellGlyph(coverage, glyphFit)
       });

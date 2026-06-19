@@ -9,8 +9,6 @@ import type {
   BaseGradientKey,
 } from './tokens.js';
 
-// --- DTCG Types ---
-
 /** A single Design Token Community Group (DTCG) token with a typed value. */
 export interface DTCGToken {
   /** Token type descriptor (e.g. 'color', 'gradient', 'string'). */
@@ -22,20 +20,11 @@ export interface DTCGToken {
 }
 
 /** A named group of DTCG tokens or nested groups. */
-export interface DTCGGroup {
-  [key: string]: DTCGToken | DTCGGroup;
-}
+export type DTCGGroup = Record<string, unknown>;
 
 /** A top-level DTCG document containing token groups and/or individual tokens. */
-export type DTCGDocument = Record<string, DTCGToken | DTCGGroup>;
+export type DTCGDocument = Record<string, unknown>;
 
-// --- Helpers ---
-
-/**
- * Parse a `#rrggbb` hex string to an RGB tuple.
- * @param hex - Hex color string (with or without `#`).
- * @returns RGB tuple.
- */
 function hexToRgb(hex: string): RGB {
   const h = hex.replace('#', '');
   return [
@@ -45,50 +34,53 @@ function hexToRgb(hex: string): RGB {
   ];
 }
 
-/**
- * Convert an RGB tuple to a `#rrggbb` hex string.
- * @param rgb - RGB tuple to convert.
- * @returns Hex color string with leading `#`.
- */
 function rgbToHex(rgb: RGB): string {
   return '#' + rgb.map((c) => c.toString(16).padStart(2, '0')).join('');
 }
 
-/**
- * Type guard that checks whether an object is a DTCGToken (has a `$value` property).
- * @param obj - Value to test.
- * @returns True if `obj` conforms to the DTCGToken shape.
- */
 function isDTCGToken(obj: unknown): obj is DTCGToken {
   return typeof obj === 'object' && obj !== null && '$value' in obj;
 }
 
-/**
- * Walk a dot-delimited DTCG reference path (e.g. `{color.primary}`) and return its resolved value.
- * @param ref - DTCG reference string in `{group.key}` format.
- * @param doc - Root document to resolve against.
- * @returns The resolved `$value` or raw nested value, or `undefined` if not found.
- */
+function isObjectRecord(obj: unknown): obj is Record<string, unknown> {
+  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+}
+
+function isTextModifier(value: unknown): value is TextModifier {
+  return value === 'bold'
+    || value === 'dim'
+    || value === 'strikethrough'
+    || value === 'inverse'
+    || value === 'underline'
+    || value === 'curly-underline'
+    || value === 'dotted-underline'
+    || value === 'dashed-underline';
+}
+
+function readModifiers(value: unknown): TextModifier[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const modifiers = value.filter(isTextModifier);
+  return modifiers.length === value.length ? modifiers : undefined;
+}
+
+function isRgb(value: unknown): value is RGB {
+  return Array.isArray(value)
+    && value.length === 3
+    && value.every((channel) => typeof channel === 'number');
+}
+
 function resolveReference(ref: string, doc: DTCGDocument): unknown {
   // DTCG references look like "{color.primary}"
   const path = ref.replace(/^\{|\}$/g, '').split('.');
   let current: unknown = doc;
   for (const segment of path) {
-    if (typeof current !== 'object' || current === null) return undefined;
-    current = (current as Record<string, unknown>)[segment];
+    if (!isObjectRecord(current)) return undefined;
+    current = current[segment];
   }
   if (isDTCGToken(current)) return current.$value;
   return current;
 }
 
-/**
- * Recursively resolve a DTCG value, following `{reference}` strings until a concrete value is reached.
- * @param value - Value to resolve (may be a reference string or a concrete value).
- * @param doc - Root document for reference lookups.
- * @param seen - Set of already-visited references for circular-reference detection.
- * @returns The fully-resolved concrete value.
- * @throws {Error} If a circular reference is detected or a reference cannot be resolved.
- */
 function resolveValue(value: unknown, doc: DTCGDocument, seen?: Set<string>): unknown {
   if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
     const visitedRefs = seen ?? new Set<string>();
@@ -105,24 +97,17 @@ function resolveValue(value: unknown, doc: DTCGDocument, seen?: Set<string>): un
   return value;
 }
 
-/**
- * Convert a raw DTCG value (possibly a reference) into a TokenValue.
- * @param value - Raw value or reference string from a DTCG token.
- * @param doc - Root document for reference resolution.
- * @returns Resolved TokenValue (defaults to `{ hex: '#000000' }` on failure).
- */
 function toTokenValue(value: unknown, doc: DTCGDocument): TokenValue {
   const resolved = resolveValue(value, doc);
   if (typeof resolved === 'string') {
     return { hex: resolved };
   }
-  if (typeof resolved === 'object' && resolved !== null) {
-    const obj = resolved as Record<string, unknown>;
-    const hex = typeof obj['hex'] === 'string' ? obj['hex'] : '#000000';
-    const modifiers = Array.isArray(obj['modifiers'])
-      ? (obj['modifiers'] as TextModifier[])
-      : undefined;
-    const bg = typeof obj['bg'] === 'string' ? obj['bg'] : undefined;
+  if (isObjectRecord(resolved)) {
+    const hexValue = resolved['hex'];
+    const bgValue = resolved['bg'];
+    const hex = typeof hexValue === 'string' ? hexValue : '#000000';
+    const modifiers = readModifiers(resolved['modifiers']);
+    const bg = typeof bgValue === 'string' ? bgValue : undefined;
     const tv: TokenValue = { hex };
     if (bg) tv.bg = bg;
     if (modifiers) tv.modifiers = modifiers;
@@ -131,61 +116,40 @@ function toTokenValue(value: unknown, doc: DTCGDocument): TokenValue {
   return { hex: '#000000' };
 }
 
-/**
- * Convert a raw DTCG value (possibly a reference) into an array of GradientStops.
- * @param value - Raw value or reference string from a DTCG gradient token.
- * @param doc - Root document for reference resolution.
- * @returns Array of gradient stops (empty if the resolved value is not an array).
- */
 function toGradientStops(value: unknown, doc: DTCGDocument): GradientStop[] {
   const resolved = resolveValue(value, doc);
   if (!Array.isArray(resolved)) return [];
   return resolved.map((stop: unknown) => {
-    const s = stop as Record<string, unknown>;
+    const s = isObjectRecord(stop) ? stop : {};
     const pos = typeof s['pos'] === 'number' ? s['pos'] : 0;
-    const color = Array.isArray(s['color'])
-      ? (s['color'] as RGB)
+    const color: RGB = isRgb(s['color'])
+      ? s['color']
       : typeof s['color'] === 'string'
         ? hexToRgb(s['color'])
-        : [0, 0, 0] as RGB;
+        : [0, 0, 0];
     return { pos, color };
   });
 }
 
-// --- fromDTCG ---
+function tokenFromGroup(group: unknown, key: string, doc: DTCGDocument): TokenValue {
+  const source = isObjectRecord(group) && !isDTCGToken(group) ? group : undefined;
+  const token = source?.[key];
+  return isDTCGToken(token) ? toTokenValue(token.$value, doc) : { hex: '#000000' };
+}
 
-/**
- * Extract a record of TokenValues from a DTCG group for the given keys.
- * @template K - Union of string keys to extract.
- * @param group - DTCG group to read tokens from.
- * @param keys - Keys to extract.
- * @param doc - Root document for reference resolution.
- * @returns Record mapping each key to its resolved TokenValue (defaults to `#000000` for missing keys).
- */
-function extractGroup<K extends string>(
-  group: DTCGGroup | undefined,
-  keys: readonly K[],
+function extractGroup(
+  group: unknown,
+  keys: readonly string[],
   doc: DTCGDocument,
-): Record<K, TokenValue> {
-  const result = {} as Record<K, TokenValue>;
+): Record<string, TokenValue> {
+  const result: Record<string, TokenValue> = {};
   for (const key of keys) {
-    const token = group?.[key];
-    if (isDTCGToken(token)) {
-      result[key] = toTokenValue(token.$value, doc);
-    } else {
-      result[key] = { hex: '#000000' };
-    }
+    result[key] = tokenFromGroup(group, key, doc);
   }
   return result;
 }
 
-/** All built-in status keys used when extracting from a DTCG document. */
 const STATUS_KEYS: readonly BaseStatusKey[] = ['success', 'error', 'warning', 'info', 'pending', 'active', 'muted'];
-/** All built-in semantic keys used when extracting from a DTCG document. */
-const SEMANTIC_KEYS = ['success', 'error', 'warning', 'info', 'accent', 'muted', 'primary'] as const;
-/** All built-in border keys used when extracting from a DTCG document. */
-const BORDER_KEYS = ['primary', 'secondary', 'success', 'warning', 'error', 'muted'] as const;
-/** All built-in UI element keys used when extracting from a DTCG document. */
 const UI_KEYS: readonly BaseUiKey[] = [
   'cursor',
   'focusGutter',
@@ -196,9 +160,6 @@ const UI_KEYS: readonly BaseUiKey[] = [
   'tableHeader',
   'trackEmpty',
 ];
-/** All built-in surface keys used when extracting from a DTCG document. */
-const SURFACE_KEYS = ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const;
-/** All built-in gradient keys used when extracting from a DTCG document. */
 const GRADIENT_KEYS: readonly BaseGradientKey[] = ['brand', 'progress'];
 
 /**
@@ -207,24 +168,45 @@ const GRADIENT_KEYS: readonly BaseGradientKey[] = ['brand', 'progress'];
  * @returns Fully-populated Theme with all built-in keys resolved.
  */
 export function fromDTCG(doc: DTCGDocument): Theme {
-  const name = typeof (doc['name'] as DTCGToken | undefined)?.$value === 'string'
-    ? (doc['name'] as DTCGToken).$value as string
+  const nameToken = doc['name'];
+  const name = isDTCGToken(nameToken) && typeof nameToken.$value === 'string'
+    ? nameToken.$value
     : 'imported';
 
-  const statusGroup = doc['status'] as DTCGGroup | undefined;
-  const semanticGroup = doc['semantic'] as DTCGGroup | undefined;
-  const borderGroup = doc['border'] as DTCGGroup | undefined;
-  const uiGroup = doc['ui'] as DTCGGroup | undefined;
-  const surfaceGroup = doc['surface'] as DTCGGroup | undefined;
-  const gradientGroup = doc['gradient'] as DTCGGroup | undefined;
+  const status = extractGroup(doc['status'], STATUS_KEYS, doc);
+  const semanticGroup = doc['semantic'];
+  const semantic = {
+    success: tokenFromGroup(semanticGroup, 'success', doc),
+    error: tokenFromGroup(semanticGroup, 'error', doc),
+    warning: tokenFromGroup(semanticGroup, 'warning', doc),
+    info: tokenFromGroup(semanticGroup, 'info', doc),
+    accent: tokenFromGroup(semanticGroup, 'accent', doc),
+    muted: tokenFromGroup(semanticGroup, 'muted', doc),
+    primary: tokenFromGroup(semanticGroup, 'primary', doc),
+  };
+  const borderGroup = doc['border'];
+  const border = {
+    primary: tokenFromGroup(borderGroup, 'primary', doc),
+    secondary: tokenFromGroup(borderGroup, 'secondary', doc),
+    success: tokenFromGroup(borderGroup, 'success', doc),
+    warning: tokenFromGroup(borderGroup, 'warning', doc),
+    error: tokenFromGroup(borderGroup, 'error', doc),
+    muted: tokenFromGroup(borderGroup, 'muted', doc),
+  };
+  const ui = extractGroup(doc['ui'], UI_KEYS, doc);
+  const surfaceGroup = doc['surface'];
+  const surface = {
+    primary: tokenFromGroup(surfaceGroup, 'primary', doc),
+    secondary: tokenFromGroup(surfaceGroup, 'secondary', doc),
+    elevated: tokenFromGroup(surfaceGroup, 'elevated', doc),
+    overlay: tokenFromGroup(surfaceGroup, 'overlay', doc),
+    muted: tokenFromGroup(surfaceGroup, 'muted', doc),
+  };
 
-  const status = extractGroup(statusGroup, STATUS_KEYS, doc);
-  const semantic = extractGroup(semanticGroup, SEMANTIC_KEYS, doc);
-  const border = extractGroup(borderGroup, BORDER_KEYS, doc);
-  const ui = extractGroup(uiGroup, UI_KEYS, doc);
-  const surface = extractGroup(surfaceGroup, SURFACE_KEYS, doc);
-
-  const gradient = {} as Record<BaseGradientKey, GradientStop[]>;
+  const gradient: Record<string, GradientStop[]> = {};
+  const gradientGroup = isObjectRecord(doc['gradient']) && !isDTCGToken(doc['gradient'])
+    ? doc['gradient']
+    : undefined;
   for (const key of GRADIENT_KEYS) {
     const token = gradientGroup?.[key];
     if (isDTCGToken(token)) {
@@ -237,13 +219,6 @@ export function fromDTCG(doc: DTCGDocument): Theme {
   return { name, status, semantic, gradient, border, ui, surface };
 }
 
-// --- toDTCG ---
-
-/**
- * Convert a single TokenValue to a DTCGToken.
- * @param token - Token to convert.
- * @returns DTCG token with `$type: 'color'`.
- */
 function tokenToDTCG(token: TokenValue): DTCGToken {
   if ((token.modifiers && token.modifiers.length > 0) || token.bg) {
     const val: Record<string, unknown> = { hex: token.hex };
@@ -254,11 +229,6 @@ function tokenToDTCG(token: TokenValue): DTCGToken {
   return { $type: 'color', $value: token.hex };
 }
 
-/**
- * Convert an array of GradientStops to a DTCGToken with `$type: 'gradient'`.
- * @param stops - Gradient stops to serialize.
- * @returns DTCG token whose `$value` is an array of `{ pos, color }` objects with hex colors.
- */
 function gradientToDTCG(stops: GradientStop[]): DTCGToken {
   return {
     $type: 'gradient',
@@ -269,13 +239,6 @@ function gradientToDTCG(stops: GradientStop[]): DTCGToken {
   };
 }
 
-/**
- * Convert a record of values into a DTCGGroup.
- * @template V - Values in the record.
- * @param record - Record to convert.
- * @param convert - Converts each record value into a DTCG token.
- * @returns DTCGGroup with each key mapped to a DTCG token.
- */
 function recordToDTCGGroup<V>(
   record: Readonly<Record<string, V>>,
   convert: (value: V) => DTCGToken,
@@ -306,8 +269,6 @@ export function toDTCG(theme: Theme): DTCGDocument {
   return doc;
 }
 
-// --- IO Helpers ---
-
 /**
  * Load a single theme from a DTCG JSON file using the provided IO port.
  * @param io - IO adapter with a `readFile` method.
@@ -316,8 +277,15 @@ export function toDTCG(theme: Theme): DTCGDocument {
  */
 export function loadTheme(io: { readFile(path: string): string }, path: string): Theme {
   const content = io.readFile(path);
-  const doc = JSON.parse(content) as DTCGDocument;
+  const doc = parseDTCGDocument(JSON.parse(content));
   return fromDTCG(doc);
+}
+
+export function parseDTCGDocument(value: unknown): DTCGDocument {
+  if (!isObjectRecord(value)) {
+    throw new Error('Invalid DTCG document: expected object payload');
+  }
+  return value;
 }
 
 /**
