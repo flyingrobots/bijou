@@ -4,7 +4,7 @@ legend: WF
 lane: bad-code
 priority: high
 github_issue: 379
-status: design
+status: complete
 keywords:
   - code-dojo
   - eslint
@@ -118,3 +118,26 @@ behavior.
 - Focused validation for the touched surfaces passes.
 - `npm run code-dojo:verify`, `npm run docs:inventory`, `npm run lint`, and
   `git diff --check` pass before review.
+
+## Retrospective
+
+Completed with aggregate Code Dojo debt reduced from `2,015` to `1,963`
+(`-52`). The stored ESLint baseline now records `1,551` live findings, down
+from `1,603`, and the next aggregate target is `1,913` or lower.
+
+The implementation cleaned three non-DOGFOOD files:
+
+- `packages/bijou/src/core/theme/dtcg.ts` now treats imported DTCG documents as
+  unknown-shaped records and validates token, modifier, RGB, group, and JSON
+  reads locally instead of casting external payloads into narrower types.
+- `packages/bijou-tui/src/canvas.ts` now uses `unknown` shader uniforms,
+  preserves packed-surface narrowing directly, computes UV denominators
+  explicitly, and removes assertion-based Braille dot reads.
+- `packages/bijou-i18n-tools/src/exchange.ts` now validates serialized exchange
+  value kinds before decoding, keeps external version fields checkable, and
+  derives workbook row typing from the column manifest.
+
+Touched file/context budgets held or shrank: `dtcg.ts` is now `291` lines /
+`9,587` bytes against a `347` / `12,346` baseline, `canvas.ts` is now `356`
+lines / `10,895` bytes against a `377` / `11,295` baseline, and `exchange.ts`
+is now `344` lines / `11,440` bytes against a `361` / `11,459` baseline.

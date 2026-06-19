@@ -12,72 +12,9 @@ import type {
 } from './tools.js';
 import { exportTranslationRows } from './tools.js';
 
-export type ExchangeValueKind =
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'null'
-  | 'object'
-  | 'array'
-  | 'reference';
+export type ExchangeValueKind = 'string' | 'number' | 'boolean' | 'null' | 'object' | 'array' | 'reference';
 
-export interface EncodedExchangeValue {
-  readonly kind: ExchangeValueKind;
-  readonly payload: string;
-}
-
-export interface TranslationWorkbookRow {
-  readonly namespace: string;
-  readonly id: string;
-  readonly kind: string;
-  readonly sourceLocale: string;
-  readonly targetLocale: string;
-  readonly status: string;
-  readonly sourceHash: string;
-  readonly description: string;
-  readonly sourceValueKind: string;
-  readonly sourceValue: string;
-  readonly translatedValueKind: string;
-  readonly translatedValue: string;
-}
-
-export interface ExchangeSheet {
-  readonly name: string;
-  readonly columns: readonly string[];
-  readonly rows: readonly TranslationWorkbookRow[];
-}
-
-export interface ExchangeWorkbook {
-  readonly version: 1;
-  readonly sheets: readonly ExchangeSheet[];
-}
-
-export interface SerializedAuthoringTranslation {
-  readonly value: EncodedExchangeValue;
-  readonly sourceHash: string;
-  readonly status: AuthoringTranslationStatus;
-}
-
-export interface SerializedAuthoringCatalogEntry {
-  readonly key: I18nCatalogKey;
-  readonly kind: I18nEntryKind;
-  readonly sourceLocale: string;
-  readonly sourceValue: EncodedExchangeValue;
-  readonly translations: Readonly<Record<string, SerializedAuthoringTranslation>>;
-  readonly description?: string;
-}
-
-export interface SerializedAuthoringCatalog {
-  readonly namespace: string;
-  readonly entries: readonly SerializedAuthoringCatalogEntry[];
-}
-
-export interface CatalogBundle {
-  readonly version: 1;
-  readonly catalogs: readonly SerializedAuthoringCatalog[];
-}
-
-const TRANSLATION_WORKBOOK_COLUMNS = [
+const COLUMNS = [
   'namespace',
   'id',
   'kind',
@@ -91,6 +28,49 @@ const TRANSLATION_WORKBOOK_COLUMNS = [
   'translatedValueKind',
   'translatedValue',
 ] as const;
+
+export interface EncodedExchangeValue {
+  readonly kind: ExchangeValueKind;
+  readonly payload: string;
+}
+
+export type TranslationWorkbookRow = Readonly<Record<(typeof COLUMNS)[number], string>>;
+
+export interface ExchangeSheet {
+  readonly name: string;
+  readonly columns: readonly string[];
+  readonly rows: readonly TranslationWorkbookRow[];
+}
+
+export interface ExchangeWorkbook {
+  readonly version: number;
+  readonly sheets: readonly ExchangeSheet[];
+}
+
+export interface SerializedAuthoringTranslation {
+  readonly value: EncodedExchangeValue;
+  readonly sourceHash: string;
+  readonly status: string;
+}
+
+export interface SerializedAuthoringCatalogEntry {
+  readonly key: I18nCatalogKey;
+  readonly kind: string;
+  readonly sourceLocale: string;
+  readonly sourceValue: EncodedExchangeValue;
+  readonly translations: Readonly<Record<string, SerializedAuthoringTranslation>>;
+  readonly description?: string;
+}
+
+export interface SerializedAuthoringCatalog {
+  readonly namespace: string;
+  readonly entries: readonly SerializedAuthoringCatalogEntry[];
+}
+
+export interface CatalogBundle {
+  readonly version: number;
+  readonly catalogs: readonly SerializedAuthoringCatalog[];
+}
 
 function isReference(value: unknown): value is I18nReference {
   return typeof value === 'object'
@@ -107,6 +87,10 @@ function isEntryKind(value: string): value is I18nEntryKind {
 function isTranslationStatus(value: string): value is AuthoringTranslationStatus {
   return value === 'current' || value === 'stale' || value === 'missing';
 }
+
+const EXCHANGE_VALUE_KINDS = new Set<string>(['string', 'number', 'boolean', 'null', 'object', 'array', 'reference']);
+
+function isExchangeValueKind(value: string): value is ExchangeValueKind { return EXCHANGE_VALUE_KINDS.has(value); }
 
 function assertObject(value: unknown, message: string): asserts value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -208,17 +192,17 @@ function rowToTranslationRow(row: TranslationWorkbookRow): TranslationRow {
     throw new Error(`Invalid translation workbook: unknown translation status ${row.status}`);
   }
 
-  const sourceValue = decodeExchangeValue({
-    kind: row.sourceValueKind as ExchangeValueKind,
-    payload: row.sourceValue,
-  });
+  if (!isExchangeValueKind(row.sourceValueKind)) {
+    throw new Error(`Invalid translation workbook: unknown source value kind ${row.sourceValueKind}`);
+  }
+  const sourceValue = decodeExchangeValue({ kind: row.sourceValueKind, payload: row.sourceValue });
 
   let translatedValue: unknown;
   if (row.translatedValueKind !== '' || row.translatedValue !== '') {
-    translatedValue = decodeExchangeValue({
-      kind: row.translatedValueKind as ExchangeValueKind,
-      payload: row.translatedValue,
-    });
+    if (!isExchangeValueKind(row.translatedValueKind)) {
+      throw new Error(`Invalid translation workbook: unknown translated value kind ${row.translatedValueKind}`);
+    }
+    translatedValue = decodeExchangeValue({ kind: row.translatedValueKind, payload: row.translatedValue });
   }
 
   return {
@@ -266,7 +250,7 @@ export function exportTranslationWorkbook(
     sheets: [
       {
         name: `translations-${locale}`,
-        columns: TRANSLATION_WORKBOOK_COLUMNS,
+        columns: COLUMNS,
         rows: exportTranslationRows(catalogs, locale).map((row) => translationRowToWorkbookRow(row)),
       },
     ],
@@ -274,17 +258,17 @@ export function exportTranslationWorkbook(
 }
 
 export function importTranslationWorkbook(workbook: ExchangeWorkbook): readonly TranslationRow[] {
-  if (workbook.version !== 1 || !Array.isArray(workbook.sheets)) {
+  if (workbook.version !== 1) {
     throw new Error('Invalid translation workbook: expected versioned workbook payload');
   }
 
   const rows: TranslationRow[] = [];
   for (const sheet of workbook.sheets) {
-    if (!TRANSLATION_WORKBOOK_COLUMNS.every((column) => sheet.columns.includes(column))) {
+    if (!COLUMNS.every((column) => sheet.columns.includes(column))) {
       throw new Error(`Invalid translation workbook: missing required columns in ${sheet.name}`);
     }
     for (const row of sheet.rows) {
-      if (!TRANSLATION_WORKBOOK_COLUMNS.every((column) => typeof row[column] === 'string')) {
+      if (!COLUMNS.every((column) => typeof row[column] === 'string')) {
         throw new Error(`Invalid translation workbook: row in ${sheet.name} contains non-string cells`);
       }
       rows.push(rowToTranslationRow(row));
@@ -320,7 +304,7 @@ export function exportCatalogBundle(catalogs: readonly AuthoringCatalog[]): Cata
 }
 
 export function importCatalogBundle(bundle: CatalogBundle): readonly AuthoringCatalog[] {
-  if (bundle.version !== 1 || !Array.isArray(bundle.catalogs)) {
+  if (bundle.version !== 1) {
     throw new Error('Invalid catalog bundle: expected versioned bundle payload');
   }
 
