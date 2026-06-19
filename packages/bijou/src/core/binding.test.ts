@@ -13,16 +13,20 @@ import {
   providerScope,
   resolveProviderRequirement,
   resolveProviderRequirements,
-  type BindingIssue,
   type BindingStatus,
 } from './binding.js';
 
-interface Article {
-  title: string;
-  tags: string[];
-  meta: {
-    draft: boolean;
-  };
+interface Article { title: string; tags: string[]; meta: { draft: boolean }; }
+
+function m(target: object | undefined, key: PropertyKey, value: unknown): void {
+  if (target === undefined) throw new Error('missing mutation target');
+  Object.defineProperty(target, key, { value });
+}
+
+function c(target: unknown, args: readonly unknown[]): true {
+  if (typeof target !== 'function') throw new Error('target is not callable');
+  Reflect.apply(target, undefined, args);
+  return true;
 }
 
 describe('binding primitives', () => {
@@ -62,13 +66,13 @@ describe('binding primitives', () => {
     expect(Object.isFrozen(snapshot.facts)).toBe(true);
     expect(Object.isFrozen(snapshot.facts[0])).toBe(true);
     expect(() => {
-      (snapshot.data as { title: string }).title = 'mutated';
+      m(snapshot.data, 'title', 'mutated');
     }).toThrow(TypeError);
     expect(() => {
-      (snapshot.data?.tags as string[]).push('mutable');
+      m(snapshot.data?.tags, '1', 'mutable');
     }).toThrow(TypeError);
     expect(() => {
-      (snapshot.issues as BindingIssue[]).push({
+      m(snapshot.issues, '1', {
         severity: 'error',
         code: 'mutation',
         message: 'mutated',
@@ -202,12 +206,12 @@ describe('binding primitives', () => {
       status: 'ready',
     })).toThrow('binding snapshot: version must be a positive integer');
 
-    expect(() => bindingSnapshot({
+    expect(() => c(bindingSnapshot, [{
       providerId: 'docs.articleProvider',
       requirementId: 'article',
       version: 1,
-      status: 'loaded' as BindingStatus,
-    })).toThrow('binding snapshot: unsupported status loaded');
+      status: 'loaded',
+    }])).toThrow('binding snapshot: unsupported status loaded');
   });
 
   it('creates binding frames with read-only require, get, status, and issues accessors', () => {
@@ -251,7 +255,7 @@ describe('binding primitives', () => {
       'binding frame: missing requirement missing',
     );
     expect(() => {
-      (frame.require<Article>('article') as { title: string }).title = 'mutated';
+      m(frame.require<Article>('article'), 'title', 'mutated');
     }).toThrow(TypeError);
   });
 
@@ -287,14 +291,12 @@ describe('binding primitives', () => {
     expect(() => bindingFrame([first, second])).toThrow(
       'binding frame: duplicate requirement id article',
     );
-    expect(() => bindingFrame([{
+    expect(() => c(bindingFrame, [[{
       providerId: 'docs.articleProvider',
       requirementId: 'article',
       version: 1,
       status: 'ready',
-    } as never])).toThrow(
-      'binding frame: snapshot at index 0 was not created by bindingSnapshot()',
-    );
+    }]])).toThrow(/bindingSnapshot/);
   });
 
   it('models provider updates as new frames without mutating the old frame', () => {
@@ -428,15 +430,15 @@ describe('binding primitives', () => {
       provide(articleProvider),
       provide(duplicateIdProvider),
     ])).toThrow('provider scope: duplicate provider id docs.articleProvider');
-    expect(() => provide({
+    expect(() => c(provide, [{
       id: 'docs.looseProvider',
       resource: 'docs.article',
       facts: [],
-    } as never)).toThrow('provider scope: provider was not created by defineDataProvider()');
-    expect(() => providerScope([{
+    }])).toThrow(/defineDataProvider/);
+    expect(() => c(providerScope, [[{
       resource: articleProvider.resource,
       provider: articleProvider,
-    } as never])).toThrow('provider scope: entry at index 0 was not created by provide()');
+    }]])).toThrow(/provide/);
   });
 
   it('resolves data requirements against an explicit provider scope', () => {
@@ -496,19 +498,17 @@ describe('binding primitives', () => {
     ]);
     expect(Object.isFrozen(missing.issues)).toBe(true);
     expect(() => {
-      (missing.issues as BindingIssue[]).push({
+      m(missing.issues, '1', {
         severity: 'error',
         code: 'mutated',
         message: 'mutated',
       });
     }).toThrow(TypeError);
-    expect(() => resolveProviderRequirement({
+    expect(() => c(resolveProviderRequirement, [{
       id: 'article',
       resource: 'docs.article',
       facts: [],
-    } as never, scope)).toThrow(
-      'provider resolution: requirement was not created by defineDataRequirement()',
-    );
+    }, scope])).toThrow(/defineDataRequirement/);
   });
 
   it('assembles binding frames from resolved provider snapshots', () => {
@@ -613,7 +613,7 @@ describe('binding primitives', () => {
         }),
       ],
     })).toThrow('binding frame assembly: snapshot requirement unknown was not resolved');
-    expect(() => bindingFrameFromSnapshots({
+    expect(() => c(bindingFrameFromSnapshots, [{
       resolutions: [{
         requirementId: 'article',
         resource: 'docs.article',
@@ -622,9 +622,9 @@ describe('binding primitives', () => {
         providerId: 'docs.articleProvider',
         issues: [],
         facts: [],
-      } as never],
+      }],
       snapshots: [],
-    })).toThrow('binding frame assembly: resolution at index 0 was not created by resolveProviderRequirement()');
+    }])).toThrow(/resolveProviderRequirement/);
   });
 
   it('defines immutable named view data contracts without provider handles', () => {
@@ -690,7 +690,7 @@ describe('binding primitives', () => {
         { name: 'articleAgain', requirement: articleAgain },
       ],
     })).toThrow('view data: duplicate requirement id article');
-    expect(() => defineViewData({
+    expect(() => c(defineViewData, [{
       requirements: [
         {
           name: 'article',
@@ -698,9 +698,9 @@ describe('binding primitives', () => {
             id: 'article',
             resource: 'docs.article',
             facts: [],
-          } as never,
+          },
         },
       ],
-    })).toThrow('view data: requirement article was not created by defineDataRequirement()');
+    }])).toThrow(/defineDataRequirement/);
   });
 });

@@ -136,9 +136,9 @@ visible rendering.
 ## Retrospective
 
 Completed with a measured aggregate Code Dojo debt reduction from `4,940` to
-`2,178` (`-2,762`). The stored ESLint baseline now records `1,766` live
-findings, down from `4,517` (`-2,751`), and the next aggregate target is
-`2,128` or lower. Follow-on passes covered mechanically reviewable clusters
+`2,128` (`-2,812`). The stored ESLint baseline now records `1,716` live
+findings, down from `4,517` (`-2,801`), and the next aggregate target is
+`2,078` or lower. Follow-on passes covered mechanically reviewable clusters
 across tests, scripts, examples, MCP docs, DOGFOOD, app-frame surfaces,
 render/surface helpers, table/markdown parsing, geometry, benchmarks, runtime
 helpers, i18n helpers, and TUI input/action surfaces.
@@ -149,4 +149,6 @@ debt, and node style test regex debt. Touched file/context budgets stayed below
 their stored ceilings, two file/context exceptions have been removed, and the
 latest app-frame core/overlay pass removed retained-layout non-null assertions,
 shell-command handler narrowing casts, combo-key formatting debt, and framed-app
-runtime bridge assertions.
+runtime bridge assertions. The binding cluster then removed runtime brand casts,
+unchecked generic snapshot casts, descriptor clone assertions, and unchecked
+fixture casts from the core binding contract and tests.
