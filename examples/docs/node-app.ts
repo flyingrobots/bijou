@@ -1,8 +1,9 @@
 import type { BijouContext } from '../../packages/bijou/src/index.js';
+import type { RunOptions } from '../../packages/bijou-tui/src/index.js';
 import { createDocsApp, runDocsApp } from './app.js';
 import { createNodeDogfoodLocalePort, type NodeDogfoodLocaleEnv } from './node-locale.js';
 
-type DocsRunOptions = Parameters<typeof runDocsApp>[2];
+type DocsRunOptions = NonNullable<Parameters<typeof runDocsApp>[2]> & Pick<RunOptions<never>, never>;
 
 export function createNodeDocsApp(ctx: BijouContext, env?: NodeDogfoodLocaleEnv) {
   return createDocsApp(ctx, {
