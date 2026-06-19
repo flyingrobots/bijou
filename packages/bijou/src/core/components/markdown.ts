@@ -43,7 +43,7 @@ export interface MarkdownOptions {
  * @param options - Rendering options (wrap width, context).
  * @returns The rendered terminal string.
  */
-export function markdown(source: string, options?: MarkdownOptions): string {
+export function markdown(source: string | null | undefined, options?: MarkdownOptions): string {
   const safeSource = source ?? '';
   if (safeSource.trim() === '') return '';
 

@@ -370,8 +370,8 @@ describe('markdown()', () => {
     });
 
     it('handles null/undefined input gracefully', () => {
-      expect(markdown(null as any, { ctx: ctx() })).toBe('');
-      expect(markdown(undefined as any, { ctx: ctx() })).toBe('');
+      expect(markdown(null, { ctx: ctx() })).toBe('');
+      expect(markdown(undefined, { ctx: ctx() })).toBe('');
     });
   });
 

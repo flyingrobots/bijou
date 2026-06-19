@@ -12,7 +12,7 @@ import {
 import {
   decodeExchangeValue,
   encodeExchangeValue,
-  type ExchangeValueKind,
+  isExchangeValueKind,
 } from './exchange.js';
 import {
   hashSourceValue,
@@ -25,14 +25,14 @@ import {
 export interface StringTableRow {
   readonly namespace: string;
   readonly id: string;
-  readonly kind: string;
+  readonly kind: I18nEntryKind;
   readonly sourceLocale: string;
   readonly sourceValueKind: string;
   readonly sourceValue: string;
   readonly locale: string;
   readonly valueKind: string;
   readonly value: string;
-  readonly status: string;
+  readonly status: AuthoringTranslationStatus;
   readonly description: string;
 }
 
@@ -55,13 +55,9 @@ const STRING_TABLE_COLUMNS = [
   'description',
 ] as const;
 
-function isEntryKind(value: string): value is I18nEntryKind {
-  return value === 'message' || value === 'resource' || value === 'data';
-}
+function isEntryKind(value: string): value is I18nEntryKind { return value === 'message' || value === 'resource' || value === 'data'; }
 
-function isTranslationStatus(value: string): value is AuthoringTranslationStatus {
-  return value === 'current' || value === 'stale' || value === 'missing';
-}
+function isTranslationStatus(value: string): value is AuthoringTranslationStatus { return value === 'current' || value === 'stale' || value === 'missing'; }
 
 function assertStringTableRow(row: Readonly<Record<string, string>>, context: string): StringTableRow {
   const namespace = requiredCell(row, 'namespace', context);
@@ -113,11 +109,12 @@ function requiredCell(
 }
 
 function decode(kind: string, payload: string, context: string): unknown {
+  if (!isExchangeValueKind(kind)) throw new Error(`Bad ${context}: k ${kind}`);
   try {
-    return decodeExchangeValue({ kind: kind as ExchangeValueKind, payload });
+    return decodeExchangeValue({ kind, payload });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'unknown error';
-    throw new Error(`Invalid string table value in ${context}: ${message}`);
+    const m = error instanceof Error ? error.message : '?';
+    throw new Error(`Bad ${context}: ${m}`, { cause: error });
   }
 }
 
@@ -184,7 +181,7 @@ export function stringTableFromDelimitedSheet(sheet: DelimitedSheet): StringTabl
   }
   return Object.freeze({
     columns: STRING_TABLE_COLUMNS,
-    rows: Object.freeze(sheet.rows.map((row, index) => assertStringTableRow(row, `row ${index + 2}`))),
+    rows: Object.freeze(sheet.rows.map((row, index) => assertStringTableRow(row, `row ${String(index + 2)}`))),
   });
 }
 
@@ -196,7 +193,7 @@ export function authoringCatalogsFromStringTable(table: StringTable): readonly A
     const existing = entriesByKey.get(key);
     const entry: AuthoringCatalogEntry = existing ?? {
       key: { namespace: row.namespace, id: row.id },
-      kind: row.kind as I18nEntryKind,
+      kind: row.kind,
       sourceLocale: row.sourceLocale,
       sourceValue,
       translations: {},
@@ -212,11 +209,11 @@ export function authoringCatalogsFromStringTable(table: StringTable): readonly A
     }
 
     if (row.locale !== row.sourceLocale && row.status !== 'missing' && row.valueKind !== '') {
-      const translations = { ...entry.translations } as Record<string, AuthoringTranslation>;
+      const translations: Record<string, AuthoringTranslation> = { ...entry.translations };
       translations[row.locale] = {
         value: decode(row.valueKind, row.value, `${key}:${row.locale}`),
         sourceHash: hashSourceValue(sourceValue),
-        status: row.status as AuthoringTranslationStatus,
+        status: row.status,
       };
       entriesByKey.set(key, {
         ...entry,

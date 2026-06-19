@@ -94,7 +94,7 @@ function isTranslationStatus(value: string): value is AuthoringTranslationStatus
 
 const VALUE_KINDS = new Set<string>(['string', 'number', 'boolean', 'null', 'object', 'array', 'reference']);
 
-function isExchangeValueKind(value: string): value is ExchangeValueKind { return VALUE_KINDS.has(value); }
+export function isExchangeValueKind(value: string): value is ExchangeValueKind { return VALUE_KINDS.has(value); }
 
 function assertObject(value: unknown, message: string): asserts value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
