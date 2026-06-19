@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1656,
-  "errors": 1656,
+  "total": 1603,
+  "errors": 1603,
   "warnings": 0,
   "rules": [
     {
@@ -50,7 +50,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 60
+      "count": 57
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 371
+      "count": 340
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 122
+      "count": 116
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 280
+      "count": 278
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -122,7 +122,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
-      "count": 13
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
@@ -134,7 +134,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-promise-reject-errors",
-      "count": 2
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/prefer-regexp-exec",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 361
+      "count": 357
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -182,7 +182,7 @@
     },
     {
       "ruleId": "no-useless-assignment",
-      "count": 5
+      "count": 4
     },
     {
       "ruleId": "no-useless-escape",

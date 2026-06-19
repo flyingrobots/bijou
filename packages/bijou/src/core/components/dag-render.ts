@@ -152,7 +152,7 @@ function buildCenteredRun(
   const content = ' '.repeat(left) + text + ' '.repeat(right);
   const types: CharType[] = [];
   for (let i = 0; i < left; i++) types.push('pad');
-  for (let i = 0; i < segmentGraphemes(text).length; i++) types.push(labelType);
+  types.push(...segmentGraphemes(text).map(() => labelType));
   for (let i = 0; i < right; i++) types.push('pad');
   return { content, types };
 }
@@ -173,9 +173,9 @@ function buildCenteredLabelAndBadge(
 
   const types: CharType[] = [];
   for (let i = 0; i < left; i++) types.push('pad');
-  for (let i = 0; i < segmentGraphemes(truncatedLabel).length; i++) types.push('label');
+  types.push(...segmentGraphemes(truncatedLabel).map((): CharType => 'label'));
   types.push('pad');
-  for (let i = 0; i < segmentGraphemes(badgeText).length; i++) types.push('badge');
+  types.push(...segmentGraphemes(badgeText).map((): CharType => 'badge'));
   for (let i = 0; i < right; i++) types.push('pad');
 
   return {
@@ -259,9 +259,9 @@ function renderCompactNode(
   const centered = buildCenteredLabelAndBadge(label, badgeText, contentWidth);
   const line = open + centered.content + close;
   const charTypes: CharType[] = [];
-  for (let i = 0; i < segmentGraphemes(open).length; i++) charTypes.push('border');
+  charTypes.push(...segmentGraphemes(open).map((): CharType => 'border'));
   charTypes.push(...centered.types);
-  for (let i = 0; i < segmentGraphemes(close).length; i++) charTypes.push('border');
+  charTypes.push(...segmentGraphemes(close).map((): CharType => 'border'));
   return {
     lines: [line],
     charTypes: [charTypes],
@@ -287,8 +287,7 @@ function expandToColumns(
 ): { chars: string[]; types: CharType[] } {
   const outChars: string[] = [];
   const outTypes: CharType[] = [];
-  for (let i = 0; i < graphemes.length; i++) {
-    const g = graphemes[i]!;
+  for (const [i, g] of graphemes.entries()) {
     const t = types[i] ?? 'pad';
     const w = graphemeWidth(g);
     outChars.push(g);
@@ -328,8 +327,8 @@ export function renderInteractiveLayout(
 
   const colIndex = new Map<string, number>();
   for (const layer of layers) {
-    for (let i = 0; i < layer.length; i++) {
-      colIndex.set(layer[i]!, i);
+    for (const [i, id] of layer.entries()) {
+      colIndex.set(id, i);
     }
   }
 
@@ -392,7 +391,7 @@ export function renderInteractiveLayout(
 
   const gridRows = layers.length * rowStride;
   const gridCols = totalWidth;
-  const colCenter = (layer: number, col: number): number => layerOffsets[layer]! + col * colStride + Math.floor(nodeWidth / 2);
+  const colCenter = (layer: number, col: number): number => (layerOffsets[layer] ?? 0) + col * colStride + Math.floor(nodeWidth / 2);
 
   const g: GridState = createGrid(gridRows, gridCols);
 
@@ -456,7 +455,7 @@ export function renderInteractiveLayout(
         n.compactShape ?? 'square',
       )
       : renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
-    const startCol = layerOffsets[layer]! + col * colStride;
+    const startCol = (layerOffsets[layer] ?? 0) + col * colStride;
     const startRow = layer * rowStride;
 
     positions.set(n.id, { row: startRow, col: startCol, width: box.width, height: box.height });
@@ -481,9 +480,9 @@ export function renderInteractiveLayout(
     // index by column offset directly (handles CJK/wide characters).
     const expandedChars: string[][] = [];
     const expandedTypes: CharType[][] = [];
-    for (let lineIdx = 0; lineIdx < box.lines.length; lineIdx++) {
-      const graphemes = segmentGraphemes(box.lines[lineIdx]!);
-      const types = box.charTypes[lineIdx]!;
+    for (const [lineIdx, line] of box.lines.entries()) {
+      const graphemes = segmentGraphemes(line);
+      const types = box.charTypes[lineIdx] ?? [];
       const { chars: ec, types: et } = expandToColumns(graphemes, types);
       expandedChars.push(ec);
       expandedTypes.push(et);
@@ -515,8 +514,9 @@ export function renderInteractiveLayout(
   if (options.highlightPath && hlToken) {
     const path = options.highlightPath;
     for (let i = 0; i < path.length - 1; i++) {
-      const fromId = path[i]!;
-      const toId = path[i + 1]!;
+      const fromId = path[i];
+      const toId = path[i + 1];
+      if (fromId === undefined || toId === undefined) continue;
       const fLayer = layerMap.get(fromId);
       const tLayer = layerMap.get(toId);
       const fCol = colIndex.get(fromId);
@@ -548,8 +548,8 @@ export function renderInteractiveLayout(
         if (col >= p.startCol && col < p.startCol + p.width) {
           const lineIdx = row - p.startRow;
           const ci = col - p.startCol;
-          const ch = p.chars[lineIdx]![ci] ?? ' ';
-          const charType = p.charTypes[lineIdx]![ci];
+          const ch = p.chars[lineIdx]?.[ci] ?? ' ';
+          const charType = p.charTypes[lineIdx]?.[ci] ?? 'pad';
           const token = charType === 'label'
             ? p.labelToken
             : charType === 'badge'
@@ -610,7 +610,7 @@ export function renderInteractiveLayout(
     lines.push(line.replace(/\s+$/, ''));
   }
 
-  while (lines.length > 0 && lines[lines.length - 1]!.trim() === '') {
+  while (lines.at(-1)?.trim() === '') {
     lines.pop();
   }
 
@@ -668,11 +668,11 @@ export function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>
 
   // Count only edges whose target exists in the graph (matching rendered output)
   const totalEdges = nodes.reduce((s, n) => s + (n.edges ?? []).filter(e => nodeMap.has(e)).length, 0);
-  const lines: string[] = [`Graph: ${nodes.length} nodes, ${totalEdges} edges`, ''];
+  const lines: string[] = [`Graph: ${String(nodes.length)} nodes, ${String(totalEdges)} edges`, ''];
 
-  for (let l = 0; l < layers.length; l++) {
-    lines.push(`Layer ${l + 1}:`);
-    for (const id of layers[l]!) {
+  for (const [layerIndex, layer] of layers.entries()) {
+    lines.push(`Layer ${String(layerIndex + 1)}:`);
+    for (const id of layer) {
       const n = nodeMap.get(id);
       if (!n) continue;
       const badgePart = n.badge ? ` (${n.badge})` : '';
@@ -687,6 +687,6 @@ export function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>
     lines.push('');
   }
 
-  while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  while (lines.at(-1) === '') lines.pop();
   return lines.join('\n');
 }

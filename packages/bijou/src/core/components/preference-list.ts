@@ -85,7 +85,8 @@ function isPreparedPreferenceRow(row: PreferenceRow | PreparedPreferenceRow): ro
 function isPreparedPreferenceSection(
   section: PreferenceSection | PreparedPreferenceSection,
 ): section is PreparedPreferenceSection {
-  return section.rows.length === 0 || isPreparedPreferenceRow(section.rows[0]!);
+  const firstRow = section.rows[0];
+  return firstRow === undefined || isPreparedPreferenceRow(firstRow);
 }
 
 export function preparePreferenceRow(row: PreferenceRow): PreparedPreferenceRow {
@@ -148,21 +149,21 @@ export function preferenceRowSurface(
           let bR = -1, bG = 0, bB = 0;
           const bgP = bgRGB ?? colorRgb(bg);
           if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
-          for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
-            const char = valueChars[offset]!;
+          for (const [offset, char] of valueChars.entries()) {
+            if (startX + valueStart + offset >= width) break;
             if (char === ' ') continue;
             (surface).setRGB(startX + valueStart + offset, 0, char, fR, fG, fB, bR, bG, bB, FLAG_BOLD);
           }
         } else {
-          for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
-            const char = valueChars[offset]!;
+          for (const [offset, char] of valueChars.entries()) {
+            if (startX + valueStart + offset >= width) break;
             if (char === ' ') continue;
             surface.set(startX + valueStart + offset, 0, { char, ...valueStyle, bg, bgRGB, modifiers: ['bold'], empty: false });
           }
         }
       } else {
-        for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
-          const char = valueChars[offset]!;
+        for (const [offset, char] of valueChars.entries()) {
+          if (startX + valueStart + offset >= width) break;
           if (char === ' ') continue;
           surface.set(startX + valueStart + offset, 0, { char, ...valueStyle, bg, bgRGB, modifiers: ['bold'], empty: false });
         }
@@ -170,11 +171,11 @@ export function preferenceRowSurface(
     }
   }
 
-  for (let index = 0; index < layout.descriptionLines.length; index++) {
+  for (const [index, descriptionLine] of layout.descriptionLines.entries()) {
     writePreferenceLine(
       surface,
       (layout.stackValue ? 2 : 1) + index,
-      `   ${layout.descriptionLines[index]!}`,
+      `   ${descriptionLine}`,
       {
         dim: options.theme?.descriptionToken == null,
         fg: options.theme?.descriptionToken?.hex,
@@ -203,29 +204,25 @@ export function preferenceListSurface(
       },
   );
   const visibleSections = preparedSections.filter((section) => section.rows.length > 0);
-  let totalHeight = 1;
   let y = 0;
 
-  for (let sectionIndex = 0; sectionIndex < visibleSections.length; sectionIndex++) {
-    const section = visibleSections[sectionIndex]!;
+  for (const [sectionIndex, section] of visibleSections.entries()) {
     if (sectionIndex > 0) y += 1;
     y += 1;
     y += 1;
 
-    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const row = section.rows[rowIndex]!;
+    for (const [rowIndex, row] of section.rows.entries()) {
       const rowLayout = resolvePreferenceRowLayout(row, width);
       y += rowLayout.height;
       if (rowIndex < section.rows.length - 1) y += 1;
     }
   }
 
-  totalHeight = Math.max(1, y);
+  const totalHeight = Math.max(1, y);
   const surface = createSurface(width, totalHeight);
   y = 0;
 
-  for (let sectionIndex = 0; sectionIndex < visibleSections.length; sectionIndex++) {
-    const section = visibleSections[sectionIndex]!;
+  for (const [sectionIndex, section] of visibleSections.entries()) {
     if (sectionIndex > 0) y += 1;
     writePreferenceLine(surface, y, section.title, {
       strong: options.theme?.sectionTitleToken == null,
@@ -236,8 +233,7 @@ export function preferenceListSurface(
     });
     y += 2;
 
-    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const row = section.rows[rowIndex]!;
+    for (const [rowIndex, row] of section.rows.entries()) {
       const rowLayout = resolvePreferenceRowLayout(row, width);
       const rowSurface = preferenceRowSurface(row, {
         width,
@@ -400,16 +396,16 @@ function writePreferenceLine(
       const bgP = options.bgRGB ?? colorRgb(options.bg);
       if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
       const flags = options.strong ? FLAG_BOLD : options.dim ? FLAG_DIM : 0;
-      for (let x = 0; x < chars.length && x < surface.width; x++) {
-        const char = chars[x]!;
+      for (const [x, char] of chars.entries()) {
+        if (x >= surface.width) break;
         if (char === ' ') continue;
         (surface).setRGB(x, y, char, fR, fG, fB, bR, bG, bB, flags);
       }
       return;
     }
   }
-  for (let x = 0; x < chars.length && x < surface.width; x++) {
-    const char = chars[x]!;
+  for (const [x, char] of chars.entries()) {
+    if (x >= surface.width) break;
     if (char === ' ') continue;
     surface.set(x, y, {
       char,
