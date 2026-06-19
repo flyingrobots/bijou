@@ -60,7 +60,7 @@ export interface UiAction {
 
 export interface UiTokenUse {
   readonly nodeId: string;
-  readonly slot: 'fg' | 'bg' | 'border' | string;
+  readonly slot: string;
   readonly token: string;
 }
 
@@ -286,10 +286,10 @@ function sha256Hex(source: string): string {
     }
     for (let index = 16; index < 64; index++) {
       words[index] = (
-        sha256SmallSigma1(words[index - 2]!)
-        + words[index - 7]!
-        + sha256SmallSigma0(words[index - 15]!)
-        + words[index - 16]!
+        sha256SmallSigma1(words[index - 2] ?? 0)
+        + (words[index - 7] ?? 0)
+        + sha256SmallSigma0(words[index - 15] ?? 0)
+        + (words[index - 16] ?? 0)
       ) >>> 0;
     }
 
@@ -307,8 +307,8 @@ function sha256Hex(source: string): string {
         h
         + sha256BigSigma1(e)
         + ((e & f) ^ (~e & g))
-        + SHA256_K[index]!
-        + words[index]!
+        + (SHA256_K[index] ?? 0)
+        + (words[index] ?? 0)
       ) >>> 0;
       const temp2 = (sha256BigSigma0(a) + ((a & b) ^ (a & c) ^ (b & c))) >>> 0;
       h = g;
@@ -358,11 +358,12 @@ function sha256SmallSigma1(value: number): number {
 
 export function validateUiSceneIr(scene: UiSceneIr): UiSceneValidationResult {
   const issues: UiSceneValidationIssue[] = [];
-  if (scene.irVersion !== UI_SCENE_IR_VERSION) {
+  const v: string = scene.irVersion;
+  if (v !== UI_SCENE_IR_VERSION) {
     issues.push({
       code: 'unsupported-ir-version',
-      message: `Unsupported UI scene IR version: ${scene.irVersion}`,
-      id: scene.irVersion,
+      message: `Unsupported UI scene IR version: ${v}`,
+      id: v,
     });
   }
 
@@ -511,8 +512,7 @@ export function validateUiSceneIr(scene: UiSceneIr): UiSceneValidationResult {
     }
   }
 
-  for (let index = 0; index < scene.targetProfiles.length; index++) {
-    const profile = scene.targetProfiles[index]!;
+  for (const [index, profile] of scene.targetProfiles.entries()) {
     const issue = validateTargetProfile(profile, index);
     if (issue != null) {
       issues.push(issue);
@@ -607,7 +607,7 @@ export function lowerUiSceneToSurface(
 
     for (let offset = visibleSpan.startOffset; offset < visibleSpan.endOffset; offset++) {
       surface.set(x + offset, y, {
-        char: graphemes[offset]!,
+        char: graphemes[offset] ?? ' ',
         ...style,
         empty: false,
       });
@@ -788,7 +788,7 @@ function hashSurface(surface: Surface): string {
 }
 
 function sanitizeLayoutCoordinate(value: number | undefined): number {
-  return Number.isFinite(value) ? Math.trunc(value!) : 0;
+  return value !== undefined && Number.isFinite(value) ? Math.trunc(value) : 0;
 }
 
 function sortedUnique(values: readonly string[]): readonly string[] {
@@ -846,8 +846,8 @@ function validateTargetProfile(profile: UiTargetProfile, index: number): UiScene
 function invalidTargetProfile(kind: string, index: number, reason: string): UiSceneValidationIssue {
   return {
     code: 'invalid-target-profile',
-    message: `Invalid target profile ${kind} at index ${index}: ${reason}`,
-    id: `${kind}:${index}`,
+    message: `Invalid target profile ${kind} at index ${String(index)}: ${reason}`,
+    id: `${kind}:${String(index)}`,
   };
 }
 
@@ -876,10 +876,9 @@ function normalizeStableJson(value: unknown): unknown {
     return value.map((item) => normalizeStableJson(item));
   }
   if (typeof value === 'object') {
-    const input = value as Record<string, unknown>;
     const output: Record<string, unknown> = {};
-    for (const key of Object.keys(input).sort(compareCodeUnits)) {
-      const normalized = normalizeStableJson(input[key]);
+    for (const [key, raw] of Object.entries(value).sort(([left], [right]) => compareCodeUnits(left, right))) {
+      const normalized = normalizeStableJson(raw);
       if (normalized !== undefined) {
         output[key] = normalized;
       }

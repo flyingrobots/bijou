@@ -51,7 +51,7 @@ next goalpost while keeping touched-file size ratchets flat or lower.
 Reduce aggregate Code Dojo debt from `1,846` to `1,796` or lower by eliminating
 at least `50` live ESLint findings with real fixes.
 
-Initial non-DOGFOOD candidates from the offender list:
+Final non-DOGFOOD slice from the offender list:
 
 | File | Findings |
 | :--- | ---: |
@@ -59,10 +59,14 @@ Initial non-DOGFOOD candidates from the offender list:
 | `packages/bijou/src/core/active-binding-collection.ts` | 16 |
 | `packages/bijou/src/core/layout/envelope.ts` | 16 |
 | `packages/bijou-tui/src/flex.ts` | 13 |
-| **Candidate total** | **62** |
+| **Slice total** | **62** |
 
-The final slice may substitute equivalent files if a candidate exposes broader
-semantic work than this goalpost should carry.
+## Implementation Result
+
+The final slice lowered live type-aware ESLint findings from `1,434` to
+`1,372` and removed `packages/bijou-tui/src/flex.ts` from the code-size
+baseline by shrinking it to the 500-line ratchet boundary. Aggregate Code Dojo
+debt fell from `1,846` to `1,783`.
 
 ## Scope
 
@@ -94,6 +98,15 @@ Live counts on `main` at `f820fc07`:
 - code-size baseline: `56`, including `4` legacy hard-limit files
 - next aggregate target: `1,796` or lower
 
+Live counts after the implementation slice:
+
+- aggregate Code Dojo debt: `1,783`
+- ESLint findings: `1,372`
+- file/context baseline: `333`
+- mock-ban baseline: `23`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- next aggregate target: `1,733` or lower
+
 ## Playback Questions
 
 1. Is aggregate Code Dojo debt at `1,796` or lower?
@@ -112,7 +125,7 @@ layout envelope resolution, or flex layout.
 
 - The selected touched TypeScript files have zero new ESLint findings and reduce
   live findings by at least `50`.
-- Aggregate Code Dojo debt is `1,796` or lower.
+- Aggregate Code Dojo debt is `1,783` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live ESLint count.
 - `docs/code-dojo-exceptions.md` and `package.json` report the lower ceiling.
 - Focused validation for the touched surfaces passes.

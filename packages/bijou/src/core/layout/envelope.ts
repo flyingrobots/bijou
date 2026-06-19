@@ -264,7 +264,6 @@ export function assignLayoutChild(
 
 export function isResolvedLayoutEnvelope(envelope: LayoutEnvelope): envelope is ResolvedLayoutEnvelope {
   return typeof envelope.assigned === 'object'
-    && envelope.assigned !== null
     && typeof envelope.reason === 'string'
     && envelope.reason.length > 0;
 }
@@ -329,8 +328,7 @@ export function resolveStackLayout(input: StackLayoutInput): StackLayoutResult {
   const resolvedChildren: ResolvedLayoutEnvelope[] = [];
   let cursor = axis === 'inline' ? assigned.inlineStart : assigned.blockStart;
 
-  for (let index = 0; index < children.length; index++) {
-    const child = children[index]!;
+  for (const [index, child] of children.entries()) {
     const size = sizes[index] ?? 0;
     const rect = axis === 'inline'
       ? {
@@ -344,10 +342,10 @@ export function resolveStackLayout(input: StackLayoutInput): StackLayoutResult {
           blockStart: cursor,
           inlineSize: crossSize,
           blockSize: size,
-        };
+    };
     const reason = child.track.kind === 'fixed'
-      ? `stack ${axis} fixed track ${size} cells`
-      : `stack ${axis} flex track ${trackWeight(child.track)} resolved by largest-remainder-source-order`;
+      ? `stack ${axis} fixed track ${String(size)} cells`
+      : `stack ${axis} flex track ${String(trackWeight(child.track))} resolved by largest-remainder-source-order`;
     resolvedChildren.push(assignLayoutChild(child.envelope, rect, reason));
     cursor += size + (index < children.length - 1 ? gap : 0);
   }
@@ -407,10 +405,10 @@ export function layoutExplanationFacts(envelope: ResolvedLayoutEnvelope): readon
       envelope.preference.maxBlock,
     )),
     fact('assigned', [
-      `inline-start ${envelope.assigned.inlineStart}`,
-      `block-start ${envelope.assigned.blockStart}`,
-      `inline-size ${envelope.assigned.inlineSize}`,
-      `block-size ${envelope.assigned.blockSize}`,
+      `inline-start ${String(envelope.assigned.inlineStart)}`,
+      `block-start ${String(envelope.assigned.blockStart)}`,
+      `inline-size ${String(envelope.assigned.inlineSize)}`,
+      `block-size ${String(envelope.assigned.blockSize)}`,
     ].join(' ')),
     fact('reason', envelope.reason),
   ]);
@@ -422,7 +420,7 @@ export function layoutExplanationText(envelope: ResolvedLayoutEnvelope): string 
     `node ${envelope.id}`,
     ...facts
       .filter((item) => item.key !== 'node.id')
-      .map((item) => `${item.key} ${item.value}`),
+      .map((item) => `${item.key} ${String(item.value)}`),
   ].join('\n');
 }
 
@@ -432,7 +430,7 @@ function contentExtent(source: ContentExtent['source'], input: Omit<ContentExten
     inlineSize: sanitizeNonNegativeInt(input.inlineSize, 0),
     blockSize: sanitizeNonNegativeInt(input.blockSize, 0),
     ...(input.baseline === undefined ? {} : { baseline: sanitizeNonNegativeInt(input.baseline, 0) }),
-    facts: freezeFacts(input.facts ?? []),
+    facts: freezeFacts(input.facts),
   };
   return Object.freeze(extent);
 }
@@ -445,8 +443,8 @@ function resolveStackTrackSizes(
   let fixed = 0;
   let totalFlex = 0;
 
-  for (let index = 0; index < children.length; index++) {
-    const track = children[index]!.track;
+  for (const [index, child] of children.entries()) {
+    const track = child.track;
     if (track.kind === 'fixed') {
       const size = sanitizeNonNegativeInt(track.size, 0);
       sizes[index] = size;
@@ -458,8 +456,8 @@ function resolveStackTrackSizes(
 
   if (fixed > available) {
     let remaining = available;
-    for (let index = 0; index < children.length; index++) {
-      if (children[index]!.track.kind !== 'fixed') continue;
+    for (const [index, child] of children.entries()) {
+      if (child.track.kind !== 'fixed') continue;
       const next = Math.min(sizes[index] ?? 0, remaining);
       sizes[index] = next;
       remaining = Math.max(0, remaining - next);
@@ -472,8 +470,8 @@ function resolveStackTrackSizes(
 
   let assigned = 0;
   const fractionalShares: { readonly index: number; readonly remainder: number }[] = [];
-  for (let index = 0; index < children.length; index++) {
-    const track = children[index]!.track;
+  for (const [index, child] of children.entries()) {
+    const track = child.track;
     if (track.kind !== 'flex') continue;
     const raw = (remaining * trackWeight(track)) / totalFlex;
     const whole = Math.floor(raw);
@@ -558,11 +556,11 @@ function fact(key: string, value: LayoutFact['value']): LayoutFact {
 }
 
 function formatRange(min: number, max: LayoutBound): string {
-  return `${min}..${formatBound(max)}`;
+  return `${String(min)}..${formatBound(max)}`;
 }
 
 function formatPreference(min: number, preferred: number, max: LayoutBound): string {
-  return `min ${min} preferred ${preferred} max ${formatBound(max)}`;
+  return `min ${String(min)} preferred ${String(preferred)} max ${formatBound(max)}`;
 }
 
 function formatBound(bound: LayoutBound): string {
