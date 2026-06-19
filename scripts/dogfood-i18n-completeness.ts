@@ -64,6 +64,7 @@ interface IndexedEntry {
 
 const SOURCE_TABLE_PATH = 'examples/docs/i18n/source/dogfood-strings.csv';
 const DEFAULT_BASE_REF = 'origin/main';
+const s = String;
 export const DOGFOOD_I18N_MISSING_TRANSLATION_BASELINE: DogfoodI18nMissingTranslationBaseline = Object.freeze({
   total: 432,
   byLocale: Object.freeze({
@@ -143,13 +144,13 @@ export function evaluateDogfoodI18nMissingTranslationRatchet(
   const violations: string[] = [];
 
   if (total > baseline.total) {
-    violations.push(`missing translations ${total} exceeds baseline ${baseline.total}`);
+    violations.push(`missing translations ${s(total)} exceeds baseline ${s(baseline.total)}`);
   }
 
   for (const locale of byLocale) {
     const baselineCount = baseline.byLocale[locale.locale] ?? 0;
     if (locale.count > baselineCount) {
-      violations.push(`missing translations ${locale.locale} ${locale.count} exceeds baseline ${baselineCount}`);
+      violations.push(`missing translations ${locale.locale} ${s(locale.count)} exceeds baseline ${s(baselineCount)}`);
     }
   }
 
@@ -193,13 +194,13 @@ export function runDogfoodI18nCompleteness(io: DogfoodI18nCompletenessIO = {}): 
     });
     if (result.ok && missingResult.ok) {
       stdout(
-        `dogfood-i18n-completeness: ok (${result.checked} changed localization keys; ${missingResult.total} missing translations; baseline ${missingResult.baseline.total})\n`,
+        `dogfood-i18n-completeness: ok (${s(result.checked)} changed localization keys; ${s(missingResult.total)} missing translations; baseline ${s(missingResult.baseline.total)})\n`,
       );
       return 0;
     }
 
     stderr([
-      `dogfood-i18n-completeness: failed (${result.checked} changed localization keys; ${result.issues.length} issues; ${missingResult.total} missing translations; baseline ${missingResult.baseline.total})`,
+      `dogfood-i18n-completeness: failed (${s(result.checked)} changed localization keys; ${s(result.issues.length)} issues; ${s(missingResult.total)} missing translations; baseline ${s(missingResult.baseline.total)})`,
       ...result.issues.map((entry) => (
         `- ${entry.namespace}:${entry.id} [${entry.locale}] ${entry.reason}`
       )),
@@ -229,9 +230,7 @@ function readBaseStringTable(baseRef: string): StringTable {
     return parseStringTable(gitOutput(['show', `${comparisonRef}:${SOURCE_TABLE_PATH}`]), 'csv');
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(
-      `unable to read ${SOURCE_TABLE_PATH} at ${comparisonRef}; fetch the base ref or pass --base <ref>: ${message}`,
-    );
+    throw new Error(`unable to read base at ${comparisonRef}: ${message}`, { cause: error });
   }
 }
 

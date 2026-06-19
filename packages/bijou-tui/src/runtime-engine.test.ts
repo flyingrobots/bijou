@@ -18,7 +18,6 @@ import {
   dropInactiveRuntimeLayouts,
   executeRuntimeEffectBuffer,
   getRuntimeRetainedLayout,
-  getRuntimeComponentContract,
   handleRuntimeComponentInput,
   invalidateRuntimeLayouts,
   listRuntimeRetainedLayouts,
@@ -455,8 +454,8 @@ describe('runtime input routing', () => {
       if (layer.id === 'palette') {
         return {
           handled: true,
-          commands: [`select:${hit?.target.id}`],
-          effects: [`flash:${hit?.path.map((node) => node.id).join('>')}`],
+          commands: [`select:${hit?.target.id ?? ''}`],
+          effects: [`flash:${hit?.path.map((node) => node.id).join('>') ?? ''}`],
         };
       }
       return undefined;
@@ -541,7 +540,7 @@ describe('runtime command and effect buffers', () => {
       'two',
       'three',
     ]);
-    const result = applyRuntimeCommandBuffer({ order: [] as string[] }, commandBuffer, (state, command) => {
+    const result = applyRuntimeCommandBuffer({ order: Array<string>() }, commandBuffer, (state, command) => {
       applied.push(command);
       return {
         order: [...state.order, command],
@@ -558,7 +557,7 @@ describe('runtime command and effect buffers', () => {
       'play-click',
       'announce.confirm',
     ]);
-    const result = await executeRuntimeEffectBuffer(effectBuffer, async (effect) => {
+    const result = await executeRuntimeEffectBuffer(effectBuffer, (effect) => {
       executed.push(effect);
     });
     expect(executed).toEqual(['play-click', 'announce.confirm']);
@@ -591,7 +590,7 @@ describe('runtime component contracts', () => {
       rect: { x: 10, y: 8, width: 12, height: 1 },
       component: contract,
     });
-    expect(getRuntimeComponentContract(node)).toMatchObject({
+    expect(node.component).toMatchObject({
       componentId: 'confirm.primary-action',
       layout: {
         width: 'fill',
@@ -605,7 +604,7 @@ describe('runtime component contracts', () => {
       },
     });
   });
-  it('prefers the deepest enabled interactive node in a retained hit path', () => {
+  it('prefers the deepest enabled hit node', () => {
     const root = createRuntimeComponentNode({
       id: 'confirm-root',
       rect: { x: 0, y: 0, width: 40, height: 10 },
@@ -641,15 +640,13 @@ describe('runtime component contracts', () => {
         }),
       ],
     });
+    const [card = root] = root.children;
+    const [primary = card] = card.children;
     const hit = {
       viewId: 'modal',
       point: { x: 10, y: 5 },
-      path: [
-        root,
-        root.children[0]!,
-        root.children[0]!.children[0]!,
-      ],
-      target: root.children[0]!.children[0]!,
+      path: [root, card, primary],
+      target: primary,
     };
     const target = resolveRuntimeInteractiveTarget(hit, {
       kind: 'pointer',
@@ -684,11 +681,13 @@ describe('runtime component contracts', () => {
         }),
       ],
     });
+    const [disabledChild] = root.children;
+    if (disabledChild == null) throw Error();
     const hit = {
       viewId: 'workspace',
       point: { x: 3, y: 2 },
-      path: [root, root.children[0]!],
-      target: root.children[0]!,
+      path: [root, disabledChild],
+      target: disabledChild,
     };
     const target = resolveRuntimeInteractiveTarget(hit, {
       kind: 'pointer',
@@ -700,20 +699,21 @@ describe('runtime component contracts', () => {
     expect(target?.id).toBe('scroll-card');
   });
   it('lets component handlers emit multiple commands and effects', () => {
+    const component = createRuntimeComponentContract<string, string>({
+      componentId: 'confirm.primary',
+      interaction: {
+        pointerActions: ['press'],
+        handleInput: ({ component, node }) => ({
+          handled: true,
+          commands: [`activate:${component.componentId}`, `focus:${node.id ?? ''}`],
+          effects: ['play-click'],
+        }),
+      },
+    });
     const node = createRuntimeComponentNode<string, string>({
       id: 'confirm-primary',
       rect: { x: 8, y: 5, width: 10, height: 1 },
-      component: createRuntimeComponentContract<string, string>({
-        componentId: 'confirm.primary',
-        interaction: {
-          pointerActions: ['press'],
-          handleInput: ({ component, node }) => ({
-            handled: true,
-            commands: [`activate:${component.componentId}`, `focus:${node.id}`],
-            effects: ['play-click'],
-          }),
-        },
-      }),
+      component,
     });
     const result = handleRuntimeComponentInput({
       layer: {
@@ -731,7 +731,7 @@ describe('runtime component contracts', () => {
         y: 5,
       },
       node,
-      component: node.component!,
+      component,
     });
     expect(result).toEqual({
       handled: true,

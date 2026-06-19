@@ -96,7 +96,7 @@
     {
       "path": "packages/bijou-tui/src/runtime-engine.test.ts",
       "lines": 775,
-      "bytes": 24450
+      "bytes": 24441
     },
     {
       "path": "packages/bijou-tui/src/app-frame-render.ts",
@@ -229,14 +229,14 @@
       "bytes": 19433
     },
     {
-      "path": "packages/bijou-tui/src/transition-shaders.test.ts",
-      "lines": 565,
-      "bytes": 20530
-    },
-    {
       "path": "scripts/smoke-all-examples-lib.ts",
       "lines": 563,
       "bytes": 15738
+    },
+    {
+      "path": "packages/bijou-tui/src/transition-shaders.test.ts",
+      "lines": 560,
+      "bytes": 20475
     },
     {
       "path": "packages/bijou/src/core/binding-lifecycle.ts",
@@ -439,14 +439,14 @@
       "bytes": 13150
     },
     {
-      "path": "packages/bijou-tui/src/driver.test.ts",
-      "lines": 400,
-      "bytes": 12511
-    },
-    {
       "path": "tests/cycles/DX-031/dogfood-blocks-section.test.ts",
       "lines": 398,
       "bytes": 18162
+    },
+    {
+      "path": "packages/bijou-tui/src/driver.test.ts",
+      "lines": 397,
+      "bytes": 12444
     },
     {
       "path": "packages/bijou-tui/src/app-frame-routing.test.ts",
@@ -504,11 +504,6 @@
       "bytes": 10556
     },
     {
-      "path": "packages/bijou/src/core/components/markdown-parse.ts",
-      "lines": 374,
-      "bytes": 12540
-    },
-    {
       "path": "packages/bijou-tui/src/app-frame-modal-routing.test.ts",
       "lines": 379,
       "bytes": 12452
@@ -542,6 +537,11 @@
       "path": "scripts/docs-preview-landing.test.ts",
       "lines": 374,
       "bytes": 17027
+    },
+    {
+      "path": "packages/bijou/src/core/components/markdown-parse.ts",
+      "lines": 374,
+      "bytes": 12540
     },
     {
       "path": "packages/bijou-tui/src/keybindings.ts",
@@ -715,8 +715,8 @@
     },
     {
       "path": "scripts/dogfood-i18n-completeness.ts",
-      "lines": 317,
-      "bytes": 10325
+      "lines": 316,
+      "bytes": 10324
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/schema-parsers-core.ts",
@@ -1269,11 +1269,6 @@
       "bytes": 8587
     },
     {
-      "path": "packages/bijou/src/core/render/packed-cell.test.ts",
-      "lines": 204,
-      "bytes": 7786
-    },
-    {
       "path": "tests/cycles/DX-034/active-binding-runtime-loop.test.ts",
       "lines": 204,
       "bytes": 7595
@@ -1312,6 +1307,11 @@
       "path": "bench/src/harnesses/wall-time/runner.ts",
       "lines": 200,
       "bytes": 6103
+    },
+    {
+      "path": "packages/bijou/src/core/render/packed-cell.test.ts",
+      "lines": 199,
+      "bytes": 7710
     },
     {
       "path": "packages/bijou/src/core/theme/resolve.ts",
@@ -1527,11 +1527,6 @@
       "path": "packages/bijou/src/core/block-tree-render.test.ts",
       "lines": 172,
       "bytes": 5569
-    },
-    {
-      "path": "packages/bijou/src/core/forms/select.ts",
-      "lines": 171,
-      "bytes": 6059
     },
     {
       "path": "packages/bijou/src/core/components/inspector.ts",
