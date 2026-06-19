@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import path from "node:path";
+import { eslintCacheArgs, localEslintCommand } from "./eslint-results.mjs";
 import { repoRoot } from "./git.mjs";
 
 function parseArgs(args) {
@@ -12,12 +11,6 @@ function parseArgs(args) {
   }
   if (files.length === 0) throw new Error("Usage: npm run code-dojo:slice -- <file.ts> [more-files.ts]");
   return files;
-}
-
-function localEslintCommand(root) {
-  const executable = process.platform === "win32" ? "eslint.cmd" : "eslint";
-  const localPath = path.join(root, "node_modules", ".bin", executable);
-  return existsSync(localPath) ? localPath : "eslint";
 }
 
 function runStep(root, label, command, args) {
@@ -49,7 +42,12 @@ function main() {
   }
 
   const root = repoRoot();
-  runStep(root, "focused ESLint", localEslintCommand(root), ["--max-warnings=0", "--no-warn-ignored", ...files]);
+  runStep(root, "focused cached ESLint", localEslintCommand(root), [
+    "--max-warnings=0",
+    "--no-warn-ignored",
+    ...eslintCacheArgs(root),
+    ...files,
+  ]);
   runStep(root, "file/context ratchet", "node", ["scripts/code-dojo/check-staged-files.mjs", "--all"]);
   runStep(root, "code size gate", "npm", ["run", "code:size"]);
   runStep(root, "test typecheck", "npm", ["run", "typecheck:test"]);

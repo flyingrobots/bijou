@@ -53,6 +53,12 @@ const DOT_BITS = [
   [0x40, 0x80], // row 3
 ] as const;
 
+function dotBit(row: number, col: number): number {
+  const bit = DOT_BITS[row]?.[col];
+  if (bit == null) throw new Error('braille chart dot index out of range');
+  return bit;
+}
+
 // sampleToWidth, safeMin, safeMax, sanitizeValues imported from data-viz-utils.
 
 /**
@@ -105,8 +111,9 @@ export function brailleChartSurface(
 
         for (let dotCol = 0; dotCol < 2; dotCol++) {
           const sampleIdx = cx * 2 + dotCol;
-          if (sampleIdx < heights.length && heights[sampleIdx]! >= threshold) {
-            bits |= DOT_BITS[dotRow]![dotCol]!;
+          const sampleHeight = heights[sampleIdx];
+          if (sampleHeight != null && sampleHeight >= threshold) {
+            bits |= dotBit(dotRow, dotCol);
           }
         }
       }

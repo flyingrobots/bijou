@@ -13,11 +13,11 @@ describe('gifenc ambient types', () => {
   it('describe the encoder and palette helper surface', () => {
     expectTypeOf<PaletteFormat>().toEqualTypeOf<'rgb565' | 'rgb444' | 'rgba4444'>();
     expectTypeOf<PaletteColor>().toEqualTypeOf<[number, number, number] | [number, number, number, number]>();
-    expectTypeOf<GifEncoderOptions>().toMatchTypeOf<{
+    expectTypeOf<GifEncoderOptions>().toExtend<{
       auto?: boolean;
       initialCapacity?: number;
     }>();
-    expectTypeOf<QuantizeOptions>().toMatchTypeOf<{
+    expectTypeOf<QuantizeOptions>().toExtend<{
       format?: PaletteFormat;
       clearAlpha?: boolean;
       clearAlphaColor?: number;
@@ -25,7 +25,7 @@ describe('gifenc ambient types', () => {
       oneBitAlpha?: boolean | number;
       useSqrt?: boolean;
     }>();
-    expectTypeOf<GifFrameOptions>().toMatchTypeOf<{
+    expectTypeOf<GifFrameOptions>().toExtend<{
       palette?: PaletteColor[];
       first?: boolean;
       transparent?: boolean;

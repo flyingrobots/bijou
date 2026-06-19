@@ -125,10 +125,24 @@ describe('git hooks', () => {
 
   it('exposes fast Code Dojo slice planning commands', () => {
     const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
+    const fastLane = readFileSync(resolve(ROOT, 'scripts/code-dojo/fast.mjs'), 'utf8');
+    const eslintResults = readFileSync(resolve(ROOT, 'scripts/code-dojo/eslint-results.mjs'), 'utf8');
+    const testTypecheckConfig = readFileSync(resolve(ROOT, 'tsconfig.tests.json'), 'utf8');
 
     expect(packageJson).toContain('"code-dojo:eslint:offenders"');
+    expect(packageJson).toContain('"code-dojo:fast"');
+    expect(packageJson).toContain('"code-dojo:changed"');
     expect(packageJson).toContain('"code-dojo:slice"');
     expect(existsSync(resolve(ROOT, 'scripts/code-dojo/eslint-offenders.mjs'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'scripts/code-dojo/fast.mjs'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'scripts/code-dojo/changed.mjs'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'scripts/code-dojo/slice.mjs'))).toBe(true);
+    expect(fastLane).not.toContain('typecheck:test');
+    expect(fastLane).not.toContain('test:run');
+    expect(eslintResults).toContain('--cache-strategy');
+    expect(eslintResults).toContain('content');
+    expect(eslintResults).toContain('.cache/eslint/.eslintcache');
+    expect(testTypecheckConfig).toContain('"incremental": true');
+    expect(testTypecheckConfig).toContain('"tsBuildInfoFile": "tsconfig.tests.tsbuildinfo"');
   });
 });

@@ -12,7 +12,7 @@ export function installBCSSResolver(
   const sheet = parseBCSS(css);
   const themeMode = detectThemeMode(ctx);
 
-  (ctx as any).resolveBCSS = (identity: { type: string; id?: string; classes?: string[] }) => {
+  ctx.resolveBCSS = (identity: { type: string; id?: string; classes?: string[] }) => {
     return resolveStyles(
       identity,
       sheet,

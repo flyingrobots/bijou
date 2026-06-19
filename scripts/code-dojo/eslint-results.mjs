@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -13,6 +13,11 @@ export const lintTargets = [
   "vitest.config.ts",
 ];
 
+export function eslintCacheArgs(root) {
+  mkdirSync(path.join(root, ".cache", "eslint"), { recursive: true });
+  return ["--cache", "--cache-strategy", "content", "--cache-location", ".cache/eslint/.eslintcache"];
+}
+
 export function runEslintJson(root, targets = lintTargets) {
   const directory = mkdtempSync(path.join(tmpdir(), "bijou-eslint-"));
   const outputPath = path.join(directory, "eslint.json");
@@ -20,7 +25,7 @@ export function runEslintJson(root, targets = lintTargets) {
   try {
     const result = spawnSync(
       eslintCommand,
-      ["--format", "json", "--output-file", outputPath, "--no-warn-ignored", ...targets],
+      ["--format", "json", "--output-file", outputPath, "--no-warn-ignored", ...eslintCacheArgs(root), ...targets],
       {
         cwd: root,
         encoding: "utf8",
@@ -38,7 +43,7 @@ export function runEslintJson(root, targets = lintTargets) {
   }
 }
 
-function localEslintCommand(root) {
+export function localEslintCommand(root) {
   const executable = process.platform === "win32" ? "eslint.cmd" : "eslint";
   const localPath = path.join(root, "node_modules", ".bin", executable);
   return existsSync(localPath) ? localPath : "eslint";

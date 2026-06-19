@@ -15,7 +15,7 @@ const ctx = initDefaultContext();
 // Generate some content to scroll through
 const CONTENT = Array.from({ length: 60 }, (_, i) => {
   if (i === 0) return 'Welcome to the focus area demo!';
-  if (i % 10 === 0) return `── Section ${i / 10} ${'─'.repeat(60)}`;
+  if (i % 10 === 0) return `── Section ${String(i / 10)} ${'─'.repeat(60)}`;
   return `Line ${String(i).padStart(2, ' ')}: ${('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ').repeat(Math.ceil(Math.random() * 2))}`;
 }).join('\n');
 const CONTENT_SURFACE = contentSurface(CONTENT);
@@ -93,6 +93,7 @@ const app: App<Model, Msg> = {
         case 'bottom': return [{ ...model, fa: focusAreaScrollToBottom(model.fa) }, []];
         case 'scroll-left': return [{ ...model, fa: focusAreaScrollByX(model.fa, -3) }, []];
         case 'scroll-right': return [{ ...model, fa: focusAreaScrollByX(model.fa, 3) }, []];
+        case 'quit': return [model, [quit()]];
       }
     }
 
@@ -112,4 +113,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

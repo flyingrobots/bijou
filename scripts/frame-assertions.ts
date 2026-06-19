@@ -67,7 +67,7 @@ export function assertFrameWidth(frameText: string, width: number): void {
   for (const [index, line] of lines.entries()) {
     const visible = visibleLength(line);
     if (visible !== width) {
-      throw new Error(`expected frame line ${index} to be width ${width}, got ${visible}`);
+      throw new Error(`expected frame line ${String(index)} to be width ${String(width)}, got ${String(visible)}`);
     }
   }
 }

@@ -53,7 +53,7 @@ describe('extendTheme', () => {
   it('overrides existing keys when specified', () => {
     const override = { hex: '#111111' };
     const extended = extendTheme(CYAN_MAGENTA, {
-      status: { success: override } as any,
+      status: { success: override },
     });
     expect(extended.status.success).toEqual(override);
   });

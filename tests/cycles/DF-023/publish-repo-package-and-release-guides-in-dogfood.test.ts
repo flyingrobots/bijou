@@ -7,15 +7,14 @@ import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
-const BIJOU_VERSION: string = JSON.parse(
-  readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8'),
-).version;
+const PACKAGE_JSON = readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8');
+const BIJOU_VERSION = must(/"version":\s*"([^"]+)"/u.exec(PACKAGE_JSON)?.[1], 'bijou package version');
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }

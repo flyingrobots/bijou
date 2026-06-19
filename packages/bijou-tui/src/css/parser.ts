@@ -60,8 +60,10 @@ function parseRules(css: string): BCSSRule[] {
   const regex = /([^{]+)\{([^}]+)\}/g;
   let match;
   while ((match = regex.exec(css)) !== null) {
-    const rawSelectors = match[1]!.split(',').map(s => s.trim()).filter(Boolean);
-    const rawDecls = match[2]!.split(';').map(d => d.trim()).filter(Boolean);
+    const [, selectorSource, declarationSource] = match;
+    if (selectorSource == null || declarationSource == null) continue;
+    const rawSelectors = selectorSource.split(',').map(s => s.trim()).filter(Boolean);
+    const rawDecls = declarationSource.split(';').map(d => d.trim()).filter(Boolean);
     
     const selectors = rawSelectors.map(parseSelector);
     const declarations = rawDecls.map(parseDeclaration);
@@ -95,7 +97,9 @@ function parseSelector(raw: string): BCSSSelector {
 
 function parseDeclaration(raw: string): BCSSDeclaration {
   const parts = raw.split(':');
-  const property = parts[0]!.trim().toLowerCase();
+  const propertySource = parts[0];
+  if (propertySource == null) throw new Error('BCSS declaration is missing a property');
+  const property = propertySource.trim().toLowerCase();
   let value = parts.slice(1).join(':').trim();
   
   const important = value.endsWith('!important');

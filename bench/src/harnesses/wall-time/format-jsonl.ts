@@ -18,6 +18,19 @@ export interface BenchMetricRecord {
   readonly fingerprint: Fingerprint;
 }
 
+const METRIC_KEYS = [
+  'ns_per_frame.count',
+  'ns_per_frame.mean',
+  'ns_per_frame.stddev',
+  'ns_per_frame.cov',
+  'ns_per_frame.min',
+  'ns_per_frame.max',
+  'ns_per_frame.p50',
+  'ns_per_frame.p90',
+  'ns_per_frame.p99',
+] as const;
+type MetricKey = (typeof METRIC_KEYS)[number];
+
 const METRIC_UNITS = {
   'ns_per_frame.count': 'count',
   'ns_per_frame.mean': 'ns',
@@ -28,13 +41,12 @@ const METRIC_UNITS = {
   'ns_per_frame.p50': 'ns',
   'ns_per_frame.p90': 'ns',
   'ns_per_frame.p99': 'ns',
-} as const satisfies Record<string, BenchMetricRecord['unit']>;
+} as const satisfies Record<MetricKey, BenchMetricRecord['unit']>;
 
 export function scenarioToMetricRecords(
   report: RunReport,
-  scenario: ScenarioReport & { readonly tags?: readonly string[] },
+  scenario: ScenarioReport,
 ): readonly BenchMetricRecord[] {
-  const tags = scenario.tags ?? [];
   const metricValues = {
     'ns_per_frame.count': scenario.nsPerFrameStats.count,
     'ns_per_frame.mean': scenario.nsPerFrameStats.mean,
@@ -45,18 +57,18 @@ export function scenarioToMetricRecords(
     'ns_per_frame.p50': scenario.nsPerFrameStats.p50,
     'ns_per_frame.p90': scenario.nsPerFrameStats.p90,
     'ns_per_frame.p99': scenario.nsPerFrameStats.p99,
-  } as const satisfies Record<string, number>;
+  } as const satisfies Record<MetricKey, number>;
 
-  return (Object.entries(metricValues) as [keyof typeof metricValues, number][]).map(([metric, value]) => ({
+  return METRIC_KEYS.map((metric) => ({
     kind: 'bench.v2.metric',
     runId: report.runId,
     generatedAt: report.generatedAt,
     commit: report.commit,
     scenario: scenario.scenarioId,
     label: scenario.label,
-    tags,
+    tags: scenario.tags,
     metric,
-    value,
+    value: metricValues[metric],
     unit: METRIC_UNITS[metric],
     columns: scenario.columns,
     rows: scenario.rows,
@@ -67,13 +79,13 @@ export function scenarioToMetricRecords(
 }
 
 export function reportToMetricRecords(
-  report: RunReport & { readonly scenarios: readonly (ScenarioReport & { readonly tags?: readonly string[] })[] },
+  report: RunReport,
 ): readonly BenchMetricRecord[] {
   return report.scenarios.flatMap((scenario) => scenarioToMetricRecords(report, scenario));
 }
 
 export function formatReportAsJsonl(
-  report: RunReport & { readonly scenarios: readonly (ScenarioReport & { readonly tags?: readonly string[] })[] },
+  report: RunReport,
 ): string {
   return reportToMetricRecords(report)
     .map((record) => JSON.stringify(record))

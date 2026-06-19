@@ -19,6 +19,15 @@ interface Model {
 type WorkerMsg =
   | { type: 'host-note'; text: string };
 
+function isJobFinishedMessage(payload: unknown): payload is { type: 'job-finished'; durationMs: number } {
+  return typeof payload === 'object'
+    && payload !== null
+    && 'type' in payload
+    && payload.type === 'job-finished'
+    && 'durationMs' in payload
+    && typeof payload.durationMs === 'number';
+}
+
 export const app: App<Model, WorkerMsg> = {
   init: () => [{
     completedJobs: 0,
@@ -40,7 +49,7 @@ export const app: App<Model, WorkerMsg> = {
         return [{
           ...model,
           completedJobs: model.completedJobs + 1,
-          status: `Completed heavy task in ${durationMs}ms`,
+          status: `Completed heavy task in ${String(durationMs)}ms`,
         }, []];
       }
     }
@@ -57,7 +66,7 @@ export const app: App<Model, WorkerMsg> = {
       vstackSurface(
         badge('Worker Runtime', { variant: 'primary' }),
         spacer(1, 1),
-        badge(`Jobs ${model.completedJobs}`, { variant: 'accent' }),
+        badge(`Jobs ${String(model.completedJobs)}`, { variant: 'accent' }),
         spacer(1, 1),
         line('Press SPACE to run a synchronous CPU-heavy task in the worker thread.'),
         line('Press Q to quit.'),
@@ -98,8 +107,8 @@ if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]
       entry: fileURLToPath(import.meta.url),
       execArgv: ['--import', 'tsx'],
       onMessage(payload) {
-        if (typeof payload === 'object' && payload !== null && 'type' in payload && payload.type === 'job-finished') {
-          process.stderr.write(`[worker] heavy task finished in ${payload.durationMs}ms\n`);
+        if (isJobFinishedMessage(payload)) {
+          process.stderr.write(`[worker] heavy task finished in ${String(payload.durationMs)}ms\n`);
         }
       },
     });
