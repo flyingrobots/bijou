@@ -4,7 +4,7 @@ legend: WF
 lane: bad-code
 priority: high
 github_issue: 377
-status: active
+status: complete
 keywords:
   - code-dojo
   - eslint
@@ -116,3 +116,23 @@ message routing, or runtime viewport handling.
 - Focused validation for the touched capture and worker surfaces passes.
 - `npm run code-dojo:verify`, `npm run docs:inventory`, `npm run lint`, and
   `git diff --check` pass before review.
+
+## Retrospective
+
+Completed with aggregate Code Dojo debt reduced from `2,068` to `2,017`
+(`-51`). The stored ESLint baseline now records `1,605` live findings, down
+from `1,656`, and the next aggregate target is `1,967` or lower.
+
+The implementation cleaned the targeted DOGFOOD capture and worker IPC files:
+
+- `examples/docs/capture-main.ts` now widens inner commands without `any` and
+  emits autoplay key messages through the wrapper app's typed message union.
+- `packages/bijou-node/src/worker/worker.ts` now reads worker data through a
+  typed guard, narrows `parentPort` once, and validates raw worker IPC messages
+  before dispatching them into proxy I/O handlers.
+- `packages/bijou-node/src/worker/worker-data.ts` keeps worker-data validation
+  out of the already-baselined worker runtime file.
+
+Touched file/context budgets held or shrank: `capture-main.ts` is now `189`
+lines / `5,610` bytes against a `192` / `5,633` baseline, and `worker.ts` is
+`318` lines / `10,676` bytes against a `334` / `11,496` baseline.

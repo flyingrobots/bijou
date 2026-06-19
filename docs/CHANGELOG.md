@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135 lowers live type-aware ESLint
-  findings from `4,517` to `1,656`, cutting `2,872` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-136 lower live type-aware ESLint
+  findings from `4,517` to `1,605`, cutting `2,923` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -47,9 +47,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   regex cleanup, plus app-frame core/overlay retained-layout and shell-command
   narrowing cleanup, plus core binding runtime-brand, snapshot clone, and
   unchecked fixture cleanup, plus TUI runtime binding brand/dispatch cleanup and
-  core schema-block inert-data, brand, and bind-output cleanup. The aggregate
-  debt ceiling now ratchets from `4,940` to `2,068`, with the next goalpost
-  target set to `2,018` or lower, while touched
+  core schema-block inert-data, brand, and bind-output cleanup, plus DOGFOOD
+  capture command typing and worker IPC data guard cleanup. The aggregate
+  debt ceiling now ratchets from `4,940` to `2,017`, with the next goalpost
+  target set to `1,967` or lower, while touched
   file/context budgets remain held under their stored ceilings and two
   file/context exceptions are removed.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers

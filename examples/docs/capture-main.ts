@@ -6,24 +6,22 @@ import { createDocsApp } from './app.js';
 type InnerApp = ReturnType<typeof createDocsApp>;
 type CaptureModel = ReturnType<InnerApp['init']>[0];
 type CaptureMsg = Parameters<InnerApp['update']>[0];
-type CaptureRoute = 'landing' | 'docs';
-type CaptureScenarioName = 'landing' | 'docs';
 
-type WalkthroughStep = {
+interface WalkthroughStep {
   readonly delayMs: number;
   readonly key: string;
   readonly ctrl?: boolean;
   readonly alt?: boolean;
   readonly shift?: boolean;
-};
+}
 
-type CaptureScenario = {
-  readonly initialRoute: CaptureRoute;
+interface CaptureScenario {
+  readonly initialRoute: 'landing' | 'docs';
   readonly pace: number;
   readonly steps: readonly WalkthroughStep[];
-};
+}
 
-const CAPTURE_SCENARIOS: Record<CaptureScenarioName, CaptureScenario> = {
+const CAPTURE_SCENARIOS: Record<'landing' | 'docs', CaptureScenario> = {
   landing: {
     initialRoute: 'landing',
     pace: 1,
@@ -73,7 +71,7 @@ function readNumberEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function readScenarioEnv(): CaptureScenarioName {
+function readScenarioEnv(): keyof typeof CAPTURE_SCENARIOS {
   const raw = process.env['DOGFOOD_CAPTURE_SCENARIO'];
   return raw === 'docs' ? 'docs' : 'landing';
 }
@@ -88,23 +86,22 @@ function keyMsg(step: WalkthroughStep): KeyMsg {
   };
 }
 
-function widenCmd<M>(cmd: Cmd<any>): Cmd<M> {
-  return async (emit, capabilities) => {
-    const result = await cmd((msg: any) => emit(msg as M), capabilities);
-    return result as any;
-  };
+function widenCmd<Narrow extends CaptureMsg>(cmd: Cmd<Narrow>): Cmd<CaptureMsg> {
+  return (emit, capabilities) => cmd((msg) => { emit(msg); }, capabilities);
 }
 
 function autoplayCmd(scenario: CaptureScenario): Cmd<CaptureMsg> {
   return async (emit, capabilities) => {
-    const sleep = capabilities.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+    const sleep = capabilities.sleep === undefined
+      ? (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+      : (ms: number) => capabilities.sleep?.(ms) ?? Promise.resolve();
     const pace = readNumberEnv('DOGFOOD_CAPTURE_PACE', scenario.pace);
     for (const step of scenario.steps) {
       const delayMs = Math.max(0, Math.round(step.delayMs * pace));
       if (delayMs > 0) {
         await sleep(delayMs);
       }
-      emit(keyMsg(step) as CaptureMsg);
+      emit(keyMsg(step));
     }
   };
 }
@@ -117,19 +114,20 @@ function createCaptureApp(
   return {
     init() {
       const [model, cmds] = inner.init();
-      return [model, [...cmds.map((cmd) => widenCmd<CaptureMsg>(cmd)), autoplayCmd(scenario)]];
+      return [model, [...cmds.map(widenCmd), autoplayCmd(scenario)]];
     },
     update(msg, model) {
       if (scenario.initialRoute === 'landing' && msg.type === 'pulse') {
         return [model, []];
       }
-      return inner.update(msg as any, model as any) as any;
+      const [nextModel, cmds] = inner.update(msg, model);
+      return [nextModel, cmds.map(widenCmd)];
     },
     view(model) {
-      return inner.view(model as any);
+      return inner.view(model);
     },
     routeRuntimeIssue(issue) {
-      return inner.routeRuntimeIssue?.(issue) as CaptureMsg | undefined;
+      return inner.routeRuntimeIssue?.(issue);
     },
   };
 }
@@ -172,7 +170,7 @@ function createCaptureContext() {
     ...baseIO,
     rawInput() {
       return {
-        dispose() {},
+        dispose() { return undefined; },
       };
     },
   };
