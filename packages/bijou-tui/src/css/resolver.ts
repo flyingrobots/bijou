@@ -34,7 +34,6 @@ export function resolveStyles(
 ): ResolvedStyles {
   const matchedRules: { rule: BCSSRule; specificity: number }[] = [];
 
-  // 1. Collect rules from main sheet
   for (const rule of sheet.rules) {
     const specificity = getMatchSpecificity(identity, rule.selectors);
     if (specificity > 0) {
@@ -42,27 +41,22 @@ export function resolveStyles(
     }
   }
 
-  // 2. Collect rules from active media queries
   for (const mq of sheet.mediaQueries) {
     if (matchesMediaQuery(mq.condition, terminal)) {
       for (const rule of mq.rules) {
         const specificity = getMatchSpecificity(identity, rule.selectors);
         if (specificity > 0) {
-          // Media query rules have slightly higher base priority in CSS
           matchedRules.push({ rule, specificity: specificity + 0.1 });
         }
       }
     }
   }
 
-  // 3. Sort by specificity (and then order of appearance)
   matchedRules.sort((a, b) => a.specificity - b.specificity);
 
-  // 4. Merge declarations into final object
   const finalStyles: ResolvedStyles = {};
   for (const { rule } of matchedRules) {
     for (const decl of rule.declarations) {
-      // !important handling
       if (decl.important || !isImportant(finalStyles, decl.property)) {
         finalStyles[decl.property] = resolveValue(decl.value, graph, mode);
         if (decl.important) {
@@ -81,16 +75,15 @@ export function resolveStyles(
 function resolveValue(value: string, graph?: TokenGraph, mode: ThemeMode = 'dark'): string {
   if (!graph) return value;
 
-  // Simple regex for var(path.to.token)
   const varRegex = /var\(([^)]+)\)/g;
   
-  return value.replace(varRegex, (_, path) => {
+  return value.replace(varRegex, (_match: string, path: unknown) => {
+    if (typeof path !== 'string') return 'inherit';
     try {
-      // Try to get as full token first, then fallback to color
       const resolved = graph.get(path.trim(), mode);
       return resolved.hex;
     } catch {
-      return 'inherit'; // Fallback for unresolved vars
+      return 'inherit';
     }
   });
 }
@@ -145,14 +138,19 @@ function getMatchSpecificity(identity: ComponentIdentity, selectors: BCSSSelecto
  * Evaluate a basic media query condition like "(width < 80)" or "(height >= 24)".
  */
 export function matchesMediaQuery(condition: string, terminal: { width: number; height: number }): boolean {
-  // Simple regex for (property op value)
   const regex = /\((width|height)\s*(<|>|<=|>=|==|!=)\s*(\d+)\)/;
   const match = regex.exec(condition);
   if (!match) return false;
 
-  const property = match[1] === 'width' ? terminal.width : terminal.height;
+  const propertyName = match[1];
   const op = match[2];
-  const value = parseInt(match[3]!, 10);
+  const rawValue = match[3];
+  if ((propertyName !== 'width' && propertyName !== 'height') || op === undefined || rawValue === undefined) {
+    return false;
+  }
+
+  const property = propertyName === 'width' ? terminal.width : terminal.height;
+  const value = Number.parseInt(rawValue, 10);
 
   switch (op) {
     case '<': return property < value;

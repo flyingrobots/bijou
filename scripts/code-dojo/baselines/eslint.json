@@ -1,75 +1,107 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 697,
-  "errors": 697,
+  "total": 646,
+  "errors": 646,
   "warnings": 0,
   "rules": [
     {
-      "ruleId": "@typescript-eslint/array-type",
-      "count": 3
+      "ruleId": "@typescript-eslint/no-unsafe-argument",
+      "count": 17
     },
     {
-      "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 11
+      "ruleId": "@typescript-eslint/no-unsafe-return",
+      "count": 5
+    },
+    {
+      "ruleId": "@typescript-eslint/no-empty-function",
+      "count": 10
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "count": 14
+    },
+    {
+      "ruleId": "@typescript-eslint/no-non-null-assertion",
+      "count": 96
+    },
+    {
+      "ruleId": "@typescript-eslint/restrict-template-expressions",
+      "count": 165
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
+      "count": 110
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
       "count": 4
     },
     {
-      "ruleId": "@typescript-eslint/no-base-to-string",
-      "count": 4
-    },
-    {
-      "ruleId": "@typescript-eslint/no-confusing-void-expression",
-      "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/no-deprecated",
-      "count": 5
-    },
-    {
-      "ruleId": "@typescript-eslint/no-dynamic-delete",
-      "count": 1
-    },
-    {
-      "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 12
-    },
-    {
-      "ruleId": "@typescript-eslint/no-empty-object-type",
-      "count": 1
-    },
-    {
-      "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 22
-    },
-    {
-      "ruleId": "@typescript-eslint/no-floating-promises",
-      "count": 7
-    },
-    {
-      "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 115
-    },
-    {
-      "ruleId": "@typescript-eslint/no-redundant-type-constituents",
-      "count": 1
-    },
-    {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 44
+      "count": 38
     },
     {
-      "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
-      "count": 7
+      "ruleId": "@typescript-eslint/prefer-regexp-exec",
+      "count": 3
+    },
+    {
+      "ruleId": "@typescript-eslint/prefer-optional-chain",
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-assertion",
       "count": 26
     },
     {
+      "ruleId": "@typescript-eslint/no-unsafe-assignment",
+      "count": 9
+    },
+    {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
+      "count": 11
+    },
+    {
+      "ruleId": "@typescript-eslint/array-type",
+      "count": 3
+    },
+    {
+      "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
+      "count": 5
+    },
+    {
+      "ruleId": "@typescript-eslint/no-explicit-any",
+      "count": 22
+    },
+    {
+      "ruleId": "@typescript-eslint/no-confusing-void-expression",
+      "count": 2
+    },
+    {
+      "ruleId": "@typescript-eslint/unbound-method",
+      "count": 2
+    },
+    {
+      "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
+      "count": 2
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
+      "count": 7
+    },
+    {
+      "ruleId": "@typescript-eslint/no-base-to-string",
+      "count": 4
+    },
+    {
+      "ruleId": "no-useless-assignment",
+      "count": 3
+    },
+    {
+      "ruleId": "@typescript-eslint/no-floating-promises",
+      "count": 7
+    },
+    {
+      "ruleId": "@typescript-eslint/consistent-type-assertions",
       "count": 11
     },
     {
@@ -77,95 +109,63 @@
       "count": 8
     },
     {
-      "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 19
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-assignment",
+      "ruleId": "@typescript-eslint/require-await",
       "count": 9
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-call",
-      "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 5
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 5
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 113
-    },
-    {
-      "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 14
-    },
-    {
-      "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
-      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
       "count": 6
     },
     {
-      "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 16
+      "ruleId": "no-control-regex",
+      "count": 6
     },
     {
-      "ruleId": "@typescript-eslint/prefer-optional-chain",
+      "ruleId": "@typescript-eslint/no-unsafe-member-access",
       "count": 4
     },
     {
-      "ruleId": "@typescript-eslint/prefer-regexp-exec",
-      "count": 3
-    },
-    {
-      "ruleId": "@typescript-eslint/require-await",
-      "count": 9
-    },
-    {
-      "ruleId": "@typescript-eslint/restrict-plus-operands",
+      "ruleId": "@typescript-eslint/no-redundant-type-constituents",
       "count": 1
     },
     {
-      "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 177
+      "ruleId": "@typescript-eslint/no-deprecated",
+      "count": 5
     },
     {
-      "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
-      "count": 9
-    },
-    {
-      "ruleId": "@typescript-eslint/unbound-method",
-      "count": 2
-    },
-    {
-      "ruleId": "@typescript-eslint/unified-signatures",
-      "count": 4
-    },
-    {
-      "ruleId": "no-control-regex",
-      "count": 6
+      "ruleId": "prefer-const",
+      "count": 1
     },
     {
       "ruleId": "no-restricted-imports",
       "count": 2
     },
     {
-      "ruleId": "no-useless-assignment",
-      "count": 3
-    },
-    {
       "ruleId": "no-useless-escape",
       "count": 1
     },
     {
-      "ruleId": "prefer-const",
+      "ruleId": "@typescript-eslint/unified-signatures",
+      "count": 3
+    },
+    {
+      "ruleId": "@typescript-eslint/no-empty-object-type",
+      "count": 1
+    },
+    {
+      "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+      "count": 16
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unsafe-call",
+      "count": 1
+    },
+    {
+      "ruleId": "@typescript-eslint/restrict-plus-operands",
+      "count": 1
+    },
+    {
+      "ruleId": "@typescript-eslint/no-dynamic-delete",
       "count": 1
     }
   ]

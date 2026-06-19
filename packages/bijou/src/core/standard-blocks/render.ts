@@ -298,7 +298,7 @@ function standardBlockRenderIdentity(blockName: StandardBlockName): StandardBloc
 }
 
 function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
-  return ALL_OUTPUT_MODES.includes(mode!) ? mode! : 'interactive';
+  return mode && ALL_OUTPUT_MODES.includes(mode) ? mode : 'interactive';
 }
 
 function renderSurfaceBounds(input: BlockRenderInput): RenderSurfaceBounds {
@@ -353,7 +353,7 @@ function ownSlotValue(slots: Readonly<Record<string, unknown>> | undefined, key:
 }
 
 export function slotValueText(value: unknown): string | undefined {
-  if (value === undefined || value === null) {
+  if (value == null) {
     return undefined;
   }
 
@@ -372,17 +372,10 @@ export function slotValueText(value: unknown): string | undefined {
     return value.metadata.blockName;
   }
 
-  switch (typeof value) {
-    case 'string':
-      return value;
-    case 'number':
-    case 'boolean':
-      return String(value);
-    case 'object':
-      return recordSlotText(value);
-    default:
-      return undefined;
-  }
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (typeof value === 'object') return recordSlotText(value);
+  return undefined;
 }
 
 function slotValueVisualContent(value: unknown, textContent: string | undefined): string | Surface | undefined {
@@ -394,13 +387,9 @@ function slotValueVisualContent(value: unknown, textContent: string | undefined)
 }
 
 function isSurfaceSlotValue(value: unknown): value is Surface {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && typeof (value as Surface).width === 'number'
-      && typeof (value as Surface).height === 'number'
-      && typeof (value as Surface).get === 'function',
-  );
+  if (value == null || typeof value !== 'object') return false;
+  return 'width' in value && 'height' in value && 'get' in value
+    && typeof value.width === 'number' && typeof value.height === 'number' && typeof value.get === 'function';
 }
 
 function surfaceSlotText(surface: Surface): string | undefined {

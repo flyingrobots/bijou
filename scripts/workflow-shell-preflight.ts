@@ -68,8 +68,7 @@ export function parseWorkflowRunSteps(source: string, workflowPath: string): rea
     currentStep = null;
   };
 
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index]!;
+  for (const [index, line] of lines.entries()) {
     const indent = countLeadingSpaces(line);
 
     if (stepsIndent == null) {
@@ -105,7 +104,7 @@ function parseStepBlock(
   workflowPath: string,
   startLine: number,
 ): WorkflowShellStep | null {
-  let stepName = `run@${startLine}`;
+  let stepName = `run@${String(startLine)}`;
   let shell: string | null = null;
 
   for (const line of stepLines) {
@@ -120,8 +119,7 @@ function parseStepBlock(
     }
   }
 
-  for (let index = 0; index < stepLines.length; index += 1) {
-    const line = stepLines[index]!;
+  for (const [index, line] of stepLines.entries()) {
     const normalized = line.trimStart().replace(/^- /, '');
     if (!normalized.startsWith('run:')) continue;
 
@@ -142,7 +140,8 @@ function readYamlBlock(stepLines: readonly string[], startIndex: number, parentI
   const blockLines: string[] = [];
 
   for (let index = startIndex + 1; index < stepLines.length; index += 1) {
-    const line = stepLines[index]!;
+    const line = stepLines[index];
+    if (line === undefined) break;
     if (line.trim() === '') {
       if (blockIndent != null) {
         blockLines.push('');
@@ -204,7 +203,7 @@ export function runWorkflowShellPreflight(io: WorkflowShellPreflightIO = {}): nu
       stdout('FAIL\n');
       failures.push(
         [
-          `${relative(root, step.workflowPath)}:${step.line} (${step.stepName})`,
+          `${relative(root, step.workflowPath)}:${String(step.line)} (${step.stepName})`,
           error,
           step.script,
         ].join('\n'),

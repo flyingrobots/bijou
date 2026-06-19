@@ -17,15 +17,6 @@ export interface ChalkStyleOptions {
  * @param noColor - Pass `true` to suppress all ANSI styling.
  * @returns A {@link StylePort} implemented via chalk.
  */
-export function chalkStyle(noColor?: boolean): StylePort;
-/**
- * Create a chalk-backed {@link StylePort} with detailed options.
- *
- * @param options - Configuration including `noColor` flag and explicit chalk `level`.
- * @returns A {@link StylePort} implemented via chalk.
- */
-export function chalkStyle(options?: ChalkStyleOptions): StylePort;
-// Implementation
 export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const opts = typeof arg === 'boolean' ? { noColor: arg } : (arg ?? {});
   const isNoColor = opts.noColor ?? false;
@@ -93,8 +84,8 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
 
   function styleCacheKey(token: TokenValue): string {
     return [
-      token.hex ?? '',
-      token.bg ?? '',
+      token.hex,
+      token.bg,
       token.modifiers?.join(',') ?? '',
     ].join('|');
   }

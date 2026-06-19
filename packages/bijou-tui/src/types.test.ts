@@ -113,13 +113,13 @@ describe('isMouseMsg', () => {
 
 describe('command cleanup helpers', () => {
   it('recognizes disposable cleanup handles', () => {
-    const handle = { dispose() {} };
+    const handle = { dispose: () => undefined };
     expect(isCmdDisposable(handle)).toBe(true);
     expect(isCmdCleanup(handle)).toBe(true);
   });
 
   it('recognizes cleanup functions', () => {
-    const cleanup = () => {};
+    const cleanup = () => undefined;
     expect(isCmdDisposable(cleanup)).toBe(false);
     expect(isCmdCleanup(cleanup)).toBe(true);
   });

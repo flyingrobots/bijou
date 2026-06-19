@@ -229,8 +229,8 @@ function renderBraille(
           );
           const adjustedSample = adjustSample(sample, (x * 2) + sx, (y * 4) + sy, adjustments);
           accumulateSampleColors(adjustedSample, colors, darkColors, lightColors, threshold);
-          if (adjustedSample !== undefined && adjustedSample.darkness >= threshold) {
-            code |= BRAILLE_DOT_MAP[sy]![sx]!;
+          if ((adjustedSample?.darkness ?? -1) >= threshold) {
+            code |= BRAILLE_DOT_MAP[sy]?.[sx] ?? 0;
           }
         }
       }
@@ -321,8 +321,8 @@ function adjustedDarkness(
 }
 
 function orderedDitherOffset(x: number, y: number): number {
-  const row = BAYER_4X4[Math.abs(Math.floor(y)) % BAYER_4X4.length]!;
-  const value = row[Math.abs(Math.floor(x)) % row.length]!;
+  const row = BAYER_4X4[Math.abs(Math.floor(y)) % BAYER_4X4.length];
+  const value = row?.[Math.abs(Math.floor(x)) % row.length] ?? 0;
   return ((value - 7.5) / 16) * ORDERED_DITHER_STRENGTH;
 }
 
@@ -558,10 +558,9 @@ function validateRgbaFrame(frame: RgbaFrame): void {
   if (width <= 0 || height <= 0) {
     throw new RangeError('RGBA frame width and height must be positive integers.');
   }
-
   const requiredLength = width * height * 4;
   if (frame.data.length < requiredLength) {
-    throw new RangeError(`RGBA frame data must contain at least ${requiredLength} values.`);
+    throw new RangeError(`RGBA frame data must contain at least ${String(requiredLength)} values.`);
   }
 }
 
