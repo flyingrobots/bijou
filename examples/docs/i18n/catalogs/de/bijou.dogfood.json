@@ -1775,6 +1775,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Bijou-Dokumentation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "guide.info.currentPostureTitle"
       },
       "kind": "message",
@@ -1809,6 +1820,17 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.components"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Komponenten-Story-Erkundungspfad fuer DOGFOOD."
+      }
     },
     {
       "key": {

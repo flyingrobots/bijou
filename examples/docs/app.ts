@@ -24,7 +24,6 @@ import {
   type BijouContext,
   type BlockDefinition,
   type Cell,
-  type OutputMode,
   type PreferenceListTheme,
   type Surface,
   type StandardBlockStory,
@@ -105,7 +104,7 @@ import {
   type ComponentStory,
   type StoryMode,
 } from '../_stories/protocol.js';
-import { resolveDogfoodDocsCoverage, type DogfoodDocsCoverage } from './coverage.js';
+import { resolveDogfoodDocsCoverage } from './coverage.js';
 import {
   DEFAULT_LOCALE,
   dogfoodLocaleLabel,
@@ -145,7 +144,6 @@ import {
   DOGFOOD_RELEASE_TITLE_GALLERY,
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
-  renderDogfoodReleaseTitleText,
 } from './release-title.js';
 import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from './svg-raster.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
@@ -161,17 +159,17 @@ import {
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 import { DOGFOOD_SHELL_THEMES, DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
+import { formatFamilyRow, formatGuideRow } from './app-row-format.js';
+import { countMarkdownHeadings, readMarkdownDoc, readMarkdownDocExcerpt } from './app-markdown.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
+export { stripMarkdownFrontmatter } from './app-markdown.js';
 
 const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
   new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
   'utf8',
 ).trimEnd();
 const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
-const BIJOU_PACKAGE_JSON = JSON.parse(
-  readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
-) as { readonly version: string };
-const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
+const BIJOU_VERSION = readBijouPackageVersion();
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
 const GUIDES_I18N_WORKFLOW_TEXT = readMarkdownDoc('./content/guides-i18n-workflow.md');
@@ -218,13 +216,22 @@ const THEME_LAB_GUIDE_ID = 'theme-lab';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_STANDARD_NAV_WIDTH = 28;
 const DOCS_NARROW_NAV_WIDTH = 26;
-const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • F10 Theme Inspector • q Quit';
-const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
 const DOCS_FRAME_CHROME_ROWS = 2;
 const DOCS_LAYOUT_VERTICAL_MARGIN_ROWS = 2;
 const DOCS_FAMILY_SEPARATOR_ROWS = 1;
 
 export { DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG };
+
+function readBijouPackageVersion(): string {
+  const packageJson: unknown = JSON.parse(
+    readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
+  );
+  const version: unknown = typeof packageJson === 'object' && packageJson !== null
+    ? Object.getOwnPropertyDescriptor(packageJson, 'version')?.value
+    : undefined;
+  if (typeof version === 'string') return version;
+  throw new Error();
+}
 
 export type DocsLayoutVariant = 'wide' | 'standard' | 'narrow' | 'tiny';
 
@@ -290,7 +297,6 @@ const RELEASE_TITLE_GUIDES = DOGFOOD_RELEASE_TITLE_GALLERY.map(releaseTitleGuide
 
 interface DocsPageSpec {
   readonly id: DocsPageId;
-  readonly title: string;
 }
 
 interface RowDescriptor {
@@ -359,8 +365,15 @@ interface RootModel {
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
-type RootMsg = { type: 'docs'; msg: FramedAppMsg<DocsMsg> };
-type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
+interface RootMsg {
+  readonly type: 'docs';
+  readonly msg: FramedAppMsg<DocsMsg>;
+}
+
+interface PulseLikeMsg {
+  readonly type: 'pulse';
+  readonly dt: number;
+}
 type DocsMsg = ExplorerMsg | PulseLikeMsg;
 type Rgb = [number, number, number];
 
@@ -404,14 +417,25 @@ type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
-  { id: GUIDES_PAGE_ID, title: 'Guides' },
-  { id: COMPONENTS_PAGE_ID, title: 'Components' },
-  { id: BLOCKS_PAGE_ID, title: 'Blocks' },
-  { id: PACKAGES_PAGE_ID, title: 'Packages' },
-  { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
-  { id: THEME_LAB_PAGE_ID, title: THEME_LAB_PAGE_ID },
-  { id: RELEASE_PAGE_ID, title: 'Release' },
+  { id: GUIDES_PAGE_ID },
+  { id: COMPONENTS_PAGE_ID },
+  { id: BLOCKS_PAGE_ID },
+  { id: PACKAGES_PAGE_ID },
+  { id: PHILOSOPHY_PAGE_ID },
+  { id: THEME_LAB_PAGE_ID },
+  { id: RELEASE_PAGE_ID },
 ]);
+
+function isDocsPageId(value: string): value is DocsPageId {
+  return value === GUIDES_PAGE_ID
+    || value === COMPONENTS_PAGE_ID
+    || value === BLOCKS_PAGE_ID
+    || value === PACKAGES_PAGE_ID
+    || value === PHILOSOPHY_PAGE_ID
+    || value === THEME_LAB_PAGE_ID
+    || value === RELEASE_PAGE_ID;
+}
+
 const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'start-here',
@@ -838,7 +862,7 @@ function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellThemeSpec[
         theme: shellTheme.theme,
       }];
     }
-    return (shellTheme.modes ?? []).map((mode) => ({
+    return shellTheme.modes.map((mode) => ({
       id: docsShellThemeChoiceId(shellTheme.id, mode.id),
       label: `${shellTheme.label} / ${mode.label}`,
       shellThemeId: shellTheme.id,
@@ -1064,35 +1088,6 @@ function themeInspectorScrollTarget(msg: KeyMsg, viewportHeight: number): number
   return undefined;
 }
 
-function readMarkdownDoc(path: string): string {
-  return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
-}
-
-function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
-  const content = readMarkdownDoc(path);
-  const lines = content.split('\n');
-  const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
-  return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
-}
-
-export function stripMarkdownFrontmatter(markdownText: string): string {
-  const withoutBom = markdownText.replace(/^\uFEFF/, '');
-  const opening = withoutBom.match(/^---\r?\n/);
-  if (opening == null) return markdownText;
-  const bodyStart = opening[0].length;
-  const body = withoutBom.slice(bodyStart);
-  const closingMatch = body.match(/\r?\n---[ \t]*(?:\r?\n|$)/);
-  if (closingMatch == null || closingMatch.index == null) return markdownText;
-  return body.slice(closingMatch.index + closingMatch[0].length);
-}
-
-function countMarkdownHeadings(markdownText: string): number {
-  return markdownText
-    .split('\n')
-    .filter((lineText) => /^#{1,6}\s+\S/.test(lineText.trim()))
-    .length;
-}
-
 function standardBlockInventoryMarkdown(localization?: LocalizationPort): string {
   const blockIndex = standardBlockCatalogIndexMarkdown();
   const blockSections = standardBlocks
@@ -1126,7 +1121,7 @@ function standardBlockInventoryMarkdown(localization?: LocalizationPort): string
   return [
     '# Pre-made Blocks',
     '',
-    `First-party standard blocks shipped by @flyingrobots/bijou: ${standardBlocks.length}.`,
+    `First-party standard blocks shipped by @flyingrobots/bijou: ${String(standardBlocks.length)}.`,
     '',
     'These are public block authoring contracts with semantic slots, declared modes, data requirements, command intents, variants, and stories. Select a block under Block Preview for the live rendered example.',
     '',
@@ -1150,7 +1145,7 @@ function standardBlockCatalogIndexMarkdown(): string {
   const rows = Math.ceil(names.length / columns);
   const leftColumnWidth = Math.max(...names.slice(0, rows).map((name) => name.length));
   return Array.from({ length: rows }, (_, row) => {
-    const left = names[row];
+    const left = names[row] ?? '';
     const right = names[row + rows];
     if (right === undefined) {
       return `- ${left}`;
@@ -1298,10 +1293,10 @@ function standardBlockLoweringMarkdown(localization?: LocalizationPort): string 
     .map((block) => {
       const metadata = block.metadata;
       const semanticFacts = (metadata.semanticFacts ?? [])
-        .map((fact) => `${fact.kind}:${fact.key}=${fact.value}`);
+        .map((fact) => `${fact.kind}:${fact.key}=${String(fact.value ?? '')}`);
       const variantFacts = (metadata.variants ?? [])
         .flatMap((variant) => variant.facts ?? [])
-        .map((fact) => `${fact.kind}:${fact.key}=${fact.value}`);
+        .map((fact) => `${fact.kind}:${fact.key}=${String(fact.value ?? '')}`);
 
       return [
         `## ${metadata.blockName}`,
@@ -1496,7 +1491,7 @@ function standardBlockLoweringPreviewSurface(
   const slots = standardBlockExampleSlots(block.metadata.blockName, localization);
   const modeLines = block.metadata.modes.map((mode) => {
     const result = renderBlockTree(blockRenderNode(block, {
-      mode: mode as OutputMode,
+      mode: mode,
       slots,
       config: standardBlockExampleConfig(innerWidth, block.metadata.blockName),
     }));
@@ -1938,7 +1933,7 @@ function blockRenderOutputText(output: unknown, maxLength = 120): string {
     return compactPreviewText(output, maxLength);
   }
   if (isSurfaceLike(output)) {
-    return `${output.width}x${output.height}`;
+    return `${String(output.width)}x${String(output.height)}`;
   }
   try {
     return compactPreviewText(JSON.stringify(output), maxLength);
@@ -1951,9 +1946,12 @@ function isSurfaceLike(value: unknown): value is Surface {
   return Boolean(
     value
       && typeof value === 'object'
-      && typeof (value as Surface).width === 'number'
-      && typeof (value as Surface).height === 'number'
-      && typeof (value as Surface).get === 'function',
+      && 'width' in value
+      && typeof value.width === 'number'
+      && 'height' in value
+      && typeof value.height === 'number'
+      && 'get' in value
+      && typeof value.get === 'function',
   );
 }
 
@@ -2011,7 +2009,10 @@ function storySearchText(story: ComponentStory): string {
     ...story.docs.useWhen,
     ...story.docs.avoidWhen,
     ...story.docs.relatedFamilies,
-    ...Object.values(story.docs.gracefulLowering),
+    story.docs.gracefulLowering.interactive,
+    story.docs.gracefulLowering.static,
+    story.docs.gracefulLowering.pipe,
+    story.docs.gracefulLowering.accessible,
     ...story.variants.flatMap((variant) => [
       variant.id,
       variant.label,
@@ -2469,7 +2470,9 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     const quality = resolveLandingQuality(width, height, qualityMode);
     const quantizedTimeMs = Math.floor(model.landingTimeMs / quality.frameStepMs) * quality.frameStepMs;
     const fpsBadgeValue = quantizeLandingFps(quality, model.landingFps);
-    const hasToast = model.landingToast != null && model.landingTimeMs < model.landingToast.expiresAtMs;
+    const activeToast = model.landingToast != null && model.landingTimeMs < model.landingToast.expiresAtMs
+      ? model.landingToast
+      : undefined;
     const cacheKey = [
       width,
       height,
@@ -2478,7 +2481,7 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
       quality.id,
       quantizedTimeMs,
       fpsBadgeValue,
-      hasToast ? model.landingToast?.message ?? '' : '',
+      activeToast?.message ?? '',
     ].join(':');
 
     if (cache.key === cacheKey && cache.front != null) {
@@ -2541,9 +2544,9 @@ function createLandingRenderer(getCtx: () => BijouContext, localization: Localiz
     }
     surface.blit(staticSurfaces.footerVersion, footerVersionX, footerY);
 
-    const output = hasToast
+    const output = activeToast != null
       ? compositeSurface(surface, [toast({
-          message: model.landingToast!.message,
+          message: activeToast.message,
           variant: 'info',
           anchor: 'top-right',
           screenWidth: width,
@@ -2565,7 +2568,7 @@ function prepareLandingSurface(
   height: number,
   background: string,
 ): Surface {
-  const surface = scratch != null && scratch.width === width && scratch.height === height
+  const surface = scratch?.width === width && scratch.height === height
     ? scratch
     : createSurface(width, height, {
         char: ' ',
@@ -2595,7 +2598,6 @@ function paintLandingBackground(
   const widthDenominator = width - 1 || 1;
   const heightDenominator = height - 1 || 1;
 
-  const cells = surface.cells;
   const tile = quality.backgroundTile;
   const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
 
@@ -2621,7 +2623,7 @@ function paintLandingBackground(
       );
       const bg = sampleColorRamp(tokens.waveRamp, colorT);
       const fg = bg;
-      const modifiers = level < 0.55 ? DIM_MODIFIERS : undefined;
+      const modifiers: string[] | undefined = level < 0.55 ? DIM_MODIFIERS : undefined;
       const maxY = Math.min(height, tileY + tile);
       const maxX = Math.min(width, tileX + tile);
 
@@ -2631,7 +2633,7 @@ function paintLandingBackground(
             char,
             bg,
             fg,
-            modifiers: modifiers as string[] | undefined,
+            modifiers,
             empty: false,
             opacity: 1,
           });
@@ -2657,7 +2659,8 @@ function landingWakeLayer(
   }
 
   for (let index = edges.length - 1; index >= 0; index--) {
-    if (x > edges[index]!) return index + 1;
+    const edgeThreshold = edges[index];
+    if (edgeThreshold !== undefined && x > edgeThreshold) return index + 1;
   }
 
   return 0;
@@ -2729,7 +2732,7 @@ function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayM
 }
 
 function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
-  const key = `${columns}:${rows}`;
+  const key = `${String(columns)}:${String(rows)}`;
   const cached = LANDING_BIJOU_SVG_OVERLAY_CACHE.get(key);
   if (cached != null) return cached;
 
@@ -2782,7 +2785,7 @@ function paintLandingLogoOverlay(
 
   for (let y = 0; y < mark.height; y++) {
     for (let x = 0; x < mark.width; x++) {
-      const markChar = mark.get(x, y).char ?? ' ';
+      const markChar = mark.get(x, y).char;
       if (markChar === ' ') continue;
 
       const targetX = left + x;
@@ -2817,8 +2820,8 @@ function paintLandingLogoOverlay(
         char: markChar,
         fg,
         modifiers: opacity < 0.38
-          ? DIM_MODIFIERS as string[]
-          : BOLD_MODIFIERS as string[],
+          ? DIM_MODIFIERS
+          : BOLD_MODIFIERS,
         empty: false,
         opacity: 1,
       }, LANDING_LOGO_OVERLAY_MASK);
@@ -2920,7 +2923,13 @@ function resolveLandingQuality(width: number, height: number, mode: LandingQuali
     if (forced != null) return forced;
   }
   const area = width * height;
-  return LANDING_QUALITY_PROFILES.find((profile) => area <= profile.maxArea) ?? LANDING_QUALITY_PROFILES[LANDING_QUALITY_PROFILES.length - 1]!;
+  return LANDING_QUALITY_PROFILES.find((profile) => area <= profile.maxArea) ?? fallbackLandingQualityProfile();
+}
+
+function fallbackLandingQualityProfile(): LandingQualityProfile {
+  const fallback = LANDING_QUALITY_PROFILES[LANDING_QUALITY_PROFILES.length - 1];
+  if (fallback != null) return fallback;
+  throw new Error();
 }
 
 function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number {
@@ -3050,21 +3059,14 @@ function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
   return model.docsModel.pageModels[model.docsModel.activePageId]?.landingQualityMode ?? 'auto';
 }
 
-function applyOpaqueCell(
-  target: { char: string; fg?: string; modifiers?: string[]; empty?: boolean; opacity?: number },
-  char: string,
-  fg: string,
-  modifiers?: readonly string[],
-): void {
-  target.char = char;
-  target.fg = fg;
-  target.modifiers = modifiers as string[] | undefined;
-  target.empty = false;
-  target.opacity = 1;
+function resolveLandingTheme(index: number): LandingThemeTokens {
+  return LANDING_THEMES[mod(index, LANDING_THEMES.length)] ?? fallbackLandingTheme();
 }
 
-function resolveLandingTheme(index: number): LandingThemeTokens {
-  return LANDING_THEMES[mod(index, LANDING_THEMES.length)]!;
+function fallbackLandingTheme(): LandingThemeTokens {
+  const fallback = LANDING_THEMES[0];
+  if (fallback != null) return fallback;
+  throw new Error();
 }
 
 function nextLandingThemeIndex(current: number, delta: number): number {
@@ -3157,11 +3159,11 @@ function getLandingFpsBadge(
   localization?: LocalizationPort,
 ): Surface {
   const qualityLabel = landingQualityBadgeLabel(quality, mode, localization);
-  const key = `${tokens.id}:${fps}:${quality.id}:${mode}:${qualityLabel}`;
+  const key = `${tokens.id}:${String(fps)}:${quality.id}:${mode}:${qualityLabel}`;
   const cached = LANDING_FPS_BADGE_CACHE.get(key);
   if (cached) return cached;
 
-  const surface = createTransparentTextSurface(`${fps} fps • ${qualityLabel}`, {
+  const surface = createTransparentTextSurface(`${String(fps)} fps • ${qualityLabel}`, {
     bg: tokens.background,
     transparentSpaces: false,
     fg: tokens.fpsColor,
@@ -3195,8 +3197,8 @@ function getLandingDogfoodPanel(
     },
     mode: 'interactive',
   });
-  const [panelTitle = title, panelBody = expansion] = String(renderedTitle.output).split('\n');
-  const key = `${tokens.id}:${width}:${panelTitle}:${panelBody}`;
+  const [panelTitle = title, panelBody = expansion] = renderedTitle.output.split('\n');
+  const key = `${tokens.id}:${String(width)}:${panelTitle}:${panelBody}`;
   const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
@@ -3230,7 +3232,8 @@ function mapDocsPageModels(
   const nextPageModels: Record<string, DocsExplorerModel> = {};
 
   for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
-    const nextPageModel = transform(pageModel, pageId as DocsPageId);
+    if (!isDocsPageId(pageId)) continue;
+    const nextPageModel = transform(pageModel, pageId);
     nextPageModels[pageId] = nextPageModel;
     if (nextPageModel !== pageModel) {
       changed = true;
@@ -3367,7 +3370,7 @@ function docsVisualThemeFromShellThemeChoice(shellTheme: DocsShellThemeChoice): 
   });
 }
 
-function createGradientStops(gradient: readonly [string, string, string]): Array<{ pos: number; color: Rgb }> {
+function createGradientStops(gradient: readonly [string, string, string]): { pos: number; color: Rgb }[] {
   return [
     { pos: 0, color: hexToRgb(gradient[0]) },
     { pos: 0.5, color: hexToRgb(gradient[1]) },
@@ -3375,10 +3378,11 @@ function createGradientStops(gradient: readonly [string, string, string]): Array
   ];
 }
 
-function gradientStopsFromHexes(colors: readonly string[]): Array<{ pos: number; color: Rgb }> {
+function gradientStopsFromHexes(colors: readonly string[]): { pos: number; color: Rgb }[] {
   if (colors.length === 0) return [];
   if (colors.length === 1) {
-    return [{ pos: 0, color: hexToRgb(colors[0]!) }];
+    const onlyColor = colors[0];
+    return onlyColor === undefined ? [] : [{ pos: 0, color: hexToRgb(onlyColor) }];
   }
   return colors.map((hex, index) => ({
     pos: index / (colors.length - 1),
@@ -3386,7 +3390,7 @@ function gradientStopsFromHexes(colors: readonly string[]): Array<{ pos: number;
   }));
 }
 
-function buildColorRamp(stops: Array<{ pos: number; color: Rgb }>): readonly string[] {
+function buildColorRamp(stops: { pos: number; color: Rgb }[]): readonly string[] {
   const ramp = new Array<string>(LANDING_COLOR_RAMP_SIZE);
   for (let index = 0; index < LANDING_COLOR_RAMP_SIZE; index++) {
     const t = index / (LANDING_COLOR_RAMP_SIZE - 1 || 1);
@@ -3397,7 +3401,7 @@ function buildColorRamp(stops: Array<{ pos: number; color: Rgb }>): readonly str
 
 function sampleColorRamp(ramp: readonly string[], t: number): string {
   const index = Math.max(0, Math.min(ramp.length - 1, Math.round(clamp01(t) * (ramp.length - 1))));
-  return ramp[index]!;
+  return ramp[index] ?? '#000000';
 }
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -3531,11 +3535,12 @@ function createTransparentTextSurface(
       const modifiers = typeof options.modifiers === 'function'
         ? options.modifiers(x, y, char, width)
         : options.modifiers;
+      const cellModifiers: string[] | undefined = modifiers === undefined ? undefined : [...modifiers];
       surface.set(x, y, {
         char,
         bg: options.bg,
         fg,
-        modifiers: modifiers as string[] | undefined,
+        modifiers: cellModifiers,
         empty: false,
       });
     }
@@ -3731,7 +3736,7 @@ function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
 }
 
 function resolveDocsShellThemeById(id: string | undefined): DocsShellThemeChoice {
-  return DOCS_SHELL_THEME_CHOICES.find((theme) => theme.id === id) ?? DOCS_SHELL_THEME_CHOICES[0]!;
+  return DOCS_SHELL_THEME_CHOICES.find((theme) => theme.id === id) ?? fallbackDocsShellThemeChoice();
 }
 
 function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
@@ -3740,7 +3745,13 @@ function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number
 
 function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
   const shellThemeId = resolveDocsShellThemeById(id).id;
-  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? DOCS_VISUAL_THEME_BY_SHELL_ID.get(DOCS_SHELL_THEME_CHOICES[0]!.id)!;
+  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? resolveLandingTheme(0);
+}
+
+function fallbackDocsShellThemeChoice(): DocsShellThemeChoice {
+  const fallback = DOCS_SHELL_THEME_CHOICES[0];
+  if (fallback != null) return fallback;
+  throw new Error();
 }
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
@@ -3816,13 +3827,16 @@ function writeSurfaceText(
   text: string,
   token: TokenValue = { hex: '#f8fafc' },
 ): void {
-  for (let index = 0; index < text.length && x + index < surface.width; index++) {
+  let index = 0;
+  for (const char of text) {
+    if (x + index >= surface.width) break;
     surface.set(x + index, y, {
-      char: text[index]!,
+      char,
       fg: token.hex,
       bg: token.bg,
       modifiers: token.modifiers,
     });
+    index += 1;
   }
 }
 
@@ -3988,7 +4002,7 @@ function renderThemeLabPane(
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(24, paneWidth - 2);
   const shellGallery = DOCS_SHELL_THEME_CHOICES
-    .map((shellTheme, index) => `${index + 1}. ${shellTheme.label} -> ${shellTheme.theme.name}`)
+    .map((shellTheme, index) => `${String(index + 1)}. ${shellTheme.label} -> ${shellTheme.theme.name}`)
     .join('\n');
   const defaultSummary = [
     dogfoodText(localization, 'themeLab.defaultDark', 'Default dark preset: {name} ({summary})', {
@@ -4221,25 +4235,32 @@ function blitCentered(
 function renderFamiliesPane(
   model: DocsExplorerModel,
   width: number,
-  height: number,
+  _height: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
-  const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
   const body = browsableListSurface(model.familyState, {
     width: Math.max(1, paneWidth),
     showScrollbar: true,
     ctx,
     focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
-    renderItem: ({ item, focused }) => formatFamilyRow({
-      row: parseRowValue(item.value),
-      focused,
-      selectedStoryId: model.selectedStoryId,
-      expandedFamilies: model.expandedFamilies,
-      ctx,
-      theme,
-    }),
+    renderItem: ({ item, focused }) => {
+      const rowValue = typeof item.value === 'string' ? item.value : '';
+      return formatFamilyRow({
+        row: parseRowValue(rowValue),
+        focused,
+        selectedStoryId: model.selectedStoryId,
+        expandedFamilies: model.expandedFamilies,
+        ctx,
+        tokens: {
+          accent: docsThemeAccentToken(theme),
+          muted: docsThemeMutedBorderToken(theme),
+        },
+        findFamily: (familyId) => STORY_FAMILIES.find((candidate) => candidate.id === familyId),
+        findStory: findComponentStory,
+      });
+    },
   });
 
   return insetPaneSurface(column([
@@ -4371,7 +4392,7 @@ function renderStoryPane(
   const preview = storyPreviewSurface(variant.render({
     width: previewWidth,
     ctx: previewCtx,
-    state: variant.initialState as never,
+    state: variant.initialState,
     timeMs: model.previewTimeMs,
   }));
   const previewTitle = `live preview • ${preset.label} • ${variant.label}`;
@@ -4477,13 +4498,12 @@ function renderGuideNavPane(
   pageId: DocsPageId,
   model: DocsExplorerModel,
   width: number,
-  height: number,
+  _height: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
   localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
-  const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
   const loweredMode = ctx.mode === 'pipe' || ctx.mode === 'accessible';
   const guideState = localizedGuideStateForPage(pageId, model, localization);
   const focusedGuideId = guideState.items[guideState.focusIndex]?.value;
@@ -4500,7 +4520,7 @@ function renderGuideNavPane(
     mode: ctx.mode,
   });
   const body = loweredMode
-    ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
+    ? proseSurface(navigationBlockResult.output, Math.max(1, paneWidth))
     : browsableListSurface(guideState, {
         width: Math.max(1, paneWidth),
         showScrollbar: true,
@@ -4511,7 +4531,10 @@ function renderGuideNavPane(
           focused,
           selectedGuideId: model.selectedGuideId,
           ctx,
-          theme,
+          tokens: {
+            accent: docsThemeAccentToken(theme),
+            muted: docsThemeMutedBorderToken(theme),
+          },
         }),
       });
 
@@ -4569,7 +4592,7 @@ function renderGuideReaderPane(
     },
     mode: ctx.mode,
   });
-  const articleBody = String(renderedArticle.output);
+  const articleBody = renderedArticle.output;
 
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${docTitle}`, paneWidth, ctx, theme),
@@ -4594,8 +4617,7 @@ function renderGuideInfoPane(
   const selectedTitle = doc == null ? pageTitle(pageId, localization) : guideDocTitle(doc, localization);
   const description = doc == null
     ? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.')
-    : guideDocSummary(doc, localization)
-    ?? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.');
+    : guideDocSummary(doc, localization);
   const currentPosture = (() => {
     switch (pageId) {
       case GUIDES_PAGE_ID:
@@ -4603,6 +4625,12 @@ function renderGuideInfoPane(
           localization,
           'guide.info.posture.guides',
           'Reader-first orientation path for DOGFOOD with the repo documentation map.',
+        );
+      case COMPONENTS_PAGE_ID:
+        return dogfoodText(
+          localization,
+          'guide.info.posture.components',
+          'Component story exploration path for DOGFOOD.',
         );
       case BLOCKS_PAGE_ID:
         return dogfoodText(
@@ -4673,7 +4701,7 @@ function renderGuideInfoPane(
         ? guideInspectorSections
         : [{
           title: 'GuideInspectorBlock',
-          content: String(renderedInspector.output),
+          content: renderedInspector.output,
           tone: 'muted',
         }],
       width: Math.max(22, paneWidth),
@@ -4685,10 +4713,14 @@ function renderGuideInfoPane(
 }
 
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization: LocalizationPort): string {
-  const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
+  const pageId = isDocsPageId(model.activePageId) ? model.activePageId : GUIDES_PAGE_ID;
   const pageModel = model.pageModels[pageId];
-  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
-  if (pageModel == null || !pageModel.showHints) {
+  const shellHint = dogfoodText(
+    localization,
+    'docs.footer.shell',
+    '? Help • / Search • F2 Settings • F10 Theme Inspector • q Quit',
+  );
+  if (!pageModel?.showHints) {
     return renderDocsFooterHint({
       controls: shellHint,
     });
@@ -4696,7 +4728,7 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
 
   const focusedPane = model.focusedPaneByPage[pageId];
   const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
-  const paneSwitch = dogfoodText(localization, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
+  const paneSwitch = dogfoodText(localization, 'docs.footer.paneSwitch', 'Tab next pane');
   const activeHint = (() => {
     if (pageId !== COMPONENTS_PAGE_ID) {
       switch (focusedPane) {
@@ -4737,6 +4769,8 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
             '{paneSwitch} • section overview',
             { paneSwitch },
           );
+        case undefined:
+          return undefined;
         default:
           return undefined;
       }
@@ -4766,6 +4800,8 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
             '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles',
             { paneSwitch },
           );
+      case undefined:
+        return undefined;
       default:
         return undefined;
     }
@@ -4781,17 +4817,17 @@ function renderDocsFooterHint(config: {
   readonly activeHint?: string;
   readonly status?: string;
 }): string {
-  return String(footerHintBlock.render({
+  return footerHintBlock.render({
     config,
     mode: 'pipe',
-  }).output);
+  }).output;
 }
 
 function renderDocsSearchTitle(title: string): string {
-  return String(searchPanelBlock.render({
+  return searchPanelBlock.render({
     config: { title },
     mode: 'accessible',
-  }).output);
+  }).output;
 }
 
 function familyRowIndexAtPosition(
@@ -5047,7 +5083,7 @@ function createDocsExplorerApp(
   return createFramedApp<DocsExplorerModel, DocsMsg>({
     ctx,
     i18n,
-    title: 'Bijou Docs',
+    title: dogfoodText(localization, 'docs.title', 'Bijou Docs'),
     defaultPageId: options.initialPageId ?? GUIDES_PAGE_ID,
     headerStyle: ({ pageModel }) => ({
       activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveDocsVisualThemeByShellThemeId(pageModel.activeShellThemeId)),
@@ -5110,6 +5146,15 @@ function createDocsExplorerApp(
                 return [{ ...model, locale: msg.locale }, []];
               case 'cycle-landing-quality':
                 return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+              case 'guide-next':
+              case 'guide-prev':
+              case 'guide-page-down':
+              case 'guide-page-up':
+              case 'activate-guide':
+              case 'activate-guide-index':
+              case 'select-guide':
+              case 'counter-block-intent':
+                return [model, []];
               default:
                 return [model, []];
             }
@@ -5208,21 +5253,35 @@ function createDocsExplorerApp(
                 ),
                 previewTimeMs: 0,
               }, []];
+            case 'family-next':
+            case 'family-prev':
+            case 'family-page-down':
+            case 'family-page-up':
+            case 'activate-row':
+            case 'activate-row-index':
+            case 'expand-row':
+            case 'collapse-row':
+            case 'select-story':
+            case 'select-variant':
+            case 'variant-next':
+            case 'variant-prev':
+            case 'set-profile':
+              return [model, []];
             default:
               return [model, []];
           }
         },
         inputAreas(model) {
-          const inputAreas: FrameInputArea<DocsExplorerModel, DocsMsg>[] = [{
+          const guideInputArea: FrameInputArea<DocsExplorerModel, DocsMsg> = {
             paneId: 'guide-nav',
             keyMap: guidePaneKeys,
             helpSource: guidePaneKeys,
             mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
-          }];
+          };
           if (spec.id === BLOCKS_PAGE_ID && model.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID) {
             return [
               {
-                ...inputAreas[0]!,
+                ...guideInputArea,
                 keyMap: counterBlockGuidePaneKeys,
                 helpSource: counterBlockGuidePaneKeys,
               },
@@ -5233,7 +5292,7 @@ function createDocsExplorerApp(
               },
             ];
           }
-          return inputAreas;
+          return [guideInputArea];
         },
         searchTitle: () => renderDocsSearchTitle(
           dogfoodText(localization, 'docs.search.title', 'Search documentation'),
@@ -5341,7 +5400,8 @@ function syncDocsExplorerViewportLayout(
   const nextScrollByPage: Record<string, Readonly<Record<string, { readonly x: number; readonly y: number }>>> = {};
 
   for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
-    const docsPageId = pageId as DocsPageId;
+    if (!isDocsPageId(pageId)) continue;
+    const docsPageId = pageId;
     let nextPageModel: DocsExplorerModel = pageModel.layoutVariant === nextLayoutVariant
       ? pageModel
       : { ...pageModel, layoutVariant: nextLayoutVariant };
@@ -5379,9 +5439,10 @@ function syncDocsExplorerViewportLayout(
 
     const visiblePaneIds = visiblePaneIdsForLayout(docsPageId, nextLayoutVariant);
     const previousFocusedPane = docsModel.focusedPaneByPage[pageId];
+    const fallbackFocusedPane = visiblePaneIds[0];
     const nextFocusedPane = previousFocusedPane != null && visiblePaneIds.includes(previousFocusedPane)
       ? previousFocusedPane
-      : visiblePaneIds[0];
+      : fallbackFocusedPane;
     const previousScroll = docsModel.scrollByPage[pageId] ?? {};
     const nextScroll = Object.fromEntries(visiblePaneIds.map((paneId) => [
       paneId,
@@ -5624,12 +5685,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         }
       }
 
-      if (isKeyMsg(msg) || isMouseMsg(msg) || msg.type === 'pulse') {
+      if (isKeyMsg(msg) || isMouseMsg(msg)) {
         const [nextModel, cmds] = updateExplorer(msg, model);
         return [nextModel, cmds];
       }
 
-      return [model, []];
+      const [nextModel, cmds] = updateExplorer(msg, model);
+      return [nextModel, cmds];
     },
 
     view(model) {
@@ -5654,7 +5716,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
 
     routeRuntimeIssue(issue) {
       const routed = explorer.routeRuntimeIssue?.(issue);
-      return routed === undefined ? undefined : { type: 'docs', msg: routed as ExplorerMsg };
+      return routed === undefined ? undefined : { type: 'docs', msg: routed };
     },
   };
 }
@@ -5727,67 +5789,4 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     || 'family';
-}
-
-function formatFamilyRow(options: {
-  readonly row: RowDescriptor;
-  readonly focused: boolean;
-  readonly selectedStoryId?: string;
-  readonly expandedFamilies: Readonly<Record<string, boolean>>;
-  readonly ctx: BijouContext;
-  readonly theme: LandingThemeTokens;
-}): string {
-  const { row, focused, selectedStoryId, expandedFamilies, ctx, theme } = options;
-  const accentToken = docsThemeAccentToken(theme);
-  const mutedToken = docsThemeMutedBorderToken(theme);
-  if (row.kind === 'family') {
-    const family = STORY_FAMILIES.find((candidate) => candidate.id === row.familyId);
-    if (family == null) return '';
-    const expanded = expandedFamilies[row.familyId] ?? false;
-    const focusPrefix = focused
-      ? ctx.style.styled(accentToken as any, '›')
-      : ' ';
-    const arrow = ctx.style.styled(accentToken as any, expanded ? '▼' : '▶');
-    const title = focused
-      ? ctx.style.styled(accentToken as any, family.label)
-      : family.label;
-    return `${focusPrefix} ${arrow} ${title}`;
-  }
-
-  const story = row.storyId == null ? undefined : findComponentStory(row.storyId);
-  if (story == null) return '';
-  const selected = selectedStoryId === story.id;
-  const focusPrefix = focused
-    ? ctx.style.styled(accentToken as any, '›')
-    : ' ';
-  const bullet = selected
-    ? ctx.style.styled(accentToken as any, '•')
-    : ctx.style.styled(mutedToken as any, '•');
-  const title = selected
-    ? ctx.style.styled(accentToken as any, story.title)
-    : story.title;
-  return `${focusPrefix}   ${bullet} ${title}`;
-}
-
-function formatGuideRow(options: {
-  readonly item: { readonly label: string; readonly value: string; readonly description?: string };
-  readonly focused: boolean;
-  readonly selectedGuideId?: string;
-  readonly ctx: BijouContext;
-  readonly theme: LandingThemeTokens;
-}): string {
-  const { item, focused, selectedGuideId, ctx, theme } = options;
-  const accentToken = docsThemeAccentToken(theme);
-  const mutedToken = docsThemeMutedBorderToken(theme);
-  const selected = selectedGuideId === item.value;
-  const focusPrefix = focused
-    ? ctx.style.styled(accentToken as any, '›')
-    : ' ';
-  const bullet = selected
-    ? ctx.style.styled(accentToken as any, '•')
-    : ctx.style.styled(mutedToken as any, '•');
-  const title = selected || focused
-    ? ctx.style.styled(accentToken as any, item.label)
-    : item.label;
-  return `${focusPrefix} ${bullet} ${title}`;
 }
