@@ -8,8 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Code Dojo iteration loop** — PR verification avoids duplicate test builds
+  by using `npm run test:run` after explicit build steps, the Code Dojo workflow
+  now runs the standards-only `code-dojo:verify` lane while the full local
+  `code-dojo:ci` lane remains available on demand, and local pre-push skips
+  DOGFOOD i18n gates when pushed paths do not affect DOGFOOD policy. Set
+  `BIJOU_FULL_PUSH=1` to force the full pre-push DOGFOOD gate.
 - **Respecting the Dojo burndown** — WF-135 lowers live type-aware ESLint
-  findings from `4,517` to `2,475`, cutting `2,049` counted Code Dojo
+  findings from `4,517` to `2,253`, cutting `2,273` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -18,10 +24,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   accessors, shader middleware state fixtures, responsive DOGFOOD layout
   witnesses, release-title model access, and grid-layout example bootstrap
   cleanup, plus docs-preview page-model helper typing and locale helper
-  cleanup, AppFrame routing/theme test harness cleanup, and runtime interactive
-  pipeline rejection cleanup, plus core surface packed-buffer safe-read cleanup.
-  The aggregate debt ceiling now ratchets from `4,940` to `2,891`, with the next
-  goalpost target set to `2,841` or lower, while touched
+  cleanup, AppFrame routing/theme test harness cleanup, runtime interactive
+  pipeline rejection cleanup, core surface packed-buffer safe-read cleanup,
+  table/markdown parsing cleanup, small utility cleanup, compact component and
+  example cleanup, and runtime/example/TUI/i18n cycle cleanup. The aggregate
+  debt ceiling now ratchets from `4,940` to `2,667`, with the next goalpost
+  target set to `2,617` or lower, while touched
   file/context budgets remain held under their stored ceilings.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the

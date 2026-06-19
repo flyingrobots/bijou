@@ -4,8 +4,12 @@ This ledger tracks the standards debt that remains after installing the
 verbatim [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
 artifact.
 
-Passing `npm run code-dojo:ci` means the repository did not grow the currently
-tracked debt. It does not mean the repository fully adheres to the standards.
+Passing `npm run code-dojo:verify` means the repository did not grow the
+currently tracked standards debt. It does not mean the repository fully adheres
+to the standards.
+
+`npm run code-dojo:ci` remains the local full-proof lane when a change needs
+the standards checks plus build, typecheck, workspace lint, ESLint, and tests.
 
 ## Counted Violations
 
@@ -22,9 +26,9 @@ Current count:
 | :--- | ---: | :--- |
 | File/context baseline | 335 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 23 | Existing test mock/spy violations. |
-| Code-size baseline | 58 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 2,475 | Type-aware ESLint findings after the WF-135 burndown passes. |
-| **Total** | **2,891** | Aggregate Code Dojo standards debt. |
+| Code-size baseline | 56 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
+| ESLint baseline | 2,253 | Type-aware ESLint findings after the WF-135 burndown passes. |
+| **Total** | **2,667** | Aggregate Code Dojo standards debt. |
 
 ## Goalpost Burndown Policy
 
@@ -49,8 +53,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `2,891`. The next met goalpost must lower the ceiling to
-`2,841` or lower.
+The current ceiling is `2,667`. The next met goalpost must lower the ceiling to
+`2,617` or lower.
 
 ## Updating The Ceiling
 
@@ -61,6 +65,6 @@ At a goalpost boundary:
 3. Lower the `--max` value in the `code-dojo:debt` package script by at least
    50, or to zero if fewer than 50 violations remain.
 4. Update this ledger's current count and next target.
-5. Run `npm run code-dojo:ci`.
+5. Run `npm run code-dojo:verify`.
 
 Do not raise the ceiling without explicit design-review justification.

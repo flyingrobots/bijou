@@ -6,6 +6,7 @@ export interface CiWorkflowTestJobPolicy {
   readonly checkoutFetchDepth: number;
   readonly i18nPolicyGateName: string;
   readonly i18nPolicyGateRun: string;
+  readonly testRunCommand: string;
 }
 
 export interface CiWorkflowPolicy {
@@ -52,6 +53,13 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   }
 
   const i18nPolicyGate = asRecord(steps[i18nPolicyGateIndex], 'workflow.jobs.test.i18nPolicyGate');
+  const testRunStep = steps.map((step) => {
+    return asRecord(step, 'workflow.jobs.test.steps[]');
+  }).find((step) => step.run === 'npm run test:run' || step.run === 'npm test');
+  if (testRunStep == null) {
+    throw new Error('CI workflow test job is missing full test run step');
+  }
+
   const focusedPortableStep = focusedUnitTestsSteps.map((step) => {
     return asRecord(step, 'workflow.jobs.unit_cross_platform.steps[]');
   }).find((step) => step.name === 'Focused portable unit tests');
@@ -65,6 +73,7 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
       checkoutFetchDepth: fetchDepth,
       i18nPolicyGateName: asString(i18nPolicyGate.name, 'workflow.jobs.test.i18nPolicyGate.name'),
       i18nPolicyGateRun: asString(i18nPolicyGate.run, 'workflow.jobs.test.i18nPolicyGate.run'),
+      testRunCommand: asString(testRunStep.run, 'workflow.jobs.test.fullTest.run'),
     },
     focusedUnitTestsJob: {
       permissionsContents: focusedUnitTestsPermissions == null

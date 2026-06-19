@@ -71,7 +71,7 @@ jobs:
         run: npm run dogfood:coverage:gate
 
       - name: Test
-        run: npm test
+        run: npm run test:run
 
       - name: Smoke interactive examples
         run: npm run verify:interactive-examples
