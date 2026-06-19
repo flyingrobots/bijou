@@ -276,7 +276,7 @@ function inspectResolvedContrast(
     backgroundPath,
     ratio,
     minRatio,
-    message: `${foregroundPath} on ${backgroundPath} contrast ${ratio} < ${minRatio}`,
+    message: `${foregroundPath}/${backgroundPath}: ${String(ratio)}<${String(minRatio)}`,
   });
 }
 
@@ -308,7 +308,7 @@ function inspectColorReuse(
       limit: maxColorReuse,
       count: paths.length,
       paths,
-      message: `${color} reused by ${paths.length} tokens (limit ${maxColorReuse})`,
+      message: `${color} reuse ${String(paths.length)}>${String(maxColorReuse)}`,
     });
   }
 }

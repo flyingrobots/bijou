@@ -65,10 +65,10 @@ export class AppShellComposition {
   readonly facts: readonly BindingFact[];
 
   constructor(input: AppShellCompositionInput) {
-    if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) {
+    const value: unknown = input;
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       throw new Error('app shell composition: input must be an object');
     }
-
     if (input.providers !== undefined && !isProviderScope(input.providers)) {
       throw new Error('app shell composition: providers must be created by providerScope()');
     }
@@ -176,7 +176,7 @@ function normalizeSlotContent(
 ): readonly BlockDefinition[] {
   if (Array.isArray(content)) {
     return Object.freeze(
-      content.flatMap((item, index) => normalizeSlotContent(item, `${path}[${index}]`)),
+      content.flatMap((item, index) => normalizeSlotContent(item, `${path}[${String(index)}]`)),
     );
   }
 
@@ -189,11 +189,10 @@ function normalizeSlotContent(
 
 function normalizeSlotId(slotId: string): AppShellSlotId {
   const normalized = slotId.trim();
-  if (!APP_SHELL_SLOT_IDS.includes(normalized as AppShellSlotId)) {
-    throw new Error(`app shell composition: unsupported slot ${normalized}`);
+  for (const id of APP_SHELL_SLOT_IDS) {
+    if (normalized === id) return id;
   }
-
-  return normalized as AppShellSlotId;
+  throw new Error(`app shell composition: unsupported slot ${normalized}`);
 }
 
 function optionalTrimmedText(value: string | undefined): string | undefined {

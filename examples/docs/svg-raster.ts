@@ -24,6 +24,7 @@ interface RasterizeSvgOptions {
 type PathCommand = 'M' | 'L' | 'Q' | 'Z';
 
 const PATH_COMMAND_RE = /[MLQZ]|-?(?:\d+\.?\d*|\.\d+)/g;
+const PATH_LINE = 'L' satisfies PathCommand, PATH_CLOSE = 'Z' satisfies PathCommand;
 const QUADRATIC_SEGMENTS = 12;
 
 export function rasterizeSvgToRgba(svg: string, options: RasterizeSvgOptions): RgbaFrame {
@@ -70,38 +71,36 @@ export function svgViewBoxAspectRatio(svg: string): number {
 }
 
 function parseSvgGeometry(svg: string): SvgGeometry {
-  const viewBox = svg.match(/\bviewBox\s*=\s*"([^"]+)"/i);
-  if (viewBox == null) {
-    throw new Error('SVG rasterizer expected a viewBox.');
+  const viewBoxText = /\bviewBox\s*=\s*"([^"]+)"/i.exec(svg)?.[1];
+  if (viewBoxText == null) {
+    throw new Error('SVG viewBox.');
   }
 
-  const viewBoxValues = viewBox[1]!
+  const viewBoxValues = viewBoxText
     .split(/[\s,]+/)
     .filter((part) => part.length > 0)
     .map(Number);
-  if (viewBoxValues.length !== 4 || viewBoxValues.some((value) => !Number.isFinite(value))) {
-    throw new Error('SVG rasterizer expected a numeric viewBox.');
+  const [, , width, height] = viewBoxValues;
+  if (width == null || height == null || viewBoxValues.length !== 4 || viewBoxValues.some((value) => !Number.isFinite(value))) {
+    throw new Error('SVG numeric viewBox.');
   }
-
-  const width = viewBoxValues[2]!;
-  const height = viewBoxValues[3]!;
   if (width <= 0 || height <= 0) {
-    throw new Error('SVG rasterizer expected a positive viewBox size.');
+    throw new Error('SVG positive viewBox.');
   }
 
   const polygons = Array.from(svg.matchAll(/\bd\s*=\s*"([^"]+)"/gi))
-    .flatMap((match) => parsePathPolygons(match[1]!))
+    .flatMap(([, path]) => (path == null ? [] : parsePathPolygons(path)))
     .filter((polygon) => polygon.points.length >= 3);
 
   if (polygons.length === 0) {
-    throw new Error('SVG rasterizer expected at least one path.');
+    throw new Error('SVG path.');
   }
 
   return { width, height, polygons };
 }
 
 function parsePathPolygons(path: string): readonly Polygon[] {
-  const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), (match) => match[0]!);
+  const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), ([token]) => token);
   const polygons: Polygon[] = [];
   let index = 0;
   let command: PathCommand | undefined;
@@ -110,18 +109,17 @@ function parsePathPolygons(path: string): readonly Polygon[] {
   let points: Point[] = [];
 
   while (index < tokens.length) {
-    const token = tokens[index]!;
+    const token = tokens[index];
+    if (token == null) break;
     if (isPathCommand(token)) {
-      command = token.toUpperCase() as PathCommand;
+      command = token;
       index++;
-      if (command === 'Z') {
-        closeCurrentPolygon();
-      }
+      if (command === PATH_CLOSE) closeCurrentPolygon();
       continue;
     }
 
     if (command === undefined) {
-      throw new Error('SVG path data started without a command.');
+      throw new Error('SVG path needs a command.');
     }
 
     switch (command) {
@@ -132,7 +130,7 @@ function parsePathPolygons(path: string): readonly Polygon[] {
         current = point;
         start = point;
         points = [point];
-        command = 'L';
+        command = PATH_LINE;
         break;
       }
       case 'L': {
@@ -144,7 +142,7 @@ function parsePathPolygons(path: string): readonly Polygon[] {
       }
       case 'Q': {
         if (current === undefined) {
-          throw new Error('SVG quadratic path segment had no current point.');
+          throw new Error('SVG quadratic point missing.');
         }
         const control = readPoint(tokens, index);
         const end = readPoint(tokens, index + 2);
@@ -166,7 +164,8 @@ function parsePathPolygons(path: string): readonly Polygon[] {
 
   function closeCurrentPolygon(): void {
     if (points.length >= 3) {
-      const closingPoints = start === undefined || samePoint(points[points.length - 1]!, start)
+      const last = points[points.length - 1];
+      const closingPoints = start === undefined || last == null || samePoint(last, start)
         ? points
         : [...points, start];
       polygons.push({ points: closingPoints });
@@ -181,7 +180,7 @@ function readPoint(tokens: readonly string[], index: number): Point {
   const x = Number(tokens[index]);
   const y = Number(tokens[index + 1]);
   if (!Number.isFinite(x) || !Number.isFinite(y)) {
-    throw new Error('SVG path data contained an invalid point.');
+    throw new Error('SVG point.');
   }
   return { x, y };
 }
@@ -198,9 +197,9 @@ function isFilledEvenOdd(x: number, y: number, polygons: readonly Polygon[]): bo
   let crossings = 0;
   for (const polygon of polygons) {
     const points = polygon.points;
-    for (let index = 0; index < points.length; index++) {
-      const a = points[index]!;
-      const b = points[(index + 1) % points.length]!;
+    for (const [index, a] of points.entries()) {
+      const b = points[(index + 1) % points.length];
+      if (b == null) continue;
       if ((a.y > y) === (b.y > y)) continue;
 
       const crossingX = a.x + (((y - a.y) * (b.x - a.x)) / (b.y - a.y));
@@ -210,8 +209,8 @@ function isFilledEvenOdd(x: number, y: number, polygons: readonly Polygon[]): bo
   return crossings % 2 === 1;
 }
 
-function isPathCommand(token: string): boolean {
-  return /^[MLQZ]$/.test(token);
+function isPathCommand(token: string): token is PathCommand {
+  return /^[MLQZ]$/.exec(token) != null;
 }
 
 function samePoint(left: Point, right: Point): boolean {

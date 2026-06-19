@@ -21,7 +21,8 @@ import {
   createFramedApp,
   type FramePage,
 } from '../../../packages/bijou-tui/src/app-frame.js';
-interface Msg { type: 'noop' }
+import type { KeyMsg } from '../../../packages/bijou-tui/src/types.js';
+type Msg = { readonly type: 'noop' } | KeyMsg;
 interface PageModel {
   readonly count: number;
   readonly notifications: NotificationState<Msg>;
@@ -48,8 +49,9 @@ function seedNotificationHistory(
       durationMs: null,
     }, nowMs);
     const id = state.items.at(-1)?.id;
+    if (id == null) throw new Error('expected notification id');
     nowMs += 20;
-    state = dismissNotification(state, id!, nowMs);
+    state = dismissNotification(state, id, nowMs);
     nowMs += 500;
     state = tickNotifications(state, nowMs);
   }
@@ -123,7 +125,7 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
       }),
     });
     let [model] = app.init();
-    [model] = app.update({ type: 'key', key: 'n', ctrl: false, alt: false, shift: true } as never, model);
+    [model] = app.update({ type: 'key', key: 'n', ctrl: false, alt: false, shift: true }, model);
     const view = app.view(model);
     if (typeof view === 'string' || !('cells' in view)) throw new Error('expected a surface');
     const lines = surfaceToString(view, ctx.style).split('\n');

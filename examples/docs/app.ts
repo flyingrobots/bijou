@@ -4,14 +4,9 @@ import {
   BIJOU_LIGHT,
   boxSurface,
   blockRenderNode,
-  cloneContextWithTheme,
   createSurface,
-  CYAN_MAGENTA,
-  colorHex,
-  doctorTheme,
   inspector,
   inspectorPanelBlock,
-  lerp3,
   markdown,
   progressBar,
   readerSurfaceBlock,
@@ -19,17 +14,13 @@ import {
   standardBlocks,
   standardBlockStories,
   renderBlockTree,
-  tv,
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
-  type Cell,
-  type PreferenceListTheme,
   type Surface,
   type StandardBlockStory,
   type Theme,
   type TextModifier,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import {
   FRAME_I18N_CATALOG,
@@ -51,12 +42,9 @@ import {
   mapCmds,
   placeSurface,
   quit,
-  rasterToGlyphSurface,
   renderShellQuitOverlay,
-  renderFramePerfHudOverlay,
   shouldUseShellQuitConfirm,
   summarizeFrameTimings,
-  toast,
   viewportSurface,
   type App,
   type Cmd,
@@ -68,7 +56,6 @@ import {
   type FrameLayoutNode,
   type FramedApp,
   type FramedAppMsg,
-  type FrameShellThemeSpec,
   type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
@@ -123,7 +110,6 @@ import {
 import { dogfoodMissingLocalizationMessage } from './i18n/missing-localization.js';
 import {
   dogfoodLocalizedText,
-  formatLocalizedList,
   localizedText,
 } from './localization.js';
 import {
@@ -140,12 +126,10 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import {
-  CURRENT_DOGFOOD_RELEASE_TITLE,
   DOGFOOD_RELEASE_TITLE_GALLERY,
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
 } from './release-title.js';
-import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from './svg-raster.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   defaultDogfoodBlockRegistry,
@@ -155,20 +139,53 @@ import {
   guideInspectorBlock,
   navigationListBlock,
   searchPanelBlock,
-  titleScreenBlock,
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
-import { DOGFOOD_SHELL_THEMES, DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 import { formatFamilyRow, formatGuideRow } from './app-row-format.js';
 import { countMarkdownHeadings, readMarkdownDoc, readMarkdownDocExcerpt } from './app-markdown.js';
+import {
+  createLandingRenderer,
+  landingQualityModeLabel,
+  landingQualitySettingDescription,
+  landingQualitySettingValue,
+  LANDING_THEME_COUNT,
+  nextLandingQualityMode,
+  nextLandingThemeIndex,
+  normalizeLandingThemeIndex,
+  previousLandingQualityMode,
+  renderLandingPerfHudOverlay,
+  resolveLandingQualityMode,
+  resolveLandingTheme,
+  updateLandingFps,
+  type LandingQualityMode,
+  type LandingTextModifiers,
+  type LandingThemeTokens,
+  type LandingToastState,
+} from './app-landing.js';
+import {
+  applyDocsShellThemeToContext as applyShellThemeStateToContext,
+  createDocsShellThemeState,
+  resolveDocsShellThemeById as resolveShellThemeStateById,
+  resolveDocsVisualThemeByShellThemeId as resolveVisualThemeByShellThemeStateId,
+  resolveLandingThemeIndexForShellThemeId as resolveLandingThemeIndexForShellThemeStateId,
+} from './app-docs-shell-theme.js';
+import {
+  docsThemeAccentToken,
+  docsThemeBorderToken,
+  docsThemeMutedBorderToken,
+  docsThemePreferenceListTheme,
+  docsThemeProgressTokens,
+  docsThemeSurfaceToken,
+  docsThemeUnfocusedGutterToken,
+  resolveDocsThemeActiveHeaderTabToken,
+} from './app-docs-theme-tokens.js';
+import { dogfoodSafePairSummary, themeColorReuseSummary } from './app-theme-diagnostics.js';
+import { renderThemeTokenPalette } from './app-theme-token-palette.js';
+import { themePaletteRows } from './app-theme-token-model.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
+export { resolveDocsThemeActiveHeaderTabToken } from './app-docs-theme-tokens.js';
 
-const FLYING_ROBOTS_LOGO_TEXT = readFileSync(
-  new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
-  'utf8',
-).trimEnd();
-const LANDING_BIJOU_SVG_TEXT = readFileSync(new URL('../../assets/Bijou.svg', import.meta.url), 'utf8');
 const BIJOU_VERSION = readBijouPackageVersion();
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
@@ -199,9 +216,6 @@ const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
-const FLYING_ROBOTS_LOGO_LINES = splitGlyphLines(FLYING_ROBOTS_LOGO_TEXT);
-const ENTER_PROMPT_TEXT = 'Press [Enter]';
-const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
 const GUIDES_PAGE_ID = 'guides';
 const COMPONENTS_PAGE_ID = 'components';
@@ -375,44 +389,6 @@ interface PulseLikeMsg {
   readonly dt: number;
 }
 type DocsMsg = ExplorerMsg | PulseLikeMsg;
-type Rgb = [number, number, number];
-
-interface LandingThemeSeed {
-  readonly id: string;
-  readonly label: string;
-  readonly background: string;
-  readonly waveGradient: readonly [string, string, string];
-  readonly logoGradient: readonly [string, string, string];
-}
-
-interface LandingThemeTokens {
-  readonly id: string;
-  readonly label: string;
-  readonly background: string;
-  readonly waveRamp: readonly string[];
-  readonly logoRamp: readonly string[];
-  readonly promptBodyColor: string;
-  readonly promptAccentColor: string;
-  readonly footerMutedColor: string;
-  readonly footerStrongColor: string;
-  readonly fpsColor: string;
-}
-
-interface LandingToastState {
-  readonly message: string;
-  readonly expiresAtMs: number;
-}
-
-interface LandingQualityProfile {
-  readonly id: string;
-  readonly maxArea: number;
-  readonly frameStepMs: number;
-  readonly fpsStep: number;
-  readonly backgroundTile: number;
-  readonly logoTile: number;
-}
-
-type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
@@ -692,196 +668,22 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: RELEASE_MIGRATION_GUIDE_TEXT,
   },
 ]);
-const LANDING_FPS_ALPHA = 0.2;
-const LANDING_COLOR_RAMP_SIZE = 256;
-const LANDING_WAKE_CHARS = ['█', '▓', '▒', '░', ' '] as const;
-const LANDING_WAKE_WAVES = [
-  { seeds: [0.15, 0.13, 0.37], amps: [10, 8, 5], scale: 0.9 },
-  { seeds: [0.12, 0.14, 0.27], amps: [3, 6, 5], scale: 0.8 },
-  { seeds: [0.089, 0.023, 0.217], amps: [2, 4, 2], scale: 0.3 },
-  { seeds: [0.167, 0.054, 0.147], amps: [4, 6, 7], scale: 0.4 },
-] as const;
-const LANDING_BIJOU_SVG_CHARSET = ' ░▒▓█';
-const LANDING_TITLE_CELL_ASPECT_RATIO = 0.5;
-const LANDING_BIJOU_SVG_ASPECT_RATIO = svgViewBoxAspectRatio(LANDING_BIJOU_SVG_TEXT);
-const LANDING_FLYING_ROBOTS_FADE_DELAY_MS = 3000;
-const LANDING_FLYING_ROBOTS_FADE_DURATION_MS = 1000;
-const LANDING_BIJOU_LOGO_LETTER_COUNT = 5;
-const LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS = 1.35;
 const DIM_MODIFIERS: TextModifier[] = ['dim'];
 const BOLD_MODIFIERS: TextModifier[] = ['bold'];
-const BRAILLE_BLANK = '\u2800';
-const LANDING_LOGO_OVERLAY_MASK = { char: true, fg: true, modifiers: true } as const;
-const LANDING_BIJOU_SVG_OVERLAY_CACHE = new Map<string, Surface>();
-const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
-  readonly footerControls: Surface;
-  readonly footerVersion: Surface;
-}>();
-const LANDING_FPS_BADGE_CACHE = new Map<string, Surface>();
-const LANDING_DOGFOOD_PANEL_CACHE = new Map<string, Surface>();
-interface LandingFrameCache {
-  key?: string;
-  front?: Surface;
-  back?: Surface;
+const DIM_STRIKETHROUGH_MODIFIERS: TextModifier[] = ['dim', 'strikethrough'];
+const LANDING_TEXT_MODIFIERS: LandingTextModifiers = {
+  dim: DIM_MODIFIERS,
+  bold: BOLD_MODIFIERS,
+  dimStrikethrough: DIM_STRIKETHROUGH_MODIFIERS,
+};
+
+const DOCS_SHELL_THEME_STATE = createDocsShellThemeState(LANDING_TEXT_MODIFIERS);
+
+export function docsShellThemesForTesting() {
+  return DOCS_SHELL_THEME_STATE.shellThemes;
 }
 
-interface BijouSvgOverlayMetrics {
-  readonly left: number;
-  readonly top: number;
-  readonly columns: number;
-  readonly rows: number;
-}
-
-interface LandingLogoOverlayOptions {
-  readonly foregroundSample?: 'visible-cell' | 'background-cell';
-  readonly opacity?: number;
-  readonly yOffset?: (x: number, y: number, char: string, width: number, height: number) => number;
-  readonly foreground?: (input: LandingLogoForegroundInput) => string;
-}
-
-interface LandingLogoForegroundInput {
-  readonly x: number;
-  readonly y: number;
-  readonly targetX: number;
-  readonly targetY: number;
-  readonly char: string;
-  readonly width: number;
-  readonly height: number;
-  readonly targetCell: Cell;
-  readonly baseForeground: string;
-  readonly sampledColor: string;
-}
-
-const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
-  {
-    id: 'blocklab-workstation',
-    label: 'BlockLab Workstation',
-    background: '#18172b',
-    waveGradient: ['#2f3f66', '#5f87c8', '#f2c96b'],
-    logoGradient: ['#8ba8ff', '#f3b57a', '#ffd86d'],
-  },
-  {
-    id: 'cabinet-of-curiosities',
-    label: 'Cabinet of Curiosities',
-    background: '#1d1720',
-    waveGradient: ['#55413a', '#9f7754', '#d7ba7f'],
-    logoGradient: ['#8eb489', '#d8b26e', '#d47a4f'],
-  },
-  {
-    id: 'soft-arcade',
-    label: 'Soft Arcade',
-    background: '#161a26',
-    waveGradient: ['#31557c', '#67a2d3', '#f4a57c'],
-    logoGradient: ['#9bb6ff', '#f0a0bf', '#ffd76e'],
-  },
-  {
-    id: 'moss-and-embers',
-    label: 'Moss and Embers',
-    background: '#171d1b',
-    waveGradient: ['#40594b', '#84af86', '#ef9d51'],
-    logoGradient: ['#6fa9a3', '#dfbf73', '#ee7c56'],
-  },
-  {
-    id: 'paper-moon',
-    label: 'Paper Moon',
-    background: '#1f1d24',
-    waveGradient: ['#52506f', '#8c8ab8', '#f3ceb0'],
-    logoGradient: ['#8eb7d8', '#d9a7c7', '#f4d98b'],
-  },
-  {
-    id: 'verdant-plum',
-    label: 'Verdant Plum',
-    background: '#043015',
-    waveGradient: ['#265408', '#968425', '#b96862'],
-    logoGradient: ['#968425', '#b96862', '#c281af'],
-  },
- ] as const;
-const LANDING_THEMES: readonly LandingThemeTokens[] = LANDING_THEME_SEEDS.map(compileLandingTheme);
-const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
-  {
-    id: 'full',
-    maxArea: 14_000,
-    frameStepMs: 16,
-    fpsStep: 1,
-    backgroundTile: 1,
-    logoTile: 1,
-  },
-  {
-    id: 'balanced',
-    maxArea: 28_000,
-    frameStepMs: 33,
-    fpsStep: 2,
-    backgroundTile: 2,
-    logoTile: 1,
-  },
-  {
-    id: 'ultra',
-    maxArea: Number.POSITIVE_INFINITY,
-    frameStepMs: 50,
-    fpsStep: 5,
-    backgroundTile: 3,
-    logoTile: 1,
-  },
-] as const;
-
-const DOCS_SHELL_THEMES: readonly FrameShellThemeSpec[] = [
-  ...DOGFOOD_SHELL_THEMES,
-  ...LANDING_THEMES.map((theme) => ({
-    id: theme.id,
-    label: theme.label,
-    theme: landingTokensToShellTheme(theme),
-  })),
-];
-
-export function docsShellThemesForTesting(): readonly FrameShellThemeSpec[] {
-  return DOCS_SHELL_THEMES;
-}
-
-interface DocsShellThemeChoice {
-  readonly id: string;
-  readonly label: string;
-  readonly shellThemeId: string;
-  readonly shellThemeLabel: string;
-  readonly modeId?: string;
-  readonly modeLabel?: string;
-  readonly theme: Theme;
-}
-
-function docsShellThemeChoiceId(shellThemeId: string, modeId?: string): string {
-  return modeId === undefined ? shellThemeId : `${shellThemeId}:${modeId}`;
-}
-
-function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellThemeSpec[]): readonly DocsShellThemeChoice[] {
-  return shellThemes.flatMap((shellTheme) => {
-    if (shellTheme.theme !== undefined) {
-      return [{
-        id: docsShellThemeChoiceId(shellTheme.id),
-        label: shellTheme.label,
-        shellThemeId: shellTheme.id,
-        shellThemeLabel: shellTheme.label,
-        theme: shellTheme.theme,
-      }];
-    }
-    return shellTheme.modes.map((mode) => ({
-      id: docsShellThemeChoiceId(shellTheme.id, mode.id),
-      label: `${shellTheme.label} / ${mode.label}`,
-      shellThemeId: shellTheme.id,
-      shellThemeLabel: shellTheme.label,
-      modeId: mode.id,
-      modeLabel: mode.label,
-      theme: mode.theme,
-    }));
-  });
-}
-
-const DOCS_SHELL_THEME_CHOICES = flattenDocsShellThemeChoices(DOCS_SHELL_THEMES);
-const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
-const DOCS_VISUAL_THEME_BY_SHELL_ID = new Map<string, LandingThemeTokens>([
-  ...LANDING_THEMES.map((theme) => [theme.id, theme] as const),
-  ...DOCS_SHELL_THEME_CHOICES
-    .filter((choice) => !LANDING_THEME_INDEX_BY_ID.has(choice.id))
-    .map((choice) => [choice.id, docsVisualThemeFromShellThemeChoice(choice)] as const),
-]);
+const DOCS_SHELL_THEME_CHOICES = DOCS_SHELL_THEME_STATE.choices;
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -2458,770 +2260,9 @@ function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerM
   return selectGuide(pageId, model, doc.id);
 }
 
-function createLandingRenderer(getCtx: () => BijouContext, localization: LocalizationPort): (model: RootModel) => Surface {
-  const cache: LandingFrameCache = {};
-
-  return (model: RootModel): Surface => {
-    const ctx = getCtx();
-    const width = Math.max(1, model.columns);
-    const height = Math.max(1, model.rows);
-    const tokens = resolveLandingTheme(model.landingThemeIndex);
-    const qualityMode = resolveLandingQualityMode(model);
-    const quality = resolveLandingQuality(width, height, qualityMode);
-    const quantizedTimeMs = Math.floor(model.landingTimeMs / quality.frameStepMs) * quality.frameStepMs;
-    const fpsBadgeValue = quantizeLandingFps(quality, model.landingFps);
-    const activeToast = model.landingToast != null && model.landingTimeMs < model.landingToast.expiresAtMs
-      ? model.landingToast
-      : undefined;
-    const cacheKey = [
-      width,
-      height,
-      tokens.id,
-      qualityMode,
-      quality.id,
-      quantizedTimeMs,
-      fpsBadgeValue,
-      activeToast?.message ?? '',
-    ].join(':');
-
-    if (cache.key === cacheKey && cache.front != null) {
-      return cache.front;
-    }
-
-    const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
-    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
-    paintV7TitleArt(surface, tokens, quantizedTimeMs);
-
-    const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
-    const wordmark = createWordmarkSurface(wordmarkGlyphs);
-    const staticSurfaces = getLandingStaticSurfaces(tokens, localization);
-    const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, localization);
-    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, localization);
-    const dogfoodPanel = getLandingDogfoodPanel(
-      Math.max(28, Math.min(width - 6, 88)),
-      ctx,
-      tokens,
-      localization,
-    );
-    const panelPromptGap = 1;
-    const promptWordmarkGap = 1;
-    const footerY = Math.max(0, height - 1);
-    const contentTop = Math.min(height - 1, Math.max(1, Math.floor(height * 0.68)));
-    const contentBottom = Math.max(contentTop, footerY - 2);
-    const availableHeight = Math.max(0, contentBottom - contentTop + 1);
-    const fullClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap + wordmark.height;
-    const compactClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height;
-
-    if (availableHeight >= fullClusterHeight) {
-      const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
-      blitCentered(surface, dogfoodPanel, startY);
-      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
-      paintFlyingRobotsLogoOverlay(
-        surface,
-        wordmark,
-        startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap,
-        tokens,
-        quantizedTimeMs,
-      );
-    } else if (availableHeight >= compactClusterHeight) {
-      const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
-      blitCentered(surface, dogfoodPanel, startY);
-      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
-    } else {
-      const promptY = Math.max(0, Math.min(contentBottom - promptLine.height + 1, contentTop));
-      blitCentered(surface, promptLine, promptY);
-      if (availableHeight >= dogfoodPanel.height) {
-        blitCentered(surface, dogfoodPanel, contentTop);
-      }
-    }
-    surface.blit(staticSurfaces.footerControls, 0, footerY);
-    const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
-    const footerBadgeX = Math.floor((width - fpsBadge.width) / 2);
-    const footerBadgeMinX = staticSurfaces.footerControls.width + 2;
-    const footerBadgeMaxX = footerVersionX - fpsBadge.width - 2;
-    if (footerBadgeMinX <= footerBadgeMaxX) {
-      surface.blit(fpsBadge, Math.max(footerBadgeMinX, Math.min(footerBadgeX, footerBadgeMaxX)), footerY);
-    }
-    surface.blit(staticSurfaces.footerVersion, footerVersionX, footerY);
-
-    const output = activeToast != null
-      ? compositeSurface(surface, [toast({
-          message: activeToast.message,
-          variant: 'info',
-          anchor: 'top-right',
-          screenWidth: width,
-          screenHeight: height,
-          ctx,
-        })])
-      : surface;
-
-    cache.key = cacheKey;
-    cache.back = cache.front;
-    cache.front = output;
-    return output;
-  };
-}
-
-function prepareLandingSurface(
-  scratch: Surface | undefined,
-  width: number,
-  height: number,
-  background: string,
-): Surface {
-  const surface = scratch?.width === width && scratch.height === height
-    ? scratch
-    : createSurface(width, height, {
-        char: ' ',
-        bg: background,
-        empty: false,
-      });
-  surface.fill({
-    char: ' ',
-    bg: background,
-    empty: false,
-    fg: undefined,
-    modifiers: undefined,
-    opacity: 1,
-  });
-  return surface;
-}
-
-function paintLandingBackground(
-  surface: Surface,
-  timeMs: number,
-  tokens: LandingThemeTokens,
-  quality: LandingQualityProfile,
-): void {
-  const width = surface.width;
-  const height = surface.height;
-  const time = timeMs * 0.002;
-  const widthDenominator = width - 1 || 1;
-  const heightDenominator = height - 1 || 1;
-
-  const tile = quality.backgroundTile;
-  const amplitudeScale = Math.max(0.35, Math.min(1.4, width / 120));
-
-  for (let tileY = 0; tileY < height; tileY += tile) {
-    const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
-    const v = sampleY / heightDenominator;
-    for (let tileX = 0; tileX < width; tileX += tile) {
-      const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
-      const u = sampleX / widthDenominator;
-      const layer = landingWakeLayer(sampleX, sampleY, width, time, amplitudeScale);
-      const char = LANDING_WAKE_CHARS[layer] ?? ' ';
-      if (char === ' ') {
-        continue;
-      }
-
-      const level = 1 - (layer / (LANDING_WAKE_CHARS.length - 1));
-      const colorT = clamp01(
-        0.1
-        + (layer * 0.16)
-        + (u * 0.26)
-        + (0.18 * (0.5 + (Math.sin((time * 0.9) + (v * 5.2)) * 0.5)))
-        + (0.06 * Math.sin((time * 0.7) + (sampleX * 0.035))),
-      );
-      const bg = sampleColorRamp(tokens.waveRamp, colorT);
-      const fg = bg;
-      const modifiers: string[] | undefined = level < 0.55 ? DIM_MODIFIERS : undefined;
-      const maxY = Math.min(height, tileY + tile);
-      const maxX = Math.min(width, tileX + tile);
-
-      for (let y = tileY; y < maxY; y++) {
-        for (let x = tileX; x < maxX; x++) {
-          surface.set(x, y, {
-            char,
-            bg,
-            fg,
-            modifiers,
-            empty: false,
-            opacity: 1,
-          });
-        }
-      }
-    }
-  }
-}
-
-function landingWakeLayer(
-  x: number,
-  y: number,
-  width: number,
-  time: number,
-  amplitudeScale: number,
-): number {
-  const edges: number[] = [];
-  let edge = width / 4;
-
-  for (const spec of LANDING_WAKE_WAVES) {
-    edge += stackedWakeWave(time, y, spec.seeds, spec.amps) * spec.scale * amplitudeScale;
-    edges.push(edge);
-  }
-
-  for (let index = edges.length - 1; index >= 0; index--) {
-    const edgeThreshold = edges[index];
-    if (edgeThreshold !== undefined && x > edgeThreshold) return index + 1;
-  }
-
-  return 0;
-}
-
-function stackedWakeWave(
-  time: number,
-  y: number,
-  seeds: readonly [number, number, number],
-  amps: readonly [number, number, number],
-): number {
-  return (
-    ((Math.sin(time + (y * seeds[0])) + 1) * amps[0])
-    + ((Math.sin(time + (y * seeds[1])) + 1) * amps[1])
-    + (Math.sin(time + (y * seeds[2])) * amps[2])
-  );
-}
-
-function paintV7TitleArt(
-  surface: Surface,
-  tokens: LandingThemeTokens,
-  timeMs: number,
-): void {
-  const width = surface.width;
-  const height = surface.height;
-  if (width < 40 || height < 14) return;
-
-  paintBijouSvgOverlay(surface, tokens, timeMs);
-}
-
-function paintBijouSvgOverlay(
-  surface: Surface,
-  tokens: LandingThemeTokens,
-  timeMs: number,
-): void {
-  const metrics = bijouSvgOverlayMetrics(surface.width, surface.height);
-  if (metrics == null) return;
-
-  const mark = getBijouSvgOverlaySurface(metrics.columns, metrics.rows);
-  paintLandingLogoOverlay(surface, mark, metrics.left, metrics.top, tokens, {
-    yOffset: (x, _y, _char, width) => landingBijouLogoYOffset(x, width, timeMs),
-    foreground: ({ x, width, baseForeground }) => landingBijouLogoFillColor(baseForeground, tokens, x, width, timeMs),
-  });
-}
-
-function bijouSvgOverlayMetrics(width: number, height: number): BijouSvgOverlayMetrics | undefined {
-  if (width < 40 || height < 14) return undefined;
-
-  const maxColumns = Math.max(1, width - 4);
-  const targetColumns = Math.max(20, Math.min(maxColumns, Math.floor(width * 0.84)));
-  const maxRows = Math.max(3, Math.floor(height * 0.32));
-  const rows = Math.max(
-    3,
-    Math.min(maxRows, Math.round((targetColumns * LANDING_TITLE_CELL_ASPECT_RATIO) / LANDING_BIJOU_SVG_ASPECT_RATIO)),
-  );
-  const columns = Math.max(
-    12,
-    Math.min(maxColumns, Math.round((rows * LANDING_BIJOU_SVG_ASPECT_RATIO) / LANDING_TITLE_CELL_ASPECT_RATIO)),
-  );
-  const centerY = Math.floor(height * 0.29);
-  const topLimit = Math.max(0, height - rows - 2);
-
-  return {
-    columns,
-    rows,
-    left: Math.max(0, Math.floor((width - columns) / 2)),
-    top: Math.max(1, Math.min(topLimit, centerY - Math.floor(rows / 2))),
-  };
-}
-
-function getBijouSvgOverlaySurface(columns: number, rows: number): Surface {
-  const key = `${String(columns)}:${String(rows)}`;
-  const cached = LANDING_BIJOU_SVG_OVERLAY_CACHE.get(key);
-  if (cached != null) return cached;
-
-  const frame = rasterizeSvgToRgba(LANDING_BIJOU_SVG_TEXT, {
-    width: Math.max(1, columns * 2),
-    height: Math.max(1, rows * 4),
-  });
-  const surface = rasterToGlyphSurface(frame, {
-    columns,
-    rows,
-    fit: 'stretch',
-    colorMode: 'none',
-    renderer: {
-      kind: 'charset',
-      chars: LANDING_BIJOU_SVG_CHARSET,
-      order: 'light-to-dark',
-    },
-  });
-
-  LANDING_BIJOU_SVG_OVERLAY_CACHE.set(key, surface);
-  return surface;
-}
-
-function landingBackgroundCellColor(cell: Cell, tokens: LandingThemeTokens): string {
-  if (cell.fgRGB != null) {
-    return rgbHex(cell.fgRGB[0], cell.fgRGB[1], cell.fgRGB[2]);
-  }
-
-  return colorHex(cell.fg) ?? sampleColorRamp(tokens.waveRamp, 0.58);
-}
-
-function landingCellBackgroundColor(cell: Cell, tokens: LandingThemeTokens): string {
-  if (cell.bgRGB != null) {
-    return rgbHex(cell.bgRGB[0], cell.bgRGB[1], cell.bgRGB[2]);
-  }
-
-  return colorHex(cell.bg) ?? tokens.background;
-}
-
-function paintLandingLogoOverlay(
-  surface: Surface,
-  mark: Surface,
-  left: number,
-  top: number,
-  tokens: LandingThemeTokens,
-  options: LandingLogoOverlayOptions = {},
-): void {
-  const opacity = options.opacity ?? 1;
-  if (opacity <= 0.02) return;
-
-  for (let y = 0; y < mark.height; y++) {
-    for (let x = 0; x < mark.width; x++) {
-      const markChar = mark.get(x, y).char;
-      if (markChar === ' ') continue;
-
-      const targetX = left + x;
-      const targetY = top + y + Math.round(options.yOffset?.(x, y, markChar, mark.width, mark.height) ?? 0);
-      if (targetX < 0 || targetX >= surface.width || targetY < 0 || targetY >= surface.height) {
-        continue;
-      }
-
-      const targetCell = surface.get(targetX, targetY);
-      const foregroundSample = options.foregroundSample === 'background-cell'
-        ? landingCellBackgroundColor(targetCell, tokens)
-        : landingBackgroundCellColor(targetCell, tokens);
-
-      const baseForeground = oppositeHexColor(foregroundSample);
-      const animatedForeground = options.foreground?.({
-        x,
-        y,
-        targetX,
-        targetY,
-        char: markChar,
-        width: mark.width,
-        height: mark.height,
-        targetCell,
-        baseForeground,
-        sampledColor: foregroundSample,
-      }) ?? baseForeground;
-      const fg = opacity >= 0.995
-        ? animatedForeground
-        : mixHexColor(landingCellBackgroundColor(targetCell, tokens), animatedForeground, opacity);
-
-      surface.set(targetX, targetY, {
-        char: markChar,
-        fg,
-        modifiers: opacity < 0.38
-          ? DIM_MODIFIERS
-          : BOLD_MODIFIERS,
-        empty: false,
-        opacity: 1,
-      }, LANDING_LOGO_OVERLAY_MASK);
-    }
-  }
-}
-
-function landingFlyingRobotsOpacity(timeMs: number): number {
-  if (timeMs <= LANDING_FLYING_ROBOTS_FADE_DELAY_MS) return 1;
-  return 1 - clamp01((timeMs - LANDING_FLYING_ROBOTS_FADE_DELAY_MS) / LANDING_FLYING_ROBOTS_FADE_DURATION_MS);
-}
-
-function landingBijouLogoLetterIndex(x: number, width: number): number {
-  const letterWidth = Math.max(1, width / LANDING_BIJOU_LOGO_LETTER_COUNT);
-  return Math.max(0, Math.min(LANDING_BIJOU_LOGO_LETTER_COUNT - 1, Math.floor(x / letterWidth)));
-}
-
-function landingBijouLogoWavePhase(timeMs: number, letterIndex: number): number {
-  return (timeMs * 0.004) + (letterIndex * 0.82);
-}
-
-function landingBijouLogoYOffset(x: number, width: number, timeMs: number): number {
-  const phase = landingBijouLogoWavePhase(timeMs, landingBijouLogoLetterIndex(x, width));
-  return Math.round(Math.sin(phase) * LANDING_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS);
-}
-
-function landingBijouLogoFillColor(
-  baseForeground: string,
-  tokens: LandingThemeTokens,
-  x: number,
-  width: number,
-  timeMs: number,
-): string {
-  const letterIndex = landingBijouLogoLetterIndex(x, width);
-  const phase = landingBijouLogoWavePhase(timeMs, letterIndex);
-  const local = width <= 1 ? 0 : x / (width - 1);
-  const wave = 0.5 + (Math.sin(phase + (local * Math.PI * 1.4)) * 0.5);
-  const logo = sampleColorRamp(tokens.logoRamp, clamp01(0.34 + (wave * 0.62)));
-  const wake = sampleColorRamp(tokens.waveRamp, clamp01(0.42 + ((1 - wave) * 0.36)));
-  return mixHexColor(baseForeground, mixHexColor(logo, wake, 0.22), 0.64);
-}
-
-function createWordmarkSurface(
-  lines: readonly (readonly string[])[],
-): Surface {
-  return createTransparentTextSurface(lines, {
-    modifiers: (_x, _y, char) => char === ' ' ? undefined : BOLD_MODIFIERS,
-  });
-}
-
-function paintFlyingRobotsLogoOverlay(
-  surface: Surface,
-  mark: Surface,
-  top: number,
-  tokens: LandingThemeTokens,
-  timeMs: number,
-): void {
-  const left = Math.floor((surface.width - mark.width) / 2);
-  paintLandingLogoOverlay(surface, mark, left, top, tokens, {
-    foregroundSample: 'background-cell',
-    opacity: landingFlyingRobotsOpacity(timeMs),
-  });
-}
-
-function renderLandingPerfHudOverlay(
-  model: RootModel,
-  ctx: BijouContext,
-  i18n?: I18nRuntime,
-) {
-  return renderFramePerfHudOverlay({
-    columns: model.columns,
-    rows: model.rows,
-    frameTimeMs: model.docsModel.frameTimeMs,
-    viewTimeMs: model.docsModel.viewTimeMs,
-    diffTimeMs: model.docsModel.diffTimeMs,
-    refreshRate: ctx.runtime.refreshRate,
-  }, {
-    i18n,
-    ctx,
-  });
-}
-
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
-}
-
-function clamp01(value: number): number {
-  return Math.max(0, Math.min(1, value));
-}
-
-function resolveLandingQuality(width: number, height: number, mode: LandingQualityMode = 'auto'): LandingQualityProfile {
-  if (mode !== 'auto') {
-    const forced = LANDING_QUALITY_PROFILES.find((profile) => (
-      (mode === 'quality' && profile.id === 'full')
-      || (mode === 'balanced' && profile.id === 'balanced')
-      || (mode === 'performance' && profile.id === 'ultra')
-    ));
-    if (forced != null) return forced;
-  }
-  const area = width * height;
-  return LANDING_QUALITY_PROFILES.find((profile) => area <= profile.maxArea) ?? fallbackLandingQualityProfile();
-}
-
-function fallbackLandingQualityProfile(): LandingQualityProfile {
-  const fallback = LANDING_QUALITY_PROFILES[LANDING_QUALITY_PROFILES.length - 1];
-  if (fallback != null) return fallback;
-  throw new Error();
-}
-
-function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number {
-  if (quality.fpsStep <= 1) return fps;
-  return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
-}
-
-function landingQualityProfileLabel(quality: LandingQualityProfile, localization?: LocalizationPort): string {
-  switch (quality.id) {
-    case 'full':
-      return dogfoodText(localization, 'landing.quality.profile.full', 'full');
-    case 'balanced':
-      return dogfoodText(localization, 'landing.quality.profile.balanced', 'balanced');
-    case 'ultra':
-      return dogfoodText(localization, 'landing.quality.profile.performance', 'performance');
-    default:
-      return quality.id;
-  }
-}
-
-function landingQualityModeLabel(mode: LandingQualityMode, localization?: LocalizationPort): string {
-  switch (mode) {
-    case 'auto':
-      return dogfoodText(localization, 'landing.quality.auto', 'Auto');
-    case 'quality':
-      return dogfoodText(localization, 'landing.quality.quality', 'Quality');
-    case 'balanced':
-      return dogfoodText(localization, 'landing.quality.balanced', 'Balanced');
-    case 'performance':
-      return dogfoodText(localization, 'landing.quality.performance', 'Performance');
-  }
-}
-
-function landingQualityBadgeLabel(
-  quality: LandingQualityProfile,
-  mode: LandingQualityMode,
-  localization?: LocalizationPort,
-): string {
-  if (mode === 'auto') {
-    return `auto/${landingQualityProfileLabel(quality, localization)}`;
-  }
-  return landingQualityModeLabel(mode, localization).toLowerCase();
-}
-
-function nextLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
-  switch (mode) {
-    case 'auto':
-      return 'quality';
-    case 'quality':
-      return 'balanced';
-    case 'balanced':
-      return 'performance';
-    case 'performance':
-      return 'auto';
-  }
-}
-
-function previousLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
-  switch (mode) {
-    case 'auto':
-      return 'performance';
-    case 'quality':
-      return 'auto';
-    case 'balanced':
-      return 'quality';
-    case 'performance':
-      return 'balanced';
-  }
-}
-
-function landingQualitySettingValue(
-  width: number,
-  height: number,
-  mode: LandingQualityMode,
-  localization?: LocalizationPort,
-): string {
-  if (mode !== 'auto') return landingQualityModeLabel(mode, localization);
-  return `${landingQualityModeLabel(mode, localization)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode), localization)})`;
-}
-
-function landingQualitySettingDescription(
-  width: number,
-  height: number,
-  mode: LandingQualityMode,
-  localization?: LocalizationPort,
-): string {
-  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode), localization);
-  const options = formatLocalizedList(localization, [
-    landingQualityModeLabel('auto', localization),
-    landingQualityModeLabel('quality', localization),
-    landingQualityModeLabel('balanced', localization),
-    landingQualityModeLabel('performance', localization),
-  ]);
-  switch (mode) {
-    case 'auto':
-      return dogfoodText(
-        localization,
-        'settings.landingQuality.description.auto',
-        'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.',
-        { profile: currentProfile, options },
-      );
-    case 'quality':
-      return dogfoodText(
-        localization,
-        'settings.landingQuality.description.quality',
-        'Prioritizes the richest title treatment even on larger terminals. Options: {options}.',
-        { options },
-      );
-    case 'balanced':
-      return dogfoodText(
-        localization,
-        'settings.landingQuality.description.balanced',
-        'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.',
-        { options },
-      );
-    case 'performance':
-      return dogfoodText(
-        localization,
-        'settings.landingQuality.description.performance',
-        'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.',
-        { options },
-      );
-  }
-}
-
-function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
-  return model.docsModel.pageModels[model.docsModel.activePageId]?.landingQualityMode ?? 'auto';
-}
-
-function resolveLandingTheme(index: number): LandingThemeTokens {
-  return LANDING_THEMES[mod(index, LANDING_THEMES.length)] ?? fallbackLandingTheme();
-}
-
-function fallbackLandingTheme(): LandingThemeTokens {
-  const fallback = LANDING_THEMES[0];
-  if (fallback != null) return fallback;
-  throw new Error();
-}
-
-function nextLandingThemeIndex(current: number, delta: number): number {
-  return mod(current + delta, LANDING_THEMES.length);
-}
-
-function updateLandingFps(current: number, dtSeconds: number): number {
-  if (!(dtSeconds > 0)) return current;
-  const instantFps = Math.max(1, Math.round(1 / dtSeconds));
-  if (current <= 0) return instantFps;
-  return Math.max(1, Math.round((current * (1 - LANDING_FPS_ALPHA)) + (instantFps * LANDING_FPS_ALPHA)));
-}
-
-function getLandingStaticSurfaces(tokens: LandingThemeTokens, localization: LocalizationPort): {
-  readonly footerControls: Surface;
-  readonly footerVersion: Surface;
-} {
-  const controlsText = dogfoodText(localization, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
-  const cacheKey = `${tokens.id}:${controlsText}`;
-  const cached = LANDING_STATIC_SURFACE_CACHE.get(cacheKey);
-  if (cached) return cached;
-
-  const surfaces = {
-    footerControls: createTransparentTextSurface(controlsText, {
-      bg: tokens.background,
-      transparentSpaces: false,
-      fg: tokens.footerMutedColor,
-      modifiers: DIM_MODIFIERS,
-    }),
-    footerVersion: createTransparentTextSurface(VERSION_TEXT, {
-      bg: tokens.background,
-      transparentSpaces: false,
-      fg: tokens.footerStrongColor,
-      modifiers: BOLD_MODIFIERS,
-    }),
-  };
-  LANDING_STATIC_SURFACE_CACHE.set(cacheKey, surfaces);
-  return surfaces;
-}
-
-function createLandingPromptSurface(
-  tokens: LandingThemeTokens,
-  timeMs: number,
-  localization?: LocalizationPort,
-): Surface {
-  const promptText = dogfoodText(localization, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
-  const highlightStart = promptText.indexOf('[');
-  const highlightEnd = promptText.indexOf(']');
-  const enterStart = highlightStart >= 0 && highlightEnd > highlightStart ? highlightStart + 1 : -1;
-  const enterEnd = highlightEnd > enterStart ? highlightEnd - 1 : -1;
-  const time = timeMs / 1000;
-
-  return createTransparentTextSurface(promptText, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: (x) => {
-      const inEnter = enterStart >= 0 && enterEnd >= enterStart && x >= enterStart && x <= enterEnd;
-      if (inEnter) {
-        const span = Math.max(1, enterEnd - enterStart);
-        const local = (x - enterStart) / span;
-        const sweep = 0.5 + (Math.sin((time * 5.2) + (local * Math.PI * 2.6)) * 0.5);
-        return sampleColorRamp(tokens.logoRamp, clamp01(0.42 + (local * 0.34) + (sweep * 0.22)));
-      }
-
-      if (x === highlightStart || x === highlightEnd) {
-        return sampleColorRamp(tokens.waveRamp, 0.76);
-      }
-
-      if (highlightStart < 0 || highlightEnd < highlightStart || x < highlightStart || x > highlightEnd) {
-        return tokens.promptBodyColor;
-      }
-
-      return tokens.promptAccentColor;
-    },
-    modifiers: (x) => {
-      const inHighlight = highlightStart >= 0
-        && highlightEnd >= highlightStart
-        && x >= highlightStart
-        && x <= highlightEnd;
-      return inHighlight ? BOLD_MODIFIERS : DIM_MODIFIERS;
-    },
-  });
-}
-
-function getLandingFpsBadge(
-  tokens: LandingThemeTokens,
-  fps: number,
-  quality: LandingQualityProfile,
-  mode: LandingQualityMode,
-  localization?: LocalizationPort,
-): Surface {
-  const qualityLabel = landingQualityBadgeLabel(quality, mode, localization);
-  const key = `${tokens.id}:${String(fps)}:${quality.id}:${mode}:${qualityLabel}`;
-  const cached = LANDING_FPS_BADGE_CACHE.get(key);
-  if (cached) return cached;
-
-  const surface = createTransparentTextSurface(`${String(fps)} fps • ${qualityLabel}`, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: tokens.fpsColor,
-    modifiers: DIM_MODIFIERS,
-  });
-  LANDING_FPS_BADGE_CACHE.set(key, surface);
-  return surface;
-}
-
-function getLandingDogfoodPanel(
-  width: number,
-  ctx: BijouContext,
-  tokens: LandingThemeTokens,
-  localization?: LocalizationPort,
-): Surface {
-  const title = dogfoodText(localization, 'landing.dogfood.title', 'DOGFOOD');
-  const expansion = dogfoodText(
-    localization,
-    'landing.dogfood.expansion',
-    'Documentation Of Good Foundational Onboarding and Discovery',
-  );
-  const releaseTitle = dogfoodText(
-    localization,
-    CURRENT_DOGFOOD_RELEASE_TITLE.titleKey,
-    CURRENT_DOGFOOD_RELEASE_TITLE.title,
-  );
-  const renderedTitle = titleScreenBlock.render({
-    config: {
-      title: `${title} / ${releaseTitle}`,
-      subtitle: expansion,
-    },
-    mode: 'interactive',
-  });
-  const [panelTitle = title, panelBody = expansion] = renderedTitle.output.split('\n');
-  const key = `${tokens.id}:${String(width)}:${panelTitle}:${panelBody}`;
-  const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
-  if (cached) return cached;
-
-  const bodyWidth = Math.max(18, width - 4);
-  const body = centerSurfaceHorizontally(createTransparentTextSurface(
-    wrapToWidth(panelBody, bodyWidth).join('\n'),
-    {
-      bg: tokens.background,
-      transparentSpaces: false,
-      fg: tokens.footerStrongColor,
-      modifiers: BOLD_MODIFIERS,
-    },
-  ), bodyWidth);
-  const surface = boxSurface(body, {
-    title: panelTitle,
-    width,
-    borderToken: landingDogfoodPanelBorderToken(tokens),
-    bgToken: { hex: tokens.footerStrongColor, bg: tokens.background },
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
-  LANDING_DOGFOOD_PANEL_CACHE.set(key, surface);
-  return surface;
 }
 
 function mapDocsPageModels(
@@ -3281,7 +2322,7 @@ function applyLandingThemeSelection(
   model: RootModel,
   index: number,
 ): RootModel {
-  const nextIndex = mod(index, LANDING_THEMES.length);
+  const nextIndex = normalizeLandingThemeIndex(index);
   const theme = resolveLandingTheme(nextIndex);
   if (nextIndex === model.landingThemeIndex && model.docsModel.activeShellThemeId === theme.id) return model;
   syncShellThemeContext(theme.id);
@@ -3322,675 +2363,20 @@ function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode
   };
 }
 
-function compileLandingTheme(seed: LandingThemeSeed): LandingThemeTokens {
-  const waveStops = createGradientStops(seed.waveGradient);
-  const logoStops = createGradientStops(seed.logoGradient);
-  const waveRamp = buildColorRamp(waveStops);
-  const logoRamp = buildColorRamp(logoStops);
-
-  return {
-    id: seed.id,
-    label: seed.label,
-    background: seed.background,
-    waveRamp,
-    logoRamp,
-    promptBodyColor: sampleColorRamp(waveRamp, 0.58),
-    promptAccentColor: sampleColorRamp(logoRamp, 0.92),
-    footerMutedColor: sampleColorRamp(waveRamp, 0.52),
-    footerStrongColor: sampleColorRamp(logoRamp, 0.88),
-    fpsColor: sampleColorRamp(waveRamp, 0.62),
-  };
-}
-
-function themeTokenHex(token: TokenValue | undefined, fallback: string): string {
-  return token?.hex ?? fallback;
-}
-
-function themeTokenBg(token: TokenValue | undefined, fallback: string): string {
-  return token?.bg ?? fallback;
-}
-
-function docsVisualThemeFromShellThemeChoice(shellTheme: DocsShellThemeChoice): LandingThemeTokens {
-  const theme = shellTheme.theme;
-  const background = themeTokenBg(theme.surface.primary, '#10131a');
-  return compileLandingTheme({
-    id: shellTheme.id,
-    label: shellTheme.label,
-    background,
-    waveGradient: [
-      themeTokenBg(theme.surface.muted, background),
-      themeTokenBg(theme.surface.secondary, background),
-      themeTokenHex(theme.border.primary, themeTokenHex(theme.semantic.info, '#6aa6ff')),
-    ],
-    logoGradient: [
-      themeTokenHex(theme.semantic.info, '#6aa6ff'),
-      themeTokenHex(theme.semantic.accent, '#d7a84f'),
-      themeTokenHex(theme.semantic.primary, '#f5f2e8'),
-    ],
-  });
-}
-
-function createGradientStops(gradient: readonly [string, string, string]): { pos: number; color: Rgb }[] {
-  return [
-    { pos: 0, color: hexToRgb(gradient[0]) },
-    { pos: 0.5, color: hexToRgb(gradient[1]) },
-    { pos: 1, color: hexToRgb(gradient[2]) },
-  ];
-}
-
-function gradientStopsFromHexes(colors: readonly string[]): { pos: number; color: Rgb }[] {
-  if (colors.length === 0) return [];
-  if (colors.length === 1) {
-    const onlyColor = colors[0];
-    return onlyColor === undefined ? [] : [{ pos: 0, color: hexToRgb(onlyColor) }];
-  }
-  return colors.map((hex, index) => ({
-    pos: index / (colors.length - 1),
-    color: hexToRgb(hex),
-  }));
-}
-
-function buildColorRamp(stops: { pos: number; color: Rgb }[]): readonly string[] {
-  const ramp = new Array<string>(LANDING_COLOR_RAMP_SIZE);
-  for (let index = 0; index < LANDING_COLOR_RAMP_SIZE; index++) {
-    const t = index / (LANDING_COLOR_RAMP_SIZE - 1 || 1);
-    ramp[index] = rgbHex(...lerp3(stops, t));
-  }
-  return ramp;
-}
-
-function sampleColorRamp(ramp: readonly string[], t: number): string {
-  const index = Math.max(0, Math.min(ramp.length - 1, Math.round(clamp01(t) * (ramp.length - 1))));
-  return ramp[index] ?? '#000000';
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  const normalized = hex.replace(/^#/, '');
-  return [
-    parseInt(normalized.slice(0, 2), 16),
-    parseInt(normalized.slice(2, 4), 16),
-    parseInt(normalized.slice(4, 6), 16),
-  ];
-}
-
-function rgbHex(r: number, g: number, b: number): string {
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
-function mixHexColor(from: string, to: string, t: number): string {
-  const [fromR, fromG, fromB] = hexToRgb(from);
-  const [toR, toG, toB] = hexToRgb(to);
-  const mixT = clamp01(t);
-  return rgbHex(
-    Math.round(fromR + ((toR - fromR) * mixT)),
-    Math.round(fromG + ((toG - fromG) * mixT)),
-    Math.round(fromB + ((toB - fromB) * mixT)),
-  );
-}
-
-function oppositeHexColor(hex: string): string {
-  const [r, g, b] = hexToRgb(hex);
-  return rgbHex(255 - r, 255 - g, 255 - b);
-}
-
-function srgbChannelToLinear(channel: number): number {
-  const normalized = channel / 255;
-  return normalized <= 0.03928
-    ? normalized / 12.92
-    : ((normalized + 0.055) / 1.055) ** 2.4;
-}
-
-function relativeLuminance(hex: string): number {
-  const [r, g, b] = hexToRgb(hex);
-  return (0.2126 * srgbChannelToLinear(r))
-    + (0.7152 * srgbChannelToLinear(g))
-    + (0.0722 * srgbChannelToLinear(b));
-}
-
-function contrastRatio(a: string, b: string): number {
-  const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
-  const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
-function colorDistance(a: string, b: string): number {
-  const [ar, ag, ab] = hexToRgb(a);
-  const [br, bg, bb] = hexToRgb(b);
-  return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2);
-}
-
-function pickStandoutColor(background: string, base: string, candidates: readonly string[]): string {
-  let best = candidates[0] ?? base;
-  let bestScore = Number.NEGATIVE_INFINITY;
-  for (const candidate of candidates) {
-    const contrast = contrastRatio(candidate, background);
-    const distance = colorDistance(candidate, base) / Math.sqrt(3 * 255 * 255);
-    const score = contrast * 3 + distance;
-    if (score > bestScore) {
-      bestScore = score;
-      best = candidate;
-    }
-  }
-  return best;
-}
-
-function mod(value: number, divisor: number): number {
-  return ((value % divisor) + divisor) % divisor;
-}
-
-function splitGlyphLines(text: string): readonly (readonly string[])[] {
-  return text.split(/\r?\n/).map((lineText) => Array.from(lineText));
-}
-
-function fitGlyphLinesToWidth(
-  lines: readonly (readonly string[])[],
-  maxWidth: number,
-): readonly (readonly string[])[] {
-  const width = Math.max(0, ...lines.map((lineText) => lineText.length));
-  const targetWidth = Math.max(1, Math.min(width, Math.floor(maxWidth)));
-  if (width <= targetWidth) return lines;
-
-  return lines.map((lineText) => {
-    const fitted: string[] = [];
-    for (let x = 0; x < targetWidth; x++) {
-      const sourceX = Math.min(width - 1, Math.floor((x / targetWidth) * width));
-      fitted.push(lineText[sourceX] ?? ' ');
-    }
-    return fitted;
-  });
-}
-
-function transparentLogoGlyphs(lines: readonly (readonly string[])[]): readonly (readonly string[])[] {
-  return lines.map((lineText) => lineText.map((char) => char === BRAILLE_BLANK ? ' ' : char));
-}
-
-function createTransparentTextSurface(
-  text: string | readonly (readonly string[])[],
-  options: {
-    readonly bg?: string;
-    readonly fg?: string | ((x: number, y: number, char: string, width: number) => string | undefined);
-    readonly modifiers?: readonly string[] | ((x: number, y: number, char: string, width: number) => readonly string[] | undefined);
-    readonly transparentSpaces?: boolean;
-  } = {},
-): Surface {
-  const lines: readonly (readonly string[])[] = typeof text === 'string'
-    ? splitGlyphLines(text)
-    : text;
-  const width = Math.max(1, ...lines.map((lineText) => lineText.length));
-  const height = Math.max(1, lines.length);
-  const surface = createSurface(width, height);
-  const transparentSpaces = options.transparentSpaces ?? true;
-
-  for (let y = 0; y < height; y++) {
-    const lineText = lines[y] ?? [];
-    for (let x = 0; x < width; x++) {
-      const char = lineText[x] ?? ' ';
-      if (char === ' ' && transparentSpaces) {
-        surface.set(x, y, { char: ' ', empty: true });
-        continue;
-      }
-      const fg = typeof options.fg === 'function'
-        ? options.fg(x, y, char, width)
-        : options.fg;
-      const modifiers = typeof options.modifiers === 'function'
-        ? options.modifiers(x, y, char, width)
-        : options.modifiers;
-      const cellModifiers: string[] | undefined = modifiers === undefined ? undefined : [...modifiers];
-      surface.set(x, y, {
-        char,
-        bg: options.bg,
-        fg,
-        modifiers: cellModifiers,
-        empty: false,
-      });
-    }
-  }
-
-  return surface;
-}
-
-function centerSurfaceHorizontally(content: Surface, width: number): Surface {
-  const centered = createSurface(Math.max(1, width), Math.max(1, content.height));
-  centered.blit(content, Math.max(0, Math.floor((centered.width - content.width) / 2)), 0);
-  return centered;
-}
-
-function docsThemeAccentToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.logoRamp, 0.78), modifiers: ['bold'] };
-}
-
-function docsThemeBorderToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.58) };
-}
-
-function docsThemeMutedBorderToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.36), modifiers: ['dim'] };
-}
-
-function docsThemeSurfaceToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.44),
-    bg: sampleColorRamp(theme.waveRamp, 0.06),
-  };
-}
-
-function docsThemeSelectedRowBgToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.62),
-    bg: sampleColorRamp(theme.waveRamp, 0.12),
-  };
-}
-
-function docsThemeDescriptionToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.58),
-    modifiers: ['dim'],
-  };
-}
-
-export function resolveDocsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
-  const base = docsThemeSurfaceToken(theme).hex;
-  const background = sampleColorRamp(theme.waveRamp, 0.14);
-  return {
-    hex: pickStandoutColor(background, base, [
-      sampleColorRamp(theme.logoRamp, 0.98),
-      sampleColorRamp(theme.logoRamp, 0.84),
-      sampleColorRamp(theme.waveRamp, 0.88),
-      sampleColorRamp(theme.logoRamp, 0.62),
-    ]),
-    bg: background,
-    modifiers: ['bold'],
-  };
-}
-
-function docsThemeProgressTokens(theme: LandingThemeTokens): {
-  readonly filledToken: TokenValue;
-  readonly filledEndToken: TokenValue;
-  readonly emptyToken: TokenValue;
-  readonly labelToken: TokenValue;
-} {
-  const surface = docsThemeSurfaceToken(theme);
-  const background = surface.bg ?? theme.background;
-  const base = surface.hex;
-  const filledStart = pickStandoutColor(background, base, [
-    sampleColorRamp(theme.waveRamp, 0.58),
-    sampleColorRamp(theme.logoRamp, 0.34),
-    sampleColorRamp(theme.waveRamp, 0.74),
-  ]);
-  const filledEnd = pickStandoutColor(background, filledStart, [
-    sampleColorRamp(theme.logoRamp, 0.78),
-    sampleColorRamp(theme.logoRamp, 0.96),
-    sampleColorRamp(theme.waveRamp, 0.9),
-  ]);
-  return {
-    filledToken: { hex: filledStart, modifiers: ['bold'] },
-    filledEndToken: { hex: filledEnd, modifiers: ['bold'] },
-    emptyToken: { hex: sampleColorRamp(theme.waveRamp, 0.22), modifiers: ['dim'] },
-    labelToken: {
-      hex: pickStandoutColor(background, base, [
-        sampleColorRamp(theme.logoRamp, 0.9),
-        sampleColorRamp(theme.waveRamp, 0.84),
-        sampleColorRamp(theme.logoRamp, 0.7),
-      ]),
-      modifiers: ['bold'],
-    },
-  };
-}
-
-function landingDogfoodPanelBorderToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: pickStandoutColor(theme.background, theme.footerMutedColor, [
-      theme.footerStrongColor,
-      sampleColorRamp(theme.logoRamp, 0.84),
-      sampleColorRamp(theme.waveRamp, 0.78),
-    ]),
-    bg: theme.background,
-  };
-}
-
-function docsThemePreferenceListTheme(theme: LandingThemeTokens): PreferenceListTheme {
-  return {
-    sectionTitleToken: docsThemeAccentToken(theme),
-    selectedRowBgToken: docsThemeSelectedRowBgToken(theme),
-    toggleOnToken: docsThemeAccentToken(theme),
-    toggleOffToken: docsThemeMutedBorderToken(theme),
-    choiceToken: docsThemeAccentToken(theme),
-    infoToken: { hex: sampleColorRamp(theme.waveRamp, 0.82) },
-    descriptionToken: docsThemeDescriptionToken(theme),
-  };
-}
-
-function docsThemeFocusedGutterToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.logoRamp, 0.82), bg: sampleColorRamp(theme.waveRamp, 0.12), modifiers: ['bold'] };
-}
-
-function docsThemeUnfocusedGutterToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.38), bg: sampleColorRamp(theme.waveRamp, 0.08), modifiers: ['dim'] };
-}
-
-function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
-  return {
-    ...CYAN_MAGENTA,
-    name: `dogfood-${theme.id}`,
-    status: {
-      ...CYAN_MAGENTA.status,
-      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
-      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
-      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
-      info: tv(sampleColorRamp(theme.waveRamp, 0.66)),
-      active: tv(sampleColorRamp(theme.logoRamp, 0.84)),
-      muted: tv(sampleColorRamp(theme.waveRamp, 0.44), ['dim', 'strikethrough']),
-    },
-    semantic: {
-      ...CYAN_MAGENTA.semantic,
-      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
-      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
-      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
-      info: tv(sampleColorRamp(theme.waveRamp, 0.66)),
-      accent: tv(sampleColorRamp(theme.logoRamp, 0.84)),
-      muted: tv(sampleColorRamp(theme.waveRamp, 0.58), ['dim']),
-      primary: tv(sampleColorRamp(theme.logoRamp, 0.96), ['bold']),
-    },
-    gradient: {
-      ...CYAN_MAGENTA.gradient,
-      brand: gradientStopsFromHexes([
-        sampleColorRamp(theme.waveRamp, 0.08),
-        sampleColorRamp(theme.waveRamp, 0.52),
-        sampleColorRamp(theme.logoRamp, 0.9),
-      ]),
-      progress: gradientStopsFromHexes([
-        sampleColorRamp(theme.waveRamp, 0.24),
-        sampleColorRamp(theme.waveRamp, 0.62),
-        sampleColorRamp(theme.logoRamp, 0.76),
-        sampleColorRamp(theme.logoRamp, 0.94),
-      ]),
-    },
-    border: {
-      ...CYAN_MAGENTA.border,
-      primary: tv(sampleColorRamp(theme.waveRamp, 0.72)),
-      secondary: tv(sampleColorRamp(theme.logoRamp, 0.74)),
-      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
-      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
-      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
-      muted: tv(sampleColorRamp(theme.waveRamp, 0.38)),
-    },
-    ui: {
-      ...CYAN_MAGENTA.ui,
-      cursor: tv(sampleColorRamp(theme.logoRamp, 0.88)),
-      focusGutter: docsThemeFocusedGutterToken(theme),
-      scrollThumb: tv(sampleColorRamp(theme.logoRamp, 0.88)),
-      scrollTrack: tv(sampleColorRamp(theme.waveRamp, 0.18)),
-      sectionHeader: tv(sampleColorRamp(theme.waveRamp, 0.8), BOLD_MODIFIERS),
-      logo: tv(sampleColorRamp(theme.logoRamp, 0.94)),
-      tableHeader: tv(sampleColorRamp(theme.logoRamp, 0.9)),
-      trackEmpty: tv(sampleColorRamp(theme.waveRamp, 0.26)),
-    },
-    surface: {
-      primary: { hex: sampleColorRamp(theme.logoRamp, 0.96), bg: theme.background },
-      secondary: { hex: sampleColorRamp(theme.waveRamp, 0.84), bg: sampleColorRamp(theme.waveRamp, 0.14) },
-      elevated: { hex: sampleColorRamp(theme.logoRamp, 0.92), bg: sampleColorRamp(theme.waveRamp, 0.18) },
-      overlay: { hex: sampleColorRamp(theme.logoRamp, 0.96), bg: theme.background },
-      muted: { hex: sampleColorRamp(theme.waveRamp, 0.62), bg: sampleColorRamp(theme.waveRamp, 0.08) },
-    },
-  };
-}
-
-function resolveDocsShellThemeById(id: string | undefined): DocsShellThemeChoice {
-  return DOCS_SHELL_THEME_CHOICES.find((theme) => theme.id === id) ?? fallbackDocsShellThemeChoice();
+function resolveDocsShellThemeById(id: string | undefined) {
+  return resolveShellThemeStateById(DOCS_SHELL_THEME_STATE, id);
 }
 
 function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
-  return LANDING_THEME_INDEX_BY_ID.get(resolveDocsShellThemeById(id).id) ?? 0;
+  return resolveLandingThemeIndexForShellThemeStateId(DOCS_SHELL_THEME_STATE, id);
 }
 
 function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
-  const shellThemeId = resolveDocsShellThemeById(id).id;
-  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? resolveLandingTheme(0);
-}
-
-function fallbackDocsShellThemeChoice(): DocsShellThemeChoice {
-  const fallback = DOCS_SHELL_THEME_CHOICES[0];
-  if (fallback != null) return fallback;
-  throw new Error();
+  return resolveVisualThemeByShellThemeStateId(DOCS_SHELL_THEME_STATE, id);
 }
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
-  const shellTheme = resolveDocsShellThemeById(themeId);
-  return cloneContextWithTheme(ctx, shellTheme.theme);
-}
-
-type ThemeTokenFamily = 'semantic' | 'surface' | 'border' | 'ui' | 'status' | 'gradient';
-
-interface ThemeTokenEntry {
-  readonly family: ThemeTokenFamily;
-  readonly path: string;
-  readonly token?: TokenValue;
-  readonly stops?: readonly string[];
-}
-
-type ThemePaletteRow =
-  | { readonly kind: 'group'; readonly label: string }
-  | { readonly kind: 'token'; readonly entry: ThemeTokenEntry };
-
-function hexFromRgb([red, green, blue]: Rgb): string {
-  return `#${[red, green, blue]
-    .map((channel) => channel.toString(16).padStart(2, '0'))
-    .join('')}`;
-}
-
-function themeTokenRecordEntries(
-  family: Exclude<ThemeTokenFamily, 'gradient'>,
-  tokens: Record<string, TokenValue>,
-): readonly ThemeTokenEntry[] {
-  return Object.entries(tokens).map(([key, token]) => ({
-    family,
-    path: `${family}.${key}`,
-    token,
-  }));
-}
-
-function themeTokenEntries(theme: Theme): readonly ThemeTokenEntry[] {
-  return [
-    ...themeTokenRecordEntries('semantic', theme.semantic),
-    ...themeTokenRecordEntries('surface', theme.surface),
-    ...themeTokenRecordEntries('border', theme.border),
-    ...themeTokenRecordEntries('ui', theme.ui),
-    ...themeTokenRecordEntries('status', theme.status),
-    ...Object.entries(theme.gradient).map(([key, stops]) => ({
-      family: 'gradient' as const,
-      path: `gradient.${key}`,
-      stops: stops.map((stop) => hexFromRgb(stop.color)),
-    })),
-  ];
-}
-
-function themePaletteRows(theme: Theme): readonly ThemePaletteRow[] {
-  const entries = themeTokenEntries(theme);
-  const rows: ThemePaletteRow[] = [];
-  for (const family of ['semantic', 'surface', 'border', 'ui', 'status', 'gradient'] as const) {
-    rows.push({ kind: 'group', label: family });
-    rows.push(...entries
-      .filter((entry) => entry.family === family)
-      .map((entry) => ({ kind: 'token' as const, entry })));
-  }
-  return rows;
-}
-
-function readableSwatchForeground(background: string): string {
-  return relativeLuminance(background) > 0.46 ? '#111827' : '#f8fafc';
-}
-
-function writeSurfaceText(
-  surface: Surface,
-  x: number,
-  y: number,
-  text: string,
-  token: TokenValue = { hex: '#f8fafc' },
-): void {
-  let index = 0;
-  for (const char of text) {
-    if (x + index >= surface.width) break;
-    surface.set(x + index, y, {
-      char,
-      fg: token.hex,
-      bg: token.bg,
-      modifiers: token.modifiers,
-    });
-    index += 1;
-  }
-}
-
-function renderSwatch(
-  surface: Surface,
-  entry: ThemeTokenEntry,
-  x: number,
-  y: number,
-  width: number,
-): void {
-  if (entry.token !== undefined) {
-    const background = entry.family === 'surface' && entry.token.bg !== undefined
-      ? entry.token.bg
-      : entry.token.hex;
-    const foreground = entry.family === 'surface'
-      ? entry.token.hex
-      : readableSwatchForeground(background);
-    for (let offset = 0; offset < width; offset++) {
-      surface.set(x + offset, y, {
-        char: ' ',
-        fg: foreground,
-        bg: background,
-      });
-    }
-    return;
-  }
-
-  const stops = entry.stops ?? ['#808080'];
-  for (let offset = 0; offset < width; offset++) {
-    const stopIndex = Math.min(
-      stops.length - 1,
-      Math.floor((offset / Math.max(1, width)) * stops.length),
-    );
-    const background = stops[stopIndex] ?? '#808080';
-    surface.set(x + offset, y, {
-      char: ' ',
-      fg: readableSwatchForeground(background),
-      bg: background,
-    });
-  }
-}
-
-function describeThemeToken(entry: ThemeTokenEntry, localization: LocalizationPort | undefined): string {
-  if (entry.token !== undefined) {
-    return entry.token.bg === undefined
-      ? entry.token.hex
-      : dogfoodText(localization, 'themePalette.tokenWithBackground', '{foreground} on {background}', {
-        foreground: entry.token.hex,
-        background: entry.token.bg,
-      });
-  }
-  return (entry.stops ?? []).join(' -> ');
-}
-
-function foregroundOnlyToken(token: TokenValue): TokenValue {
-  return {
-    hex: token.hex,
-    modifiers: token.modifiers,
-  };
-}
-
-function themePaletteChromeTokens(theme: Theme): {
-  readonly group: TokenValue;
-  readonly label: TokenValue;
-  readonly value: TokenValue;
-} {
-  return {
-    group: foregroundOnlyToken(theme.ui.sectionHeader),
-    label: foregroundOnlyToken(theme.surface.primary),
-    value: foregroundOnlyToken(theme.surface.muted),
-  };
-}
-
-function renderThemeTokenPalette(
-  theme: Theme,
-  width: number,
-  localization: LocalizationPort | undefined,
-  options: {
-    readonly maxRows?: number;
-    readonly chromeTheme?: Theme;
-  } = {},
-): Surface {
-  const safeWidth = Math.max(24, width);
-  const chrome = themePaletteChromeTokens(options.chromeTheme ?? theme);
-  const rows = themePaletteRows(theme);
-  const visibleRows = options.maxRows === undefined
-    ? rows
-    : rows.slice(0, Math.max(1, options.maxRows));
-  const truncatedCount = Math.max(0, rows.length - visibleRows.length);
-  const surface = createSurface(safeWidth, Math.max(1, visibleRows.length + (truncatedCount > 0 ? 1 : 0)));
-  const swatchWidth = Math.min(8, Math.max(4, Math.floor(safeWidth / 8)));
-  const labelX = swatchWidth + 2;
-
-  visibleRows.forEach((row, y) => {
-    if (row.kind === 'group') {
-      writeSurfaceText(surface, 0, y, row.label.toUpperCase(), chrome.group);
-      return;
-    }
-    renderSwatch(surface, row.entry, 0, y, swatchWidth);
-    writeSurfaceText(surface, labelX, y, row.entry.path, chrome.label);
-    writeSurfaceText(
-      surface,
-      Math.min(safeWidth - 1, labelX + 26),
-      y,
-      describeThemeToken(row.entry, localization),
-      chrome.value,
-    );
-  });
-
-  if (truncatedCount > 0) {
-    writeSurfaceText(
-      surface,
-      0,
-      surface.height - 1,
-      dogfoodText(localization, 'themePalette.moreTokens', '... {count} more tokens', {
-        count: truncatedCount,
-      }),
-      chrome.value,
-    );
-  }
-
-  return surface;
-}
-
-function dogfoodSafePairSummary(theme: Theme, localization: LocalizationPort | undefined): string {
-  const report = doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
-  const passed = Math.max(0, DOGFOOD_THEME_SAFE_PAIRS.length - report.issues.length);
-  return dogfoodText(localization, 'themeDiagnostics.safePairs', '{passed}/{total} safe pairs pass', {
-    passed,
-    total: DOGFOOD_THEME_SAFE_PAIRS.length,
-  });
-}
-
-function themeColorReuseSummary(theme: Theme, localization: LocalizationPort | undefined): string {
-  const uses = new Map<string, string[]>();
-  for (const entry of themeTokenEntries(theme)) {
-    if (entry.token !== undefined) {
-      const values = entry.token.bg === undefined
-        ? [entry.token.hex]
-        : [entry.token.hex, entry.token.bg];
-      for (const value of values) {
-        uses.set(value, [...(uses.get(value) ?? []), entry.path]);
-      }
-      continue;
-    }
-    for (const stop of entry.stops ?? []) {
-      uses.set(stop, [...(uses.get(stop) ?? []), entry.path]);
-    }
-  }
-  const repeated = Array.from(uses.values()).filter((paths) => new Set(paths).size > 1);
-  return dogfoodText(localization, 'themeDiagnostics.colorReuse', '{count} reused colors across {total} unique values', {
-    count: repeated.length,
-    total: uses.size,
-  });
+  return applyShellThemeStateToContext(DOCS_SHELL_THEME_STATE, ctx, themeId);
 }
 
 function renderThemeLabPane(
@@ -4212,24 +2598,6 @@ function insetPaneSurface(content: Surface, width: number): Surface {
   const result = createSurface(safeWidth, content.height);
   result.blit(content, inset, 0, 0, 0, innerWidth, content.height);
   return result;
-}
-
-function blitCentered(
-  surface: Surface,
-  content: Surface,
-  y: number,
-  mask?: Parameters<Surface['blit']>[7],
-): void {
-  surface.blit(
-    content,
-    Math.floor((surface.width - content.width) / 2),
-    y,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    mask,
-  );
 }
 
 function renderFamiliesPane(
@@ -5091,7 +3459,7 @@ function createDocsExplorerApp(
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     helpLineSource: ({ model }) => buildDocsFooterHint(model, localization),
-    shellThemes: DOCS_SHELL_THEMES,
+    shellThemes: DOCS_SHELL_THEME_STATE.shellThemes,
     pages: DOCS_SITE_PAGES.map((spec) => {
       if (spec.id === COMPONENTS_PAGE_ID) {
         return {
@@ -5533,7 +3901,12 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
     currentCtx = nextCtx;
   }, i18n, localization, options, initialLocale.id);
-  const renderLanding = createLandingRenderer(() => currentCtx, localization);
+  const renderLanding = createLandingRenderer({
+    getCtx: () => currentCtx,
+    localization,
+    textModifiers: LANDING_TEXT_MODIFIERS,
+    versionText: VERSION_TEXT,
+  });
   const initialRoute = options.initialRoute ?? 'landing';
 
   function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
@@ -5644,7 +4017,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           }
           if (!msg.ctrl && !msg.alt && /^[1-9]$/.test(msg.key)) {
             const themeIndex = Number(msg.key) - 1;
-            if (themeIndex < LANDING_THEMES.length) {
+            if (themeIndex < LANDING_THEME_COUNT) {
               return [applyLandingThemeSelection(syncShellThemeContext, model, themeIndex), []];
             }
           }
@@ -5699,7 +4072,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         const landing = renderLanding(model);
         const overlays = [
           ...(model.landingQuitConfirmOpen ? [renderShellQuitOverlay(model.columns, model.rows)] : []),
-          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, currentCtx, i18n)] : []),
+          ...(model.docsModel.perfHudOpen ? [renderLandingPerfHudOverlay(model, { ctx: currentCtx, i18n })] : []),
         ];
         return overlays.length === 0
           ? landing

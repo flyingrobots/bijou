@@ -27,8 +27,13 @@ Current count:
 | File/context baseline | 331 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 22 | Existing test mock/spy violations. |
 | Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 317 | Type-aware ESLint findings after the LX-023 DOGFOOD block/capture ratchet pass. |
-| **Total** | **725** | Aggregate Code Dojo standards debt. |
+| ESLint baseline | 266 | Type-aware ESLint findings after the DF-077 DOGFOOD app/theme extraction pass. |
+| **Total** | **674** | Aggregate Code Dojo standards debt. |
+
+DF-077 keeps `examples/docs/app.ts` over both size thresholds, but it tightens
+that file's file/context baseline from `5,793` to `4,166` split-counted lines
+and from `201,982` to `147,799` bytes. It also lowers ESLint debt from `317` to
+`266`, so the aggregate Code Dojo ceiling falls from `725` to `674`.
 
 ## Goalpost Burndown Policy
 
@@ -53,8 +58,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `725`. The next met goalpost must lower the ceiling to
-`675` or lower.
+The current ceiling is `674`. The next met goalpost must lower the ceiling to
+`624` or lower.
 
 ## Updating The Ceiling
 

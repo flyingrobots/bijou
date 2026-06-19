@@ -13,8 +13,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+
+const fs = await import('node:fs');
+const path = await import('node:path');
 
 /**
  * Files allowed to contain raw ANSI escapes (relative to packages/bijou/src/).
@@ -40,8 +41,8 @@ const ALLOWED = new Set([
 /** Recursively collect all `.ts` files, excluding `.test.ts` and `.d.ts`. */
 function collectSourceFiles(dir: string): string[] {
   const results: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...collectSourceFiles(full));
     } else if (
@@ -55,7 +56,7 @@ function collectSourceFiles(dir: string): string[] {
   return results;
 }
 
-const SRC_ROOT = join(__dirname, '../../src');
+const SRC_ROOT = path.join(__dirname, '../../src');
 
 describe('ANSI lint', () => {
   it('no raw ANSI escapes in non-allowed source files', () => {
@@ -64,17 +65,17 @@ describe('ANSI lint', () => {
 
     for (const file of files) {
       // Normalize to forward slashes for cross-platform allowlist matching
-      const rel = relative(SRC_ROOT, file).replace(/\\/g, '/');
+      const rel = path.relative(SRC_ROOT, file).replace(/\\/g, '/');
       if (ALLOWED.has(rel)) continue;
 
-      const content = readFileSync(file, 'utf-8');
+      const content = fs.readFileSync(file, 'utf-8');
       // Case-insensitive match for ANSI escape encodings in source:
       // - hex:     \x1b[ / \x1B] etc.
       // - unicode: \u001b[ / \u001B] etc.
       // - braced:  \u{1b}[ / \u{1B}] etc.
       // - literal: ESC byte (U+001B) followed by [ or ]
       const hasAnsiEscape =
-        /(\\x1b|\\u001b|\\u\{1b\})[\[\]]/i.test(content)
+        /(\\x1b|\\u001b|\\u\{1b\})(?:\[|])/i.test(content)
         || content.includes('\x1b[') || content.includes('\x1b]');
       if (hasAnsiEscape) {
         violations.push(rel);

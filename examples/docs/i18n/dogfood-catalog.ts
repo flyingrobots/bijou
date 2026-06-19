@@ -14,17 +14,28 @@ export function dogfoodI18nCatalogsForLocale(locale: string): readonly I18nCatal
   return Object.freeze(catalogs);
 }
 
-export const DOGFOOD_I18N_CATALOG: I18nCatalog = dogfoodI18nCatalogsForLocale('en')[0]!;
+export const DOGFOOD_I18N_CATALOG: I18nCatalog = firstDogfoodI18nCatalog();
+
+function firstDogfoodI18nCatalog(): I18nCatalog {
+  const [catalog] = dogfoodI18nCatalogsForLocale('en');
+  if (catalog == null) throw new Error('DOGFOOD English i18n catalog is missing');
+  return catalog;
+}
 
 function readRuntimeCatalog(url: URL): I18nCatalog {
   const parsed = JSON.parse(readFileSync(url, 'utf8')) as unknown;
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new Error(`Invalid DOGFOOD i18n catalog: expected object at ${url.pathname}`);
-  }
-  const namespace = (parsed as { namespace?: unknown }).namespace;
-  const entries = (parsed as { entries?: unknown }).entries;
-  if (typeof namespace !== 'string' || !Array.isArray(entries)) {
+  if (!isRuntimeCatalog(parsed)) {
     throw new Error(`Invalid DOGFOOD i18n catalog: missing namespace or entries at ${url.pathname}`);
   }
-  return Object.freeze(parsed as I18nCatalog);
+  return Object.freeze(parsed);
+}
+
+function isRuntimeCatalog(value: unknown): value is I18nCatalog {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+  return 'namespace' in value
+    && typeof value.namespace === 'string'
+    && 'entries' in value
+    && Array.isArray(value.entries);
 }
