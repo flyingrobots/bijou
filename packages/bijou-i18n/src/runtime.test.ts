@@ -81,10 +81,9 @@ describe('bijou-i18n runtime', () => {
     expect(Object.isFrozen(resolved?.lines)).toBe(true);
 
     try {
-      (resolved?.lines as string[] | undefined)?.push('MUTATED');
+      Reflect.apply(Array.prototype.push, resolved?.lines ?? [], ['MUTATED']);
     } catch {
-      // Frozen values should reject mutation; old mutable values should still
-      // fail the final catalog-state assertion below.
+      // frozen
     }
 
     expect(runtime.resource({ namespace: 'assets', id: 'logo' })).toEqual({
@@ -159,13 +158,13 @@ describe('bijou-i18n runtime', () => {
       ],
     });
 
-    const { t } = runtime;
+    const t = runtime.t.bind(undefined);
 
     expect(t({ namespace: 'shell', id: 'ready' })).toBe('Ready');
   });
 
   it('creates an async runtime that preloads the initial locale through the loader', async () => {
-    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>((locale: string) => Promise.resolve([{
       namespace: 'shell',
       entries: [
         {
@@ -177,7 +176,7 @@ describe('bijou-i18n runtime', () => {
           },
         },
       ],
-    }]);
+    }]));
 
     const runtime = await createI18nRuntimeAsync({
       locale: 'fr',
@@ -190,7 +189,7 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('switches loader-managed catalogs on locale change and caches prior loads', async () => {
-    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>((locale: string) => Promise.resolve([{
       namespace: 'shell',
       entries: [
         {
@@ -202,7 +201,7 @@ describe('bijou-i18n runtime', () => {
           },
         },
       ],
-    }]);
+    }]));
 
     const runtime = await createI18nRuntimeAsync({
       locale: 'en',
@@ -220,12 +219,12 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('keeps the active locale stable when loader-backed locale switching fails', async () => {
-    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => {
+    const loader = vi.fn<I18nCatalogLoader>((locale: string) => {
       if (locale === 'fr') {
-        throw new Error('catalog loader unavailable');
+        return Promise.reject(new Error('catalog loader unavailable'));
       }
 
-      return [{
+      return Promise.resolve([{
         namespace: 'shell',
         entries: [
           {
@@ -237,7 +236,7 @@ describe('bijou-i18n runtime', () => {
             },
           },
         ],
-      }];
+      }]);
     });
 
     const runtime = await createI18nRuntimeAsync({
@@ -280,8 +279,8 @@ describe('bijou-i18n runtime', () => {
         },
       ],
     };
-    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => (
-      locale === 'fr' ? [conflictingFrenchCatalog] : [englishCatalog]
+    const loader = vi.fn<I18nCatalogLoader>((locale: string) => Promise.resolve(
+      locale === 'fr' ? [conflictingFrenchCatalog] : [englishCatalog],
     ));
     const runtime = await createI18nRuntimeAsync({
       locale: 'en',
@@ -304,7 +303,7 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('preloads a locale without switching until setLocale is called', async () => {
-    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>((locale: string) => Promise.resolve([{
       namespace: 'shell',
       entries: [
         {
@@ -316,7 +315,7 @@ describe('bijou-i18n runtime', () => {
           },
         },
       ],
-    }]);
+    }]));
 
     const runtime = createI18nRuntime({
       locale: 'en',

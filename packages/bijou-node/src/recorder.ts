@@ -1,45 +1,44 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { createRequire } from 'node:module';
 import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { runScript, type App, type ScriptStep } from '@flyingrobots/bijou-tui';
+import { applyGifPalette, createGifEncoder, quantizeColors } from './gifenc-runtime.js';
+import { loadOledFont } from './oled-font.js';
 
-const require = createRequire(import.meta.url);
-const { GIFEncoder, applyPalette, quantize } = require('gifenc') as typeof import('gifenc');
-const FONT = require('oled-font-5x7') as {
-  width: number;
-  height: number;
-  fontData: number[];
-  lookup: string[];
-};
+const FONT = loadOledFont();
 
 const GLYPH_MAP = new Map<string, number>(FONT.lookup.map((char, index) => [char, index]));
 const DEFAULT_FOREGROUND = '#f5f7ff';
 const DEFAULT_BACKGROUND = '#0b1020';
 
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null; }
+
+function isRgbTuple(value: unknown): value is readonly [number, number, number] {
+  return Array.isArray(value) && value.length === 3 && value.every((item) => typeof item === 'number');
+}
+
 function resolvedColorRgb(ref: unknown): Rgb | undefined {
-  if (typeof ref !== 'object' || ref == null) return undefined;
-  if (!('kind' in ref) || (ref as { kind?: unknown }).kind !== 'resolved-color') return undefined;
-  if (!('rgb' in ref)) return undefined;
-  const rgb = (ref as { rgb: readonly [number, number, number] }).rgb;
-  return { r: rgb[0], g: rgb[1], b: rgb[2] };
+  if (!isRecord(ref) || ref['kind'] !== 'resolved-color' || !isRgbTuple(ref['rgb'])) {
+    return undefined;
+  }
+  const [r, g, b] = ref['rgb'];
+  return { r, g, b };
 }
 
 function normalizeRgb(rgb: Rgb | readonly [number, number, number]): Rgb {
-  return Array.isArray(rgb)
-    ? { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! }
-    : (rgb as Rgb);
+  if (isRgbTuple(rgb)) {
+    const [r, g, b] = rgb;
+    return { r, g, b };
+  }
+  return rgb;
 }
 
 function resolvedColorHex(ref: unknown): string | undefined {
   if (typeof ref === 'string') return ref;
-  return typeof ref === 'object'
-    && ref !== null
-    && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'hex' in ref
-    ? (ref as { hex: string }).hex
-    : undefined;
+  if (!isRecord(ref) || ref['kind'] !== 'resolved-color' || typeof ref['hex'] !== 'string') {
+    return undefined;
+  }
+  return ref['hex'];
 }
 
 export interface NativeDemoSpec<Model, M = never> {
@@ -116,12 +115,12 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
   const frames = options.frames
     .map((frame) => normalizeSurfaceFrame(frame, width, height))
     .map((frame) => rasterizeSurface(frame, rasterOptions));
-  const palette = quantize(joinFrames(frames), 256, { format: 'rgb565' });
-  const gif = GIFEncoder();
+  const palette = quantizeColors(joinFrames(frames), 256, { format: 'rgb565' });
+  const gif = createGifEncoder();
   const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10));
 
   for (const frame of frames) {
-    const indexed = applyPalette(frame, palette);
+    const indexed = applyGifPalette(frame, palette);
     gif.writeFrame(indexed, width * rasterOptions.cellWidth, height * rasterOptions.cellHeight, {
       palette,
       delay,

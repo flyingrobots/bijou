@@ -17,6 +17,7 @@ import {
   type UiTokenUse,
 } from './ui-scene-ir.js';
 import type { Surface } from '../ports/surface.js';
+import { capture, parseGraphqlStringArg } from './graphql-parser-utils.js';
 
 export const BIJOU_BLOCK_ARTIFACT_VERSION = 'bijou-block/1' as const;
 export const GRAPHQL_BIJOU_BLOCK_DEBUG_SUMMARY_VERSION = 'graphql-bijou-block-debug/1' as const;
@@ -188,7 +189,7 @@ export function compileGraphqlBijouBlock(
 }
 
 export function lowerBijouBlockToUiScene(artifact: BijouBlockArtifact): UiSceneIr {
-  const groups = artifact.groups ?? [];
+  const groups = artifact.groups;
   assertUniqueBlockIdentities(groups, artifact.fields, artifact.rootNodeId);
   const nodes: UiNode[] = [
     {
@@ -313,7 +314,7 @@ function parseConstrainedGraphqlBijouBlock(source: string): ParsedGraphqlBijouBl
       if (match == null) {
         continue;
       }
-      typeName = match[1]!;
+      typeName = capture(match, 1, 'type name');
       const rest = match[2] ?? '';
       typeDirectiveTexts.push(rest);
       insideType = rest.includes('{');
@@ -340,8 +341,8 @@ function parseConstrainedGraphqlBijouBlock(source: string): ParsedGraphqlBijouBl
         fields.push(fieldFromDraft(currentField));
       }
       currentField = {
-        fieldName: fieldMatch[1]!,
-        graphqlType: fieldMatch[2]!,
+        fieldName: capture(fieldMatch, 1, 'field name'),
+        graphqlType: capture(fieldMatch, 2, 'field type'),
         directiveTexts: [fieldMatch[3] ?? ''],
       };
       continue;
@@ -378,7 +379,7 @@ function parseDirectives(source: string): readonly ParsedDirective[] {
   const directives: ParsedDirective[] = [];
   for (const match of source.matchAll(DIRECTIVE_PATTERN)) {
     directives.push({
-      name: match[1]!,
+      name: capture(match, 1, 'directive name'),
       args: parseDirectiveArgs(match[2] ?? ''),
     });
   }
@@ -388,19 +389,11 @@ function parseDirectives(source: string): readonly ParsedDirective[] {
 function parseDirectiveArgs(source: string): Readonly<Record<string, DirectiveArgValue>> {
   const args: Record<string, DirectiveArgValue> = {};
   for (const match of source.matchAll(ARG_PATTERN)) {
-    const key = match[1]!;
-    const rawValue = match[2]!;
-    args[key] = rawValue.startsWith('"') ? parseQuotedArg(rawValue) : Number(rawValue);
+    const key = capture(match, 1, 'argument name');
+    const rawValue = capture(match, 2, 'argument value');
+    args[key] = rawValue.startsWith('"') ? parseGraphqlStringArg(rawValue) : Number(rawValue);
   }
   return args;
-}
-
-function parseQuotedArg(rawValue: string): string {
-  try {
-    return JSON.parse(rawValue) as string;
-  } catch {
-    throw new Error(`Invalid GraphQL Bijou block string argument: ${rawValue}`);
-  }
 }
 
 function bijouBlockFieldFor(field: ParsedField, typeName: string, sourceName: string): BijouBlockField {
@@ -519,13 +512,11 @@ function targetProfilesFor(directives: readonly ParsedDirective[]): readonly UiT
   if (kind !== 'bijou-terminal') {
     throw new Error(`Unsupported GraphQL Bijou block target kind: ${kind}`);
   }
-  return [
-    {
-      kind,
-      cols: requiredPositiveIntegerArg(targetDirective, 'cols', '@bijouTarget bijou-terminal must include positive cols:.'),
-      rows: requiredPositiveIntegerArg(targetDirective, 'rows', '@bijouTarget bijou-terminal must include positive rows:.'),
-    },
-  ];
+  return [{
+    kind,
+    cols: requiredPositiveIntegerArg(targetDirective, 'cols', '@bijouTarget bijou-terminal must include positive cols:.'),
+    rows: requiredPositiveIntegerArg(targetDirective, 'rows', '@bijouTarget bijou-terminal must include positive rows:.'),
+  }];
 }
 
 function layoutFor(directive: ParsedDirective): UiLayoutIntent {
@@ -677,18 +668,9 @@ function assertUniqueBlockIdentities(
   fields: readonly BijouBlockField[],
   rootNodeId: string,
 ): void {
-  assertUniqueValues(
-    fields.map((field) => field.fieldName),
-    'field name',
-  );
-  assertUniqueValues(
-    groups.map((group) => group.id),
-    'group id',
-  );
-  assertUniqueValues(
-    [rootNodeId, ...groups.map((group) => group.id), ...fields.map((field) => field.nodeId)],
-    'node id',
-  );
+  assertUniqueValues(fields.map((field) => field.fieldName), 'field name');
+  assertUniqueValues(groups.map((group) => group.id), 'group id');
+  assertUniqueValues([rootNodeId, ...groups.map((group) => group.id), ...fields.map((field) => field.nodeId)], 'node id');
   const groupIds = new Set(groups.map((group) => group.id));
   for (const field of fields) {
     if (field.groupId != null && !groupIds.has(field.groupId)) {
@@ -706,7 +688,7 @@ function assertUniqueBlockIdentities(
 }
 
 function debugGroupFacts(artifact: BijouBlockArtifact): readonly GraphqlBijouBlockDebugGroupFact[] {
-  const groups = artifact.groups ?? [];
+  const groups = artifact.groups;
   return groups.map((group) => {
     const fact: {
       id: string;
@@ -818,7 +800,7 @@ function stripGraphqlLineComment(line: string): string {
   let quoted = false;
   let escaped = false;
   for (let index = 0; index < line.length; index++) {
-    const char = line[index]!;
+    const char = line.charAt(index);
     if (escaped) {
       escaped = false;
       continue;

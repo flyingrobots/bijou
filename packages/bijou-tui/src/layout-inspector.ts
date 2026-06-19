@@ -28,7 +28,6 @@ export interface LayoutInspectorRegion {
 export interface LayoutInspectorOptions {
   /** Draw region labels on the top border. Defaults to `true`. */
   readonly showLabels?: boolean;
-  /** Maximum label width, before clipping to the visible region. */
   readonly maxLabelWidth?: number;
 }
 
@@ -166,7 +165,7 @@ function drawLabel(
   const label = labelForRegion(region).slice(0, maxLabelWidth);
 
   for (let index = 0; index < label.length; index++) {
-    writeChar(surface, rect.x + 1 + index, rect.y, label[index]!);
+    writeChar(surface, rect.x + 1 + index, rect.y, label.charAt(index));
   }
 }
 
@@ -202,11 +201,11 @@ function field(name: string, value: string): string {
 }
 
 function rectLabel(rect: LayoutInspectorRect): string {
-  return `${rectColumn(rect)}${COORD_SEPARATOR}${rectRow(rect)} ${rect.width}${SIZE_SEPARATOR}${rect.height}`;
+  return [rectColumn(rect),COORD_SEPARATOR,rectRow(rect),' ',rect.width,SIZE_SEPARATOR,rect.height].join('');
 }
 
 function scrollLabel(scroll: LayoutInspectorScroll): string {
-  return `${scroll.x}${COORD_SEPARATOR}${scroll.y}`;
+  return [scroll.x,COORD_SEPARATOR,scroll.y].join('');
 }
 
 function rectColumn(rect: LayoutInspectorRect): number {

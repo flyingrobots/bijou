@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135/WF-147 lower live type-aware ESLint
-  findings from `4,517` to `909`, cutting `3,622` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-148 lower live type-aware ESLint
+  findings from `4,517` to `857`, cutting `3,674` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -74,9 +74,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   lifecycle brand/guard cleanup, DOGFOOD shell theme clone/localization
   cleanup, DOGFOOD i18n debt scanner cleanup, localized shell cycle test
   typing, DTCG fuzz fixture typing, binding lifecycle malformed-input tests,
-  and i18n Node adapter cycle import cleanup. The aggregate debt ceiling now
-  ratchets from `4,940` to `1,318`, with the next goalpost target set to
-  `1,268` or lower, while touched
+  i18n Node adapter cycle import cleanup, i18n delimited adapter boundary
+  guards, runtime loader fixture cleanup, GIF recorder import validation,
+  TUI layout/viewport indexing cleanup, and GraphQL block parser capture
+  guards. The aggregate debt ceiling now
+  ratchets from `4,940` to `1,266`, with the next goalpost target set to
+  `1,216` or lower, while touched
   file/context budgets remain held under their stored ceilings, three
   file/context exceptions are removed, and the DOGFOOD raw-string debt baseline
   drops from `2,772` to `2,766`.
