@@ -53,7 +53,8 @@ async function fallbackFilter<T>(options: FilterOptions<T>, ctx: BijouContext): 
   // Try numeric selection first
   const idx = parseInt(trimmed, 10) - 1;
   if (idx >= 0 && idx < options.options.length) {
-    return options.options[idx]!.value;
+    const selected = options.options[idx];
+    if (selected !== undefined) return selected.value;
   }
 
   // Try matching by text
@@ -63,5 +64,7 @@ async function fallbackFilter<T>(options: FilterOptions<T>, ctx: BijouContext): 
     if (matched) return matched.value;
   }
 
-  return options.defaultValue ?? options.options[0]!.value;
+  const fallback = options.options[0];
+  if (fallback === undefined) throw new Error('filter() requires at least one option, or a defaultValue');
+  return options.defaultValue ?? fallback.value;
 }

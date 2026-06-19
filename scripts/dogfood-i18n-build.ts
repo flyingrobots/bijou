@@ -35,7 +35,7 @@ export function runDogfoodI18nBuild(
       if (stale.length > 0) {
         throw new Error(`generated catalog files are stale: ${stale.map((file) => file.path).join(', ')}`);
       }
-      options.stdout?.(`dogfood-i18n-build: ${expectedFiles.length} catalog files up to date\n`);
+      options.stdout?.(`dogfood-i18n-build: ${String(expectedFiles.length)} catalog files up to date\n`);
       return {
         exitCode: 0,
         files: Object.freeze(expectedFiles.map((file) => file.path)),
@@ -48,7 +48,7 @@ export function runDogfoodI18nBuild(
       writeFileSync(file.path, file.content, 'utf8');
       writtenFiles.push(file.path);
     }
-    options.stdout?.(`dogfood-i18n-build: wrote ${expectedFiles.length} catalog files\n`);
+    options.stdout?.(`dogfood-i18n-build: wrote ${String(expectedFiles.length)} catalog files\n`);
     return {
       exitCode: 0,
       files: Object.freeze(writtenFiles),

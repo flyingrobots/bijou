@@ -59,7 +59,7 @@ describe('mockClock()', () => {
 
   it('throws when runAll() would loop forever on an active interval', () => {
     const clock = mockClock();
-    clock.setInterval(() => {}, 5);
+    clock.setInterval(() => undefined, 5);
 
     expect(() => { clock.runAll(); }).toThrow(/active interval timers/i);
   });
@@ -67,10 +67,9 @@ describe('mockClock()', () => {
   it('still allows runAll() when an interval disposes itself', () => {
     const clock = mockClock();
     const calls: number[] = [];
-    let handle: { dispose(): void } | undefined;
-    handle = clock.setInterval(() => {
+    const handle = clock.setInterval(() => {
       calls.push(clock.now());
-      handle?.dispose();
+      handle.dispose();
     }, 5);
 
     clock.runAll();

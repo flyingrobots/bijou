@@ -2411,6 +2411,61 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.requiresTty"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "DOGFOOD nécessite un terminal interactif avec stdin et stdout attachés à un TTY."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.runCommand"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Exécutez `npm run dogfood` dans un émulateur de terminal, pas via un pipeline shell, une redirection ou un exécuteur de tâches non interactif."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.scriptedVerification"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Pour la vérification scriptée, utilisez `npm run smoke:dogfood`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.notice.exitControls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Commandes de sortie : appuyez sur q pour ouvrir la confirmation, y pour confirmer, n pour annuler ou Ctrl-C pour quitter immédiatement."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.notice.start"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Démarrage de DOGFOOD, une TUI interactive en plein écran."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeDiagnostics.colorReuse"
       },
       "kind": "message",

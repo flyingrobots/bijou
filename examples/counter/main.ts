@@ -25,7 +25,7 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const lines = [
       '',
-      box(`  Count: ${model.count}  `),
+      box(`  Count: ${String(model.count)}  `),
       '',
       `  ${kbd('↑')} ${kbd('k')} ${kbd('+')}  increment`,
       `  ${kbd('↓')} ${kbd('j')} ${kbd('-')}  decrement`,

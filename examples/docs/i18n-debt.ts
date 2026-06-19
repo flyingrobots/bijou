@@ -143,7 +143,7 @@ export function discoverDogfoodI18nDebtSources(
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2766,
+  total: 2761,
   bySurface: Object.freeze({
     'capture-main': 17,
     'component-stories': 1631,
@@ -161,7 +161,6 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'storybook-app': 37,
     'storybook-workstation': 7,
     'svg-raster': 2,
-    'terminal-guard': 5,
   }),
 });
 

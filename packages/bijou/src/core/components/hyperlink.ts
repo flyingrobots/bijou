@@ -27,8 +27,8 @@ export interface HyperlinkOptions {
 export function hyperlink(text: string, url: string, options?: HyperlinkOptions): string {
   const ctx = resolveCtx(options?.ctx);
   const fallback = options?.fallback ?? 'both';
-  const safeText = sanitizePlainTerminalText(text ?? '');
-  const safeUrl = sanitizePlainTerminalText(url ?? '', { newlineReplacement: '' });
+  const safeText = sanitizePlainTerminalText(text);
+  const safeUrl = sanitizePlainTerminalText(url, { newlineReplacement: '' });
 
   // No context → use fallback format
   if (!ctx) return formatFallback(safeText, safeUrl, fallback);

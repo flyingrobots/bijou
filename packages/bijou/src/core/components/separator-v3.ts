@@ -60,11 +60,15 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   if (useRGB) {
     const ps = surface;
     for (let x = 0; x < left; x++) ps.setRGB(x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);
-    for (let i = 0; i < labelGraphemes.length; i++) ps.setRGB(left + i, 0, labelGraphemes[i]!, -1, 0, 0, -1, 0, 0);
+    for (let i = 0; i < labelGraphemes.length; i++) {
+      ps.setRGB(left + i, 0, labelGraphemes[i] ?? ' ', -1, 0, 0, -1, 0, 0);
+    }
     for (let x = 0; x < right; x++) ps.setRGB(left + labelGraphemes.length + x, 0, '\u2500', bfgR, bfgG, bfgB, bbgR, bbgG, bbgB, bflags);
   } else {
     for (let x = 0; x < left; x++) surface.set(x, 0, { char: '\u2500', ...borderStyle, empty: false });
-    for (let i = 0; i < labelGraphemes.length; i++) surface.set(left + i, 0, { char: labelGraphemes[i]!, empty: false });
+    for (let i = 0; i < labelGraphemes.length; i++) {
+      surface.set(left + i, 0, { char: labelGraphemes[i] ?? ' ', empty: false });
+    }
     for (let x = 0; x < right; x++) surface.set(left + labelGraphemes.length + x, 0, { char: '\u2500', ...borderStyle, empty: false });
   }
 

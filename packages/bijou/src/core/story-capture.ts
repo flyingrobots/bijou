@@ -95,7 +95,7 @@ export function storyCaptureMatrixText(matrix: StoryCaptureMatrix): string {
     lines.push(`variant ${variant.id} (${variant.label})`);
     for (const profile of matrix.profiles) {
       const capture = findCapture(matrix.captures, profile.id, variant.id);
-      lines.push(`[${profile.id} ${profile.mode} width=${profile.width}]`);
+      lines.push(`[${profile.id} ${profile.mode} width=${String(profile.width)}]`);
       lines.push(capture?.output ?? EMPTY_LABEL);
     }
   }

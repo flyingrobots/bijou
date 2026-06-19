@@ -8,13 +8,13 @@ function alphaAt(
   x: number,
   y: number,
 ): number {
-  return Number(frame.data[((y * frame.width) + x) * 4 + 3] ?? 0);
+  return frame.data[((y * frame.width) + x) * 4 + 3] ?? 0;
 }
 
 function filledPixelCount(frame: { readonly data: Uint8ClampedArray | readonly number[] }): number {
   let count = 0;
   for (let offset = 3; offset < frame.data.length; offset += 4) {
-    if (Number(frame.data[offset] ?? 0) > 0) count++;
+    if ((frame.data[offset] ?? 0) > 0) count++;
   }
   return count;
 }

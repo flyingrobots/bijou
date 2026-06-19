@@ -10,11 +10,13 @@
 import { expect } from 'vitest';
 import type { TestContext } from './index.js';
 
+const ESC = String.fromCharCode(27);
+
 /** Matches any ANSI escape: CSI (`\x1b[`) or OSC (`\x1b]`). */
-const ANSI_RE = new RegExp('\\x1b[\\[\\]]');
+const ANSI_RE = new RegExp(ESC + '[\\[\\]]');
 
 /** Matches SGR color/style sequences (`\x1b[<digits>m`) but not cursor control. */
-const SGR_RE = new RegExp('\\x1b\\[\\d+(?:;\\d+)*m');
+const SGR_RE = new RegExp(ESC + '\\[\\d+(?:;\\d+)*m');
 
 /**
  * Assert that the output contains no ANSI escapes at all (no CSI, no OSC).

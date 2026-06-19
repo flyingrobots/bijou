@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Implemented.
 
 ## Tracker
 
@@ -41,11 +41,20 @@ Live counts on `main` at `212cd006`:
 
 Selected cleanup slice:
 
-- TBD after focused offender probing.
+- Small runtime, test, script, and example files with fake async callbacks,
+  unsafe test payload assertions, unchecked array reads, control-regex
+  construction, non-null assertions, numeric template interpolation, and raw
+  DOGFOOD terminal guard strings.
 
 Implemented counts on this branch before review:
 
-- TBD after implementation.
+- aggregate Code Dojo debt: `953`
+- ESLint findings: `545`
+- file/context baseline: `331`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- DOGFOOD raw-string debt: `2,761`
+- next aggregate target: `903` or lower
 
 ## Scope
 

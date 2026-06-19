@@ -54,8 +54,7 @@ describe('note', () => {
 
   it('resolves to undefined (compatible with wizard)', async () => {
     const ctx = createTestContext({ mode: 'pipe' });
-    const result = await note({ message: 'Test', ctx });
-    expect(result).toBeUndefined();
+    await expect(note({ message: 'Test', ctx })).resolves.toBeUndefined();
   });
 
   it('handles multiline messages', async () => {

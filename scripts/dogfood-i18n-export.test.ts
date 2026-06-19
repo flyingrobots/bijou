@@ -64,7 +64,8 @@ describe('DOGFOOD i18n export workflow', () => {
   });
   it('exports Dogfood translations through the existing CSV workbook adapter', async () => {
     const workbook = createDogfoodTranslationWorkbook('it');
-    const sheet = workbook.sheets[0]!;
+    const sheet = workbook.sheets[0];
+    if (sheet === undefined) throw new Error('Expected translation workbook sheet');
     const csv = (await runDogfoodI18nExport({
       args: ['--locale', 'it', '--format', 'csv'],
       stdout: (text) => text,
@@ -126,11 +127,8 @@ describe('DOGFOOD i18n export workflow', () => {
       join(dir, 'catalogs', 'es', 'bijou.dogfood.json'),
       join(dir, 'catalogs', 'fr', 'bijou.dogfood.json'),
     ]);
-    expect(JSON.parse(frCatalog).entries.find(
-      (entry: { key: { id: string } }) => entry.key.id === 'settings.language.label',
-    ).values).toEqual({
-      fr: 'Langue préférée',
-    });
+    expect(frCatalog).toContain('"id": "settings.language.label"');
+    expect(frCatalog).toContain('"fr": "Langue préférée"');
     expect(runDogfoodI18nBuild({
       outDir: join(dir, 'catalogs'),
       check: true,

@@ -55,8 +55,8 @@ describe('mockIO()', () => {
 
   it('rawInput() returns a disposable handle', () => {
     const io = mockIO();
-    const handle = io.rawInput(() => {});
-    expect(handle.dispose).toBeTypeOf('function');
+    const handle = io.rawInput(() => undefined);
+    expect(handle).toHaveProperty('dispose');
     handle.dispose(); // should not throw
   });
 

@@ -15,7 +15,10 @@ export const FRUIT_OPTIONS: SelectOption[] = [
 ];
 
 /** A large set of numbered options for scrolling tests. */
-export const MANY_OPTIONS: SelectOption[] = Array.from({ length: 20 }, (_, i) => ({
-  label: `Option ${i + 1}`,
-  value: `v${i + 1}`,
-}));
+export const MANY_OPTIONS: SelectOption[] = Array.from({ length: 20 }, (_, i) => {
+  const optionNumber = String(i + 1);
+  return {
+    label: `Option ${optionNumber}`,
+    value: `v${optionNumber}`,
+  };
+});

@@ -2411,6 +2411,61 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.requiresTty"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "DOGFOOD benötigt ein interaktives Terminal mit stdin und stdout an einem TTY."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.runCommand"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Führe `npm run dogfood` in einem Terminalemulator aus, nicht über eine Shell-Pipeline, Umleitung oder einen nicht interaktiven Task-Runner."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.nonInteractive.scriptedVerification"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Für skriptgesteuerte Verifizierung verwende `npm run smoke:dogfood`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.notice.exitControls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Beenden: Drücke q für die Beenden-Bestätigung, y zum Bestätigen, n zum Abbrechen oder Ctrl-C zum harten Beenden."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "terminal.notice.start"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "DOGFOOD startet, eine interaktive Vollbild-TUI."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeDiagnostics.colorReuse"
       },
       "kind": "message",
