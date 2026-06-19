@@ -7,7 +7,7 @@ Planned.
 ## Tracker
 
 - Issue: [#421](https://github.com/flyingrobots/bijou/issues/421)
-- Pull request: pending
+- Pull request: [#422](https://github.com/flyingrobots/bijou/pull/422)
 - Branch: `cycle/dogfood-app-landing-extraction-725`
 
 ## Current Truth
