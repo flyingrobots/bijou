@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Tracker
 
@@ -25,6 +25,21 @@ Live counts on `main` at `2fcdba1a`:
 - `examples/docs/app.ts` code-size baseline: `5,793` lines
 - DOGFOOD raw-string debt: `2,644`
 - `docs-app` raw-string debt: `256`
+- missing Markdown localization debt: `78`
+
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `725`
+- next aggregate Code Dojo target: `675` or lower
+- ESLint findings: `317`
+- file/context baseline: `331`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` hard-limit files
+- `examples/docs/app.ts`: `4,549` enforced lines and `159,729` bytes
+- `examples/docs/app.ts` file/context baseline: `4,549` lines and `159,729` bytes
+- `examples/docs/app.ts` code-size baseline: `4,549` lines
+- DOGFOOD raw-string debt: `2,607`
+- `docs-app` raw-string debt: `219`
 - missing Markdown localization debt: `78`
 
 `examples/docs/app.ts` is now ESLint-clean, but it is still the largest
@@ -88,7 +103,7 @@ without widening the change.
 
 ## Validation Plan
 
-- `npx eslint examples/docs/app.ts examples/docs/app-landing.ts`
+- `npx eslint examples/docs/app.ts examples/docs/app-landing*.ts examples/docs/i18n-debt.ts`
 - `npm run code-dojo:changed`
 - `npm run code-dojo:debt`
 - `npm run dogfood:i18n:debt`
@@ -100,6 +115,26 @@ without widening the change.
 - `npm run docs:inventory`
 - `git diff --check`
 - full pre-push gate
+
+Implemented validation:
+
+- `npx eslint examples/docs/app.ts examples/docs/app-landing*.ts examples/docs/i18n-debt.ts`
+- `npm run typecheck:test`
+- `npm run dogfood:i18n:complete`
+- `npm run dogfood:i18n:check`
+- `npm run dogfood:i18n:debt`
+- `npm run code-dojo:changed`
+- `npm run code-dojo:debt`
+- `npm run code-dojo:verify`
+- `npm run test:run -- tests/cycles/DF-060/v7-dogfood-release-title-screen.test.ts
+  tests/cycles/DF-067/responsive-dogfood-layout-variants.test.ts
+  scripts/smoke-dogfood.test.ts
+  tests/cycles/WF-003/replace-smoke-examples-with-smoke-dogfood.test.ts`
+- `npm run smoke:dogfood:landing -- --skip-build`
+- `npm run smoke:dogfood:docs -- --skip-build`
+- `npm run docs:inventory`
+- `npm run lint`
+- `git diff --check`
 
 ## Acceptance Criteria
 

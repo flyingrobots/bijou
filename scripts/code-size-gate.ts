@@ -37,7 +37,7 @@ const SKIPPED_DIRECTORIES = new Set([
 ]);
 
 export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freeze([
-  { path: 'examples/docs/app.ts', lines: 5793 },
+  { path: 'examples/docs/app.ts', lines: 4549 },
   { path: 'examples/docs/stories.ts', lines: 5007 },
   { path: 'packages/bijou-tui/src/app-frame.ts', lines: 2871 },
   { path: 'examples/docs/dogfood-blocks.ts', lines: 2638 },

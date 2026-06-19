@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "examples/docs/app.ts",
-      "lines": 5793,
-      "bytes": 201982
+      "lines": 4549,
+      "bytes": 159729
     },
     {
       "path": "examples/docs/stories.ts",

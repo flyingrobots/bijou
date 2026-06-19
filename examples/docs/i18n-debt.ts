@@ -141,13 +141,13 @@ export function discoverDogfoodI18nDebtSources(
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2644,
+  total: 2607,
   bySurface: Object.freeze({
     'capture-main': 9,
     'component-stories': 1526,
     'counter-block-demo': 56,
     coverage: 1,
-    'docs-app': 256,
+    'docs-app': 219,
     'dogfood-blocks': 679,
     'dogfood-locale': 12,
     'i18n-dogfood-authoring': 1,
@@ -628,6 +628,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
   if (isDiscriminantComparison(node)) return true;
   if (isErrorConstructorArgument(node)) return true;
   if (hasAncestor(node, (ancestor) => isOutputModeDeclaration(ancestor, sourceFile))) return true;
+  if (hasAncestor(node, (ancestor) => isTypedControlVocabulary(ancestor, sourceFile))) return true;
   if (isThemeTokenFamilyIdentifier(node)) return true;
 
   const propertyName = nearestPropertyName(node);
@@ -767,6 +768,11 @@ function isErrorConstructorArgument(node: ts.Node): boolean {
 function isOutputModeDeclaration(node: ts.Node, sourceFile: ts.SourceFile): boolean {
   if (!ts.isVariableDeclaration(node) || node.type == null) return false;
   return node.type.getText(sourceFile).includes('OutputMode');
+}
+
+function isTypedControlVocabulary(node: ts.Node, sourceFile: ts.SourceFile): boolean {
+  return ts.isSatisfiesExpression(node)
+    && /\b[A-Za-z0-9]+(?:Mode|Kind|Status|Type|Id)\b/.test(node.type.getText(sourceFile));
 }
 
 function containsNode(parent: ts.Node, target: ts.Node): boolean {

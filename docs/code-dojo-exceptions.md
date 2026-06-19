@@ -27,8 +27,12 @@ Current count:
 | File/context baseline | 331 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 22 | Existing test mock/spy violations. |
 | Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 317 | Type-aware ESLint findings after the LX-023 DOGFOOD block/capture ratchet pass. |
+| ESLint baseline | 317 | Type-aware ESLint findings after the DF-077 DOGFOOD landing extraction pass. |
 | **Total** | **725** | Aggregate Code Dojo standards debt. |
+
+DF-077 does not lower the aggregate count because `examples/docs/app.ts` remains
+over both size thresholds, but it tightens that file's line baseline from
+`5,793` to `4,549` and byte baseline from `201,982` to `159,729`.
 
 ## Goalpost Burndown Policy
 
