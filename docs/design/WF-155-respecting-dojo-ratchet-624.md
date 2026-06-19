@@ -2,12 +2,12 @@
 
 ## Status
 
-Shaping.
+In progress.
 
 ## Tracker
 
 - GitHub Issue: [#423](https://github.com/flyingrobots/bijou/issues/423)
-- Pull Request: Pending.
+- Pull Request: [#424](https://github.com/flyingrobots/bijou/pull/424)
 
 ## Legend
 
