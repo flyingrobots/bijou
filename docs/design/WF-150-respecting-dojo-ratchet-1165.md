@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Tracker
 
@@ -24,6 +24,26 @@ Live counts on `main` at `321bb2b0`:
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - DOGFOOD raw-string debt: `2,766`
 - next aggregate target: `1,165` or lower
+
+Selected cleanup slice:
+
+- `packages/bijou-tui/src/app-frame-input-overlays.test.ts`
+- `packages/bijou-tui/src/subapp/mount.test.ts`
+- `packages/bijou/src/core/block-metadata.test.ts`
+- `scripts/docs-preview-landing.test.ts`
+- `scripts/smoke-all-examples.test.ts`
+- `tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts`
+- `tests/cycles/LX-011/dogfood-locale-ratchet.test.ts`
+
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `1,160`
+- ESLint findings: `752`
+- file/context baseline: `331`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- DOGFOOD raw-string debt: `2,766`
+- next aggregate target: `1,110` or lower
 
 ## Scope
 

@@ -34,7 +34,6 @@ import {
   V7_DEFAULT_BACKGROUND,
   V7_RASTER_TITLE_GLYPHS,
   _resetDefaultContextForTesting,
-  Theme,
 } from './docs-preview.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
@@ -46,7 +45,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
 
     let [model] = app.init();
-    let cmds: any[] = [];
+    let cmds: ReturnType<typeof app.update>[1];
 
     [model, cmds] = app.update(keyMsg('escape'), model);
     expect((model).landingQuitConfirmOpen).toBe(true);
@@ -56,11 +55,7 @@ describe('docs preview app', () => {
     expect((model).landingQuitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]?.(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const returned = await must(cmds[0])(() => undefined, { onPulse: () => ({ dispose: () => undefined }) });
     expect(returned).toBe(QUIT);
   });
 
@@ -84,11 +79,7 @@ describe('docs preview app', () => {
     const [, cmds] = app.update(keyMsg('escape'), model);
     expect(cmds).toHaveLength(1);
 
-    const returned = await cmds[0]?.(() => {}, {
-      onPulse() {
-        return { dispose() {} };
-      },
-    });
+    const returned = await must(cmds[0])(() => undefined, { onPulse: () => ({ dispose: () => undefined }) });
     expect(returned).toBe(QUIT);
   });
 
@@ -133,7 +124,7 @@ describe('docs preview app', () => {
           continue;
         }
         const cell = initial.frames[0]?.get(x, y);
-        if (!V7_RASTER_TITLE_GLYPHS.has(cell.char ?? '')) continue;
+        if (!V7_RASTER_TITLE_GLYPHS.has(cell.char)) continue;
         if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
         if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
         sameColorWakeCells++;

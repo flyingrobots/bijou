@@ -10,29 +10,26 @@ import {
   resolveDogfoodInitialLocale,
 } from '../../../examples/docs/locale.js';
 import { createNodeDogfoodLocalePort } from '../../../examples/docs/node-locale.js';
+type DocsModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];
 const KEY_DOWN = '\x1b[B';
 const KEY_ENTER = '\r';
 const KEY_F2 = '\x1bOQ';
 const RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS = 15_000;
-function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+function frameText(frame?: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+  if (!frame) throw new Error('missing frame');
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
   return text;
 }
-function pageLocales(model: unknown): readonly string[] {
-  const pageModels = (model as {
-    readonly docsModel: {
-      readonly pageModels: Readonly<Record<string, { readonly locale: string }>>;
-    };
-  }).docsModel.pageModels;
-  return Object.values(pageModels).map((pageModel) => pageModel.locale);
+function pageLocales(model: DocsModel): readonly string[] {
+  return Object.values(model.docsModel.pageModels).map((pageModel) => pageModel.locale);
 }
-function expectEveryPageLocale(model: unknown, locale: string): void {
+function expectEveryPageLocale(model: DocsModel, locale: string): void {
   const locales = pageLocales(model);
   expect(locales.length).toBeGreaterThan(0);
   expect(locales).toEqual(Array.from({ length: locales.length }, () => locale));
@@ -76,7 +73,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       },
     });
     expect(port.preferredLocale()).toBe('es_MX.UTF-8');
-    port.savePreferredLocale?.('fr');
+    void port.savePreferredLocale?.('fr');
     expect(port.preferredLocale()).toBe('fr');
     expect(writes.get('/tmp/bijou-test-locale')).toBe('fr\n');
   });
@@ -88,7 +85,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
         readText() {
           throw Object.assign(new Error('permission denied'), { code: 'EACCES' });
         },
-        writeText() {},
+        writeText: () => undefined,
       },
     });
     expect(port.preferredLocale()).toBe('de_DE.UTF-8');
@@ -154,7 +151,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     });
     const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
     expectEveryPageLocale(result.model, 'fr');
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(frameText(result.frames.at(-1))).toContain('Langue préférée');
   });
   it('normalizes supported explicit locale aliases before rendering localized settings', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -163,7 +160,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       locale: 'fr-FR',
     });
     const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(result.frames.at(-1));
     expectEveryPageLocale(result.model, 'fr');
     expect(text).toContain('Langue préférée');
     expect(text).not.toContain('Preferred language');
@@ -184,7 +181,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       }],
     });
     const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(frameText(result.frames.at(-1))).toContain('Langue préférée');
   });
   it('preserves extra DOGFOOD catalog overrides after language cycling', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -208,7 +205,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       { key: KEY_ENTER },
     ], { ctx });
     expectEveryPageLocale(result.model, 'fr');
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue sentinelle');
+    expect(frameText(result.frames.at(-1))).toContain('Langue sentinelle');
   }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
   it('refreshes frame page labels from the selected locale after language cycling', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -263,7 +260,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       { key: KEY_DOWN },
       { key: KEY_ENTER },
     ], { ctx });
-    const text = frameText(result.frames.at(-1)!);
+    const text = frameText(result.frames.at(-1));
     expect(text).toContain('Blocs sentinelle');
     expect(text).toContain('Paquets sentinelle');
     expect(text).not.toContain('[Guides]  Components  Blocks');
@@ -288,7 +285,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       { key: KEY_ENTER },
     ], { ctx });
     expectEveryPageLocale(result.model, 'fr');
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(frameText(result.frames.at(-1))).toContain('Langue préférée');
     expect(savedLocales).toEqual(['fr']);
   }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
   it('keeps locale activation when preference persistence fails', async () => {
@@ -312,7 +309,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       { key: KEY_ENTER },
     ], { ctx });
     expectEveryPageLocale(result.model, 'fr');
-    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(frameText(result.frames.at(-1))).toContain('Langue préférée');
     expect(attemptedSaves).toEqual(['fr']);
   }, RENDERED_LANGUAGE_CYCLE_TEST_TIMEOUT_MS);
 });
