@@ -9,8 +9,6 @@ import {
   isBindingLifecycleOwner,
   isBindingLifecycleRecord,
   suspendBinding,
-  type BindingInvalidation,
-  type BindingLifecycleState,
 } from './binding-lifecycle.js';
 
 describe('binding lifecycle primitives', () => {
@@ -125,17 +123,12 @@ describe('binding lifecycle primitives', () => {
     ]);
     expect(Object.isFrozen(invalidated.invalidations)).toBe(true);
     expect(Object.isFrozen(invalidated.invalidations[0])).toBe(true);
-    expect(() => {
-      (invalidated.invalidations as BindingInvalidation[]).push({
-        requirementId: 'article',
-        reason: 'manual',
-      });
-    }).toThrow(TypeError);
+    expect(() => Object.assign(invalidated.invalidations, { 0: undefined })).toThrow(TypeError);
   });
 
   it('rejects empty ids, invalid states, and loose lifecycle-shaped objects', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
-    const inheritedOwner = Object.create(owner);
+    const inherited: unknown = Object.create(owner);
 
     expect(() => defineBindingLifecycleOwner({ id: '', kind: 'view' })).toThrow(
       'binding lifecycle owner: id is required',
@@ -144,17 +137,17 @@ describe('binding lifecycle primitives', () => {
       id: 'reader.view',
       kind: 'page',
     })).toThrow('binding lifecycle owner: unsupported kind page');
-    expect(() => bindingLifecycleRecord({
-      owner: { id: 'reader.view', kind: 'view' } as never,
+    expect(() => bad(bindingLifecycleRecord, [{
+      owner: { id: 'reader.view', kind: 'view' },
       requirementId: 'article',
-    })).toThrow(
+    }])).toThrow(
       'binding lifecycle: owner was not created by defineBindingLifecycleOwner()',
     );
-    expect(isBindingLifecycleOwner(inheritedOwner)).toBe(false);
-    expect(() => bindingLifecycleRecord({
-      owner: inheritedOwner,
+    expect(isBindingLifecycleOwner(inherited)).toBe(false);
+    expect(() => bad(bindingLifecycleRecord, [{
+      owner: inherited,
       requirementId: 'article',
-    })).toThrow(
+    }])).toThrow(
       'binding lifecycle: owner was not created by defineBindingLifecycleOwner()',
     );
     expect(() => bindingLifecycleRecord({ owner, requirementId: '   ' })).toThrow(
@@ -165,19 +158,19 @@ describe('binding lifecycle primitives', () => {
       requirementId: 'article',
       providerId: '   ',
     })).toThrow('binding lifecycle: providerId is required');
-    expect(() => bindingLifecycleRecord({
+    expect(() => bad(bindingLifecycleRecord, [{
       owner,
       requirementId: 'article',
-      state: 'loading' as BindingLifecycleState,
-    })).toThrow('binding lifecycle: unsupported state loading');
+      state: 'loading',
+    }])).toThrow('binding lifecycle: unsupported state loading');
     expect(() => bindingLifecycleRecord({
       owner,
       requirementId: 'article',
       version: 0,
     })).toThrow('binding lifecycle: version must be a positive integer');
-    expect(() => invalidateBinding(activeRecord(), {
-      reason: 'refresh' as never,
-    })).toThrow('binding invalidation: unsupported reason refresh');
+    expect(() => bad(invalidateBinding, [activeRecord(), {
+      reason: 'refresh',
+    }])).toThrow('binding invalidation: unsupported reason refresh');
     expect(() => bindingLifecycleRecord({
       owner,
       requirementId: 'article',
@@ -210,9 +203,9 @@ describe('binding lifecycle primitives', () => {
     })).toThrow('binding lifecycle: transition chain is discontinuous at index 1');
 
     const record = activeRecord();
-    const inheritedRecord = Object.create(record);
+    const inheritedRecord: unknown = Object.create(record);
     expect(isBindingLifecycleRecord(inheritedRecord)).toBe(false);
-    expect(() => suspendBinding(inheritedRecord)).toThrow(
+    expect(() => bad(suspendBinding, [inheritedRecord])).toThrow(
       'binding lifecycle: record was not created by bindingLifecycleRecord()',
     );
   });
@@ -259,3 +252,5 @@ function activeRecord() {
     providerId: 'docs.articleProvider',
   });
 }
+
+function bad(fn: unknown, args: unknown[]): unknown { if (typeof fn !== 'function') throw new TypeError(); return Reflect.apply(fn, null, args); }
