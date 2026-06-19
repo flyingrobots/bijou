@@ -1,8 +1,8 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { GIFEncoder, applyPalette, quantize } from 'gifenc';
 import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { runScript, type App, type ScriptStep } from '@flyingrobots/bijou-tui';
+import { applyGifPalette, createGifEncoder, quantizeColors } from './gifenc-runtime.js';
 import { loadOledFont } from './oled-font.js';
 
 const FONT = loadOledFont();
@@ -115,12 +115,12 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
   const frames = options.frames
     .map((frame) => normalizeSurfaceFrame(frame, width, height))
     .map((frame) => rasterizeSurface(frame, rasterOptions));
-  const palette = quantize(joinFrames(frames), 256, { format: 'rgb565' });
-  const gif = GIFEncoder();
+  const palette = quantizeColors(joinFrames(frames), 256, { format: 'rgb565' });
+  const gif = createGifEncoder();
   const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10));
 
   for (const frame of frames) {
-    const indexed = applyPalette(frame, palette);
+    const indexed = applyGifPalette(frame, palette);
     gif.writeFrame(indexed, width * rasterOptions.cellWidth, height * rasterOptions.cellHeight, {
       palette,
       delay,

@@ -1,13 +1,27 @@
 import { describe, expect, it } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { createSurface } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { App } from '@flyingrobots/bijou-tui';
 import { recordDemoGif, rasterizeSurface, writeSurfaceGif } from './recorder.js';
 
+const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
+
 describe('recorder', () => {
+  it('loads through the Node ESM loader', () => {
+    execFileSync(process.execPath, [
+      '--import',
+      'tsx',
+      '--input-type=module',
+      '--eval',
+      "await import('./packages/bijou-node/src/recorder.ts');",
+    ], { cwd: REPO_ROOT });
+  });
+
   it('rasterizes cell foreground and background colors', () => {
     const surface = createSurface(1, 1);
     surface.set(0, 0, {
