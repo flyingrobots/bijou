@@ -92,6 +92,19 @@ describe('git hooks', () => {
     expect(packageJson).not.toMatch(/"test:run": "npm test"/u);
   });
 
+  it('pre-commit delegates duplicate lint and code-size gates to Code Dojo', () => {
+    const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-commit'), 'utf8');
+    const localHook = readFileSync(resolve(ROOT, 'scripts/hooks/pre-commit'), 'utf8');
+    const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
+
+    expect(hookShim).toContain('npm run -s code-dojo:precommit');
+    expect(hookShim).toContain('scripts/hooks/pre-commit');
+    expect(packageJson).toMatch(/"code-dojo:precommit": "[^"]*npm run code:size[^"]*npm run lint/u);
+    expect(localHook).not.toContain('npm run lint');
+    expect(localHook).not.toContain('npm run code:size');
+    expect(localHook).toContain('npm ls --all');
+  });
+
   it('Code Dojo workflow uses the standards-only verification lane', () => {
     const workflow = readFileSync(resolve(ROOT, '.github/workflows/code-dojo.yml'), 'utf8');
     const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
@@ -102,9 +115,20 @@ describe('git hooks', () => {
   });
 
   it('bounds the full Vitest worker pool for CI stability', () => {
+    const runner = readFileSync(resolve(ROOT, 'scripts/run-vitest.mjs'), 'utf8');
     const config = vitestConfig as { test?: { maxWorkers?: unknown; testTimeout?: unknown } };
 
     expect(config.test?.maxWorkers).toBe(2);
     expect(config.test?.testTimeout).toBe(60_000);
+    expect(runner).toContain('BIJOU_VITEST_MAX_WORKERS');
+  });
+
+  it('exposes fast Code Dojo slice planning commands', () => {
+    const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
+
+    expect(packageJson).toContain('"code-dojo:eslint:offenders"');
+    expect(packageJson).toContain('"code-dojo:slice"');
+    expect(existsSync(resolve(ROOT, 'scripts/code-dojo/eslint-offenders.mjs'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'scripts/code-dojo/slice.mjs'))).toBe(true);
   });
 });

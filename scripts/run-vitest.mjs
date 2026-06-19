@@ -7,11 +7,12 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const VITEST = resolve(ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHUNK_SIZE = parsePositiveInt(process.env.BIJOU_VITEST_CHUNK_SIZE, 48);
+const MAX_WORKERS = parsePositiveInt(process.env.BIJOU_VITEST_MAX_WORKERS, 2);
 const BASE_ARGS = [
   'run',
   '--config',
   'vitest.config.ts',
-  '--maxWorkers=2',
+  `--maxWorkers=${MAX_WORKERS}`,
   '--testTimeout=60000',
 ];
 

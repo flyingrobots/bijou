@@ -15,6 +15,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   DOGFOOD i18n gates when pushed paths do not affect DOGFOOD policy and runs
   the full Vitest suite through `npm run test:run` to avoid the `pretest`
   rebuild. Set `BIJOU_FULL_PUSH=1` to force the full pre-push DOGFOOD gate.
+  The local burndown loop also exposes `code-dojo:eslint:offenders` and
+  `code-dojo:slice` for focused standards cleanup, lets local Vitest runs raise
+  `BIJOU_VITEST_MAX_WORKERS`, and removes duplicate pre-commit lint and
+  code-size checks that were already covered by `code-dojo:precommit`.
 - **Respecting the Dojo burndown** — WF-135 lowers live type-aware ESLint
   findings from `4,517` to `2,144`, cutting `2,382` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
