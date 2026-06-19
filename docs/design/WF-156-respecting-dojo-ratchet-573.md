@@ -7,7 +7,7 @@ In progress.
 ## Tracker
 
 - GitHub Issue: [#425](https://github.com/flyingrobots/bijou/issues/425)
-- Pull Request: TBD
+- Pull Request: [#426](https://github.com/flyingrobots/bijou/pull/426)
 
 ## Legend
 
