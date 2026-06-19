@@ -23,7 +23,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
 - **Respecting the Dojo burndown** — WF-135/WF-137 lower live type-aware ESLint
-  findings from `4,517` to `1,551`, cutting `2,977` counted Code Dojo
+  findings from `4,517` to `1,497`, cutting `3,031` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -49,10 +49,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   unchecked fixture cleanup, plus TUI runtime binding brand/dispatch cleanup and
   core schema-block inert-data, brand, and bind-output cleanup, plus worker IPC
   data guard cleanup, DAG renderer safe-indexing cleanup, and preference-list
-  iteration cleanup, plus DTCG token import guards, canvas shader typing, and
-  i18n exchange import validation cleanup. The aggregate debt ceiling now
-  ratchets from `4,940` to `1,963`, with the next goalpost target set to
-  `1,913` or lower, while touched
+  iteration cleanup, plus DTCG token import guards, canvas shader typing, i18n
+  exchange import validation, overlay surface safe-read, render pipeline state,
+  and runtime lifecycle/error formatting cleanup. The aggregate debt ceiling now
+  ratchets from `4,940` to `1,909`, with the next goalpost target set to
+  `1,859` or lower, while touched
   file/context budgets remain held under their stored ceilings and two
   file/context exceptions are removed.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers

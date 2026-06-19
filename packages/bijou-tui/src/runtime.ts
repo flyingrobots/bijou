@@ -28,17 +28,9 @@ import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.j
 import { evaluateSurfaceBudget, type SurfaceBudgetWarning } from './surface-budget.js';
 import type { RuntimeIssue } from './types.js';
 
-/**
- * Disable mouse reporting sequences that terminals may send.
- * Some terminals auto-enable mouse tracking in alt screen mode.
- */
-const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
+type ErrorWritePort = Pick<WritePort, 'write'> & Partial<Pick<WritePort, 'writeError'>>;
 
-/**
- * Enable SGR mouse reporting.
- * 1000 = basic press/release, 1002 = button-event tracking (drag),
- * 1006 = SGR extended format (supports large coordinates, explicit release).
- */
+const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
 const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
@@ -59,26 +51,10 @@ export interface RuntimePostRenderEffect<Model> {
 }
 
 export interface RuntimeLifecycleHooks<Model> {
-  beforeRender?(model: Model): Model | void;
-  afterRender?(summary: RuntimeRenderSummary<Model>): RuntimePostRenderEffect<Model> | void;
+  beforeRender?(model: Model): Model | undefined;
+  afterRender?(summary: RuntimeRenderSummary<Model>): RuntimePostRenderEffect<Model> | undefined;
 }
 
-/**
- * Run a TEA application.
- *
- * In non-interactive modes (pipe/static/accessible), renders the initial view
- * once and exits. In interactive mode, enters the alt screen, starts the
- * keyboard event loop, and drives the model/update/view cycle.
- *
- * All input sources (keyboard, resize, commands) are unified through an
- * internal EventBus — a single subscription drives the update cycle.
- *
- * @template Model - The application model type.
- * @template M     - The message (action) type for the TEA update cycle.
- * @param app     - The TEA application definition (init, update, view).
- * @param options - Optional runtime configuration (context, alt screen, cursor, mouse).
- * @returns A promise that resolves when the application exits.
- */
 export async function run<Model, M>(
   app: App<Model, M>,
   options?: RunOptions<M>,
@@ -180,10 +156,21 @@ export async function runWithLifecycleHooks<Model, M>(
 
   function formatModelSnapshot(snapshot: unknown): string {
     try {
-      const serialized = JSON.stringify(snapshot, null, 2);
-      return serialized ?? String(snapshot);
+      const serialized: unknown = JSON.stringify(snapshot, null, 2);
+      return typeof serialized === 'string' ? serialized : formatRuntimeDetail(snapshot);
     } catch {
       return '[unserializable model snapshot]';
+    }
+  }
+
+  function formatRuntimeDetail(error: unknown): string {
+    if (error instanceof Error) return error.stack ?? error.message;
+    if (error == null || typeof error !== 'object') return String(error);
+    try {
+      const serialized: unknown = JSON.stringify(error);
+      return typeof serialized === 'string' ? serialized : Object.prototype.toString.call(error);
+    } catch {
+      return Object.prototype.toString.call(error);
     }
   }
 
@@ -194,9 +181,7 @@ export async function runWithLifecycleHooks<Model, M>(
   ): Surface {
     const viewport = runtimeViewport();
     ensureFramebufferSize(viewport.columns, viewport.rows);
-    const detail = error instanceof Error
-      ? error.stack ?? error.message
-      : String(error);
+    const detail = formatRuntimeDetail(error);
     const content = [
       'Bijou runtime crash',
       '',
@@ -223,7 +208,7 @@ export async function runWithLifecycleHooks<Model, M>(
     if (fatalError === null) {
       fatalError = error;
     }
-    const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+    const detail = formatRuntimeDetail(error);
     writeErrorLine(ctx.io, `[Runtime Error] ${detail}\n`);
     if (crashMode) return;
 
@@ -250,7 +235,7 @@ export async function runWithLifecycleHooks<Model, M>(
     } catch (crashRenderError) {
       writeErrorLine(
         ctx.io,
-        `[Runtime Error] Failed to render crash surface: ${crashRenderError instanceof Error ? (crashRenderError.stack ?? crashRenderError.message) : String(crashRenderError)}\n`,
+        `[Runtime Error] Failed to render crash surface: ${formatRuntimeDetail(crashRenderError)}\n`,
       );
       shutdown(fatalError);
     }
@@ -260,7 +245,7 @@ export async function runWithLifecycleHooks<Model, M>(
     clock,
     commandBackpressureThreshold: options?.commandBackpressureThreshold,
     onCommandBackpressure(info) {
-      const message = `Command backpressure: ${info.pendingCommands} commands pending (threshold ${info.backpressureThreshold})`;
+      const message = `Command backpressure: ${String(info.pendingCommands)} commands pending (threshold ${String(info.backpressureThreshold)})`;
       writeErrorLine(ctx.io, `[EventBus] ${message}\n`);
       routeRuntimeIssue({
         level: 'warning',
@@ -272,7 +257,7 @@ export async function runWithLifecycleHooks<Model, M>(
     onCommandRejected(error) {
       const message = error instanceof Error
         ? `${error.name}: ${error.message}`
-        : String(error);
+        : formatRuntimeDetail(error);
       writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
       routeRuntimeIssue({
         level: 'error',
@@ -285,7 +270,7 @@ export async function runWithLifecycleHooks<Model, M>(
     onError(message, error) {
       const detail = error instanceof Error
         ? `${error.name}: ${error.message}`
-        : String(error);
+        : formatRuntimeDetail(error);
       writeErrorLine(ctx.io, `${message} ${detail}\n`);
       routeRuntimeIssue({
         level: 'warning',
@@ -304,7 +289,7 @@ export async function runWithLifecycleHooks<Model, M>(
   pipeline.use('Layout', (state, next) => {
     let viewOutput;
     try {
-      viewOutput = app.view(state.model);
+      viewOutput = app.view(model);
     } catch (error) {
       state.data[FATAL_RENDER_ERROR_KEY] = error;
       return;
@@ -315,7 +300,6 @@ export async function runWithLifecycleHooks<Model, M>(
       height: viewport.rows,
     });
     state.data[RENDER_LAYOUT_ROOT_KEY] = layoutRoot;
-    (state as any).layoutRoot = layoutRoot;
     next();
   });
 
@@ -382,6 +366,9 @@ export async function runWithLifecycleHooks<Model, M>(
   let renderQueued = false;
   let renderInFlight = false;
   let renderHandle: TimerHandle | null = null;
+  const hasPendingRender = () => renderHandle != null || renderInFlight;
+  const isCrashMode = () => crashMode;
+  const isRenderQueued = () => renderQueued;
   function scheduleRender(): void {
     if (renderHandle != null || renderInFlight) return;
 
@@ -457,7 +444,7 @@ export async function runWithLifecycleHooks<Model, M>(
         enterCrashMode('render', error, model);
       } finally {
         renderInFlight = false;
-        if (renderQueued) {
+        if (isRenderQueued()) {
           scheduleRender();
         }
       }
@@ -565,7 +552,7 @@ export async function runWithLifecycleHooks<Model, M>(
   resetFramebuffers(postResizeViewport.columns, postResizeViewport.rows);
 
   // Initial render + startup commands
-  if (!crashMode) {
+  if (!isCrashMode()) {
     render();
     executeCommands(initCmds);
     executeCommands(resizeCmds);
@@ -578,7 +565,7 @@ export async function runWithLifecycleHooks<Model, M>(
   });
 
   // Ensure any pending render is flushed before exiting
-  if (renderHandle != null || renderInFlight) {
+  if (hasPendingRender()) {
     await new Promise<void>((resolve) => {
       let flushHandle: TimerHandle | null = null;
       flushHandle = clock.setTimeout(() => {
@@ -595,7 +582,7 @@ export async function runWithLifecycleHooks<Model, M>(
     SHUTDOWN_DRAIN_TIMEOUT_MS,
   );
   if (shutdownDrainResult === 'timed-out') {
-    const message = `Timed out waiting ${SHUTDOWN_DRAIN_TIMEOUT_MS}ms for pending commands to drain during shutdown.`;
+    const message = `Timed out waiting ${String(SHUTDOWN_DRAIN_TIMEOUT_MS)}ms for pending commands to drain during shutdown.`;
     writeErrorLine(ctx.io, `[Runtime Warning] ${message}\n`);
   }
 
@@ -612,7 +599,7 @@ export async function runWithLifecycleHooks<Model, M>(
   }
 
   if (fatalError != null) {
-    throw fatalError instanceof Error ? fatalError : new Error(String(fatalError));
+    throw fatalError instanceof Error ? fatalError : new Error(formatRuntimeDetail(fatalError));
   }
 }
 
@@ -651,19 +638,7 @@ async function awaitDrainWithinTimeout(
   }
 }
 
-/**
- * Upper-bound byte budget per surface cell for the pooled output buffer.
- * Each cell can emit at most a CUP move (~10 bytes), a full RGB SGR
- * prefix (~44 bytes), four modifier codes (~16 bytes), a grapheme
- * (~4 bytes UTF-8 in the fast path, ~28 bytes for side-table emoji
- * clusters), and an SGR reset (~4 bytes). 96 bytes per cell covers the
- * worst case where diff-gradient-style frames emit a unique style per
- * cell with no batching; the differ also flushes mid-frame if the
- * pool runs low, so this budget is a comfort margin rather than an
- * absolute bound.
- */
 const OUTBUF_BYTES_PER_CELL = 96;
-/** Fixed slack added on top of the cell budget for ANSI preamble/tail. */
 const OUTBUF_SLACK = 8192;
 
 /**
@@ -685,7 +660,7 @@ function createInvalidatedFrontBuffer(columns: number, rows: number): Surface {
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */
-function writeErrorLine(io: WritePort, data: string): void {
+function writeErrorLine(io: ErrorWritePort, data: string): void {
   if (io.writeError != null) {
     io.writeError(data);
     return;

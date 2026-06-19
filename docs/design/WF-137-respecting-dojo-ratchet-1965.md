@@ -121,11 +121,11 @@ behavior.
 
 ## Retrospective
 
-Completed with aggregate Code Dojo debt reduced from `2,015` to `1,963`
-(`-52`). The stored ESLint baseline now records `1,551` live findings, down
-from `1,603`, and the next aggregate target is `1,913` or lower.
+Completed with aggregate Code Dojo debt reduced from `2,015` to `1,909`
+(`-106`). The stored ESLint baseline now records `1,497` live findings, down
+from `1,603`, and the next aggregate target is `1,859` or lower.
 
-The implementation cleaned three non-DOGFOOD files:
+The implementation cleaned six non-DOGFOOD files:
 
 - `packages/bijou/src/core/theme/dtcg.ts` now treats imported DTCG documents as
   unknown-shaped records and validates token, modifier, RGB, group, and JSON
@@ -136,8 +136,23 @@ The implementation cleaned three non-DOGFOOD files:
 - `packages/bijou-i18n-tools/src/exchange.ts` now validates serialized exchange
   value kinds before decoding, keeps external version fields checkable, and
   derives workbook row typing from the column manifest.
+- `packages/bijou-tui/src/overlay.ts` now guards resolved color records and
+  packed-buffer reads without non-null assertions while preserving drawer and
+  inherited-background behavior.
+- `packages/bijou-tui/src/pipeline/pipeline.ts` now uses `unknown` render-state
+  extension data, guarded layout-root and thenable reads, explicit unknown error
+  formatting, and preserved halted-stage timing semantics.
+- `packages/bijou-tui/src/runtime.ts` now avoids `void` unions in lifecycle hook
+  returns, keeps render/crash queue checks explicit, removes the legacy
+  `layoutRoot` mutation, and formats runtime errors without object
+  stringification.
 
-Touched file/context budgets held or shrank: `dtcg.ts` is now `291` lines /
-`9,587` bytes against a `347` / `12,346` baseline, `canvas.ts` is now `356`
-lines / `10,895` bytes against a `377` / `11,295` baseline, and `exchange.ts`
+Touched file/context budgets held or shrank: `dtcg.ts` is now `314` lines /
+`10,484` bytes against a `347` / `12,346` baseline, `canvas.ts` is now `358`
+lines / `10,953` bytes against a `377` / `11,295` baseline, and `exchange.ts`
 is now `344` lines / `11,440` bytes against a `361` / `11,459` baseline.
+The follow-on TUI slice held the same ratchet: `overlay.ts` is now `933` lines
+/ `33,332` bytes against a `942` / `33,721` baseline, `pipeline.ts` is now
+`238` lines / `7,756` bytes against a `268` / `8,646` baseline, and
+`runtime.ts` is now `669` lines / `19,491` bytes against a `695` / `20,640`
+baseline.

@@ -1,13 +1,3 @@
-/**
- * Overlay compositing primitives for TUI apps.
- *
- * - `composite()` — paint overlays onto a background string (ANSI-safe)
- * - `compositeSurface()` — paint overlays onto a background surface
- * - `modal()` — centered dialog overlay with title, body, hint
- * - `toast()` — anchored notification overlay with variant icons
- * - `tooltip()` — positioned overlay relative to a target element
- */
-
 import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
 import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
 import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
@@ -25,24 +15,31 @@ import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
 
 function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
-  return typeof ref === 'object'
-    && ref !== null
-    && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'rgb' in ref
-    ? (ref as { rgb: readonly [number, number, number] }).rgb
+  const rgb = isResolvedColorRecord(ref) ? ref['rgb'] : undefined;
+  return isRgbTuple(rgb)
+    ? rgb
     : undefined;
 }
 
 function resolvedColorHex(ref: unknown): string | undefined {
   if (typeof ref === 'string') return ref;
+  const hex = isResolvedColorRecord(ref) ? ref['hex'] : undefined;
+  return typeof hex === 'string'
+    ? hex
+    : undefined;
+}
+
+function isResolvedColorRecord(ref: unknown): ref is Record<string, unknown> {
   return typeof ref === 'object'
     && ref !== null
     && 'kind' in ref
-    && (ref as { kind?: unknown }).kind === 'resolved-color'
-    && 'hex' in ref
-    ? (ref as { hex: string }).hex
-    : undefined;
+    && ref.kind === 'resolved-color';
+}
+
+function isRgbTuple(value: unknown): value is readonly [number, number, number] {
+  return Array.isArray(value)
+    && value.length === 3
+    && value.every((channel) => typeof channel === 'number');
 }
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { forceTextPresentation } from './icon-presentation.js';
@@ -197,8 +194,9 @@ export function composite(
 
   if (options?.dim) {
     for (let i = 0; i < bgLines.length; i++) {
-      if (visibleLength(bgLines[i]!) > 0) {
-        bgLines[i] = '\x1b[2m' + bgLines[i] + '\x1b[0m';
+      const line = bgLines[i] ?? '';
+      if (visibleLength(line) > 0) {
+        bgLines[i] = `\x1b[2m${line}\x1b[0m`;
       }
     }
   }
@@ -208,7 +206,7 @@ export function composite(
     for (let i = 0; i < oLines.length; i++) {
       const targetRow = overlay.row + i;
       if (targetRow < 0 || targetRow >= bgLines.length) continue;
-      bgLines[targetRow] = spliceLine(bgLines[targetRow]!, oLines[i]!, overlay.col);
+      bgLines[targetRow] = spliceLine(bgLines[targetRow] ?? '', oLines[i] ?? '', overlay.col);
     }
   }
 
@@ -257,10 +255,11 @@ export function compositeSurfaceInto(
       const size = target.width * target.height;
       for (let i = 0; i < size; i++) {
         const off = i * CELL_STRIDE;
-        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+        const flags = buf[off + OFF_FLAGS] ?? 0;
+        if (flags & FLAG_EMPTY) continue;
         // Skip space chars (charCode 0x20)
-        if (buf[off]! === 0x20 && buf[off + 1]! === 0) continue;
-        buf[off + OFF_FLAGS] = buf[off + OFF_FLAGS]! | FLAG_DIM;
+        if ((buf[off] ?? 0) === 0x20 && (buf[off + 1] ?? 0) === 0) continue;
+        buf[off + OFF_FLAGS] = flags | FLAG_DIM;
       }
       target.markAllDirty();
     } else {
@@ -418,10 +417,12 @@ function lineWithInheritedBackground(line: Surface, style: Pick<CellStyle, 'bg' 
     const buf = packedSurface.buffer;
     for (let i = 0; i < result.width; i++) {
       const off = i * CELL_STRIDE;
-      if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
-      if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+      const flags = buf[off + OFF_FLAGS] ?? 0;
+      const alpha = buf[off + OFF_ALPHA] ?? 0;
+      if (flags & FLAG_EMPTY) continue;
+      if (alpha & FLAG_BG_SET) continue;
       buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
-      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+      buf[off + OFF_ALPHA] = alpha | FLAG_BG_SET;
     }
     packedSurface.markAllDirty();
     return result;
@@ -480,13 +481,13 @@ function renderBoxSurface(
   for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, height - 1, BORDER.h, paintedBorderStyle);
   setStyledCell(surface, width - 1, height - 1, BORDER.br, paintedBorderStyle);
 
-  for (let i = 0; i < lines.length; i++) {
-    const y = i + 1;
+  for (const [index, sourceLine] of lines.entries()) {
+    const y = index + 1;
     setStyledCell(surface, 0, y, BORDER.v, paintedBorderStyle);
     for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, y, ' ', fillStyle);
     setStyledCell(surface, width - 1, y, BORDER.v, paintedBorderStyle);
 
-    const line = lineWithInheritedBackground(lines[i]!, fillStyle);
+    const line = lineWithInheritedBackground(sourceLine, fillStyle);
     if (line.width > 0 && innerWidth > 0) {
       surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
     }
@@ -709,7 +710,7 @@ export function drawer(options: DrawerOptions): Overlay {
 
   const fillStyle = backgroundStyleFromToken(options.bgToken, ctx);
   const borderStyle = withFallbackBackground(styleFromToken(options.borderToken, ctx), fillStyle);
-  const titleStyle = ctx ? { modifiers: ['bold'] as string[] } : {};
+  const titleStyle: CellStyle = ctx ? { modifiers: ['bold'] } : {};
   const surface = createSurface(width, height);
 
   if (width === 0 || height === 0) {
@@ -772,7 +773,7 @@ function resolveDrawerDimensions(
   if (options.anchor === 'top' || options.anchor === 'bottom') {
     const anchor = options.anchor;
     const heightRaw = options.height;
-    if (heightRaw == null || !Number.isFinite(heightRaw)) {
+    if (!Number.isFinite(heightRaw)) {
       throw new Error(`drawer(): "height" is required for anchor "${anchor}"`);
     }
     const height = clamp(Math.floor(heightRaw), 0, region.height);
@@ -785,26 +786,17 @@ function resolveDrawerDimensions(
   }
 
   const anchor = options.anchor ?? 'right';
-  if (anchor === 'left' || anchor === 'right') {
-    const widthRaw = options.width;
-    if (widthRaw == null || !Number.isFinite(widthRaw)) {
-      throw new Error(`drawer(): "width" is required for anchor "${anchor}"`);
-    }
-    const width = clamp(Math.floor(widthRaw), 0, region.width);
-    const height = region.height;
-    const row = region.row;
-    const col = anchor === 'left'
-      ? region.col
-      : region.col + region.width - width;
-    return { width, height, row, col: Math.max(region.col, col) };
+  const widthRaw = options.width;
+  if (typeof widthRaw !== 'number' || !Number.isFinite(widthRaw)) {
+    throw new Error(`drawer(): "width" is required for anchor "${anchor}"`);
   }
-
-  return assertNever(anchor);
-}
-
-/** Exhaustive check — always throws. */
-function assertNever(value: never): never {
-  throw new Error(`Unexpected drawer anchor: ${String(value)}`);
+  const width = clamp(Math.floor(widthRaw), 0, region.width);
+  const height = region.height;
+  const row = region.row;
+  const col = anchor === 'left'
+    ? region.col
+    : region.col + region.width - width;
+  return { width, height, row, col: Math.max(region.col, col) };
 }
 
 /** Normalize an optional region into a clamped LayoutRect within screen bounds. */
