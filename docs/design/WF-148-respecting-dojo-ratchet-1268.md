@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Implemented.
 
 ## Tracker
 
@@ -34,7 +34,25 @@ Live counts on `main` at `c911b15f`:
 
 Selected cleanup slice:
 
-- TBD after `npm run code-dojo:eslint:offenders`.
+- `packages/bijou-i18n-tools/src/adapters.ts`
+- `packages/bijou-i18n-tools/src/adapter-guards.ts`
+- `packages/bijou-i18n/src/runtime.test.ts`
+- `packages/bijou-node/src/recorder.ts`
+- `packages/bijou-node/src/oled-font.ts`
+- `packages/bijou-tui/src/layout-inspector.ts`
+- `packages/bijou-tui/src/viewport.ts`
+- `packages/bijou/src/core/graphql-bijou-block.ts`
+- `packages/bijou/src/core/graphql-parser-utils.ts`
+
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `1,266`
+- ESLint findings: `857`
+- file/context baseline: `332`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- DOGFOOD raw-string debt: `2,766`
+- next aggregate target: `1,216` or lower
 
 ## Scope
 

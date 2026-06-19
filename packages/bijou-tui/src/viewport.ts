@@ -87,7 +87,7 @@ export interface ScrollState {
 // ---------------------------------------------------------------------------
 
 /** Pattern matching SGR-style ANSI escape sequences. */
-const ANSI_RE = /\x1b\[[0-9;]*m/g;
+const ANSI_RE = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
 /**
  * Strip all SGR ANSI escape sequences from a string.
@@ -154,7 +154,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
   let i = 0;
 
   while (i < str.length) {
-    const ch = str[i]!;
+    const ch = str.charAt(i);
 
     if (ch === '\x1b') {
       inEscape = true;
@@ -179,10 +179,10 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
       continue;
     }
 
-    // Visible character — consume next pre-segmented grapheme
     if (gi >= graphemes.length) break;
 
-    const grapheme = graphemes[gi]!;
+    const grapheme = graphemes[gi];
+    if (grapheme === undefined) break;
     const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible >= endCol) {
@@ -231,7 +231,7 @@ export function tokenizeAnsi(str: string, width: number): string[] {
   let visibleCount = 0;
 
   while (i < str.length && visibleCount < width) {
-    const ch = str[i]!;
+    const ch = str.charAt(i);
 
     if (ch === '\x1b') {
       inEscape = true;
@@ -253,10 +253,10 @@ export function tokenizeAnsi(str: string, width: number): string[] {
 
     if (gi >= graphemes.length) break;
 
-    const grapheme = graphemes[gi]!;
+    const grapheme = graphemes[gi];
+    if (grapheme === undefined) break;
     const gWidth = graphemeClusterWidth(grapheme);
 
-    // If adding this grapheme exceeds width, stop
     if (visibleCount + gWidth > width) break;
 
     const styledGrapheme = activeAnsi + grapheme + '\x1b[0m';
@@ -268,7 +268,6 @@ export function tokenizeAnsi(str: string, width: number): string[] {
     i += grapheme.length;
   }
 
-  // Pad with spaces
   while (result.length < width) {
     result.push(' ');
   }
@@ -406,11 +405,9 @@ export function viewport(options: ViewportOptions): string {
   // Append scrollbar
   if (needsScrollbar) {
     const bar = renderScrollbar(height, totalLines, clampedY, scrollbarTrackChar, scrollbarThumbChar);
-    return rendered.map((line, i) => (
-      scrollbarMode === 'overlay'
-        ? overlayScrollbarChar(line, width, bar[i]!)
-        : line + bar[i]!
-    )).join('\n');
+    return rendered.map((line, i) => (scrollbarMode === 'overlay'
+      ? overlayScrollbarChar(line, width, bar[i] ?? ' ')
+      : line + (bar[i] ?? ' '))).join('\n');
   }
 
   return rendered.join('\n');
@@ -481,8 +478,9 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
     const bar = renderScrollbar(safeHeight, totalLines, clampedY, scrollbarTrackChar, scrollbarThumbChar);
     const scrollbarX = safeWidth - 1;
     for (let y = 0; y < safeHeight; y++) {
-      const cell = bar[y] === scrollbarThumbChar ? scrollbarThumbCell : scrollbarTrackCell;
-      result.set(scrollbarX, y, { ...cell, char: bar[y]!, empty: false });
+      const rail = bar[y] ?? ' ';
+      const cell = rail === scrollbarThumbChar ? scrollbarThumbCell : scrollbarTrackCell;
+      result.set(scrollbarX, y, { ...cell, char: rail, empty: false });
     }
   }
 
@@ -565,7 +563,7 @@ function normalizeViewportContent(content: Surface | LayoutNode): Surface {
 }
 
 function isSurfaceContent(value: Surface | LayoutNode): value is Surface {
-  return typeof value === 'object' && value !== null && 'cells' in value;
+  return 'cells' in value;
 }
 
 /**

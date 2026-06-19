@@ -1,5 +1,6 @@
-import type { CatalogBundle, ExchangeSheet, TranslationWorkbookRow } from './exchange.js';
+import type { CatalogBundle, ExchangeSheet } from './exchange.js';
 import { exportCatalogBundle, importCatalogBundle } from './exchange.js';
+import { assertCatalogBundle, assertWorkbookRow, delimitedRowFromCells, serializedCell } from './adapter-guards.js';
 
 export type DelimitedFormat = 'csv' | 'tsv';
 
@@ -35,8 +36,8 @@ function parseDelimited(input: string, delimiter: string): string[][] {
   let inQuotes = false;
 
   for (let index = 0; index < input.length; index += 1) {
-    const char = input[index];
-    const next = input[index + 1];
+    const char = input.charAt(index);
+    const next = input.charAt(index + 1);
 
     if (inQuotes) {
       if (char === '"') {
@@ -94,36 +95,6 @@ function parseDelimited(input: string, delimiter: string): string[][] {
   return rows;
 }
 
-function assertWorkbookRow(row: Record<string, string>, context: string): TranslationWorkbookRow {
-  const required = [
-    'namespace',
-    'id',
-    'kind',
-    'sourceLocale',
-    'targetLocale',
-    'status',
-    'sourceHash',
-    'description',
-    'sourceValueKind',
-    'sourceValue',
-    'translatedValueKind',
-    'translatedValue',
-  ] as const;
-
-  for (const key of required) {
-    if (typeof row[key] !== 'string') {
-      throw new Error(`Invalid delimited sheet: missing ${key} in ${context}`);
-    }
-  }
-
-  return row as unknown as TranslationWorkbookRow;
-}
-
-function serializedCell(row: object, column: string): string {
-  const value = (row as Readonly<Record<string, unknown>>)[column];
-  return typeof value === 'string' ? value : '';
-}
-
 export function serializeDelimitedSheet(sheet: DelimitedSheetInput, format: DelimitedFormat): string {
   const delimiter = delimiterFor(format);
   const lines = [
@@ -151,11 +122,9 @@ export function parseDelimitedSheet(input: string, format: DelimitedFormat): Del
   const columns = [...header];
   const parsedRows = body.map((cells, rowIndex) => {
     if (cells.length !== columns.length) {
-      throw new Error(`Invalid delimited sheet: ragged row ${rowIndex + 2}`);
+      throw new Error(`Invalid delimited sheet: ragged row ${String(rowIndex + 2)}`);
     }
-    return Object.freeze(Object.fromEntries(
-      columns.map((column, index) => [column, cells[index] ?? '']),
-    ) as Record<string, string>);
+    return delimitedRowFromCells(columns, cells);
   });
 
   return Object.freeze({
@@ -176,7 +145,7 @@ export function parseExchangeSheet(
   const sheet = parseDelimitedSheet(input, format);
   const parsedRows = sheet.rows.map((row, rowIndex) => {
     const record = { ...row };
-    return assertWorkbookRow(record, `${name}:${rowIndex + 2}`);
+    return assertWorkbookRow(record, `${name}:${String(rowIndex + 2)}`);
   });
 
   return {
@@ -199,9 +168,10 @@ export function parseCatalogBundleJson(input: string): CatalogBundle {
   }
 
   try {
-    return exportCatalogBundle(importCatalogBundle(parsed as CatalogBundle));
+    assertCatalogBundle(parsed);
+    return exportCatalogBundle(importCatalogBundle(parsed));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'unknown error';
-    throw new Error(`Invalid catalog bundle json: ${message}`);
+    throw new Error(`Invalid catalog bundle json: ${message}`, { cause: error });
   }
 }
