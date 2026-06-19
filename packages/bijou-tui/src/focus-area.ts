@@ -23,7 +23,7 @@
 
 import type { BijouContext, Cell, Surface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
-import { resolveBCSSTextToken } from './css/text-style.js';
+import { resolveBCSSTextToken, toStyleToken } from './css/text-style.js';
 import {
   type ScrollbarMode,
   type ScrollState,
@@ -436,9 +436,6 @@ function paintCellPreservingBackground(target: Surface, x: number, y: number, ce
   });
 }
 
-/**
- * Resolve the styled gutter string based on focus state and context.
- */
 function resolveGutter(
   focused: boolean,
   ctx: BijouContext | undefined,
@@ -462,11 +459,11 @@ function resolveGutter(
         {
           hex: baseToken.hex,
           bg: baseToken.bg,
-          modifiers: baseToken.modifiers as string[] | undefined,
+          modifiers: baseToken.modifiers,
         },
       );
 
-      return ctx.style.styled(token as any, GUTTER_CHAR);
+      return ctx.style.styled(toStyleToken(token), GUTTER_CHAR);
     },
   }, options);
 }
@@ -521,10 +518,10 @@ function resolveScrollbarCell(
     {
       hex: baseToken.hex,
       bg: baseToken.bg,
-      modifiers: baseToken.modifiers as string[] | undefined,
+      modifiers: baseToken.modifiers,
     },
   );
-  const parsed = parseAnsiToSurface(ctx.style.styled(token as any, baseChar), 1, 1).get(0, 0);
+  const parsed = parseAnsiToSurface(ctx.style.styled(toStyleToken(token), baseChar), 1, 1).get(0, 0);
   scrollbarCellCache.set(key, parsed);
   return parsed;
 }

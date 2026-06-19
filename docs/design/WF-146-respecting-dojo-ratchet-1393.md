@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped; pending implementation.
+Implemented; pending final validation and review.
 
 ## Issue
 
@@ -68,7 +68,21 @@ Live counts on `main` at `5eccfb69`:
 
 Implemented counts on this branch before review:
 
-- pending
+- aggregate Code Dojo debt: `1,390`
+- ESLint findings: `981`
+- file/context baseline: `332`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- next aggregate target: `1,340` or lower
+
+Selected cleanup slice:
+
+- `packages/bijou-tui/src/app-frame-types.ts`
+- `packages/bijou-tui/src/css/text-style.ts`
+- `packages/bijou-tui/src/driver.ts`
+- `packages/bijou-tui/src/focus-area.ts`
+- `packages/bijou/src/core/binding-lifecycle.ts`
+- `examples/docs/dogfood-shell-themes.ts`
 
 ## Playback Questions
 

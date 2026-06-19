@@ -2,45 +2,14 @@ import {
   BIJOU_DARK,
   BIJOU_LIGHT,
   defineThemeSafePairs,
-  type RGB,
   type Theme,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
 
-function cloneToken(token: TokenValue): TokenValue {
-  return {
-    ...token,
-    ...(token.modifiers === undefined ? {} : { modifiers: [...token.modifiers] }),
-    ...(token.fgRGB === undefined ? {} : { fgRGB: [...token.fgRGB] as RGB }),
-    ...(token.bgRGB === undefined ? {} : { bgRGB: [...token.bgRGB] as RGB }),
-  };
-}
-
-function cloneTokenRecord<T extends Record<string, TokenValue>>(tokens: T): T {
-  return Object.fromEntries(
-    Object.entries(tokens).map(([key, token]) => [key, cloneToken(token)]),
-  ) as T;
-}
-
 function cloneThemeWithName(theme: Theme, name: string): Theme {
   return {
-    ...theme,
+    ...structuredClone(theme),
     name,
-    status: cloneTokenRecord(theme.status),
-    semantic: cloneTokenRecord(theme.semantic),
-    gradient: Object.fromEntries(
-      Object.entries(theme.gradient).map(([key, stops]) => [
-        key,
-        stops.map((stop) => ({
-          pos: stop.pos,
-          color: [...stop.color] as RGB,
-        })),
-      ]),
-    ) as Theme['gradient'],
-    border: cloneTokenRecord(theme.border),
-    ui: cloneTokenRecord(theme.ui),
-    surface: cloneTokenRecord(theme.surface),
   };
 }
 

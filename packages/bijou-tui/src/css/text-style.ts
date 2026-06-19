@@ -1,11 +1,11 @@
-import { createSurface, isPackedSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, segmentGraphemes, type BijouContext, type Surface, type TextModifier, type TokenValue } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 export interface StyledTextToken {
   hex?: string;
   bg?: string;
-  fgRGB?: readonly [number, number, number];
-  bgRGB?: readonly [number, number, number];
+  fgRGB?: [number, number, number];
+  bgRGB?: [number, number, number];
   modifiers?: string[];
 }
 
@@ -58,6 +58,14 @@ export function mergeBCSSModifiers(
   return modifiers.size > 0 ? Array.from(modifiers) : undefined;
 }
 
+function styleModifiers(modifiers: readonly string[] | undefined): TextModifier[] | undefined {
+  return modifiers?.filter((modifier): modifier is TextModifier => /^(?:bold|dim|strikethrough|inverse|(?:curly-|dotted-|dashed-)?underline)$/u.test(modifier));
+}
+
+export function toStyleToken(token: StyledTextToken): TokenValue {
+  return { hex: token.hex ?? '', bg: token.bg, fgRGB: token.fgRGB, bgRGB: token.bgRGB, modifiers: styleModifiers(token.modifiers) };
+}
+
 export function resolveBCSSTextToken(
   ctx: BijouContext,
   identity: BCSSIdentity,
@@ -97,13 +105,9 @@ export function styleTextWithBCSS(
     return text;
   }
 
-  return ctx.style.styled(token as any, text);
+  return ctx.style.styled(toStyleToken(token), text);
 }
 
-/**
- * Fill a surface with styled text graphemes. Shared implementation used by
- * both the create and paint paths to avoid logic duplication.
- */
 function fillStyledText(
   surface: Surface,
   text: string,
@@ -115,12 +119,11 @@ function fillStyledText(
   if (safeWidth === 0) return;
 
   if (!ctx) {
-    // Fill all cells first to clear stale content from previous paints,
-    // then overwrite with the new graphemes.
     surface.fill({ char: ' ', empty: false });
     const graphemes = segmentGraphemes(text);
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
-      surface.set(x, 0, { char: graphemes[x]!, empty: false });
+      const grapheme = graphemes[x] ?? ' ';
+      surface.set(x, 0, { char: grapheme, empty: false });
     }
     return;
   }
@@ -138,19 +141,19 @@ function fillStyledText(
   const graphemes = segmentGraphemes(text);
   const packed = isPackedSurface(surface);
   const fg = packed ? (token.fgRGB ?? (token.hex ? parseHex(token.hex) : undefined)) : undefined;
-  if (fg) {
+  if (packed && fg) {
     const [fR, fG, fB] = fg;
     const bg = token.bgRGB ?? (token.bg ? parseHex(token.bg) : undefined);
     let bR = -1, bG = 0, bB = 0;
     if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
     const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
-      (surface as any).setRGB(x, 0, graphemes[x]!, fR, fG, fB, bR, bG, bB, flags);
+      surface.setRGB(x, 0, graphemes[x] ?? ' ', fR, fG, fB, bR, bG, bB, flags);
     }
   } else {
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
       surface.set(x, 0, {
-        char: graphemes[x]!,
+        char: graphemes[x] ?? ' ',
         fg: token.hex,
         bg: token.bg,
         modifiers: token.modifiers,
@@ -173,11 +176,6 @@ export function createStyledTextSurfaceWithBCSS(
   return surface;
 }
 
-/**
- * Repaint an existing surface in-place with styled text. Zero allocation
- * when the surface width already matches — only cell values are mutated.
- * Falls back to creating a new surface when the width changed (resize).
- */
 export function paintStyledTextSurfaceWithBCSS(
   surface: Surface | undefined,
   text: string,
@@ -188,7 +186,6 @@ export function paintStyledTextSurfaceWithBCSS(
 ): Surface {
   const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
 
-  // Need a new surface if none exists or width changed.
   if (surface?.width !== safeWidth || surface.height !== 1) {
     return createStyledTextSurfaceWithBCSS(text, width, ctx, identity, base);
   }
