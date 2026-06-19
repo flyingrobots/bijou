@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   buildSmokeScenarios,
   createScenarioPlan,
-  type Result,
   listExampleTargets,
   parseSmokeRunOptions,
   resolvePipeConcurrency,
@@ -11,6 +10,10 @@ import {
   ROOT,
   selectSmokeScenarios,
 } from './smoke-all-examples-lib.js';
+
+function call(value: unknown, line?: string): void {
+  if (typeof value === 'function') Reflect.apply(value, undefined, line ? [line] : []);
+}
 
 describe('listExampleTargets', () => {
   it('sorts discovered examples deterministically', () => {
@@ -183,11 +186,10 @@ describe('runScenarioWithTimeout', () => {
       mode: 'interactive-scripted',
       script: { keys: ['\r'] },
     }, {
-      loadInteractiveModuleImpl: async () => ({
-        async main(...args: unknown[]) {
-          const writeLine = args[1] as ((line?: string) => void) | undefined;
-          writeLine?.();
-          writeLine?.('Selected package manager: YARN');
+      loadInteractiveModuleImpl: () => Promise.resolve({
+        main(...args: unknown[]) {
+          call(args[1]);
+          call(args[1], 'Selected package manager: YARN');
         },
       }),
     });
@@ -203,9 +205,9 @@ describe('runScenarioWithTimeout', () => {
       script: { keys: ['\r'] },
     }, {
       interactiveTimeoutMs: 20,
-      loadInteractiveModuleImpl: async () => ({
+      loadInteractiveModuleImpl: () => Promise.resolve({
         main() {
-          return new Promise<void>(() => {});
+          return new Promise<void>(() => undefined);
         },
       }),
     });
@@ -233,13 +235,9 @@ describe('runSmokeAllExamples', () => {
       buildImpl() {
         buildCount += 1;
       },
-      runScenarioImpl: async (_root, scenario) => {
+      runScenarioImpl: (_root, scenario) => {
         executed.push(`${scenario.path}:${scenario.mode}`);
-        return {
-          path: scenario.path,
-          mode: scenario.mode,
-          status: 'ok',
-        };
+        return Promise.resolve({ path: scenario.path, mode: scenario.mode, status: 'ok' });
       },
     });
 
@@ -295,13 +293,9 @@ describe('runSmokeAllExamples', () => {
         { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
         { path: 'examples/filter/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
       ],
-      runScenarioImpl: async (_root, scenario) => {
+      runScenarioImpl: (_root, scenario) => {
         executed.push(`${scenario.path}:${scenario.mode}`);
-        return {
-          path: scenario.path,
-          mode: scenario.mode,
-          status: 'ok',
-        } satisfies Result;
+        return Promise.resolve({ path: scenario.path, mode: scenario.mode, status: 'ok' });
       },
     });
 

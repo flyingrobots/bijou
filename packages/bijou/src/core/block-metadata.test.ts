@@ -24,9 +24,9 @@ const appShellMetadata: BlockMetadata = {
   modes: ['interactive', 'static', 'pipe', 'accessible'],
   sourcePath: 'packages/bijou/src/core/block-metadata.ts',
   docs: {
-    summary: 'Top-level shell composition with named navigation, content, inspector, and status regions.',
-    useWhen: ['An app needs a standard frame with persistent regions.'],
-    avoidWhen: ['A single in-flow component is enough.'],
+    summary: 'Shell composition.',
+    useWhen: ['Persistent regions.'],
+    avoidWhen: ['A single component is enough.'],
     relatedDocs: ['docs/design/DX-031-standard-bijou-blocks.md'],
   },
   slots: [
@@ -49,7 +49,7 @@ const appShellMetadata: BlockMetadata = {
       id: 'density',
       kind: 'enum',
       values: ['comfortable', 'compact'],
-      description: 'Controls default spacing rhythm.',
+      description: 'Spacing rhythm.',
     },
   ],
   composedComponents: ['createFramedApp', 'viewportSurface'],
@@ -63,6 +63,7 @@ const appShellMetadata: BlockMetadata = {
   ],
   tags: ['shell', 'layout'],
 };
+function loose(block: object): unknown { return Reflect.apply(defineBlock, undefined, [block]); }
 
 describe('block metadata contract', () => {
   it('validates and summarizes block metadata', () => {
@@ -119,20 +120,20 @@ describe('block metadata contract', () => {
   });
 
   it('rejects loose block data and command contracts', () => {
-    expect(() => defineBlock({
+    expect(() => loose({
       metadata: appShellMetadata,
       data: {
         id: 'reader.data',
         requirements: [],
-      } as never,
+      },
       render: () => ({ output: 'reader' }),
     })).toThrow('block definition: data must be created by defineViewData()');
-    expect(() => defineBlock({
+    expect(() => loose({
       metadata: appShellMetadata,
       commands: [{
         id: 'reader.selectHeading',
         facts: [],
-      } as never],
+      }],
       render: () => ({ output: 'reader' }),
     })).toThrow('block definition: command at index 0 must be created by commandIntent()');
   });
@@ -186,11 +187,9 @@ describe('block metadata contract', () => {
   });
 
   it('reports unsupported enum-like values from untyped package consumers', () => {
-    const report = validateBlockMetadata({
-      ...appShellMetadata,
-      scale: 'screenlet' as never,
-      modes: ['interactive', 'screen' as never],
-    });
+    const looseMetadata: BlockMetadata = { ...appShellMetadata };
+    Object.assign(looseMetadata, { scale: 'screenlet', modes: ['interactive', 'screen'] });
+    const report = validateBlockMetadata(looseMetadata);
 
     expect(report.passed).toBe(false);
     expect(report.issues.map((issue) => issue.path)).toEqual([

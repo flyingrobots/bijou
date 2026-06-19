@@ -121,7 +121,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
     expect(report.issues.filter((issue) => issue.kind === 'low-contrast')).toEqual([]);
   });
 
-  it('renders Theme Lab and Theme Inspector swatch text with readable light theme tokens', async () => {
+  it('renders Theme Lab and Theme Inspector swatch text with readable light theme tokens', () => {
     const lightTheme = DOGFOOD_SHELL_THEMES[0]?.modes?.find((mode) => mode.id === 'light')?.theme;
     expect(lightTheme?.name).toBe('dogfood-light');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 56 } });
@@ -241,21 +241,21 @@ function firstHexTokenCellAfter(
       return { x, y, cell };
     }
   }
-  throw new Error(`No hex token cell found on row ${y} after column ${startX}.`);
+  throw new Error(`No hex token at row ${String(y)} after x ${String(startX)}.`);
 }
 
 function firstTopBorderCol(surface: Surface, start: number, row = 0): number {
   for (let x = start; x < surface.width; x += 1) {
     if (surface.get(x, row).char === '┌') return x;
   }
-  throw new Error(`No top-left border found from column ${start} on row ${row}.`);
+  throw new Error(`No top-left border from col ${String(start)} row ${String(row)}.`);
 }
 
 function lastTopBorderCol(surface: Surface, row: number): number {
   for (let x = surface.width - 1; x >= 0; x -= 1) {
     if (surface.get(x, row).char === '┐') return x;
   }
-  throw new Error(`No top-right border found on row ${row}.`);
+  throw new Error(`No top-right border row ${String(row)}.`);
 }
 
 function firstBorderRowContaining(surface: Surface, text: string): number {
@@ -273,5 +273,5 @@ function findNearestBorderRow(surface: Surface, startRow: number, step: -1 | 1):
       return y;
     }
   }
-  throw new Error(`No modal border row found from ${startRow}.`);
+  throw new Error(`No modal border row from ${String(startRow)}.`);
 }

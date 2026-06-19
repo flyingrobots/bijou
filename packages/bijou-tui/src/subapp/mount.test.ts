@@ -26,9 +26,9 @@ createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
 describe('mount', () => {
   it('returns the sub-app surface', () => {
     const mockSurface = createSurface(10, 10);
-    const mockApp: App<number, any> = {
+    const mockApp: App<number> = {
       init: () => [0, []],
-      update: (m) => [0, []],
+      update: () => [0, []],
       view: () => mockSurface,
     };
 
@@ -51,7 +51,7 @@ describe('mapCmds', () => {
     interface SubMsg { sub: true; val: number }
     interface ParentMsg { parent: true; val: number }
 
-    const cmd: Cmd<SubMsg> = async (emit) => {
+    const cmd: Cmd<SubMsg> = (emit) => {
       emit({ sub: true, val: 1 });
       return { sub: true, val: 2 };
     };
@@ -97,7 +97,7 @@ describe('initSubApp', () => {
     interface SubMsg { type: 'ready'; value: number }
 
     const child: App<number, SubMsg> = {
-      init: () => [7, [async () => ({ type: 'ready', value: 7 })]],
+      init: () => [7, [() => ({ type: 'ready', value: 7 })]],
       update: (_msg, model) => [model, []],
       view: () => createSurface(1, 1),
     };
@@ -118,7 +118,7 @@ describe('updateSubApp', () => {
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
-      update: (_msg, model) => [model + 1, [async () => ({ type: 'inc' })]],
+      update: (_msg, model) => [model + 1, [() => ({ type: 'inc' })]],
       view: () => createSurface(1, 1),
     };
 

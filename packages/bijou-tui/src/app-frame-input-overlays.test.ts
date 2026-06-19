@@ -274,8 +274,8 @@ describe('createFramedApp', () => {
           id: 'shell',
           title: 'Shell',
           rows: Array.from({ length: 24 }, (_, index) => ({
-            id: `setting-${index}`,
-            label: `Setting ${index}`,
+            id: `setting-${String(index)}`,
+            label: `Setting ${String(index)}`,
             valueLabel: index % 2 === 0 ? 'On' : 'Off',
           })),
         }],
@@ -284,7 +284,7 @@ describe('createFramedApp', () => {
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).settingsScrollY).toBeGreaterThan(0);
+    expect(model.settingsScrollY).toBeGreaterThan(0);
     expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
   });
   it('renders settings row descriptions as secondary drawer copy', () => {
@@ -417,7 +417,7 @@ describe('createFramedApp', () => {
       { key: 't' },
       { key: KEY_ENTER },
     ]);
-    expect((result.model as any).settingsOpen).toBe(true);
+    expect(result.model.settingsOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
   });
 });
