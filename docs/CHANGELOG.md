@@ -8,6 +8,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD string-debt ratchet** — LX-021 makes partial cleanup of large
+  DOGFOOD TypeScript sources possible by changing the touched-file i18n debt
+  gate from all-or-nothing cleanup to a merge-base ratchet: newly touched
+  files with legacy raw strings must now reduce their per-file count instead
+  of merely holding flat. The first string-focused slice extracts localized
+  component-story preview helpers from `examples/docs/stories.ts`, adds 94
+  catalog-backed DOGFOOD story keys, regenerates runtime catalogs, lowers
+  DOGFOOD raw-string debt from `2,761` to `2,656`, lowers
+  `component-stories` from `1,631` to `1,526`, keeps Markdown localization
+  debt flat at `78`, and also ratchets Code Dojo ESLint findings from `543` to
+  `502` with aggregate Code Dojo debt lowered from `951` to `910`.
 - **Code Dojo iteration loop** — PR verification avoids duplicate test builds
   by using `npm run test:run` after explicit build steps, the Code Dojo workflow
   now runs the standards-only `code-dojo:verify` lane while the full local

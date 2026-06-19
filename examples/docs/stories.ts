@@ -44,19 +44,16 @@ import {
   compositeSurface,
   browsableListSurface,
   cpFilter,
-  createFocusAreaStateForSurface,
   createKeyMap,
   createAccordionState,
   createBrowsableListState,
   createCommandPaletteState,
   createNavigableTableState,
   createNotificationState,
-  createPagerStateForSurface,
   createSplitPaneState,
   dismissNotification,
   drawer,
   filePickerSurface,
-  focusAreaSurface,
   gridSurface,
   helpShort,
   helpShortSurface,
@@ -65,7 +62,6 @@ import {
   interactiveAccordion,
   modal,
   navigableTableSurface,
-  pagerSurface,
   pushNotification,
   renderNotificationHistory,
   renderNotificationHistorySurface,
@@ -75,7 +71,6 @@ import {
   tickNotifications,
   toast,
   tooltip,
-  viewportSurface,
   commandPaletteSurface,
   createSpringState,
   raytraceDot,
@@ -96,500 +91,43 @@ import {
   row,
   screenSurface,
   spacer,
-  textSurface,
 } from '../_shared/example-surfaces.js';
 import {
   CANONICAL_STORY_PROFILE_PRESETS,
   type ComponentStory,
 } from '../_stories/protocol.js';
+import { confirmPreview } from './story-preview-confirm.js';
+import {
+  LONG_DOCUMENT,
+  MARKDOWN_RELEASE_NOTES,
+} from './story-preview-documents.js';
+import {
+  modalBackdrop,
+  pagerPreviewSurface,
+  toastBackdrop,
+  viewportPreviewSurface,
+} from './story-preview-layout.js';
+import { focusedPanePreviewSurface } from './story-preview-focus.js';
+import { multiselectPreview } from './story-preview-multiselect.js';
+import {
+  filterPreview,
+  selectPreview,
+} from './story-preview-single-select.js';
+import {
+  dogfoodText,
+  infoText,
+  mutedText,
+} from './story-preview-style.js';
 
 export interface DogfoodComponentStory<State = void> extends ComponentStory<State> {
   readonly coverageFamilyIds: readonly string[];
 }
-
-function modalBackdrop(width: number, ctx: BijouContext): Surface {
-  const innerWidth = Math.max(28, width - 4);
-  const content = textSurface([
-    'Release queue',
-    '',
-    '  web',
-    '  api',
-    '  workers',
-    '',
-    `  ${kbd('d', { ctx })} deploy  ${kbd('?', { ctx })} help  ${kbd('q', { ctx })} quit`,
-  ].join('\n'), Math.max(1, innerWidth - 2), 12);
-  const fullHeightPanel = boxSurface(content, {
-    title: 'release-workbench',
-    width: innerWidth,
-    ctx,
-  });
-  return screenSurface(width, 14, fullHeightPanel);
-}
-
-function toastBackdrop(width: number, height: number, ctx: BijouContext): Surface {
-  const panel = boxSurface(column([
-    row(['release queue  ', badgeSurface('LIVE', 'success', ctx)]),
-    spacer(),
-    line('Canaries stable in eu-west'),
-    line('Promotion window opens in 4m'),
-  ]), {
-    title: 'release dashboard',
-    width: Math.max(28, width - 4),
-    ctx,
-  });
-  return screenSurface(width, height, panel, 1, 1);
-}
-
-function viewportPreviewSurface(
-  width: number,
-  content: string | Surface,
-  scrollY: number,
-  ctx: BijouContext,
-  summaryLines: readonly string[],
-): string | Surface {
-  const viewportWidth = Math.max(24, width);
-  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
-    return [
-      'viewport mask',
-      `scrollY=${scrollY}`,
-      `width=${viewportWidth}`,
-      ...summaryLines,
-    ].join('\n');
-  }
-
-  const header = separatorSurface({ label: 'viewport mask', width: viewportWidth, ctx });
-  const body = viewportSurface({
-    width: viewportWidth,
-    height: 9,
-    content,
-    scrollY,
-    showScrollbar: true,
-  });
-  return column([
-    header,
-    body,
-    line(`  scrollY=${scrollY}  width=${viewportWidth}`, viewportWidth),
-  ]);
-}
-
-function pagerPreviewSurface(width: number, ctx: BijouContext): string | Surface {
-  const paneWidth = Math.max(30, Math.min(width, 54));
-  const content = boxSurface(column([
-    line('Build plan'),
-    spacer(),
-    line('1. Resolve dependencies'),
-    line('2. Run migrations'),
-    line('3. Bake artifacts'),
-    line('4. Roll canaries'),
-    line('5. Promote release'),
-    spacer(),
-    line('Each stage emits its own frame and can be replayed later.'),
-    spacer(),
-    line('Pager status keeps long linear text anchored.'),
-  ]), {
-    title: 'release reader',
-    width: paneWidth,
-    ctx,
-  });
-  const state = createPagerStateForSurface(content, {
-    width: paneWidth,
-    height: 10,
-  });
-  const scrollY = Math.min(3, state.scroll.maxY);
-
-  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
-    return [
-      'pager surface',
-      `Line ${scrollY + 1}/${content.height}`,
-      'release reader',
-      'Run migrations',
-      'Promote release',
-    ].join('\n');
-  }
-
-  return boxSurface(
-    pagerSurface(content, {
-      ...state,
-      scroll: { ...state.scroll, y: scrollY },
-    }, {
-      showScrollbar: true,
-      showStatus: true,
-    }),
-    {
-      title: 'pager surface',
-      width: paneWidth + 2,
-      ctx,
-    },
-  );
-}
-
-function focusedPanePreviewSurface(width: number, ctx: BijouContext): string | Surface {
-  const paneWidth = Math.max(30, Math.min(width, 54));
-  const content = column([
-    boxSurface('Signals\n\n- db healthy\n- cache warm\n- queue low', {
-      title: 'Inspector notes',
-      width: paneWidth - 2,
-      ctx,
-    }),
-    spacer(),
-    boxSurface('Warnings\n\n- migration is slow\n- stale preview', {
-      title: 'Review',
-      width: paneWidth - 2,
-      ctx,
-    }),
-    spacer(),
-    boxSurface('Actions\n\n- confirm deploy\n- watch rollout', {
-      title: 'Next',
-      width: paneWidth - 2,
-      ctx,
-    }),
-  ]);
-  const state = createFocusAreaStateForSurface(content, {
-    width: paneWidth,
-    height: 9,
-  });
-  const scrollY = Math.min(2, state.scroll.maxY);
-
-  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
-    return [
-      'focused pane',
-      'focused=true',
-      `scrollY=${scrollY}`,
-      'Inspector notes',
-      'Warnings',
-      'Actions',
-    ].join('\n');
-  }
-
-  return boxSurface(
-    focusAreaSurface(content, {
-      ...state,
-      scroll: { ...state.scroll, y: scrollY },
-    }, {
-      focused: true,
-      ctx,
-      id: 'docs-inspector',
-    }),
-    {
-      title: 'focused pane',
-      width: paneWidth + 2,
-      ctx,
-    },
-  );
-}
-
-const LONG_DOCUMENT = [
-  'Build plan',
-  '',
-  '1. Resolve dependencies',
-  '2. Run migrations',
-  '3. Bake artifacts',
-  '4. Roll canaries',
-  '5. Promote release',
-  '',
-  'Each stage emits its own frame and can be replayed later.',
-  '',
-  'The viewport story is intentionally width-sensitive so the docs app can',
-  'prove clipping, masking, and scroll-state behavior without a separate demo.',
-].join('\n');
-
-const MARKDOWN_RELEASE_NOTES = [
-  '# Release note',
-  '',
-  '**Bijou** keeps docs, shell, and examples inside the same runtime.',
-  '',
-  '## This slice',
-  '',
-  '- documents bounded prose honestly',
-  '- keeps links explicit instead of vague',
-  '- avoids turning markdown into layout chrome',
-  '',
-  '> Move to pager patterns if the content becomes a document-reading task.',
-].join('\n');
 
 function loopingProgressPercent(timeMs: number, offsetMs = 0, cycleMs = 2_800): number {
   const normalized = (((timeMs + offsetMs) % cycleMs) + cycleMs) % cycleMs;
   const phase = normalized / cycleMs;
   const pingPong = phase <= 0.5 ? phase * 2 : (1 - phase) * 2;
   return Math.round(pingPong * 100);
-}
-
-function infoText(ctx: BijouContext, text: string): string {
-  return ctx.theme.noColor ? text : ctx.style.styled(ctx.semantic('info'), text);
-}
-
-function mutedText(ctx: BijouContext, text: string): string {
-  return ctx.theme.noColor ? text : ctx.style.styled(ctx.semantic('muted'), text);
-}
-
-function successText(ctx: BijouContext, text: string): string {
-  return ctx.theme.noColor ? text : ctx.style.styled(ctx.status('success'), text);
-}
-
-function warningText(ctx: BijouContext, text: string): string {
-  return ctx.theme.noColor ? text : ctx.style.styled(ctx.status('warning'), text);
-}
-
-function confirmPreview(input: {
-  readonly width: number;
-  readonly ctx: BijouContext;
-  readonly question: string;
-  readonly defaultValue?: boolean;
-  readonly yesMeaning: string;
-  readonly noMeaning: string;
-}): string | Surface {
-  const {
-    width,
-    ctx,
-    question,
-    defaultValue = true,
-    yesMeaning,
-    noMeaning,
-  } = input;
-  const hint = defaultValue ? '[Y/n]' : '[y/N]';
-  const defaultLabel = defaultValue ? 'Yes' : 'No';
-
-  if (ctx.mode === 'pipe') {
-    return [
-      `${question} ${defaultValue ? 'Y/n' : 'y/N'}?`,
-      `Yes: ${yesMeaning}`,
-      `No: ${noMeaning}`,
-    ].join('\n');
-  }
-
-  if (ctx.mode === 'accessible') {
-    return [
-      question,
-      `Type yes or no (default: ${defaultValue ? 'yes' : 'no'}).`,
-      `Yes: ${yesMeaning}`,
-      `No: ${noMeaning}`,
-    ].join('\n');
-  }
-
-  const panelWidth = Math.max(38, Math.min(width, 54));
-  return boxSurface(contentSurface([
-    `${infoText(ctx, '?')} ${question} ${mutedText(ctx, hint)}`,
-    '',
-    `Default: ${defaultValue ? successText(ctx, defaultLabel) : warningText(ctx, defaultLabel)}`,
-    `Yes: ${yesMeaning}`,
-    `No: ${noMeaning}`,
-    '',
-    mutedText(ctx, 'Enter accepts the default.'),
-  ].join('\n')), {
-    title: 'binary decision',
-    width: panelWidth,
-    ctx,
-  });
-}
-
-interface MultiselectPreviewOption {
-  readonly label: string;
-  readonly description?: string;
-}
-
-interface SingleChoicePreviewOption {
-  readonly label: string;
-  readonly description?: string;
-  readonly keywords?: readonly string[];
-}
-
-function multiselectPreview(input: {
-  readonly width: number;
-  readonly ctx: BijouContext;
-  readonly title: string;
-  readonly options: readonly MultiselectPreviewOption[];
-  readonly selectedIndices: readonly number[];
-  readonly focusedIndex?: number;
-}): string | Surface {
-  const {
-    width,
-    ctx,
-    title,
-    options,
-    selectedIndices,
-    focusedIndex = 0,
-  } = input;
-  const selectedSet = new Set(selectedIndices);
-  const selectedLabels = options
-    .filter((_, index) => selectedSet.has(index))
-    .map((option) => option.label);
-
-  if (ctx.mode === 'pipe') {
-    return [
-      title,
-      '',
-      ...options.map((option, index) => `${index + 1}. ${option.label}`),
-      '',
-      `Enter numbers (comma-separated): ${selectedIndices.map((index) => index + 1).join(', ')}`,
-      `Selected: ${selectedLabels.join(', ')}`,
-    ].join('\n');
-  }
-
-  if (ctx.mode === 'accessible') {
-    return [
-      title,
-      '',
-      ...options.map((option, index) => {
-        const state = selectedSet.has(index) ? 'selected' : 'not selected';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
-      }),
-      '',
-      'Enter numbers separated by commas to choose a set.',
-      `Current set: ${selectedLabels.join(', ')}`,
-    ].join('\n');
-  }
-
-  const lines = [
-    `${infoText(ctx, '?')} ${title}`,
-    '',
-    ...options.map((option, index) => {
-      const pointer = index === focusedIndex ? infoText(ctx, '\u276f') : ' ';
-      const mark = selectedSet.has(index) ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
-      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
-      return `${pointer} ${mark} ${option.label}${description}`;
-    }),
-    '',
-    mutedText(ctx, '(space to toggle, enter to confirm)'),
-  ];
-
-  return boxSurface(contentSurface(lines.join('\n')), {
-    title: 'multiple choice',
-    width: Math.max(40, Math.min(width, 58)),
-    ctx,
-  });
-}
-
-function selectPreview(input: {
-  readonly width: number;
-  readonly ctx: BijouContext;
-  readonly title: string;
-  readonly options: readonly SingleChoicePreviewOption[];
-  readonly selectedIndex: number;
-  readonly focusedIndex?: number;
-}): string | Surface {
-  const {
-    width,
-    ctx,
-    title,
-    options,
-    selectedIndex,
-    focusedIndex = selectedIndex,
-  } = input;
-  const selected = options[selectedIndex] ?? options[0];
-
-  if (ctx.mode === 'pipe') {
-    return [
-      title,
-      '',
-      ...options.map((option, index) => `${index + 1}. ${option.label}`),
-      '',
-      `> ${selectedIndex + 1}`,
-      `Selected: ${selected?.label ?? ''}`,
-    ].join('\n');
-  }
-
-  if (ctx.mode === 'accessible') {
-    return [
-      title,
-      '',
-      ...options.map((option, index) => {
-        const state = index === selectedIndex ? 'selected' : 'not selected';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
-      }),
-      '',
-      `Current choice: ${selected?.label ?? ''}`,
-      'Enter a number to choose one option.',
-    ].join('\n');
-  }
-
-  const lines = [
-    `${infoText(ctx, '?')} ${title}`,
-    '',
-    ...options.map((option, index) => {
-      const pointer = index === focusedIndex ? infoText(ctx, '\u276f') : ' ';
-      const mark = index === selectedIndex ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
-      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
-      return `${pointer} ${mark} ${option.label}${description}`;
-    }),
-    '',
-    mutedText(ctx, '(↑/↓ browse, enter to confirm)'),
-  ];
-
-  return box(lines.join('\n'), {
-    title: 'single choice',
-    width: Math.max(42, Math.min(width, 60)),
-    ctx,
-  });
-}
-
-function filterPreview(input: {
-  readonly width: number;
-  readonly ctx: BijouContext;
-  readonly title: string;
-  readonly query: string;
-  readonly options: readonly SingleChoicePreviewOption[];
-  readonly matchedIndices: readonly number[];
-  readonly selectedIndex: number;
-}): string | Surface {
-  const {
-    width,
-    ctx,
-    title,
-    query,
-    options,
-    matchedIndices,
-    selectedIndex,
-  } = input;
-  const selected = options[selectedIndex] ?? options[0];
-  const matchedOptions = matchedIndices.map((index) => options[index]).filter(Boolean) as SingleChoicePreviewOption[];
-
-  if (ctx.mode === 'pipe') {
-    return [
-      title,
-      '',
-      ...matchedOptions.map((option, index) => `${index + 1}. ${option.label}`),
-      '',
-      `Enter number or search: ${query}`,
-      `Matched: ${selected?.label ?? ''}`,
-    ].join('\n');
-  }
-
-  if (ctx.mode === 'accessible') {
-    return [
-      title,
-      '',
-      `Search query: ${query}`,
-      ...matchedOptions.map((option, index) => {
-        const state = matchedIndices[index] === selectedIndex ? 'selected match' : 'match';
-        const keywords = option.keywords?.length ? ` — keywords: ${option.keywords.join(', ')}` : '';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}${keywords}`;
-      }),
-      '',
-      `Current match: ${selected?.label ?? ''}`,
-      'Type or enter a number to choose one option.',
-    ].join('\n');
-  }
-
-  const lines = [
-    `${infoText(ctx, '?')} ${title}`,
-    `${mutedText(ctx, 'Search:')} ${query}`,
-    '',
-    ...matchedOptions.map((option, index) => {
-      const globalIndex = matchedIndices[index]!;
-      const pointer = globalIndex === selectedIndex ? infoText(ctx, '\u276f') : ' ';
-      const mark = globalIndex === selectedIndex ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
-      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
-      return `${pointer} ${mark} ${option.label}${description}`;
-    }),
-    '',
-    mutedText(ctx, '(type to narrow, enter to confirm)'),
-  ];
-
-  return box(lines.join('\n'), {
-    title: 'filterable single choice',
-    width: Math.max(44, Math.min(width, 64)),
-    ctx,
-  });
 }
 
 function textEntryPreview(input: {
@@ -619,8 +157,8 @@ function textEntryPreview(input: {
       '',
       `${label}:`,
       value,
-      ...(helperText ? ['', `Help: ${helperText}`] : []),
-      ...(validationText ? [`Validation: ${validationText}`] : []),
+      ...(helperText ? ['', dogfoodText(undefined, 'stories.preview.textEntry.help', 'Help: {value}', { value: helperText })] : []),
+      ...(validationText ? [dogfoodText(undefined, 'stories.preview.textEntry.validation', 'Validation: {value}', { value: validationText })] : []),
     ].join('\n');
   }
 
@@ -628,11 +166,17 @@ function textEntryPreview(input: {
     return [
       title,
       '',
-      `Field: ${label}`,
-      `Input type: ${multiline ? 'multiline text' : 'single-line text'}`,
-      `Current value: ${value.replace(/\n/g, ' / ')}`,
-      ...(helperText ? [`Help: ${helperText}`] : []),
-      ...(validationText ? [`Validation: ${validationText}`] : []),
+      dogfoodText(undefined, 'stories.preview.textEntry.field', 'Field: {label}', { label }),
+      dogfoodText(undefined, 'stories.preview.textEntry.inputType', 'Input type: {value}', {
+        value: multiline
+          ? dogfoodText(undefined, 'stories.preview.textEntry.multilineType', 'multiline text')
+          : dogfoodText(undefined, 'stories.preview.textEntry.singleLineType', 'single-line text'),
+      }),
+      dogfoodText(undefined, 'stories.preview.textEntry.currentValue', 'Current value: {value}', {
+        value: value.replace(/\n/g, ' / '),
+      }),
+      ...(helperText ? [dogfoodText(undefined, 'stories.preview.textEntry.help', 'Help: {value}', { value: helperText })] : []),
+      ...(validationText ? [dogfoodText(undefined, 'stories.preview.textEntry.validation', 'Validation: {value}', { value: validationText })] : []),
     ].join('\n');
   }
 
@@ -644,7 +188,9 @@ function textEntryPreview(input: {
     ...(helperText ? ['', mutedText(ctx, helperText)] : []),
     ...(validationText ? [mutedText(ctx, validationText)] : []),
   ].join('\n')), {
-    title: multiline ? 'multiline entry' : 'text entry',
+    title: multiline
+      ? dogfoodText(undefined, 'stories.preview.textEntry.multilineTitle', 'multiline entry')
+      : dogfoodText(undefined, 'stories.preview.textEntry.title', 'text entry'),
     width: Math.max(42, Math.min(width, multiline ? 62 : 54)),
     ctx,
   });
@@ -1309,33 +855,37 @@ interface DataVizMetricEntry {
 
 function summarizeDataVizSeries(values: readonly number[]): DataVizSeriesSummary {
   const safeValues = values.map((value) => Number.isFinite(value) ? value : 0);
-  if (safeValues.length === 0) {
+  const [first, ...rest] = safeValues;
+  if (first === undefined) {
     return { count: 0, first: 0, last: 0, min: 0, max: 0, trend: 'flat' };
   }
 
-  const first = safeValues[0]!;
-  const last = safeValues[safeValues.length - 1]!;
+  let last = first;
   let min = first;
   let max = first;
   let rises = 0;
   let falls = 0;
+  let previous = first;
 
-  for (let index = 1; index < safeValues.length; index++) {
-    const previous = safeValues[index - 1]!;
-    const current = safeValues[index]!;
+  for (const current of rest) {
     if (current > previous) rises++;
     else if (current < previous) falls++;
     if (current < min) min = current;
     if (current > max) max = current;
+    previous = current;
+    last = current;
   }
 
   const range = max - min;
-  let trend = 'flat';
-  if (rises === 0 && falls === 0) trend = 'flat';
-  else if (rises === 0) trend = 'falling';
-  else if (falls === 0) trend = 'rising';
-  else if (Math.abs(last - first) <= Math.max(1, range * 0.2)) trend = 'mixed';
-  else trend = last > first ? 'rising with dips' : 'falling with rebounds';
+  const trend = rises === 0 && falls === 0
+    ? 'flat'
+    : rises === 0
+      ? 'falling'
+      : falls === 0
+        ? 'rising'
+        : Math.abs(last - first) <= Math.max(1, range * 0.2)
+          ? 'mixed'
+          : last > first ? 'rising with dips' : 'falling with rebounds';
 
   return { count: safeValues.length, first, last, min, max, trend };
 }
@@ -1377,7 +927,7 @@ function renderSparklineStoryPreview(
   const summary = summarizeDataVizSeries(values);
   if (ctx.mode === 'pipe') {
     return dataVizSummarySurface(width, [
-      `samples: ${summary.count}`,
+      `samples: ${String(summary.count)}`,
       `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
       `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
       `values: ${compactDataVizValues(values)}`,
@@ -1385,7 +935,7 @@ function renderSparklineStoryPreview(
   }
 
   return dataVizSummarySurface(width, [
-    `${summary.count} samples.`,
+    `${String(summary.count)} samples.`,
     `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
     `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; latest ${formatDataVizNumber(summary.last)}.`,
     `Overall ${summary.trend} trend.`,
@@ -1405,7 +955,7 @@ function renderBrailleChartStoryPreview(
   const summary = summarizeDataVizSeries(values);
   if (ctx.mode === 'pipe') {
     return dataVizSummarySurface(width, [
-      `samples: ${summary.count}`,
+      `samples: ${String(summary.count)}`,
       `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
       `peak: ${formatDataVizNumber(summary.max)}`,
       `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
@@ -1413,7 +963,7 @@ function renderBrailleChartStoryPreview(
   }
 
   return dataVizSummarySurface(width, [
-    `${summary.count} samples.`,
+    `${String(summary.count)} samples.`,
     `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
     `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; peak ${formatDataVizNumber(summary.max)}.`,
     `Overall ${summary.trend} area trend.`,
@@ -1480,7 +1030,7 @@ function perfOverlayEntries(stats: {
   const entries: DataVizMetricEntry[] = [
     { label: 'FPS', value: String(Math.round(stats.fps)) },
     { label: 'frame', value: `${formatPerfValue(stats.frameTimeMs, 2)} ms`, sparkline: stats.frameTimeHistory },
-    { label: 'size', value: `${stats.width}×${stats.height}` },
+    { label: 'size', value: `${String(stats.width)}×${String(stats.height)}` },
   ];
 
   if (stats.heapUsedMB != null) {
@@ -2073,13 +1623,13 @@ function renderSpringTimelinePreview(input: {
   const filled = Math.max(0, Math.min(barWidth, Math.round((values.camera ?? 0) * barWidth)));
   const empty = Math.max(0, barWidth - filled);
   const process = processTimeline([
-    { label: 'camera spring', description: `settled ${Math.round(springState.value * 100)}%`, status: 'info' },
-    { label: 'shader glow', description: `opacity ${Math.round((values.glow ?? 0) * 100)}%`, status: 'success' },
-    { label: 'caption reveal', description: `timeline ${Math.round((values.caption ?? 0) * 100)}%`, status: 'warning' },
+    { label: 'camera spring', description: `settled ${String(Math.round(springState.value * 100))}%`, status: 'info' },
+    { label: 'shader glow', description: `opacity ${String(Math.round((values.glow ?? 0) * 100))}%`, status: 'success' },
+    { label: 'caption reveal', description: `timeline ${String(Math.round((values.caption ?? 0) * 100))}%`, status: 'warning' },
   ], { ctx });
 
   return boxSurface(column([
-    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${Math.round((values.camera ?? 0) * 100)}%`, width - 2),
+    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${String(Math.round((values.camera ?? 0) * 100))}%`, width - 2),
     spacer(),
     contentSurface(process),
   ]), {
@@ -2183,6 +1733,7 @@ function workspaceLayoutPreview(input: {
   }
 
   const panelWidth = Math.max(48, Math.min(width, 64));
+  const paneSize = (paneWidth: number, paneHeight: number): string => `${String(paneWidth)}x${String(paneHeight)}`;
   const body = mode === 'split'
     ? splitPaneSurface(createSplitPaneState({ ratio: 0.36, focused: 'b' }), {
         direction: 'row',
@@ -2190,11 +1741,11 @@ function workspaceLayoutPreview(input: {
         height: 10,
         minA: 16,
         minB: 18,
-        paneA: (paneWidth, paneHeight) => boxSurface(`Files\n\n- stories.ts\n- app.ts\n- coverage.ts\n\n${paneWidth}x${paneHeight}`, {
+        paneA: (paneWidth, paneHeight) => boxSurface(`Files\n\n- stories.ts\n- app.ts\n- coverage.ts\n\n${paneSize(paneWidth, paneHeight)}`, {
           width: paneWidth,
           ctx,
         }),
-        paneB: (paneWidth, paneHeight) => boxSurface(`Editor\n\nconst floor = 64;\nconst next = 69;\n\n${paneWidth}x${paneHeight}`, {
+        paneB: (paneWidth, paneHeight) => boxSurface(`Editor\n\nconst floor = 64;\nconst next = 69;\n\n${paneSize(paneWidth, paneHeight)}`, {
           width: paneWidth,
           ctx,
         }),
@@ -2212,9 +1763,9 @@ function workspaceLayoutPreview(input: {
         gap: 1,
         cells: {
           header: (paneWidth) => boxSurface('Workspace layout', { width: paneWidth, ctx }),
-          nav: (paneWidth, paneHeight) => boxSurface(`Families\n\n- forms\n- docs\n- shell\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
-          log: (paneWidth, paneHeight) => boxSurface(`Log\n\n[ok] build\n[ok] docs\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
-          main: (paneWidth, paneHeight) => boxSurface(`Main pane\n\nLayout primitives keep simultaneous context honest.\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
+          nav: (paneWidth, paneHeight) => boxSurface(`Families\n\n- forms\n- docs\n- shell\n\n${paneSize(paneWidth, paneHeight)}`, { width: paneWidth, ctx }),
+          log: (paneWidth, paneHeight) => boxSurface(`Log\n\n[ok] build\n[ok] docs\n\n${paneSize(paneWidth, paneHeight)}`, { width: paneWidth, ctx }),
+          main: (paneWidth, paneHeight) => boxSurface(`Main pane\n\nLayout primitives keep simultaneous context honest.\n\n${paneSize(paneWidth, paneHeight)}`, { width: paneWidth, ctx }),
         },
       });
 

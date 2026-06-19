@@ -10,8 +10,8 @@
     },
     {
       "path": "examples/docs/stories.ts",
-      "lines": 5008,
-      "bytes": 181779
+      "lines": 4559,
+      "bytes": 169954
     },
     {
       "path": "packages/bijou-tui/src/app-frame.ts",
