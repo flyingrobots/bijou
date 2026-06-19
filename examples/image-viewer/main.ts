@@ -66,14 +66,8 @@ export interface ImageViewerOptions {
   readonly rows?: number;
 }
 
-type ImageViewerMsg =
-  | { readonly type: 'focus-next' }
-  | { readonly type: 'focus-prev' }
-  | { readonly type: 'enter' }
-  | { readonly type: 'back' }
-  | { readonly type: 'refresh' }
-  | { readonly type: 'toggle-mode' }
-  | { readonly type: 'quit' };
+interface AppMsg { readonly type: 'focus-next' | 'focus-prev' | 'enter' | 'back' | 'refresh' | 'toggle-mode' | 'quit' }
+interface ImageViewerApp extends Omit<App<ImageViewerModel, AppMsg>, 'view'> { view(model: ImageViewerModel): Surface }
 
 interface StartupPaths {
   readonly root: string;
@@ -112,7 +106,7 @@ const MAX_THRESHOLD_PERCENT = 95;
 const CONTRAST_STEP_PERCENT = 10;
 const MIN_CONTRAST_PERCENT = 50;
 const MAX_CONTRAST_PERCENT = 200;
-const pickerKeys = filePickerKeyMap<ImageViewerMsg>({
+const pickerKeys = filePickerKeyMap<AppMsg>({
   focusNext: { type: 'focus-next' },
   focusPrev: { type: 'focus-prev' },
   enter: { type: 'enter' },
@@ -123,7 +117,7 @@ const pickerKeys = filePickerKeyMap<ImageViewerMsg>({
 export function createImageViewerApp(
   ctx: BijouContext = initDefaultContext(),
   options: ImageViewerOptions = {},
-): App<ImageViewerModel, ImageViewerMsg> {
+): ImageViewerApp {
   const startup = resolveStartupPaths(options);
   const io = scopedNodeIO({ root: startup.root });
 
@@ -174,9 +168,8 @@ export function createImageViewerApp(
           return [{ ...model, mode: nextMode(model.mode), lastError: undefined }, []];
         case 'quit':
           return [model, [quit()]];
+        case 'mouse': case 'pulse': return [model, []];
       }
-
-      return [model, []];
     },
 
     view: (model) => renderImageViewer(model, ctx, io),
@@ -195,7 +188,7 @@ function updateKey(
   msg: KeyMsg,
   model: ImageViewerModel,
   io: ScopedNodeIO,
-): [ImageViewerModel, Cmd<ImageViewerMsg>[]] | [ImageViewerModel, []] {
+): [ImageViewerModel, Cmd<AppMsg>[]] | [ImageViewerModel, []] {
   if (msg.key === 'm' || msg.key === 'tab') {
     return [{ ...model, mode: nextMode(model.mode), lastError: undefined }, []];
   }
@@ -293,10 +286,10 @@ function updateKey(
 }
 
 function createImageViewerAppUpdate(
-  msg: ImageViewerMsg,
+  msg: AppMsg,
   model: ImageViewerModel,
   io: ScopedNodeIO,
-): [ImageViewerModel, Cmd<ImageViewerMsg>[]] | [ImageViewerModel, []] {
+): [ImageViewerModel, Cmd<AppMsg>[]] | [ImageViewerModel, []] {
   switch (msg.type) {
     case 'focus-next':
       return [{ ...model, picker: fpFocusNext(model.picker), lastError: undefined }, []];
@@ -589,8 +582,8 @@ function renderPreview(
       status = [
         `Mode: ${model.mode}`,
         `Format: ${loaded.format.toUpperCase()}`,
-        `Source: ${loaded.width}x${loaded.height}`,
-        `Zoom: ${model.viewport.zoomPercent}%`,
+        `Source: ${String(loaded.width)}x${String(loaded.height)}`,
+        `Zoom: ${String(model.viewport.zoomPercent)}%`,
         `Pan: ${formatPan(model.viewport.panX)},${formatPan(model.viewport.panY)}`,
         `Color: ${formatColorMode(model.tuning.colorMode)}`,
         `Dither: ${model.tuning.dither}`,
@@ -730,11 +723,11 @@ function formatPercentSlider(value: number, min: number, max: number): string {
   for (let index = 0; index < slots; index++) {
     bar += index === position ? '|' : '-';
   }
-  return `${value}% [${bar}]`;
+  return `${String(value)}% [${bar}]`;
 }
 
 function formatPan(value: number): string {
-  if (value > 0) return `+${value}`;
+  if (value > 0) return '+' + String(value);
   return String(value);
 }
 

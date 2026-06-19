@@ -1,8 +1,6 @@
 import type { TokenValue } from '../theme/tokens.js';
 import type { DagNode } from './dag.js';
 
-// ── DagSource Interface ─────────────────────────────────────────────
-
 /**
  * Adapter interface for accessing graph data. Decouples DAG rendering
  * from any specific in-memory representation. Implementations can wrap
@@ -71,7 +69,9 @@ export interface DagSliceOptions {
   depth?: number;
 }
 
-// ── Type Guard ──────────────────────────────────────────────────────
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value); }
+
+function pushMapValue(map: Map<string, string[]>, key: string, value: string): void { const values = map.get(key); if (values === undefined) map.set(key, [value]); else values.push(value); }
 
 /**
  * Return true if the value implements the `DagSource` interface.
@@ -83,14 +83,10 @@ export interface DagSliceOptions {
  * @returns `true` if `value` conforms to `DagSource`.
  */
 export function isDagSource(value: unknown): value is DagSource {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    typeof (value as DagSource).has === 'function' &&
-    typeof (value as DagSource).label === 'function' &&
-    typeof (value as DagSource).children === 'function'
-  );
+  return isRecord(value)
+    && typeof value['has'] === 'function'
+    && typeof value['label'] === 'function'
+    && typeof value['children'] === 'function';
 }
 
 /**
@@ -103,15 +99,12 @@ export function isDagSource(value: unknown): value is DagSource {
  * @returns `true` if `value` conforms to `SlicedDagSource`.
  */
 export function isSlicedDagSource(value: unknown): value is SlicedDagSource {
-  return (
-    isDagSource(value) &&
-    typeof (value as SlicedDagSource).ids === 'function' &&
-    typeof (value as SlicedDagSource).ghost === 'function' &&
-    typeof (value as SlicedDagSource).ghostLabel === 'function'
-  );
+  return isDagSource(value)
+    && isRecord(value)
+    && typeof value['ids'] === 'function'
+    && typeof value['ghost'] === 'function'
+    && typeof value['ghostLabel'] === 'function';
 }
-
-// ── arraySource ─────────────────────────────────────────────────────
 
 /**
  * Wrap a `DagNode[]` as a `SlicedDagSource`.
@@ -131,8 +124,7 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
   for (const n of nodes) {
     if (!parentMap.has(n.id)) parentMap.set(n.id, []);
     for (const c of n.edges ?? []) {
-      if (!parentMap.has(c)) parentMap.set(c, []);
-      parentMap.get(c)!.push(n.id);
+      pushMapValue(parentMap, c, n.id);
     }
   }
 
@@ -154,8 +146,6 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
     ghostLabel: (id) => map.get(id)?._ghostLabel,
   };
 }
-
-// ── materialize ─────────────────────────────────────────────────────
 
 /**
  * @internal Convert a `SlicedDagSource` back to a `DagNode[]` array.
@@ -197,8 +187,6 @@ export function materialize(source: SlicedDagSource): DagNode[] {
   return nodes;
 }
 
-// ── emptySource ─────────────────────────────────────────────────────
-
 /** @internal Shared frozen empty array for sources with no nodes. */
 const EMPTY_IDS: readonly string[] = Object.freeze([]);
 
@@ -212,15 +200,11 @@ const EMPTY_SOURCE: SlicedDagSource = Object.freeze({
   ghostLabel: () => undefined,
 });
 
-// ── Ghost ID Prefixes ───────────────────────────────────────────────
-
 /** @internal ID prefix for ghost nodes representing truncated ancestor branches. */
 const GHOST_ANCESTORS_PREFIX = '__ghost_ancestors_';
 
 /** @internal ID prefix for ghost nodes representing truncated descendant branches. */
 const GHOST_DESCENDANTS_PREFIX = '__ghost_descendants_';
-
-// ── sliceSource ─────────────────────────────────────────────────────
 
 /**
  * BFS-walk a `DagSource` from a focus node and return a bounded
@@ -268,8 +252,8 @@ export function sliceSource(
       const getParents = source.parents.bind(source);
       const queue: [string, number][] = [[focus, 0]];
       const visited = new Set<string>();
-      while (queue.length > 0) {
-        const [id, depth] = queue.shift()!;
+      for (let next = queue.shift(); next !== undefined; next = queue.shift()) {
+        const [id, depth] = next;
         if (visited.has(id)) continue;
         visited.add(id);
         included.add(id);
@@ -286,7 +270,7 @@ export function sliceSource(
             included.add(ghostId);
             const count = boundaryParents.length;
             ghostNodes.set(ghostId, {
-              label: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
+              label: `... ${String(count)} ancestor${count !== 1 ? 's' : ''}`,
               edges: [id],
             });
           }
@@ -299,8 +283,8 @@ export function sliceSource(
   if (direction === 'descendants' || direction === 'both') {
     const queue: [string, number][] = [[focus, 0]];
     const visited = new Set<string>();
-    while (queue.length > 0) {
-      const [id, depth] = queue.shift()!;
+    for (let next = queue.shift(); next !== undefined; next = queue.shift()) {
+      const [id, depth] = next;
       if (visited.has(id)) continue;
       visited.add(id);
       included.add(id);
@@ -308,8 +292,7 @@ export function sliceSource(
       // Track reverse edges for derived parent map
       if (!source.parents) {
         for (const c of ch) {
-          if (!derivedParents.has(c)) derivedParents.set(c, []);
-          derivedParents.get(c)!.push(id);
+          pushMapValue(derivedParents, c, id);
         }
       }
       if (depth < maxDepth) {
@@ -323,7 +306,7 @@ export function sliceSource(
           included.add(ghostId);
           const count = boundaryChildren.length;
           ghostNodes.set(ghostId, {
-            label: `... ${count} descendant${count !== 1 ? 's' : ''}`,
+            label: `... ${String(count)} descendant${count !== 1 ? 's' : ''}`,
             edges: [],
           });
         }
@@ -381,7 +364,7 @@ export function sliceSource(
 
     compactShape: (id) => ghostNodes.has(id) ? undefined : source.compactShape?.(id),
 
-    ghost: (id) => ghostNodes.has(id) || (inheritGhost !== null && inheritGhost.ghost(id)),
+    ghost: (id) => ghostNodes.has(id) || (inheritGhost?.ghost(id) ?? false),
 
     ghostLabel: (id) => ghostNodes.get(id)?.label ?? inheritGhost?.ghostLabel(id),
   };

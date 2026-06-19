@@ -48,7 +48,7 @@ function brailleGlyphCells(frame: Surface): ReturnType<Surface['get']>[] {
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
       const cell = frame.get(x, y);
-      const codePoint = cell.char?.codePointAt(0);
+      const codePoint = cell.char.codePointAt(0);
       if (codePoint !== undefined && codePoint > 0x2800 && codePoint <= 0x28ff) {
         cells.push(cell);
       }
@@ -186,7 +186,7 @@ describe('image viewer app', () => {
 
     expect(model.selectedPath).toBe(realpathSync.native(join(root, 'sample.ppm')));
     expect(model.picker.focusIndex).toBe(0);
-    const text = frameText(app.view(model) as Surface);
+    const text = frameText(app.view(model));
     expect(text).toContain('Images');
     expect(text).toContain('> * - sample.ppm');
     expect(text).toContain('Mode: braille');
@@ -206,7 +206,7 @@ describe('image viewer app', () => {
     expect(model.picker.entries[0]).toEqual({ name: 'child', isDirectory: true });
     expect(model.picker.entries[1]).toEqual({ name: 'sample.ppm', isDirectory: false });
     expect(model.picker.focusIndex).toBe(1);
-    expect(frameText(app.view(model) as Surface)).toContain('> * - sample.ppm');
+    expect(frameText(app.view(model))).toContain('> * - sample.ppm');
   });
 
   it('hot-swaps the selected image renderer from Braille to ASCII', () => {
@@ -218,7 +218,7 @@ describe('image viewer app', () => {
     const [next] = app.update(keyMsg('m'), model);
 
     expect(next.mode).toBe('ascii');
-    expect(frameText(app.view(next) as Surface)).toContain('Mode: ascii');
+    expect(frameText(app.view(next))).toContain('Mode: ascii');
   });
 
   it('can preserve sampled image colors on rendered glyphs', () => {
@@ -228,8 +228,8 @@ describe('image viewer app', () => {
     const app = createImageViewerApp(ctx, { root });
     const [model] = app.init();
     const [colored] = app.update(keyMsg('c'), model);
-    const glyphCells = brailleGlyphCells(app.view(colored) as Surface);
-    const text = frameText(app.view(colored) as Surface);
+    const glyphCells = brailleGlyphCells(app.view(colored));
+    const text = frameText(app.view(colored));
 
     expect(colored.tuning.colorMode).toBe('fg-bg');
     expect(glyphCells.some((cell) => {
@@ -249,7 +249,7 @@ describe('image viewer app', () => {
     const [thresholdUp] = app.update(keyMsg(']'), model);
     const [contrastUp] = app.update(keyMsg('.'), thresholdUp);
     const [dithered] = app.update(keyMsg('d'), contrastUp);
-    const text = frameText(app.view(dithered) as Surface);
+    const text = frameText(app.view(dithered));
 
     expect(dithered.tuning).toEqual({
       colorMode: 'none',
@@ -273,7 +273,7 @@ describe('image viewer app', () => {
     const [selected] = app.update(keyMsg('enter'), focused);
 
     expect(selected.selectedPath).toBe(realpathSync.native(join(root, 'b.ppm')));
-    const text = frameText(app.view(selected) as Surface);
+    const text = frameText(app.view(selected));
     expect(text).toContain('b.ppm');
     expect(text).toContain('Format: PPM');
   });
@@ -286,7 +286,7 @@ describe('image viewer app', () => {
     const app = createImageViewerApp(ctx, { root });
     const [model] = app.init();
     const [focused] = app.update(keyMsg('j'), model);
-    const text = frameText(app.view(focused) as Surface);
+    const text = frameText(app.view(focused));
 
     expect(text).toContain('  * - a.ppm');
     expect(text).toContain('>   - b.ppm');
@@ -308,7 +308,7 @@ describe('image viewer app', () => {
       panX: 4,
       panY: 2,
     });
-    const text = frameText(app.view(pannedDown) as Surface);
+    const text = frameText(app.view(pannedDown));
     expect(text).toContain('Pan: +4,+2');
   });
 
@@ -331,7 +331,7 @@ describe('image viewer app', () => {
       panX: 0,
       panY: 0,
     });
-    expect(frameText(app.view(zoomedIn) as Surface)).toContain('Zoom: 125%');
+    expect(frameText(app.view(zoomedIn))).toContain('Zoom: 125%');
   });
 
   it('resets zoom and pan when a new image is selected', () => {
@@ -352,7 +352,7 @@ describe('image viewer app', () => {
       panX: 0,
       panY: 0,
     });
-    const text = frameText(app.view(selected) as Surface);
+    const text = frameText(app.view(selected));
     expect(text).toContain('Zoom: 100%');
     expect(text).toContain('Pan: 0,0');
   });
@@ -361,7 +361,7 @@ describe('image viewer app', () => {
     const ctx = createTestContext({ runtime: { columns: 120, rows: 32 } });
     const app = createImageViewerApp(ctx, { initialPath: 'assets/Bijou.svg' });
     const [model] = app.init();
-    const glyphCells = brailleGlyphCells(app.view(model) as Surface);
+    const glyphCells = brailleGlyphCells(app.view(model));
 
     expect(glyphCells.length).toBeGreaterThan(20);
     expect(glyphCells.every((cell) => colorHex(cell.fg) === undefined)).toBe(true);

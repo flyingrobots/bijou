@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Issue
 
@@ -23,9 +23,9 @@ toward that endpoint, not an exception shuffle.
 Reduce aggregate Code Dojo debt from `1,729` to `1,679` or lower by eliminating
 at least `50` live ESLint findings with behavior-preserving TypeScript fixes.
 
-## Candidate Slice
+## Final Slice
 
-Initial non-DOGFOOD offender candidates:
+The implemented cleanup removes 58 live ESLint findings:
 
 | File | Findings |
 | :--- | ---: |
@@ -33,10 +33,12 @@ Initial non-DOGFOOD offender candidates:
 | `packages/bijou/src/core/theme/graph.ts` | 13 |
 | `packages/bijou/src/core/components/dag-source.ts` | 13 |
 | `scripts/image-viewer.test.ts` | 13 |
-| **Candidate total** | **52** |
+| `examples/image-viewer/main.ts` | 6 |
+| **Slice total** | **58** |
 
-The final slice may substitute equivalent compact offenders if a candidate
-exposes broader semantic work than this goalpost should carry.
+The final slice added `examples/image-viewer/main.ts` because narrowing that
+app's concrete surface-rendering return type removes unsafe surface assertions
+from the image-viewer tests while preserving runtime behavior.
 
 ## Scope
 
@@ -67,9 +69,16 @@ Live counts on `main` at `45462fae`:
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,679` or lower
 
+Implementation result:
+
+- aggregate Code Dojo debt: `1,671`
+- ESLint findings: `1,260`
+- live ESLint reduction: `58`
+- next aggregate target: `1,621` or lower
+
 ## Playback Questions
 
-1. Is aggregate Code Dojo debt at `1,679` or lower?
+1. Is aggregate Code Dojo debt at `1,671` or lower?
 2. Did the implementation remove at least `50` real violations?
 3. Did touched file/context, mock-ban, and code-size ceilings stay flat or
    lower?
@@ -88,7 +97,7 @@ Live counts on `main` at `45462fae`:
 
 - The selected touched TypeScript files have zero new ESLint findings and reduce
   live findings by at least `50`.
-- Aggregate Code Dojo debt is `1,679` or lower.
+- Aggregate Code Dojo debt is `1,671` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live ESLint count.
 - `docs/code-dojo-exceptions.md` and `package.json` report the lower ceiling.
 - Focused validation for the touched surfaces passes.
