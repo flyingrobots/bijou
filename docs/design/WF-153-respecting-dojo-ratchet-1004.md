@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Validated locally.
 
 ## Tracker
 
@@ -41,11 +41,28 @@ Live counts on `main` at `cc54799a`:
 
 Selected cleanup slice:
 
-- TBD after focused offender probing.
+- `tests/cycles/DF-062/notification-system-family-audit.test.ts`
+- `tests/cycles/DF-068/dogfood-block-preview-regressions.test.ts`
+- `packages/bijou-tui/src/runtime-interactive-resize.test.ts`
+- `packages/bijou-tui/src/app-frame-core.test.ts`
+- `packages/bijou-tui/src/app-frame-overlays.test.ts`
+- `packages/bijou-tui/src/split-pane.test.ts`
+- `packages/bijou-tui/src/pager.ts`
+- `packages/bijou/src/adapters/test/io.ts`
+- `packages/bijou/src/core/forms/form-utils.ts`
+- `packages/bijou/src/core/binding-frame-update.ts`
+- `packages/bijou/src/core/components/dag-edges.ts`
 
 Implemented counts on this branch before review:
 
-- TBD after implementation.
+- aggregate Code Dojo debt: `1,003`
+- ESLint findings: `595`
+- file/context baseline: `331`, with touched baselines lowered where files
+  shrank
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- DOGFOOD raw-string debt: `2,766`
+- next aggregate target: `953` or lower
 
 ## Scope
 
@@ -133,4 +150,4 @@ without re-running broad discovery first.
 - Aggregate Code Dojo debt is `1,004` or lower.
 - The ESLint baseline records the lower live count.
 - The Code Dojo exception ledger and `package.json` report the lower ceiling.
-- The next ratchet target is documented as `954` or lower.
+- The next ratchet target is documented as `953` or lower.

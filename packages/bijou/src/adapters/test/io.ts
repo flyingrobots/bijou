@@ -104,10 +104,10 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
     rawInput(onKey: (key: string) => void): RawInputHandle {
       const keyQueue = [...(options.keys ?? [])];
       let disposed = false;
-      /** @internal Deliver the next key from the queue via microtask. */
       function deliver() {
         if (disposed || keyQueue.length === 0) return;
-        const key = keyQueue.shift()!;
+        const key = keyQueue.shift();
+        if (key === undefined) return;
         onKey(key);
         if (keyQueue.length > 0) clock.queueMicrotask(deliver);
       }
@@ -132,7 +132,8 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
       let disposed = false;
       function deliver() {
         if (disposed || keyQueue.length === 0) return;
-        const key = keyQueue.shift()!;
+        const key = keyQueue.shift();
+        if (key === undefined) return;
         onKey(key);
         if (keyQueue.length > 0) clock.queueMicrotask(deliver);
       }
@@ -140,13 +141,9 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
       return { dispose() { disposed = true; } };
     },
 
-    /**
-     * Register a resize callback (no-op in tests).
-     * @param _callback - Ignored; resize events are not simulated.
-     * @returns A no-op disposable handle.
-     */
-    onResize(_callback: (cols: number, rows: number) => void): RawInputHandle {
-      return { dispose() {} };
+    /** Register a resize callback (no-op in tests). */
+    onResize(callback: (cols: number, rows: number) => void): RawInputHandle {
+      return { dispose() { void callback; } };
     },
 
     /**

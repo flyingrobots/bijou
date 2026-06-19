@@ -138,14 +138,14 @@ describe('splitPaneResizeBy', () => {
 });
 
 describe('splitPane render', () => {
-  it('renders exact width/height in row mode', () => {
+  it('renders row dimensions', () => {
     const state = createSplitPaneState({ ratio: 0.5 });
     const output = splitPane(state, {
       direction: 'row',
       width: 21,
       height: 4,
-      paneA: (w, h) => `A(${w}x${h})`,
-      paneB: (w, h) => `B(${w}x${h})`,
+      paneA: (w, h) => `A(${String(w)}x${String(h)})`,
+      paneB: (w, h) => `B(${String(w)}x${String(h)})`,
     });
 
     const lines = output.split('\n');
@@ -175,7 +175,7 @@ describe('splitPane render', () => {
     }
   });
 
-  it('renders exact width/height in column mode', () => {
+  it('renders column dimensions', () => {
     const state = createSplitPaneState({ ratio: 0.5 });
     const output = splitPane(state, {
       direction: 'column',
@@ -194,7 +194,7 @@ describe('splitPane render', () => {
     expect(output).toContain('bottom');
   });
 
-  it('renders exact width/height on the surface path in row mode', () => {
+  it('renders row surface dimensions', () => {
     const ctx = createTestContext();
     const state = createSplitPaneState({ ratio: 0.5 });
     const surface = splitPaneSurface(state, {

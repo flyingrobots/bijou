@@ -1,36 +1,36 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 646,
-  "errors": 646,
+  "total": 595,
+  "errors": 595,
   "warnings": 0,
   "rules": [
     {
       "ruleId": "@typescript-eslint/no-unsafe-argument",
-      "count": 17
+      "count": 16
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 5
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 10
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 14
+      "count": 12
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 96
+      "count": 89
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 165
+      "count": 147
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 110
+      "count": 103
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -54,7 +54,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-assignment",
-      "count": 9
+      "count": 8
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-conversion",
@@ -70,7 +70,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 22
+      "count": 20
     },
     {
       "ruleId": "@typescript-eslint/no-confusing-void-expression",
@@ -94,7 +94,7 @@
     },
     {
       "ruleId": "no-useless-assignment",
-      "count": 3
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
@@ -102,7 +102,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 11
+      "count": 9
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-parameters",
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 9
+      "count": 7
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",
@@ -122,7 +122,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
-      "count": 4
+      "count": 3
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -154,7 +154,7 @@
     },
     {
       "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
-      "count": 16
+      "count": 13
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",

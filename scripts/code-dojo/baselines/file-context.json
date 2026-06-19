@@ -366,7 +366,7 @@
     {
       "path": "packages/bijou-tui/src/app-frame-core.test.ts",
       "lines": 442,
-      "bytes": 13409
+      "bytes": 13406
     },
     {
       "path": "packages/bijou-tui/src/command-palette.test.ts",
@@ -635,8 +635,8 @@
     },
     {
       "path": "packages/bijou-tui/src/pager.ts",
-      "lines": 345,
-      "bytes": 10606
+      "lines": 343,
+      "bytes": 10480
     },
     {
       "path": "packages/bijou-tui/src/raster-glyph.test.ts",
@@ -746,7 +746,7 @@
     {
       "path": "tests/cycles/DF-062/notification-system-family-audit.test.ts",
       "lines": 313,
-      "bytes": 13848
+      "bytes": 13792
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/schema-blocks.ts",
@@ -815,8 +815,8 @@
     },
     {
       "path": "packages/bijou/src/core/components/dag-edges.ts",
-      "lines": 304,
-      "bytes": 10013
+      "lines": 300,
+      "bytes": 9581
     },
     {
       "path": "packages/bijou/src/core/components/dag-source-adapter-sliced.test.ts",
@@ -876,7 +876,7 @@
     {
       "path": "tests/cycles/DF-068/dogfood-block-preview-regressions.test.ts",
       "lines": 284,
-      "bytes": 11060
+      "bytes": 11058
     },
     {
       "path": "packages/bijou/src/core/component-metadata.ts",
@@ -930,8 +930,8 @@
     },
     {
       "path": "packages/bijou/src/core/forms/form-utils.ts",
-      "lines": 270,
-      "bytes": 9120
+      "lines": 267,
+      "bytes": 9073
     },
     {
       "path": "examples/showcase/registry-display.ts",
@@ -1036,7 +1036,7 @@
     {
       "path": "packages/bijou-tui/src/split-pane.test.ts",
       "lines": 250,
-      "bytes": 8308
+      "bytes": 8280
     },
     {
       "path": "packages/bijou/src/core/theme/color.test.ts",
@@ -1126,7 +1126,7 @@
     {
       "path": "packages/bijou-tui/src/runtime-interactive-resize.test.ts",
       "lines": 229,
-      "bytes": 6713
+      "bytes": 6709
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/schema-parsers-advanced.ts",
@@ -1145,8 +1145,8 @@
     },
     {
       "path": "packages/bijou/src/core/binding-frame-update.ts",
-      "lines": 227,
-      "bytes": 7294
+      "lines": 225,
+      "bytes": 7282
     },
     {
       "path": "packages/create-bijou-tui-app/src/cli.test.ts",
@@ -1380,8 +1380,8 @@
     },
     {
       "path": "packages/bijou/src/adapters/test/io.ts",
-      "lines": 193,
-      "bytes": 6804
+      "lines": 190,
+      "bytes": 6698
     },
     {
       "path": "packages/bijou-tui/src/raytrace.ts",
@@ -1535,8 +1535,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-overlays.test.ts",
-      "lines": 170,
-      "bytes": 5434
+      "lines": 166,
+      "bytes": 5405
     },
     {
       "path": "tests/cycles/DF-070/dogfood-block-product-polish.test.ts",

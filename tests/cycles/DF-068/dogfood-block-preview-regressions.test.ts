@@ -50,7 +50,7 @@ function frameText(frame: FrameLike) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -104,7 +104,7 @@ function findTextStart(frame: FrameLike, text: string): { readonly x: number; re
   for (let y = 0; y < frame.height; y++) {
     let row = '';
     for (let x = 0; x < frame.width; x++) {
-      row += frame.get(x, y).char || ' ';
+      row += frame.get(x, y).char ?? ' ';
     }
     const x = row.indexOf(text);
     if (x >= 0) return { x, y };
@@ -120,7 +120,7 @@ function findCharBefore(
   for (let x = beforeX - 1; x >= 0; x--) {
     if (frame.get(x, y).char === char) return { x, y };
   }
-  throw new Error(`character ${char} not found before column ${beforeX}`);
+  throw new Error(`character ${char} not found before col ${String(beforeX)}`);
 }
 function textBefore(text: string, marker: string): string {
   const index = text.indexOf(marker);
@@ -241,7 +241,7 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
     const guideId = blockPreviewGuideId('CounterDemoBlock');
     const selected = await renderBlocksGuide(guideId, 150, 43);
     const incremented = await runScript(
-      createDocsApp(selected.ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any }),
+      createDocsApp(selected.ctx, { initialRoute: 'docs', initialPageId: 'blocks' }),
       [
         {
           msg: {

@@ -15,7 +15,7 @@ import {
 
 describe('run', () => {
   describe('interactive mode', () => {
-    it('waits for async cleanup-producing commands to settle before shutdown completes', async () => {
+    it('waits for async cleanup before shutdown', async () => {
       let disposeCalls = 0;
       const { clock, ctx } = createInteractiveContext();
       const app: App<string> = {
@@ -50,11 +50,11 @@ describe('run', () => {
       expect(disposeCalls).toBe(1);
     });
 
-    it('emits one explicit warning when shutdown drain times out', async () => {
+    it('warns when shutdown drain times out', async () => {
       const { clock, ctx } = createInteractiveContext();
       const app: App<string> = {
         init: () => ['hang', [
-          () => new Promise(() => {}),
+          () => new Promise<never>((resolve) => void resolve),
           quit(),
         ]],
         update: (_msg, model) => [model, []],
@@ -116,7 +116,7 @@ describe('run', () => {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
           return [model, []];
         },
-        view: (model) => textView(`count: ${model}`),
+        view: (model) => textView(`count: ${String(model)}`),
       };
 
       const { clock, ctx } = createInteractiveContext({ runtime: { refreshRate: 60 } });
@@ -159,7 +159,7 @@ describe('run', () => {
         },
         view(current) {
           viewCalls += 1;
-          return textView(`count: ${current.count}`);
+          return textView(`count: ${String(current.count)}`);
         },
       };
 
@@ -186,7 +186,7 @@ describe('run', () => {
         },
         view(model) {
           viewCalls += 1;
-          return textView(`count: ${model}`);
+          return textView(`count: ${String(model)}`);
         },
       };
 
@@ -210,7 +210,7 @@ describe('run', () => {
         },
         view(model) {
           viewCalls += 1;
-          return textView(`count: ${model}`);
+          return textView(`count: ${String(model)}`);
         },
       };
 
