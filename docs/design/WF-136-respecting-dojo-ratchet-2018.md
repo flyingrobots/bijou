@@ -72,10 +72,11 @@ the current `53` ESLint findings in:
 
 ## Non-Goals
 
-- Do not touch the 5,000-line DOGFOOD app in this slice.
-- Do not soften, disable, or narrow ESLint rules.
-- Do not raise file/context or code-size ceilings.
-- Do not change worker lifecycle semantics for static-analysis convenience.
+- Leave the 5,000-line DOGFOOD app untouched in this slice.
+- Keep ESLint rules at full strength; no softening, disabling, or narrowing.
+- Preserve existing file/context and code-size ceilings.
+- Preserve worker lifecycle semantics instead of changing them for
+  static-analysis convenience.
 
 ## Current Evidence
 
@@ -99,11 +100,11 @@ Focused ESLint findings:
 
 ## Playback Questions
 
-1. Did aggregate Code Dojo debt fall to `2,018` or lower?
-2. Did the stored ESLint baseline match the new live count?
-3. Did file/context and code-size debt hold or shrink?
-4. Did worker, DAG renderer, and preference-list focused tests pass?
-5. Did the repo gates pass before review?
+1. Is aggregate Code Dojo debt at `2,018` or lower?
+2. Does the stored ESLint baseline match the new live count?
+3. Have file/context and code-size debt held or shrunk?
+4. Do focused worker, DAG renderer, and preference-list tests pass?
+5. Are the repo gates passing before review?
 
 ## Tests To Write First
 
