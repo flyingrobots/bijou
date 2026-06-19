@@ -16,7 +16,7 @@ export const separatorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_separator',
   description: 'Render a horizontal separator line with an optional centered label.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = separator({ label: input.label, width: input.width, ctx });

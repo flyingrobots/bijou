@@ -26,7 +26,7 @@ export const inspectorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_inspector',
   description: 'Render an inspector panel with a title, primary value, supporting text, and detail sections.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = inspector({

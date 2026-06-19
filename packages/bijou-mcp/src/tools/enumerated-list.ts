@@ -19,7 +19,7 @@ export const enumeratedListTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_enumerated_list',
   description: 'Render a list with bullets, numbers (arabic), letters (alpha), roman numerals, or dashes.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = enumeratedList(input.items, {

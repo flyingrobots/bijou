@@ -19,7 +19,7 @@ export const tabsTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_tabs',
   description: 'Render a horizontal tab bar with one active tab highlighted.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = tabs(input.items, { active: input.active, separator: input.separator, ctx });

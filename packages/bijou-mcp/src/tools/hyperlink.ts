@@ -18,7 +18,7 @@ export const hyperlinkTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_hyperlink',
   description: 'Render a terminal hyperlink (OSC 8). Falls back to text + URL in plain mode.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = hyperlink(input.text, input.url, { fallback: input.fallback, ctx });

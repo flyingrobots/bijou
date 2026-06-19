@@ -63,6 +63,11 @@ const app: App<Model, Msg> = {
       case 'logo-y': return [{ ...model, logoY: msg.value }, []];
       case 'tagline': return [{ ...model, taglineOpacity: msg.value }, []];
       case 'show-prompt': return [{ ...model, showPrompt: true }, [tick(500, { type: 'blink' })]];
+      case 'quit': return [model, [quit()]];
+      case 'key':
+      case 'mouse':
+      case 'pulse':
+      case 'resize': return [model, []];
       case 'blink': return [
         { ...model, promptBlink: model.promptBlink + 1 },
         [tick(500, { type: 'blink' })],
@@ -110,4 +115,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

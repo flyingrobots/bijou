@@ -18,7 +18,7 @@ export const constrainTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_constrain',
   description: 'Constrain text to a maximum width and/or height, truncating with ellipsis if needed.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = constrain(input.content, {

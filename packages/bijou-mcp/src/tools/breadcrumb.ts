@@ -16,7 +16,7 @@ export const breadcrumbTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_breadcrumb',
   description: 'Render a breadcrumb navigation trail. The last item is highlighted as the current location.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = breadcrumb(input.items, { separator: input.separator, ctx });

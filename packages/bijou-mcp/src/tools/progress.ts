@@ -19,7 +19,7 @@ export const progressBarTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_progress_bar',
   description: 'Render a static progress bar showing completion percentage.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = progressBar(input.percent, {

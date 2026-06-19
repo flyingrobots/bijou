@@ -29,7 +29,7 @@ export const explainabilityTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_explainability',
   description: 'Render an AI explainability card showing a decision with rationale, evidence, confidence, and governance.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = explainability({

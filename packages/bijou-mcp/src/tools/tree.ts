@@ -25,7 +25,7 @@ export const treeTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_tree',
   description: 'Render a tree hierarchy with Unicode box-drawing connectors (lines and corner pieces). Returns plain-text.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = tree(input.nodes, { ctx });

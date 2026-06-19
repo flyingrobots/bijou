@@ -78,13 +78,13 @@ export function stripAnsi(text: string): string {
 export function detectGarbage(cleanOutput: string): string | null {
   for (const pattern of RAW_SURFACE_PATTERNS) {
     if (pattern.test(cleanOutput)) {
-      return `raw Surface dump matched ${pattern}`;
+      return `raw Surface dump matched ${String(pattern)}`;
     }
   }
 
   for (const pattern of ERROR_PATTERNS) {
     if (pattern.test(cleanOutput)) {
-      return `error output matched ${pattern}`;
+      return `error output matched ${String(pattern)}`;
     }
   }
 
@@ -95,7 +95,9 @@ export function rewritePackageManifestToTarballs(
   packageJsonSource: string,
   tarballSpecs: Readonly<Record<string, string>>,
 ): string {
-  const manifest = JSON.parse(packageJsonSource) as PackageManifest;
+  const parsed: unknown = JSON.parse(packageJsonSource);
+  if (!isPackageManifest(parsed)) throw new Error('Expected package manifest object');
+  const manifest = parsed;
   const sections: readonly DependencySection[] = [
     'dependencies',
     'devDependencies',
@@ -123,4 +125,8 @@ export function rewritePackageManifestToTarballs(
   }
 
   return `${JSON.stringify(manifest, null, 2)}\n`;
+}
+
+function isPackageManifest(value: unknown): value is PackageManifest {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

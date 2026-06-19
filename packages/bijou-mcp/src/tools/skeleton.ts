@@ -16,7 +16,7 @@ export const skeletonTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_skeleton',
   description: 'Render a placeholder skeleton loader (shimmering block characters). Useful for showing loading state.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = skeleton({ width: input.width, lines: input.lines, ctx });

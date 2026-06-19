@@ -18,7 +18,7 @@ export const stepperTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_stepper',
   description: 'Render a horizontal step-progress indicator with checkmarks, dots, and connectors. Returns plain-text with Unicode characters.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = stepper(input.steps, { current: input.current, ctx });

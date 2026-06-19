@@ -61,7 +61,7 @@ export const app: App<null> = {
         spacer(1, 1),
         chips,
         spacer(1, 1),
-        line(`Resize below 80 columns to flip the container theme. Current width: ${ctx.runtime.columns}`),
+        line(`Resize below 80 columns to flip the container theme. Current width: ${String(ctx.runtime.columns)}`),
         line('Press Q to quit.'),
       ),
       {
@@ -76,5 +76,5 @@ export const app: App<null> = {
 };
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app, { ctx, css });
+  void run(app, { ctx, css });
 }

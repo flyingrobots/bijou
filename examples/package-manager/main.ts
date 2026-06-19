@@ -78,7 +78,7 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const rows = [spacer()] as Surface[];
+    const rows: Surface[] = [spacer()];
 
     if (model.phase === 'resolving') {
       rows.push(line(`  ${spinnerFrame(model.frame)} Resolving dependencies...`));
@@ -132,4 +132,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+void run(app);

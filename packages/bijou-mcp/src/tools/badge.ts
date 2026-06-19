@@ -18,7 +18,7 @@ export const badgeTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_badge',
   description: 'Render an inline pill-shaped badge label. Variants: success, error, warning, info, accent, primary.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const surface = badge(input.text, { variant: input.variant, ctx });

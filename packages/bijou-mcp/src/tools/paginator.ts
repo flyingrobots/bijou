@@ -17,7 +17,7 @@ export const paginatorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_paginator',
   description: 'Render a page indicator showing current position. Styles: dots or text.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = paginator({ current: input.current, total: input.total, style: input.style, ctx });

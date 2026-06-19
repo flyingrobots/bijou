@@ -15,7 +15,7 @@ export const kbdTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_kbd',
   description: 'Render a keyboard key indicator (like an HTML <kbd> element). Shows a styled key label.',
   inputSchema: inputShape,
-  handler: async (args) => {
+  handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = kbd(input.key, { ctx });
