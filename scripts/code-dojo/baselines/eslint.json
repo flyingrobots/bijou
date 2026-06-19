@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1038,
-  "errors": 1038,
+  "total": 1034,
+  "errors": 1034,
   "warnings": 0,
   "rules": [
     {
@@ -58,7 +58,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 70
+      "count": 67
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -98,7 +98,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 181
+      "count": 180
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",

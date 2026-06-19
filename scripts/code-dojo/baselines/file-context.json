@@ -310,8 +310,8 @@
     },
     {
       "path": "packages/bijou-node/src/index.test.ts",
-      "lines": 473,
-      "bytes": 16537
+      "lines": 472,
+      "bytes": 16443
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/metadata-standard.ts",

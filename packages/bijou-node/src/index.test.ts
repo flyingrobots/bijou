@@ -311,12 +311,11 @@ describe('initDefaultContext()', () => {
       try {
         initDefaultContext();
       } catch (error) {
-        expect(error).toBeInstanceOf(BijouBootstrapError);
-        const bootstrapError = error as BijouBootstrapError;
-        expect(bootstrapError.name).toBe('BijouBootstrapError');
-        expect(bootstrapError.reason).toBe('stdout reported zero columns/rows');
-        expect(bootstrapError.hint).toContain('use pipe mode');
-        expect(bootstrapError.message).toBe('initDefaultContext failed: stdout reported zero columns/rows');
+        if (!(error instanceof BijouBootstrapError)) throw error;
+        expect(error.name).toBe('BijouBootstrapError');
+        expect(error.reason).toBe('stdout reported zero columns/rows');
+        expect(error.hint).toContain('use pipe mode');
+        expect(error.message).toBe('initDefaultContext failed: stdout reported zero columns/rows');
       }
     });
   });
@@ -429,7 +428,7 @@ describe('startApp()', () => {
       view: () => textSurface('hello from themed startApp'),
     }, { theme: TEST_THEME });
 
-    expect(getDefaultContext()?.theme.theme.name).toBe('test-theme');
+    expect(getDefaultContext().theme.theme.name).toBe('test-theme');
     expect(spy).toHaveBeenCalledWith('hello from themed startApp');
     spy.mockRestore();
   });
@@ -445,8 +444,8 @@ describe('startApp()', () => {
       view: () => textSurface('hello from auto themed startApp'),
     }, { themes: TEST_THEME_SET, themeMode: 'auto' });
 
-    expect(getDefaultContext()?.theme.theme.name).toBe('light-theme');
-    expect(getDefaultContext()?.theme.colorScheme).toBe('light');
+    expect(getDefaultContext().theme.theme.name).toBe('light-theme');
+    expect(getDefaultContext().theme.colorScheme).toBe('light');
     expect(spy).toHaveBeenCalledWith('hello from auto themed startApp');
     spy.mockRestore();
   });
@@ -467,6 +466,6 @@ describe('startApp()', () => {
   });
 
   it('defaults StartAppOptions message payloads to unknown instead of any', () => {
-    expectTypeOf<StartAppOptions>().toEqualTypeOf<RunOptions<unknown> & NodeThemeOptions>();
+    expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<RunOptions & NodeThemeOptions>();
   });
 });

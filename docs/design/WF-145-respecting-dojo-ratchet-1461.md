@@ -76,12 +76,12 @@ Live counts on `main` at `f279b6d2`:
 
 Implemented counts on this branch before review:
 
-- aggregate Code Dojo debt: `1,447`
-- ESLint findings: `1,038`
+- aggregate Code Dojo debt: `1,443`
+- ESLint findings: `1,034`
 - file/context baseline: `332`
 - mock-ban baseline: `22`
 - code-size baseline: `55`, including `4` legacy hard-limit files
-- next aggregate target: `1,397` or lower
+- next aggregate target: `1,393` or lower
 
 ## Playback Questions
 
