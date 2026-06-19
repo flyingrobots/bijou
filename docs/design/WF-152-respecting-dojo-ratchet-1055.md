@@ -7,7 +7,7 @@ Shaped.
 ## Tracker
 
 - GitHub Issue: [#409](https://github.com/flyingrobots/bijou/issues/409)
-- Pull Request: TBD
+- Pull Request: [#410](https://github.com/flyingrobots/bijou/pull/410)
 
 ## Legend
 
