@@ -1,21 +1,3 @@
-/**
- * Scripted driver for TEA applications.
- *
- * Feeds a sequence of key events into an app and captures all rendered
- * frames. Useful for automated demos, integration tests, and CI.
- *
- * ```ts
- * const result = await runScript(counterApp, [
- *   { key: 'up' },
- *   { key: 'up' },
- *   { key: 'down' },
- *   { key: 'q' },
- * ]);
- * console.log(result.model);   // final model state
- * console.log(result.frames);  // all rendered frames
- * ```
- */
-
 import type { App, RunOptions, ResizeMsg, MouseMsg, MouseButton, Cmd } from './types.js';
 import { isCmdCleanup, isResizeMsg, QUIT } from './types.js';
 import { createEventBus, type BusMsg } from './eventbus.js';
@@ -24,9 +6,7 @@ import { type Surface, resolveClock, sleep } from '@flyingrobots/bijou';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput } from './view-output.js';
 
-// ---------------------------------------------------------------------------
 // Types
-// ---------------------------------------------------------------------------
 
 /** A single step in a scripted interaction sequence. */
 export type ScriptStep<M = never> =
@@ -108,7 +88,7 @@ export interface RunScriptResult<Model> {
 }
 
 /** Options for {@link testRuntime}. */
-export interface TestRuntimeOptions extends RunScriptOptions {}
+export type TestRuntimeOptions = RunScriptOptions;
 
 /** Final outcome recorded for a command observed by {@link testRuntime}. */
 export type TestRuntimeCommandResolution =
@@ -137,7 +117,7 @@ export interface TestRuntimeCommandRecord<M> {
   /** How the command ultimately settled. */
   readonly resolution: TestRuntimeCommandResolution;
   /** Final returned value when the command settled with a value or error. */
-  readonly result?: M | unknown;
+  readonly result?: unknown;
   /** Whether runtime teardown disposed the command's cleanup handle. */
   readonly cleanedUp: boolean;
   /** Whether the command has finished executing. */
@@ -213,14 +193,16 @@ export interface TestHarness<Model, M> {
 interface MutableCommandRecord<M> extends TestRuntimeCommandRecord<M> {
   emitted: M[];
   resolution: TestRuntimeCommandResolution;
-  result?: M | unknown;
+  result?: unknown;
   cleanedUp: boolean;
   settled: boolean;
 }
 
-// ---------------------------------------------------------------------------
+class RuntimeState { running = true; tornDown = false; }
+
 // Implementation
-// ---------------------------------------------------------------------------
+
+function isStopped(state: { readonly running: unknown; readonly tornDown: unknown }): boolean { return state.tornDown === true || state.running !== true; }
 
 function mouseMsg(
   button: MouseButton,
@@ -297,8 +279,8 @@ export function sgrMouse<M = never>(raw: string, delay?: number): MouseScriptSte
 
 function initialSize(ctx: RunOptions['ctx']): { width: number; height: number } {
   return {
-    width: Math.max(0, Math.floor(ctx?.runtime.columns || 80)),
-    height: Math.max(0, Math.floor(ctx?.runtime.rows || 24)),
+    width: Math.max(0, Math.floor(ctx?.runtime.columns ?? 80)),
+    height: Math.max(0, Math.floor(ctx?.runtime.rows ?? 24)),
   };
 }
 
@@ -331,8 +313,7 @@ export async function testRuntime<Model, M>(
   const bus = createEventBus<M>({ clock });
   const ctx = options?.ctx;
   let commandId = 0;
-  let running = true;
-  let tornDown = false;
+  const runtimeState = new RuntimeState();
   let model!: Model;
   let currentSize = initialSize(ctx);
 
@@ -345,7 +326,9 @@ export async function testRuntime<Model, M>(
   }
 
   function latestSnapshot(): TestRuntimeSnapshot<Model, M> {
-    return snapshots[snapshots.length - 1]!;
+    const snapshot = snapshots.at(-1);
+    if (snapshot === undefined) throw new Error('testRuntime: no snapshots captured');
+    return snapshot;
   }
 
   function captureSnapshot(
@@ -439,13 +422,13 @@ export async function testRuntime<Model, M>(
   }
 
   async function processStep(step: ScriptStep<M>): Promise<TestRuntimeSnapshot<Model, M>> {
-    if (tornDown || !running) return latestSnapshot();
+    if (isStopped(runtimeState)) return latestSnapshot();
 
     if (step.delay && step.delay > 0) {
       await sleep(clock, step.delay);
     }
 
-    if (tornDown || !running) return latestSnapshot();
+    if (isStopped(runtimeState)) return latestSnapshot();
 
     if ('key' in step) {
       bus.emit(parseKey(step.key));
@@ -471,20 +454,20 @@ export async function testRuntime<Model, M>(
   }
 
   async function teardown(): Promise<void> {
-    if (tornDown) return;
-    tornDown = true;
-    running = false;
+    if (runtimeState.tornDown) return;
+    runtimeState.tornDown = true;
+    runtimeState.running = false;
     bus.stopPulse();
     bus.dispose();
     await Promise.resolve();
   }
 
   bus.onQuit(() => {
-    running = false;
+    runtimeState.running = false;
   });
 
   bus.on((msg) => {
-    if (!running) return;
+    if (!runtimeState.running) return;
     handledMessages.push(msg);
     const [nextModel, cmds] = app.update(msg, model);
     model = nextModel;
@@ -540,14 +523,14 @@ export async function testRuntime<Model, M>(
       return clock.now() - start;
     },
     get running() {
-      return running && !tornDown;
+      return runtimeState.running && !runtimeState.tornDown;
     },
     snapshot: latestSnapshot,
     settle,
     step: processStep,
     async run(steps) {
       for (const step of steps) {
-        if (tornDown || !running) break;
+        if (isStopped(runtimeState)) break;
         await processStep(step);
       }
       return settle();
@@ -608,7 +591,7 @@ export async function runScript<Model, M>(
 
   const [initModel, initCmds] = app.init();
   let model = initModel;
-  let running = true;
+  const runtimeState = new RuntimeState();
   let currentSize = initialSize(ctx);
 
   if (options?.pulseFps !== false) {
@@ -616,13 +599,13 @@ export async function runScript<Model, M>(
   }
 
   function shutdown(): void {
-    running = false;
+    runtimeState.running = false;
   }
 
   bus.onQuit(shutdown);
 
   bus.on((msg) => {
-    if (!running) return;
+    if (!runtimeState.running) return;
     const [newModel, cmds] = app.update(msg, model);
     model = newModel;
     if (isResizeMsg(msg)) {
@@ -652,13 +635,13 @@ export async function runScript<Model, M>(
     await bus.drain();
 
     for (const step of steps) {
-      if (!running) break;
+      if (isStopped(runtimeState)) break;
 
       if (step.delay && step.delay > 0) {
         await sleep(clock, step.delay);
       }
 
-      if (!running) break;
+      if (isStopped(runtimeState)) break;
 
       if ('key' in step) {
         bus.emit(parseKey(step.key));

@@ -103,9 +103,9 @@ const BINDING_TRANSITION_REASONS: readonly BindingLifecycleTransitionReason[] = 
   'dispose',
   'invalidate',
 ];
-const EMPTY_BINDING_INVALIDATIONS = Object.freeze([]) as readonly BindingInvalidation[];
-const EMPTY_BINDING_TRANSITIONS = Object.freeze([]) as readonly BindingLifecycleTransition[];
-const EMPTY_BINDING_FACTS = Object.freeze([]) as readonly BindingFact[];
+const EMPTY_BINDING_INVALIDATIONS: readonly BindingInvalidation[] = Object.freeze([]);
+const EMPTY_BINDING_TRANSITIONS: readonly BindingLifecycleTransition[] = Object.freeze([]);
+const EMPTY_BINDING_FACTS: readonly BindingFact[] = Object.freeze([]);
 
 export function defineBindingLifecycleOwner(
   input: BindingLifecycleOwnerInput,
@@ -120,6 +120,7 @@ export function defineBindingLifecycleOwner(
   }
 
   const owner = {
+    [BINDING_LIFECYCLE_OWNER_BRAND]: true,
     id: normalizeRequiredText({
       scope: 'binding lifecycle owner',
       field: 'id',
@@ -127,9 +128,9 @@ export function defineBindingLifecycleOwner(
     }),
     kind,
     label: optionalTrimmedText(input.label),
-  } as BindingLifecycleOwner;
+  } satisfies BindingLifecycleOwner;
 
-  Object.defineProperty(owner, BINDING_LIFECYCLE_OWNER_BRAND, { value: true });
+  Object.defineProperty(owner, BINDING_LIFECYCLE_OWNER_BRAND, { enumerable: false, value: true });
   return Object.freeze(owner);
 }
 
@@ -138,7 +139,7 @@ export function isBindingLifecycleOwner(value: unknown): value is BindingLifecyc
     value
       && typeof value === 'object'
       && Object.prototype.hasOwnProperty.call(value, BINDING_LIFECYCLE_OWNER_BRAND)
-      && (value as BindingLifecycleOwnerBrandCarrier)[BINDING_LIFECYCLE_OWNER_BRAND] === true,
+      && Reflect.get(value, BINDING_LIFECYCLE_OWNER_BRAND) === true,
   );
 }
 
@@ -175,6 +176,7 @@ export function bindingLifecycleRecord(
   const transitions = freezeTransitions(input.transitions, state);
 
   const record = {
+    [BINDING_LIFECYCLE_RECORD_BRAND]: true,
     owner: input.owner,
     requirementId,
     providerId,
@@ -183,9 +185,9 @@ export function bindingLifecycleRecord(
     invalidations,
     transitions,
     facts: freezeFacts(input.facts),
-  } as BindingLifecycleRecord;
+  } satisfies BindingLifecycleRecord;
 
-  Object.defineProperty(record, BINDING_LIFECYCLE_RECORD_BRAND, { value: true });
+  Object.defineProperty(record, BINDING_LIFECYCLE_RECORD_BRAND, { enumerable: false, value: true });
   return Object.freeze(record);
 }
 
@@ -194,7 +196,7 @@ export function isBindingLifecycleRecord(value: unknown): value is BindingLifecy
     value
       && typeof value === 'object'
       && Object.prototype.hasOwnProperty.call(value, BINDING_LIFECYCLE_RECORD_BRAND)
-      && (value as BindingLifecycleRecordBrandCarrier)[BINDING_LIFECYCLE_RECORD_BRAND] === true,
+      && Reflect.get(value, BINDING_LIFECYCLE_RECORD_BRAND) === true,
   );
 }
 
@@ -379,11 +381,11 @@ function freezeTransitions(
     const previous = frozenTransitions[index - 1];
     const current = frozenTransitions[index];
     if (previous === undefined || current === undefined) {
-      throw new Error(`binding lifecycle: missing transition at index ${index}`);
+      throw new Error(`binding lifecycle: missing transition at index ${String(index)}`);
     }
     if (previous.to !== current.from) {
       throw new Error(
-        `binding lifecycle: transition chain is discontinuous at index ${index}`,
+        `binding lifecycle: transition chain is discontinuous at index ${String(index)}`,
       );
     }
   }
@@ -468,14 +470,6 @@ function freezeFacts(facts: readonly BindingFact[] | undefined): readonly Bindin
   return deepFreeze([...facts]);
 }
 
-interface BindingLifecycleOwnerBrandCarrier {
-  readonly [BINDING_LIFECYCLE_OWNER_BRAND]?: true;
-}
-
-interface BindingLifecycleRecordBrandCarrier {
-  readonly [BINDING_LIFECYCLE_RECORD_BRAND]?: true;
-}
-
 interface RequiredTextOptions {
   readonly scope: string;
   readonly field: string;
@@ -515,19 +509,23 @@ function optionalTrimmedText(value: string | undefined): string | undefined {
 }
 
 function isBindingLifecycleState(value: string): value is BindingLifecycleState {
-  return BINDING_LIFECYCLE_STATES.includes(value as BindingLifecycleState);
+  return isOneOf(BINDING_LIFECYCLE_STATES, value);
 }
 
 function isBindingLifecycleOwnerKind(value: string): value is BindingLifecycleOwnerKind {
-  return BINDING_LIFECYCLE_OWNER_KINDS.includes(value as BindingLifecycleOwnerKind);
+  return isOneOf(BINDING_LIFECYCLE_OWNER_KINDS, value);
 }
 
 function isBindingInvalidationReason(value: string): value is BindingInvalidationReason {
-  return BINDING_INVALIDATION_REASONS.includes(value as BindingInvalidationReason);
+  return isOneOf(BINDING_INVALIDATION_REASONS, value);
 }
 
 function isBindingTransitionReason(value: string): value is BindingLifecycleTransitionReason {
-  return BINDING_TRANSITION_REASONS.includes(value as BindingLifecycleTransitionReason);
+  return isOneOf(BINDING_TRANSITION_REASONS, value);
+}
+
+function isOneOf<T extends string>(values: readonly T[], value: string): value is T {
+  return values.some((item) => item === value);
 }
 
 function deepFreeze<T>(value: T, seen = new WeakSet()): T {

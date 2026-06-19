@@ -2,45 +2,19 @@ import {
   BIJOU_DARK,
   BIJOU_LIGHT,
   defineThemeSafePairs,
-  type RGB,
   type Theme,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
+import { dogfoodLocalizedText } from './localization.js';
 
-function cloneToken(token: TokenValue): TokenValue {
-  return {
-    ...token,
-    ...(token.modifiers === undefined ? {} : { modifiers: [...token.modifiers] }),
-    ...(token.fgRGB === undefined ? {} : { fgRGB: [...token.fgRGB] as RGB }),
-    ...(token.bgRGB === undefined ? {} : { bgRGB: [...token.bgRGB] as RGB }),
-  };
-}
-
-function cloneTokenRecord<T extends Record<string, TokenValue>>(tokens: T): T {
-  return Object.fromEntries(
-    Object.entries(tokens).map(([key, token]) => [key, cloneToken(token)]),
-  ) as T;
+function dogfoodText(id: string, fallback: string): string {
+  return dogfoodLocalizedText(undefined, id, fallback);
 }
 
 function cloneThemeWithName(theme: Theme, name: string): Theme {
   return {
-    ...theme,
+    ...structuredClone(theme),
     name,
-    status: cloneTokenRecord(theme.status),
-    semantic: cloneTokenRecord(theme.semantic),
-    gradient: Object.fromEntries(
-      Object.entries(theme.gradient).map(([key, stops]) => [
-        key,
-        stops.map((stop) => ({
-          pos: stop.pos,
-          color: [...stop.color] as RGB,
-        })),
-      ]),
-    ) as Theme['gradient'],
-    border: cloneTokenRecord(theme.border),
-    ui: cloneTokenRecord(theme.ui),
-    surface: cloneTokenRecord(theme.surface),
   };
 }
 
@@ -100,19 +74,28 @@ export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 export const DOGFOOD_SHELL_THEMES: readonly FrameShellThemeSpec[] = Object.freeze([
   {
     id: 'dogfood',
-    label: 'DOGFOOD',
-    description: 'High-contrast neutral docs shell with dark and light modes.',
+    label: dogfoodText('shell.theme.dogfood.label', 'DOGFOOD'),
+    description: dogfoodText(
+      'shell.theme.dogfood.description',
+      'High-contrast neutral docs shell with dark and light modes.',
+    ),
     modes: [
       {
         id: 'dark',
-        label: 'Dark',
-        description: 'High-contrast neutral docs shell for dark terminals.',
+        label: dogfoodText('shell.theme.dogfood.dark.label', 'Dark'),
+        description: dogfoodText(
+          'shell.theme.dogfood.dark.description',
+          'High-contrast neutral docs shell for dark terminals.',
+        ),
         theme: DOGFOOD_DARK_THEME,
       },
       {
         id: 'light',
-        label: 'Light',
-        description: 'High-contrast neutral docs shell for light terminals.',
+        label: dogfoodText('shell.theme.dogfood.light.label', 'Light'),
+        description: dogfoodText(
+          'shell.theme.dogfood.light.description',
+          'High-contrast neutral docs shell for light terminals.',
+        ),
         theme: DOGFOOD_LIGHT_THEME,
       },
     ],

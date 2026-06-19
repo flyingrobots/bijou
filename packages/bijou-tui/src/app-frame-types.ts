@@ -32,7 +32,7 @@ export type FrameNotificationSpec = Omit<NotificationSpec<never>, 'action'>;
 export type FramePageMsg<Msg> = Msg | MouseMsg | PulseMsg;
 
 /** Typed tuple returned by framed pages from `init()` and `update()`. */
-export type FramePageUpdateResult<PageModel, Msg> = [PageModel, Cmd<Msg>[]];
+export type FramePageUpdateResult<PageModel, Msg> = [PageModel, Cmd<Msg | FrameScopedMsg>[]];
 
 /** Static or model-resolved page text used for tab and search labels. */
 export type FramePageText<PageModel> = string | ((model: PageModel) => string);
@@ -330,7 +330,7 @@ export function isFrameScopedMsg(value: unknown): value is FrameScopedMsg {
   return typeof value === 'object'
     && value !== null
     && FRAME_MSG_TOKEN in value
-    && (value as FrameScopedMsg)[FRAME_MSG_TOKEN];
+    && Reflect.get(value, FRAME_MSG_TOKEN) === true;
 }
 
 /** Wrap a frame action into a FrameScopedMsg for the update loop. */
@@ -342,12 +342,12 @@ export function wrapFrameMsg(action: FrameAction): FrameScopedMsg {
 }
 
 /** Create a page command that emits a frame-scoped action back to the shell. */
-export function emitFrameAction<Msg>(action: FrameAction): Cmd<Msg> {
-  return async (_emit, _caps) => wrapFrameMsg(action) as unknown as Msg;
+export function emitFrameAction<Msg>(action: FrameAction): Cmd<Msg | FrameScopedMsg> {
+  return () => wrapFrameMsg(action);
 }
 
 /** Create a page command that pushes a frame-managed transient notification. */
-export function notify<Msg>(notification: FrameNotificationSpec): Cmd<Msg> {
+export function notify<Msg>(notification: FrameNotificationSpec): Cmd<Msg | FrameScopedMsg> {
   return emitFrameAction<Msg>({ type: 'push-notification', notification });
 }
 
@@ -356,7 +356,7 @@ export function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg
   return typeof value === 'object'
     && value !== null
     && PAGE_MSG_TOKEN in value
-    && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN];
+    && Reflect.get(value, PAGE_MSG_TOKEN) === true;
 }
 
 /** Tag a page-bound message with its originating page ID. */
@@ -370,16 +370,16 @@ export function wrapPageMsg<Msg>(pageId: string, msg: FramePageMsg<Msg>): PageSc
 
 /** Create a command that immediately resolves with the given message. */
 export function emitMsg<Msg>(msg: Msg): Cmd<FramedAppMsg<Msg>> {
-  return async (_emit, _caps) => msg;
+  return () => msg;
 }
 
 /** Create a command that emits a page-scoped message. */
 export function emitMsgForPage<Msg>(pageId: string, msg: FramePageMsg<Msg>): Cmd<FramedAppMsg<Msg>> {
-  return async (_emit, _caps) => wrapPageMsg(pageId, msg);
+  return () => wrapPageMsg(pageId, msg);
 }
 
 /** Wrap a page-level command so its emitted messages are tagged with the page ID. */
-export function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<FramedAppMsg<Msg>> {
+export function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg | FrameScopedMsg>): Cmd<FramedAppMsg<Msg>> {
   return async (emit, caps) => {
     const result = await cmd((msg) => {
       if (isFrameScopedMsg(msg)) {
