@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Implemented.
 
 ## Tracker
 
@@ -32,6 +32,22 @@ The selected files can clear the required 50-count ratchet if fixed rather than
 waived. `dogfood-blocks.ts` also carries legacy DOGFOOD raw strings, so any
 touch to that file must respect the DOGFOOD i18n ratchet.
 
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `725`
+- next aggregate Code Dojo target: `675` or lower
+- ESLint findings: `317`
+- `examples/docs/dogfood-blocks.ts` ESLint findings: `0`
+- `examples/docs/capture-main.ts` ESLint findings: `0`
+- `examples/docs/dogfood-blocks.ts` file/context baseline: `2,638` lines and
+  `92,020` bytes
+- `examples/docs/capture-main.ts` file/context baseline: `188` lines and
+  `5,472` bytes
+- DOGFOOD raw-string debt: `2,644`
+- `dogfood-blocks` raw-string debt: `679`
+- `capture-main` raw-string debt: `9`
+- missing Markdown localizations: `78`
+
 ## Problem
 
 The Code Dojo baseline is enforceable, but the repository is not yet living at
@@ -47,8 +63,9 @@ silencing.
   and capture cluster.
 - Prefer checked reads, local type guards, explicit `String(...)` formatting,
   and precise return types over assertions.
-- Replace touched raw DOGFOOD strings with catalog-backed lookups when that is
-  the honest local fix.
+- Reduce touched raw DOGFOOD strings by removing non-user-facing literals,
+  de-duplicating code tokens, or using catalog-backed lookups when product copy
+  is actually touched.
 - Update measured baselines only after validation proves the new counts.
 - Update Code Dojo and changelog documentation with landed numbers.
 
@@ -89,11 +106,30 @@ next highest small offender only after documenting the reason in this file.
 - `git diff --check`
 - full pre-push gate
 
+Implemented validation:
+
+- `npx eslint examples/docs/dogfood-blocks.ts examples/docs/capture-main.ts`
+- `npm run typecheck:test`
+- `npm run dogfood:i18n:debt`
+- `npm run code-dojo:changed`
+- `npm run test:run -- tests/cycles/DF-069/dogfood-block-registry.test.ts
+  tests/cycles/DF-030/dogfood-docs-surface-block.test.ts
+  tests/cycles/DF-070/dogfood-block-product-polish.test.ts
+  tests/cycles/DF-071/dogfood-block-authored-surfaces.test.ts
+  tests/cycles/DX-046/graphql-dogfood-navigation-fixture.test.ts
+  scripts/smoke-dogfood.test.ts
+  tests/cycles/WF-003/replace-smoke-examples-with-smoke-dogfood.test.ts`
+- `npm run code-dojo:verify`
+- `npm run lint`
+- `npm run docs:inventory`
+- `npm run dogfood:i18n:complete`
+- `npm run dogfood:i18n:check`
+- `git diff --check`
+
 ## Acceptance Criteria
 
-- Aggregate Code Dojo debt is `742` or lower.
-- ESLint baseline is `334` or lower.
-- Touched DOGFOOD i18n debt does not increase and is reduced where source
-  strings are replaced with catalog-backed lookup.
+- Aggregate Code Dojo debt is `725` or lower.
+- ESLint baseline is `317` or lower.
+- Touched DOGFOOD i18n debt is reduced without adding new missing translations.
 - Touched files remain under their current file/context baselines.
 - Issue #419, this design doc, and the pull request are cross-linked.
