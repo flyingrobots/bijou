@@ -35,7 +35,8 @@ export function clipToWidth(str: string, maxWidth: number): string {
   let i = 0;
 
   while (i < str.length) {
-    const ch = str[i]!;
+    const ch = str[i];
+    if (ch === undefined) break;
 
     if (ch === '\x1b') {
       inEscape = true;
@@ -59,7 +60,8 @@ export function clipToWidth(str: string, maxWidth: number): string {
     // Visible character — consume next pre-segmented grapheme
     if (gi >= graphemes.length) break;
 
-    const grapheme = graphemes[gi]!;
+    const grapheme = graphemes[gi];
+    if (grapheme === undefined) break;
     const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible + gWidth > maxWidth) {

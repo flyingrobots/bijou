@@ -50,7 +50,7 @@ function formatConfidence(confidence: number | string | undefined): string | und
   if (typeof confidence === 'string') return confidence;
   if (Number.isNaN(confidence)) return undefined;
   const percentage = confidence >= 0 && confidence <= 1 ? confidence * 100 : confidence;
-  return `${Math.round(percentage)}%`;
+  return `${String(Math.round(percentage))}%`;
 }
 
 function formatEvidenceItem(item: ExplainabilityEvidenceItem): string {

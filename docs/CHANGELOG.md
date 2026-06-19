@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135/WF-153 lower live type-aware ESLint
-  findings from `4,517` to `595`, cutting `3,937` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-154 lower live type-aware ESLint
+  findings from `4,517` to `543`, cutting `3,989` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -91,11 +91,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   workflow preflight indexing, cleanup handle test fakes, runtime resize/frame
   overlay/pager/split-pane cleanup, test I/O no-op handle cleanup, form utility
   formatting, binding-frame narrowing, DAG edge safe-indexing, and notification
-  plus DOGFOOD block-preview regression cleanup. The aggregate debt ceiling now
-  ratchets from `4,940` to `1,003`, with the next goalpost target set to `953`
+  plus DOGFOOD block-preview regression cleanup, plus DOGFOOD terminal guard
+  localization and small MCP, AppFrame, form, component, script, and example
+  strict-typing cleanup. The aggregate debt ceiling now ratchets from `4,940`
+  to `951`, with the next goalpost target set to `901`
   or lower, while touched file/context budgets remain held under their stored
   ceilings, three file/context exceptions are removed, and the DOGFOOD
-  raw-string debt baseline drops from `2,772` to `2,766`.
+  raw-string debt baseline drops from `2,772` to `2,761`.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe

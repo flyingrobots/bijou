@@ -80,7 +80,7 @@ function renderAccessible(nodes: TreeNode[], depth: number): string {
   const lines: string[] = [];
   for (const node of nodes) {
     if (node.children && node.children.length > 0) {
-      lines.push(`${indent}${node.label} (contains ${node.children.length} items)`);
+      lines.push(`${indent}${node.label} (contains ${String(node.children.length)} items)`);
       lines.push(renderAccessible(node.children, depth + 1));
     } else {
       lines.push(`${indent}${node.label}`);

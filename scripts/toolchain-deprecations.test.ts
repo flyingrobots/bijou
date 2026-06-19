@@ -9,12 +9,14 @@ const TSX_MINIMUM_VERSION = '4.22.4';
 
 describe('toolchain deprecation guards', () => {
   it('keeps tsx on a version that uses module.registerHooks when Node supports it', () => {
-    const workspacePackage = readJson<{ readonly devDependencies?: Readonly<Record<string, string>> }>('package.json');
-    const installedPackage = readJson<{ readonly version: string }>('node_modules/tsx/package.json');
-    const requestedVersion = minimumVersion(workspacePackage.devDependencies?.tsx ?? '');
+    const workspacePackage = readJsonObject('package.json');
+    const installedPackage = readJsonObject('node_modules/tsx/package.json');
+    const devDependencies = stringRecordValue(workspacePackage['devDependencies']);
+    const installedVersion = requiredString(installedPackage['version'], 'node_modules/tsx version');
+    const requestedVersion = minimumVersion(devDependencies?.['tsx'] ?? '');
 
     expect(compareVersions(requestedVersion, TSX_MINIMUM_VERSION)).toBeGreaterThanOrEqual(0);
-    expect(compareVersions(installedPackage.version, TSX_MINIMUM_VERSION)).toBeGreaterThanOrEqual(0);
+    expect(compareVersions(installedVersion, TSX_MINIMUM_VERSION)).toBeGreaterThanOrEqual(0);
   });
 
   it('loads TypeScript through the tsx ESM loader without runtime deprecations', () => {
@@ -52,8 +54,27 @@ describe('toolchain deprecation guards', () => {
   });
 });
 
-function readJson<T>(path: string): T {
-  return JSON.parse(readFileSync(resolve(ROOT, path), 'utf8')) as T;
+function readJsonObject(path: string): Readonly<Record<string, unknown>> {
+  const parsed: unknown = JSON.parse(readFileSync(resolve(ROOT, path), 'utf8'));
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`${path} must contain a JSON object`);
+  }
+  return Object.freeze(Object.fromEntries(Object.entries(parsed)));
+}
+
+function stringRecordValue(value: unknown): Readonly<Record<string, string>> | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined;
+  const record: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (typeof entry !== 'string') return undefined;
+    record[key] = entry;
+  }
+  return Object.freeze(record);
+}
+
+function requiredString(value: unknown, label: string): string {
+  if (typeof value !== 'string') throw new Error(`${label} must be a string`);
+  return value;
 }
 
 function compareVersions(left: string, right: string): number {

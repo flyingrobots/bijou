@@ -113,10 +113,10 @@ describe('withHiddenCursor', () => {
     const ctx = createTestContext({ mode: 'interactive' });
 
     expect(() => {
-      withHiddenCursor(ctx.io, () => {
-        throw new Error('boom');
+      void withHiddenCursor(ctx.io, () => {
+        throw new Error('x');
       });
-    }).toThrow('boom');
+    }).toThrow('x');
 
     expect(ctx.io.written.join('')).toContain('\x1b[?25h');
   });
@@ -129,9 +129,7 @@ describe('withHiddenCursor', () => {
 
   it('works with async fn', async () => {
     const ctx = createTestContext({ mode: 'interactive' });
-    const result = await withHiddenCursor(ctx.io, async () => {
-      return 'async-value';
-    });
+    const result = await withHiddenCursor(ctx.io, () => Promise.resolve('async-value'));
     expect(result).toBe('async-value');
     expect(ctx.io.written.join('')).toContain('\x1b[?25h');
   });
@@ -139,9 +137,7 @@ describe('withHiddenCursor', () => {
   it('shows cursor after async fn rejects', async () => {
     const ctx = createTestContext({ mode: 'interactive' });
     await expect(
-      withHiddenCursor(ctx.io, async () => {
-        throw new Error('async-boom');
-      }),
+      withHiddenCursor(ctx.io, () => Promise.reject(new Error('async-boom'))),
     ).rejects.toThrow('async-boom');
 
     expect(ctx.io.written.join('')).toContain('\x1b[?25h');

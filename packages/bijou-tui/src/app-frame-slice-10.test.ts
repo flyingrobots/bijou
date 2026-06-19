@@ -16,10 +16,8 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  MouseMsg,
-  Msg,
-  must,
+  FramePage, MouseMsg, Msg, must,
+  isCmdCleanup, QUIT,
 } from './app-frame.test-support.js';
 describe('createFramedApp', () => {
   const testCtx = createTestContext();
@@ -39,11 +37,12 @@ describe('createFramedApp', () => {
     if (runtimeMsg == null) throw new Error('expected runtime issue message');
     const [nextModel, cmds] = app.update(runtimeMsg, model);
     const tickMsg = await cmds[0]?.(() => undefined, {
-      onPulse: () => ({ dispose() {} }),
-      sleep: async () => undefined,
+      onPulse: () => ({ dispose: () => undefined }),
+      sleep: () => Promise.resolve(),
       now: () => 200,
     });
-    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) throw new Error('expected notification tick message');
+    const [visibleModel] = app.update(tickMsg, nextModel);
     let dismissMouse: MouseMsg | undefined;
     let sawActionTarget = false;
     for (let row = 0; row < visibleModel.rows; row++) {

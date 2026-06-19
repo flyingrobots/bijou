@@ -78,8 +78,11 @@ describe('view output normalization', () => {
   });
 
   it('explains the sanctioned surface bridge when a raw string reaches runtime normalization', () => {
-    expect(() => normalizeViewOutput('plain text' as unknown as LayoutNode, { width: 10, height: 1 }))
-      .toThrowError(
+    expect(() => {
+      // @ts-expect-error regression fixture intentionally exercises runtime validation.
+      normalizeViewOutput('plain text', { width: 10, height: 1 });
+    })
+      .toThrow(
         'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them with contentSurface(...), parseAnsiToSurface(...), or stringToSurface(...).',
       );
   });

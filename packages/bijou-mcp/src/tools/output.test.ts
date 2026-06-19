@@ -117,14 +117,25 @@ describe('MCP structured output modes', () => {
     const result = await docsTool.handler({ query: 'dag', output: 'both' });
     const structured = result.structuredContent;
     if (structured == null) throw new Error('Expected structured content');
-    const payload = structured['data'] as Record<string, unknown>;
-    const entries = payload['entries'] as Record<string, unknown>[];
 
     expect(result.content[0]?.type).toBe('text');
     expect(result.content[0]?.text).toContain('"tool": "bijou_dag"');
     expect(structured['output']).toBe('both');
     expect(structured['rendered']).toBe(result.content[0]?.text);
-    expect(Number(payload['returnedEntries'])).toBeGreaterThanOrEqual(1);
-    expect(entries[0]?.['tool']).toBe('bijou_dag');
+    const payload = recordValue(structured['data']);
+    if (payload === undefined) throw new Error('Expected structured data payload');
+    const returnedEntries = payload['returnedEntries'];
+    if (typeof returnedEntries !== 'number') throw new Error('Expected numeric returnedEntries');
+    const entries = payload['entries'];
+    if (!Array.isArray(entries)) throw new Error('Expected docs entries array');
+    const firstEntry = recordValue(entries[0]);
+    if (firstEntry === undefined) throw new Error('Expected first docs entry');
+    expect(returnedEntries).toBeGreaterThanOrEqual(1);
+    expect(firstEntry['tool']).toBe('bijou_dag');
   });
 });
+
+function recordValue(value: unknown): Readonly<Record<string, unknown>> | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined;
+  return Object.freeze(Object.fromEntries(Object.entries(value)));
+}

@@ -52,7 +52,7 @@ export function stepper(steps: StepperStep[], options: StepperOptions): string {
         const state = i < current ? 'complete' : i === current ? 'current' : 'pending';
         return `${step.label} (${state})`;
       });
-      return `Step ${current + 1} of ${total}: ${parts.join(', ')}`;
+      return `Step ${String(current + 1)} of ${String(total)}: ${parts.join(', ')}`;
     },
     interactive: () => {
       // interactive + static

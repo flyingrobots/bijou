@@ -7,8 +7,8 @@ import {
 } from './app-frame-types.js';
 
 const TEST_CAPS = {
-  onPulse: () => ({ dispose() {} }),
-  sleep: async () => undefined,
+  onPulse: () => ({ dispose: () => undefined }),
+  sleep: () => Promise.resolve(),
   now: () => 0,
 };
 

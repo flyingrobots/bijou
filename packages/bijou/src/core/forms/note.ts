@@ -28,7 +28,7 @@ export interface NoteOptions {
  * @param options - Note configuration.
  * @returns A promise that resolves to `undefined` after writing the note.
  */
-export async function note(options: NoteOptions): Promise<void> {
+export function note(options: NoteOptions): Promise<void> {
   const ctx = resolveCtx(options.ctx);
   const { message, title } = options;
 
@@ -39,6 +39,7 @@ export async function note(options: NoteOptions): Promise<void> {
   }, options);
 
   ctx.io.write(output + '\n');
+  return Promise.resolve();
 }
 
 /** Format a plain-text note for pipe/accessible modes. */

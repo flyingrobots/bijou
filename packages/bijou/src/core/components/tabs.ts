@@ -66,7 +66,7 @@ export function tabs(items: TabItem[], options: TabsOptions): string {
         .map((item, i) => {
           const label = formatLabel(item);
           const tag = i === active ? ' (active)' : '';
-          return `Tab ${i + 1} of ${total}: ${label}${tag}`;
+          return `Tab ${String(i + 1)} of ${String(total)}: ${label}${tag}`;
         })
         .join(' | ');
     },

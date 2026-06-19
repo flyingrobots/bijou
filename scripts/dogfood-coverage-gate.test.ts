@@ -43,8 +43,8 @@ describe('dogfood coverage gate', () => {
     expect(code).toBe(0);
     expect(stderr).toEqual([]);
     expect(stdout.join('')).toContain('dogfood-coverage: ok');
-    expect(stdout.join('')).toContain(`floor ${DOGFOOD_COVERAGE_FLOOR_PERCENT}%`);
-    expect(stdout.join('')).toContain(`next target ${DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT}%`);
+    expect(stdout.join('')).toContain(`floor ${String(DOGFOOD_COVERAGE_FLOOR_PERCENT)}%`);
+    expect(stdout.join('')).toContain(`next target ${String(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT)}%`);
   });
 
   it('prints a useful failure summary when the floor is not met', () => {
