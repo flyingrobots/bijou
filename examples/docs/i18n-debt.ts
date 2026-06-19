@@ -46,12 +46,6 @@ export interface DogfoodI18nDebtRatchetResult {
   readonly violations: readonly string[];
 }
 
-export interface DogfoodTouchedI18nDebtResult {
-  readonly ok: boolean;
-  readonly touchedPaths: readonly string[];
-  readonly violations: readonly string[];
-}
-
 export interface DogfoodMarkdownLocalizationDocument {
   readonly surface: string;
   readonly path: string;
@@ -108,6 +102,10 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
     path: 'examples/docs/i18n-debt.ts',
     reason: 'localization debt scanner implementation, not a DOGFOOD product surface',
   },
+  {
+    path: 'examples/docs/i18n-debt-touched.ts',
+    reason: 'localization touched-file ratchet implementation, not a DOGFOOD product surface',
+  },
 ]);
 
 const DOGFOOD_I18N_DEBT_SURFACE_NAMES: Readonly<Record<string, string>> = Object.freeze({
@@ -143,10 +141,10 @@ export function discoverDogfoodI18nDebtSources(
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2761,
+  total: 2656,
   bySurface: Object.freeze({
     'capture-main': 17,
-    'component-stories': 1631,
+    'component-stories': 1526,
     'counter-block-demo': 56,
     coverage: 1,
     'docs-app': 258,
@@ -254,25 +252,6 @@ export function evaluateDogfoodI18nDebtRatchet(
     ok: violations.length === 0,
     total: inventory.total,
     baseline,
-    violations: Object.freeze(violations),
-  });
-}
-
-export function evaluateDogfoodTouchedI18nDebt(
-  inventory: DogfoodI18nDebtInventory,
-  touchedPaths: readonly string[],
-): DogfoodTouchedI18nDebtResult {
-  const touched = new Set(touchedPaths);
-  const violations = inventory.bySurface.flatMap((surface) => {
-    const entries = inventory.entries.filter((entry) => entry.surface === surface.surface);
-    const path = entries[0]?.path;
-    if (path == null || !touched.has(path) || entries.length === 0) return [];
-    return [`touched DOGFOOD source ${path} has ${String(entries.length)} raw string debt entr${entries.length === 1 ? 'y' : 'ies'}`];
-  });
-
-  return Object.freeze({
-    ok: violations.length === 0,
-    touchedPaths: Object.freeze([...touched].sort()),
     violations: Object.freeze(violations),
   });
 }

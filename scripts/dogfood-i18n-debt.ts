@@ -10,17 +10,19 @@ import {
   collectDogfoodMarkdownLocalizationDebt,
   evaluateDogfoodI18nDebtRatchet,
   evaluateDogfoodMarkdownLocalizationRatchet,
-  evaluateDogfoodTouchedI18nDebt,
   type DogfoodI18nDebtBaseline,
   type DogfoodI18nDebtInventory,
   type DogfoodMarkdownLocalizationBaseline,
   type DogfoodMarkdownLocalizationInventory,
 } from '../examples/docs/i18n-debt.js';
+import { evaluateDogfoodTouchedI18nDebt } from '../examples/docs/i18n-debt-touched.js';
+import { collectBaseDogfoodI18nDebt } from './dogfood-i18n-debt-base.js';
 
 export interface DogfoodI18nDebtInventoryIO {
   readonly args?: readonly string[];
   readonly changedPaths?: readonly string[];
   readonly inventory?: DogfoodI18nDebtInventory;
+  readonly baseInventory?: DogfoodI18nDebtInventory;
   readonly baseline?: DogfoodI18nDebtBaseline;
   readonly markdownInventory?: DogfoodMarkdownLocalizationInventory;
   readonly markdownBaseline?: DogfoodMarkdownLocalizationBaseline;
@@ -52,8 +54,11 @@ export function runDogfoodI18nDebtInventory(io: DogfoodI18nDebtInventoryIO = {})
   const markdownBaseline = io.markdownBaseline ?? DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE;
   const result = evaluateDogfoodI18nDebtRatchet(inventory, baseline);
   const markdownResult = evaluateDogfoodMarkdownLocalizationRatchet(markdownInventory, markdownBaseline);
-  const changedPaths = io.changedPaths ?? changedPathsFromBase(baseRefFromArgs(args), io.gitOutput ?? gitOutput);
-  const touchedResult = evaluateDogfoodTouchedI18nDebt(inventory, changedPaths);
+  const baseRef = baseRefFromArgs(args);
+  const runGit = io.gitOutput ?? gitOutput;
+  const changedPaths = io.changedPaths ?? changedPathsFromBase(baseRef, runGit);
+  const baseInventory = io.baseInventory ?? collectBaseDogfoodI18nDebt(baseRef, changedPaths, runGit);
+  const touchedResult = evaluateDogfoodTouchedI18nDebt(inventory, changedPaths, baseInventory);
 
   if (!result.ok || !markdownResult.ok || !touchedResult.ok) {
     stderr([

@@ -2,7 +2,7 @@
 
 ## Status
 
-Active.
+Implemented.
 
 ## Tracker
 
@@ -39,6 +39,15 @@ Target for this cycle:
 - lower `component-stories` to `1,531` or lower
 - keep missing Markdown localizations flat at `78`
 - keep aggregate Code Dojo debt at `951` or lower
+
+Implemented counts on this branch before review:
+
+- DOGFOOD raw-string debt: `2,656`
+- `component-stories` raw-string debt: `1,526`
+- missing Markdown localizations: `78`
+- aggregate Code Dojo debt: `910`
+- ESLint findings: `502`
+- next aggregate Code Dojo target: `860` or lower
 
 ## Scope
 
