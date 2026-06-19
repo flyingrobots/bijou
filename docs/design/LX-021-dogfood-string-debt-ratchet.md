@@ -2,12 +2,12 @@
 
 ## Status
 
-Shaped.
+Active.
 
 ## Tracker
 
 - GitHub Issue: [#415](https://github.com/flyingrobots/bijou/issues/415)
-- Pull Request: TBD
+- Pull Request: [#416](https://github.com/flyingrobots/bijou/pull/416)
 
 ## Legend
 
