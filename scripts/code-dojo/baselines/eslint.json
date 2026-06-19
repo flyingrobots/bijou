@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1101,
-  "errors": 1101,
+  "total": 1038,
+  "errors": 1038,
   "warnings": 0,
   "rules": [
     {
@@ -10,7 +10,7 @@
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-assertions",
-      "count": 26
+      "count": 22
     },
     {
       "ruleId": "@typescript-eslint/consistent-type-definitions",
@@ -30,11 +30,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-dynamic-delete",
-      "count": 2
+      "count": 1
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 27
+      "count": 25
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
@@ -42,19 +42,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-explicit-any",
-      "count": 40
+      "count": 39
     },
     {
       "ruleId": "@typescript-eslint/no-floating-promises",
       "count": 8
     },
     {
-      "ruleId": "@typescript-eslint/no-invalid-void-type",
-      "count": 1
-    },
-    {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 175
+      "count": 174
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -62,7 +58,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 76
+      "count": 70
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -90,7 +86,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-call",
-      "count": 5
+      "count": 4
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-member-access",
@@ -98,15 +94,15 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-return",
-      "count": 7
+      "count": 6
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 208
+      "count": 181
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
-      "count": 29
+      "count": 26
     },
     {
       "ruleId": "@typescript-eslint/non-nullable-type-assertion-style",
@@ -138,7 +134,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 28
+      "count": 27
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -146,7 +142,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 236
+      "count": 223
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
@@ -182,7 +178,7 @@
     },
     {
       "ruleId": "preserve-caught-error",
-      "count": 3
+      "count": 2
     }
   ]
 }

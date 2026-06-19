@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135/WF-144 lower live type-aware ESLint
-  findings from `4,517` to `1,101`, cutting `3,429` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-145 lower live type-aware ESLint
+  findings from `4,517` to `1,038`, cutting `3,493` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -45,8 +45,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   shell assertion cleanup, bench CLI formatting cleanup, focus-map text
   formatting cleanup, key parser regex/assertion cleanup, and node style test
   regex cleanup, plus app-frame core/overlay retained-layout and shell-command
-  narrowing cleanup, plus core binding runtime-brand, snapshot clone, and
-  unchecked fixture cleanup, plus TUI runtime binding brand/dispatch cleanup and
+  narrowing cleanup, TUI command type, smoke-example orchestration, wall-time
+  runner parsing, DTCG token test guard, and app-shell malformed-input cleanup,
+  plus command-contract return cleanup and eventbus fixture cleanup, plus core
+  binding runtime-brand, snapshot clone, and unchecked fixture cleanup, plus TUI
+  runtime binding brand/dispatch cleanup and
   core schema-block inert-data, brand, and bind-output cleanup, plus worker IPC
   data guard cleanup, DAG renderer safe-indexing cleanup, and preference-list
   iteration cleanup, plus DTCG token import guards, canvas shader typing, i18n
@@ -67,8 +70,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   transition shader character indexing, deterministic animate test callbacks,
   multiselect option indexing, enumerated-list safe reads and explicit
   formatting, and DOGFOOD smoke scenario/env narrowing. The aggregate debt
-  ceiling now ratchets from `4,940` to `1,511`, with the next goalpost target
-  set to `1,461` or lower, while touched file/context budgets remain held under
+  ceiling now ratchets from `4,940` to `1,447`, with the next goalpost target
+  set to `1,397` or lower, while touched file/context budgets remain held under
   their stored ceilings and three file/context exceptions are removed.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the

@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented; pending review.
 
 ## Issue
 
@@ -23,24 +23,28 @@ bounded cleanup slice toward that endpoint.
 Reduce aggregate Code Dojo debt from `1,511` to `1,461` or lower by eliminating
 at least `50` live findings with behavior-preserving TypeScript fixes.
 
-## Candidate Slice
+## Selected Slice
 
-The current non-DOGFOOD package/script offenders include enough coherent debt
-to meet the ratchet without mixing in DOGFOOD raw visible-copy policy work:
+The implementation used a non-DOGFOOD package/script/test cluster that avoided
+DOGFOOD raw visible-copy policy work, removed `63` live ESLint findings, and
+retired one mock-ban violation:
 
 | File | Findings |
 | :--- | ---: |
-| `packages/bijou-tui/src/app-frame-types.ts` | 12 |
 | `scripts/smoke-all-examples-lib.ts` | 12 |
 | `bench/src/harnesses/wall-time/runner.ts` | 11 |
-| `packages/bijou-node/src/recorder.ts` | 11 |
 | `packages/bijou-tui/src/types.ts` | 11 |
-| **Candidate total** | **57** |
+| `packages/bijou/src/core/theme/dtcg.test.ts` | 11 |
+| `packages/bijou/src/core/app-shell-composition.test.ts` | 10 |
+| command-contract follow-up cleanup | 8 |
+| **Selected total** | **63** |
 
-The implementation may choose a smaller or adjacent coherent cluster if live
-probes show a safer path, but it must remove at least `50` findings while
-leaving every touched file raw-ESLint clean and at or below its stored
-file/context ceiling.
+The selected cluster leaves every touched file raw-ESLint clean and at or below
+its stored file/context ceiling. The implementation intentionally avoided
+`packages/bijou-tui/src/app-frame-types.ts` and
+`packages/bijou-node/src/recorder.ts` because the former has a deliberate
+frame-scoped generic bridge and the latter needs broader recorder module
+validation than this bounded slice should carry.
 
 ## Scope
 
@@ -69,6 +73,15 @@ Live counts on `main` at `f279b6d2`:
 - mock-ban baseline: `23`
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,461` or lower
+
+Implemented counts on this branch before review:
+
+- aggregate Code Dojo debt: `1,447`
+- ESLint findings: `1,038`
+- file/context baseline: `332`
+- mock-ban baseline: `22`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- next aggregate target: `1,397` or lower
 
 ## Playback Questions
 

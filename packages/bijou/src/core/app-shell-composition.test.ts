@@ -131,16 +131,16 @@ describe('app shell composition contract', () => {
       render: () => ({ output: 'reader' }),
     });
 
-    expect(() => defineAppShellComposition({
+    expect(() => loose({
       slots: {
         leftNav: block,
         content: block,
-      } as never,
+      },
     })).toThrow('app shell composition: unsupported slot leftNav');
-    expect(() => defineAppShellComposition({
+    expect(() => loose({
       slots: {
         navigation: block,
-      } as never,
+      },
     })).toThrow('app shell composition: content slot is required');
     expect(() => defineAppShellComposition({
       slots: {
@@ -156,27 +156,27 @@ describe('app shell composition contract', () => {
     });
 
     expect(isBlockDefinition(block)).toBe(true);
-    expect(() => defineAppShellComposition({
-      providers: { id: 'loose' } as never,
+    expect(() => loose({
+      providers: { id: 'loose' },
       slots: { content: block },
     })).toThrow('app shell composition: providers must be created by providerScope()');
-    expect(() => defineAppShellComposition({
+    expect(() => loose({
       slots: {
         content: {
           metadata: metadataFor('LooseReaderSurface', 'loose-reader-surface'),
           render: () => ({ output: 'loose' }),
-        } as never,
+        },
       },
     })).toThrow('slots.content: slot content must be created by defineBlock()');
-    expect(() => defineAppShellComposition({
-      slots: null as never,
+    expect(() => loose({
+      slots: null,
     })).toThrow('app shell composition: slots must be an object');
-    expect(() => defineAppShellComposition(null as never)).toThrow(
+    expect(() => loose(null)).toThrow(
       'app shell composition: input must be an object',
     );
   });
 });
-
+function loose(input: unknown): true { Reflect.apply(defineAppShellComposition, undefined, [input]); return true; }
 function metadataFor(blockName: string, storyId: string): BlockMetadata {
   return {
     packageName: '@flyingrobots/bijou',

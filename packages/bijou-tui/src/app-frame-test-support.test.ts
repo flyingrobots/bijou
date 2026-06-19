@@ -7,8 +7,8 @@ import {
 describe('app-frame test support', () => {
   it('fails fast when command collection exhausts its pulse budget', async () => {
     const resolvers: (() => void)[] = [];
-    const pendingCmd: Cmd<string> = () => new Promise<void>((resolve) => {
-      resolvers.push(resolve);
+    const pendingCmd: Cmd<string> = () => new Promise<undefined>((resolve) => {
+      resolvers.push(() => { resolve(undefined); });
     });
 
     await expect(Promise.race([

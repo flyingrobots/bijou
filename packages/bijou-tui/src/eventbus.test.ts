@@ -1,16 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createEventBus, type BusMsg } from './eventbus.js';
-import type { Cmd, KeyMsg } from './types.js';
+import type { Cmd } from './types.js';
 import { QUIT, isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
-import type { IOPort, RawInputHandle } from '@flyingrobots/bijou';
+import type { IOPort } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function keyMsg(key: string, mods?: Partial<KeyMsg>): KeyMsg {
-  return { type: 'key', key, ctrl: false, alt: false, shift: false, ...mods };
-}
 
 interface TestMsg { type: 'custom'; value: number }
 
@@ -282,7 +278,7 @@ describe('runCmd', () => {
     const bus = createEventBus<TestMsg>();
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
-    bus.onQuit(() => {});
+    bus.onQuit(() => undefined);
 
     const cmd: Cmd<TestMsg> = () => QUIT;
     bus.runCmd(cmd);
@@ -324,8 +320,8 @@ describe('runCmd', () => {
       onCommandBackpressure,
     });
     const resolvers: (() => void)[] = [];
-    const cmd: Cmd<TestMsg> = () => new Promise<void>((resolve) => {
-      resolvers.push(resolve);
+    const cmd: Cmd<TestMsg> = () => new Promise<undefined>((resolve) => {
+      resolvers.push(() => { resolve(undefined); });
     });
 
     bus.runCmd(cmd);
@@ -412,8 +408,10 @@ describe('runCmd', () => {
 
     await bus.drain();
     expect(onCommandRejected).toHaveBeenCalledTimes(1);
-    expect(onCommandRejected.mock.calls[0]?.[0]).toBeInstanceOf(Error);
-    expect((onCommandRejected.mock.calls[0]?.[0] as Error).message).toBe('boom');
+    const rejection: unknown = onCommandRejected.mock.calls[0]?.[0];
+    expect(rejection).toBeInstanceOf(Error);
+    if (!(rejection instanceof Error)) throw new Error('expected rejection');
+    expect(rejection.message).toBe('boom');
   });
 
   it('routes both errors through onError if onCommandRejected throws', async () => {
@@ -483,21 +481,14 @@ describe('runCmd', () => {
 
     await bus.drain();
     expect(throwingRejected).toHaveBeenCalledTimes(1);
-    // safeReport swallowed the throw from onError
     expect(throwingOnError).toHaveBeenCalled();
   });
 
   it('silently drops rejected commands when no handlers are configured', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const bus = createEventBus<TestMsg>();
-      bus.runCmd(() => Promise.reject(new Error('boom')));
+    const bus = createEventBus<TestMsg>();
+    bus.runCmd(() => Promise.reject(new Error('boom')));
 
-      await bus.drain();
-      expect(consoleError).not.toHaveBeenCalled();
-    } finally {
-      consoleError.mockRestore();
-    }
+    await expect(bus.drain()).resolves.toBeUndefined();
   });
 });
 
@@ -530,7 +521,9 @@ describe('middleware', () => {
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
 
-    const mw = vi.fn((msg, next) => next(msg));
+    const mw = vi.fn((msg: BusMsg<TestMsg>, next: (msg: BusMsg<TestMsg>) => void) => {
+      next(msg);
+    });
     bus.use(mw);
 
     bus.emit({ type: 'custom', value: 42 });

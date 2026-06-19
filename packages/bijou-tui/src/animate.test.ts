@@ -205,14 +205,8 @@ describe('sequence', () => {
     const order: string[] = [];
     const caps = createMockCaps();
     const cmd = sequence<string>(
-      (emit) => {
-        order.push('first');
-        emit('a');
-      },
-      (emit) => {
-        order.push('second');
-        emit('b');
-      },
+      (emit) => { order.push('first'); emit('a'); return undefined; },
+      (emit) => { order.push('second'); emit('b'); return undefined; },
     );
     const emitted: string[] = [];
     await cmd((msg) => emitted.push(msg), caps);

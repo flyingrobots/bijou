@@ -1,12 +1,3 @@
-/**
- * Wall-time harness — parent/runner.
- *
- * Spawns child processes (one per (scenario, sample)) and collects
- * their JSON output into a structured report. Each child is fully
- * isolated so per-sample variance reflects only hardware/OS jitter,
- * not V8 state accumulation.
- */
-
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -16,8 +7,6 @@ import { computeStats, type SampleStats } from '../../stats.js';
 import { SCENARIOS, getScenario } from '../../scenarios/index.js';
 import type { AnyScenario } from '../../scenarios/index.js';
 
-// Resolve the path to child.ts relative to this file so the runner
-// can be invoked from anywhere.
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CHILD_PATH = resolve(__dirname, 'child.ts');
 
@@ -102,10 +91,10 @@ function detectCommit(): string | null {
 }
 
 function runChild(
-  scenarioId: string,
-  sampleIndex: number,
-  warmupFrames: number,
-  measureFrames: number,
+  id: string,
+  sample: number,
+  warmup: number,
+  frames: number,
 ): ChildSample {
   const result = spawnSync(
     process.execPath,
@@ -113,10 +102,10 @@ function runChild(
       '--import',
       'tsx',
       CHILD_PATH,
-      `--scenario=${scenarioId}`,
-      `--sample=${sampleIndex}`,
-      `--warmup=${warmupFrames}`,
-      `--frames=${measureFrames}`,
+      `--scenario=${id}`,
+      `--sample=${String(sample)}`,
+      `--warmup=${String(warmup)}`,
+      `--frames=${String(frames)}`,
     ],
     {
       encoding: 'utf8',
@@ -124,19 +113,28 @@ function runChild(
     },
   );
   if (result.status !== 0) {
-    const stderr = result.stderr ?? '';
-    throw new Error(`child failed for ${scenarioId} sample ${sampleIndex}: ${stderr}`);
+    throw new Error(`fail ${id}#${String(sample)}: ${result.stderr}`);
   }
-  const stdout = result.stdout ?? '';
-  const line = stdout.trim();
+  const line = result.stdout.trim();
   if (!line) {
-    throw new Error(`child produced no output for ${scenarioId} sample ${sampleIndex}`);
+    throw new Error(`no output ${id}#${String(sample)}`);
   }
   try {
-    return JSON.parse(line) as ChildSample;
+    return parseSample(JSON.parse(line));
   } catch (err) {
-    throw new Error(`failed to parse child output for ${scenarioId} sample ${sampleIndex}: ${(err as Error).message}\nraw: ${line}`);
+    throw new Error(`bad ${id}#${String(sample)}: ${err instanceof Error ? err.message : String(err)}\nraw: ${line}`, { cause: err });
   }
+}
+
+function parseSample(v: unknown): ChildSample { if (!isSample(v)) throw new Error('bad sample'); return v; }
+
+function isSample(v: unknown): v is ChildSample {
+  return typeof v === 'object' && v !== null
+    && 'scenarioId' in v && typeof v.scenarioId === 'string'
+    && 'sampleIndex' in v && typeof v.sampleIndex === 'number'
+    && 'elapsedNs' in v && typeof v.elapsedNs === 'number'
+    && 'frames' in v && typeof v.frames === 'number'
+    && 'nsPerFrame' in v && typeof v.nsPerFrame === 'number';
 }
 
 export function runBench(options: RunOptions): RunReport {

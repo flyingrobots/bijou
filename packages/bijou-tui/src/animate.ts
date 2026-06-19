@@ -112,9 +112,10 @@ export function animate<M>(options: AnimateOptions<M>): Cmd<M> {
 
   // Immediate mode — single frame, no physics
   if (immediate) {
-    return async (emit) => {
+    return (emit) => {
       emit(onFrame(to));
       if (onComplete) emit(onComplete());
+      return undefined;
     };
   }
 
@@ -171,7 +172,7 @@ function createSpringCmd<M>(
   onComplete?: () => M,
 ): Cmd<M> {
   return (emit, caps) =>
-    new Promise<void>((resolve) => {
+    new Promise<undefined>((resolve) => {
       let state = createSpringState(from);
       let accumulatedSeconds = 0;
 
@@ -196,7 +197,7 @@ function createSpringCmd<M>(
         if (state.done) {
           handle.dispose();
           if (onComplete) emit(onComplete());
-          resolve();
+          resolve(undefined);
         }
       });
     });
@@ -250,7 +251,7 @@ function createTweenCmd<M>(
   const config = resolveTweenConfig({ from, to, duration, ease });
 
   return (emit, caps) =>
-    new Promise<void>((resolve) => {
+    new Promise<undefined>((resolve) => {
       let state = createTweenState(from);
 
       const handle = caps.onPulse((dt) => {
@@ -261,15 +262,11 @@ function createTweenCmd<M>(
         if (state.done) {
           handle.dispose();
           if (onComplete) emit(onComplete());
-          resolve();
+          resolve(undefined);
         }
       });
     });
 }
-
-// ---------------------------------------------------------------------------
-// sequence() — chain animations like a GSAP timeline
-// ---------------------------------------------------------------------------
 
 /**
  * Run animations in sequence. Each animation completes before the next starts.
@@ -283,5 +280,6 @@ export function sequence<M>(...cmds: Cmd<M>[]): Cmd<M> {
     for (const cmd of cmds) {
       await cmd(emit, caps);
     }
+    return undefined;
   };
 }
