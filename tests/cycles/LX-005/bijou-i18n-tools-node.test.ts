@@ -1,15 +1,15 @@
 import { existsSync } from 'node:fs';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { rm } from 'node:fs/promises';
+import * as runtimeMod from '../../../packages/bijou-i18n/src/index.js';
+import * as tools from '../../../packages/bijou-i18n-tools/src/index.js';
+import * as nodeTools from '../../../packages/bijou-i18n-tools-node/src/index.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const NODE_TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools-node/src/index.ts');
-const TOOLS_ENTRY = resolve(ROOT, 'packages/bijou-i18n-tools/src/index.ts');
-const RUNTIME_ENTRY = resolve(ROOT, 'packages/bijou-i18n/src/index.ts');
 
 const tempDirs: string[] = [];
 
@@ -26,25 +26,20 @@ afterEach(async () => {
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-  it('ships a dedicated Node helper package for workbook and bundle files', async () => {
+  it('ships a dedicated Node helper package for workbook and bundle files', () => {
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools-node/package.json'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools-node/tsconfig.json'))).toBe(true);
     expect(existsSync(NODE_TOOLS_ENTRY)).toBe(true);
 
-    const mod: typeof import('../../../packages/bijou-i18n-tools-node/src/index.js') = await import(pathToFileURL(NODE_TOOLS_ENTRY).href);
-    expect(typeof mod.writeExchangeSheetFile).toBe('function');
-    expect(typeof mod.readExchangeSheetFile).toBe('function');
-    expect(typeof mod.writeCatalogBundleFile).toBe('function');
-    expect(typeof mod.readCatalogBundleFile).toBe('function');
-    expect(typeof mod.writeExchangeWorkbookDirectory).toBe('function');
-    expect(typeof mod.readExchangeWorkbookDirectory).toBe('function');
+    expect(typeof nodeTools.writeExchangeSheetFile).toBe('function');
+    expect(typeof nodeTools.readExchangeSheetFile).toBe('function');
+    expect(typeof nodeTools.writeCatalogBundleFile).toBe('function');
+    expect(typeof nodeTools.readCatalogBundleFile).toBe('function');
+    expect(typeof nodeTools.writeExchangeWorkbookDirectory).toBe('function');
+    expect(typeof nodeTools.readExchangeWorkbookDirectory).toBe('function');
   });
 
   it('roundtrips workbook directories through disk and back into runtime-consumable catalogs', async () => {
-    const nodeTools: typeof import('../../../packages/bijou-i18n-tools-node/src/index.js') = await import(pathToFileURL(NODE_TOOLS_ENTRY).href);
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-    const runtimeMod: typeof import('../../../packages/bijou-i18n/src/index.js') = await import(pathToFileURL(RUNTIME_ENTRY).href);
-
     const staleCatalogs = tools.markStaleTranslations([
       {
         namespace: 'shell',
@@ -91,9 +86,6 @@ describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
   });
 
   it('roundtrips catalog bundle files through disk without losing typed values or refs', async () => {
-    const nodeTools: typeof import('../../../packages/bijou-i18n-tools-node/src/index.js') = await import(pathToFileURL(NODE_TOOLS_ENTRY).href);
-    const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
-
     const catalogs = [
       {
         namespace: 'shell',
@@ -127,8 +119,6 @@ describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
   });
 
   it('infers formats from file extensions for sheet and bundle helpers', async () => {
-    const nodeTools: typeof import('../../../packages/bijou-i18n-tools-node/src/index.js') = await import(pathToFileURL(NODE_TOOLS_ENTRY).href);
-
     const dir = await makeTempDir();
     const sheetPath = join(dir, 'translations-de.csv');
     await writeFile(
@@ -149,8 +139,6 @@ describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
   });
 
   it('fails clearly on malformed manifests or missing sheet files', async () => {
-    const nodeTools: typeof import('../../../packages/bijou-i18n-tools-node/src/index.js') = await import(pathToFileURL(NODE_TOOLS_ENTRY).href);
-
     const dir = await makeTempDir();
     const workbookDir = join(dir, 'broken');
     await nodeTools.writeExchangeWorkbookDirectory(workbookDir, {
