@@ -391,8 +391,7 @@ export class BindingFrame {
 }
 
 export function defineDataRequirement(input: DataRequirementInput): DataRequirement {
-  const requirement: DataRequirement = Object.freeze({
-    [DATA_REQUIREMENT_BRAND]: true as const,
+  const requirement = {
     id: normalizeRequiredText({
       scope: 'data requirement',
       field: 'id',
@@ -407,9 +406,10 @@ export function defineDataRequirement(input: DataRequirementInput): DataRequirem
     description: optionalTrimmedText(input.description),
     optional: input.optional,
     facts: freezeFacts(input.facts),
-  });
+  };
 
-  return requirement;
+  brand(requirement, DATA_REQUIREMENT_BRAND);
+  return Object.freeze(requirement);
 }
 
 export function isDataRequirement(value: unknown): value is DataRequirement {
@@ -425,8 +425,7 @@ export function isViewDataContract(value: unknown): value is ViewDataContract {
 }
 
 export function defineDataProvider(input: DataProviderInput): DataProvider {
-  const provider: DataProvider = Object.freeze({
-    [DATA_PROVIDER_BRAND]: true as const,
+  const provider = {
     id: normalizeRequiredText({
       scope: 'data provider',
       field: 'id',
@@ -440,9 +439,10 @@ export function defineDataProvider(input: DataProviderInput): DataProvider {
     label: optionalTrimmedText(input.label),
     description: optionalTrimmedText(input.description),
     facts: freezeFacts(input.facts),
-  });
+  };
 
-  return provider;
+  brand(provider, DATA_PROVIDER_BRAND);
+  return Object.freeze(provider);
 }
 
 export function provide(provider: DataProvider): ProviderScopeEntry {
@@ -450,13 +450,13 @@ export function provide(provider: DataProvider): ProviderScopeEntry {
     throw new Error('provider scope: provider was not created by defineDataProvider()');
   }
 
-  const entry: ProviderScopeEntry = Object.freeze({
-    [PROVIDER_SCOPE_ENTRY_BRAND]: true as const,
+  const entry = {
     resource: provider.resource,
     provider,
-  });
+  };
 
-  return entry;
+  brand(entry, PROVIDER_SCOPE_ENTRY_BRAND);
+  return Object.freeze(entry);
 }
 
 export function providerScope(
@@ -544,8 +544,7 @@ export function bindingSnapshot<Data = unknown>(
     throw new Error(`binding snapshot: unsupported status ${String(input.status)}`);
   }
 
-  const snapshot: BindingSnapshot<Data> = Object.freeze({
-    [BINDING_SNAPSHOT_BRAND]: true as const,
+  const snapshot = {
     providerId,
     requirementId,
     version: input.version,
@@ -553,9 +552,10 @@ export function bindingSnapshot<Data = unknown>(
     ...(input.data === undefined ? {} : { data: freezeSnapshotData(input.data) }),
     issues: freezeIssues(input.issues),
     facts: freezeFacts(input.facts),
-  });
+  };
 
-  return snapshot;
+  brand(snapshot, BINDING_SNAPSHOT_BRAND);
+  return Object.freeze(snapshot);
 }
 
 export function bindingFrame(snapshots: readonly BindingSnapshot[]): BindingFrame {
@@ -644,8 +644,7 @@ export function commandIntent<Payload = unknown>(
   id: string,
   options: CommandIntentOptions = {},
 ): CommandIntent<Payload> {
-  const intent: CommandIntent<Payload> = Object.freeze({
-    [COMMAND_INTENT_BRAND]: true as const,
+  const intent = {
     id: normalizeRequiredText({
       scope: 'command intent',
       field: 'id',
@@ -654,9 +653,10 @@ export function commandIntent<Payload = unknown>(
     label: optionalTrimmedText(options.label),
     description: optionalTrimmedText(options.description),
     facts: freezeFacts(options.facts),
-  });
+  };
 
-  return intent;
+  brand(intent, COMMAND_INTENT_BRAND);
+  return Object.freeze(intent);
 }
 
 export function isBindingSnapshot(value: unknown): value is BindingSnapshot {
@@ -683,12 +683,19 @@ function isProviderScopeEntry(value: unknown): value is ProviderScopeEntry {
   return hasBrand(value, PROVIDER_SCOPE_ENTRY_BRAND);
 }
 
+function brand<Brand extends symbol, Value extends object>(
+  value: Value,
+  brandSymbol: Brand,
+): asserts value is Value & Readonly<Record<Brand, true>> {
+  Object.defineProperty(value, brandSymbol, { value: true });
+}
+
 function hasBrand(value: unknown, brand: symbol): boolean {
   if (value === null || typeof value !== 'object') {
     return false;
   }
 
-  return Object.getOwnPropertyDescriptor(value, brand)?.value === true;
+  return brand in value && Reflect.get(value, brand) === true;
 }
 
 interface RequiredTextOptions {
@@ -753,8 +760,7 @@ function normalizeIssue(issue: BindingIssue, index: number): BindingIssue {
 }
 
 function providerResolution(input: Omit<ProviderResolution, typeof PROVIDER_RESOLUTION_BRAND>): ProviderResolution {
-  const resolution: ProviderResolution = Object.freeze({
-    [PROVIDER_RESOLUTION_BRAND]: true as const,
+  const resolution = {
     requirementId: input.requirementId,
     resource: input.resource,
     optional: input.optional,
@@ -763,9 +769,10 @@ function providerResolution(input: Omit<ProviderResolution, typeof PROVIDER_RESO
     providerId: input.providerId,
     issues: input.issues,
     facts: input.facts,
-  });
+  };
 
-  return resolution;
+  brand(resolution, PROVIDER_RESOLUTION_BRAND);
+  return Object.freeze(resolution);
 }
 
 function freezeFacts(facts: readonly BindingFact[] | undefined): readonly BindingFact[] {
