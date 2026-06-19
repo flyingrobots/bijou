@@ -45,14 +45,14 @@ import {
   column,
   contentSurface,
   line,
-  proseSurface,
-  spacer,
+  proseSurface, spacer,
 } from '../_shared/example-surfaces.js';
 import { COMPONENT_STORIES } from './stories.js';
 
 const REQUIRED_MODES: readonly OutputMode[] = ['interactive', 'static', 'pipe', 'accessible'];
 const DEFAULT_TITLE = 'Bijou BlockLab';
 const FOOTER_HINT = 'q quit | up/down story | d/u page | [/] story | ,/. variant | 1-4 profile';
+const NEXT = 'Next story';
 
 export interface StorybookAppOptions {
   readonly initialStoryId?: string;
@@ -64,7 +64,7 @@ export interface StorybookModel {
   readonly title: string;
   readonly columns: number;
   readonly rows: number;
-  readonly storyState: BrowsableListState<string>;
+  readonly storyState: BrowsableListState;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly profileIndexByStory: Readonly<Record<string, number>>;
   readonly previewTimeMs: number;
@@ -117,7 +117,6 @@ export function createStorybookFrameApp(
   });
 }
 
-export const createBlockLabApp = createStorybookApp;
 export const createBlockLabFrameApp = createStorybookFrameApp;
 
 export function createStorybookPage(
@@ -180,8 +179,9 @@ export function selectedStorybookStory(
   stories: readonly ComponentStory[] = COMPONENT_STORIES,
 ): ComponentStory {
   const storyId = model.storyState.items[model.storyState.focusIndex]?.value;
-  return stories.find((story) => story.id === storyId) ?? stories[0]!;
+  return stories.find((story) => story.id === storyId) ?? stories[0] ?? noStory();
 }
+function noStory(): never { throw new Error('empty'); }
 
 function updateStorybookMessage(
   msg: StorybookRuntimeMsg,
@@ -260,9 +260,9 @@ function updateKey(
 
 const storybookPageKeys = createKeyMap<StorybookPageMsg>()
   .group('BlockLab', (group) => group
-    .bind('down', 'Next story', { type: 'storybook-key', key: 'down' })
-    .bind('j', 'Next story', { type: 'storybook-key', key: 'j' })
-    .bind(']', 'Next story', { type: 'storybook-key', key: ']' })
+    .bind('down', NEXT, { type: 'storybook-key', key: 'down' })
+    .bind('j', NEXT, { type: 'storybook-key', key: 'j' })
+    .bind(']', NEXT, { type: 'storybook-key', key: ']' })
     .bind('up', 'Previous story', { type: 'storybook-key', key: 'up' })
     .bind('k', 'Previous story', { type: 'storybook-key', key: 'k' })
     .bind('[', 'Previous story', { type: 'storybook-key', key: '[' })
@@ -352,7 +352,7 @@ function renderCatalogPane(
   });
 
   const content = column([
-    separatorSurface({ label: `${model.storyState.items.length} stories`, width: bodyWidth, ctx }),
+    separatorSurface({ label: `${String(model.storyState.items.length)} stories`, width: bodyWidth, ctx }),
     spacer(),
     list,
   ]);
@@ -379,7 +379,7 @@ function renderPreviewPane(
   const preview = storyPreviewSurface(variant.render({
     width: previewWidth,
     ctx: previewCtx,
-    state: variant.initialState as never,
+    state: variant.initialState,
     timeMs: model.previewTimeMs,
   }));
   const previewTitle = `${profile.label} / ${variant.label}`;
@@ -435,7 +435,7 @@ function renderTestingPane(
       },
       {
         title: 'Coverage',
-        content: `${story.profilePresets.length} profiles x ${story.variants.length} variants`,
+        content: `${String(story.profilePresets.length)} profiles x ${String(story.variants.length)} variants`,
       },
       {
         title: 'Required modes',
@@ -545,7 +545,7 @@ function setProfileIndex(
   };
 }
 
-function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableListItem<string>[] {
+function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableListItem[] {
   return stories.map((story) => ({
     label: story.title,
     value: story.id,
@@ -554,9 +554,9 @@ function storyListItems(stories: readonly ComponentStory[]): readonly BrowsableL
 }
 
 function setStoryFocus(
-  state: BrowsableListState<string>,
+  state: BrowsableListState,
   focusIndex: number,
-): BrowsableListState<string> {
+): BrowsableListState {
   const nextFocusIndex = Math.max(0, Math.min(focusIndex, state.items.length - 1));
   return {
     ...state,
@@ -566,9 +566,9 @@ function setStoryFocus(
 }
 
 function syncStoryListHeight(
-  state: BrowsableListState<string>,
+  state: BrowsableListState,
   height: number,
-): BrowsableListState<string> {
+): BrowsableListState {
   const nextHeight = Math.max(1, Math.floor(height));
   return {
     ...state,

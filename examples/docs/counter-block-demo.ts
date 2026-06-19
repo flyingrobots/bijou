@@ -25,6 +25,7 @@ export const COUNTER_DEMO_MAX = 10;
 
 const COUNTER_DEMO_ANIMATION_MS = 480;
 const COUNTER_DEMO_PACKAGE = '@flyingrobots/bijou-dogfood-fixtures';
+const BLOCK_NAME = 'CounterDemoBlock';
 const COUNTER_DEMO_MODES: readonly OutputMode[] = Object.freeze([
   'interactive',
   'static',
@@ -58,7 +59,7 @@ export const counterDemoValueRequirement = defineDataRequirement({
   resource: 'fixture.counter.value',
   label: 'Counter value',
   description: 'Bounded counter value used by the non-shipping counter block fixture.',
-  facts: [{ kind: 'entity', key: 'block.fixture', value: 'CounterDemoBlock' }],
+  facts: [{ kind: 'entity', key: 'block.fixture', value: BLOCK_NAME }],
 });
 
 export const counterDemoDataContract = defineViewData({
@@ -75,7 +76,7 @@ export const counterDemoDecrementIntent = commandIntent<CounterDemoIntentPayload
   {
     label: 'Decrease counter',
     description: 'Request the counter value to decrease by one.',
-    facts: [{ kind: 'entity', key: 'block.command', value: 'CounterDemoBlock' }],
+    facts: [{ kind: 'entity', key: 'block.command', value: BLOCK_NAME }],
   },
 );
 
@@ -84,14 +85,14 @@ export const counterDemoIncrementIntent = commandIntent<CounterDemoIntentPayload
   {
     label: 'Increase counter',
     description: 'Request the counter value to increase by one.',
-    facts: [{ kind: 'entity', key: 'block.command', value: 'CounterDemoBlock' }],
+    facts: [{ kind: 'entity', key: 'block.command', value: BLOCK_NAME }],
   },
 );
 
 export const counterDemoBlock: BlockDefinition<CounterDemoBlockConfig, string> = defineBlock({
   metadata: {
     packageName: COUNTER_DEMO_PACKAGE,
-    blockName: 'CounterDemoBlock',
+    blockName: BLOCK_NAME,
     family: 'fixture-blocks',
     scale: 'control',
     modes: COUNTER_DEMO_MODES,
@@ -136,7 +137,7 @@ export const counterDemoBlock: BlockDefinition<CounterDemoBlockConfig, string> =
     ],
     composedComponents: ['progressBar()', 'commandIntent()', 'BindingFrame'],
     semanticFacts: [
-      { kind: 'entity', key: 'block', value: 'CounterDemoBlock' },
+      { kind: 'entity', key: 'block', value: BLOCK_NAME },
       { kind: 'state', key: 'shipping', value: false },
     ],
     examples: [{ id: 'counter-block.dogfood', label: 'DOGFOOD Blocks preview' }],
@@ -272,9 +273,10 @@ function renderCounterDemoBlock(
 ): BlockRenderResult<string> {
   const mode = normalizeCounterMode(input.mode ?? input.config?.ctx?.mode);
   const counter = normalizeCounterValue(input.config?.counter ?? input.slots?.counter);
+  const line = `Counter: ${String(counter)}`;
 
   if (mode === 'pipe' || mode === 'accessible') {
-    return counterDemoResult(`Counter: ${counter}`, counter);
+    return counterDemoResult(line, counter);
   }
 
   const previousCounter = normalizeCounterValue(input.config?.previousCounter ?? counter);
@@ -289,10 +291,7 @@ function renderCounterDemoBlock(
     ? fallbackProgressBar(animatedCounter, width)
     : progressBar(percent, { width, showPercent: false, ctx });
 
-  const lines = [
-    bar,
-    `Counter: ${counter}`,
-  ];
+  const lines = [bar, line];
 
   if (mode === 'interactive') {
     lines.push(
@@ -326,7 +325,8 @@ function fallbackProgressBar(counter: number, width: number): string {
 }
 
 function normalizeCounterMode(mode: OutputMode | undefined): OutputMode {
-  return COUNTER_DEMO_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
+  if (!mode || !COUNTER_DEMO_MODES.includes(mode)) return 'interactive';
+  return mode;
 }
 
 function widestLine(lines: readonly string[]): number {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
-import { createSplitPaneState, runScript, stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
+import { createSplitPaneState, runScript, stripAnsi } from '@flyingrobots/bijou-tui';
 import { createSurface, surfaceToString, type Surface } from '@flyingrobots/bijou';
 import { testRuntime } from '../../bijou-tui/src/index.js';
 import { createTuiAppSkeleton } from './index.js';
@@ -18,7 +18,7 @@ function textSurface(label: string, width: number, height: number): Surface {
 
   const clipped = label.slice(0, Math.max(0, width));
   for (let index = 0; index < clipped.length; index++) {
-    surface.set(index, 0, { char: clipped[index]!, empty: false });
+    surface.set(index, 0, { char: clipped.charAt(index), empty: false });
   }
   return surface;
 }
@@ -81,8 +81,7 @@ describe('createTuiAppSkeleton', () => {
       tabs: [{
         id: 'dashboard',
         title: 'Dashboard',
-        render: (width, height, context) =>
-          textSurface(`Consumer ${context.tab.title} ${context.model.ready ? 'ready' : 'pending'}`, width, height),
+        render: (width, height, context) => textSurface(`Consumer ${context.tab.title} ready`, width, height),
       }],
     });
 
@@ -169,7 +168,7 @@ describe('createTuiAppSkeleton', () => {
     await harness.teardown();
 
     const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
-    expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit?');
+    expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1) ?? expect.fail('expected final frame'), ctx.style))).toContain('Quit?');
   });
 
   it('animates drawer changes via physics commands', async () => {

@@ -86,27 +86,27 @@ export function createDogfoodStorybookWorkbenchModel(
 }
 
 export function renderDogfoodStorybookIndex(
-  model: DogfoodStorybookWorkbenchModel = createDogfoodStorybookWorkbenchModel(),
+  m: DogfoodStorybookWorkbenchModel = createDogfoodStorybookWorkbenchModel(),
 ): string {
   const lines = [
-    `# ${model.title}`,
+    `# ${m.title}`,
     '',
-    `Stories: ${model.storyCount}`,
-    `Families: ${model.familyCount}`,
-    `Variants: ${model.variantCount}`,
-    `Required modes: ${model.requiredModes.join(', ')}`,
+    `Stories: ${String(m.storyCount)}`,
+    `Families: ${String(m.familyCount)}`,
+    `Variants: ${String(m.variantCount)}`,
+    `Required modes: ${m.requiredModes.join(', ')}`,
   ];
 
-  for (const family of model.families) {
+  for (const family of m.families) {
     lines.push('', `## ${family.label}`);
     for (const story of family.stories) {
       lines.push([
         `- ${story.id}`,
         story.title,
-        `package=${story.packageName}`,
-        `variants=${story.variantIds.join(',')}`,
-        `modes=${story.profileModes.join(',')}`,
-        story.sourcePath == null ? undefined : `source=${story.sourcePath}`,
+        `package:${story.packageName}`,
+        `variants:${story.variantIds.join(',')}`,
+        `modes:${story.profileModes.join(',')}`,
+        story.sourcePath == null ? undefined : `source:${story.sourcePath}`,
       ].filter((part): part is string => part != null).join(' | '));
     }
   }
@@ -154,7 +154,7 @@ export function captureDogfoodStorybookMatrix(
       const preview = storyPreviewSurface(variant.render({
         width: preset.width,
         ctx: previewCtx,
-        state: variant.initialState as never,
+        state: variant.initialState,
         timeMs: 0,
       }));
 

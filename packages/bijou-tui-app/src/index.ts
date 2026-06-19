@@ -198,9 +198,8 @@ export function createTuiAppSkeleton(
   options: CreateTuiAppSkeletonOptions,
 ): FramedApp<SkeletonPageModel, SkeletonMsg> {
   const tabs = options.tabs ?? DEFAULT_TABS;
-  if (tabs.length === 0) {
-    throw new Error('createTuiAppSkeleton: "tabs" must contain at least one tab');
-  }
+  const first = tabs[0];
+  if (first === undefined) throw new Error('createTuiAppSkeleton: "tabs" must contain at least one tab');
 
   const seenTabIds = new Set<string>();
   for (const tab of tabs) {
@@ -252,7 +251,7 @@ export function createTuiAppSkeleton(
     pages,
     defaultPageId: options.defaultTabId != null && tabsById.has(options.defaultTabId)
       ? options.defaultTabId
-      : tabs[0]!.id,
+      : first.id,
     bodyTopRows: 2,
     bodyBottomRows: 3,
     globalKeys: mergedGlobalKeys,
@@ -272,7 +271,6 @@ export function createTuiAppSkeleton(
   });
 }
 
-/** Everything needed to build the skeleton app's overlay stack. */
 interface OverlayBuildOptions {
   readonly frame: FrameOverlayContext<SkeletonPageModel>;
   readonly tabsById: ReadonlyMap<string, SkeletonTab>;
@@ -290,27 +288,27 @@ function buildSkeletonOverlays(options: OverlayBuildOptions): readonly Overlay[]
   const width = Math.max(0, options.frame.screenRect.width);
   const height = Math.max(0, options.frame.screenRect.height);
   if (width <= 0 || height <= 0) return [];
-
-  const activeTab = options.tabsById.get(options.frame.activePageId) ?? options.allTabs[0]!;
-  const pageConfig = options.pageConfigs.get(activeTab.id) ?? { hasDrawer: false };
+  const tab = options.tabsById.get(options.frame.activePageId) ?? options.allTabs[0];
+  if (tab == null) return [];
+  const pageConfig = options.pageConfigs.get(tab.id) ?? { hasDrawer: false };
 
   const resolvedStatus = typeof options.statusMessage === 'function'
-    ? options.statusMessage({ activeTabId: activeTab.id, activeTabTitle: activeTab.title })
-    : (options.statusMessage ?? `${activeTab.title} ready`);
+    ? options.statusMessage({ activeTabId: tab.id, activeTabTitle: tab.title })
+    : (options.statusMessage ?? `${tab.title} ready`);
 
   const overlays: Overlay[] = [];
 
   overlays.push({
     row: 0,
     col: 0,
-    content: renderTabRow(width, options.allTabs, activeTab.id, options.tokens, options.ctx),
+    content: renderTabRow(width, options.allTabs, tab.id, options.tokens, options.ctx),
   });
 
   if (height >= 5) {
     overlays.push({
       row: 1,
       col: 0,
-      content: renderHeaderRow(width, options.title, activeTab.title, options.tokens, options.ctx),
+      content: renderHeaderRow(width, options.title, tab.title, options.tokens, options.ctx),
     });
   }
 
@@ -329,7 +327,7 @@ function buildSkeletonOverlays(options: OverlayBuildOptions): readonly Overlay[]
     overlays.push({
       row: height - 2,
       col: 0,
-      content: renderFooterStatusRow(width, resolvedStatus, activeTab.title, options.tokens, options.ctx),
+      content: renderFooterStatusRow(width, resolvedStatus, tab.title, options.tokens, options.ctx),
     });
 
     overlays.push({
@@ -491,7 +489,7 @@ function renderDrawerContent(model: SkeletonPageModel): string {
     'Keep the main pane active.',
     '',
     `Open: ${model.drawerOpen ? 'yes' : 'no'}`,
-    `Width: ${pct}%`,
+    `Width: ${String(pct)}%`,
     '',
     'o        toggle drawer',
     '[ / ]    switch pages',
@@ -577,11 +575,12 @@ function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext, model: SkeletonPag
     return spec.tab.layout({ ctx, tab: spec.tab, model });
   }
 
-  if (spec.tab.render != null) {
+  const render = spec.tab.render;
+  if (render != null) {
     return {
       kind: 'pane',
       paneId: `${spec.tab.id}-main`,
-      render: (width: number, height: number) => spec.tab.render!(width, height, {
+      render: (width: number, height: number) => render(width, height, {
         ctx,
         tab: spec.tab,
         model,

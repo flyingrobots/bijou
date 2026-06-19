@@ -104,8 +104,8 @@ const app: App<Model, Msg> = {
     leftScroll: createScrollState(LEFT_CONTENT, VP_HEIGHT),
     rightScroll: createScrollState(RIGHT_CONTENT, VP_HEIGHT),
     focusLeft: true,
-    cols: process.stdout.columns ?? 80,
-    rows: process.stdout.rows ?? 24,
+    cols: process.stdout.columns,
+    rows: process.stdout.rows,
   }, []],
 
   update: (msg, model) => {
@@ -169,4 +169,4 @@ const app: App<Model, Msg> = {
     );
   },
 };
-run(app);
+void run(app);

@@ -47,8 +47,8 @@ function circularObjectPayload(): object {
 
 function symbolArrayPayload(): readonly unknown[] {
   const symbolKey = Symbol('array-secret');
-  const value = ['visible'] as unknown[] & Record<symbol, unknown>;
-  value[symbolKey] = 'hidden';
+  const value = ['visible'];
+  Reflect.set(value, symbolKey, 'hidden');
   return value;
 }
 
@@ -73,14 +73,14 @@ function accessorArrayPayload(): readonly unknown[] {
 }
 
 function namedPropertyArrayPayload(): readonly unknown[] {
-  const value = ['visible'] as unknown[] & { hidden?: string };
-  value.hidden = 'secret';
+  const value = ['visible'];
+  Reflect.set(value, 'hidden', 'secret');
   return value;
 }
 
 function selfReferentialArrayPayload(): readonly unknown[] {
-  const value = ['visible'] as unknown[] & { self?: unknown };
-  value.self = value;
+  const value = ['visible'];
+  Reflect.set(value, 'self', value);
   return value;
 }
 

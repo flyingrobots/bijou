@@ -27,13 +27,21 @@ Current count:
 | File/context baseline | 331 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 22 | Existing test mock/spy violations. |
 | Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 266 | Type-aware ESLint findings after the DF-077 DOGFOOD app/theme extraction pass. |
-| **Total** | **674** | Aggregate Code Dojo standards debt. |
+| ESLint baseline | 215 | Type-aware ESLint findings after the WF-155 focused cleanup pass. |
+| **Total** | **623** | Aggregate Code Dojo standards debt. |
 
-DF-077 keeps `examples/docs/app.ts` over both size thresholds, but it tightens
-that file's file/context baseline from `5,793` to `4,166` split-counted lines
-and from `201,982` to `147,799` bytes. It also lowers ESLint debt from `317` to
-`266`, so the aggregate Code Dojo ceiling falls from `725` to `674`.
+WF-155 lowers ESLint debt from `266` to `215` by cleaning focused Storybook,
+counter fixture, TUI app, focus-area, collection-surface, surface primitive,
+split-editor, i18n localization, and Node IO clusters while keeping touched
+file/context ceilings flat or lower. The aggregate Code Dojo ceiling falls from
+`674` to `623`.
+
+WF-155 also keeps breaking up the oversized DOGFOOD app entrypoint by extracting
+standard block docs, live block preview rendering, and Theme Inspector state
+into sub-150-line modules. `examples/docs/app.ts` remains counted debt, but it
+falls from `4,165` physical lines / `147,799` bytes to `3,306` physical lines /
+`114,890` bytes in this pass, and DOGFOOD raw-string debt falls from `2,415` to
+`2,373` without increasing any per-file baseline.
 
 ## Goalpost Burndown Policy
 
@@ -58,8 +66,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `674`. The next met goalpost must lower the ceiling to
-`624` or lower.
+The current ceiling is `623`. The next met goalpost must lower the ceiling to
+`573` or lower.
 
 ## Updating The Ceiling
 
