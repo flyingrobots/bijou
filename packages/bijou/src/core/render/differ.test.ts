@@ -3,6 +3,9 @@ import { createSurface } from '../../ports/surface.js';
 import { parseAnsiToSurface, renderDiff, isSameCell, stringToSurface } from './differ.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
 
+const CUP_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[\\d+;\\d+H`, 'g');
+const noopWriteError = vi.fn();
+
 describe('isSameCell', () => {
   it('identifies identical cells', () => {
     const a = { char: 'x', fg: '#ff0000', bg: '#000000', modifiers: ['bold'] };
@@ -36,10 +39,11 @@ describe('renderDiff', () => {
   it('writes nothing if surfaces are identical', () => {
     const current = createSurface(10, 10, { char: 'a' });
     const target = createSurface(10, 10, { char: 'a' });
-    const mockIo: WritePort = { write: vi.fn(), writeError: vi.fn() };
+    const write = vi.fn();
+    const mockIo: WritePort = { write, writeError: vi.fn() };
 
     renderDiff(current, target, mockIo, mockStyle);
-    expect(mockIo.write).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
   });
 
   it('writes only changed cells with CUP move', () => {
@@ -48,14 +52,11 @@ describe('renderDiff', () => {
     target.set(2, 2, { char: 'b', fg: '#ff0000' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: noopWriteError };
 
     renderDiff(current, target, mockIo, mockStyle);
     
-    // Should move to (2,2) and write 'b'
-    // 0-based (2,2) is 1-based (3,3) in ANSI
     expect(output).toContain('\x1b[3;3H');
-    // Packed differ emits ANSI SGR directly, bypassing StylePort
     expect(output).toContain('\x1b[38;2;255;0;0m');
     expect(output).toContain('b');
   });
@@ -67,12 +68,11 @@ describe('renderDiff', () => {
     target.set(1, 0, { char: 'B' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: noopWriteError };
 
     renderDiff(current, target, mockIo, mockStyle);
     
-    // Only one CUP at start
-    const cupMatches = output.match(/\x1b\[\d+;\d+H/g);
+    const cupMatches = output.match(CUP_PATTERN);
     expect(cupMatches?.length).toBe(1);
     expect(cupMatches?.[0]).toBe('\x1b[1;1H');
     expect(output).toContain('A');
@@ -86,11 +86,11 @@ describe('renderDiff', () => {
     target.set(5, 0, { char: 'B' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: noopWriteError };
 
     renderDiff(current, target, mockIo, mockStyle);
     
-    const cupMatches = output.match(/\x1b\[\d+;\d+H/g);
+    const cupMatches = output.match(CUP_PATTERN);
     expect(cupMatches?.length).toBe(2);
     expect(cupMatches?.[0]).toBe('\x1b[1;1H');
     expect(cupMatches?.[1]).toBe('\x1b[1;6H');
@@ -104,7 +104,7 @@ describe('renderDiff', () => {
 
     const styled = vi.fn((_token: unknown, text: string) => `[STYLE]${text}`);
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: noopWriteError };
     const style: StylePort = {
       styled,
       rgb: (_r, _g, _b, text) => text,

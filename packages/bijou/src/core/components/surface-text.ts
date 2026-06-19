@@ -62,7 +62,7 @@ function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
  * should use `parseAnsiToSurface()` instead.
  */
 export function segmentSurfaceText(text: string, purpose = 'Surface text'): string[] {
-  return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text ?? ''), purpose);
+  return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text), purpose);
 }
 
 export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
@@ -81,7 +81,7 @@ export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
 }
 
 export function createTextSurface(text: string, style: CellTextStyle = {}): Surface {
-  const safeText = sanitizePlainTerminalText(text ?? '', { preserveNewlines: true });
+  const safeText = sanitizePlainTerminalText(text, { preserveNewlines: true });
   const lines = safeText.split('\n');
   const lineGraphemes = lines.map((line) => segmentSanitizedSurfaceText(line, 'createTextSurface'));
   const width = lineGraphemes.reduce((max, graphemes) => Math.max(max, graphemes.length), 0);
@@ -95,17 +95,15 @@ export function createTextSurface(text: string, style: CellTextStyle = {}): Surf
     // -1 signals "terminal default" to setRGB; fgG/fgB and bgG/bgB are ignored when fR/bR === -1
     const fR = numStyle.fgSet ? fgR : -1;
     const bR = numStyle.bgSet ? bgR : -1;
-    for (let y = 0; y < lines.length; y++) {
-      const graphemes = lineGraphemes[y]!;
-      for (let x = 0; x < graphemes.length; x++) {
-        surface.setRGB(x, y, graphemes[x]!, fR, fgG, fgB, bR, bgG, bgB, flags);
+    for (const [y, graphemes] of lineGraphemes.entries()) {
+      for (const [x, char] of graphemes.entries()) {
+        surface.setRGB(x, y, char, fR, fgG, fgB, bR, bgG, bgB, flags);
       }
     }
   } else {
-    for (let y = 0; y < lines.length; y++) {
-      const graphemes = lineGraphemes[y]!;
-      for (let x = 0; x < graphemes.length; x++) {
-        surface.set(x, y, { char: graphemes[x]!, ...style, empty: false });
+    for (const [y, graphemes] of lineGraphemes.entries()) {
+      for (const [x, char] of graphemes.entries()) {
+        surface.set(x, y, { char, ...style, empty: false });
       }
     }
   }
@@ -119,7 +117,7 @@ export function createSegmentSurface(segments: readonly SurfaceTextSegment[]): S
   const segmented = segments.map((segment) => ({
     style: segment.style,
     numStyle: segment.style ? parseNumericStyle(segment.style) : undefined,
-    graphemes: segmentSurfaceText(segment.text ?? '', 'createSegmentSurface'),
+    graphemes: segmentSurfaceText(segment.text, 'createSegmentSurface'),
   }));
   const width = segmented.reduce((sum, segment) => sum + segment.graphemes.length, 0);
   const surface = createSurface(width, 1);

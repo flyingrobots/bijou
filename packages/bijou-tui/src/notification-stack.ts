@@ -133,7 +133,8 @@ function selectVisibleNotificationIds<Msg>(
     let keptCount = 0;
 
     for (const item of newestFirst) {
-      const entry = preparedEntries.get(item.id)!;
+      const entry = preparedEntries.get(item.id);
+      if (entry === undefined) continue;
       const required = entry.surface.height + (keptCount > 0 ? gap : 0);
       if (keptCount === 0 || usedHeight + required <= availableHeight) {
         visibleIds.add(item.id);
@@ -196,8 +197,7 @@ function renderOverflowExits<Msg>(
 
   const rendered = [...exits]
     .sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id)
-    .map((item) => preparedEntries.get(item.id)!)
-    .filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
+    .flatMap((item) => preparedEntries.get(item.id) ?? []);
   const entries: PositionedNotificationRenderEntry<Msg>[] = [];
   const mode = placementSortSign(placement);
 
@@ -287,9 +287,7 @@ function resolveNotificationOverlayEntries<Msg>(
 
   for (const placement of placements) {
     const items = grouped.get(placement) ?? [];
-    const rendered = sortForPlacement(items, placement).map((item) =>
-      activePrepared.get(item.id)!
-    ).filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
+    const rendered = sortForPlacement(items, placement).flatMap((item) => activePrepared.get(item.id) ?? []);
 
     const totalHeight = rendered.reduce((sum, entry) => sum + entry.surface.height, 0)
       + Math.max(0, rendered.length - 1) * gap;
@@ -347,8 +345,7 @@ export function hitTestNotificationStack<Msg>(
   row: number,
 ): NotificationMouseTarget<Msg> | undefined {
   const entries = resolveNotificationOverlayEntries(state, options);
-  for (let index = entries.length - 1; index >= 0; index--) {
-    const entry = entries[index]!;
+  for (const entry of [...entries].reverse()) {
     if (
       col < entry.col
       || col >= entry.col + entry.surface.width

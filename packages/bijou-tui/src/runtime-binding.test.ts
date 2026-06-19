@@ -20,7 +20,6 @@ import {
   runtimeCommandIntentEmission,
   runtimeCommandIntentRoute,
   runtimeViewBindingSource,
-  type RuntimeViewBindingSource,
 } from './runtime-binding.js';
 
 describe('runtime active binding collection', () => {
@@ -98,24 +97,17 @@ describe('runtime active binding collection', () => {
 
   it('rejects loose runtime binding source objects before collection', () => {
     const owner = defineBindingLifecycleOwner({ id: 'docs.shell', kind: 'app-shell' });
-    const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
-    const data = defineViewData({
-      requirements: [{ name: 'article', requirement: article }],
-    });
-    const stack = createRuntimeViewStack({
+    const req = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+    const data = defineViewData({ requirements: [{ name: 'article', requirement: req }] });
+    const stack = { layers: [{
       id: 'docs-shell',
       kind: 'app-shell',
       dismissible: false,
       blocksBelow: false,
-      model: {
-        bindingSources: [{
-          owner,
-          contract: data,
-        } as unknown as RuntimeViewBindingSource],
-      },
-    });
+      model: { bindingSources: [{ owner, contract: data }] },
+    }] };
 
-    expect(() => collectRuntimeViewBindings(stack)).toThrow(
+    expect(() => { Reflect.apply(collectRuntimeViewBindings, undefined, [stack]); }).toThrow(
       'runtime binding collection: source at layer docs-shell index 0 was not created by runtimeViewBindingSource()',
     );
   });
@@ -152,10 +144,10 @@ describe('runtime active binding collection', () => {
   });
 
   it('throws deterministic errors for non-object runtime binding source inputs', () => {
-    expect(() => runtimeViewBindingSource(null as never)).toThrow(
+    expect(() => { Reflect.apply(runtimeViewBindingSource, undefined, [null]); }).toThrow(
       'runtime binding source: input must be an object',
     );
-    expect(() => runtimeViewBindingSource([] as never)).toThrow(
+    expect(() => { Reflect.apply(runtimeViewBindingSource, undefined, [[]]); }).toThrow(
       'runtime binding source: input must be an object',
     );
   });
@@ -246,15 +238,13 @@ describe('runtime command intent dispatch proof', () => {
   });
   it('throws deterministic errors for non-object command routing inputs', () => {
     const intent = commandIntent('reader.refreshRequested');
-    expect(() => runtimeCommandIntentEmission(
-      intent,
-      undefined,
-      null as never,
-    )).toThrow('runtime command intent emission: options must be an object');
-    expect(() => runtimeCommandIntentRoute(null as never)).toThrow(
+    expect(() => { Reflect.apply(runtimeCommandIntentEmission, undefined, [intent, undefined, null]); }).toThrow(
+      'runtime command intent emission: options must be an object',
+    );
+    expect(() => { Reflect.apply(runtimeCommandIntentRoute, undefined, [null]); }).toThrow(
       'runtime command intent route: input must be an object',
     );
-    expect(() => dispatchRuntimeCommandIntent(null as never)).toThrow(
+    expect(() => { Reflect.apply(dispatchRuntimeCommandIntent, undefined, [null]); }).toThrow(
       'runtime command intent dispatch: input must be an object',
     );
   });
