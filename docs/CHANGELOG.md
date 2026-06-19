@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135/WF-142 lower live type-aware ESLint
-  findings from `4,517` to `1,206`, cutting `3,323` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-143 lower live type-aware ESLint
+  findings from `4,517` to `1,154`, cutting `3,376` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -60,10 +60,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   cleanup, perf overlay size formatting, theme builder/graph runtime guards,
   DAG source checked traversal, image-viewer app/test surface typing, and
   notification history formatting, DAG layout, flex layout, theme color/extend,
-  panel dock, and surface layout checked-read cleanup. The aggregate debt
-  ceiling now ratchets from `4,940` to `1,617`, with the next goalpost target
-  set to `1,567` or lower, while touched file/context budgets remain held under
-  their stored ceilings and two file/context exceptions are removed.
+  panel dock, and surface layout checked-read cleanup, plus runtime-engine and
+  driver test checked-read cleanup, single-select option indexing, DOGFOOD i18n
+  completeness formatting/cause preservation, and transition/packed-cell import
+  cleanup. The aggregate debt ceiling now ratchets from `4,940` to `1,564`,
+  with the next goalpost target set to `1,514` or lower, while touched
+  file/context budgets remain held under their stored ceilings and three
+  file/context exceptions are removed.
 - **Code Dojo ESLint ratchet 1** — the first standards burndown pass lowers
   live type-aware ESLint findings from `5,121` to `4,563`, updates the
   aggregate Code Dojo debt ceiling from `5,768` to `4,986`, removes unsafe

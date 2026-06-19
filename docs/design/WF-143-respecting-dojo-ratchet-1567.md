@@ -1,8 +1,8 @@
-# WF-143 Respecting the Dojo Ratchet To 1567
+# WF-143 Respecting the Dojo Ratchet To 1564
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Issue
 
@@ -23,24 +23,25 @@ shuffle exceptions.
 
 Reduce aggregate Code Dojo debt from `1,617` to `1,567` or lower by eliminating
 at least `50` live ESLint findings with behavior-preserving TypeScript fixes.
+The implemented slice reaches `1,564`.
 
 ## Candidate Slice
 
-The current non-DOGFOOD package/script offenders include enough coherent debt
-to meet the ratchet without touching DOGFOOD docs source files:
+The implemented non-DOGFOOD package/script slice removes `52` live ESLint
+findings while shrinking touched file/context ceilings:
 
 | File | Findings |
 | :--- | ---: |
 | `packages/bijou-tui/src/runtime-engine.test.ts` | 13 |
-| `packages/bijou-tui/src/app-frame-render.ts` | 12 |
-| `packages/bijou-tui/src/app-frame-types.ts` | 12 |
-| `scripts/smoke-all-examples-lib.ts` | 12 |
-| `packages/bijou-node/src/recorder.ts` | 11 |
-| **Candidate total** | **60** |
+| `scripts/dogfood-i18n-completeness.ts` | 12 |
+| `packages/bijou-tui/src/driver.test.ts` | 11 |
+| `packages/bijou/src/core/forms/select.ts` | 6 |
+| `packages/bijou-tui/src/transition-shaders.test.ts` | 5 |
+| `packages/bijou/src/core/render/packed-cell.test.ts` | 5 |
+| **Implemented total** | **52** |
 
-The implementation should choose the smallest coherent cluster that can remove
-at least `50` live findings while keeping touched files at or below their
-stored file/context ceilings.
+The final slice avoided partially-cleaned files because `code-dojo:changed`
+requires touched files to be raw-ESLint clean.
 
 ## Scope
 
@@ -73,6 +74,15 @@ Live counts on `main` at `b5774a4a`:
 - mock-ban baseline: `23`
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,567` or lower
+
+Implemented counts on this branch:
+
+- aggregate Code Dojo debt: `1,564`
+- ESLint findings: `1,154`
+- file/context baseline: `332`
+- mock-ban baseline: `23`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- next aggregate target: `1,514` or lower
 
 ## Playback Questions
 

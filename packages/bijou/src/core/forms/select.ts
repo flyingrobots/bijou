@@ -53,15 +53,12 @@ export async function select<T = string>(options: SelectOptions<T>): Promise<T> 
   );
 }
 
-/**
- * Display options as a numbered list and accept numeric input.
- *
- * Used as the fallback for non-interactive or accessible modes.
- *
- * @param options - Select field configuration.
- * @param ctx - Bijou context.
- * @returns The value of the selected option.
- */
+function optionAt<T>(options: readonly SelectOption<T>[], index: number): SelectOption<T> {
+  const option = options[index];
+  if (option === undefined) throw new Error('select option index out of range');
+  return option;
+}
+
 async function numberedSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
   ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
   renderNumberedOptions(options.options, ctx);
@@ -71,21 +68,11 @@ async function numberedSelect<T>(options: SelectOptions<T>, ctx: BijouContext): 
 
   const idx = parseInt(answer.trim(), 10) - 1;
   if (idx >= 0 && idx < options.options.length) {
-    return options.options[idx]!.value;
+    return optionAt(options.options, idx).value;
   }
-  return options.defaultValue ?? options.options[0]!.value;
+  return options.defaultValue ?? optionAt(options.options, 0).value;
 }
 
-/**
- * Display a keyboard-navigable select menu using raw terminal input.
- *
- * Supports arrow keys and j/k for navigation, Enter to confirm,
- * Ctrl+C or Escape to cancel (returns default or first option).
- *
- * @param options - Select field configuration.
- * @param ctx - Bijou context.
- * @returns The value of the selected option.
- */
 async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const styledFn = createStyledFn(ctx);
@@ -96,17 +83,14 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   let cursor = 0;
   let scrollOffset = 0;
 
-  /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
     return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
-  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
-  /** Write the select UI (title, option list) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
@@ -115,7 +99,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     const visible = visibleOptions();
     for (let i = 0; i < visible.length; i++) {
       const globalIndex = scrollOffset + i;
-      const opt = visible[i]!;
+      const opt = optionAt(visible, i);
       const isCurrent = globalIndex === cursor;
       const prefix = isCurrent ? '\u276f' : ' ';
       const desc = opt.description ? styledFn(ctx.semantic('muted'), ` \u2014 ${opt.description}`) : '';
@@ -127,18 +111,16 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     }
   }
 
-  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
-  /** Erase the full UI and print the final selection summary line. */
   function cleanup(selectedLabel?: string): void {
     clearRender();
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
-    const displayLabel = selectedLabel ?? (options.options[cursor]!).label;
+    const displayLabel = selectedLabel ?? optionAt(options.options, cursor).label;
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), displayLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
@@ -154,12 +136,9 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
         scrollOffset = clampScroll(cursor, scrollOffset, maxVisible, options.options.length);
         clearRender(); render();
       } else if (isKey(key, 'enter')) {
-        handle.dispose(); cleanup(); resolve(options.options[cursor]!.value);
+        handle.dispose(); cleanup(); resolve(optionAt(options.options, cursor).value);
       } else if (isKey(key, 'c', { ctrl: true }) || isKey(key, 'escape')) {
-        // Note: bare \x1b may false-trigger on slow connections where escape
-        // sequences arrive as separate bytes. Timer-based disambiguation is a
-        // separate future improvement.
-        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        const fallbackValue = options.defaultValue ?? optionAt(options.options, 0).value;
         // Object.is uses reference equality — object-typed values must be the
         // exact same reference to match, not merely structurally equivalent.
         const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));

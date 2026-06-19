@@ -43,7 +43,7 @@ const counterApp: App<CounterModel> = {
     return [model, []];
   },
   view(model) {
-    return textView(`Count: ${model.count}`);
+    return textView(`Count: ${String(model.count)}`);
   },
 };
 
@@ -115,14 +115,12 @@ describe('runScript', () => {
 
     const app: App<Model, Msg> = {
       init(): [Model, Cmd<Msg>[]] {
-        const cmd: Cmd<Msg> = async () => ({ type: 'loaded' as const, data: 'hello' });
+        const cmd: Cmd<Msg> = () => ({ type: 'loaded', data: 'hello' });
         return [{ data: '', loaded: false }, [cmd]];
       },
       update(msg, model) {
-        if ('data' in msg && (msg).type === 'loaded') {
-          return [{ data: (msg).data, loaded: true }, []];
-        }
-        return [model, []];
+        if (!('data' in msg)) return [model, []];
+        return [{ data: msg.data, loaded: true }, []];
       },
       view(model) {
         return textView(model.loaded ? `Data: ${model.data}` : 'Loading...');
@@ -153,7 +151,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return textView(`${model.cols}x${model.rows}`);
+        return textView(`${String(model.cols)}x${String(model.rows)}`);
       },
     };
 
@@ -178,7 +176,7 @@ describe('runScript', () => {
           type: 'TestLayoutNode',
           rect: { x: 0, y: 0, width: 8, height: 1 },
           children: [],
-          surface: stringToSurface(`${model.cols}x${model.rows}`, 8, 1),
+          surface: stringToSurface(`${String(model.cols)}x${String(model.rows)}`, 8, 1),
         };
       },
     };
@@ -198,12 +196,11 @@ describe('runScript', () => {
     interface Model { count: number }
     const app: App<Model, Msg> = {
       init: () => [{ count: 0 }, []],
-      update(msg, model) {
-        if ((msg as Msg).type === 'inc') return [{ count: model.count + 1 }, []];
-        return [model, []];
+      update(_msg, model) {
+        return [{ count: model.count + 1 }, []];
       },
       view(model) {
-        return textView(`Count: ${model.count}`);
+        return textView(`Count: ${String(model.count)}`);
       },
     };
 
@@ -223,7 +220,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return textView(`Clicked: ${model.clicked}`);
+        return textView(`Clicked: ${String(model.clicked)}`);
       },
     };
 
