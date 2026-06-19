@@ -7,6 +7,7 @@ import type { CmdCapabilities } from './types.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 const sourcePath = resolve(dirname(fileURLToPath(import.meta.url)), 'animate.ts');
+const noop = () => undefined;
 
 /** Create mock capabilities that can be manually pulsed. */
 function createMockCaps(): CmdCapabilities & { pulse(dt: number): void } {
@@ -69,12 +70,11 @@ describe('animate', () => {
       });
       const emitted: number[] = [];
       const caps = createMockCaps();
-      let settled = false;
+      const s = { settled: false };
       const promise = Promise.resolve(cmd((msg) => emitted.push(msg), caps)).then(() => {
-        settled = true;
+        s.settled = true;
       });
-      // Manually pulse until done (or safety limit)
-      for (let i = 0; i < 1000 && !settled; i++) {
+      for (let i = 0; i < 1000 && !s.settled; i++) {
         caps.pulse(0.016);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
@@ -82,7 +82,6 @@ describe('animate', () => {
       expect(frames.length).toBeGreaterThan(1);
       expect(emitted.length).toBeGreaterThan(1);
       expect(emitted).toEqual(frames);
-      // Values should start near 0 and end at 100
       expect(must(frames[0])).toBeGreaterThan(0);
       expect(must(frames[0])).toBeLessThan(50);
     });
@@ -97,10 +96,9 @@ describe('animate', () => {
         },
       });
       const caps = createMockCaps();
-      let settled = false;
-      const promise = Promise.resolve(cmd(() => {}, caps)).then(() => { settled = true; });
-      // Pulse
-      for (let i = 0; i < 1000 && !settled; i++) {
+      const s = { settled: false };
+      const promise = Promise.resolve(cmd(noop, caps)).then(() => { s.settled = true; });
+      for (let i = 0; i < 1000 && !s.settled; i++) {
         caps.pulse(0.016);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
@@ -125,15 +123,15 @@ describe('animate', () => {
         },
       });
       const caps = createMockCaps();
-      let settled = false;
-      const promise = Promise.resolve(cmd(() => {}, caps)).then(() => {
-        settled = true;
+      const s = { settled: false };
+      const promise = Promise.resolve(cmd(noop, caps)).then(() => {
+        s.settled = true;
       });
-      for (let i = 0; i < 240 && !settled; i++) {
+      for (let i = 0; i < 240 && !s.settled; i++) {
         caps.pulse(1);
         await new Promise<void>((resolve) => { queueMicrotask(resolve); });
       }
-      expect(settled).toBe(true);
+      expect(s.settled).toBe(true);
       await promise;
       expect(frames.length).toBeGreaterThan(1);
       expect(must(frames[0])).toBeGreaterThan(0);
@@ -157,8 +155,7 @@ describe('animate', () => {
         },
       });
       const caps = createMockCaps();
-      const promise = cmd(() => {}, caps);
-      // Pulse 10 times (10 * 20ms = 200ms)
+      const promise = cmd(noop, caps);
       for (let i = 0; i < 11; i++) {
         caps.pulse(0.02);
       }
@@ -207,18 +204,18 @@ describe('sequence', () => {
   it('runs commands in order', async () => {
     const order: string[] = [];
     const caps = createMockCaps();
-    const cmd = sequence(
-      async (emit) => {
+    const cmd = sequence<string>(
+      (emit) => {
         order.push('first');
         emit('a');
       },
-      async (emit) => {
+      (emit) => {
         order.push('second');
         emit('b');
       },
     );
     const emitted: string[] = [];
-    await cmd((msg) => emitted.push(msg as string), caps);
+    await cmd((msg) => emitted.push(msg), caps);
     expect(order).toEqual(['first', 'second']);
     expect(emitted).toEqual(['a', 'b']);
   });

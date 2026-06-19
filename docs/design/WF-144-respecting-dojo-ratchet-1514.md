@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented; pending review.
 
 ## Issue
 
@@ -24,23 +24,24 @@ move exceptions around.
 Reduce aggregate Code Dojo debt from `1,564` to `1,514` or lower by eliminating
 at least `50` live findings with behavior-preserving TypeScript fixes.
 
-## Candidate Slice
+## Selected Slice
 
-The current non-DOGFOOD package/script offenders include enough coherent debt
-to meet the ratchet without touching DOGFOOD docs source files:
+The implementation removed a coherent cluster of app-frame, transition, form,
+component, and smoke-runner findings without touching DOGFOOD docs source
+files:
 
 | File | Findings |
 | :--- | ---: |
 | `packages/bijou-tui/src/app-frame-render.ts` | 12 |
-| `packages/bijou-tui/src/app-frame-types.ts` | 12 |
-| `scripts/smoke-all-examples-lib.ts` | 12 |
-| `bench/src/harnesses/wall-time/runner.ts` | 11 |
-| `packages/bijou-node/src/recorder.ts` | 11 |
-| **Candidate total** | **58** |
+| `scripts/smoke-dogfood-lib.ts` | 11 |
+| `packages/bijou/src/core/components/enumerated-list.ts` | 10 |
+| `packages/bijou-tui/src/animate.test.ts` | 9 |
+| `packages/bijou-tui/src/transition-shaders.ts` | 6 |
+| `packages/bijou/src/core/forms/multiselect.ts` | 5 |
+| **Selected total** | **53** |
 
-The implementation should choose the smallest coherent cluster that can remove
-at least `50` live findings while leaving every touched file raw-ESLint clean
-and at or below its stored file/context ceiling.
+All six touched files are raw-ESLint clean and at or below their stored
+file/context ceiling.
 
 ## Scope
 
@@ -71,6 +72,15 @@ Live counts on `main` at `1159ba39`:
 - mock-ban baseline: `23`
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,514` or lower
+
+Live implementation counts on `cycle/respecting-dojo-ratchet-1514`:
+
+- aggregate Code Dojo debt: `1,511`
+- ESLint findings: `1,101`
+- file/context baseline: `332`
+- mock-ban baseline: `23`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- next aggregate target after this cycle: `1,461` or lower
 
 ## Playback Questions
 

@@ -176,7 +176,7 @@ export const matrixShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   }
   if (rand < threshold + edge) {
     const chars = '01$#@%&*';
-    const char = chars[Math.min(Math.floor(rand * 100) % chars.length, chars.length - 1)]!;
+    const char = chars.charAt(Math.min(Math.floor(rand * 100) % chars.length, chars.length - 1));
     return {
       showNext: false,
       overrideChar: char,
@@ -192,7 +192,7 @@ export const scrambleShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   const scrambleAmount = 1 - Math.abs(progress - 0.5) * 2;
   if (rand < scrambleAmount * 0.8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-    const char = chars[Math.min(Math.floor(rand * 1000) % chars.length, chars.length - 1)]!;
+    const char = chars.charAt(Math.min(Math.floor(rand * 1000) % chars.length, chars.length - 1));
     return {
       showNext: false,
       overrideChar: char,
@@ -230,7 +230,6 @@ export function radial(originX = 0.5, originY = 0.5): TransitionShaderFn {
 export function diamond(originX = 0.5, originY = 0.5): TransitionShaderFn {
   return ({ x, y, width, height, progress }) => {
     const m = computeOriginMetrics(x, y, width, height, originX, originY);
-    // Manhattan distance uses absolute deltas
     const dist = Math.abs(m.dx) + Math.abs(m.dy);
     const maxDist = Math.max(originX, 1 - originX) * m.aspect
       + Math.max(originY, 1 - originY);
@@ -288,7 +287,7 @@ export function pixelate(maxBlockSize = 16): TransitionShaderFn {
     const scramble = phase > 0.3 && blockRand < phase * 0.6;
     if (scramble) {
       const chars = '░▒▓█';
-      const char = chars[Math.min(Math.floor(rand * chars.length), chars.length - 1)]!;
+      const char = chars.charAt(Math.min(Math.floor(rand * chars.length), chars.length - 1));
       return { showNext: false, overrideChar: char, overrideRole: 'decoration' as const };
     }
     return { showNext };
@@ -331,7 +330,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
     if (rowNoise < glitchAmount * 0.6) {
       const glitchChars = '▓░▒█▄▀';
       const n = noise(x, y, frame);
-      const char = glitchChars[Math.min(Math.floor(n * glitchChars.length), glitchChars.length - 1)]!;
+      const char = glitchChars.charAt(Math.min(Math.floor(n * glitchChars.length), glitchChars.length - 1));
       return {
         showNext: false,
         overrideChar: char,
@@ -344,7 +343,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
     const cellNoise = noise(x, y, frame * 0.5);
     if (cellNoise < glitchAmount * 0.3) {
       const glitchChars = '▓░▒█▄▀╪╫╬';
-      const char = glitchChars[Math.min(Math.floor(cellNoise * 100) % glitchChars.length, glitchChars.length - 1)]!;
+      const char = glitchChars.charAt(Math.min(Math.floor(cellNoise * 100) % glitchChars.length, glitchChars.length - 1));
       return {
         showNext: false,
         overrideChar: char,
@@ -377,7 +376,7 @@ export function tvStatic(density = 0.7): TransitionShaderFn {
     if (cellNoise < staticAmount * density) {
       const intensity = noise(x + 1, y + 1, frame);
       const chars = ' ░▒▓█';
-      const char = chars[Math.min(Math.floor(intensity * chars.length), chars.length - 1)]!;
+      const char = chars.charAt(Math.min(Math.floor(intensity * chars.length), chars.length - 1));
       return {
         showNext: false,
         overrideChar: char,
