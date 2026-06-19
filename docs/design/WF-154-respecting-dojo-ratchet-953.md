@@ -48,13 +48,13 @@ Selected cleanup slice:
 
 Implemented counts on this branch before review:
 
-- aggregate Code Dojo debt: `953`
-- ESLint findings: `545`
+- aggregate Code Dojo debt: `951`
+- ESLint findings: `543`
 - file/context baseline: `331`
 - mock-ban baseline: `22`
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - DOGFOOD raw-string debt: `2,761`
-- next aggregate target: `903` or lower
+- next aggregate target: `901` or lower
 
 ## Scope
 

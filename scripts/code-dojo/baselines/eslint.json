@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 545,
-  "errors": 545,
+  "total": 543,
+  "errors": 543,
   "warnings": 0,
   "rules": [
     {
@@ -110,7 +110,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 4
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/prefer-for-of",

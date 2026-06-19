@@ -23,7 +23,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
 - **Respecting the Dojo burndown** — WF-135/WF-154 lower live type-aware ESLint
-  findings from `4,517` to `545`, cutting `3,987` counted Code Dojo
+  findings from `4,517` to `543`, cutting `3,989` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -94,7 +94,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   plus DOGFOOD block-preview regression cleanup, plus DOGFOOD terminal guard
   localization and small MCP, AppFrame, form, component, script, and example
   strict-typing cleanup. The aggregate debt ceiling now ratchets from `4,940`
-  to `953`, with the next goalpost target set to `903`
+  to `951`, with the next goalpost target set to `901`
   or lower, while touched file/context budgets remain held under their stored
   ceilings, three file/context exceptions are removed, and the DOGFOOD
   raw-string debt baseline drops from `2,772` to `2,761`.

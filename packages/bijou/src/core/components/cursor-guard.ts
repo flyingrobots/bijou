@@ -84,8 +84,8 @@ export function cursorGuard(io: WritePort): CursorGuard {
  * @returns The return value of `fn`. If `fn` returns a Promise, the cursor
  *          is restored after the promise settles.
  */
-export function withHiddenCursor<T>(io: WritePort, fn: () => Promise<T>): Promise<T>;
 export function withHiddenCursor<T>(io: WritePort, fn: () => T): T;
+export function withHiddenCursor<T>(io: WritePort, fn: () => Promise<T>): Promise<T>;
 export function withHiddenCursor<T>(io: WritePort, fn: () => T | Promise<T>): T | Promise<T> {
   const guard = cursorGuard(io);
   const handle = guard.hide();
