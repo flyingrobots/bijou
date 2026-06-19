@@ -112,7 +112,8 @@ function renderSidebar(
     showScrollbar: state.items.length > state.height,
     ctx,
     renderItem: ({ item, focused }) => {
-      const entry = findEntry(item.value);
+      const itemValue = typeof item.value === 'string' ? item.value : '';
+      const entry = findEntry(itemValue);
       const tierMark = (entry?.tier ?? 1) === 3 ? ' *' : '';
       const label = `${focused ? '>' : ' '} ${item.label}${tierMark}`;
       return focused ? ctx.style.styled(ctx.semantic('primary'), label) : label;
@@ -162,21 +163,14 @@ function createCategoryPage(
     },
 
     update(msg, model) {
-      // Force quit always works
       if (msg.type === 'force-quit') {
         return [model, [quit()]];
       }
 
-      // Quit confirmation modal intercepts
       if (model.quitConfirmOpen) {
-        switch (msg.type) {
-          case 'confirm-quit':
-            return [model, [quit()]];
-          case 'cancel-quit':
-            return [{ ...model, quitConfirmOpen: false }, []];
-          default:
-            return [model, []];
-        }
+        if (msg.type === 'confirm-quit') return [model, [quit()]];
+        if (msg.type === 'cancel-quit') return [{ ...model, quitConfirmOpen: false }, []];
+        return [model, []];
       }
 
       switch (msg.type) {
@@ -191,7 +185,6 @@ function createCategoryPage(
         case 'request-quit':
           return [{ ...model, quitConfirmOpen: true }, []];
         case 'cancel-quit':
-          // Close drawer if open, otherwise no-op
           if (model.drawerOpen) {
             const nextGen = model.drawerAnimGen + 1;
             return [{ ...model, drawerOpen: false, drawerAnimGen: nextGen }, [
@@ -225,6 +218,9 @@ function createCategoryPage(
           return [{ ...model, drawerProgress: clamp01(msg.value) }, []];
         case 'force-quit':
           return [model, [quit()]];
+        case 'mouse':
+        case 'pulse':
+          return [model, []];
       }
     },
 
@@ -345,8 +341,8 @@ function renderDrawerContent(ctx: BijouContext): string {
   return [
     'Bijou Component Showcase',
     '',
-    `${total} components across`,
-    `${CATEGORIES.length} categories.`,
+    `${String(total)} components across`,
+    `${String(CATEGORIES.length)} categories.`,
     '',
     `${kbd('up', { ctx })}/${kbd('down', { ctx })}  Navigate`,
     `${kbd('[', { ctx })}/${kbd(']', { ctx })}     Categories`,

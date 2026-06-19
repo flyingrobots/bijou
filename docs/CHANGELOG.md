@@ -22,8 +22,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BIJOU_VITEST_MAX_WORKERS`, enables incremental test typecheck metadata, and
   removes duplicate pre-commit lint and code-size checks that were already
   covered by `code-dojo:precommit`.
-- **Respecting the Dojo burndown** — WF-135/WF-151 lower live type-aware ESLint
-  findings from `4,517` to `697`, cutting `3,835` counted Code Dojo
+- **Respecting the Dojo burndown** — WF-135/WF-152 lower live type-aware ESLint
+  findings from `4,517` to `646`, cutting `3,886` counted Code Dojo
   violations across the initial 1000-count pass and follow-on fake-async,
   dead-fixture, explicit-formatting, script/example, MCP docs, flame, and
   app-frame render/settings/shell-layer/notification fixture cleanups, plus
@@ -84,9 +84,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   smoke-example orchestration fakes, DOGFOOD light-theme formatting, DOGFOOD
   locale frame/model helpers, block metadata loose-consumer fixtures, canonical
   app checked reads and formatting, i18n string-table value guards, event bus
-  dispatch/backpressure cleanup, block-tree render branding, and markdown/table
-  defensive input typing. The aggregate debt ceiling now ratchets from `4,940`
-  to `1,105`, with the next goalpost target set to `1,055` or lower, while touched
+  dispatch/backpressure cleanup, block-tree render branding, markdown/table
+  defensive input typing, app-frame/showcase explicit formatting and action
+  handling, node style cache typing, TUI CSS resolver/media guards,
+  shader/raster/layout safe reads, form filter and standard-block render guards,
+  workflow preflight indexing, and cleanup handle test fakes. The aggregate debt
+  ceiling now ratchets from `4,940` to `1,054`, with the next goalpost target
+  set to `1,004` or lower, while touched
   file/context budgets remain held under their stored ceilings, three
   file/context exceptions are removed, and the DOGFOOD raw-string debt baseline
   drops from `2,772` to `2,766`.

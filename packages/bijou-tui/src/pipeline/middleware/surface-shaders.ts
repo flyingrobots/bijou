@@ -169,17 +169,18 @@ function shadePackedSurface(
 
       const index = y * width + x;
       const off = index * CELL_STRIDE;
-      const alpha = buf[off + OFF_ALPHA]!;
-      const cell = surface.cells[index]!;
+      const a = buf[off + OFF_ALPHA];
+      const cell = surface.cells[index];
+      if (a == null || !cell) continue;
 
-      if (alpha & FLAG_FG_SET) {
-        const nextFg = shadePackedRgb(buf, off + OFF_FG_R, factor);
-        cell.fg = rgbToHex(nextFg[0], nextFg[1], nextFg[2]);
+      if (a & FLAG_FG_SET) {
+        const [r, g, b] = shadePackedRgb(buf, off + OFF_FG_R, factor);
+        cell.fg = rgbToHex(r, g, b);
       }
 
-      if (alpha & FLAG_BG_SET) {
-        const nextBg = shadePackedRgb(buf, off + OFF_BG_R, factor);
-        cell.bg = rgbToHex(nextBg[0], nextBg[1], nextBg[2]);
+      if (a & FLAG_BG_SET) {
+        const [r, g, b] = shadePackedRgb(buf, off + OFF_BG_R, factor);
+        cell.bg = rgbToHex(r, g, b);
       }
     }
   }
@@ -192,15 +193,14 @@ function shadePackedRgb(
   start: number,
   factor: number,
 ): readonly [number, number, number] {
-  const r = shadeChannel(buf[start]!, factor);
-  const g = shadeChannel(buf[start + 1]!, factor);
-  const b = shadeChannel(buf[start + 2]!, factor);
+  const r = shadeChannel(buf[start] ?? 0, factor);
+  const g = shadeChannel(buf[start + 1] ?? 0, factor);
+  const b = shadeChannel(buf[start + 2] ?? 0, factor);
   buf[start] = r;
   buf[start + 1] = g;
   buf[start + 2] = b;
-  return [r, g, b] as const;
+  return [r, g, b];
 }
-
 function shadeCellSurface(
   surface: Surface,
   context: SurfaceShaderContext,

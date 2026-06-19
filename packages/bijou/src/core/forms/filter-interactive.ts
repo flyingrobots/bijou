@@ -85,7 +85,8 @@ export function defaultMatch<T>(query: string, option: FilterOption<T>): boolean
  * @returns The value of the selected (or default/first) option.
  */
 export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
-  if (options.options.length === 0) {
+  const firstOption = options.options[0];
+  if (firstOption === undefined) {
     throw new Error('[bijou] filter(): options array must contain at least one option');
   }
   const noColor = ctx.theme.noColor;
@@ -142,10 +143,10 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     const filterDisplay = query || (options.placeholder ? styledFn(ctx.semantic('muted'), options.placeholder) : '');
     ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), indicator)} ${filterDisplay}\n`);
 
-    // Visible items
     const vis = visibleItems();
     for (let i = 0; i < vis.length; i++) {
-      const opt = vis[i]!;
+      const opt = vis[i];
+      if (opt === undefined) continue;
       const isCurrent = scrollOffset + i === cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
@@ -155,8 +156,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       }
     }
 
-    // Status
-    const status = `${filtered.length}/${options.options.length} items`;
+    const status = `${String(filtered.length)}/${String(options.options.length)} items`;
     ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('muted'), status)}\n`);
   }
 
@@ -235,13 +235,12 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
         const selected = filtered[cursor];
         const resolvedLabel = selected ? selected.label : '(none)';
         cleanup(resolvedLabel);
-        resolve(filtered[cursor]?.value ?? options.defaultValue ?? options.options[0]!.value);
+        resolve(filtered[cursor]?.value ?? options.defaultValue ?? firstOption.value);
         return;
       }
 
       if (isKey(key, 'c', { ctrl: true })) {
-        // Ctrl+C — cancel from either mode
-        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        const fallbackValue = options.defaultValue ?? firstOption.value;
         const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
         handle.dispose();
         cleanup(fallbackOption?.label ?? '(none)');
@@ -256,7 +255,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
           // TODO: bare \x1b may false-trigger on slow connections where escape
           // sequences arrive as separate bytes. Timer-based disambiguation is a
           // shared debt with textarea-editor.ts — unify in a future PR.
-          const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+          const fallbackValue = options.defaultValue ?? firstOption.value;
           const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
           handle.dispose();
           cleanup(fallbackOption?.label ?? '(none)');

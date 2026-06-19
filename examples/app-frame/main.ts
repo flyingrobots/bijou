@@ -31,8 +31,7 @@ function createInitialPageModel(): PageModel {
 
 function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
   if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
-  if (msg.type === 'toggle-inspector') return [{ ...model, inspector: !model.inspector }, []];
-  return [model, []];
+  return [{ ...model, inspector: !model.inspector }, []];
 }
 
 function createPageKeyMap() {
@@ -65,7 +64,7 @@ export function createAppFrameDemo(ctx: BijouContext = initDefaultContext()) {
     paneA: {
       kind: 'pane',
       paneId: 'files',
-      render: (width) => boxSurface(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${width} cols`, {
+      render: (width) => boxSurface(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${String(width)} cols`, {
         width,
         ctx,
       }),
@@ -74,7 +73,7 @@ export function createAppFrameDemo(ctx: BijouContext = initDefaultContext()) {
       kind: 'pane',
       paneId: 'content',
       overflowX: 'scroll',
-      render: (width, height) => boxSurface(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${width}x${height}`, {
+      render: (width, height) => boxSurface(`Editor\n\ncount = ${String(model.count)}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${String(width)}x${String(height)}`, {
         width,
         ctx,
       }),
@@ -95,7 +94,7 @@ export function createAppFrameDemo(ctx: BijouContext = initDefaultContext()) {
       stats: {
         kind: 'pane',
         paneId: 'stats',
-        render: (width) => boxSurface(`Stats: counter=${model.count}`, { width, ctx }),
+        render: (width) => boxSurface(`Stats: counter=${String(model.count)}`, { width, ctx }),
       },
       left: {
         kind: 'pane',
