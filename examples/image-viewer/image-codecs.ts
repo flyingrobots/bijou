@@ -38,7 +38,7 @@ export function decodeImageRgba(input: Uint8Array, filename = 'image'): DecodedI
 }
 
 export function decodePngRgba(input: Uint8Array): RgbaFrame {
-  const buffer = Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  const buffer = Buffer.from(input);
   if (!isPng(buffer)) {
     throw new Error('PNG decoder expected a PNG signature.');
   }
@@ -91,7 +91,7 @@ export function decodePngRgba(input: Uint8Array): RgbaFrame {
 }
 
 export function decodePpmRgba(input: Uint8Array): RgbaFrame {
-  const buffer = Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  const buffer = Buffer.from(input);
   const cursor: NetpbmCursor = { offset: 0 };
   const magic = readNetpbmToken(buffer, cursor);
   if (magic !== 'P3' && magic !== 'P6') {
@@ -112,7 +112,7 @@ export function decodePpmRgba(input: Uint8Array): RgbaFrame {
 
 function isPng(input: Uint8Array): boolean {
   if (input.length < PNG_SIGNATURE.length) return false;
-  const buffer = Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  const buffer = Buffer.from(input);
   return buffer.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE);
 }
 
@@ -130,11 +130,11 @@ function readPngHeader(data: Buffer): PngHeader {
   return {
     width: data.readUInt32BE(0),
     height: data.readUInt32BE(4),
-    bitDepth: data[8]!,
-    colorType: data[9]!,
-    compression: data[10]!,
-    filter: data[11]!,
-    interlace: data[12]!,
+    bitDepth: data[8] ?? 0,
+    colorType: data[9] ?? 0,
+    compression: data[10] ?? 0,
+    filter: data[11] ?? 0,
+    interlace: data[12] ?? 0,
   };
 }
 
@@ -173,7 +173,7 @@ function unpackPngScanlines(
   let previous: Uint8Array = new Uint8Array(rowBytes);
 
   for (let y = 0; y < height; y++) {
-    const filterType = inflated[sourceOffset++]!;
+    const filterType = inflated[sourceOffset++] ?? 0;
     const encoded = inflated.subarray(sourceOffset, sourceOffset + rowBytes);
     sourceOffset += rowBytes;
     const row = unfilterPngScanline(filterType, encoded, previous, bytesPerPixel);
@@ -192,8 +192,8 @@ function unfilterPngScanline(
 ): Uint8Array {
   const row = new Uint8Array(encoded.length);
   for (let index = 0; index < encoded.length; index++) {
-    const raw = encoded[index]!;
-    const left = index >= bytesPerPixel ? row[index - bytesPerPixel]! : 0;
+    const raw = encoded[index] ?? 0;
+    const left = index >= bytesPerPixel ? row[index - bytesPerPixel] ?? 0 : 0;
     const up = previous[index] ?? 0;
     const upperLeft = index >= bytesPerPixel ? previous[index - bytesPerPixel] ?? 0 : 0;
 
@@ -214,7 +214,7 @@ function unfilterPngScanline(
         row[index] = (raw + paeth(left, up, upperLeft)) & 0xff;
         break;
       default:
-        throw new Error(`PNG decoder found unsupported scanline filter ${filterType}.`);
+        throw new Error(`PNG decoder found unsupported scanline filter ${String(filterType)}.`);
     }
   }
   return row;
@@ -255,16 +255,16 @@ function decodeP6Pixels(
   let source = cursor.offset;
   for (let pixel = 0; pixel < width * height; pixel++) {
     const target = pixel * 4;
-    rgba[target] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++]!, 'red', maxValue), maxValue);
-    rgba[target + 1] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++]!, 'green', maxValue), maxValue);
-    rgba[target + 2] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++]!, 'blue', maxValue), maxValue);
+    rgba[target] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++] ?? 0, 'red', maxValue), maxValue);
+    rgba[target + 1] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++] ?? 0, 'green', maxValue), maxValue);
+    rgba[target + 2] = scaleNetpbmSample(readNetpbmBinarySample(buffer[source++] ?? 0, 'blue', maxValue), maxValue);
     rgba[target + 3] = 255;
   }
   return { width, height, data: rgba };
 }
 
 function consumeNetpbmBinarySeparator(buffer: Buffer, cursor: NetpbmCursor): void {
-  if (cursor.offset >= buffer.length || !isNetpbmWhitespace(buffer[cursor.offset]!)) {
+  if (cursor.offset >= buffer.length || !isNetpbmWhitespace(buffer[cursor.offset] ?? 0)) {
     throw new Error('PPM decoder expected binary pixel data separator.');
   }
 
@@ -292,14 +292,14 @@ function readNetpbmSample(
 ): number {
   const value = Number(readNetpbmToken(buffer, cursor));
   if (!Number.isSafeInteger(value) || value < 0 || value > maxValue) {
-    throw new Error(`PPM decoder expected ${label} to be between 0 and ${maxValue}.`);
+    throw new Error(`PPM decoder expected ${label} to be between 0 and ${String(maxValue)}.`);
   }
   return value;
 }
 
 function readNetpbmBinarySample(value: number, label: string, maxValue: number): number {
   if (value > maxValue) {
-    throw new Error(`PPM decoder expected ${label} to be between 0 and ${maxValue}.`);
+    throw new Error(`PPM decoder expected ${label} to be between 0 and ${String(maxValue)}.`);
   }
   return value;
 }
@@ -307,7 +307,7 @@ function readNetpbmBinarySample(value: number, label: string, maxValue: number):
 function readNetpbmToken(buffer: Buffer, cursor: NetpbmCursor): string {
   skipNetpbmWhitespaceAndComments(buffer, cursor);
   const start = cursor.offset;
-  while (cursor.offset < buffer.length && !isNetpbmWhitespace(buffer[cursor.offset]!)) {
+  while (cursor.offset < buffer.length && !isNetpbmWhitespace(buffer[cursor.offset] ?? 0)) {
     cursor.offset++;
   }
   if (cursor.offset === start) {
@@ -318,7 +318,7 @@ function readNetpbmToken(buffer: Buffer, cursor: NetpbmCursor): string {
 
 function skipNetpbmWhitespaceAndComments(buffer: Buffer, cursor: NetpbmCursor): void {
   while (cursor.offset < buffer.length) {
-    const byte = buffer[cursor.offset]!;
+    const byte = buffer[cursor.offset] ?? 0;
     if (isNetpbmWhitespace(byte)) {
       cursor.offset++;
       continue;
@@ -352,10 +352,10 @@ function writeRgbRow(
   for (let x = 0; x < width; x++) {
     const source = x * bytesPerPixel;
     const target = ((y * width) + x) * 4;
-    rgba[target] = row[source]!;
-    rgba[target + 1] = row[source + 1]!;
-    rgba[target + 2] = row[source + 2]!;
-    rgba[target + 3] = bytesPerPixel === 4 ? row[source + 3]! : fallbackAlpha;
+    rgba[target] = row[source] ?? 0;
+    rgba[target + 1] = row[source + 1] ?? 0;
+    rgba[target + 2] = row[source + 2] ?? 0;
+    rgba[target + 3] = bytesPerPixel === 4 ? row[source + 3] ?? fallbackAlpha : fallbackAlpha;
   }
 }
 
