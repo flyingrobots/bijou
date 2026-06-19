@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "examples/docs/app.ts",
-      "lines": 4549,
-      "bytes": 159729
+      "lines": 4166,
+      "bytes": 147799
     },
     {
       "path": "examples/docs/stories.ts",
@@ -75,8 +75,8 @@
     },
     {
       "path": "examples/docs/i18n-debt.ts",
-      "lines": 858,
-      "bytes": 29269
+      "lines": 846,
+      "bytes": 29260
     },
     {
       "path": "packages/bijou/src/core/graphql-bijou-block.ts",
@@ -695,8 +695,8 @@
     },
     {
       "path": "packages/bijou/src/core/render/packed-cell.ts",
-      "lines": 321,
-      "bytes": 10833
+      "lines": 318,
+      "bytes": 10828
     },
     {
       "path": "tests/cycles/LX-011/dogfood-locale-ratchet.test.ts",
@@ -890,8 +890,8 @@
     },
     {
       "path": "packages/bijou/src/core/components/progress.ts",
-      "lines": 283,
-      "bytes": 10450
+      "lines": 282,
+      "bytes": 10427
     },
     {
       "path": "packages/bijou-tui/src/app-frame-palette.ts",
@@ -1165,8 +1165,8 @@
     },
     {
       "path": "examples/docs/svg-raster.ts",
-      "lines": 225,
-      "bytes": 6533
+      "lines": 224,
+      "bytes": 6531
     },
     {
       "path": "packages/bijou/src/core/forms/multiselect.test.ts",
@@ -1220,13 +1220,13 @@
     },
     {
       "path": "packages/bijou/src/core/app-shell-composition.ts",
-      "lines": 217,
-      "bytes": 6076
+      "lines": 216,
+      "bytes": 6063
     },
     {
       "path": "scripts/dogfood-i18n-export.ts",
-      "lines": 216,
-      "bytes": 6182
+      "lines": 209,
+      "bytes": 6178
     },
     {
       "path": "packages/bijou-tui/src/navigable-table.test.ts",
@@ -1610,8 +1610,8 @@
     },
     {
       "path": "packages/bijou/src/core/components/dag-stats.ts",
-      "lines": 159,
-      "bytes": 4738
+      "lines": 158,
+      "bytes": 4655
     },
     {
       "path": "packages/bijou-i18n-tools-node/src/filesystem.test.ts",

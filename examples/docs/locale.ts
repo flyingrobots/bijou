@@ -14,11 +14,13 @@ export interface DogfoodLocaleOption {
   readonly aliases: readonly string[];
 }
 
+const ENGLISH_LOCALE_LABEL = 'English';
+
 export const DOGFOOD_LOCALE_OPTIONS: readonly DogfoodLocaleOption[] = Object.freeze([
   {
     id: 'en',
-    label: 'English',
-    nativeLabel: 'English',
+    label: ENGLISH_LOCALE_LABEL,
+    nativeLabel: ENGLISH_LOCALE_LABEL,
     direction: 'ltr',
     aliases: Object.freeze(['en', 'en-us', 'en-gb']),
   },
@@ -45,13 +47,19 @@ export const DOGFOOD_LOCALE_OPTIONS: readonly DogfoodLocaleOption[] = Object.fre
   },
 ] satisfies readonly DogfoodLocaleOption[]);
 
-export const DEFAULT_LOCALE = DOGFOOD_LOCALE_OPTIONS[0]!;
+function firstDogfoodLocale(): DogfoodLocaleOption {
+  const [locale] = DOGFOOD_LOCALE_OPTIONS;
+  if (locale == null) throw new Error('DOGFOOD locale options are empty');
+  return locale;
+}
+
+export const DEFAULT_LOCALE = firstDogfoodLocale();
 
 export function normalizeDogfoodLocaleTag(locale: string | undefined): string | undefined {
   const trimmed = locale?.trim();
   if (trimmed == null || trimmed === '') return undefined;
-  return trimmed
-    .split(':')[0]!
+  const [tag = trimmed] = trimmed.split(':');
+  return tag
     .replace(/[._].*$/, '')
     .replace(/_/g, '-')
     .toLowerCase();
@@ -60,7 +68,7 @@ export function normalizeDogfoodLocaleTag(locale: string | undefined): string | 
 function findDogfoodLocale(locale: string | undefined): DogfoodLocaleOption | undefined {
   const normalized = normalizeDogfoodLocaleTag(locale);
   if (normalized == null) return undefined;
-  const primary = normalized.split('-')[0]!;
+  const [primary = normalized] = normalized.split('-');
   return DOGFOOD_LOCALE_OPTIONS.find((option) => (
     option.id === normalized
     || option.aliases.includes(normalized)

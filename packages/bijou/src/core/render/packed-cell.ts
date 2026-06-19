@@ -174,10 +174,7 @@ export function parseHex(hex: string): [number, number, number] | undefined {
 }
 
 // Pre-computed lookup: byte value → 2-char hex string
-const HEX_BYTE: string[] = new Array(256);
-for (let i = 0; i < 256; i++) {
-  HEX_BYTE[i] = (i < 16 ? '0' : '') + i.toString(16);
-}
+const HEX_BYTE = Array.from({ length: 256 }, (_value, i) => (i < 16 ? '0' : '') + i.toString(16));
 
 /**
  * Parse '#rrggbb' and write R, G, B directly into a Uint8Array at the
@@ -198,7 +195,7 @@ export function parseHexInto(hex: string, out: Uint8Array, off: number): boolean
 
 /** Encode [r, g, b] to '#rrggbb'. Uses a lookup table — no toString(16) per call. */
 export function toHex(r: number, g: number, b: number): string {
-  return '#' + HEX_BYTE[r]! + HEX_BYTE[g]! + HEX_BYTE[b]!;
+  return '#' + (HEX_BYTE[r] ?? '00') + (HEX_BYTE[g] ?? '00') + (HEX_BYTE[b] ?? '00');
 }
 
 // --- Alpha encoding ---

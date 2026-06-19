@@ -70,11 +70,22 @@ function readSavedLocale(
   }
 }
 
+function processLocaleEnv(): NodeDogfoodLocaleEnv {
+  return {
+    LANG: process.env.LANG,
+    LANGUAGE: process.env.LANGUAGE,
+    LC_ALL: process.env.LC_ALL,
+    LC_MESSAGES: process.env.LC_MESSAGES,
+    HOME: process.env.HOME,
+    XDG_STATE_HOME: process.env.XDG_STATE_HOME,
+  };
+}
+
 export function createNodeDogfoodLocalePort(
-  input: NodeDogfoodLocaleEnv | NodeDogfoodLocaleOptions = process.env as NodeDogfoodLocaleEnv,
+  input: NodeDogfoodLocaleEnv | NodeDogfoodLocaleOptions = processLocaleEnv(),
 ): DogfoodLocalePort {
   const options = isNodeDogfoodLocaleOptions(input) ? input : { env: input };
-  const env = options.env ?? (process.env as NodeDogfoodLocaleEnv);
+  const env = options.env ?? processLocaleEnv();
   const storage = options.storage ?? nodeDogfoodLocaleStorage;
   const preferencePath = options.preferencePath ?? defaultPreferencePath(env);
 

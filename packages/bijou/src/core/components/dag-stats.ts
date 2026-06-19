@@ -39,8 +39,6 @@ export interface DagStats {
  * // => { nodes: 4, edges: 4, depth: 3, width: 2, roots: 1, leaves: 1 }
  * ```
  */
-export function dagStats(nodes: DagNode[]): DagStats;
-export function dagStats(source: SlicedDagSource): DagStats;
 export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
   const nodes = isSlicedDagSource(input) ? materialize(input) : input;
 
@@ -77,7 +75,7 @@ export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
   for (const n of realNodes) {
     for (const childId of children.get(n.id) ?? []) {
       if (!parents.has(childId)) parents.set(childId, []);
-      parents.get(childId)!.push(n.id);
+      parents.get(childId)?.push(n.id);
       inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);
       totalEdges++;
     }
@@ -92,10 +90,11 @@ export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
 
   const topoOrder: string[] = [];
   while (head < queue.length) {
-    const id = queue[head++]!;
+    const id = queue[head++];
+    if (id == null) break;
     topoOrder.push(id);
     for (const childId of children.get(id) ?? []) {
-      const newDeg = inDegree.get(childId)! - 1;
+      const newDeg = (inDegree.get(childId) ?? 0) - 1;
       inDegree.set(childId, newDeg);
       if (newDeg === 0) queue.push(childId);
     }

@@ -9,12 +9,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### Fixed
 
 - **DOGFOOD app landing extraction** — DF-077 splits the landing
-  surface/theme/quality/rendering subsystem out of `examples/docs/app.ts` into
-  focused sub-150-line modules, lowers the DOGFOOD main app from `5,793` to
-  `4,549` enforced lines, tightens its file/context baseline from `5,793`
-  lines / `201,982` bytes to `4,549` lines / `159,729` bytes, tightens its
-  code-size baseline to `4,549` lines, and lowers DOGFOOD raw-string debt from
-  `2,644` to `2,607` with `docs-app` raw-string debt down from `256` to `219`.
+  surface/theme/quality/rendering subsystem plus the docs shell theme and theme
+  token diagnostics out of `examples/docs/app.ts` into focused sub-150-line
+  modules, lowers the DOGFOOD main app from `5,793` to `4,165` enforced lines,
+  tightens its file/context baseline from `5,793` split-counted lines /
+  `201,982` bytes to `4,166` split-counted lines / `147,799` bytes, tightens
+  its code-size baseline to `4,165` lines, lowers DOGFOOD raw-string debt from
+  `2,644` to `2,415` with `docs-app` raw-string debt down from `256` to `185`,
+  and ratchets aggregate Code Dojo debt from `725` to `674` with the next
+  goalpost target set to `624` or lower.
 - **DOGFOOD block/capture ratchet** — LX-023 cleans the next DOGFOOD
   standards cluster by removing all `67` current ESLint findings from
   `examples/docs/dogfood-blocks.ts` and `examples/docs/capture-main.ts`,

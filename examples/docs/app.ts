@@ -4,9 +4,7 @@ import {
   BIJOU_LIGHT,
   boxSurface,
   blockRenderNode,
-  cloneContextWithTheme,
   createSurface,
-  doctorTheme,
   inspector,
   inspectorPanelBlock,
   markdown,
@@ -19,12 +17,10 @@ import {
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
-  type PreferenceListTheme,
   type Surface,
   type StandardBlockStory,
   type Theme,
   type TextModifier,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import {
   FRAME_I18N_CATALOG,
@@ -60,7 +56,6 @@ import {
   type FrameLayoutNode,
   type FramedApp,
   type FramedAppMsg,
-  type FrameShellThemeSpec,
   type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
@@ -146,38 +141,50 @@ import {
   searchPanelBlock,
   type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
-import { DOGFOOD_SHELL_THEMES, DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 import { formatFamilyRow, formatGuideRow } from './app-row-format.js';
 import { countMarkdownHeadings, readMarkdownDoc, readMarkdownDocExcerpt } from './app-markdown.js';
 import {
   createLandingRenderer,
-  docsVisualThemeFromShellThemeChoice,
   landingQualityModeLabel,
   landingQualitySettingDescription,
   landingQualitySettingValue,
-  landingThemeIndexById,
-  landingTokensToShellTheme,
   LANDING_THEME_COUNT,
-  LANDING_THEMES,
   nextLandingQualityMode,
   nextLandingThemeIndex,
   normalizeLandingThemeIndex,
-  pickStandoutColor,
   previousLandingQualityMode,
-  relativeLuminance,
   renderLandingPerfHudOverlay,
   resolveLandingQualityMode,
   resolveLandingTheme,
-  sampleColorRamp,
   updateLandingFps,
   type LandingQualityMode,
   type LandingTextModifiers,
   type LandingThemeTokens,
   type LandingToastState,
-  type Rgb,
 } from './app-landing.js';
+import {
+  applyDocsShellThemeToContext as applyShellThemeStateToContext,
+  createDocsShellThemeState,
+  resolveDocsShellThemeById as resolveShellThemeStateById,
+  resolveDocsVisualThemeByShellThemeId as resolveVisualThemeByShellThemeStateId,
+  resolveLandingThemeIndexForShellThemeId as resolveLandingThemeIndexForShellThemeStateId,
+} from './app-docs-shell-theme.js';
+import {
+  docsThemeAccentToken,
+  docsThemeBorderToken,
+  docsThemeMutedBorderToken,
+  docsThemePreferenceListTheme,
+  docsThemeProgressTokens,
+  docsThemeSurfaceToken,
+  docsThemeUnfocusedGutterToken,
+  resolveDocsThemeActiveHeaderTabToken,
+} from './app-docs-theme-tokens.js';
+import { dogfoodSafePairSummary, themeColorReuseSummary } from './app-theme-diagnostics.js';
+import { renderThemeTokenPalette } from './app-theme-token-palette.js';
+import { themePaletteRows } from './app-theme-token-model.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
+export { resolveDocsThemeActiveHeaderTabToken } from './app-docs-theme-tokens.js';
 
 const BIJOU_VERSION = readBijouPackageVersion();
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
@@ -670,63 +677,13 @@ const LANDING_TEXT_MODIFIERS: LandingTextModifiers = {
   dimStrikethrough: DIM_STRIKETHROUGH_MODIFIERS,
 };
 
-const DOCS_SHELL_THEMES: readonly FrameShellThemeSpec[] = [
-  ...DOGFOOD_SHELL_THEMES,
-  ...LANDING_THEMES.map((theme) => ({
-    id: theme.id,
-    label: theme.label,
-    theme: landingTokensToShellTheme(theme, LANDING_TEXT_MODIFIERS),
-  })),
-];
+const DOCS_SHELL_THEME_STATE = createDocsShellThemeState(LANDING_TEXT_MODIFIERS);
 
-export function docsShellThemesForTesting(): readonly FrameShellThemeSpec[] {
-  return DOCS_SHELL_THEMES;
+export function docsShellThemesForTesting() {
+  return DOCS_SHELL_THEME_STATE.shellThemes;
 }
 
-interface DocsShellThemeChoice {
-  readonly id: string;
-  readonly label: string;
-  readonly shellThemeId: string;
-  readonly shellThemeLabel: string;
-  readonly modeId?: string;
-  readonly modeLabel?: string;
-  readonly theme: Theme;
-}
-
-function docsShellThemeChoiceId(shellThemeId: string, modeId?: string): string {
-  return modeId === undefined ? shellThemeId : `${shellThemeId}:${modeId}`;
-}
-
-function flattenDocsShellThemeChoices(shellThemes: readonly FrameShellThemeSpec[]): readonly DocsShellThemeChoice[] {
-  return shellThemes.flatMap((shellTheme) => {
-    if (shellTheme.theme !== undefined) {
-      return [{
-        id: docsShellThemeChoiceId(shellTheme.id),
-        label: shellTheme.label,
-        shellThemeId: shellTheme.id,
-        shellThemeLabel: shellTheme.label,
-        theme: shellTheme.theme,
-      }];
-    }
-    return shellTheme.modes.map((mode) => ({
-      id: docsShellThemeChoiceId(shellTheme.id, mode.id),
-      label: `${shellTheme.label} / ${mode.label}`,
-      shellThemeId: shellTheme.id,
-      shellThemeLabel: shellTheme.label,
-      modeId: mode.id,
-      modeLabel: mode.label,
-      theme: mode.theme,
-    }));
-  });
-}
-
-const DOCS_SHELL_THEME_CHOICES = flattenDocsShellThemeChoices(DOCS_SHELL_THEMES);
-const DOCS_VISUAL_THEME_BY_SHELL_ID = new Map<string, LandingThemeTokens>([
-  ...LANDING_THEMES.map((theme) => [theme.id, theme] as const),
-  ...DOCS_SHELL_THEME_CHOICES
-    .filter((choice) => landingThemeIndexById(choice.id) === undefined)
-    .map((choice) => [choice.id, docsVisualThemeFromShellThemeChoice(choice)] as const),
-]);
+const DOCS_SHELL_THEME_CHOICES = DOCS_SHELL_THEME_STATE.choices;
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -2406,360 +2363,20 @@ function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode
   };
 }
 
-function docsThemeAccentToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.logoRamp, 0.78), modifiers: ['bold'] };
-}
-
-function docsThemeBorderToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.58) };
-}
-
-function docsThemeMutedBorderToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.36), modifiers: ['dim'] };
-}
-
-function docsThemeSurfaceToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.44),
-    bg: sampleColorRamp(theme.waveRamp, 0.06),
-  };
-}
-
-function docsThemeSelectedRowBgToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.62),
-    bg: sampleColorRamp(theme.waveRamp, 0.12),
-  };
-}
-
-function docsThemeDescriptionToken(theme: LandingThemeTokens): TokenValue {
-  return {
-    hex: sampleColorRamp(theme.waveRamp, 0.58),
-    modifiers: ['dim'],
-  };
-}
-
-export function resolveDocsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
-  const base = docsThemeSurfaceToken(theme).hex;
-  const background = sampleColorRamp(theme.waveRamp, 0.14);
-  return {
-    hex: pickStandoutColor(background, base, [
-      sampleColorRamp(theme.logoRamp, 0.98),
-      sampleColorRamp(theme.logoRamp, 0.84),
-      sampleColorRamp(theme.waveRamp, 0.88),
-      sampleColorRamp(theme.logoRamp, 0.62),
-    ]),
-    bg: background,
-    modifiers: ['bold'],
-  };
-}
-
-function docsThemeProgressTokens(theme: LandingThemeTokens): {
-  readonly filledToken: TokenValue;
-  readonly filledEndToken: TokenValue;
-  readonly emptyToken: TokenValue;
-  readonly labelToken: TokenValue;
-} {
-  const surface = docsThemeSurfaceToken(theme);
-  const background = surface.bg ?? theme.background;
-  const base = surface.hex;
-  const filledStart = pickStandoutColor(background, base, [
-    sampleColorRamp(theme.waveRamp, 0.58),
-    sampleColorRamp(theme.logoRamp, 0.34),
-    sampleColorRamp(theme.waveRamp, 0.74),
-  ]);
-  const filledEnd = pickStandoutColor(background, filledStart, [
-    sampleColorRamp(theme.logoRamp, 0.78),
-    sampleColorRamp(theme.logoRamp, 0.96),
-    sampleColorRamp(theme.waveRamp, 0.9),
-  ]);
-  return {
-    filledToken: { hex: filledStart, modifiers: ['bold'] },
-    filledEndToken: { hex: filledEnd, modifiers: ['bold'] },
-    emptyToken: { hex: sampleColorRamp(theme.waveRamp, 0.22), modifiers: ['dim'] },
-    labelToken: {
-      hex: pickStandoutColor(background, base, [
-        sampleColorRamp(theme.logoRamp, 0.9),
-        sampleColorRamp(theme.waveRamp, 0.84),
-        sampleColorRamp(theme.logoRamp, 0.7),
-      ]),
-      modifiers: ['bold'],
-    },
-  };
-}
-
-function docsThemePreferenceListTheme(theme: LandingThemeTokens): PreferenceListTheme {
-  return {
-    sectionTitleToken: docsThemeAccentToken(theme),
-    selectedRowBgToken: docsThemeSelectedRowBgToken(theme),
-    toggleOnToken: docsThemeAccentToken(theme),
-    toggleOffToken: docsThemeMutedBorderToken(theme),
-    choiceToken: docsThemeAccentToken(theme),
-    infoToken: { hex: sampleColorRamp(theme.waveRamp, 0.82) },
-    descriptionToken: docsThemeDescriptionToken(theme),
-  };
-}
-
-function docsThemeUnfocusedGutterToken(theme: LandingThemeTokens): TokenValue {
-  return { hex: sampleColorRamp(theme.waveRamp, 0.38), bg: sampleColorRamp(theme.waveRamp, 0.08), modifiers: ['dim'] };
-}
-
-function resolveDocsShellThemeById(id: string | undefined): DocsShellThemeChoice {
-  return DOCS_SHELL_THEME_CHOICES.find((theme) => theme.id === id) ?? fallbackDocsShellThemeChoice();
+function resolveDocsShellThemeById(id: string | undefined) {
+  return resolveShellThemeStateById(DOCS_SHELL_THEME_STATE, id);
 }
 
 function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
-  return landingThemeIndexById(resolveDocsShellThemeById(id).id) ?? 0;
+  return resolveLandingThemeIndexForShellThemeStateId(DOCS_SHELL_THEME_STATE, id);
 }
 
 function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingThemeTokens {
-  const shellThemeId = resolveDocsShellThemeById(id).id;
-  return DOCS_VISUAL_THEME_BY_SHELL_ID.get(shellThemeId) ?? resolveLandingTheme(0);
-}
-
-function fallbackDocsShellThemeChoice(): DocsShellThemeChoice {
-  const fallback = DOCS_SHELL_THEME_CHOICES[0];
-  if (fallback != null) return fallback;
-  throw new Error();
+  return resolveVisualThemeByShellThemeStateId(DOCS_SHELL_THEME_STATE, id);
 }
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
-  const shellTheme = resolveDocsShellThemeById(themeId);
-  return cloneContextWithTheme(ctx, shellTheme.theme);
-}
-
-type ThemeTokenFamily = 'semantic' | 'surface' | 'border' | 'ui' | 'status' | 'gradient';
-
-interface ThemeTokenEntry {
-  readonly family: ThemeTokenFamily;
-  readonly path: string;
-  readonly token?: TokenValue;
-  readonly stops?: readonly string[];
-}
-
-type ThemePaletteRow =
-  | { readonly kind: 'group'; readonly label: string }
-  | { readonly kind: 'token'; readonly entry: ThemeTokenEntry };
-
-function hexFromRgb([red, green, blue]: Rgb): string {
-  return `#${[red, green, blue]
-    .map((channel) => channel.toString(16).padStart(2, '0'))
-    .join('')}`;
-}
-
-function themeTokenRecordEntries(
-  family: Exclude<ThemeTokenFamily, 'gradient'>,
-  tokens: Record<string, TokenValue>,
-): readonly ThemeTokenEntry[] {
-  return Object.entries(tokens).map(([key, token]) => ({
-    family,
-    path: `${family}.${key}`,
-    token,
-  }));
-}
-
-function themeTokenEntries(theme: Theme): readonly ThemeTokenEntry[] {
-  return [
-    ...themeTokenRecordEntries('semantic', theme.semantic),
-    ...themeTokenRecordEntries('surface', theme.surface),
-    ...themeTokenRecordEntries('border', theme.border),
-    ...themeTokenRecordEntries('ui', theme.ui),
-    ...themeTokenRecordEntries('status', theme.status),
-    ...Object.entries(theme.gradient).map(([key, stops]) => ({
-      family: 'gradient' as const,
-      path: `gradient.${key}`,
-      stops: stops.map((stop) => hexFromRgb(stop.color)),
-    })),
-  ];
-}
-
-function themePaletteRows(theme: Theme): readonly ThemePaletteRow[] {
-  const entries = themeTokenEntries(theme);
-  const rows: ThemePaletteRow[] = [];
-  for (const family of ['semantic', 'surface', 'border', 'ui', 'status', 'gradient'] as const) {
-    rows.push({ kind: 'group', label: family });
-    rows.push(...entries
-      .filter((entry) => entry.family === family)
-      .map((entry) => ({ kind: 'token' as const, entry })));
-  }
-  return rows;
-}
-
-function readableSwatchForeground(background: string): string {
-  return relativeLuminance(background) > 0.46 ? '#111827' : '#f8fafc';
-}
-
-function writeSurfaceText(
-  surface: Surface,
-  x: number,
-  y: number,
-  text: string,
-  token: TokenValue = { hex: '#f8fafc' },
-): void {
-  let index = 0;
-  for (const char of text) {
-    if (x + index >= surface.width) break;
-    surface.set(x + index, y, {
-      char,
-      fg: token.hex,
-      bg: token.bg,
-      modifiers: token.modifiers,
-    });
-    index += 1;
-  }
-}
-
-function renderSwatch(
-  surface: Surface,
-  entry: ThemeTokenEntry,
-  x: number,
-  y: number,
-  width: number,
-): void {
-  if (entry.token !== undefined) {
-    const background = entry.family === 'surface' && entry.token.bg !== undefined
-      ? entry.token.bg
-      : entry.token.hex;
-    const foreground = entry.family === 'surface'
-      ? entry.token.hex
-      : readableSwatchForeground(background);
-    for (let offset = 0; offset < width; offset++) {
-      surface.set(x + offset, y, {
-        char: ' ',
-        fg: foreground,
-        bg: background,
-      });
-    }
-    return;
-  }
-
-  const stops = entry.stops ?? ['#808080'];
-  for (let offset = 0; offset < width; offset++) {
-    const stopIndex = Math.min(
-      stops.length - 1,
-      Math.floor((offset / Math.max(1, width)) * stops.length),
-    );
-    const background = stops[stopIndex] ?? '#808080';
-    surface.set(x + offset, y, {
-      char: ' ',
-      fg: readableSwatchForeground(background),
-      bg: background,
-    });
-  }
-}
-
-function describeThemeToken(entry: ThemeTokenEntry, localization: LocalizationPort | undefined): string {
-  if (entry.token !== undefined) {
-    return entry.token.bg === undefined
-      ? entry.token.hex
-      : dogfoodText(localization, 'themePalette.tokenWithBackground', '{foreground} on {background}', {
-        foreground: entry.token.hex,
-        background: entry.token.bg,
-      });
-  }
-  return (entry.stops ?? []).join(' -> ');
-}
-
-function foregroundOnlyToken(token: TokenValue): TokenValue {
-  return {
-    hex: token.hex,
-    modifiers: token.modifiers,
-  };
-}
-
-function themePaletteChromeTokens(theme: Theme): {
-  readonly group: TokenValue;
-  readonly label: TokenValue;
-  readonly value: TokenValue;
-} {
-  return {
-    group: foregroundOnlyToken(theme.ui.sectionHeader),
-    label: foregroundOnlyToken(theme.surface.primary),
-    value: foregroundOnlyToken(theme.surface.muted),
-  };
-}
-
-function renderThemeTokenPalette(
-  theme: Theme,
-  width: number,
-  localization: LocalizationPort | undefined,
-  options: {
-    readonly maxRows?: number;
-    readonly chromeTheme?: Theme;
-  } = {},
-): Surface {
-  const safeWidth = Math.max(24, width);
-  const chrome = themePaletteChromeTokens(options.chromeTheme ?? theme);
-  const rows = themePaletteRows(theme);
-  const visibleRows = options.maxRows === undefined
-    ? rows
-    : rows.slice(0, Math.max(1, options.maxRows));
-  const truncatedCount = Math.max(0, rows.length - visibleRows.length);
-  const surface = createSurface(safeWidth, Math.max(1, visibleRows.length + (truncatedCount > 0 ? 1 : 0)));
-  const swatchWidth = Math.min(8, Math.max(4, Math.floor(safeWidth / 8)));
-  const labelX = swatchWidth + 2;
-
-  visibleRows.forEach((row, y) => {
-    if (row.kind === 'group') {
-      writeSurfaceText(surface, 0, y, row.label.toUpperCase(), chrome.group);
-      return;
-    }
-    renderSwatch(surface, row.entry, 0, y, swatchWidth);
-    writeSurfaceText(surface, labelX, y, row.entry.path, chrome.label);
-    writeSurfaceText(
-      surface,
-      Math.min(safeWidth - 1, labelX + 26),
-      y,
-      describeThemeToken(row.entry, localization),
-      chrome.value,
-    );
-  });
-
-  if (truncatedCount > 0) {
-    writeSurfaceText(
-      surface,
-      0,
-      surface.height - 1,
-      dogfoodText(localization, 'themePalette.moreTokens', '... {count} more tokens', {
-        count: truncatedCount,
-      }),
-      chrome.value,
-    );
-  }
-
-  return surface;
-}
-
-function dogfoodSafePairSummary(theme: Theme, localization: LocalizationPort | undefined): string {
-  const report = doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS });
-  const passed = Math.max(0, DOGFOOD_THEME_SAFE_PAIRS.length - report.issues.length);
-  return dogfoodText(localization, 'themeDiagnostics.safePairs', '{passed}/{total} safe pairs pass', {
-    passed,
-    total: DOGFOOD_THEME_SAFE_PAIRS.length,
-  });
-}
-
-function themeColorReuseSummary(theme: Theme, localization: LocalizationPort | undefined): string {
-  const uses = new Map<string, string[]>();
-  for (const entry of themeTokenEntries(theme)) {
-    if (entry.token !== undefined) {
-      const values = entry.token.bg === undefined
-        ? [entry.token.hex]
-        : [entry.token.hex, entry.token.bg];
-      for (const value of values) {
-        uses.set(value, [...(uses.get(value) ?? []), entry.path]);
-      }
-      continue;
-    }
-    for (const stop of entry.stops ?? []) {
-      uses.set(stop, [...(uses.get(stop) ?? []), entry.path]);
-    }
-  }
-  const repeated = Array.from(uses.values()).filter((paths) => new Set(paths).size > 1);
-  return dogfoodText(localization, 'themeDiagnostics.colorReuse', '{count} reused colors across {total} unique values', {
-    count: repeated.length,
-    total: uses.size,
-  });
+  return applyShellThemeStateToContext(DOCS_SHELL_THEME_STATE, ctx, themeId);
 }
 
 function renderThemeLabPane(
@@ -3842,7 +3459,7 @@ function createDocsExplorerApp(
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     helpLineSource: ({ model }) => buildDocsFooterHint(model, localization),
-    shellThemes: DOCS_SHELL_THEMES,
+    shellThemes: DOCS_SHELL_THEME_STATE.shellThemes,
     pages: DOCS_SITE_PAGES.map((spec) => {
       if (spec.id === COMPONENTS_PAGE_ID) {
         return {

@@ -1,15 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  serializeCatalogBundleJson,
-  serializeExchangeSheet,
-} from '../packages/bijou-i18n-tools/src/index.js';
-import {
-  createDogfoodCatalogBundle,
-  createDogfoodTranslationWorkbook,
-  dogfoodI18nCoverage,
-} from '../examples/docs/i18n/dogfood-authoring.js';
+import { serializeCatalogBundleJson, serializeExchangeSheet } from '../packages/bijou-i18n-tools/src/index.js';
+import { createDogfoodCatalogBundle, createDogfoodTranslationWorkbook, dogfoodI18nCoverage } from '../examples/docs/i18n/dogfood-authoring.js';
 
 type DogfoodI18nExportFormat = 'csv' | 'tsv' | 'json';
 
@@ -60,7 +53,7 @@ function parseArgs(args: readonly string[]): ParsedArgs {
     if (arg === '--format') {
       const value = requireArg(args, index, '--format');
       if (value !== 'csv' && value !== 'tsv' && value !== 'json') {
-        throw new Error(`Unsupported Dogfood i18n export format: ${value}`);
+        throw new Error(`Unsupported i18n export format: ${value}`);
       }
       format = value;
       index += 1;
@@ -84,7 +77,7 @@ function parseArgs(args: readonly string[]): ParsedArgs {
       help = true;
       continue;
     }
-    throw new Error(`Unknown Dogfood i18n export argument: ${arg}`);
+    throw new Error(`Unknown i18n export argument: ${String(arg)}`);
   }
 
   return {
@@ -128,7 +121,7 @@ export async function runDogfoodI18nExport(
     }
     if (parsed.coverage) {
       writeStdout(`${dogfoodI18nCoverage()
-        .map((entry) => `${entry.locale}: ${entry.translated}/${entry.total} translated (${entry.missing} missing)`)
+        .map((entry) => `${entry.locale}: ${String(entry.translated)}/${String(entry.total)} translated (${String(entry.missing)} missing)`)
         .join('\n')}\n`);
       return { exitCode: 0, stdout, stderr };
     }
@@ -145,7 +138,7 @@ export async function runDogfoodI18nExport(
     }
 
     if (parsed.locale == null) {
-      throw new Error('Dogfood i18n CSV/TSV export requires --locale');
+      throw new Error('i18n CSV/TSV export requires --locale');
     }
 
     const workbook = createDogfoodTranslationWorkbook(parsed.locale);

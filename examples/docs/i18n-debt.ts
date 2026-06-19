@@ -141,24 +141,20 @@ export function discoverDogfoodI18nDebtSources(
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2607,
+  total: 2415,
   bySurface: Object.freeze({
     'capture-main': 9,
-    'component-stories': 1526,
-    'counter-block-demo': 56,
+    'component-stories': 1453,
+    'counter-block-demo': 52,
     coverage: 1,
-    'docs-app': 219,
-    'dogfood-blocks': 679,
-    'dogfood-locale': 12,
+    'docs-app': 185,
+    'dogfood-blocks': 630,
+    'dogfood-locale': 7,
     'i18n-dogfood-authoring': 1,
-    'i18n-dogfood-catalog': 3,
     'i18n-missing-localization': 3,
-    localization: 1,
-    'node-locale': 7,
-    'release-title': 44,
-    'storybook-app': 37,
+    'release-title': 33,
+    'storybook-app': 34,
     'storybook-workstation': 7,
-    'svg-raster': 2,
   }),
 });
 
@@ -173,16 +169,13 @@ export const DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE: DogfoodMarkdownLocalization
 
 const LOCALIZED_MESSAGE_FUNCTIONS = new Set(['dogfoodMessage']);
 const LOCALIZED_FALLBACK_FUNCTIONS = new Set(['dogfoodText', 'shellText']);
-const PATH_FUNCTIONS = new Set([
-  'readMarkdownDoc',
-  'readMarkdownDocExcerpt',
-  'readFileSync',
-]);
+const PATH_FUNCTIONS = new Set(['join','readMarkdownDoc','readMarkdownDocExcerpt','readFileSync','writeFileSync']);
 const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
   'aliases',
   'command',
   'colorMode',
   'coverageFamilyIds',
+  'direction',
   'family',
   'familyId',
   'fit',
@@ -624,6 +617,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
     return true;
   }
   if (hasAncestor(node, (ancestor) => isNodeEnvComparison(ancestor, sourceFile))) return true;
+  if (isCtl(node)) return true;
   if (isCaseClauseExpression(node)) return true;
   if (isDiscriminantComparison(node)) return true;
   if (isErrorConstructorArgument(node)) return true;
@@ -643,6 +637,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
     if (callName != null && LOCALIZED_FALLBACK_FUNCTIONS.has(callName) && (argumentIndex === 1 || argumentIndex === 2)) {
       return true;
     }
+    if (callName === 'dogfoodI18nCatalogsForLocale' && argumentIndex === 0) return true;
     if (callName === 'bind' && argumentIndex === 0) return true;
     if (callName === 'themeTokenRecordEntries' && argumentIndex === 0) return true;
     if (callName != null && PATH_FUNCTIONS.has(callName)) return true;
@@ -730,6 +725,12 @@ function isNodeEnvComparison(node: ts.Node, sourceFile: ts.SourceFile): boolean 
     || node.right.getText(sourceFile) === 'process.env.NODE_ENV';
 }
 
+function isCtl(node: ts.Node): boolean {
+  if (!ts.isStringLiteralLike(node) || !ts.isBinaryExpression(node.parent)) return false;
+  const other = node.parent.left === node ? node.parent.right : node.parent.left;
+  return node.parent.operatorToken.kind === ts.SyntaxKind.InKeyword ? node.parent.left === node : ts.isTypeOfExpression(other);
+}
+
 function isCaseClauseExpression(node: ts.Node): boolean {
   return ts.isCaseClause(node.parent) && node.parent.expression === node;
 }
@@ -772,7 +773,7 @@ function isOutputModeDeclaration(node: ts.Node, sourceFile: ts.SourceFile): bool
 
 function isTypedControlVocabulary(node: ts.Node, sourceFile: ts.SourceFile): boolean {
   return ts.isSatisfiesExpression(node)
-    && /\b[A-Za-z0-9]+(?:Mode|Kind|Status|Type|Id)\b/.test(node.type.getText(sourceFile));
+    && /\b[A-Za-z0-9]+(?:Command|Family|Mode|Kind|Status|Type|Id)\b/.test(node.type.getText(sourceFile));
 }
 
 function containsNode(parent: ts.Node, target: ts.Node): boolean {

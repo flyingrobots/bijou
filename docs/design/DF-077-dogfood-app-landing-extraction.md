@@ -14,9 +14,9 @@ Implemented.
 
 Live counts on `main` at `2fcdba1a`:
 
-- aggregate Code Dojo debt: `725`
-- next aggregate Code Dojo target: `675` or lower
-- ESLint findings: `317`
+- aggregate Code Dojo debt: `674`
+- next aggregate Code Dojo target: `624` or lower
+- ESLint findings: `266`
 - file/context baseline: `331`
 - mock-ban baseline: `22`
 - code-size baseline: `55`, including `4` hard-limit files
@@ -35,18 +35,18 @@ Implemented counts on this branch before review:
 - file/context baseline: `331`
 - mock-ban baseline: `22`
 - code-size baseline: `55`, including `4` hard-limit files
-- `examples/docs/app.ts`: `4,549` enforced lines and `159,729` bytes
-- `examples/docs/app.ts` file/context baseline: `4,549` lines and `159,729` bytes
-- `examples/docs/app.ts` code-size baseline: `4,549` lines
-- DOGFOOD raw-string debt: `2,607`
-- `docs-app` raw-string debt: `219`
+- `examples/docs/app.ts`: `4,165` enforced lines and `147,799` bytes
+- `examples/docs/app.ts` file/context baseline: `4,166` split-counted lines and `147,799` bytes
+- `examples/docs/app.ts` code-size baseline: `4,165` lines
+- DOGFOOD raw-string debt: `2,415`
+- `docs-app` raw-string debt: `185`
 - missing Markdown localization debt: `78`
 
-`examples/docs/app.ts` is now ESLint-clean, but it is still the largest
-DOGFOOD source file and remains both a file/context exception and a hard
-code-size exception. The next respectful step is structural: move coherent
-subsystems out until the main DOGFOOD app file stops being a review and
-iteration bottleneck.
+`examples/docs/app.ts` is now ESLint-clean and no longer owns the landing or
+theme-token subsystems, but it remains both a file/context exception and a hard
+code-size exception. The next respectful step is still structural: move coherent
+docs explorer subsystems out until the main DOGFOOD app file stops being a
+review and iteration bottleneck.
 
 ## Problem
 
@@ -96,14 +96,15 @@ The first implementation pass should move the following clusters together:
 - background, wake, SVG, prompt, FPS badge, and DOGFOOD panel helpers
 - landing theme conversion and color utility helpers only when they are landing
   specific
+- docs shell theme flattening/state helpers
+- theme token palette, model, and diagnostics helpers
 
-Shared helpers that still serve docs panes, such as docs theme token adapters,
-should stay in `app.ts` unless they can move behind a small shared theme module
-without widening the change.
+Shared helpers that still serve docs panes moved behind small shared theme
+modules only where the boundary stayed narrow and typed.
 
 ## Validation Plan
 
-- `npx eslint examples/docs/app.ts examples/docs/app-landing*.ts examples/docs/i18n-debt.ts`
+- `npx eslint examples/docs/app.ts examples/docs/app-landing*.ts examples/docs/app-docs-*.ts examples/docs/app-theme-*.ts examples/docs/i18n-debt.ts`
 - `npm run code-dojo:changed`
 - `npm run code-dojo:debt`
 - `npm run dogfood:i18n:debt`
@@ -118,7 +119,18 @@ without widening the change.
 
 Implemented validation:
 
-- `npx eslint examples/docs/app.ts examples/docs/app-landing*.ts examples/docs/i18n-debt.ts`
+- `npx eslint examples/docs/app.ts examples/docs/app-docs-shell-theme.ts
+  examples/docs/app-docs-theme-tokens.ts examples/docs/app-theme-diagnostics.ts
+  examples/docs/app-theme-token-model.ts examples/docs/app-theme-token-palette.ts
+  examples/docs/i18n-debt.ts examples/docs/i18n/dogfood-catalog.ts
+  examples/docs/locale.ts examples/docs/node-locale.ts examples/docs/svg-raster.ts
+  packages/bijou/src/core/ansi-lint.test.ts
+  packages/bijou/src/core/app-shell-composition.ts
+  packages/bijou/src/core/components/dag-stats.ts
+  packages/bijou/src/core/components/progress.ts
+  packages/bijou/src/core/render/packed-cell.ts
+  packages/bijou/src/core/theme/doctor.ts scripts/dogfood-i18n-export.ts
+  tests/cycles/DL-004/drawer-rhythm-and-notice-rows.test.ts`
 - `npm run typecheck:test`
 - `npm run dogfood:i18n:complete`
 - `npm run dogfood:i18n:check`
@@ -126,6 +138,18 @@ Implemented validation:
 - `npm run code-dojo:changed`
 - `npm run code-dojo:debt`
 - `npm run code-dojo:verify`
+- `npm run test:run -- packages/bijou/src/core/ansi-lint.test.ts
+  tests/cycles/DL-004/drawer-rhythm-and-notice-rows.test.ts`
+- `npm run test:run -- scripts/svg-raster.test.ts
+  packages/bijou/src/core/theme/doctor.test.ts
+  packages/bijou/src/core/components/dag-stats.test.ts
+  packages/bijou/src/core/components/progress.test.ts
+  packages/bijou/src/core/app-shell-composition.test.ts
+  packages/bijou/src/core/render/packed-cell.test.ts
+  scripts/docs-preview-landing.test.ts
+  tests/cycles/DF-001/dogfood-coverage-progress.test.ts
+  tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts
+  tests/cycles/DL-018/first-party-theme-variant-coverage.test.ts`
 - `npm run test:run -- tests/cycles/DF-060/v7-dogfood-release-title-screen.test.ts
   tests/cycles/DF-067/responsive-dogfood-layout-variants.test.ts
   scripts/smoke-dogfood.test.ts

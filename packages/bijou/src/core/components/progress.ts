@@ -52,10 +52,11 @@ export interface ProgressBarOptions {
 export function progressBar(percent: number, options: ProgressBarOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const pct = Math.max(0, Math.min(100, percent));
+  const percentLabel = String(Math.round(pct));
 
   return renderByMode(ctx.mode, {
-    pipe: () => `Progress: ${Math.round(pct)}%`,
-    accessible: () => `${Math.round(pct)} percent complete.`,
+    pipe: () => `Progress: ${percentLabel}%`,
+    accessible: () => `${percentLabel} percent complete.`,
     interactive: () => {
       const width = sanitizeNonNegativeInt(options.width, 20);
       const filledChar = options.filled ?? '\u2588';
@@ -89,7 +90,7 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
         bar += ctx.style.styled(emptyToken, emptyChar.repeat(width - filledCount));
       }
 
-      const label = showPercent ? `${Math.round(pct)}%` : '';
+      const label = showPercent ? `${percentLabel}%` : '';
       return label
         ? `${noColor ? label.padStart(4) : ctx.style.styled(labelToken, label.padStart(4))} ${bar}`
         : bar;
@@ -118,9 +119,7 @@ export interface ProgressBarController {
 }
 
 /** Options for {@link createProgressBar}. Currently identical to {@link ProgressBarOptions}. */
-export interface LiveProgressBarOptions extends ProgressBarOptions {
-  // no extra options beyond ProgressBarOptions
-}
+export type LiveProgressBarOptions = ProgressBarOptions;
 
 /**
  * Create a live progress bar that the caller updates by pushing new values.
