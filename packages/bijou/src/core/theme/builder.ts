@@ -41,7 +41,7 @@ export type ThemeColorRef = ThemeColorInput | ThemeTokenRef;
 export interface ThemeBuilder {
   id(id: string): ThemeBuilder;
   label(label: string): ThemeBuilder;
-  mode(id: ThemeBuilderModeId, configure: (mode: ThemeModeBuilder) => ThemeModeBuilder | unknown): ThemeBuilder;
+  mode(id: ThemeBuilderModeId, configure: (mode: ThemeModeBuilder) => void): ThemeBuilder;
   build(): TokenTheme;
 }
 
@@ -122,10 +122,9 @@ export function tokenRef(id: string): ThemeTokenRef {
 }
 
 export function isTokenRef(value: unknown): value is ThemeTokenRef {
-  return typeof value === 'object'
-    && value !== null
-    && (value as ThemeTokenRef).kind === 'bijou.theme-token-ref'
-    && typeof (value as ThemeTokenRef).id === 'string';
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    && 'kind' in value && value.kind === 'bijou.theme-token-ref'
+    && 'id' in value && typeof value.id === 'string';
 }
 
 export function resolveThemeColorRef(
@@ -144,7 +143,7 @@ export function resolveThemeColorRef(
       themeId: options.theme.id,
       mode: options.mode,
       hex: color.hex,
-      rgb: copyRgb(color.rgb),
+      rgb: dup(color.rgb),
       fallback: false as const,
     });
   }
@@ -157,7 +156,7 @@ export function resolveThemeColorRef(
       mode: options.mode,
       tokenId: ref.id,
       hex: token.hex,
-      rgb: copyRgb(token.rgb),
+      rgb: dup(token.rgb),
       fallback: false as const,
     });
   }
@@ -173,7 +172,7 @@ export function resolveThemeColorRef(
       mode: options.mode,
       tokenId: ref.id,
       hex: fallback.hex,
-      rgb: copyRgb(fallback.rgb),
+      rgb: dup(fallback.rgb),
       fallback: true as const,
     });
   }
@@ -198,7 +197,7 @@ class MutableThemeBuilder implements ThemeBuilder {
     return this;
   }
 
-  mode(id: ThemeBuilderModeId, configure: (mode: ThemeModeBuilder) => ThemeModeBuilder | unknown): ThemeBuilder {
+  mode(id: ThemeBuilderModeId, configure: (mode: ThemeModeBuilder) => void): ThemeBuilder {
     assertNonEmpty(id, 'Theme mode id');
     if (this.modes.has(id)) {
       throw new Error(`Duplicate theme mode "${id}".`);
@@ -351,30 +350,28 @@ function normalizeColorInput(value: ThemeColorInput): ThemeColorTokenValue {
   }
 
   if (Array.isArray(value)) {
-    return fromRgb(value);
+    return from(value);
   }
 
-  return fromRgb([value.r, value.g, value.b]);
+  return from([value.r, value.g, value.b]);
 }
 
-function fromRgb(value: readonly number[]): ThemeColorTokenValue {
-  if (
-    value.length !== 3
-    || value.some(channel => !Number.isInteger(channel) || channel < 0 || channel > 255)
-  ) {
-    throw new Error('RGB channels must be integers from 0 to 255.');
+function from(value: readonly number[]): ThemeColorTokenValue { const rgb = tup(value); return freezeColorValue({ hex: rgbToHex(rgb), rgb }); }
+
+function tup(value: readonly number[]): RGB {
+  const [r, g, b] = value;
+  if (r === undefined || g === undefined || b === undefined || value.length !== 3
+    || [r, g, b].some(channel => channel % 1 !== 0 || channel < 0 || channel > 255)) {
+    throw new Error('RGB channels must be integers from 0 to 255');
   }
-  const rgb: RGB = [value[0]!, value[1]!, value[2]!];
-  return freezeColorValue({ hex: rgbToHex(rgb), rgb });
+  return [r, g, b];
 }
 
 function freezeColorValue(value: ThemeColorTokenValue): ThemeColorTokenValue {
   return Object.freeze({
     hex: value.hex,
-    rgb: copyRgb(value.rgb),
+    rgb: dup(value.rgb),
   });
 }
 
-function copyRgb(value: readonly number[]): RGB {
-  return Object.freeze([value[0]!, value[1]!, value[2]!] as RGB) as RGB;
-}
+function dup(value: readonly number[]): RGB { return tup(value); }
