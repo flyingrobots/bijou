@@ -22,7 +22,7 @@ describe('DX-033 remove showcase layout sludge', () => {
     expect(source).toContain('export type StartAppOptions<M = unknown>');
     expect(source).not.toContain('export type StartAppOptions<M = any>');
     expect(test).toContain('defaults StartAppOptions message payloads to unknown instead of any');
-    expect(test).toContain('expectTypeOf<StartAppOptions>().toEqualTypeOf<RunOptions<unknown> & NodeThemeOptions>()');
+    expect(test).toContain('expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<RunOptions & NodeThemeOptions>()');
   });
 
   it('moves showcase sidebar clipping to the shared browsable-list surface', () => {

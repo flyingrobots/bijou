@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fromDTCG, toDTCG, type DTCGDocument } from './dtcg.js';
+import { fromDTCG, toDTCG, type DTCGDocument, type DTCGToken } from './dtcg.js';
 import { CYAN_MAGENTA, PRESETS } from './presets.js';
 
 describe('DTCG interop', () => {
@@ -16,13 +16,13 @@ describe('DTCG interop', () => {
 
     it('encodes color tokens as hex strings', () => {
       const doc = toDTCG(CYAN_MAGENTA);
-      const status = doc['status'] as Record<string, { $type: string; $value: unknown }>;
+      const status = rec(doc['status']);
       expect(status['success']).toEqual({ $type: 'color', $value: '#00ff00' });
     });
 
     it('encodes tokens with modifiers as objects', () => {
       const doc = toDTCG(CYAN_MAGENTA);
-      const status = doc['status'] as Record<string, { $type: string; $value: unknown }>;
+      const status = rec(doc['status']);
       expect(status['pending']).toEqual({
         $type: 'color',
         $value: { hex: '#808080', modifiers: ['dim'] },
@@ -31,21 +31,20 @@ describe('DTCG interop', () => {
 
     it('encodes surface tokens', () => {
       const doc = toDTCG(CYAN_MAGENTA);
-      const surface = doc['surface'] as Record<string, { $type: string; $value: unknown }>;
-      expect(surface).toBeDefined();
+      const surface = rec(doc['surface']);
       for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted']) {
-        expect(surface[key], `surface.${key}`).toBeDefined();
-        expect(surface[key]?.$type).toBe('color');
-        expect(surface[key]?.$value).toBeDefined();
+        const t = tok(surface[key]);
+        expect(t.$type, `surface.${key}`).toBe('color');
+        expect(t.$value).toBeDefined();
       }
     });
 
     it('encodes gradient stops', () => {
       const doc = toDTCG(CYAN_MAGENTA);
-      const gradient = doc['gradient'] as Record<string, { $type: string; $value: unknown }>;
-      const brand = gradient['brand'];
-      expect(brand?.$type).toBe('gradient');
-      expect(Array.isArray(brand?.$value)).toBe(true);
+      const gradient = rec(doc['gradient']);
+      const brand = tok(gradient['brand']);
+      expect(brand.$type).toBe('gradient');
+      expect(Array.isArray(brand.$value)).toBe(true);
     });
   });
 
@@ -172,14 +171,12 @@ describe('DTCG interop', () => {
       const theme = fromDTCG(original);
       const roundTripped = toDTCG(theme);
 
-      // Name should match
       expect(roundTripped['name']).toEqual(original['name']);
 
-      // Status tokens with simple hex should match
-      const origStatus = original['status'] as Record<string, { $value: unknown }>;
-      const rtStatus = roundTripped['status'] as Record<string, { $value: unknown }>;
-      expect(rtStatus['success']?.$value).toBe(origStatus['success']?.$value);
-      expect(rtStatus['error']?.$value).toBe(origStatus['error']?.$value);
+      const origStatus = rec(original['status']);
+      const rtStatus = rec(roundTripped['status']);
+      expect(tok(rtStatus['success']).$value).toBe(tok(origStatus['success']).$value);
+      expect(tok(rtStatus['error']).$value).toBe(tok(origStatus['error']).$value);
     });
 
     it('fromDTCG(toDTCG(theme)) preserves theme values', () => {
@@ -213,8 +210,6 @@ describe('DTCG interop', () => {
   });
 
   describe('fromDTCG edge cases', () => {
-    // Shared minimal boilerplate — tokens without $type are still parsed
-    // (isDTCGToken only checks for $value presence)
     function minimalDoc(overrides: Partial<DTCGDocument> = {}): DTCGDocument {
       const filler = (keys: string[]) =>
         Object.fromEntries(keys.map(k => [k, { $value: '#aaa' }]));
@@ -307,7 +302,6 @@ describe('DTCG interop', () => {
         name: { $type: 'string', $value: 'partial' },
         status: {
           success: { $type: 'color', $value: '#11ff11' },
-          // all other status keys omitted
         },
         semantic: {
           primary: { $type: 'color', $value: '#ffffff' },
@@ -342,40 +336,34 @@ describe('DTCG interop', () => {
   describe('toDTCG edge cases', () => {
     it('gradient stops encode RGB as hex strings', () => {
       const doc = toDTCG(CYAN_MAGENTA);
-      const gradient = doc['gradient'] as Record<string, { $value: unknown }>;
-      expect(gradient['brand']).toBeDefined();
-      const stops = gradient['brand'].$value as { pos: number; color: string }[];
-      expect(stops.length).toBeGreaterThan(0);
-      for (const stop of stops) {
-        expect(stop.color).toMatch(/^#[0-9a-f]{6}$/);
-        expect(typeof stop.pos).toBe('number');
+      const gradient = rec(doc['gradient']);
+      const gradientStops = stops(tok(gradient['brand']).$value);
+      expect(gradientStops.length).toBeGreaterThan(0);
+      for (const stop of gradientStops) {
+        expect(text(stop['color'])).toMatch(/^#[0-9a-f]{6}$/);
+        expect(typeof stop['pos']).toBe('number');
       }
     });
 
     it('every token has $type and $value, groups are objects, name is string', () => {
       const doc = toDTCG(CYAN_MAGENTA);
 
-      // name token
-      const name = doc['name'] as { $type: string; $value: unknown };
+      const name = tok(doc['name']);
       expect(name.$type).toBe('string');
       expect(typeof name.$value).toBe('string');
 
-      // all group keys
       for (const groupKey of ['status', 'semantic', 'border', 'ui', 'surface']) {
-        const group = doc[groupKey] as Record<string, { $type?: string; $value?: unknown }>;
-        expect(typeof group).toBe('object');
-        for (const [, token] of Object.entries(group)) {
-          expect(token.$type).toBe('color');
-          expect(token.$value).toBeDefined();
+        const group = rec(doc[groupKey]);
+        for (const [, groupToken] of Object.entries(group)) {
+          expect(tok(groupToken).$type).toBe('color');
+          expect(tok(groupToken).$value).toBeDefined();
         }
       }
 
-      // gradient group
-      const gradient = doc['gradient'] as Record<string, { $type?: string; $value?: unknown }>;
-      expect(typeof gradient).toBe('object');
-      for (const [, token] of Object.entries(gradient)) {
-        expect(token.$type).toBe('gradient');
-        expect(Array.isArray(token.$value)).toBe(true);
+      const gradient = rec(doc['gradient']);
+      for (const [, groupToken] of Object.entries(gradient)) {
+        expect(tok(groupToken).$type).toBe('gradient');
+        expect(Array.isArray(tok(groupToken).$value)).toBe(true);
       }
     });
   });
@@ -535,3 +523,10 @@ describe('DTCG interop', () => {
     });
   });
 });
+
+function isRec(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value); }
+function rec(value: unknown): Record<string, unknown> { if (isRec(value)) return value; throw new TypeError('object'); }
+function isTok(value: unknown): value is DTCGToken { return isRec(value) && '$value' in value; }
+function tok(value: unknown): DTCGToken { if (isTok(value)) return value; throw new TypeError('token'); }
+function stops(value: unknown): readonly Record<string, unknown>[] { if (Array.isArray(value) && value.every(isRec)) return value; throw new TypeError('stops'); }
+function text(value: unknown): string { if (typeof value === 'string') return value; throw new TypeError('string'); }

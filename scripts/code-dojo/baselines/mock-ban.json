@@ -3,13 +3,13 @@
   "violations": [
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "mockReturnValue is banned; use a fake with explicit state",
+      "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 355
     },
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "spies usually assert choreography; prefer observable behavior",
+      "message": "mockReturnValue is banned; use a fake with explicit state",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 355
     },
@@ -21,13 +21,13 @@
     },
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "mockReturnValue is banned; use a fake with explicit state",
+      "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 386
     },
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "spies usually assert choreography; prefer observable behavior",
+      "message": "mockReturnValue is banned; use a fake with explicit state",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 386
     },
@@ -39,12 +39,6 @@
     },
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "mockReturnValue is banned; use a fake with explicit state",
-      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
-      "line": 424
-    },
-    {
-      "file": "packages/bijou-node/src/index.test.ts",
       "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 424
@@ -52,12 +46,18 @@
     {
       "file": "packages/bijou-node/src/index.test.ts",
       "message": "mockReturnValue is banned; use a fake with explicit state",
+      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
+      "line": 424
+    },
+    {
+      "file": "packages/bijou-node/src/index.test.ts",
+      "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 440
     },
     {
       "file": "packages/bijou-node/src/index.test.ts",
-      "message": "spies usually assert choreography; prefer observable behavior",
+      "message": "mockReturnValue is banned; use a fake with explicit state",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 440
     },
@@ -69,12 +69,6 @@
     },
     {
       "file": "packages/bijou-node/src/io.test.ts",
-      "message": "mockReturnValue is banned; use a fake with explicit state",
-      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
-      "line": 19
-    },
-    {
-      "file": "packages/bijou-node/src/io.test.ts",
       "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
       "line": 19
@@ -82,8 +76,8 @@
     {
       "file": "packages/bijou-node/src/io.test.ts",
       "message": "mockReturnValue is banned; use a fake with explicit state",
-      "source": "const spy = vi.spyOn(process.stderr, 'write').mockReturnValue(true);",
-      "line": 27
+      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
+      "line": 19
     },
     {
       "file": "packages/bijou-node/src/io.test.ts",
@@ -94,8 +88,8 @@
     {
       "file": "packages/bijou-node/src/io.test.ts",
       "message": "mockReturnValue is banned; use a fake with explicit state",
-      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
-      "line": 195
+      "source": "const spy = vi.spyOn(process.stderr, 'write').mockReturnValue(true);",
+      "line": 27
     },
     {
       "file": "packages/bijou-node/src/io.test.ts",
@@ -104,10 +98,10 @@
       "line": 195
     },
     {
-      "file": "packages/bijou-tui/src/eventbus.test.ts",
-      "message": "spies usually assert choreography; prefer observable behavior",
-      "source": "const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});",
-      "line": 501
+      "file": "packages/bijou-node/src/io.test.ts",
+      "message": "mockReturnValue is banned; use a fake with explicit state",
+      "source": "const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);",
+      "line": 195
     },
     {
       "file": "packages/bijou-tui/src/pipeline/pipeline.test.ts",
@@ -129,13 +123,13 @@
     },
     {
       "file": "packages/create-bijou-tui-app/src/cli.test.ts",
-      "message": "mockReturnValue is banned; use a fake with explicit state",
+      "message": "spies usually assert choreography; prefer observable behavior",
       "source": "const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue(platform);",
       "line": 45
     },
     {
       "file": "packages/create-bijou-tui-app/src/cli.test.ts",
-      "message": "spies usually assert choreography; prefer observable behavior",
+      "message": "mockReturnValue is banned; use a fake with explicit state",
       "source": "const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue(platform);",
       "line": 45
     }

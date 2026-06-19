@@ -527,10 +527,10 @@ export function syncPageFrameState<PageModel, Msg>(
 
 export function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<FramedAppMsg<Msg>> {
   return (emit, caps) =>
-    new Promise<void>((resolve) => {
+    new Promise<undefined>((resolve) => {
       if (durationMs <= 0) {
         emit(wrapFrameMsg({ type: 'transition-complete', generation }));
-        resolve();
+        resolve(undefined);
         return;
       }
 
@@ -550,7 +550,7 @@ export function createTransitionTickCmd<Msg>(durationMs: number, generation: num
         if (rawProgress >= 1) {
           pulse.dispose();
           emit(wrapFrameMsg({ type: 'transition-complete', generation }));
-          resolve();
+          resolve(undefined);
         }
       });
     });

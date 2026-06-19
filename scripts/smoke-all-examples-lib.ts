@@ -1,4 +1,4 @@
-import { execSync, spawn, type ChildProcess } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, resolve } from 'node:path';
@@ -86,7 +86,7 @@ interface SmokeDeps {
   readonly loadInteractiveModuleImpl?: (
     root: string,
     scenario: Scenario,
-  ) => Promise<InteractiveExampleModule>;
+  ) => Promise<IModule>;
   readonly interactiveTimeoutMs?: number;
   readonly platform?: NodeJS.Platform;
   readonly execPath?: string;
@@ -109,7 +109,7 @@ export interface SmokeRunOptions {
 
 export function listExampleTargets(
   root: string,
-  execSyncImpl: (command: string, options: { cwd: string; encoding: 'utf8' }) => string = defaultExampleDiscoveryExecSync,
+  execSyncImpl: (command: string, options: { cwd: string; encoding: 'utf8' }) => string = defaultDiscovery,
 ): readonly string[] {
   const examplesOutput = execSyncImpl('find examples -maxdepth 2 -name main.ts | sort', {
     cwd: root,
@@ -172,7 +172,7 @@ export function resolvePipeConcurrency(options: SmokeRunOptions = {}): number {
   const explicit = options.pipeConcurrency;
   if (explicit !== undefined) {
     if (!Number.isFinite(explicit) || explicit < 1) {
-      throw new Error(`pipeConcurrency must be a positive integer, got ${explicit}`);
+      throw new Error(`pipeConcurrency ${String(explicit)}`);
     }
     return Math.max(1, Math.floor(explicit));
   }
@@ -205,7 +205,7 @@ export function createScenarioPlan(
   }
 
   if (scenario.mode === 'static-tty') {
-    const command = `${execPath} --import tsx ${shellQuote(absPath)}`;
+    const command = `${execPath} --import tsx ${quote(absPath)}`;
     const args = platform === 'darwin'
       ? ['-q', '/dev/null', 'zsh', '-lc', command]
       : ['-q', '-e', '-c', command, '/dev/null'];
@@ -271,7 +271,7 @@ export async function runScenarioWithTimeout(
 
     const timer = setTimeout(() => {
       child.kill('SIGKILL');
-      finish('error', `timed out after ${plan.timeoutMs}ms`);
+      finish('error', `timeout ${String(plan.timeoutMs)}ms`);
     }, plan.timeoutMs);
 
     child.stdout?.on('data', (chunk: Buffer) => chunks.push(chunk));
@@ -283,7 +283,7 @@ export async function runScenarioWithTimeout(
 
     child.on('close', (code) => {
       if (code !== 0) {
-        finish('error', `exited with code ${code ?? 'null'}`);
+        finish('error', `exited with code ${code == null ? 'null' : String(code)}`);
         return;
       }
 
@@ -299,33 +299,34 @@ export async function runScenarioWithTimeout(
   });
 }
 
-interface InteractiveExampleModule {
-  readonly main?: (...args: unknown[]) => Promise<void>;
+interface IModule {
+  readonly main?: (...args: unknown[]) => unknown;
 }
 
 async function runInteractiveScriptedScenario(
   root: string,
-  scenario: Scenario,
+  s: Scenario,
   deps: SmokeDeps = {},
 ): Promise<Result> {
-  const spec = INTERACTIVE_FORM_SCRIPTS[scenario.path];
+  const spec = INTERACTIVE_FORM_SCRIPTS[s.path];
   if (spec === undefined) {
     return {
-      path: scenario.path,
-      mode: scenario.mode,
+      path: s.path,
+      mode: s.mode,
       status: 'error',
-      reason: 'missing scripted interactive spec',
+      reason: 'missing script',
     };
   }
 
-  const module = await (deps.loadInteractiveModuleImpl?.(root, scenario)
-    ?? import(pathToFileURL(resolve(root, scenario.path)).href) as Promise<InteractiveExampleModule>);
+  const module = deps.loadInteractiveModuleImpl == null
+    ? await loadInteractiveModule(root, s)
+    : await deps.loadInteractiveModuleImpl(root, s);
   if (typeof module.main !== 'function') {
     return {
-      path: scenario.path,
-      mode: scenario.mode,
+      path: s.path,
+      mode: s.mode,
       status: 'error',
-      reason: 'interactive example does not export main()',
+      reason: 'no main()',
     };
   }
 
@@ -337,42 +338,42 @@ async function runInteractiveScriptedScenario(
     },
   });
 
-  const capturedOut: string[] = [];
+  const out: string[] = [];
   const writeLine = (line = '') => {
-    capturedOut.push(`${line}\n`);
+    out.push(`${line}\n`);
   };
-  const interactiveTimeoutMs = deps.interactiveTimeoutMs ?? 5000;
-  let timeoutHandle: NodeJS.Timeout | undefined;
+  const ms = deps.interactiveTimeoutMs ?? 5000;
+  let timer: NodeJS.Timeout | undefined;
 
   try {
-    const runMain = scenario.path === 'demo.ts'
+    const runMain = s.path === 'demo.ts'
       ? Promise.resolve(module.main(ctx, (_themeName: string, currentCtx: typeof ctx) => currentCtx, writeLine))
       : Promise.resolve(module.main(ctx, writeLine));
 
     await Promise.race([
       runMain,
       new Promise<never>((_, reject) => {
-        timeoutHandle = setTimeout(() => {
-          reject(new Error(`timed out after ${interactiveTimeoutMs}ms`));
-        }, interactiveTimeoutMs);
+        timer = setTimeout(() => {
+          reject(new Error(`timed out after ${String(ms)}ms`));
+        }, ms);
       }),
     ]);
   } catch (error) {
     return finalizeInteractiveResult(
-      scenario,
-      ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join(''),
+      s,
+      ctx.io.written.join('') + ctx.io.writtenErr.join('') + out.join(''),
       'error',
       error instanceof Error ? error.message : String(error),
     );
   } finally {
-    if (timeoutHandle !== undefined) {
-      clearTimeout(timeoutHandle);
+    if (timer !== undefined) {
+      clearTimeout(timer);
     }
   }
 
   return finalizeInteractiveResult(
-    scenario,
-    ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join(''),
+    s,
+    ctx.io.written.join('') + ctx.io.writtenErr.join('') + out.join(''),
     'ok',
   );
 }
@@ -408,8 +409,8 @@ function finalizeInteractiveResult(
 export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<number> {
   const root = resolve(io.cwd ?? ROOT);
   const write = io.stdout ?? ((text: string) => process.stdout.write(text));
-  const execSyncImpl = io.execSyncImpl ?? defaultExampleDiscoveryExecSync;
-  const buildImpl = io.buildImpl ?? defaultBuildExecSync;
+  const execSyncImpl = io.execSyncImpl ?? defaultDiscovery;
+  const buildImpl = io.buildImpl ?? defaultBuild;
   const runScenario = io.runScenarioImpl ?? runScenarioWithTimeout;
   const options = io.options ?? {};
 
@@ -430,7 +431,7 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
   const pipeScenarios = scenarios.filter((scenario) => scenario.mode === 'pipe');
   const nonPipeScenarios = scenarios.filter((scenario) => scenario.mode !== 'pipe');
 
-  for (const { scenario, result } of await runScenariosInPool(root, pipeScenarios, io, resolvePipeConcurrency(options))) {
+  for (const { scenario, result } of await runPool(root, pipeScenarios, io, resolvePipeConcurrency(options))) {
     write(`smoke ${scenario.path} (${scenario.mode}) ... `);
     if (result.status === 'ok') {
       write('ok\n');
@@ -438,7 +439,7 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
     }
 
     failures.push(result);
-    write(`FAIL: ${result.reason}\n`);
+    write(`FAIL: ${result.reason ?? '?'}\n`);
   }
 
   for (const scenario of nonPipeScenarios) {
@@ -450,13 +451,13 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
     }
 
     failures.push(result);
-    write(`FAIL: ${result.reason}\n`);
+    write(`FAIL: ${result.reason ?? '?'}\n`);
   }
 
   if (failures.length > 0) {
     write('\nFailures:\n');
     for (const failure of failures) {
-      write(`- ${failure.path} [${failure.mode}] ${failure.reason}\n`);
+      write(`- ${failure.path} [${failure.mode}] ${failure.reason ?? '?'}\n`);
     }
     return 1;
   }
@@ -464,7 +465,7 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
   return 0;
 }
 
-async function runScenariosInPool(
+async function runPool(
   root: string,
   scenarios: readonly Scenario[],
   io: SmokeAllExamplesIO,
@@ -478,7 +479,8 @@ async function runScenariosInPool(
   async function worker(): Promise<void> {
     while (cursor < scenarios.length) {
       const index = cursor++;
-      const scenario = scenarios[index]!;
+      const scenario = scenarios[index];
+      if (scenario === undefined) continue;
       const result = await runScenario(root, scenario, io);
       results[index] = { scenario, result };
     }
@@ -495,7 +497,6 @@ export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
     pipeConcurrency?: number;
     modes?: ScenarioMode[];
   } = {};
-  const validModes = new Set<ScenarioMode>(['pipe', 'static-tty', 'interactive-scripted']);
   for (const arg of argv) {
     if (arg === '--skip-build') {
       options.skipBuild = true;
@@ -515,8 +516,8 @@ export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
       continue;
     }
     if (arg.startsWith('--mode=')) {
-      const raw = arg.slice('--mode='.length) as ScenarioMode;
-      if (!validModes.has(raw)) {
+      const raw = arg.slice('--mode='.length);
+      if (!isMode(raw)) {
         throw new Error(`invalid --mode value: ${raw}`);
       }
       options.modes ??= [];
@@ -528,23 +529,22 @@ export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
   return options;
 }
 
-function defaultExampleDiscoveryExecSync(
-  command: string,
-  options: { cwd: string; encoding: 'utf8' },
-): string {
-  return execSync(command, options);
-}
+function defaultDiscovery(command: string, options: { cwd: string; encoding: 'utf8' }): string { return execSync(command, options); }
 
-function defaultBuildExecSync(
-  command: string,
-  options: { cwd: string; stdio: 'ignore' },
-): void {
-  execSync(command, options);
-}
+function defaultBuild(command: string, options: { cwd: string; stdio: 'ignore' }): void { execSync(command, options); }
 
-function shellQuote(value: string): string {
+function quote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`;
 }
+
+async function loadInteractiveModule(root: string, s: Scenario): Promise<IModule> {
+  const m: unknown = await import(pathToFileURL(resolve(root, s.path)).href);
+  return hM(m) ? { main: m.main } : {};
+}
+
+function hM(v: unknown): v is { readonly main: (...args: unknown[]) => unknown } { return typeof v === 'object' && v !== null && 'main' in v && typeof v.main === 'function'; }
+
+function isMode(value: string): value is ScenarioMode { return value === 'pipe' || value === 'static-tty' || value === 'interactive-scripted'; }
 
 function mergeEnv(
   base: NodeJS.ProcessEnv,
@@ -552,11 +552,7 @@ function mergeEnv(
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...base };
   for (const [key, value] of Object.entries(overrides)) {
-    if (value == null) {
-      delete env[key];
-    } else {
-      env[key] = value;
-    }
+    env[key] = value ?? undefined;
   }
   return env;
 }

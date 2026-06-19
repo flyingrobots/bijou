@@ -1,12 +1,3 @@
-/**
- * Core type definitions for the bijou-tui framework.
- *
- * Define the message types (key, resize, mouse), TEA application interface,
- * command abstraction, and runtime options used throughout bijou-tui.
- *
- * @module
- */
-
 import type { BijouContext } from '@flyingrobots/bijou';
 import type { Middleware } from './eventbus.js';
 import type { RenderPipeline } from './pipeline/pipeline.js';
@@ -77,44 +68,25 @@ export interface MouseMsg {
 
 // --- Type guards ---
 
-/**
- * Narrow an unknown message to {@link KeyMsg}.
- *
- * @param msg - Value to test.
- * @returns `true` if `msg` is a `KeyMsg`.
- */
 export function isKeyMsg(msg: unknown): msg is KeyMsg {
-  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as KeyMsg).type === 'key';
+  return messageType(msg) === 'key';
 }
 
-/**
- * Narrow an unknown message to {@link ResizeMsg}.
- *
- * @param msg - Value to test.
- * @returns `true` if `msg` is a `ResizeMsg`.
- */
 export function isResizeMsg(msg: unknown): msg is ResizeMsg {
-  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as ResizeMsg).type === 'resize';
+  return messageType(msg) === 'resize';
 }
 
-/**
- * Narrow an unknown message to {@link PulseMsg}.
- *
- * @param msg - Value to test.
- * @returns `true` if `msg` is a `PulseMsg`.
- */
 export function isPulseMsg(msg: unknown): msg is PulseMsg {
-  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as PulseMsg).type === 'pulse';
+  return messageType(msg) === 'pulse';
 }
 
-/**
- * Narrow an unknown message to {@link MouseMsg}.
- *
- * @param msg - Value to test.
- * @returns `true` if `msg` is a `MouseMsg`.
- */
 export function isMouseMsg(msg: unknown): msg is MouseMsg {
-  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as MouseMsg).type === 'mouse';
+  return messageType(msg) === 'mouse';
+}
+
+function messageType(msg: unknown): unknown {
+  if (typeof msg !== 'object' || msg === null || !('type' in msg)) return undefined;
+  return msg.type;
 }
 
 // --- Commands ---
@@ -134,14 +106,14 @@ export interface CmdDisposable {
 export type CmdCleanup = CmdDisposable | (() => void);
 
 /** Final output a command may resolve to. */
-export type CmdResult<M> = M | QuitSignal | CmdCleanup | void;
+export type CmdResult<M> = M | QuitSignal | CmdCleanup | undefined;
 
 /** Narrow an unknown value to a disposable command handle. */
 export function isCmdDisposable(value: unknown): value is CmdDisposable {
   return typeof value === 'object'
     && value !== null
     && 'dispose' in value
-    && typeof (value as CmdDisposable).dispose === 'function';
+    && typeof value.dispose === 'function';
 }
 
 /** Narrow an unknown value to a supported command cleanup form. */
@@ -253,7 +225,7 @@ export interface App<Model, M = never> {
  * 
  * @template M - Custom application message type.
  */
-export interface RunOptions<M = any> {
+export interface RunOptions<M = unknown> {
   /** Enter the alternate screen buffer on startup. */
   altScreen?: boolean;
   /** Hide the cursor on startup. */
