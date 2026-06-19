@@ -100,8 +100,8 @@
     },
     {
       "path": "packages/bijou-tui/src/app-frame-render.ts",
-      "lines": 774,
-      "bytes": 27243
+      "lines": 764,
+      "bytes": 27077
     },
     {
       "path": "packages/bijou/src/core/standard-blocks.test.ts",
@@ -275,8 +275,8 @@
     },
     {
       "path": "packages/bijou-tui/src/transition-shaders.ts",
-      "lines": 518,
-      "bytes": 18747
+      "lines": 517,
+      "bytes": 18736
     },
     {
       "path": "tests/cycles/DF-069/dogfood-block-registry.test.ts",
@@ -769,11 +769,6 @@
       "bytes": 8283
     },
     {
-      "path": "scripts/smoke-dogfood-lib.ts",
-      "lines": 312,
-      "bytes": 8623
-    },
-    {
       "path": "packages/bijou/src/core/forms/form-utils.test.ts",
       "lines": 311,
       "bytes": 10271
@@ -807,6 +802,11 @@
       "path": "packages/bijou/src/core/components/dag-output-tokens.test.ts",
       "lines": 305,
       "bytes": 11412
+    },
+    {
+      "path": "scripts/smoke-dogfood-lib.ts",
+      "lines": 305,
+      "bytes": 8613
     },
     {
       "path": "packages/bijou-tui/src/pager.test.ts",
@@ -1149,11 +1149,6 @@
       "bytes": 7294
     },
     {
-      "path": "packages/bijou-tui/src/animate.test.ts",
-      "lines": 226,
-      "bytes": 7072
-    },
-    {
       "path": "packages/create-bijou-tui-app/src/cli.test.ts",
       "lines": 225,
       "bytes": 8344
@@ -1184,6 +1179,11 @@
       "bytes": 6673
     },
     {
+      "path": "packages/bijou-tui/src/animate.test.ts",
+      "lines": 223,
+      "bytes": 6954
+    },
+    {
       "path": "packages/bijou/src/core/components/dag-rendering.test.ts",
       "lines": 220,
       "bytes": 10404
@@ -1209,11 +1209,6 @@
       "bytes": 8274
     },
     {
-      "path": "packages/bijou/src/core/components/enumerated-list.ts",
-      "lines": 218,
-      "bytes": 7112
-    },
-    {
       "path": "packages/bijou/src/core/components/dag-layout.ts",
       "lines": 217,
       "bytes": 7271
@@ -1237,6 +1232,11 @@
       "path": "packages/bijou-tui/src/navigable-table.test.ts",
       "lines": 214,
       "bytes": 7657
+    },
+    {
+      "path": "packages/bijou/src/core/components/enumerated-list.ts",
+      "lines": 214,
+      "bytes": 7015
     },
     {
       "path": "packages/bijou-tui/src/focus-map.ts",
@@ -1444,11 +1444,6 @@
       "bytes": 5039
     },
     {
-      "path": "packages/bijou/src/core/forms/multiselect.ts",
-      "lines": 186,
-      "bytes": 6826
-    },
-    {
       "path": "tests/cycles/LX-008/localized-shell-and-dogfood.test.ts",
       "lines": 185,
       "bytes": 8048
@@ -1507,6 +1502,11 @@
       "path": "packages/bijou-tui/src/layout.ts",
       "lines": 176,
       "bytes": 5510
+    },
+    {
+      "path": "packages/bijou/src/core/forms/multiselect.ts",
+      "lines": 174,
+      "bytes": 6142
     },
     {
       "path": "tests/cycles/DF-066/data-visualization-family-audit.test.ts",

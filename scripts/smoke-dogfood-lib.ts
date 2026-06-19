@@ -7,6 +7,7 @@ export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const DOGFOOD_CAPTURE_ENTRYPOINT = 'examples/docs/capture-main.ts';
 
 export type DogfoodScenarioName = 'landing' | 'docs';
+const DOGFOOD_SCENARIO_NAMES: readonly DogfoodScenarioName[] = ['landing', 'docs'];
 
 export interface DogfoodScenario {
   readonly name: DogfoodScenarioName;
@@ -92,14 +93,8 @@ export const DOGFOOD_SCENARIOS: Readonly<Record<DogfoodScenarioName, DogfoodScen
 export function selectDogfoodScenarios(options: SmokeDogfoodOptions = {}): readonly DogfoodScenario[] {
   const names = options.scenarios != null && options.scenarios.length > 0
     ? options.scenarios
-    : Object.keys(DOGFOOD_SCENARIOS) as DogfoodScenarioName[];
-  return names.map((name) => {
-    const scenario = DOGFOOD_SCENARIOS[name];
-    if (scenario == null) {
-      throw new Error(`unknown smoke:dogfood scenario: ${name}`);
-    }
-    return scenario;
-  });
+    : DOGFOOD_SCENARIO_NAMES;
+  return names.map((name) => DOGFOOD_SCENARIOS[name]);
 }
 
 export function normalizeDogfoodOutput(rawOutput: string): string {
@@ -189,11 +184,11 @@ export async function runDogfoodScenario(
 
     const timer = setTimeout(() => {
       child.kill('SIGKILL');
-      finish('error', `timed out after ${plan.timeoutMs}ms`);
+      finish('error', `timed out after ${String(plan.timeoutMs)}ms`);
     }, plan.timeoutMs);
 
-    child.stdout?.on('data', (chunk: Buffer) => chunks.push(chunk));
-    child.stderr?.on('data', (chunk: Buffer) => chunks.push(chunk));
+    child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
+    child.stderr.on('data', (chunk: Buffer) => chunks.push(chunk));
 
     child.on('error', (error) => {
       finish('error', error.message);
@@ -201,7 +196,7 @@ export async function runDogfoodScenario(
 
     child.on('close', (code) => {
       if (code !== 0) {
-        finish('error', `exited with code ${code ?? 'null'}`);
+        finish('error', `exited with code ${code == null ? 'null' : String(code)}`);
         return;
       }
 
@@ -244,13 +239,13 @@ export async function runSmokeDogfood(io: SmokeDogfoodIO = {}): Promise<number> 
     }
 
     failures.push(result);
-    write(`FAIL: ${result.reason}\n`);
+    write(`FAIL: ${result.reason ?? 'unknown'}\n`);
   }
 
   if (failures.length > 0) {
     write('\nFailures:\n');
     for (const failure of failures) {
-      write(`- dogfood:${failure.name} ${failure.reason}\n`);
+      write(`- dogfood:${failure.name} ${failure.reason ?? 'unknown'}\n`);
     }
     return 1;
   }
@@ -270,8 +265,8 @@ export function parseSmokeDogfoodOptions(argv: readonly string[]): SmokeDogfoodO
       continue;
     }
     if (arg.startsWith('--scenario=')) {
-      const raw = arg.slice('--scenario='.length) as DogfoodScenarioName;
-      if (DOGFOOD_SCENARIOS[raw] == null) {
+      const raw = arg.slice('--scenario='.length);
+      if (!isDogfoodScenarioName(raw)) {
         throw new Error(`invalid --scenario value: ${raw}`);
       }
       options.scenarios ??= [];
@@ -295,17 +290,15 @@ function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
+function isDogfoodScenarioName(value: string): value is DogfoodScenarioName { return value in DOGFOOD_SCENARIOS; }
+
 function mergeEnv(
   base: NodeJS.ProcessEnv,
   overrides: Record<string, string | null | undefined>,
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...base };
   for (const [key, value] of Object.entries(overrides)) {
-    if (value == null) {
-      delete env[key];
-    } else {
-      env[key] = value;
-    }
+    env[key] = value ?? undefined;
   }
   return env;
 }

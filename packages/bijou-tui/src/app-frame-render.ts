@@ -1,10 +1,3 @@
-/**
- * Layout rendering for `app-frame.ts`.
- *
- * Recursive tree renderer, page content, maximized pane, header/help lines,
- * transition shader, and surface/string bridge helpers.
- */
-
 import {
   createSurface,
   darken,
@@ -162,8 +155,7 @@ function paintActiveHeaderTab(
     ?? ctx.surface('secondary').bg
     ?? '#000000';
   const baseHex = (typeof sampleCell.fg === 'string' ? sampleCell.fg : sampleCell.fg?.hex)
-    ?? ctx.surface('primary').hex
-    ?? ctx.semantic('primary').hex;
+    ?? ctx.surface('primary').hex;
   const token = tokenOverride ?? deriveActiveHeaderTabToken(ctx, backgroundHex, baseHex);
 
   for (let x = activeTarget.startCol; x <= activeTarget.endCol; x++) {
@@ -183,7 +175,6 @@ function paintActiveHeaderTab(
   }
 }
 
-/** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 export function renderFrameNode<PageModel, Msg>(
   node: FrameLayoutNode,
   rect: LayoutRect,
@@ -219,7 +210,6 @@ function paintFrameNodeInto<PageModel, Msg>(
   }
 
   if (node.kind === 'pane') {
-    // Minimized pane: render as collapsed title bar
     if (isMinimized(ctx.visibility, node.paneId)) {
       const titleBar = `[${node.paneId}] \u25b8`; // ▸
       target.blit(
@@ -265,31 +255,26 @@ function paintFrameNodeInto<PageModel, Msg>(
   if (node.kind === 'split') {
     const direction = node.direction ?? 'row';
 
-    // Consult dock state for child order
     const defaultChildIds = [getNodeId(node.paneA), getNodeId(node.paneB)];
     const resolvedOrder = resolveChildOrder(ctx.dockState, node.splitId, defaultChildIds);
     const swapped = resolvedOrder[0] !== defaultChildIds[0];
     const effectiveA = swapped ? node.paneB : node.paneA;
     const effectiveB = swapped ? node.paneA : node.paneB;
 
-    // Check for minimized panes — give minimized pane 1 row, sibling gets rest
     const aMinimized = isPaneMinimized(effectiveA, ctx.visibility);
     const bMinimized = isPaneMinimized(effectiveB, ctx.visibility);
 
     let splitState = node.state;
-    // Apply split ratio overrides from layout presets
     const ratioOverride = ctx.model.splitRatioOverrides[ctx.pageId]?.[node.splitId];
     if (ratioOverride !== undefined) {
       splitState = { ...splitState, ratio: ratioOverride };
     }
 
     if (aMinimized && !bMinimized) {
-      // A is minimized: give it minimal space
       const mainAxisTotal = direction === 'row' ? localRect.width : localRect.height;
       const minimizedSize = Math.min(1, mainAxisTotal);
       splitState = { ...splitState, ratio: minimizedSize / Math.max(1, mainAxisTotal) };
     } else if (bMinimized && !aMinimized) {
-      // B is minimized: give A most of the space
       const mainAxisTotal = direction === 'row' ? localRect.width : localRect.height;
       const minimizedSize = Math.min(1, mainAxisTotal);
       splitState = { ...splitState, ratio: 1 - minimizedSize / Math.max(1, mainAxisTotal) };
@@ -409,8 +394,8 @@ export function renderPageContentInto<PageModel, Msg>(
   const themeCtx = resolveRenderCtx(ctx);
   const frameBackgroundToken = resolveFrameBackgroundToken(themeCtx);
   fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundToken);
-  const page = pagesById.get(pageId)!;
-  const pageModel = model.pageModels[pageId]!;
+  const page = required(pagesById.get(pageId), `page "${pageId}"`);
+  const pageModel = required(model.pageModels[pageId], `page model "${pageId}"`);
   const renderCtx: RenderContext<PageModel, Msg> = {
     model,
     pageId,
@@ -462,8 +447,8 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   const themeCtx = resolveRenderCtx(ctx);
   const frameBackgroundToken = resolveFrameBackgroundToken(themeCtx);
   fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundToken);
-  const page = pagesById.get(pageId)!;
-  const pageModel = model.pageModels[pageId]!;
+  const page = required(pagesById.get(pageId), `page "${pageId}"`);
+  const pageModel = required(model.pageModels[pageId], `page model "${pageId}"`);
   const layoutTree = page.layout(pageModel);
   const paneNode = findPaneNode(layoutTree, maximizedPaneId);
   if (paneNode == null) {
@@ -511,8 +496,8 @@ export function resolveHeaderLine<PageModel, Msg>(
 ): FrameHeaderRenderResult {
   const renderCtx = resolveRenderCtx(ctx);
   const frameBackgroundToken = resolveFrameBackgroundToken(renderCtx);
-  const activePage = pagesById.get(model.activePageId)!;
-  const activePageModel = model.pageModels[model.activePageId]!;
+  const activePage = required(pagesById.get(model.activePageId), `page "${model.activePageId}"`);
+  const activePageModel = required(model.pageModels[model.activePageId], `page model "${model.activePageId}"`);
   const headerStyle = options.headerStyle?.({
     model,
     activePage,
@@ -522,8 +507,8 @@ export function resolveHeaderLine<PageModel, Msg>(
   let cursor = visibleLength(title) + 2;
   const tabTargets: FrameHeaderTabTarget[] = [];
   const tabs = model.pageOrder.map((id, index) => {
-    const page = pagesById.get(id)!;
-    const pageModel = model.pageModels[id]!;
+    const page = required(pagesById.get(id), `page "${id}"`);
+    const pageModel = required(model.pageModels[id], `page model "${id}"`);
     const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
     const label = id === model.activePageId ? `[${pageTitle}]` : ` ${pageTitle} `;
     const width = visibleLength(label);
@@ -691,7 +676,7 @@ function fillSurfaceBackground(
 function applySurfaceBackground(surface: Surface, backgroundToken: TokenValue | undefined): Surface {
   if (backgroundToken == null) return surface;
   if (backgroundToken.bg == null && backgroundToken.bgRGB == null) return surface;
-  const hasFallbackForeground = backgroundToken.hex != null || backgroundToken.fgRGB != null;
+  const hasFallbackForeground = backgroundToken.hex.length > 0 || backgroundToken.fgRGB != null;
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
@@ -739,13 +724,18 @@ export function createFramePaneScratchPool(): FramePaneScratchPool {
   return new Map();
 }
 function getFramePaneScratch(pool: FramePaneScratchPool, width: number, height: number): Surface {
-  const key = `${width}x${height}`;
+  const key = `${String(width)}x${String(height)}`;
   let scratch = pool.get(key);
   if (scratch == null) {
     scratch = createSurface(width, height);
     pool.set(key, scratch);
   }
   return scratch;
+}
+
+function required<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(`createFramedApp: ${label} is not registered`);
+  return value;
 }
 function applyTransitionCell(
   baseCell: Cell,

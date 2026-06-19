@@ -49,15 +49,12 @@ export async function multiselect<T = string>(options: MultiselectOptions<T>): P
   );
 }
 
-/**
- * Display options as a numbered list and accept comma-separated numeric input.
- *
- * Used as the fallback for non-interactive or accessible modes.
- *
- * @param options - Multiselect field configuration.
- * @param ctx - Bijou context.
- * @returns Array of selected option values.
- */
+function optionAt<T>(options: readonly SelectOption<T>[], index: number): SelectOption<T> {
+  const option = options[index];
+  if (option === undefined) throw new Error('multiselect option index out of range');
+  return option;
+}
+
 async function numberedMultiselect<T>(options: MultiselectOptions<T>, ctx: BijouContext): Promise<T[]> {
   ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
   renderNumberedOptions(options.options, ctx);
@@ -70,7 +67,7 @@ async function numberedMultiselect<T>(options: MultiselectOptions<T>, ctx: Bijou
   const indices = answer.split(',')
     .map((s) => parseInt(s.trim(), 10) - 1)
     .filter((i) => i >= 0 && i < options.options.length);
-  return indices.map((i) => options.options[i]!.value);
+  return indices.map((i) => optionAt(options.options, i).value);
 }
 
 /**
@@ -94,26 +91,22 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   let scrollOffset = 0;
   const selected = new Set<number>();
 
-  // Pre-select items matching defaultValues (if provided)
   if (options.defaultValues !== undefined) {
     for (let i = 0; i < options.options.length; i++) {
-      if (options.defaultValues.some((dv) => Object.is(dv, options.options[i]!.value))) {
+      if (options.defaultValues.some((dv) => Object.is(dv, optionAt(options.options, i).value))) {
         selected.add(i);
       }
     }
   }
 
-  /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
     return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
-  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
-  /** Write the multiselect UI (title, hint, option list) to the terminal. Hides the cursor as a side effect. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
@@ -123,7 +116,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     const visible = visibleOptions();
     for (let i = 0; i < visible.length; i++) {
       const globalIndex = scrollOffset + i;
-      const opt = visible[i]!;
+      const opt = optionAt(visible, i);
       const isCurrent = globalIndex === cursor;
       const isSelected = selected.has(globalIndex);
       const prefix = isCurrent ? '\u276f' : ' ';
@@ -141,18 +134,16 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     }
   }
 
-  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
-  /** Erase the full UI, print the final selection summary line, and restore cursor visibility. */
   function cleanup(): void {
     clearRender();
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
-    const selectedLabels = [...selected].sort().map((i) => options.options[i]!.label).join(', ');
+    const selectedLabels = [...selected].sort().map((i) => optionAt(options.options, i).label).join(', ');
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selectedLabels);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
@@ -172,11 +163,8 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
         clearRender(); render();
       } else if (isKey(key, 'enter')) {
         handle.dispose(); cleanup();
-        resolve([...selected].sort().map((i) => options.options[i]!.value));
+        resolve([...selected].sort().map((i) => optionAt(options.options, i).value));
       } else if (isKey(key, 'c', { ctrl: true }) || isKey(key, 'escape')) {
-        // Note: bare \x1b may false-trigger on slow connections where escape
-        // sequences arrive as separate bytes. Timer-based disambiguation is a
-        // separate future improvement.
         selected.clear();
         handle.dispose(); cleanup(); resolve([]);
       }

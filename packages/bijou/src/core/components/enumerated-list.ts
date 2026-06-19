@@ -26,20 +26,15 @@ export interface EnumeratedListOptions {
   readonly ctx?: BijouContext;
 }
 
-/**
- * Convert a positive integer to a lowercase Roman numeral string.
- *
- * @param n - The integer to convert.
- * @returns The Roman numeral representation.
- */
 function toRoman(n: number): string {
-  const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
-  const syms = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i'];
   let result = '';
-  for (let i = 0; i < vals.length; i++) {
-    while (n >= vals[i]!) {
-      result += syms[i]!;
-      n -= vals[i]!;
+  for (const [value, symbol] of [
+    [1000, 'm'], [900, 'cm'], [500, 'd'], [400, 'cd'], [100, 'c'], [90, 'xc'], [50, 'l'],
+    [40, 'xl'], [10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i'],
+  ] as const) {
+    while (n >= value) {
+      result += symbol;
+      n -= value;
     }
   }
   return result;
@@ -71,7 +66,7 @@ function toAlpha(n: number): string {
 function generatePrefix(style: BulletStyle, index: number): string {
   switch (style) {
     case 'arabic':
-      return `${index}.`;
+      return `${String(index)}.`;
     case 'alpha':
       return `${toAlpha(index)}.`;
     case 'roman':
@@ -97,7 +92,7 @@ function generatePrefix(style: BulletStyle, index: number): string {
 function generatePipePrefix(style: BulletStyle, index: number): string {
   switch (style) {
     case 'arabic':
-      return `${index}.`;
+      return `${String(index)}.`;
     case 'alpha':
       return `${toAlpha(index)}.`;
     case 'roman':
@@ -147,11 +142,12 @@ function renderItems(
 
   return items
     .map((item, i) => {
-      const prefix = prefixes[i]!;
+      const prefix = prefixes[i] ?? '';
       const lines = item.split('\n');
+      const first = lines[0] ?? '';
 
       if (style === 'none') {
-        const firstLine = `${indentStr}${lines[0]}`;
+        const firstLine = `${indentStr}${first}`;
         if (lines.length === 1) return firstLine;
         const contIndent = indentStr;
         return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
@@ -160,7 +156,7 @@ function renderItems(
       const paddedPrefix = isOrderedStyle(style)
         ? prefix.padStart(maxPrefixLen)
         : prefix;
-      const firstLine = `${indentStr}${paddedPrefix} ${lines[0]}`;
+      const firstLine = `${indentStr}${paddedPrefix} ${first}`;
       if (lines.length === 1) return firstLine;
       const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
       return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
@@ -202,9 +198,9 @@ export function enumeratedList(items: readonly string[], options?: EnumeratedLis
       return items
         .map((item, i) => {
           const num = start + i;
-          const prefix = `${num}.`;
+          const prefix = `${String(num)}.`;
           const lines = item.split('\n');
-          const firstLine = `${indentStr}${prefix} ${lines[0]}`;
+          const firstLine = `${indentStr}${prefix} ${lines[0] ?? ''}`;
           if (lines.length === 1) return firstLine;
           const contIndent = ' '.repeat(indent + prefix.length + 1);
           return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');

@@ -56,7 +56,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou/src/core/graphql-bijou-block.ts', lines: 839 },
   { path: 'packages/bijou/src/ports/surface.ts', lines: 823 },
   { path: 'scripts/pr-review-status.ts', lines: 778 },
-  { path: 'packages/bijou-tui/src/app-frame-render.ts', lines: 775 },
+  { path: 'packages/bijou-tui/src/app-frame-render.ts', lines: 763 },
   { path: 'packages/bijou-tui/src/notification.test.ts', lines: 761 },
   { path: 'packages/bijou/src/core/standard-blocks.test.ts', lines: 759 },
   { path: 'examples/image-viewer/main.ts', lines: 747 },
@@ -90,7 +90,7 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] = Object.freez
   { path: 'packages/bijou/src/core/theme/dtcg.test.ts', lines: 537 },
   { path: 'packages/bijou-tui/src/eventbus.ts', lines: 535 },
   { path: 'packages/bijou-tui/src/focus-area.test.ts', lines: 533 },
-  { path: 'packages/bijou-tui/src/transition-shaders.ts', lines: 517 },
+  { path: 'packages/bijou-tui/src/transition-shaders.ts', lines: 516 },
   { path: 'tests/cycles/DF-069/dogfood-block-registry.test.ts', lines: 509 },
 ]);
 

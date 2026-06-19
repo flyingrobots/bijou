@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1154,
-  "errors": 1154,
+  "total": 1101,
+  "errors": 1101,
   "warnings": 0,
   "rules": [
     {
@@ -30,11 +30,11 @@
     },
     {
       "ruleId": "@typescript-eslint/no-dynamic-delete",
-      "count": 3
+      "count": 2
     },
     {
       "ruleId": "@typescript-eslint/no-empty-function",
-      "count": 30
+      "count": 27
     },
     {
       "ruleId": "@typescript-eslint/no-empty-object-type",
@@ -54,7 +54,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-non-null-assertion",
-      "count": 198
+      "count": 175
     },
     {
       "ruleId": "@typescript-eslint/no-redundant-type-constituents",
@@ -62,7 +62,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-condition",
-      "count": 85
+      "count": 76
     },
     {
       "ruleId": "@typescript-eslint/no-unnecessary-type-arguments",
@@ -102,7 +102,7 @@
     },
     {
       "ruleId": "@typescript-eslint/no-unsafe-type-assertion",
-      "count": 211
+      "count": 208
     },
     {
       "ruleId": "@typescript-eslint/no-unused-vars",
@@ -138,7 +138,7 @@
     },
     {
       "ruleId": "@typescript-eslint/require-await",
-      "count": 30
+      "count": 28
     },
     {
       "ruleId": "@typescript-eslint/restrict-plus-operands",
@@ -146,7 +146,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 248
+      "count": 236
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",
