@@ -33,7 +33,7 @@
     "release:readiness": "tsx scripts/release-readiness.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",
     "code:size": "tsx scripts/code-size-gate.ts",
-    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 2128",
+    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 2068",
     "code-dojo:eslint:offenders": "node scripts/code-dojo/eslint-offenders.mjs",
     "code-dojo:fast": "node scripts/code-dojo/fast.mjs",
     "code-dojo:changed": "node scripts/code-dojo/changed.mjs",

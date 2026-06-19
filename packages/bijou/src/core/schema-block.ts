@@ -9,6 +9,7 @@ import type {
   BindingIssueSeverity,
   DeepReadonly,
 } from './binding.js';
+import { deepFreeze, freezeInertData } from './schema-inert-data.js';
 
 const BLOCK_SCHEMA_ADAPTER_BRAND: unique symbol = Symbol('BlockSchemaAdapter');
 const SCHEMA_BOUND_BLOCK_BRAND: unique symbol = Symbol('SchemaBoundBlockDefinition');
@@ -18,6 +19,7 @@ const BINDING_ISSUE_SEVERITIES: readonly BindingIssueSeverity[] = [
   'warning',
   'error',
 ];
+const BINDING_ISSUE_SEVERITY_VALUES: ReadonlySet<string> = new Set(BINDING_ISSUE_SEVERITIES);
 const EMPTY_BINDING_FACTS = Object.freeze([]) as readonly BindingFact[];
 
 export interface BlockSchemaIssue {
@@ -117,20 +119,15 @@ export function defineBlockSchemaAdapter<Data>(
     parse: (value: unknown) => normalizeSchemaResult(parse(value)),
     ...(describe === undefined
       ? {}
-      : { describe: () => normalizeSchemaDescription(describe() ?? {}) }),
-  } as BlockSchemaAdapter<Data>;
+      : { describe: () => normalizeSchemaDescription(describe()) }),
+  };
 
-  Object.defineProperty(adapter, BLOCK_SCHEMA_ADAPTER_BRAND, { value: true });
+  brand(adapter, BLOCK_SCHEMA_ADAPTER_BRAND);
   return Object.freeze(adapter);
 }
 
 export function isBlockSchemaAdapter(value: unknown): value is BlockSchemaAdapter {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && Object.prototype.hasOwnProperty.call(value, BLOCK_SCHEMA_ADAPTER_BRAND)
-      && (value as BlockSchemaAdapterBrandCarrier)[BLOCK_SCHEMA_ADAPTER_BRAND] === true,
-  );
+  return hasOwnBrand(value, BLOCK_SCHEMA_ADAPTER_BRAND);
 }
 
 export function parseBlockSchema<Data>(
@@ -169,21 +166,16 @@ export function defineSchemaBlock<
     block: input.block,
     schema: input.schema,
     bind: input.bind,
-  } as SchemaBoundBlockDefinition<Data, Config, Output>;
+  };
 
-  Object.defineProperty(block, SCHEMA_BOUND_BLOCK_BRAND, { value: true });
+  brand(block, SCHEMA_BOUND_BLOCK_BRAND);
   return Object.freeze(block);
 }
 
 export function isSchemaBoundBlockDefinition(
   value: unknown,
 ): value is SchemaBoundBlockDefinition {
-  return Boolean(
-    value
-      && typeof value === 'object'
-      && Object.prototype.hasOwnProperty.call(value, SCHEMA_BOUND_BLOCK_BRAND)
-      && (value as SchemaBoundBlockBrandCarrier)[SCHEMA_BOUND_BLOCK_BRAND] === true,
-  );
+  return hasOwnBrand(value, SCHEMA_BOUND_BLOCK_BRAND);
 }
 
 export function bindSchemaBlockInput<
@@ -194,7 +186,7 @@ export function bindSchemaBlockInput<
   block: SchemaBoundBlockDefinition<Data, Config, Output>,
   input: unknown,
 ): SchemaBlockBindResult<Config> {
-  if (!isSchemaBoundBlockDefinition(block)) {
+  if (!hasOwnBrand(block, SCHEMA_BOUND_BLOCK_BRAND)) {
     throw new Error('schema block bind: block must be created by defineSchemaBlock()');
   }
 
@@ -207,20 +199,12 @@ export function bindSchemaBlockInput<
     });
   }
 
-  const output = normalizeBindOutput(block.bind(parsed.data));
+  const output = normalizeBindOutput<Config>(block.bind(parsed.data));
   return Object.freeze({
     ok: true,
     input: output.input,
     facts: output.facts,
-  }) as SchemaBlockBindResult<Config>;
-}
-
-interface BlockSchemaAdapterBrandCarrier {
-  readonly [BLOCK_SCHEMA_ADAPTER_BRAND]?: true;
-}
-
-interface SchemaBoundBlockBrandCarrier {
-  readonly [SCHEMA_BOUND_BLOCK_BRAND]?: true;
+  });
 }
 
 interface RequiredTextOptions {
@@ -239,20 +223,38 @@ interface NormalizedBindOutput<Config> {
   readonly facts: readonly BindingFact[];
 }
 
+function brand<Brand extends symbol, Value extends object>(
+  value: Value,
+  brandSymbol: Brand,
+): asserts value is Value & Readonly<Record<Brand, true>> {
+  Object.defineProperty(value, brandSymbol, { value: true });
+}
+
+function hasOwnBrand(value: unknown, brandSymbol: symbol): boolean {
+  return (
+    value !== null
+    && typeof value === 'object'
+    && Object.prototype.hasOwnProperty.call(value, brandSymbol)
+    && Reflect.get(value, brandSymbol) === true
+  );
+}
+
 function normalizeSchemaResult<Data>(result: BlockSchemaResult<Data>): BlockSchemaResult<Data> {
   if (!isObjectLike(result)) {
     throw new Error('block schema result: result must be an object');
   }
 
   switch (result.ok) {
-    case true:
+    case true: {
       if (!Object.prototype.hasOwnProperty.call(result, 'data')) {
         throw new Error('block schema result: data is required for ok result');
       }
+      const data: DeepReadonly<Data> = freezeInertData(result.data, 'data');
       return Object.freeze({
         ok: true,
-        data: freezeInertData(result.data, 'data') as DeepReadonly<Data>,
+        data,
       });
+    }
     case false:
       return Object.freeze({
         ok: false,
@@ -288,15 +290,12 @@ function normalizeBindOutput<Config>(
     throw new Error('schema block bind: bind output must be a plain object');
   }
 
-  if (Object.prototype.hasOwnProperty.call(output, 'input')) {
+  if (isWrappedBindOutput(output)) {
+    const wrappedOutput = output;
     assertOnlyKeys(output, ['input', 'facts'], {
       scope: 'schema block bind',
       label: 'bind output',
     });
-    const wrappedOutput = output as {
-      readonly input?: BlockRenderInput<Config>;
-      readonly facts?: readonly BindingFact[];
-    };
     if (!isObjectLike(wrappedOutput.input)) {
       throw new Error('schema block bind: input must be an object');
     }
@@ -319,9 +318,18 @@ function normalizeBindOutput<Config>(
     label: 'bind output',
   });
   return {
-    input: freezeRenderInput(output as BlockRenderInput<Config>),
+    input: freezeRenderInput(output),
     facts: EMPTY_BINDING_FACTS,
   };
+}
+
+function isWrappedBindOutput<Config>(
+  output: SchemaBlockBindOutput<Config>,
+): output is {
+  readonly input: BlockRenderInput<Config>;
+  readonly facts?: readonly BindingFact[];
+} {
+  return Object.prototype.hasOwnProperty.call(output, 'input');
 }
 
 function freezeRenderInput<Config>(
@@ -341,9 +349,7 @@ function freezeRenderInput<Config>(
   return Object.freeze(normalizedInput);
 }
 
-function freezeSchemaIssues(
-  issues: readonly BlockSchemaIssue[] | undefined,
-): readonly BlockSchemaIssue[] {
+function freezeSchemaIssues(issues: unknown): readonly BlockSchemaIssue[] {
   if (issues === undefined) {
     throw new Error('block schema result: failed result requires at least one issue');
   }
@@ -357,29 +363,27 @@ function freezeSchemaIssues(
   return deepFreeze(issues.map((issue, index) => normalizeIssue(issue, index)));
 }
 
-function normalizeIssue(issue: BlockSchemaIssue, index: number): BlockSchemaIssue {
-  if (!isObjectLike(issue)) {
-    throw new Error(`block schema issue: issue at index ${index} must be an object`);
-  }
-  if (!BINDING_ISSUE_SEVERITIES.includes(issue.severity)) {
-    throw new Error(`block schema issue: unsupported severity ${String(issue.severity)} at index ${index}`);
+function normalizeIssue(issue: unknown, index: number): BlockSchemaIssue {
+  assertObjectRecord(issue, 'block schema issue', `issue at index ${String(index)}`);
+  if (!isBindingIssueSeverity(issue['severity'])) {
+    throw new Error(`block schema issue: unsupported severity ${String(issue['severity'])} at index ${String(index)}`);
   }
 
   return {
-    severity: issue.severity,
+    severity: issue['severity'],
     code: normalizeRequiredText({
       scope: 'block schema issue',
-      field: `issues[${index}].code`,
-      value: issue.code,
+      field: `issues[${String(index)}].code`,
+      value: issue['code'],
     }),
     message: normalizeRequiredText({
       scope: 'block schema issue',
-      field: `issues[${index}].message`,
-      value: issue.message,
+      field: `issues[${String(index)}].message`,
+      value: issue['message'],
     }),
-    path: optionalTrimmedText(issue.path, {
+    path: optionalTrimmedText(issue['path'], {
       scope: 'block schema issue',
-      field: `issues[${index}].path`,
+      field: `issues[${String(index)}].path`,
     }),
   };
 }
@@ -391,7 +395,7 @@ function freezeFacts(
   if (facts === undefined) {
     return EMPTY_BINDING_FACTS;
   }
-  if (!Array.isArray(facts)) {
+  if (!isBindingFactArray(facts)) {
     throw new Error(`${scope}: facts must be an array`);
   }
   if (facts.length === 0) {
@@ -414,12 +418,12 @@ function freezeStringList(
 
   return Object.freeze(values.map((value, index) => normalizeRequiredText({
     scope: 'block schema description',
-    field: `${field}[${index}]`,
+    field: `${field}[${String(index)}]`,
     value,
   })));
 }
 
-function normalizeOutputMode(value: OutputMode | undefined): OutputMode | undefined {
+function normalizeOutputMode(value: unknown): OutputMode | undefined {
   if (value === undefined) {
     return undefined;
   }
@@ -433,7 +437,7 @@ function normalizeOutputMode(value: OutputMode | undefined): OutputMode | undefi
     return value;
   }
 
-  throw new Error(`schema block bind: unsupported mode ${String(value)}`);
+  throw new Error(`schema block bind: unsupported mode ${unknownText(value)}`);
 }
 
 function normalizeRequiredText(options: RequiredTextOptions): string {
@@ -468,6 +472,16 @@ function isObjectLike(value: unknown): value is object {
   return value !== null && typeof value === 'object';
 }
 
+function assertObjectRecord(
+  value: unknown,
+  scope: string,
+  label = 'input',
+): asserts value is Record<string, unknown> {
+  if (!isObjectLike(value) || Array.isArray(value)) {
+    throw new Error(`${scope}: ${label} must be an object`);
+  }
+}
+
 interface AllowedKeyOptions {
   readonly scope: string;
   readonly label: string;
@@ -489,114 +503,29 @@ function keyText(key: string | symbol): string {
   return typeof key === 'string' ? key : key.toString();
 }
 
-function freezeInertData<T>(
-  value: T,
-  path: string,
-): DeepReadonly<T> {
-  return deepFreeze(cloneInertData(value, path));
-}
-
-function cloneInertData<T>(
-  value: T,
-  path: string,
-  seen = new WeakSet(),
-): T {
-  if (
-    value === null
-    || typeof value === 'string'
-    || typeof value === 'number'
-    || typeof value === 'boolean'
-  ) {
-    return value;
-  }
-
-  if (typeof value === 'bigint' || typeof value === 'symbol' || typeof value === 'function') {
-    throw new Error(`block schema data: unsupported ${typeof value} at ${path}`);
-  }
-
-  if (value === undefined) {
-    throw new Error(`block schema data: unsupported undefined at ${path}`);
-  }
-
-  if (typeof value !== 'object') {
-    throw new Error(`block schema data: unsupported ${typeof value} at ${path}`);
-  }
-
-  const objectValue = value as object;
-  if (seen.has(objectValue)) {
-    throw new Error(`block schema data: circular reference at ${path}`);
-  }
-  seen.add(objectValue);
-
-  try {
-    if (Array.isArray(value)) {
-      return value.map((item, index) => cloneInertData(item, `${path}[${index}]`, seen)) as T;
-    }
-
-    if (!isPlainObject(value)) {
-      throw new Error(`block schema data: unsupported ${objectKind(value)} at ${path}`);
-    }
-
-    const clone = Object.create(Object.getPrototypeOf(value)) as InertDataObject;
-    const descriptors = Object.getOwnPropertyDescriptors(value);
-    for (const key of Reflect.ownKeys(descriptors)) {
-      if (typeof key === 'symbol') {
-        throw new Error(`block schema data: unsupported symbol property at ${path}`);
-      }
-
-      const propertyPath = `${path}.${key}`;
-      const descriptor = descriptors[key];
-      if (descriptor === undefined) {
-        continue;
-      }
-      if (!descriptor.enumerable) {
-        throw new Error(`block schema data: unsupported non-enumerable property at ${propertyPath}`);
-      }
-      if ('get' in descriptor || 'set' in descriptor) {
-        throw new Error(`block schema data: unsupported accessor at ${propertyPath}`);
-      }
-
-      clone[key] = cloneInertData(descriptor.value, propertyPath, seen);
-    }
-
-    return clone as T;
-  } finally {
-    seen.delete(objectValue);
-  }
-}
-
-type InertDataObject = Record<string, unknown>;
-
 function isPlainObject(value: object): boolean {
-  const prototype = Object.getPrototypeOf(value);
+  const prototype = Reflect.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
 }
 
-function objectKind(value: object): string {
-  return Object.prototype.toString.call(value).slice(8, -1);
+function isBindingIssueSeverity(value: unknown): value is BindingIssueSeverity {
+  return typeof value === 'string' && BINDING_ISSUE_SEVERITY_VALUES.has(value);
 }
 
-function deepFreeze<T>(
-  value: T,
-  seen = new WeakSet(),
-): DeepReadonly<T> {
-  if (value === null || typeof value !== 'object') {
-    return value as DeepReadonly<T>;
-  }
+function isBindingFactArray(
+  value: readonly BindingFact[] | undefined,
+): value is readonly BindingFact[] {
+  return Array.isArray(value);
+}
 
-  const objectValue = value as object;
-  if (seen.has(objectValue)) {
-    return value as DeepReadonly<T>;
-  }
-
-  seen.add(objectValue);
-
-  for (const key of Reflect.ownKeys(objectValue)) {
-    const descriptor = Object.getOwnPropertyDescriptor(objectValue, key);
-    if (descriptor !== undefined && 'value' in descriptor) {
-      deepFreeze(descriptor.value, seen);
-    }
-  }
-
-  return Object.freeze(value) as DeepReadonly<T>;
+function unknownText(value: unknown): string {
+  if (value === null) return 'null';
+  if (typeof value === 'object') return Object.prototype.toString.call(value);
+  if (typeof value === 'function') return 'function';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return value.toString();
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'bigint') return value.toString();
+  if (typeof value === 'symbol') return value.description ?? 'symbol';
+  return 'undefined';
 }
