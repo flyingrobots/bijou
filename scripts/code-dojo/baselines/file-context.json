@@ -10,8 +10,8 @@
     },
     {
       "path": "examples/docs/stories.ts",
-      "lines": 5008,
-      "bytes": 181779
+      "lines": 5003,
+      "bytes": 181709
     },
     {
       "path": "packages/bijou-tui/src/app-frame.ts",
@@ -21,7 +21,7 @@
     {
       "path": "examples/docs/dogfood-blocks.ts",
       "lines": 2640,
-      "bytes": 92021
+      "bytes": 92009
     },
     {
       "path": "packages/bijou/src/core/components/table.ts",

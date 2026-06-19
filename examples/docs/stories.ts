@@ -103,6 +103,8 @@ import {
   type ComponentStory,
 } from '../_stories/protocol.js';
 
+const s = String;
+
 export interface DogfoodComponentStory<State = void> extends ComponentStory<State> {
   readonly coverageFamilyIds: readonly string[];
 }
@@ -151,8 +153,8 @@ function viewportPreviewSurface(
   if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
     return [
       'viewport mask',
-      `scrollY=${scrollY}`,
-      `width=${viewportWidth}`,
+      `scrollY=${s(scrollY)}`,
+      `width=${s(viewportWidth)}`,
       ...summaryLines,
     ].join('\n');
   }
@@ -168,7 +170,7 @@ function viewportPreviewSurface(
   return column([
     header,
     body,
-    line(`  scrollY=${scrollY}  width=${viewportWidth}`, viewportWidth),
+    line(`  scrollY=${s(scrollY)}  width=${s(viewportWidth)}`, viewportWidth),
   ]);
 }
 
@@ -200,7 +202,7 @@ function pagerPreviewSurface(width: number, ctx: BijouContext): string | Surface
   if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
     return [
       'pager surface',
-      `Line ${scrollY + 1}/${content.height}`,
+      `Line ${s(scrollY + 1)}/${s(content.height)}`,
       'release reader',
       'Run migrations',
       'Promote release',
@@ -254,7 +256,7 @@ function focusedPanePreviewSurface(width: number, ctx: BijouContext): string | S
     return [
       'focused pane',
       'focused=true',
-      `scrollY=${scrollY}`,
+      `scrollY=${s(scrollY)}`,
       'Inspector notes',
       'Warnings',
       'Actions',
@@ -418,7 +420,7 @@ function multiselectPreview(input: {
     return [
       title,
       '',
-      ...options.map((option, index) => `${index + 1}. ${option.label}`),
+      ...options.map((option, index) => `${s(index + 1)}. ${option.label}`),
       '',
       `Enter numbers (comma-separated): ${selectedIndices.map((index) => index + 1).join(', ')}`,
       `Selected: ${selectedLabels.join(', ')}`,
@@ -431,7 +433,7 @@ function multiselectPreview(input: {
       '',
       ...options.map((option, index) => {
         const state = selectedSet.has(index) ? 'selected' : 'not selected';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
+        return `${s(index + 1)}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
       }),
       '',
       'Enter numbers separated by commas to choose a set.',
@@ -481,9 +483,9 @@ function selectPreview(input: {
     return [
       title,
       '',
-      ...options.map((option, index) => `${index + 1}. ${option.label}`),
+      ...options.map((option, index) => `${s(index + 1)}. ${option.label}`),
       '',
-      `> ${selectedIndex + 1}`,
+      `> ${s(selectedIndex + 1)}`,
       `Selected: ${selected?.label ?? ''}`,
     ].join('\n');
   }
@@ -494,7 +496,7 @@ function selectPreview(input: {
       '',
       ...options.map((option, index) => {
         const state = index === selectedIndex ? 'selected' : 'not selected';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
+        return `${s(index + 1)}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
       }),
       '',
       `Current choice: ${selected?.label ?? ''}`,
@@ -541,13 +543,13 @@ function filterPreview(input: {
     selectedIndex,
   } = input;
   const selected = options[selectedIndex] ?? options[0];
-  const matchedOptions = matchedIndices.map((index) => options[index]).filter(Boolean) as SingleChoicePreviewOption[];
+  const matchedOptions = matchedIndices.map((index) => options[index]).filter((option): option is SingleChoicePreviewOption => option !== undefined);
 
   if (ctx.mode === 'pipe') {
     return [
       title,
       '',
-      ...matchedOptions.map((option, index) => `${index + 1}. ${option.label}`),
+      ...matchedOptions.map((option, index) => `${s(index + 1)}. ${option.label}`),
       '',
       `Enter number or search: ${query}`,
       `Matched: ${selected?.label ?? ''}`,
@@ -562,7 +564,7 @@ function filterPreview(input: {
       ...matchedOptions.map((option, index) => {
         const state = matchedIndices[index] === selectedIndex ? 'selected match' : 'match';
         const keywords = option.keywords?.length ? ` — keywords: ${option.keywords.join(', ')}` : '';
-        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}${keywords}`;
+        return `${s(index + 1)}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}${keywords}`;
       }),
       '',
       `Current match: ${selected?.label ?? ''}`,
@@ -575,7 +577,7 @@ function filterPreview(input: {
     `${mutedText(ctx, 'Search:')} ${query}`,
     '',
     ...matchedOptions.map((option, index) => {
-      const globalIndex = matchedIndices[index]!;
+      const globalIndex = matchedIndices[index] ?? -1;
       const pointer = globalIndex === selectedIndex ? infoText(ctx, '\u276f') : ' ';
       const mark = globalIndex === selectedIndex ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
       const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
@@ -1313,16 +1315,16 @@ function summarizeDataVizSeries(values: readonly number[]): DataVizSeriesSummary
     return { count: 0, first: 0, last: 0, min: 0, max: 0, trend: 'flat' };
   }
 
-  const first = safeValues[0]!;
-  const last = safeValues[safeValues.length - 1]!;
+  const first = safeValues[0] ?? 0;
+  const last = safeValues[safeValues.length - 1] ?? first;
   let min = first;
   let max = first;
   let rises = 0;
   let falls = 0;
 
   for (let index = 1; index < safeValues.length; index++) {
-    const previous = safeValues[index - 1]!;
-    const current = safeValues[index]!;
+    const previous = safeValues[index - 1] ?? first;
+    const current = safeValues[index] ?? previous;
     if (current > previous) rises++;
     else if (current < previous) falls++;
     if (current < min) min = current;
@@ -1330,12 +1332,7 @@ function summarizeDataVizSeries(values: readonly number[]): DataVizSeriesSummary
   }
 
   const range = max - min;
-  let trend = 'flat';
-  if (rises === 0 && falls === 0) trend = 'flat';
-  else if (rises === 0) trend = 'falling';
-  else if (falls === 0) trend = 'rising';
-  else if (Math.abs(last - first) <= Math.max(1, range * 0.2)) trend = 'mixed';
-  else trend = last > first ? 'rising with dips' : 'falling with rebounds';
+  const trend = rises === 0 ? falls === 0 ? 'flat' : 'falling' : falls === 0 ? 'rising' : Math.abs(last - first) <= Math.max(1, range * 0.2) ? 'mixed' : last > first ? 'rising with dips' : 'falling with rebounds';
 
   return { count: safeValues.length, first, last, min, max, trend };
 }
@@ -1377,7 +1374,7 @@ function renderSparklineStoryPreview(
   const summary = summarizeDataVizSeries(values);
   if (ctx.mode === 'pipe') {
     return dataVizSummarySurface(width, [
-      `samples: ${summary.count}`,
+      `samples: ${s(summary.count)}`,
       `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
       `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
       `values: ${compactDataVizValues(values)}`,
@@ -1385,7 +1382,7 @@ function renderSparklineStoryPreview(
   }
 
   return dataVizSummarySurface(width, [
-    `${summary.count} samples.`,
+    `${s(summary.count)} samples.`,
     `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
     `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; latest ${formatDataVizNumber(summary.last)}.`,
     `Overall ${summary.trend} trend.`,
@@ -1405,7 +1402,7 @@ function renderBrailleChartStoryPreview(
   const summary = summarizeDataVizSeries(values);
   if (ctx.mode === 'pipe') {
     return dataVizSummarySurface(width, [
-      `samples: ${summary.count}`,
+      `samples: ${s(summary.count)}`,
       `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
       `peak: ${formatDataVizNumber(summary.max)}`,
       `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
@@ -1413,7 +1410,7 @@ function renderBrailleChartStoryPreview(
   }
 
   return dataVizSummarySurface(width, [
-    `${summary.count} samples.`,
+    `${s(summary.count)} samples.`,
     `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
     `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; peak ${formatDataVizNumber(summary.max)}.`,
     `Overall ${summary.trend} area trend.`,
@@ -1480,7 +1477,7 @@ function perfOverlayEntries(stats: {
   const entries: DataVizMetricEntry[] = [
     { label: 'FPS', value: String(Math.round(stats.fps)) },
     { label: 'frame', value: `${formatPerfValue(stats.frameTimeMs, 2)} ms`, sparkline: stats.frameTimeHistory },
-    { label: 'size', value: `${stats.width}×${stats.height}` },
+    { label: 'size', value: `${s(stats.width)}×${s(stats.height)}` },
   ];
 
   if (stats.heapUsedMB != null) {
@@ -2073,13 +2070,13 @@ function renderSpringTimelinePreview(input: {
   const filled = Math.max(0, Math.min(barWidth, Math.round((values.camera ?? 0) * barWidth)));
   const empty = Math.max(0, barWidth - filled);
   const process = processTimeline([
-    { label: 'camera spring', description: `settled ${Math.round(springState.value * 100)}%`, status: 'info' },
-    { label: 'shader glow', description: `opacity ${Math.round((values.glow ?? 0) * 100)}%`, status: 'success' },
-    { label: 'caption reveal', description: `timeline ${Math.round((values.caption ?? 0) * 100)}%`, status: 'warning' },
+    { label: 'camera spring', description: `settled ${s(Math.round(springState.value * 100))}%`, status: 'info' },
+    { label: 'shader glow', description: `opacity ${s(Math.round((values.glow ?? 0) * 100))}%`, status: 'success' },
+    { label: 'caption reveal', description: `timeline ${s(Math.round((values.caption ?? 0) * 100))}%`, status: 'warning' },
   ], { ctx });
 
   return boxSurface(column([
-    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${Math.round((values.camera ?? 0) * 100)}%`, width - 2),
+    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${s(Math.round((values.camera ?? 0) * 100))}%`, width - 2),
     spacer(),
     contentSurface(process),
   ]), {
@@ -2190,11 +2187,11 @@ function workspaceLayoutPreview(input: {
         height: 10,
         minA: 16,
         minB: 18,
-        paneA: (paneWidth, paneHeight) => boxSurface(`Files\n\n- stories.ts\n- app.ts\n- coverage.ts\n\n${paneWidth}x${paneHeight}`, {
+        paneA: (paneWidth, paneHeight) => boxSurface(`Files\n\n- stories.ts\n- app.ts\n- coverage.ts\n\n${s(paneWidth)}x${s(paneHeight)}`, {
           width: paneWidth,
           ctx,
         }),
-        paneB: (paneWidth, paneHeight) => boxSurface(`Editor\n\nconst floor = 64;\nconst next = 69;\n\n${paneWidth}x${paneHeight}`, {
+        paneB: (paneWidth, paneHeight) => boxSurface(`Editor\n\nconst floor = 64;\nconst next = 69;\n\n${s(paneWidth)}x${s(paneHeight)}`, {
           width: paneWidth,
           ctx,
         }),
@@ -2212,9 +2209,9 @@ function workspaceLayoutPreview(input: {
         gap: 1,
         cells: {
           header: (paneWidth) => boxSurface('Workspace layout', { width: paneWidth, ctx }),
-          nav: (paneWidth, paneHeight) => boxSurface(`Families\n\n- forms\n- docs\n- shell\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
-          log: (paneWidth, paneHeight) => boxSurface(`Log\n\n[ok] build\n[ok] docs\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
-          main: (paneWidth, paneHeight) => boxSurface(`Main pane\n\nLayout primitives keep simultaneous context honest.\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
+          nav: (paneWidth, paneHeight) => boxSurface(`Families\n\n- forms\n- docs\n- shell\n\n${s(paneWidth)}x${s(paneHeight)}`, { width: paneWidth, ctx }),
+          log: (paneWidth, paneHeight) => boxSurface(`Log\n\n[ok] build\n[ok] docs\n\n${s(paneWidth)}x${s(paneHeight)}`, { width: paneWidth, ctx }),
+          main: (paneWidth, paneHeight) => boxSurface(`Main pane\n\nLayout primitives keep simultaneous context honest.\n\n${s(paneWidth)}x${s(paneHeight)}`, { width: paneWidth, ctx }),
         },
       });
 
@@ -4767,8 +4764,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
     ],
     tags: ['layout', 'split', 'grid'],
   },
-
-  // ── Data visualization ──────────────────────────────────────────
 
   {
     kind: 'component',

@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Issue
 
@@ -42,6 +42,21 @@ The implementation should choose the smallest coherent cluster that can remove
 at least `50` live findings while keeping touched files at or below their
 stored file/context ceilings.
 
+## Final Slice
+
+The implemented cleanup removes 78 live ESLint findings:
+
+| File | Findings |
+| :--- | ---: |
+| `examples/docs/stories.ts` | 41 |
+| `examples/docs/dogfood-blocks.ts` | 37 |
+| **Slice total** | **78** |
+
+The final slice focused on DOGFOOD docs/example surfaces because the live
+findings were concentrated in rendered numeric labels, unsafe registry/story
+assertions, and unnecessary conversions. Both touched files now stay below
+their stored file/context byte ceilings.
+
 ## Scope
 
 - Replace non-null assertions, unsafe assertions, `any` escapes, unchecked
@@ -73,9 +88,16 @@ Live counts on `main` at `082342b3`:
 - code-size baseline: `55`, including `4` legacy hard-limit files
 - next aggregate target: `1,621` or lower
 
+Implementation result:
+
+- aggregate Code Dojo debt: `1,593`
+- ESLint findings: `1,182`
+- live ESLint reduction: `78`
+- next aggregate target: `1,543` or lower
+
 ## Playback Questions
 
-1. Is aggregate Code Dojo debt at `1,621` or lower?
+1. Is aggregate Code Dojo debt at `1,593` or lower?
 2. Did the implementation remove at least `50` real violations?
 3. Did touched file/context, mock-ban, and code-size ceilings stay flat or
    lower?
@@ -94,7 +116,7 @@ Live counts on `main` at `082342b3`:
 
 - The selected touched TypeScript files reduce live ESLint findings by at least
   `50`.
-- Aggregate Code Dojo debt is `1,621` or lower.
+- Aggregate Code Dojo debt is `1,593` or lower.
 - `scripts/code-dojo/baselines/eslint.json` records the lower live ESLint
   count.
 - `docs/code-dojo-exceptions.md` and `package.json` report the lower ceiling.

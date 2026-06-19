@@ -19,6 +19,7 @@ const DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND: unique symbol = Symbol('DogfoodBlockRe
 const DOGFOOD_BLOCK_REGISTRY_BRAND: unique symbol = Symbol('DogfoodBlockRegistry');
 
 export const DOGFOOD_BLOCK_PACKAGE = '@flyingrobots/bijou-dogfood';
+const s = String;
 const DOGFOOD_BLOCK_MODES: readonly OutputMode[] = Object.freeze([
   'interactive',
   'static',
@@ -43,7 +44,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'fixture',
 ]);
 
-export type DogfoodBlockDefinition = BlockDefinition<never, unknown>;
+export type DogfoodBlockDefinition = BlockDefinition<never>;
 
 export type DogfoodBlockRole =
   | 'app-shell'
@@ -101,7 +102,7 @@ export class DogfoodBlockRegistry {
     entries.forEach((entry, index) => {
       if (!isDogfoodBlockRegistryEntry(entry)) {
         throw new Error(
-          `dogfood block registry: entry at index ${index} was not created by dogfoodBlockRegistryEntry()`,
+          `dogfood block registry: entry at index ${s(index)} was not created by dogfoodBlockRegistryEntry()`,
         );
       }
 
@@ -481,7 +482,7 @@ export const dogfoodDocsSurfaceSchemaBlock:
   });
 
 export function dogfoodDocsSurfacePreviewOutput(): string {
-  return String(dogfoodDocsSurfaceBlock.render({
+  return dogfoodDocsSurfaceBlock.render({
     mode: 'static',
     config: {
       docsTree: ['Guides', 'Blocks', 'Packages'],
@@ -491,7 +492,7 @@ export function dogfoodDocsSurfacePreviewOutput(): string {
       searchState: { query: 'table', hitCount: 2 },
       proofArtifacts: [{ id: 'table-demo.gif', label: 'table-demo.gif', available: true }],
     },
-  }).output);
+  }).output;
 }
 
 export const blockPreviewDefinitionRequirement = defineDataRequirement({
@@ -1800,7 +1801,8 @@ export function dogfoodBlockRegistryEntry(
     value: tag,
   })));
 
-  const entry = {
+  const entry: DogfoodBlockRegistryEntry = {
+    [DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND]: true,
     block: input.block,
     blockName: input.block.metadata.blockName,
     packageName: input.block.metadata.packageName,
@@ -1808,9 +1810,8 @@ export function dogfoodBlockRegistryEntry(
     surfaceId,
     ...(description === undefined ? {} : { description }),
     tags,
-  } as unknown as DogfoodBlockRegistryEntry;
+  };
 
-  Object.defineProperty(entry, DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND, { value: true });
   return Object.freeze(entry);
 }
 
@@ -1853,7 +1854,7 @@ function renderDogfoodDocsSurfaceBlock(
     return {
       output: [
         'route\theading\tsearch-hit-count\tproofs',
-        `${config.selectedRoute}\t${config.selectedHeadingId}\t${config.searchState.hitCount}\t${proofIds}`,
+        `${config.selectedRoute}\t${config.selectedHeadingId}\t${s(config.searchState.hitCount)}\t${proofIds}`,
       ].join('\n'),
       facts,
     };
@@ -1864,7 +1865,7 @@ function renderDogfoodDocsSurfaceBlock(
       output: [
         `DOGFOOD docs surface. ${routeLabel} page selected.`,
         `Reader heading ${config.selectedHeadingId}.`,
-        `Search query ${config.searchState.query || 'empty'} has ${config.searchState.hitCount} hits.`,
+        `Search query ${config.searchState.query || 'empty'} has ${s(config.searchState.hitCount)} hits.`,
         `Proof artifacts: ${proofLabel}.`,
       ].join(' '),
       facts,
@@ -1879,7 +1880,7 @@ function renderDogfoodDocsSurfaceBlock(
       `| ${dogfoodDocsSurfaceCell(dogfoodDocsSurfaceNavLabel(config, 1), 22)} | ${dogfoodDocsSurfaceCell('Blocks are reusable contracts...', 39)} |`,
       `| ${dogfoodDocsSurfaceCell(dogfoodDocsSurfaceNavLabel(config, 2), 22)} | ${dogfoodDocsSurfaceCell('', 39)} |`,
       '|------------------------+-----------------------------------------|',
-      `| ${dogfoodDocsSurfaceCell(`search: ${config.searchState.query || 'empty'} (${config.searchState.hitCount} hits)`, 22)} | ${dogfoodDocsSurfaceCell(`proof: ${dogfoodDocsSurfaceProofStatus(config.proofArtifacts)}`, 39)} |`,
+      `| ${dogfoodDocsSurfaceCell(`search: ${config.searchState.query || 'empty'} (${s(config.searchState.hitCount)} hits)`, 22)} | ${dogfoodDocsSurfaceCell(`proof: ${dogfoodDocsSurfaceProofStatus(config.proofArtifacts)}`, 39)} |`,
       '+------------------------------------------------------------------+',
       'Intents: docs.navigate; docs.search; docs.openProof; docs.copyLink',
     ].join('\n'),
@@ -1896,7 +1897,7 @@ function renderBlockLabWorkbenchBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `BlockLabWorkbench stories: ${storyCount}; selected: ${selectedStoryLabel}; profile: ${profileLabel}`,
+      output: `BlockLabWorkbench stories: ${s(storyCount)}; selected: ${selectedStoryLabel}; profile: ${profileLabel}`,
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockLabWorkbenchBlock' }],
     };
   }
@@ -1904,7 +1905,7 @@ function renderBlockLabWorkbenchBlock(
   return {
     output: [
       'BlockLabWorkbench',
-      `stories: ${storyCount}`,
+      `stories: ${s(storyCount)}`,
       `selected: ${selectedStoryLabel}`,
       `profile: ${profileLabel}`,
     ].join('\n'),
@@ -1955,17 +1956,17 @@ function renderNavigationListBlock(
         .join('\n'),
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
-        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: s(itemCount) },
       ],
     };
   }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Navigation items: ${itemCount}; active: ${activeLabel}`,
+      output: `Navigation items: ${s(itemCount)}; active: ${activeLabel}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
-        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: s(itemCount) },
       ],
     };
   }
@@ -1973,13 +1974,13 @@ function renderNavigationListBlock(
   return {
     output: [
       'NavigationListBlock',
-      `items: ${itemCount}`,
+      `items: ${s(itemCount)}`,
       `active: ${activeLabel}`,
       'Intents: select item; expand group; collapse group',
     ].join('\n'),
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
-      { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+      { kind: 'state', key: 'dogfood.navigation.itemCount', value: s(itemCount) },
     ],
   };
 }
@@ -1992,7 +1993,7 @@ function renderDocumentationArticleBlock(
   const headingCount = input.config?.headingCount ?? 0;
   const facts = [
     { kind: 'entity' as const, key: 'dogfood.block', value: 'DocumentationArticleBlock' },
-    { kind: 'state' as const, key: 'dogfood.documentation.headingCount', value: String(headingCount) },
+    { kind: 'state' as const, key: 'dogfood.documentation.headingCount', value: s(headingCount) },
   ];
 
   if (body !== undefined && (input.mode === 'interactive' || input.mode === 'static')) {
@@ -2005,7 +2006,7 @@ function renderDocumentationArticleBlock(
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
       output: body === undefined
-        ? `Article: ${title}; headings: ${headingCount}`
+        ? `Article: ${title}; headings: ${s(headingCount)}`
         : `${title}: ${body.replace(/\s+/g, ' ').trim()}`,
       facts,
     };
@@ -2015,7 +2016,7 @@ function renderDocumentationArticleBlock(
     output: [
       'DocumentationArticleBlock',
       `title: ${title}`,
-      `headings: ${headingCount}`,
+      `headings: ${s(headingCount)}`,
       'Intents: select heading; open reference',
     ].join('\n'),
     facts,
@@ -2049,7 +2050,7 @@ function renderSettingsMenuBlock(
     }
 
     return {
-      output: `Settings sections: ${sectionCount}; active: ${activeSettingLabel}`,
+      output: `Settings sections: ${s(sectionCount)}; active: ${activeSettingLabel}`,
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
     };
   }
@@ -2070,7 +2071,7 @@ function renderSettingsMenuBlock(
   return {
     output: [
       'SettingsMenuBlock',
-      `sections: ${sectionCount}`,
+      `sections: ${s(sectionCount)}`,
       `active: ${activeSettingLabel}`,
       'Intents: activate row; set locale; set shell theme',
     ].join('\n'),
@@ -2092,7 +2093,7 @@ function renderSearchPanelBlock(
     && activeResultLabel === 'none';
   const facts = [
     { kind: 'entity' as const, key: 'dogfood.block', value: 'SearchPanelBlock' },
-    { kind: 'state' as const, key: 'dogfood.search.resultCount', value: String(resultCount) },
+    { kind: 'state' as const, key: 'dogfood.search.resultCount', value: s(resultCount) },
   ];
 
   if (titleOnly) {
@@ -2104,7 +2105,7 @@ function renderSearchPanelBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
+      output: `Search query: ${queryLabel}; results: ${s(resultCount)}; active: ${activeResultLabel}`,
       facts,
     };
   }
@@ -2113,7 +2114,7 @@ function renderSearchPanelBlock(
     output: [
       'SearchPanelBlock',
       `query: ${queryLabel}`,
-      `results: ${resultCount}`,
+      `results: ${s(resultCount)}`,
       `active: ${activeResultLabel}`,
       'Intents: submit query; select result; dismiss',
     ].join('\n'),
@@ -2129,10 +2130,10 @@ function renderNotificationCenterBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Notification items: ${notificationCount}; filter: ${activeFilterLabel}`,
+      output: `Notification items: ${s(notificationCount)}; filter: ${activeFilterLabel}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
-        { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+        { kind: 'state', key: 'dogfood.notifications.count', value: s(notificationCount) },
       ],
     };
   }
@@ -2140,13 +2141,13 @@ function renderNotificationCenterBlock(
   return {
     output: [
       'NotificationCenterBlock',
-      `items: ${notificationCount}`,
+      `items: ${s(notificationCount)}`,
       `filter: ${activeFilterLabel}`,
       'Intents: dismiss notification; set filter',
     ].join('\n'),
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
-      { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+      { kind: 'state', key: 'dogfood.notifications.count', value: s(notificationCount) },
     ],
   };
 }
@@ -2162,10 +2163,10 @@ function renderPerfHudBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Perf HUD fps: ${fps}; frame: ${frameLabel} ms; size: ${columns}x${rows}`,
+      output: `Perf HUD fps: ${s(fps)}; frame: ${frameLabel} ms; size: ${s(columns)}x${s(rows)}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
-        { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
+        { kind: 'state', key: 'dogfood.perfHud.fps', value: s(fps) },
       ],
     };
   }
@@ -2173,14 +2174,14 @@ function renderPerfHudBlock(
   return {
     output: [
       'PerfHudBlock',
-      `fps: ${fps}`,
+      `fps: ${s(fps)}`,
       `frame: ${frameLabel} ms`,
-      `size: ${columns}x${rows}`,
+      `size: ${s(columns)}x${s(rows)}`,
       'Intents: toggle perf HUD',
     ].join('\n'),
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
-      { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
+      { kind: 'state', key: 'dogfood.perfHud.fps', value: s(fps) },
     ],
   };
 }
@@ -2193,10 +2194,10 @@ function renderHelpOverlayBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Help scope: ${scopeLabel}; bindings: ${bindingCount}`,
+      output: `Help scope: ${scopeLabel}; bindings: ${s(bindingCount)}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' },
-        { kind: 'state', key: 'dogfood.help.bindingCount', value: String(bindingCount) },
+        { kind: 'state', key: 'dogfood.help.bindingCount', value: s(bindingCount) },
       ],
     };
   }
@@ -2205,12 +2206,12 @@ function renderHelpOverlayBlock(
     output: [
       'HelpOverlayBlock',
       `scope: ${scopeLabel}`,
-      `bindings: ${bindingCount}`,
+      `bindings: ${s(bindingCount)}`,
       'Intents: dismiss help',
     ].join('\n'),
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' },
-      { kind: 'state', key: 'dogfood.help.bindingCount', value: String(bindingCount) },
+      { kind: 'state', key: 'dogfood.help.bindingCount', value: s(bindingCount) },
     ],
   };
 }
@@ -2223,10 +2224,10 @@ function renderCommandPaletteBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Command palette commands: ${commandCount}; active: ${activeCommandLabel}`,
+      output: `Command palette commands: ${s(commandCount)}; active: ${activeCommandLabel}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
-        { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
+        { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: s(commandCount) },
       ],
     };
   }
@@ -2234,13 +2235,13 @@ function renderCommandPaletteBlock(
   return {
     output: [
       'CommandPaletteBlock',
-      `commands: ${commandCount}`,
+      `commands: ${s(commandCount)}`,
       `active: ${activeCommandLabel}`,
       'Intents: execute command; dismiss command palette',
     ].join('\n'),
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
-      { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
+      { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: s(commandCount) },
     ],
   };
 }
@@ -2281,7 +2282,7 @@ function renderBlockPreviewBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Block preview: ${blockName}; modes: ${modeCount}`,
+      output: `Block preview: ${blockName}; modes: ${s(modeCount)}`,
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
     };
   }
@@ -2290,7 +2291,7 @@ function renderBlockPreviewBlock(
     output: [
       'BlockPreviewBlock',
       `block: ${blockName}`,
-      `modes: ${modeCount}`,
+      `modes: ${s(modeCount)}`,
       'Intents: select block; cycle mode',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
@@ -2316,7 +2317,7 @@ function renderGuideInspectorBlock(
     }
 
     return {
-      output: `Guide inspector: ${selectionLabel}; facts: ${factCount}`,
+      output: `Guide inspector: ${selectionLabel}; facts: ${s(factCount)}`,
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
     };
   }
@@ -2339,7 +2340,7 @@ function renderGuideInspectorBlock(
     output: [
       'GuideInspectorBlock',
       `selection: ${selectionLabel}`,
-      `facts: ${factCount}`,
+      `facts: ${s(factCount)}`,
       'Intents: open source; focus section',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
@@ -2534,13 +2535,14 @@ function normalizeDogfoodBlockRole(role: DogfoodBlockRole): DogfoodBlockRole {
     scope: 'dogfood block registry entry',
     field: 'role',
     value: role,
-  }) as DogfoodBlockRole;
+  });
 
-  if (!DOGFOOD_BLOCK_ROLES.includes(normalized)) {
-    throw new Error(`dogfood block registry entry: unsupported role ${String(role)}`);
+  const matched = DOGFOOD_BLOCK_ROLES.find((candidate) => candidate === normalized);
+  if (matched === undefined) {
+    throw new Error(`dogfood block registry entry: unsupported role ${role}`);
   }
 
-  return normalized;
+  return matched;
 }
 
 function normalizeRequiredText(input: {
@@ -2574,7 +2576,7 @@ function isPlainRecord(input: unknown): input is Record<string, unknown> {
     return false;
   }
 
-  const prototype = Object.getPrototypeOf(input);
+  const prototype: unknown = Object.getPrototypeOf(input);
   return prototype === Object.prototype || prototype === null;
 }
 
@@ -2609,9 +2611,7 @@ function booleanProperty(input: Record<string, unknown>, key: string): boolean |
 function textArrayProperty(input: Record<string, unknown>, key: string): readonly string[] | undefined {
   const value = ownDataProperty(input, key);
   const values = dataArrayValues(value);
-  return values !== undefined && values.every((item) => typeof item === 'string')
-    ? values
-    : undefined;
+  return values?.every((item) => typeof item === 'string') ? values : undefined;
 }
 
 function dataArrayValues(input: unknown): readonly unknown[] | undefined {
