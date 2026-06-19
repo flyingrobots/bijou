@@ -41,7 +41,7 @@ describe('RE-035 layout envelope scope', () => {
 });
 
 describe('layout envelope facts', () => {
-  it('normalizes immutable constraints, preferences, direction, fit, and assignment facts', () => {
+  it('normalizes layout facts', () => {
     const envelope = defineLayoutEnvelope({
       id: ' docs.content ',
       role: ' viewport ',
@@ -75,6 +75,7 @@ describe('layout envelope facts', () => {
     expect(envelope.preference.preferredInline).toBe(72);
     expect(envelope.fit).toBe('clip');
     expect(isResolvedLayoutEnvelope(envelope)).toBe(false);
+    expect(isResolvedLayoutEnvelope({ ...envelope, assigned: null, reason: 'malformed' })).toBe(false);
     expect(Object.isFrozen(envelope)).toBe(true);
     expect(Object.isFrozen(envelope.constraints)).toBe(true);
     expect(Object.isFrozen(envelope.preference)).toBe(true);
@@ -94,8 +95,7 @@ describe('render-facing layout seam', () => {
       'layout render seam: visible node docs.reader requires an assigned layout envelope',
     );
   });
-
-  it('passes the parent-assigned rect to the renderer without deriving geometry from output', () => {
+  it('passes assignment to the renderer', () => {
     const envelope = assignLayoutChild(
       defineLayoutEnvelope({
         id: 'docs.reader',
@@ -104,11 +104,11 @@ describe('render-facing layout seam', () => {
         preference: layoutPreference({ preferredInline: 72, preferredBlock: 18 }),
       }),
       { inlineStart: 24, blockStart: 1, inlineSize: 52, blockSize: 22 },
-      'parent stack assigned remaining inline space',
+      'parent assigned remaining space',
     );
 
     const rendered = renderWithResolvedLayout(envelope, ({ assigned }) => {
-      return `paint ${assigned.inlineStart}:${assigned.blockStart}:${assigned.inlineSize}:${assigned.blockSize}`;
+      return `paint ${[assigned.inlineStart, assigned.blockStart, assigned.inlineSize, assigned.blockSize].join(':')}`;
     });
 
     expect(rendered.output).toBe('paint 24:1:52:22');

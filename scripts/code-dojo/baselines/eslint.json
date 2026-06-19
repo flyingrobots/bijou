@@ -1,7 +1,7 @@
 {
   "schema": "code-dojo.eslint-baseline.v1",
-  "total": 1372,
-  "errors": 1372,
+  "total": 1368,
+  "errors": 1368,
   "warnings": 0,
   "rules": [
     {
@@ -150,7 +150,7 @@
     },
     {
       "ruleId": "@typescript-eslint/restrict-template-expressions",
-      "count": 299
+      "count": 295
     },
     {
       "ruleId": "@typescript-eslint/switch-exhaustiveness-check",

@@ -67,7 +67,7 @@ export interface LayoutEnvelope {
   readonly constraints: LayoutConstraints;
   readonly preference: LayoutPreference;
   readonly fit?: LayoutFitPolicy;
-  readonly assigned?: AssignedLayoutRect;
+  readonly assigned?: AssignedLayoutRect | null;
   readonly reason?: string;
 }
 
@@ -263,7 +263,8 @@ export function assignLayoutChild(
 }
 
 export function isResolvedLayoutEnvelope(envelope: LayoutEnvelope): envelope is ResolvedLayoutEnvelope {
-  return typeof envelope.assigned === 'object'
+  return envelope.assigned !== null
+    && typeof envelope.assigned === 'object'
     && typeof envelope.reason === 'string'
     && envelope.reason.length > 0;
 }
