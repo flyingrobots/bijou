@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **PR review hardening** — `mockClock.runAll()` now drains future one-shot
+  timers in deadline order instead of treating them like active intervals,
+  selection owner freezing rejects unsupported content kinds with a
+  deterministic domain error, and frame regression loading rejects modules that
+  expose an `app` key with an `undefined` value.
 - **Focused Code Dojo ratchet** — WF-159 removes `51` more type-aware ESLint
   findings across the i18n runtime and localization port boundary, DOGFOOD
   localization fallback interpolation, MCP package metadata parsing, TUI

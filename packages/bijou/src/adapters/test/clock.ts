@@ -172,10 +172,10 @@ export function mockClock(options: MockClockOptions = {}): MockClock {
         sortTasks();
         const next = tasks.find((task) => !task.disposed);
         if (next === undefined) break;
+        const nextIsInterval = next.intervalMs !== null;
         this.advanceBy(Math.max(0, next.at - nowMs));
         sortTasks();
-        const remaining = tasks.filter((task) => !task.disposed);
-        if (remaining.length > 0) {
+        if (nextIsInterval && tasks.some((task) => !task.disposed && task.intervalMs !== null)) {
           throw new Error(
             'mockClock.runAll() cannot drain active interval timers; dispose them or advance time manually.',
           );

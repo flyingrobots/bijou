@@ -425,6 +425,8 @@ function screenPointToContentPoint(owner: SelectionOwner, point: SelectionPoint)
 }
 
 function freezeContentModel(content: SelectionContentModel): SelectionContentModel {
+  const kind = Reflect.get(content, 'kind');
+  if (!/^(prose|surface|table|mixed)$/.test(kind)) throw new Error(`bad selection kind ${kind}`);
   if (content.kind === 'prose') {
     return Object.freeze({
       kind: 'prose',

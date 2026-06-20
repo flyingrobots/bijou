@@ -57,6 +57,17 @@ describe('mockClock()', () => {
     expect(calls).toEqual([5, 10]);
   });
 
+  it('drains future one-shot timers in deadline order', () => {
+    const clock = mockClock();
+    const calls: number[] = [];
+    clock.setTimeout(() => calls.push(clock.now()), 10);
+    clock.setTimeout(() => calls.push(clock.now()), 5);
+
+    clock.runAll();
+    expect(calls).toEqual([5, 10]);
+    expect(clock.now()).toBe(10);
+  });
+
   it('throws when runAll() would loop forever on an active interval', () => {
     const clock = mockClock();
     clock.setInterval(() => undefined, 5);
