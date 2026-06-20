@@ -1,12 +1,12 @@
 import type { DogfoodI18nDebtBaseline } from './i18n-debt.js';
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2372,
+  total: 2365,
   bySurface: Object.freeze({
     'docs-app': 153,
     'capture-main': 9,
     'counter-block-demo': 48,
-    'dogfood-block-command-palette': 36,
+    'dogfood-block-command-palette': 29,
     'dogfood-block-common': 14,
     'dogfood-block-docs-surface-data': 30,
     'dogfood-block-docs-surface-parser': 11,

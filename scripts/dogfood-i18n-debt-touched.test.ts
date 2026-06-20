@@ -48,6 +48,73 @@ describe('DOGFOOD touched-file i18n debt ratchet', () => {
     expect(result.violations).toEqual([]);
   });
 
+  it('allows extracted DOGFOOD sources when the split lineage reduces aggregate debt', () => {
+    const [baseSource] = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/legacy.ts'],
+    }).map((source) => ({
+      ...source,
+      text: [
+        "export const first = 'Visible First';",
+        "export const second = 'Visible Second';",
+        "export const third = 'Visible Third';",
+      ].join('\n'),
+    }));
+    const [currentSource] = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/legacy-child.ts'],
+    }).map((source) => ({
+      ...source,
+      text: [
+        "export const first = 'Visible First';",
+        "export const second = 'Visible Second';",
+      ].join('\n'),
+    }));
+    const inventory = collectDogfoodI18nDebt({ sources: currentSource === undefined ? [] : [currentSource] });
+    const baseInventory = collectDogfoodI18nDebt({ sources: baseSource === undefined ? [] : [baseSource] });
+    const result = evaluateDogfoodTouchedI18nDebt(
+      inventory,
+      ['examples/docs/legacy-child.ts'],
+      baseInventory,
+      [{ rootPath: 'examples/docs/legacy.ts', childPaths: ['examples/docs/legacy-child.ts'] }],
+    );
+
+    expect(result.ok).toBe(true);
+    expect(result.violations).toEqual([]);
+  });
+
+  it('rejects extracted DOGFOOD sources when the split lineage only moves debt', () => {
+    const [baseSource] = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/legacy.ts'],
+    }).map((source) => ({
+      ...source,
+      text: [
+        "export const first = 'Visible First';",
+        "export const second = 'Visible Second';",
+      ].join('\n'),
+    }));
+    const [currentSource] = discoverDogfoodI18nDebtSources({
+      paths: ['examples/docs/legacy-child.ts'],
+    }).map((source) => ({
+      ...source,
+      text: [
+        "export const first = 'Visible First';",
+        "export const second = 'Visible Second';",
+      ].join('\n'),
+    }));
+    const inventory = collectDogfoodI18nDebt({ sources: currentSource === undefined ? [] : [currentSource] });
+    const baseInventory = collectDogfoodI18nDebt({ sources: baseSource === undefined ? [] : [baseSource] });
+    const result = evaluateDogfoodTouchedI18nDebt(
+      inventory,
+      ['examples/docs/legacy-child.ts'],
+      baseInventory,
+      [{ rootPath: 'examples/docs/legacy.ts', childPaths: ['examples/docs/legacy-child.ts'] }],
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.violations).toEqual([
+      'DOGFOOD i18n split lineage examples/docs/legacy.ts has 2 raw string debt entries across extracted files; expected fewer than base 2',
+    ]);
+  });
+
   it('allows touched DOGFOOD sources once their raw string debt is cleared', () => {
     const sources = discoverDogfoodI18nDebtSources({
       paths: ['examples/docs/clean.ts'],

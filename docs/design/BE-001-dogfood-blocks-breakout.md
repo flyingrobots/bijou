@@ -64,7 +64,7 @@ Live debt after the extraction:
 - mock-ban baseline: `0`
 - code-size baseline: `54`, including `3` hard-limit files
 - ESLint baseline: `0`
-- DOGFOOD raw-string debt: `2,372`, down from the stored `2,415` baseline
+- DOGFOOD raw-string debt: `2,365`, down from the stored `2,415` baseline
 - next aggregate target from the live count: `312` or lower
 
 The extraction removes `dogfood-blocks.ts` from both debt ledgers but only

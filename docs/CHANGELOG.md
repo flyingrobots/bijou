@@ -14,7 +14,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   preserving the `./dogfood-blocks.js` public import path while removing the
   former `2,637` line / `92,020` byte monolith from both the file/context and
   code-size baselines. The code-size hard-limit count drops from `4` to `3`,
-  DOGFOOD raw-string debt is ratcheted from `2,415` to `2,372`, and aggregate
+  DOGFOOD raw-string debt is ratcheted from `2,415` to `2,365`, and aggregate
   Code Dojo debt drops from `364` to `362`.
 - **Focused Code Dojo ratchet** — WF-160 clears the final `6` ESLint findings,
   removes all `22` mock-ban baseline violations with deterministic
