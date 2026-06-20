@@ -1,5 +1,5 @@
-import type { App, Cmd, QuitSignal } from '../types.js';
-import { isCmdCleanup } from '../types.js';
+import type { App, Cmd, CmdResult } from '../types.js';
+import { isCmdCleanup, QUIT } from '../types.js';
 import type { ViewOutput } from '../view-output.js';
 
 /**
@@ -9,7 +9,7 @@ import type { ViewOutput } from '../view-output.js';
  * @template SubMsg - The sub-app's message type.
  * @template ParentMsg - The parent app's message type.
  */
-export interface MountOptions<SubModel, SubMsg, ParentMsg> {
+export interface MountOptions<SubModel, SubMsg extends object, ParentMsg> {
   /** The current state of the sub-app. */
   model: SubModel;
   /** Function to map a sub-app message into a parent message. */
@@ -52,7 +52,7 @@ export type SubAppAdapterCases<ParentMsg, SubMsg extends { readonly type: string
  * @param options - Configuration for the mounted instance.
  * @returns A tuple of `[Surface | LayoutNode, mapped Cmds]`.
  */
-export function mount<SubModel, SubMsg, ParentMsg>(
+export function mount<SubModel, SubMsg extends object, ParentMsg>(
   app: App<SubModel, SubMsg>,
   options: MountOptions<SubModel, SubMsg, ParentMsg>,
 ): [ViewOutput, Cmd<ParentMsg>[]] {
@@ -74,12 +74,33 @@ export function createSubAppAdapter<ParentMsg, SubMsg extends { readonly type: s
   cases: SubAppAdapterCases<ParentMsg, SubMsg>,
 ): (msg: SubMsg) => ParentMsg {
   return (msg) => {
-    const handler = cases[msg.type as keyof SubAppAdapterCases<ParentMsg, SubMsg>] as (msg: SubMsg) => ParentMsg;
-    return handler(msg);
+    if (hasHandler(cases, msg)) {
+      const handler = handlerFor(cases, msg.type);
+      return handler(msg);
+    }
+    throw new Error(`Unhandled sub-app message type: ${msg.type}`);
   };
 }
 
-export interface SubAppOptions<SubMsg, ParentMsg> {
+function handlerFor<
+  ParentMsg,
+  SubMsg extends { readonly type: string },
+  Type extends SubMsg['type'],
+>(
+  cases: SubAppAdapterCases<ParentMsg, SubMsg>,
+  type: Type,
+): (msg: Extract<SubMsg, { type: Type }>) => ParentMsg {
+  return cases[type];
+}
+
+function hasHandler<ParentMsg, SubMsg extends { readonly type: string }>(
+  cases: SubAppAdapterCases<ParentMsg, SubMsg>,
+  msg: SubMsg,
+): msg is Extract<SubMsg, { readonly type: string }> {
+  return Object.hasOwn(cases, msg.type);
+}
+
+export interface SubAppOptions<SubMsg extends object, ParentMsg> {
   /** Function to map a sub-app message into a parent message. */
   onMsg: (msg: SubMsg) => ParentMsg;
   /**
@@ -89,7 +110,7 @@ export interface SubAppOptions<SubMsg, ParentMsg> {
   mapCmd?: (cmd: Cmd<SubMsg>) => Cmd<ParentMsg>;
 }
 
-export function initSubApp<SubModel, SubMsg, ParentMsg>(
+export function initSubApp<SubModel, SubMsg extends object, ParentMsg>(
   app: App<SubModel, SubMsg>,
   options: SubAppOptions<SubMsg, ParentMsg>,
 ): [SubModel, Cmd<ParentMsg>[]] {
@@ -97,7 +118,7 @@ export function initSubApp<SubModel, SubMsg, ParentMsg>(
   return [model, mapSubAppCmds(cmds, options)];
 }
 
-export function updateSubApp<SubModel, SubMsg, ParentMsg>(
+export function updateSubApp<SubModel, SubMsg extends object, ParentMsg>(
   app: App<SubModel, SubMsg>,
   msg: SubMsg,
   model: SubModel,
@@ -114,19 +135,20 @@ export function updateSubApp<SubModel, SubMsg, ParentMsg>(
  * @param mapper - The message mapping function.
  * @returns An array of commands that emit parent messages.
  */
-export function mapCmds<SubMsg, ParentMsg>(
+export function mapCmds<SubMsg extends object, ParentMsg>(
   cmds: Cmd<SubMsg>[],
   mapper: (msg: SubMsg) => ParentMsg,
 ): Cmd<ParentMsg>[] {
   return cmds.map((cmd) => mapSingleCmd(cmd, mapper));
 }
 
-function mapSubAppCmds<SubMsg, ParentMsg>(
+function mapSubAppCmds<SubMsg extends object, ParentMsg>(
   cmds: Cmd<SubMsg>[],
   options: SubAppOptions<SubMsg, ParentMsg>,
 ): Cmd<ParentMsg>[] {
-  if (options.mapCmd != null) {
-    return cmds.map((cmd) => options.mapCmd!(cmd));
+  const mapCmd = options.mapCmd;
+  if (mapCmd != null) {
+    return cmds.map((cmd) => mapCmd(cmd));
   }
   return mapCmds(cmds, options.onMsg);
 }
@@ -134,7 +156,7 @@ function mapSubAppCmds<SubMsg, ParentMsg>(
 /**
  * Map a single sub-app command to a parent command.
  */
-function mapSingleCmd<SubMsg, ParentMsg>(
+function mapSingleCmd<SubMsg extends object, ParentMsg>(
   cmd: Cmd<SubMsg>,
   mapper: (msg: SubMsg) => ParentMsg,
 ): Cmd<ParentMsg> {
@@ -146,11 +168,12 @@ function mapSingleCmd<SubMsg, ParentMsg>(
 
     const result = await cmd(mappedEmit, caps);
 
-    // If the command resolves to a final message, map it.
-    // Quit signals are passed through unaltered.
-    if (result === undefined) return undefined;
-    if (typeof result === 'symbol') return result as QuitSignal; // QUIT
-    if (isCmdCleanup(result)) return result;
-    return mapper(result);
+    return isSubAppMessageResult(result) ? mapper(result) : result;
   };
+}
+
+function isSubAppMessageResult<SubMsg extends object>(
+  result: CmdResult<SubMsg>,
+): result is SubMsg {
+  return result !== undefined && result !== QUIT && !isCmdCleanup(result);
 }

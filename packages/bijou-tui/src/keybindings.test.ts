@@ -307,6 +307,6 @@ describe('bindings()', () => {
       group: '',
       enabled: true,
     });
-    expect((info as any).action).toBeUndefined();
+    expect('action' in info).toBe(false);
   });
 });

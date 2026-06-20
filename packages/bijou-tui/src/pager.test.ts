@@ -19,7 +19,7 @@ import type { KeyMsg } from './types.js';
 // ── Test Data ──────────────────────────────────────────────────────
 
 const SHORT_CONTENT = 'line 1\nline 2\nline 3';
-const LONG_CONTENT = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`).join('\n');
+const LONG_CONTENT = Array.from({ length: 50 }, (_, i) => `line ${String(i + 1)}`).join('\n');
 
 function plainSurface(surface: Surface): string {
   const lines: string[] = [];
@@ -146,7 +146,7 @@ describe('pagerSetContent', () => {
       createPagerState({ content: LONG_CONTENT, width: 40, height: 10 }),
       5,
     );
-    const newContent = Array.from({ length: 60 }, (_, i) => `new ${i}`).join('\n');
+    const newContent = Array.from({ length: 60 }, (_, i) => `new ${String(i)}`).join('\n');
     const next = pagerSetContent(state, newContent);
     expect(next.scroll.y).toBe(5);
     expect(next.scroll.totalLines).toBe(60);

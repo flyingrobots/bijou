@@ -68,7 +68,7 @@ describe('navigableTable', () => {
 
     it('focusNext wraps around', () => {
       let state = createNavigableTableState({ columns, rows });
-      for (let i = 0; i < rows.length; i++) state = navTableFocusNext(state);
+      for (let remaining = rows.length; remaining > 0; remaining -= 1) state = navTableFocusNext(state);
       expect(state.focusRow).toBe(0);
     });
 
@@ -130,7 +130,7 @@ describe('navigableTable', () => {
     it('scrollY adjusts when focus goes above viewport', () => {
       let state = createNavigableTableState({ columns, rows, height: 2 });
       // Go to bottom, then wrap to 0
-      for (let i = 0; i < rows.length; i++) state = navTableFocusNext(state);
+      for (let remaining = rows.length; remaining > 0; remaining -= 1) state = navTableFocusNext(state);
       expect(state.focusRow).toBe(0);
       expect(state.scrollY).toBe(0);
     });

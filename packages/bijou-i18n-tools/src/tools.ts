@@ -47,13 +47,17 @@ function stableStringify(value: unknown): string {
   if (Array.isArray(value)) {
     return `[${value.map((item) => stableStringify(item)).join(',')}]`;
   }
-  if (typeof value === 'object' && value !== null) {
-    const entries = Object.entries(value as Record<string, unknown>)
+  if (isJsonRecord(value)) {
+    const entries = Object.entries(value)
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([key, entryValue]) => `${JSON.stringify(key)}:${stableStringify(entryValue)}`);
     return `{${entries.join(',')}}`;
   }
   return JSON.stringify(value);
+}
+
+function isJsonRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function keyToString(key: I18nCatalogKey): string {
@@ -155,7 +159,7 @@ export function importTranslationRows(
   return catalogs.map((catalog) => ({
     ...catalog,
     entries: catalog.entries.map((entry) => {
-      const translations = { ...entry.translations } as Record<string, AuthoringTranslation>;
+      const translations: Record<string, AuthoringTranslation> = { ...entry.translations };
       for (const [rowKey, row] of rowsByKey.entries()) {
         const expectedPrefix = `${entry.key.namespace}:${entry.key.id}:`;
         if (!rowKey.startsWith(expectedPrefix)) {

@@ -3,9 +3,11 @@ import { must, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { createSurface, stringToSurface } from '@flyingrobots/bijou';
 import { flex, flexSurface } from './flex.js';
 
+const ANSI_SGR_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+
 /** Count visible (non-ANSI) characters in a line. */
 function visWidth(s: string): number {
-  return s.replace(/\x1b\[[0-9;]*m/g, '').length;
+  return s.replace(ANSI_SGR_PATTERN, '').length;
 }
 
 function surfaceLines(surface: { width: number; height: number; get(x: number, y: number): { char: string } }): string[] {
@@ -300,7 +302,7 @@ describe('resize reflow', () => {
       flex(
         { direction: 'row', width, height, gap: 1 },
         { basis: 15, content: 'sidebar' },
-        { flex: 1, content: (w) => `main(${w})` },
+        { flex: 1, content: (w) => `main(${String(w)})` },
       );
     const wide = renderApp(80, 24);
     const narrow = renderApp(40, 24);
