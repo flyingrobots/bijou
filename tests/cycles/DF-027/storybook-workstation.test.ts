@@ -17,11 +17,9 @@ import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { readRepoFile } from '../repo.js';
 
-const KEY_UP = '\x1b[A';
-const KEY_DOWN = '\x1b[B';
+const KEY_UP = '\x1b[A', KEY_DOWN = '\x1b[B';
 type StorybookFrameModel = ReturnType<ReturnType<typeof createStorybookFrameApp>['init']>[0];
 function storybookPageModel(model: StorybookFrameModel): StorybookModel { return must(model.pageModels.storybook); }
-
 describe('DF-027 BlockLab DOGFOOD workstation', () => {
   it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-027-storybook-style-tool-for-bijou.md');

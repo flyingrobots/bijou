@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Tracker
 
@@ -150,3 +150,36 @@ without re-running broad discovery first.
 - The final counts and next target are recorded in the exception ledger.
 - The package-script debt ceiling is lowered to the proven count.
 - No Dojo bucket grows and no new baseline entry is added.
+
+## Implementation Notes
+
+WF-160 removes the final six ESLint findings, clears all `22` mock-ban
+violations, and removes `22` file/context baseline entries. The resulting
+aggregate debt is exactly `364`:
+
+- file/context baseline: `309`
+- mock-ban baseline: `0`
+- code-size baseline: `55`, including `4` legacy hard-limit files
+- ESLint baseline: `0`
+- next aggregate target: `314` or lower
+
+The mock-ban cleanup adds deterministic writer/platform seams for Node IO and
+`create-bijou-tui-app`, plus an explicit plan-rebuild observer for the TUI
+pipeline. The final ESLint cleanup removes unsafe or caller-chosen type
+assertions from coverage parsing, schema-block tests, and PR review status
+parsing. File/context cleanup is structural: oversized type clusters and test
+fixtures are split into focused support modules while preserving behavior.
+
+## Validation Evidence
+
+- `npm run code-dojo:changed`
+- `npm run code-dojo:debt -- --json`
+- `npm run code-dojo:verify`
+- `npm run dogfood:i18n:debt`
+- `npm run docs:inventory`
+- `npm run typecheck:test`
+- `npm run lint`
+- `git diff --check`
+- focused Vitest suites for the touched Node IO, create-app CLI, pipeline,
+  schema-block, PR review status, form, layout, TUI, MCP, theme, and cycle
+  proof files

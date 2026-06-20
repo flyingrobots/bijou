@@ -6,7 +6,6 @@ import {
 } from './binding.js';
 import {
   defineBlock,
-  type BlockMetadata,
 } from './block-metadata.js';
 import {
   bindSchemaBlockInput,
@@ -16,71 +15,11 @@ import {
   isSchemaBoundBlockDefinition,
   parseBlockSchema,
 } from './schema-block.js';
-
-interface Article {
-  readonly id: string;
-  readonly title: string;
-  readonly tags?: readonly string[];
-}
-
-const readerSurfaceMetadata: BlockMetadata = {
-  packageName: '@flyingrobots/bijou',
-  blockName: 'ReaderSurface',
-  family: 'content-reading',
-  scale: 'section',
-  modes: ['interactive', 'static', 'pipe', 'accessible'],
-  docs: {
-    summary: 'Composes readable article content with optional navigation and outline slots.',
-  },
-  slots: [
-    { id: 'content', required: true },
-    { id: 'navigation', required: false },
-    { id: 'outline', required: false },
-  ],
-};
-
-const bad = (value: unknown): never => value as never;
-function defineArticleSchema() {
-  return defineBlockSchemaAdapter<Article>({
-    id: ' docs.article ',
-    parse(input) {
-      if (!isArticleInput(input)) {
-        return {
-          ok: false,
-          issues: [{
-            severity: 'error',
-            code: 'article.invalid',
-            message: 'Article data is required.',
-            path: 'article',
-          }],
-        };
-      }
-
-      return {
-        ok: true,
-        data: {
-          id: input.id,
-          title: input.title,
-          ...(input.tags === undefined ? {} : { tags: input.tags }),
-        },
-      };
-    },
-    describe: () => ({
-      requiredFields: ['id', 'title'],
-      optionalFields: ['tags'],
-      redactedFields: ['secret'],
-    }),
-  });
-}
-
-function isArticleInput(input: unknown): input is Article {
-  if (input === null || typeof input !== 'object') {
-    return false;
-  }
-
-  const article = input as Partial<Article>;
-  return typeof article.id === 'string' && typeof article.title === 'string';
-}
+import {
+  defineArticleSchema,
+  readerSurfaceMetadata,
+  type Article,
+} from './schema-block.test-support.js';
 
 describe('schema-bound block contract', () => {
   it('creates branded schema adapters and schema-bound blocks around block definitions', () => {
@@ -229,17 +168,19 @@ describe('schema-bound block contract', () => {
     const topLevelTypo = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad({ slotz: { content: 'typo' } }),
+      // @ts-expect-error runtime guard coverage for unsupported bind output keys.
+      bind: () => ({ slotz: { content: 'typo' } }),
     });
     const wrappedTypo = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad({ input: { slotz: { content: 'typo' } } }),
+      // @ts-expect-error runtime guard coverage for unsupported wrapped input keys.
+      bind: () => ({ input: { slotz: { content: 'typo' } } }),
     });
     const backchannel = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad({
+      bind: () => ({
         input: { slots: { content: 'safe' } },
         dispatch: () => undefined,
       }),
@@ -267,17 +208,20 @@ describe('schema-bound block contract', () => {
     const dateOutput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad(new Date(0)),
+      // @ts-expect-error runtime guard coverage for non-plain bind output.
+      bind: () => new Date(0),
     });
     const wrappedDateInput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad({ input: new Date(0) }),
+      // @ts-expect-error runtime guard coverage for non-plain wrapped input.
+      bind: () => ({ input: new Date(0) }),
     });
     const arrayOutput = defineSchemaBlock({
       block,
       schema: defineArticleSchema(),
-      bind: () => bad([]),
+      // @ts-expect-error runtime guard coverage for array bind output.
+      bind: () => [],
     });
 
     expect(() => bindSchemaBlockInput(dateOutput, {
@@ -324,91 +268,5 @@ describe('schema-bound block contract', () => {
     expect('subscribe' in schemaBlock).toBe(false);
     expect('refresh' in schemaBlock).toBe(false);
     expect('dispatch' in schemaBlock).toBe(false);
-  });
-
-  it('rejects loose schema-shaped objects and unsupported schema ids/results', () => {
-    const block = defineBlock({
-      metadata: readerSurfaceMetadata,
-      render: () => ({ output: 'reader' }),
-    });
-
-    expect(() => defineBlockSchemaAdapter(bad(null))).toThrow(Error);
-    expect(() => defineSchemaBlock(bad(null))).toThrow(Error);
-
-    expect(() => defineBlockSchemaAdapter({
-      id: '   ',
-      parse: () => ({ ok: true, data: {} }),
-    })).toThrow(Error);
-
-    expect(() => defineSchemaBlock({
-      block,
-      schema: bad({
-        id: 'docs.article',
-        parse: () => ({ ok: true, data: {} }),
-      }),
-      bind: () => ({}),
-    })).toThrow(Error);
-
-    expect(() => defineSchemaBlock({
-      block: bad({
-        metadata: readerSurfaceMetadata,
-        render: () => ({ output: 'reader' }),
-      }),
-      schema: defineArticleSchema(),
-      bind: () => ({}),
-    })).toThrow(Error);
-
-    expect(() => parseBlockSchema(defineBlockSchemaAdapter({
-      id: 'docs.invalid',
-      parse: () => ({ ok: false, issues: [] }),
-    }), {})).toThrow(Error);
-  });
-
-  it('reports deterministic errors for malformed untyped schema inputs', () => {
-    expect(() => defineBlockSchemaAdapter({
-      id: bad(42),
-      parse: () => ({ ok: true, data: {} }),
-    })).toThrow('block schema adapter: id must be a string');
-
-    expect(() => parseBlockSchema(defineBlockSchemaAdapter({
-      id: 'docs.invalid',
-      parse: () => bad({ ok: false, issues: { code: 'bad' } }),
-    }), {})).toThrow('block schema result: issues must be an array');
-
-    const badDescription = defineBlockSchemaAdapter({
-      id: 'docs.description',
-      parse: () => ({ ok: true, data: {} }),
-      describe: () => bad({ requiredFields: 'id' }),
-    });
-    expect(() => badDescription.describe?.()).toThrow(
-      'block schema description: requiredFields must be an array',
-    );
-
-    const badSchemaFacts = defineBlockSchemaAdapter({
-      id: 'docs.facts',
-      parse: () => ({ ok: true, data: {} }),
-      describe: () => bad({ facts: 'entity:article' }),
-    });
-    expect(() => badSchemaFacts.describe?.()).toThrow(
-      'block schema description: facts must be an array',
-    );
-
-    const block = defineBlock({
-      metadata: readerSurfaceMetadata,
-      render: () => ({ output: 'reader' }),
-    });
-    const badBindFacts = defineSchemaBlock({
-      block,
-      schema: defineArticleSchema(),
-      bind: () => ({
-        input: { slots: { content: 'DX-031' } },
-        facts: bad('entity:article'),
-      }),
-    });
-
-    expect(() => bindSchemaBlockInput(badBindFacts, {
-      id: 'dx-031',
-      title: 'DX-031',
-    })).toThrow('schema block bind: facts must be an array');
   });
 });

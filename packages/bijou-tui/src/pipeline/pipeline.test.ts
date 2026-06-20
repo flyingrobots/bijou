@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   createPipeline,
   getRenderStageTimings,
@@ -142,8 +142,8 @@ describe('createPipeline', () => {
   });
 
   it('reuses the flattened chain until middleware registration changes', () => {
-    const mapSpy = vi.spyOn(Array.prototype, 'map');
-    const pipeline = createPipeline();
+    let planBuilds = 0;
+    const pipeline = createPipeline({ onPlanRebuild: () => { planBuilds += 1; } });
     const log: string[] = [];
 
     pipeline.use('Layout', (_, next) => { log.push('layout'); next(); });
@@ -152,20 +152,19 @@ describe('createPipeline', () => {
     pipeline.execute(createMockState());
     pipeline.execute(createMockState());
 
-    expect(mapSpy).toHaveBeenCalledTimes(1);
+    expect(planBuilds).toBe(1);
     expect(log).toEqual(['layout', 'paint', 'layout', 'paint']);
 
     pipeline.use('PostProcess', (_, next) => { log.push('post'); next(); });
     pipeline.execute(createMockState());
 
-    expect(mapSpy).toHaveBeenCalledTimes(2);
+    expect(planBuilds).toBe(2);
     expect(log).toEqual([
       'layout', 'paint',
       'layout', 'paint',
       'layout', 'paint', 'post',
     ]);
 
-    mapSpy.mockRestore();
   });
 
   it('records per-stage timings and notifies observers in stage order', () => {

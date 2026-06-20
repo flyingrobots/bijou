@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { mockClock } from '@flyingrobots/bijou/adapters/test';
 import { nodeIO, scopedNodeIO, ScopedNodeIOError } from './io.js';
+import { capturedWriter } from './io.test-support.js';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync, symlinkSync, realpathSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -15,20 +16,18 @@ describe('nodeIO()', () => {
     }
   });
 
-  it('write() calls process.stdout.write', () => {
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
-    const io = nodeIO();
+  it('write() calls the configured stdout writer', () => {
+    const stdout = capturedWriter();
+    const io = nodeIO({ stdout });
     io.write('hello');
-    expect(spy).toHaveBeenCalledWith('hello');
-    spy.mockRestore();
+    expect(stdout.text()).toBe('hello');
   });
 
-  it('writeError() calls process.stderr.write', () => {
-    const spy = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
-    const io = nodeIO();
+  it('writeError() calls the configured stderr writer', () => {
+    const stderr = capturedWriter();
+    const io = nodeIO({ stderr });
     io.writeError('err');
-    expect(spy).toHaveBeenCalledWith('err');
-    spy.mockRestore();
+    expect(stderr.text()).toBe('err');
   });
 
   it('readFile() reads a real file', () => {
@@ -192,11 +191,10 @@ describe('scopedNodeIO()', () => {
 
   it('passes through terminal writes from the base adapter', () => {
     tempDir = mkdtempSync(join(tmpdir(), 'bijou-scoped-'));
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
-    const io = scopedNodeIO({ root: tempDir });
+    const stdout = capturedWriter();
+    const io = scopedNodeIO({ root: tempDir, baseIO: nodeIO({ stdout }) });
 
     io.write('hello');
-    expect(spy).toHaveBeenCalledWith('hello');
-    spy.mockRestore();
+    expect(stdout.text()).toBe('hello');
   });
 });

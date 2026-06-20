@@ -8,6 +8,9 @@ import {
   type Surface,
 } from '@flyingrobots/bijou';
 import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
+import type { CachedMarqueeLine, SelectedRowOverflow } from './collection-surface-types.js';
+
+export type { SelectedRowOverflow } from './collection-surface-types.js';
 
 const PRESERVE_BG_MASK: CellMask = {
   ...FULL_MASK,
@@ -15,11 +18,6 @@ const PRESERVE_BG_MASK: CellMask = {
 };
 const MARQUEE_CACHE_LIMIT = 128;
 const marqueeLineCache = new Map<string, CachedMarqueeLine>();
-
-interface CachedMarqueeLine {
-  readonly visibleWidth: number;
-  readonly cells: readonly string[];
-}
 
 function rowInsetForWidth(width: number): number {
   return width >= 3 ? 1 : 0;
@@ -74,16 +72,6 @@ export function collectionRowsSurface(
 
   return surface;
 }
-
-export type SelectedRowOverflow =
-  | 'clip'
-  | {
-    readonly mode: 'marquee';
-    readonly elapsedMs: number;
-    readonly stepMs?: number;
-    readonly startDelayMs?: number;
-    readonly endDelayMs?: number;
-  };
 
 function resolveRowText(
   line: string,

@@ -48,7 +48,9 @@ export function resolveDogfoodDocsCoverage(stories: readonly CoverageStoryLike[]
 function parseComponentFamilyReference(markdown: string): readonly DogfoodCoverageFamily[] {
   const matches = [...markdown.matchAll(/^### (.+)$/gm)];
   const families = matches.map((match) => {
-    const label = match[1]!.trim();
+    const rawLabel = match[1];
+    if (rawLabel === undefined) throw new Error();
+    const label = rawLabel.trim();
     return {
       id: slugifyHeading(label),
       label,
@@ -69,7 +71,6 @@ function parseComponentFamilyReference(markdown: string): readonly DogfoodCovera
 function slugifyHeading(label: string): string {
   return label
     .toLowerCase()
-    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }

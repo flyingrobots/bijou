@@ -11,15 +11,29 @@ import {
 } from './index.js';
 
 /** CLI entrypoint for create-bijou-tui-app. */
-export function runCli(argv: readonly string[]): number {
-  const parsedOrCode = parseCliArgs(argv);
+export interface RunCliOptions {
+  readonly stdout?: CliWriter;
+  readonly stderr?: CliWriter;
+  readonly platform?: NodeJS.Platform;
+}
+
+export interface CliWriter {
+  write(data: string): unknown;
+}
+
+/** CLI entrypoint for create-bijou-tui-app. */
+export function runCli(argv: readonly string[], options: RunCliOptions = {}): number {
+  const stdout = options.stdout ?? process.stdout;
+  const stderr = options.stderr ?? process.stderr;
+  const platform = options.platform ?? process.platform;
+  const parsedOrCode = parseCliArgs(argv, stderr);
   if (typeof parsedOrCode === 'number') {
     return parsedOrCode;
   }
 
   const parsed = parsedOrCode;
   if (parsed.help) {
-    process.stdout.write(`${usage()}\n`);
+    stdout.write(`${usage()}\n`);
     return 0;
   }
 
@@ -35,43 +49,43 @@ export function runCli(argv: readonly string[]): number {
       ? '.'
       : (relDir.startsWith('..') ? result.targetDir : relDir);
 
-    process.stdout.write(`\nCreated project in ${result.targetDir}\n`);
-    process.stdout.write(`\nNext steps:\n`);
+    stdout.write(`\nCreated project in ${result.targetDir}\n`);
+    stdout.write(`\nNext steps:\n`);
     if (suggestedDir !== '.') {
-      process.stdout.write(`  cd ${quotePath(suggestedDir)}\n`);
+      stdout.write(`  cd ${quotePath(suggestedDir, platform)}\n`);
     }
     if (!result.installed) {
-      process.stdout.write(`  ${installCommand(result.packageManager)}\n`);
+      stdout.write(`  ${installCommand(result.packageManager)}\n`);
     }
-    process.stdout.write(`  ${runDevCommand(result.packageManager)}\n\n`);
+    stdout.write(`  ${runDevCommand(result.packageManager)}\n\n`);
     return 0;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`create-bijou-tui-app: ${message}\n`);
+    stderr.write(`create-bijou-tui-app: ${message}\n`);
     if (isInstallFailure(message)) {
-      process.stderr.write('Tip: rerun with --no-install, then install dependencies manually.\n');
+      stderr.write('Tip: rerun with --no-install, then install dependencies manually.\n');
     } else {
-      process.stderr.write('Tip: run with --help to see CLI options.\n');
+      stderr.write('Tip: run with --help to see CLI options.\n');
     }
     return 1;
   }
 }
 
 /** Parse CLI arguments, returning the parsed result or an exit code on failure. */
-function parseCliArgs(argv: readonly string[]): ReturnType<typeof parseArgs> | number {
+function parseCliArgs(argv: readonly string[], stderr: CliWriter): ReturnType<typeof parseArgs> | number {
   try {
     return parseArgs(argv);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`create-bijou-tui-app: ${message}\n`);
-    process.stderr.write(`\n${usage()}\n`);
+    stderr.write(`create-bijou-tui-app: ${message}\n`);
+    stderr.write(`\n${usage()}\n`);
     return 1;
   }
 }
 
 /** Quote a file path for safe display in shell commands (platform-aware). */
-function quotePath(value: string): string {
-  if (process.platform === 'win32') {
+function quotePath(value: string, platform: NodeJS.Platform): string {
+  if (platform === 'win32') {
     const escaped = value
       .replace(/%/g, '%%')
       .replace(/\^/g, '^^')

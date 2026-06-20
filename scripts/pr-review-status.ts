@@ -1,8 +1,15 @@
 #!/usr/bin/env npx tsx
 
-import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  ghGraphql,
+  ghJson,
+  isCheckEntries,
+  isPrNumberPayload,
+  isPullRequestGraphqlResponse,
+  isReviewThreadsResponse,
+} from './pr-review-status-parse.js';
 
 interface PullRequestView {
   readonly number: number;
@@ -18,7 +25,7 @@ interface PullRequestView {
   readonly reviews: readonly PullRequestReview[];
 }
 
-interface CheckEntry {
+export interface CheckEntry {
   readonly name: string;
   readonly bucket: string;
   readonly state: string;
@@ -26,32 +33,32 @@ interface CheckEntry {
   readonly workflow?: string;
 }
 
-interface PullRequestComment {
+export interface PullRequestComment {
   readonly author?: { readonly login: string; readonly __typename?: string } | null;
   readonly body: string;
   readonly createdAt: string;
 }
 
-interface PullRequestReview {
+export interface PullRequestReview {
   readonly author?: { readonly login: string; readonly __typename?: string } | null;
   readonly body: string;
   readonly submittedAt: string | null;
   readonly state: string;
 }
 
-interface ReviewThreadComment {
+export interface ReviewThreadComment {
   readonly author?: { readonly login: string } | null;
   readonly body: string;
   readonly path?: string | null;
   readonly url: string;
 }
 
-interface ReviewThreadNode {
+export interface ReviewThreadNode {
   readonly isResolved: boolean;
   readonly comments: { readonly nodes: readonly ReviewThreadComment[] };
 }
 
-interface ReviewThreadsResponse {
+export interface ReviewThreadsResponse {
   readonly data: {
     readonly repository: {
       readonly pullRequest: {
@@ -61,12 +68,12 @@ interface ReviewThreadsResponse {
   };
 }
 
-interface PageInfo {
+export interface PageInfo {
   readonly hasNextPage: boolean;
   readonly endCursor?: string | null;
 }
 
-interface PullRequestConnection<TNode> {
+export interface PullRequestConnection<TNode> {
   readonly nodes: readonly TNode[];
   readonly totalCount: number;
   readonly pageInfo: PageInfo;
@@ -77,7 +84,7 @@ interface PullRequestGraphqlNode extends Omit<PullRequestView, 'comments' | 'rev
   readonly reviews: PullRequestConnection<PullRequestReview>;
 }
 
-interface PullRequestGraphqlResponse {
+export interface PullRequestGraphqlResponse {
   readonly data: {
     readonly repository: {
       readonly pullRequest: PullRequestGraphqlNode | null;
@@ -440,13 +447,13 @@ export function computeMergeReadinessExitCode(readiness: MergeReadiness): number
 function main(): void {
   const options = parseArgs(process.argv.slice(2));
   const pr = fetchPullRequest(options.prArg);
-  const checks = ghJson<CheckEntry[]>([
+  const checks = ghJson([
     'pr',
     'checks',
     S(pr.number),
     '--json',
     'name,bucket,state,link,workflow',
-  ]);
+  ], isCheckEntries);
   const threads = fetchReviewThreads(pr.number);
   const unresolved = extractUnresolvedFindings(threads);
   const summary = summarizeChecks(checks);
@@ -554,7 +561,7 @@ query($prNumber: Int!) {
 }
 `;
 
-  const payload = ghGraphql<ReviewThreadsResponse>(query, { prNumber: S(prNumber) });
+  const payload = ghGraphql(query, { prNumber: S(prNumber) }, isReviewThreadsResponse);
   const reviewThreads = payload.data.repository.pullRequest.reviewThreads;
   assertUntruncatedPullRequestData({ reviewThreads });
   return reviewThreads.nodes;
@@ -639,13 +646,13 @@ function isCodeRabbitAuthor(login: string | undefined): boolean {
 
 function fetchPullRequest(prArg: string | undefined): PullRequestView {
   const selector = prArg == null || prArg === '' ? undefined : prArg;
-  const prNumber = ghJson<{ readonly number: number }>([
+  const prNumber = ghJson([
     'pr',
     'view',
     ...maybeArg(selector),
     '--json',
     'number',
-  ]).number;
+  ], isPrNumberPayload).number;
 
   const query = `
 query($prNumber: Int!) {
@@ -689,7 +696,7 @@ query($prNumber: Int!) {
   }
 }
 `;
-  const payload = ghGraphql<PullRequestGraphqlResponse>(query, { prNumber: S(prNumber) });
+  const payload = ghGraphql(query, { prNumber: S(prNumber) }, isPullRequestGraphqlResponse);
   const pullRequest = payload.data.repository.pullRequest;
   if (pullRequest == null) {
     throw new Error(`no pull request found for ${selector ?? 'current branch'}`);
@@ -702,37 +709,6 @@ query($prNumber: Int!) {
     comments: pullRequest.comments.nodes,
     reviews: pullRequest.reviews.nodes,
   };
-}
-
-function ghJson<T>(args: readonly string[]): T {
-  const output = execFileSync('gh', args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      GH_PAGER: 'cat',
-    },
-  });
-
-  return JSON.parse(output) as T;
-}
-
-function ghGraphql<T>(query: string, variables: Readonly<Record<string, string>>): T {
-  const args = ['api', 'graphql', '-f', `query=${query}`];
-  for (const [key, value] of Object.entries(variables)) {
-    args.push('-F', `${key}=${value}`);
-  }
-
-  const output = execFileSync('gh', args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      GH_PAGER: 'cat',
-    },
-  });
-
-  return JSON.parse(output) as T;
 }
 
 function maybeArg(value: string | undefined): readonly string[] {

@@ -1,19 +1,8 @@
 import type { BCSSSheet, BCSSRule, BCSSSelector } from './types.js';
 import type { TokenGraph, ThemeMode } from '@flyingrobots/bijou';
+import type { ComponentIdentity, ResolvedStyles } from './resolver-types.js';
 
-/**
- * Metadata for a component used to match CSS selectors.
- */
-export interface ComponentIdentity {
-  type?: string;
-  id?: string;
-  classes?: string[];
-}
-
-/**
- * Resolved styles for a component.
- */
-export type ResolvedStyles = Record<string, string>;
+export type { ComponentIdentity, ResolvedStyles } from './resolver-types.js';
 
 /**
  * Resolves the final styles for a component based on a CSS sheet and terminal dimensions.
@@ -69,9 +58,7 @@ export function resolveStyles(
   return finalStyles;
 }
 
-/**
- * Resolve a CSS value, handling var(token.path) references via the TokenGraph.
- */
+/** Resolve a CSS value, handling var(token.path) references via the TokenGraph. */
 function resolveValue(value: string, graph?: TokenGraph, mode: ThemeMode = 'dark'): string {
   if (!graph) return value;
 
@@ -103,19 +90,16 @@ function getMatchSpecificity(identity: ComponentIdentity, selectors: BCSSSelecto
     let match = true;
     let specificity = 0;
 
-    // Type match
     if (selector.type && selector.type !== '*') {
       if (identity.type !== selector.type) match = false;
       specificity += 1;
     }
 
-    // ID match
     if (selector.id) {
       if (identity.id !== selector.id) match = false;
       specificity += 100;
     }
 
-    // Class match (all classes in selector must be present on component)
     if (selector.classes.length > 0) {
       for (const cls of selector.classes) {
         if (!identity.classes?.includes(cls)) {

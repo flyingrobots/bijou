@@ -1,4 +1,4 @@
-import type { SelectFieldOptions, SelectOption } from './types.js';
+import type { SelectOption } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import {
@@ -14,16 +14,9 @@ import {
   subscribeFormKeyInput,
 } from './form-utils.js';
 import { sanitizePositiveInt } from '../numeric.js';
+import type { SelectOptions } from './select-types.js';
 
-/**
- * Options for the single-select field.
- *
- * @typeParam T - Type of each option's value.
- */
-export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
-  /** Bijou context for IO, styling, and mode detection. */
-  ctx?: BijouContext;
-}
+export type { SelectOptions } from './select-types.js';
 
 /**
  * Prompt the user to choose one item from a list.

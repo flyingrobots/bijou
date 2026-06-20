@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-160 clears the final `6` type-aware
+  ESLint findings, removes all `22` mock-ban baseline violations by replacing
+  spies with deterministic fake writer/platform and pipeline observer seams,
+  and removes `22` file/context entries through focused type and test-support
+  extraction, lowering aggregate Code Dojo debt from `414` to `364` with the
+  next goalpost target set to `314` or lower.
 - **PR review hardening** — `mockClock.runAll()` now drains future one-shot
   timers in deadline order instead of treating them like active intervals,
   selection owner freezing rejects unsupported content kinds with a

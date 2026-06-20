@@ -1,23 +1,7 @@
 import type { LayoutNode, LayoutRect } from '../../ports/surface.js';
+import type { FlexChildProps, FlexOptions } from './flex-types.js';
 
-/**
- * Options for the flex layout engine.
- */
-export interface FlexOptions {
-  direction?: 'row' | 'column';
-  gap?: number;
-}
-
-/**
- * Metadata for a flex child.
- */
-export interface FlexChildProps {
-  id?: string;
-  flex?: number;
-  basis?: number;
-  minSize?: number;
-  maxSize?: number;
-}
+export type { FlexChildProps, FlexOptions } from './flex-types.js';
 
 /**
  * Calculate flex layout geometry.

@@ -65,6 +65,8 @@ export interface RenderPipeline {
 export interface CreatePipelineOptions {
   /** Optional timing source override, primarily for deterministic tests. */
   now?: () => number;
+  /** Optional diagnostic hook invoked when the stage plan cache is rebuilt. */
+  onPlanRebuild?: () => void;
 }
 
 function isLayoutNode(value: unknown): value is LayoutNode {
@@ -139,6 +141,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
         middlewares: stages[stage],
       }));
       chainDirty = false;
+      options.onPlanRebuild?.();
     }
 
     return cachedPlan;
