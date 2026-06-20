@@ -98,55 +98,48 @@ removed.
 
 Target module boundaries:
 
-- `examples/docs/dogfood-block-registry.ts`
-  - `DogfoodBlockRegistry`
-  - registry entry brands and guards
-  - `dogfoodBlockRegistryEntry`
-  - `dogfoodBlockRegistry`
-  - coverage report helpers
+- Shared helpers:
+  - `examples/docs/dogfood-block-common.ts`
+  - `examples/docs/dogfood-block-text.ts`
+  - `examples/docs/dogfood-block-schema-utils.ts`
 
-- `examples/docs/dogfood-block-docs-surface.ts`
-  - docs surface requirements, intents, and view data
-  - `dogfoodDocsSurfaceBlock`
-  - docs surface schema adapter/block
-  - docs surface preview output
+- Registry assembly:
+  - `examples/docs/dogfood-block-registry-types.ts`
+  - `examples/docs/dogfood-block-registry-key.ts`
+  - `examples/docs/dogfood-block-registry-entry.ts`
+  - `examples/docs/dogfood-block-registry.ts`
+  - `examples/docs/dogfood-block-registry-entries.ts`
 
-- `examples/docs/dogfood-block-preview.ts`
-  - block preview requirements, intents, and view data
-  - `blockPreviewBlock`
-  - block preview renderer
+- Docs surface block:
+  - `examples/docs/dogfood-block-docs-surface-types.ts`
+  - `examples/docs/dogfood-block-docs-surface-data.ts`
+  - `examples/docs/dogfood-block-docs-surface-parser.ts`
+  - `examples/docs/dogfood-block-docs-surface-render.ts`
+  - `examples/docs/dogfood-block-docs-surface-schema.ts`
+  - `examples/docs/dogfood-block-docs-surface.ts`
 
-- `examples/docs/dogfood-block-guide-inspector.ts`
-  - guide inspector requirements, intents, and view data
-  - `guideInspectorBlock`
-  - guide inspector renderer
+- Rendered block families:
+  - `examples/docs/dogfood-block-preview.ts`
+  - `examples/docs/dogfood-block-guide-inspector.ts`
+  - `examples/docs/dogfood-block-guide-inspector-render.ts`
+  - `examples/docs/dogfood-block-settings-menu.ts`
+  - `examples/docs/dogfood-block-settings-menu-render.ts`
+  - `examples/docs/dogfood-block-search-panel.ts`
+  - `examples/docs/dogfood-block-search-panel-render.ts`
+  - `examples/docs/dogfood-block-notification-center.ts`
+  - `examples/docs/dogfood-block-perf-hud.ts`
+  - `examples/docs/dogfood-block-help-overlay.ts`
+  - `examples/docs/dogfood-block-command-palette.ts`
+  - `examples/docs/dogfood-block-footer-hint.ts`
+  - `examples/docs/dogfood-block-documentation-article.ts`
+  - `examples/docs/dogfood-block-navigation-list.ts`
+  - `examples/docs/dogfood-block-navigation-list-render.ts`
+  - `examples/docs/dogfood-block-title-screen.ts`
+  - `examples/docs/dogfood-block-workbench.ts`
+  - `examples/docs/dogfood-block-workbench-render.ts`
 
-- `examples/docs/dogfood-block-shell.ts`
-  - settings menu block
-  - search panel block
-  - notification center block
-  - perf HUD block
-  - help overlay block
-  - command palette block
-  - footer hint block
-
-- `examples/docs/dogfood-block-doc-navigation.ts`
-  - title screen block
-  - navigation list block
-  - documentation article block
-
-- `examples/docs/dogfood-block-workbench.ts`
-  - BlockLab/Storybook workbench block
-  - shared workbench aliases and registry entries
-
-- `examples/docs/dogfood-block-schema-utils.ts`
-  - schema parsing helpers
-  - plain-record/data property helpers
-  - schema error helpers
-  - text/number/boolean normalization helpers
-
-- `examples/docs/dogfood-blocks.ts`
-  - compatibility facade
+- Public facade:
+  - `examples/docs/dogfood-blocks.ts`
   - public re-exports
   - `requiredDogfoodBlockSurfaceIds`
   - `defaultDogfoodBlockRegistry`
