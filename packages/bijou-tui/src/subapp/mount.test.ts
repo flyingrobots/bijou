@@ -17,12 +17,10 @@ const adapter = createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
   done: (msg) => ({ type: 'closed', count: msg.count }),
   error: (msg) => ({ type: 'alert', text: msg.error }),
 });
-
 // @ts-expect-error Exhaustive child message coverage is required.
 createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
   done: (msg) => ({ type: 'closed', count: msg.count }),
 });
-
 describe('mount', () => {
   it('returns the sub-app surface', () => {
     const mockSurface = createSurface(10, 10);
@@ -59,7 +57,6 @@ describe('mapCmds', () => {
 
     const mapped = mapCmds([cmd], (msg) => ({ parent: true as const, val: msg.val }));
     expect(mapped).toHaveLength(1);
-
     const emitted: ParentMsg[] = [];
     const mockCaps = {
       onPulse: vi.fn(),

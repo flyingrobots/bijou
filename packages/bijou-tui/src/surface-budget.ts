@@ -1,38 +1,13 @@
 import { type Cell, type Surface } from '@flyingrobots/bijou';
-import { type RenderStage, type RenderStageTiming } from './pipeline/pipeline.js';
+import type { RenderStage } from './pipeline/pipeline.js';
+import type { EvaluateSurfaceBudgetOptions, SurfaceBudgetMetric, SurfaceBudgetWarning } from './surface-budget-types.js';
 
-export type SurfaceBudgetMetric =
-  | 'surface-width'
-  | 'surface-height'
-  | 'surface-area'
-  | 'styled-cells'
-  | 'frame-duration'
-  | 'stage-duration';
-
-export interface SurfaceBudgetThresholds {
-  readonly maxWidth?: number;
-  readonly maxHeight?: number;
-  readonly maxArea?: number;
-  readonly maxStyledCells?: number;
-  readonly maxFrameDurationMs?: number;
-  readonly maxStageDurationMs?: Partial<Record<RenderStage, number>>;
-}
-
-export interface EvaluateSurfaceBudgetOptions {
-  readonly surface: Surface;
-  readonly thresholds: SurfaceBudgetThresholds;
-  readonly timings?: readonly RenderStageTiming[];
-  readonly label?: string;
-}
-
-export interface SurfaceBudgetWarning {
-  readonly label: string;
-  readonly metric: SurfaceBudgetMetric;
-  readonly actual: number;
-  readonly limit: number;
-  readonly message: string;
-  readonly stage?: RenderStage;
-}
+export type {
+  EvaluateSurfaceBudgetOptions,
+  SurfaceBudgetMetric,
+  SurfaceBudgetThresholds,
+  SurfaceBudgetWarning,
+} from './surface-budget-types.js';
 
 const DEFAULT_SURFACE_BUDGET_LABEL = 'surface';
 const MILLISECOND_UNIT = 'ms';

@@ -4,14 +4,14 @@ import {
   createNodeContext,
   initDefaultContext,
   startApp,
-  type NodeThemeOptions,
   type StartAppOptions,
   _resetInitializedForTesting,
   _registerDefaultContextInitializerForTesting,
 } from './index.js';
-import { getDefaultContext, stringToSurface, type Surface, type Theme } from '@flyingrobots/bijou';
+import { getDefaultContext, setDefaultContext, stringToSurface, type Surface, type Theme } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { createFramedApp, run, type RunOptions } from '@flyingrobots/bijou-tui';
+import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
+type Opts<M> = StartAppOptions<M>;
 
 function textSurface(text: string): Surface {
   const lines = text.split('\n');
@@ -351,7 +351,8 @@ describe('startApp()', () => {
 
   it('initializes the default node context automatically when ctx is omitted', async () => {
     vi.stubEnv('TERM', 'dumb');
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+    const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
+    setDefaultContext(ctx);
 
     await startApp({
       init: () => [0, []],
@@ -359,16 +360,14 @@ describe('startApp()', () => {
       view: () => textSurface('hello from startApp'),
     });
 
-    expect(getDefaultContext()).toBeDefined();
-    expect(spy).toHaveBeenCalledWith('hello from startApp');
-    spy.mockRestore();
+    expect(getDefaultContext()).toBe(ctx);
+    expect(ctx.io.written).toEqual(['hello from startApp']);
   });
 
   it('uses an explicit ctx without overwriting the existing default context', async () => {
     vi.stubEnv('TERM', 'dumb');
     const defaultCtx = initDefaultContext();
     const explicitCtx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
-    const writeSpy = vi.spyOn(explicitCtx.io, 'write');
 
     await startApp({
       init: () => [0, []],
@@ -377,12 +376,13 @@ describe('startApp()', () => {
     }, { ctx: explicitCtx });
 
     expect(getDefaultContext()).toBe(defaultCtx);
-    expect(writeSpy).toHaveBeenCalledWith('explicit ctx path');
+    expect(explicitCtx.io.written).toEqual(['explicit ctx path']);
   });
 
   it('lets run() resolve the Node default context without a manual init step', async () => {
     vi.stubEnv('TERM', 'dumb');
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+    const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
+    setDefaultContext(ctx);
 
     await run({
       init: () => [0, []],
@@ -390,70 +390,63 @@ describe('startApp()', () => {
       view: () => textSurface('hello from ambient run'),
     });
 
-    expect(getDefaultContext()).toBeDefined();
-    expect(spy).toHaveBeenCalledWith('hello from ambient run');
-    spy.mockRestore();
+    expect(getDefaultContext()).toBe(ctx);
+    expect(ctx.io.written).toEqual(['hello from ambient run']);
   });
 
   it('delegates to self-running framed apps instead of bypassing their hosted runner', async () => {
     const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
-    const app = createFramedApp({
-      pages: [{
-        id: 'home',
-        title: 'Home',
-        init: () => [{ count: 0 }, []],
-        update: (_msg, model) => [model, []],
-        layout: () => ({
-          kind: 'pane',
-          paneId: 'main',
-          render: () => textSurface('framed through startApp'),
-        }),
-      }],
-    });
-    const runSpy = vi.spyOn(app, 'run');
+    let received: RunOptions | undefined;
+    const app: App<number> & { run(options?: RunOptions): Promise<void> } = {
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('bypassed view'),
+      run(options?: RunOptions): Promise<void> {
+        received = options;
+        options?.ctx?.io.write('framed through startApp');
+        return Promise.resolve();
+      },
+    };
 
     await startApp(app, { ctx });
 
-    expect(runSpy).toHaveBeenCalledWith({ ctx });
+    expect(received).toEqual({ ctx });
     expect(ctx.io.written.some((chunk) => chunk.includes('framed through startApp'))).toBe(true);
   });
 
   it('creates and registers a themed default context when startApp() receives a theme override', async () => {
     vi.stubEnv('TERM', 'dumb');
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+    const io = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } }).io;
 
     await startApp({
       init: () => [0, []],
       update: (_msg, model) => [model, []],
       view: () => textSurface('hello from themed startApp'),
-    }, { theme: TEST_THEME });
+    }, { theme: TEST_THEME, io });
 
     expect(getDefaultContext().theme.theme.name).toBe('test-theme');
-    expect(spy).toHaveBeenCalledWith('hello from themed startApp');
-    spy.mockRestore();
+    expect(io.written).toEqual(['hello from themed startApp']);
   });
 
   it('creates and registers the auto-selected theme from a theme set when startApp() receives themes', async () => {
     vi.stubEnv('TERM', 'dumb');
     vi.stubEnv('COLORFGBG', '0;15');
-    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+    const io = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } }).io;
 
     await startApp({
       init: () => [0, []],
       update: (_msg, model) => [model, []],
       view: () => textSurface('hello from auto themed startApp'),
-    }, { themes: TEST_THEME_SET, themeMode: 'auto' });
+    }, { themes: TEST_THEME_SET, themeMode: 'auto', io });
 
     expect(getDefaultContext().theme.theme.name).toBe('light-theme');
     expect(getDefaultContext().theme.colorScheme).toBe('light');
-    expect(spy).toHaveBeenCalledWith('hello from auto themed startApp');
-    spy.mockRestore();
+    expect(io.written).toEqual(['hello from auto themed startApp']);
   });
 
   it('prefers an explicit ctx over a theme override when both are provided', async () => {
     vi.stubEnv('TERM', 'dumb');
     const explicitCtx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
-    const writeSpy = vi.spyOn(explicitCtx.io, 'write');
 
     await startApp({
       init: () => [0, []],
@@ -462,10 +455,10 @@ describe('startApp()', () => {
     }, { ctx: explicitCtx, theme: TEST_THEME });
 
     expect(getDefaultContext()).not.toBe(explicitCtx);
-    expect(writeSpy).toHaveBeenCalledWith('explicit ctx beats theme');
+    expect(explicitCtx.io.written).toEqual(['explicit ctx beats theme']);
   });
 
   it('defaults StartAppOptions message payloads to unknown instead of any', () => {
-    expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<RunOptions & NodeThemeOptions>();
+    expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<Opts<unknown>>();
   });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '../../adapters/test/index.js';
-import { cursorGuard, withHiddenCursor } from './cursor-guard.js';
+import { cursorGuard } from './cursor-guard.js';
 
 describe('cursorGuard', () => {
   it('hides cursor on first hide() and shows on dispose()', () => {
@@ -93,76 +93,5 @@ describe('cursorGuard', () => {
     expect(guard.depth).toBe(1);
     h2.dispose();
     expect(guard.depth).toBe(0);
-  });
-});
-
-describe('withHiddenCursor', () => {
-  it('hides cursor before fn and shows after', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    let cursorWasHidden = false;
-
-    withHiddenCursor(ctx.io, () => {
-      cursorWasHidden = ctx.io.written.join('').includes('\x1b[?25l');
-    });
-
-    expect(cursorWasHidden).toBe(true);
-    expect(ctx.io.written.join('')).toContain('\x1b[?25h');
-  });
-
-  it('shows cursor even when fn throws', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-
-    expect(() => {
-      void withHiddenCursor(ctx.io, () => {
-        throw new Error('x');
-      });
-    }).toThrow('x');
-
-    expect(ctx.io.written.join('')).toContain('\x1b[?25h');
-  });
-
-  it('returns the value from fn', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const result = withHiddenCursor(ctx.io, () => 42);
-    expect(result).toBe(42);
-  });
-
-  it('works with async fn', async () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const result = await withHiddenCursor(ctx.io, () => Promise.resolve('async-value'));
-    expect(result).toBe('async-value');
-    expect(ctx.io.written.join('')).toContain('\x1b[?25h');
-  });
-
-  it('shows cursor after async fn rejects', async () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    await expect(
-      withHiddenCursor(ctx.io, () => Promise.reject(new Error('async-boom'))),
-    ).rejects.toThrow('async-boom');
-
-    expect(ctx.io.written.join('')).toContain('\x1b[?25h');
-  });
-
-  it('nests correctly with the shared guard', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const guard = cursorGuard(ctx.io);
-
-    withHiddenCursor(ctx.io, () => {
-      expect(guard.depth).toBe(1);
-
-      withHiddenCursor(ctx.io, () => {
-        expect(guard.depth).toBe(2);
-      });
-
-      // Inner done, but outer still holds — cursor should still be hidden
-      expect(guard.depth).toBe(1);
-      const output = ctx.io.written.join('');
-      const shows = output.split('\x1b[?25h').length - 1;
-      expect(shows).toBe(0);
-    });
-
-    // Both done — cursor shown
-    expect(guard.depth).toBe(0);
-    expect(ctx.io.written.join('')).toContain('\x1b[?25h');
   });
 });

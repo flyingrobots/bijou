@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { runCli } from './cli.js';
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -22,32 +22,26 @@ function runCliCaptured(argv: readonly string[]): {
   let stdout = '';
   let stderr = '';
 
-  const stdoutSpy = vi.spyOn(process.stdout, 'write')
-    .mockImplementation((chunk: string | Uint8Array) => {
-      stdout += chunkToString(chunk);
-      return true;
-    });
-  const stderrSpy = vi.spyOn(process.stderr, 'write')
-    .mockImplementation((chunk: string | Uint8Array) => {
-      stderr += chunkToString(chunk);
-      return true;
-    });
-
-  try {
-    return { code: runCli(argv), stdout, stderr };
-  } finally {
-    stdoutSpy.mockRestore();
-    stderrSpy.mockRestore();
-  }
+  const code = runCli(argv, {
+    stdout: { write: (chunk: string): true => { stdout += chunkToString(chunk); return true; } },
+    stderr: { write: (chunk: string): true => { stderr += chunkToString(chunk); return true; } },
+  });
+  return { code, stdout, stderr };
 }
 
-function withPlatform<T>(platform: NodeJS.Platform, run: () => T): T {
-  const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue(platform);
-  try {
-    return run();
-  } finally {
-    platformSpy.mockRestore();
-  }
+function runCliCapturedForPlatform(platform: NodeJS.Platform, argv: readonly string[]): {
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+} {
+  let stdout = '';
+  let stderr = '';
+  const code = runCli(argv, {
+    platform,
+    stdout: { write: (chunk: string): true => { stdout += chunkToString(chunk); return true; } },
+    stderr: { write: (chunk: string): true => { stderr += chunkToString(chunk); return true; } },
+  });
+  return { code, stdout, stderr };
 }
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {
@@ -72,7 +66,7 @@ function resolveInstalledCliEntrypoint(runnerDir: string): string {
   const bin = packageJson['bin'];
   const binRelative = typeof bin === 'string' ? bin : requireRecord(bin, 'package.json bin')['create-bijou-tui-app'];
   if (typeof binRelative !== 'string' || binRelative.length === 0) {
-    throw new Error('Installed package does not declare a create-bijou-tui-app bin entry.');
+    throw new Error('Installed package lacks create-bijou-tui-app bin.');
   }
   return join(packageDir, binRelative);
 }
@@ -120,7 +114,7 @@ describe('create-bijou-tui-app cli', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, "my app's workspace");
-      const result = withPlatform('darwin', () => runCliCaptured([targetDir, '--no-install']));
+      const result = runCliCapturedForPlatform('darwin', [targetDir, '--no-install']);
       expect(result.code).toBe(0);
       const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
       expect(cdLine).toContain("'\"'\"'");
@@ -133,7 +127,7 @@ describe('create-bijou-tui-app cli', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, 'my app');
-      const result = withPlatform('win32', () => runCliCaptured([targetDir, '--no-install']));
+      const result = runCliCapturedForPlatform('win32', [targetDir, '--no-install']);
       expect(result.code).toBe(0);
       const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
       expect(cdLine).toBeDefined();
@@ -148,7 +142,7 @@ describe('create-bijou-tui-app cli', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, 'my %APPDATA%^ app');
-      const result = withPlatform('win32', () => runCliCaptured([targetDir, '--no-install']));
+      const result = runCliCapturedForPlatform('win32', [targetDir, '--no-install']);
       expect(result.code).toBe(0);
       const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
       expect(cdLine).toBeDefined();

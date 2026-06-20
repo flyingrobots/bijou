@@ -17,6 +17,7 @@ import {
   SHOW_CURSOR,
   EXIT_ALT_SCREEN,
 } from './screen.js';
+import { scheduleKeys, scheduleResizes } from './runtime-schedule.test-support.js';
 
 const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
@@ -85,42 +86,6 @@ function createInteractiveContext(options: Parameters<typeof createTestContext>[
   const clock = mockClock();
   const ctx = createTestContext({ ...options, mode: 'interactive', clock });
   return { clock, ctx };
-}
-
-function scheduleKeys(
-  ctx: ReturnType<typeof createTestContext>,
-  clock: ReturnType<typeof mockClock>,
-  events: { at: number; key: string }[],
-): void {
-  ctx.io.rawInput = (onKey) => {
-    const handles = events.map(({ at, key }) => clock.setTimeout(() => { onKey(key); }, at));
-    return {
-      dispose() {
-        handles.forEach((handle) => {
-          handle.dispose();
-        });
-      },
-    };
-  };
-}
-
-function scheduleResizes(
-  ctx: ReturnType<typeof createTestContext>,
-  clock: ReturnType<typeof mockClock>,
-  events: { at: number; columns: number; rows: number }[],
-): void {
-  ctx.io.onResize = (onResize) => {
-    const handles = events.map(({ at, columns, rows }) =>
-      clock.setTimeout(() => { onResize(columns, rows); }, at)
-    );
-    return {
-      dispose() {
-        handles.forEach((handle) => {
-          handle.dispose();
-        });
-      },
-    };
-  };
 }
 
 export {

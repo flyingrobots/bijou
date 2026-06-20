@@ -14,6 +14,20 @@ import {
 import { exportCatalogBundle, ref } from '@flyingrobots/bijou-i18n-tools';
 
 const tempDirs: string[] = [];
+const SHEET_COLUMNS = [
+  'namespace',
+  'id',
+  'kind',
+  'sourceLocale',
+  'targetLocale',
+  'status',
+  'sourceHash',
+  'description',
+  'sourceValueKind',
+  'sourceValue',
+  'translatedValueKind',
+  'translatedValue',
+];
 
 async function makeTempDir(): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'bijou-i18n-tools-node-'));
@@ -36,38 +50,12 @@ describe('bijou-i18n-tools-node filesystem helpers', () => {
       sheets: [
         {
           name: 'b-sheet',
-          columns: [
-            'namespace',
-            'id',
-            'kind',
-            'sourceLocale',
-            'targetLocale',
-            'status',
-            'sourceHash',
-            'description',
-            'sourceValueKind',
-            'sourceValue',
-            'translatedValueKind',
-            'translatedValue',
-          ],
+          columns: SHEET_COLUMNS,
           rows: [],
         },
         {
           name: 'a-sheet',
-          columns: [
-            'namespace',
-            'id',
-            'kind',
-            'sourceLocale',
-            'targetLocale',
-            'status',
-            'sourceHash',
-            'description',
-            'sourceValueKind',
-            'sourceValue',
-            'translatedValueKind',
-            'translatedValue',
-          ],
+          columns: SHEET_COLUMNS,
           rows: [],
         },
       ],

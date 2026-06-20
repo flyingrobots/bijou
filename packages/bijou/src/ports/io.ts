@@ -1,8 +1,6 @@
-/** Disposable handle returned by raw-input or resize listeners. */
-export interface RawInputHandle {
-  /** Remove the listener and release resources. */
-  dispose(): void;
-}
+import type { RawInputHandle, TimerHandle } from './io-handles.js';
+
+export type { RawInputHandle, TimerHandle } from './io-handles.js';
 
 /**
  * Structured semantic keypress delivered by test-friendly input adapters.
@@ -23,12 +21,6 @@ export interface KeyInputMsg {
   shift: boolean;
   /** Printable text payload, when this key represents typed text. */
   text?: string;
-}
-
-/** Disposable handle returned by interval timers. */
-export interface TimerHandle {
-  /** Cancel the timer. */
-  dispose(): void;
 }
 
 /**

@@ -1,28 +1,11 @@
 import * as readline from 'readline';
 import { existsSync, readFileSync, readdirSync, realpathSync } from 'fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
-import { resolveClock, type ClockPort, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
+import { resolveClock, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
+import type { NodeIOOptions, ScopedNodeIO, ScopedNodeIOOptions } from './io-types.js';
+import { createReadlineOutput } from './readline-output.js';
 
-/** Optional overrides for {@link nodeIO}. */
-export interface NodeIOOptions {
-  /** Clock override for deterministic timer scheduling in tests. */
-  clock?: ClockPort;
-}
-
-export interface ScopedNodeIOOptions extends NodeIOOptions {
-  /** Root directory that all file access must stay inside. */
-  readonly root: string;
-  /** Optional base adapter for stdout/stdin/timer behavior. Defaults to {@link nodeIO}. */
-  readonly baseIO?: IOPort;
-}
-
-export interface ScopedNodeIO extends IOPort {
-  /** Absolute root directory that constrains filesystem access. */
-  readonly root: string;
-  /** Resolve a relative or absolute path and reject anything outside {@link root}. */
-  resolvePath(path: string): string;
-}
-
+export type { NodeIOOptions, NodeWriteStream, ScopedNodeIO, ScopedNodeIOOptions } from './io-types.js';
 export class ScopedNodeIOError extends Error {
   constructor(root: string, requestedPath: string) {
     super(`Scoped node IO path escapes root "${root}": ${requestedPath}`);
@@ -43,14 +26,11 @@ export class ScopedNodeIOError extends Error {
  */
 export function nodeIO(options: NodeIOOptions = {}): IOPort {
   const clock = resolveClock(options.clock);
+  const stdout = options.stdout ?? process.stdout;
+  const stderr = options.stderr ?? process.stderr;
   return {
-    /**
-     * Write a string directly to `process.stdout`.
-     *
-     * @param data - Text to write.
-     */
     write(data: string): void {
-      process.stdout.write(data);
+      stdout.write(data);
     },
 
     /**
@@ -65,19 +45,14 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
     writeBytes(buf: Uint8Array, len: number): void {
       if (len <= 0) return;
       if (len === buf.length) {
-        process.stdout.write(buf);
+        stdout.write(buf);
       } else {
-        process.stdout.write(buf.subarray(0, len));
+        stdout.write(buf.subarray(0, len));
       }
     },
 
-    /**
-     * Write a string directly to `process.stderr`.
-     *
-     * @param data - Text to write.
-     */
     writeError(data: string): void {
-      process.stderr.write(data);
+      stderr.write(data);
     },
 
     /**
@@ -95,7 +70,7 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
     question(prompt: string): Promise<string> {
       const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output: options.stdout === undefined ? process.stdout : createReadlineOutput(stdout),
       });
       return new Promise<string>((resolve) => {
         rl.question(prompt, (answer) => {
@@ -219,7 +194,7 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
  * @returns An {@link ScopedNodeIO} rooted at the provided directory.
  */
 export function scopedNodeIO(options: ScopedNodeIOOptions): ScopedNodeIO {
-  const baseIO = options.baseIO ?? nodeIO({ clock: options.clock });
+  const baseIO = options.baseIO ?? nodeIO({ clock: options.clock, stdout: options.stdout, stderr: options.stderr });
   const root = resolve(options.root);
   const realRoot = realpathSync.native(root);
 

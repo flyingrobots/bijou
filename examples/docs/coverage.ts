@@ -47,13 +47,7 @@ export function resolveDogfoodDocsCoverage(stories: readonly CoverageStoryLike[]
 
 function parseComponentFamilyReference(markdown: string): readonly DogfoodCoverageFamily[] {
   const matches = [...markdown.matchAll(/^### (.+)$/gm)];
-  const families = matches.map((match) => {
-    const label = match[1]!.trim();
-    return {
-      id: slugifyHeading(label),
-      label,
-    };
-  });
+  const families = matches.map(parseComponentFamilyHeading);
 
   const seen = new Set<string>();
   for (const family of families) {
@@ -66,10 +60,21 @@ function parseComponentFamilyReference(markdown: string): readonly DogfoodCovera
   return families;
 }
 
+export function parseComponentFamilyHeading(match: readonly string[]): DogfoodCoverageFamily {
+  const rawLabel = match[1];
+  if (rawLabel === undefined) {
+    throw new Error('Invalid component family heading: expected capture group for "### <label>"');
+  }
+  const label = rawLabel.trim();
+  return {
+    id: slugifyHeading(label),
+    label,
+  };
+}
+
 function slugifyHeading(label: string): string {
   return label
     .toLowerCase()
-    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }

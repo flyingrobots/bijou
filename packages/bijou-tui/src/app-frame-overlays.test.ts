@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved, type Theme } from '@flyingrobots/bijou';
+import { CYAN_MAGENTA, TEAL_ORANGE_PINK, createResolved } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { FrameShellTheme, FrameShellThemeChange, FrameShellThemeFamily, FrameShellThemeSpec } from './app-frame.js';
 import { createKeyMap } from './keybindings.js';
@@ -9,40 +9,12 @@ import {
   resolveFrameShellThemeChoices,
   resolveCurrentShellTheme,
   resolveNextShellTheme,
-  type ResolvedFrameShellTheme,
 } from './app-frame-overlays.js';
-
-function shellTheme(
-  id: string,
-  label: string,
-  resolvedTheme: ReturnType<typeof createResolved>,
-): ResolvedFrameShellTheme {
-  return {
-    id,
-    label,
-    shellTheme: {
-      id,
-      label,
-      theme: resolvedTheme.theme,
-    },
-    shellThemeSpec: {
-      id,
-      label,
-      theme: resolvedTheme.theme,
-    },
-    shellThemeId: id,
-    shellThemeLabel: label,
-    resolvedTheme,
-  };
-}
-
-function requireConcreteShellThemeTheme(shellTheme: FrameShellTheme): Theme {
-  return shellTheme.theme;
-}
-
-function requireConcreteShellThemeChange(change: FrameShellThemeChange): Theme {
-  return change.shellTheme.theme;
-}
+import {
+  requireConcreteShellThemeChange,
+  requireConcreteShellThemeTheme,
+  shellTheme,
+} from './app-frame-overlays.test-support.js';
 
 describe('app-frame-overlays', () => {
   it('resolves current and next shell themes by stable id', () => {

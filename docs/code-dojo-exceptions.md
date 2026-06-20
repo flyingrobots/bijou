@@ -24,11 +24,20 @@ Current count:
 
 | Source | Count | Meaning |
 | :--- | ---: | :--- |
-| File/context baseline | 331 | Files over the Code Dojo context threshold. |
-| Mock-ban baseline | 22 | Existing test mock/spy violations. |
+| File/context baseline | 309 | Files over the Code Dojo context threshold. |
+| Mock-ban baseline | 0 | Existing test mock/spy violations. |
 | Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
-| ESLint baseline | 6 | Type-aware ESLint findings after the WF-159 focused cleanup pass. |
-| **Total** | **414** | Aggregate Code Dojo standards debt. |
+| ESLint baseline | 0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
+| **Total** | **364** | Aggregate Code Dojo standards debt. |
+
+WF-160 clears the final ESLint and mock-ban baselines while removing `22`
+file/context entries through focused type extraction, test-support extraction,
+and behavior-preserving test splits. Node IO and create-app CLI tests now use
+observable fake writers/platform seams instead of process spies, pipeline tests
+observe rebuild behavior through an explicit callback, and the PR review status
+script uses validator-backed parsing instead of caller-chosen generics. The
+aggregate Code Dojo ceiling falls from `414` to `364`, and the next target is
+`314` or lower.
 
 WF-159 lowers ESLint debt from `57` to `6` by making the i18n runtime boundary
 return unknown catalog values instead of caller-chosen unchecked generics,
@@ -102,8 +111,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `414`. The next met goalpost must lower the ceiling to
-`364` or lower.
+The current ceiling is `364`. The next met goalpost must lower the ceiling to
+`314` or lower.
 
 ## Updating The Ceiling
 

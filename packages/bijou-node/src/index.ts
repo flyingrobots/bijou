@@ -21,6 +21,12 @@ import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
 import { nodeRuntime } from './runtime.js';
 import { nodeIO } from './io.js';
 import { chalkStyle } from './style.js';
+import type {
+  CreateNodeContextOptions,
+  InitDefaultContextOptions,
+  NodeThemeEntry,
+  NodeThemeOptions,
+} from './options.js';
 
 /** Re-export the Node.js {@link RuntimePort} factory. */
 export { nodeRuntime, detectRefreshRate } from './runtime.js';
@@ -31,9 +37,18 @@ export {
   ScopedNodeIOError,
   type ScopedNodeIO,
   type ScopedNodeIOOptions,
+  type NodeIOOptions,
+  type NodeWriteStream,
 } from './io.js';
 /** Re-export the Chalk-based {@link StylePort} factory and its options type. */
 export { chalkStyle, type ChalkStyleOptions } from './style.js';
+export type {
+  CreateNodeContextOptions,
+  InitDefaultContextOptions,
+  NodeThemeEntry,
+  NodeThemeMode,
+  NodeThemeOptions,
+} from './options.js';
 
 /** Re-export Worker utilities for multi-threaded applications. */
 export { isBijouWorker, runInWorker, sendToMain, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
@@ -73,53 +88,8 @@ export class BijouBootstrapError extends Error {
   }
 }
 
-/** Theme-selection options for Node-hosted context creation. */
-export interface NodeThemeEntry {
-  /** Stable selection id for env/config or app-owned override state. */
-  readonly id: string;
-  /** Theme value associated with this entry. */
-  readonly theme: Theme;
-  /**
-   * Optional light/dark hint used by automatic selection.
-   *
-   * When omitted, `id === "light"` and `id === "dark"` are treated as the
-   * corresponding scheme.
-   */
-  readonly scheme?: ColorScheme;
-}
-
-/** Host-level theme mode for automatic selection. */
-export type NodeThemeMode = 'auto' | ColorScheme;
-
-/** Theme-selection options for Node-hosted context creation. */
-export interface NodeThemeOptions {
-  /**
-   * Explicit fallback theme object to use for this host context.
-   *
-   * This wins whenever the selected env var does not point at a known preset or
-   * a valid DTCG JSON file.
-   */
-  theme?: Theme;
-  /** Named preset themes available to env-var selection. */
-  presets?: Record<string, Theme>;
-  /** Environment variable name that selects a preset or JSON theme path. */
-  envVar?: string;
-  /** Named theme entries available for auto-selection or app-owned overrides. */
-  themes?: readonly NodeThemeEntry[];
-  /** Automatic or forced light/dark selection mode for `themes`. */
-  themeMode?: NodeThemeMode;
-  /** Explicit theme-entry id override that wins over env-driven selection. */
-  themeOverride?: string;
-}
-
-/** Options for {@link createNodeContext}. */
-export type CreateNodeContextOptions = NodeThemeOptions;
-
-/** Options for {@link initDefaultContext}. */
-export type InitDefaultContextOptions = NodeThemeOptions;
-
 /** Options for {@link startApp}. */
-export type StartAppOptions<M = unknown> = RunOptions<M> & NodeThemeOptions;
+export type StartAppOptions<M = unknown> = RunOptions<M> & CreateNodeContextOptions;
 
 interface SelfRunningApp<M = unknown> {
   run(options?: RunOptions<M>): Promise<void>;
@@ -252,7 +222,7 @@ export function createNodeContext(options: CreateNodeContextOptions = {}): Bijou
   // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
-    io: nodeIO(),
+    io: options.io ?? nodeIO(options.nodeIO),
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
     theme: selection.fallbackTheme,
     presets: selection.presets,
@@ -283,8 +253,7 @@ export function _resetInitializedForTesting(): void {
  * Initialize and register the global default {@link BijouContext}.
  *
  * On the first call, creates a Node.js context via {@link createNodeContext}
- * and registers it with `setDefaultContext` so that bijou components
- * omitting the optional `ctx` parameter automatically use it.
+ * and registers it with `setDefaultContext` for ambient `ctx` use.
  *
  * Subsequent calls return a fresh (unregistered) context without
  * overwriting the global default.
@@ -303,14 +272,14 @@ export function initDefaultContext(options: InitDefaultContextOptions = {}): Bij
   }
 
   try {
-    const hasExplicitThemeSelection =
+    const hasExplicitOptions =
       options.theme !== undefined
       || options.presets !== undefined
       || options.envVar !== undefined
       || options.themes !== undefined
       || options.themeMode !== undefined
-      || options.themeOverride !== undefined;
-    if (!initialized && !hasExplicitThemeSelection) {
+      || options.themeOverride !== undefined || options.io !== undefined || options.nodeIO !== undefined;
+    if (!initialized && !hasExplicitOptions) {
       const existing = resolveSafeCtx();
       if (existing != null) {
         initialized = true;
@@ -365,6 +334,8 @@ export async function startApp<Model, M>(
     themes,
     themeMode,
     themeOverride,
+    io: ioOverride,
+    nodeIO: nodeIOOptions,
     ...runOptions
   } = options ?? {};
   let ctx = explicitCtx;
@@ -376,8 +347,19 @@ export async function startApp<Model, M>(
       || themes !== undefined
       || themeMode !== undefined
       || themeOverride !== undefined
+      || ioOverride !== undefined
+      || nodeIOOptions !== undefined
     ) {
-      ctx = createNodeContext({ theme, presets, envVar, themes, themeMode, themeOverride });
+      ctx = createNodeContext({
+        theme,
+        presets,
+        envVar,
+        themes,
+        themeMode,
+        themeOverride,
+        io: ioOverride,
+        nodeIO: nodeIOOptions,
+      });
       setDefaultContext(ctx);
       initialized = true;
     } else {
