@@ -66,7 +66,10 @@ describe('focus navigation', () => {
   it('focusNext wraps around', () => {
     const io = createMockIO();
     let state = createFilePickerState({ cwd: '/project', io });
-    for (let i = 0; i < state.entries.length; i++) state = fpFocusNext(state);
+    for (const entry of state.entries) {
+      void entry;
+      state = fpFocusNext(state);
+    }
     expect(state.focusIndex).toBe(0);
   });
 

@@ -125,7 +125,8 @@ function fieldScore(value: string | undefined, query: string, baseScore: number)
   if (index < 0) return undefined;
   if (haystack === query) return baseScore;
   if (index === 0) return baseScore + 1;
-  if (index > 0 && /\W/.test(haystack[index - 1]!)) return baseScore + 2;
+  const previous = haystack[index - 1];
+  if (previous !== undefined && /\W/.test(previous)) return baseScore + 2;
   return baseScore + 3 + Math.min(index, 100);
 }
 

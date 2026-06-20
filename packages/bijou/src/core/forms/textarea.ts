@@ -42,7 +42,7 @@ async function fallbackTextarea(options: TextareaOptions, ctx: BijouContext): Pr
     ? 'Enter text: '
     : '> ';
   const answer = await ctx.io.question(prompt);
-  const value = answer.trim() || options.defaultValue || '';
+  const value = answer.trim() || (options.defaultValue ?? '');
 
   if (options.required && value === '') {
     writeValidationError('This field is required.', ctx);

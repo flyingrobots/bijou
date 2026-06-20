@@ -20,7 +20,7 @@ function tokenizeAnsiText(str: string): WrapToken[] {
   let lastIndex = 0;
 
   for (const match of str.matchAll(regex)) {
-    const index = match.index ?? 0;
+    const index = match.index;
     if (index > lastIndex) {
       const raw = str.slice(lastIndex, index);
       for (const grapheme of segmentGraphemes(raw)) {
@@ -51,7 +51,7 @@ function tokenizeAnsiText(str: string): WrapToken[] {
 }
 
 export function prepareWrappedText(str: string): PreparedWrappedText {
-  const source = str ?? '';
+  const source = str;
   return {
     source,
     lines: source.split('\n').map((line) => ({

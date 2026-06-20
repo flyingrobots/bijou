@@ -107,7 +107,22 @@ function message(id: string, value: string) {
 function interpolate(template: string, values: Readonly<Record<string, unknown>>): string {
   return template.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => {
     const value = values[rawKey];
-    return value === undefined ? `{${rawKey}}` : String(value);
+    switch (typeof value) {
+      case 'undefined':
+      case 'function':
+        return `{${rawKey}}`;
+      case 'object':
+        return value === null ? 'null' : JSON.stringify(value);
+      case 'string':
+        return value;
+      case 'boolean':
+        return value ? 'true' : 'false';
+      case 'symbol':
+        return value.description ?? 'Symbol()';
+      case 'number':
+      case 'bigint':
+        return value.toString();
+    }
   });
 }
 

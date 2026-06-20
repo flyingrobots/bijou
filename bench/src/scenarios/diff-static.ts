@@ -68,7 +68,7 @@ export const diffStatic: Scenario<State> = {
     return { current, target, sink: createSink(), style: stubStyle, cols: columns, rows };
   },
 
-  frame(state, _frameIndex) {
+  frame(state) {
     const { current, target, sink, style } = state;
     renderDiff(current, target, sink, style);
     // Model the runtime swap+clear pattern: between frames, the

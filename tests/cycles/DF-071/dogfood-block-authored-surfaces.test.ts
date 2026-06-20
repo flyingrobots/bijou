@@ -12,7 +12,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -50,10 +50,10 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{ key: '/' }], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    const expectedTitle = String(searchPanelBlock.render({
+    const expectedTitle = searchPanelBlock.render({
       config: { title: 'Search documentation' },
       mode: 'accessible',
-    }).output);
+    }).output;
 
     expect(text).toContain(expectedTitle);
     expect(text).toContain('What are Blocks');

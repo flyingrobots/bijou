@@ -27,7 +27,7 @@ describe('code-dojo debt summary', () => {
       fileContextEntries: Array.from({ length: 80 }),
       mockBanViolations: Array.from({ length: 20 }),
       codeSizeBaseline: Array.from({ length: 20 }, (_, index) => ({
-        path: `src/${index}.ts`,
+        path: `src/${String(index)}.ts`,
         lines: 501,
       })),
       eslintViolations: 20,

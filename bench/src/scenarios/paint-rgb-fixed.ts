@@ -46,7 +46,7 @@ export const paintRgbFixed: Scenario<State> = {
     return { surface, cols: columns, rows };
   },
 
-  frame(state, _frameIndex) {
+  frame(state) {
     const { surface, cols, rows } = state;
     // Fixed bytes. Matches a theme token like '#9ba9ff' on '#111320'.
     for (let row = 0; row < rows; row++) {

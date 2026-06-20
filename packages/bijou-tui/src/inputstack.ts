@@ -171,7 +171,8 @@ export function createInputStack<Msg, A>(): InputStack<Msg, A> {
     dispatch(msg) {
       // Walk top-down
       for (let i = stack.length - 1; i >= 0; i--) {
-        const layer = stack[i]!;
+        const layer = stack[i];
+        if (layer === undefined) continue;
         const action = layer.handler.handle(msg);
 
         if (action !== undefined) {

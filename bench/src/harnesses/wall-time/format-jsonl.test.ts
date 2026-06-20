@@ -70,7 +70,7 @@ const FIXTURE: RunReport & {
 
 describe('flat bench report formatting', () => {
   it('formats one JSONL record per scenario metric', () => {
-    const lines = formatReportAsJsonl(FIXTURE).trim().split('\n').map((line) => JSON.parse(line));
+    const lines = formatReportAsJsonl(FIXTURE).trim().split('\n').map((line): unknown => JSON.parse(line));
     expect(lines).toHaveLength(9);
     expect(lines[0]).toMatchObject({
       kind: 'bench.v2.metric',

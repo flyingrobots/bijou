@@ -18,7 +18,7 @@ function readIntEnv(name: string, fallback: number): number {
 function allocateHeapSample(allocationCount: number, arraySize: number): void {
   const chunks: number[][] = [];
   for (let i = 0; i < allocationCount; i++) {
-    chunks.push(new Array(arraySize).fill(i));
+    chunks.push(new Array<number>(arraySize).fill(i));
   }
   void chunks;
 }

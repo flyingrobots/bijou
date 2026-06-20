@@ -16,10 +16,6 @@ function key(k: string): KeyMsg {
   return { type: 'key', key: k, ctrl: false, alt: false, shift: false };
 }
 
-function ctrlKey(k: string): KeyMsg {
-  return { type: 'key', key: k, ctrl: true, alt: false, shift: false };
-}
-
 function makePanels(): readonly PanelDef<Msg>[] {
   const navMap = createKeyMap<Msg>()
     .bind('j', 'Down', { type: 'nav-down' })

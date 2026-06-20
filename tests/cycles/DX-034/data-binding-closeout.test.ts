@@ -114,13 +114,15 @@ describe('DX-034 data binding closeout', () => {
         details: selection.details,
       },
     }).output;
+    const statusSlot = update.frame.status('status') ?? 'missing';
+    const statusText = update.frame.get<string>('status') ?? '';
     const renderedShell = appShellBlock.render({
       mode: 'pipe',
       slots: {
         navigation: update.frame.require<string>('navigation'),
         content: renderedReader,
         inspector: renderedInspector,
-        status: `${update.frame.status('status')}: ${update.frame.get<string>('status')}`,
+        status: `${statusSlot}: ${statusText}`,
       },
     });
 

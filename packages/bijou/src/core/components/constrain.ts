@@ -32,7 +32,7 @@ export interface ConstrainOptions {
  */
 export function constrain(content: string, options: ConstrainOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const safeContent = content ?? '';
+  const safeContent = content;
 
   return renderByMode(ctx.mode, {
     pipe: () => safeContent,

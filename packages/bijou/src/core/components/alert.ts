@@ -70,7 +70,7 @@ const BORDER_TOKENS: Record<AlertVariant, keyof Theme['border']> = {
 export function alert(message: string, options: AlertOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const variant = options.variant ?? 'info';
-  const safeMessage = message ?? '';
+  const safeMessage = message;
 
   return renderByMode(ctx.mode, {
     pipe: () => `[${PIPE_LABELS[variant]}] ${safeMessage}`,

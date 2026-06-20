@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Tracker
 
@@ -57,6 +57,34 @@ The DOGFOOD app entrypoint remains oversized after the WF-157 merge:
 
 - `examples/docs/app.ts`: `3,306` physical lines / `114,890` bytes
 - DOGFOOD raw-string debt: `2,373`
+
+## Implementation Notes
+
+WF-158 removes `53` live type-aware ESLint findings, lowering the ESLint
+baseline from `110` to `57` and the aggregate Code Dojo ceiling from `518` to
+`465`.
+
+Cleanup clusters:
+
+- Core forms and tests: preserve empty-answer default semantics while replacing
+  unsafe fallback chains, add explicit numeric formatting in fuzz fixtures, and
+  remove control-character regex literals from prompt/progress tests.
+- DOGFOOD and cycle tests: replace visible frame-text fallbacks with nullish
+  checks, remove unnecessary conversions, and keep rendered text assertions
+  behaviorally equivalent.
+- Bench and smoke helpers: type GC sample arrays, make JSONL parsing return
+  `unknown`, document intentional no-op sinks, and remove needless async
+  wrappers.
+- TUI helpers: replace non-null assertions with checked reads in command
+  palette, file picker, panel focus, input stack, status bar, cell glyph, CSS
+  parser, and app-frame layout traversal.
+- Core components: remove unnecessary fallbacks from already-required string
+  inputs, unify DAG overloads, and keep runtime viewport overlay typing direct.
+
+Per the operator's temporary waiver for touched-file size ratchets, existing
+file/context entries for touched legacy-large files were refreshed to their
+current measured line/byte counts. No new counted file/context, mock-ban, or
+code-size entries were added.
 
 ## Scope
 
@@ -149,4 +177,4 @@ without re-running broad discovery first.
 - Aggregate Code Dojo debt is `468` or lower.
 - The ESLint baseline records the lower live count.
 - The Code Dojo exception ledger and `package.json` report the lower ceiling.
-- The next ratchet target is documented as `418` or lower.
+- The next ratchet target is documented as `415` or lower.

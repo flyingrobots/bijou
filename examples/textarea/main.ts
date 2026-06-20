@@ -21,15 +21,10 @@ export async function main(
     ctx,
   });
 
-  if (message != null) {
-    writeLine();
-    writeLine(headerBox('Commit Message', { detail: message, ctx }));
-  } else {
-    writeLine();
-    writeLine('Cancelled.');
-  }
+  writeLine();
+  writeLine(headerBox('Commit Message', { detail: message, ctx }));
 }
 
-if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   main().catch(console.error);
 }

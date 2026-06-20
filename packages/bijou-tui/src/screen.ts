@@ -63,7 +63,7 @@ const CURSOR_SHAPE_CODE: Record<CursorShape, number> = {
  */
 export function setCursorStyle(io: IOPort, shape: CursorShape, options?: { blink?: boolean }): void {
   const code = options?.blink ? CURSOR_SHAPE_CODE[shape] - 1 : CURSOR_SHAPE_CODE[shape];
-  io.write(`\x1b[${code} q`);
+  io.write(`\x1b[${String(code)} q`);
 }
 
 /**
