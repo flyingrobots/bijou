@@ -6,21 +6,21 @@ import { createSurface } from '@flyingrobots/bijou';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 type AdapterChildMsg =
-  | { type: 'child-done'; count: number }
-  | { type: 'child-error'; error: string };
+  | { type: 'done'; count: number }
+  | { type: 'error'; error: string };
 
 type AdapterParentMsg =
-  | { type: 'panel-closed'; count: number }
-  | { type: 'show-alert'; text: string };
+  | { type: 'closed'; count: number }
+  | { type: 'alert'; text: string };
 
 const adapter = createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
-  'child-done': (msg) => ({ type: 'panel-closed', count: msg.count }),
-  'child-error': (msg) => ({ type: 'show-alert', text: msg.error }),
+  done: (msg) => ({ type: 'closed', count: msg.count }),
+  error: (msg) => ({ type: 'alert', text: msg.error }),
 });
 
 // @ts-expect-error Exhaustive child message coverage is required.
 createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
-  'child-done': (msg) => ({ type: 'panel-closed', count: msg.count }),
+  done: (msg) => ({ type: 'closed', count: msg.count }),
 });
 
 describe('mount', () => {
@@ -42,9 +42,10 @@ describe('mount', () => {
 });
 
 describe('mapCmds', () => {
-  it('builds exhaustive parent mappers from child discriminants', () => {
-    expect(adapter({ type: 'child-done', count: 7 })).toEqual({ type: 'panel-closed', count: 7 });
-    expect(adapter({ type: 'child-error', error: 'boom' })).toEqual({ type: 'show-alert', text: 'boom' });
+  it('maps child discriminants', () => {
+    expect(adapter({ type: 'done', count: 7 })).toEqual({ type: 'closed', count: 7 });
+    expect(adapter({ type: 'error', error: 'boom' })).toEqual({ type: 'alert', text: 'boom' });
+    expect(() => { void Reflect.apply(adapter, undefined, [{ type: 'x' }]); }).toThrow('Unhandled sub-app message type: x');
   });
 
   it('maps emitted messages to the parent type', async () => {
@@ -71,8 +72,7 @@ describe('mapCmds', () => {
   });
 
   it('QUIT', async () => {
-    const cmd: Cmd<never> = () => QUIT;
-    const mapped = mapCmds([cmd], (m) => m).at(0);
+    const mapped = mapCmds<never, never>([() => QUIT], (m) => m).at(0);
     if (!mapped) throw new Error('missing');
     const result = await mapped(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(QUIT);

@@ -74,16 +74,15 @@ export function createSubAppAdapter<ParentMsg, SubMsg extends { readonly type: s
   cases: SubAppAdapterCases<ParentMsg, SubMsg>,
 ): (msg: SubMsg) => ParentMsg {
   return (msg) => {
-    const type = msg.type;
-    const handler = subAppHandler(cases, type);
-    if (isSubAppMessageType(msg, type)) {
+    if (hasHandler(cases, msg)) {
+      const handler = handlerFor(cases, msg.type);
       return handler(msg);
     }
-    throw new Error(`Unhandled sub-app message type: ${type}`);
+    throw new Error(`Unhandled sub-app message type: ${msg.type}`);
   };
 }
 
-function subAppHandler<
+function handlerFor<
   ParentMsg,
   SubMsg extends { readonly type: string },
   Type extends SubMsg['type'],
@@ -94,11 +93,11 @@ function subAppHandler<
   return cases[type];
 }
 
-function isSubAppMessageType<
-  SubMsg extends { readonly type: string },
-  Type extends SubMsg['type'],
->(msg: SubMsg, type: Type): msg is Extract<SubMsg, { type: Type }> {
-  return msg.type === type;
+function hasHandler<ParentMsg, SubMsg extends { readonly type: string }>(
+  cases: SubAppAdapterCases<ParentMsg, SubMsg>,
+  msg: SubMsg,
+): msg is Extract<SubMsg, { readonly type: string }> {
+  return Object.hasOwn(cases, msg.type);
 }
 
 export interface SubAppOptions<SubMsg extends object, ParentMsg> {
