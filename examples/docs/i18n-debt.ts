@@ -2,7 +2,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { posix as posixPath } from 'node:path';
 import ts from 'typescript';
 import { parse as parseYaml } from 'yaml';
+import { DOGFOOD_I18N_DEBT_BASELINE } from './i18n-debt-baseline.js';
 import { DEFAULT_LOCALE, DOGFOOD_LOCALE_OPTIONS } from './locale.js';
+
+export { DOGFOOD_I18N_DEBT_BASELINE } from './i18n-debt-baseline.js';
 
 export interface DogfoodI18nDebtSource {
   readonly surface: string;
@@ -103,6 +106,10 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
     reason: 'localization debt scanner implementation, not a DOGFOOD product surface',
   },
   {
+    path: 'examples/docs/i18n-debt-baseline.ts',
+    reason: 'localization debt baseline data, not a DOGFOOD product surface',
+  },
+  {
     path: 'examples/docs/i18n-debt-touched.ts',
     reason: 'localization touched-file ratchet implementation, not a DOGFOOD product surface',
   },
@@ -139,24 +146,6 @@ export function discoverDogfoodI18nDebtSources(
 }
 
 export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = discoverDogfoodI18nDebtSources();
-
-export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2415,
-  bySurface: Object.freeze({
-    'capture-main': 9,
-    'component-stories': 1453,
-    'counter-block-demo': 52,
-    coverage: 1,
-    'docs-app': 185,
-    'dogfood-blocks': 630,
-    'dogfood-locale': 7,
-    'i18n-dogfood-authoring': 1,
-    'i18n-missing-localization': 3,
-    'release-title': 33,
-    'storybook-app': 34,
-    'storybook-workstation': 7,
-  }),
-});
 
 export const DOGFOOD_MARKDOWN_LOCALIZATION_BASELINE: DogfoodMarkdownLocalizationBaseline = Object.freeze({
   total: 78,
