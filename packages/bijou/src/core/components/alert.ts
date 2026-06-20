@@ -67,10 +67,10 @@ const BORDER_TOKENS: Record<AlertVariant, keyof Theme['border']> = {
  * @param options - Alert configuration.
  * @returns The rendered alert string.
  */
-export function alert(message: string, options: AlertOptions = {}): string {
+export function alert(message: string | null | undefined, options: AlertOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const variant = options.variant ?? 'info';
-  const safeMessage = message;
+  const safeMessage = message ?? '';
 
   return renderByMode(ctx.mode, {
     pipe: () => `[${PIPE_LABELS[variant]}] ${safeMessage}`,

@@ -30,9 +30,9 @@ export interface ConstrainOptions {
  * @param options - Constraint configuration.
  * @returns The constrained string.
  */
-export function constrain(content: string, options: ConstrainOptions = {}): string {
+export function constrain(content: string | null | undefined, options: ConstrainOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const safeContent = content;
+  const safeContent = content ?? '';
 
   return renderByMode(ctx.mode, {
     pipe: () => safeContent,

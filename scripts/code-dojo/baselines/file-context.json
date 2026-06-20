@@ -1136,7 +1136,7 @@
     {
       "path": "packages/bijou/src/core/components/box.ts",
       "lines": 227,
-      "bytes": 9112
+      "bytes": 9150
     },
     {
       "path": "packages/bijou/src/core/forms/input.test.ts",
@@ -1191,7 +1191,7 @@
     {
       "path": "packages/bijou/src/core/text/wrap.ts",
       "lines": 220,
-      "bytes": 6519
+      "bytes": 6533
     },
     {
       "path": "packages/bijou-tui/src/layout-inspector.ts",

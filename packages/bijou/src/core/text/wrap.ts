@@ -50,8 +50,8 @@ function tokenizeAnsiText(str: string): WrapToken[] {
   return tokens;
 }
 
-export function prepareWrappedText(str: string): PreparedWrappedText {
-  const source = str;
+export function prepareWrappedText(str: string | null | undefined): PreparedWrappedText {
+  const source = str ?? '';
   return {
     source,
     lines: source.split('\n').map((line) => ({
