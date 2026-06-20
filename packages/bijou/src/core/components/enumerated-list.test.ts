@@ -72,7 +72,7 @@ describe('enumeratedList', () => {
 
   it('right-aligns prefixes for consistent indentation with 10+ items', () => {
     const ctx = createTestContext({ mode: 'interactive' });
-    const items = Array.from({ length: 12 }, (_, i) => `Item ${i + 1}`);
+    const items = Array.from({ length: 12 }, (_, i) => `Item ${String(i + 1)}`);
     const result = enumeratedList(items, { ctx });
     const lines = result.split('\n');
     // ' 1.' has length 3 and '12.' has length 3, but ' 1.' is padded

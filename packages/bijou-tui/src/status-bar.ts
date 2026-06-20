@@ -112,7 +112,7 @@ function layoutStatusBar(options: StatusBarOptions): StatusBarLayout | null {
   if (width <= 0) return null;
 
   // Use first character of fillChar, default to space
-  const fill = rawFillChar ? rawFillChar[0]! : ' ';
+  const fill = rawFillChar ? (rawFillChar[0] ?? ' ') : ' ';
 
   // Measure visible lengths
   const leftLen = visibleLength(left);

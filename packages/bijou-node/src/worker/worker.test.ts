@@ -35,7 +35,9 @@ describe('worker runtime', () => {
       ctx,
       entry,
       mouse: true,
-      onMessage() {},
+      onMessage() {
+        // no-op for terminal mode
+      },
     });
 
     handle.send({ type: 'host-note', text: 'from-main' });

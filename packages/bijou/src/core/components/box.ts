@@ -142,7 +142,7 @@ function drawBox(
  * @param options - Box configuration.
  * @returns The rendered box string, or plain content in non-visual modes.
  */
-export function box(content: string, options: BoxOptions = {}): string {
+export function box(content: string | null | undefined, options: BoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const safeContent = content ?? '';
 
@@ -190,7 +190,7 @@ export interface HeaderBoxOptions extends BoxOptions {
  * @param options - Header box configuration.
  * @returns The rendered header box string.
  */
-export function headerBox(label: string, options: HeaderBoxOptions = {}): string {
+export function headerBox(label: string | null | undefined, options: HeaderBoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const detail = options.detail ?? '';
   const safeLabel = label ?? '';

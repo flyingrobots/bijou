@@ -147,7 +147,7 @@ describe('confirm()', () => {
       await confirm({ title: 'Continue?', ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('[Y/n]');
-      expect(output).not.toMatch(/\x1b\[/);
+      expect(output).not.toMatch(new RegExp(`${String.fromCharCode(27)}\\[`, 'u'));
     });
 
     it('"y" returns true under noColor', async () => {

@@ -75,8 +75,9 @@ export function normalizeViewOutputInto(
 
 export function wrapViewOutputAsLayoutRoot(
   output: ViewOutput,
-  _size: ViewportSize,
+  size: ViewportSize,
 ): LayoutNode {
+  void size;
   if (isSurfaceView(output)) {
     return {
       type: 'SurfaceView',

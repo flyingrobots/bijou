@@ -45,7 +45,7 @@ async function runExample(relativePath: string): Promise<void> {
         return;
       }
 
-      rejectPromise(new Error(`${relativePath} exited with code ${code ?? 'null'}`));
+      rejectPromise(new Error(`${relativePath} exited with code ${String(code ?? 'null')}`));
     });
   });
 }

@@ -110,12 +110,12 @@ describe('runSmokeDogfood', () => {
       buildImpl() {
         buildCount += 1;
       },
-      runScenarioImpl: async (_root, scenario) => {
+      runScenarioImpl(_root, scenario) {
         executed.push(scenario.name);
-        return {
+        return Promise.resolve({
           name: scenario.name,
           status: 'ok',
-        };
+        });
       },
     });
 

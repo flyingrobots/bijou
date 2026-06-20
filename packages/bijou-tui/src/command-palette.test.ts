@@ -163,7 +163,10 @@ describe('focus navigation', () => {
 
   it('focusNext wraps around', () => {
     let state = createCommandPaletteState(items);
-    for (let i = 0; i < items.length; i++) state = cpFocusNext(state);
+    for (const item of items) {
+      void item;
+      state = cpFocusNext(state);
+    }
     expect(state.focusIndex).toBe(0);
   });
 

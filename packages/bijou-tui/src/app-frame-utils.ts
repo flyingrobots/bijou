@@ -66,7 +66,9 @@ export function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<Fra
   if (node.kind === 'pane') return node.paneId === paneId ? node : undefined;
   if (node.kind === 'split') return findPaneNode(node.paneA, paneId) ?? findPaneNode(node.paneB, paneId);
   for (const key of Object.keys(node.cells)) {
-    const found = findPaneNode(node.cells[key]!, paneId);
+    const child = node.cells[key];
+    if (child === undefined) continue;
+    const found = findPaneNode(child, paneId);
     if (found) return found;
   }
   return undefined;

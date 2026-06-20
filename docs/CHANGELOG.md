@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-158 removes `53` more type-aware ESLint
+  findings across form defaults and fuzz fixtures, DOGFOOD frame-text helpers,
+  benchmark no-op and JSONL parsing, core component fallback handling, DAG
+  overloads, progress and confirm escape assertions, TUI command/file/panel
+  checked reads, screen formatting, runtime viewport typing, and smoke helpers,
+  lowering aggregate Code Dojo debt from `518` to `465` with the next goalpost
+  target set to `415` or lower.
 - **Focused Code Dojo ratchet** — WF-157 removes `52` more type-aware ESLint
   findings across i18n catalog/freezing boundaries, MCP docs example coercion,
   TUI key/navigation/drawer/motion/notification/pager/split-pane helpers,

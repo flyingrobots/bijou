@@ -723,7 +723,7 @@ function surfaceText(surface: { width: number; height: number; get(x: number, y:
   let text = '';
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
-      text += surface.get(x, y).char || ' ';
+      text += surface.get(x, y).char ?? ' ';
     }
     text += '\n';
   }

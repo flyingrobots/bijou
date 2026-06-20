@@ -32,7 +32,7 @@ export async function input(options: InputOptions): Promise<string> {
 
   const prompt = buildPrompt(options, noColor, ctx);
   const answer = await ctx.io.question(prompt);
-  const value = answer.trim() || options.defaultValue || '';
+  const value = answer.trim() || (options.defaultValue ?? '');
 
   if (options.required && value === '') {
     writeValidationError('This field is required.', ctx);

@@ -89,7 +89,7 @@ function fitAsciiDensityGlyph(samples: readonly number[]): string {
 function meanSquaredCoverageError(samples: readonly number[], candidate: readonly number[]): number {
   let total = 0;
   for (let index = 0; index < CELL_GLYPH_SAMPLE_COUNT; index++) {
-    const delta = samples[index]! - clampUnit(candidate[index] ?? 0);
+    const delta = (samples[index] ?? 0) - clampUnit(candidate[index] ?? 0);
     total += delta * delta;
   }
   return total / CELL_GLYPH_SAMPLE_COUNT;

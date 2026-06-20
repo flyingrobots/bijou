@@ -166,8 +166,6 @@ export function dagSlice(
  * @returns The layout result with output string, node positions, and dimensions.
  * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
  */
-export function dagLayout(source: SlicedDagSource, options?: DagOptions): DagLayout;
-export function dagLayout(nodes: readonly DagNode[], options?: DagOptions): DagLayout;
 export function dagLayout(
   input: readonly DagNode[] | SlicedDagSource,
   options: DagOptions = {},
@@ -201,8 +199,6 @@ export function dagLayout(
  *
  * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
  */
-export function dag(source: SlicedDagSource, options?: DagOptions): string;
-export function dag(nodes: readonly DagNode[], options?: DagOptions): string;
 export function dag(
   input: readonly DagNode[] | SlicedDagSource,
   options: DagOptions = {},

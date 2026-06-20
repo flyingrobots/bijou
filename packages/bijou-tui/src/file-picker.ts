@@ -281,7 +281,7 @@ function renderFilePickerEntryLines(
 
   return state.entries.map((entry, index) => {
     const prefix = index === state.focusIndex ? indicator : pad;
-    const selected = hasSelection && index === options?.selectedIndex ? selectedIndicator : selectedPad;
+    const selected = hasSelection && index === options.selectedIndex ? selectedIndicator : selectedPad;
     const icon = entry.isDirectory ? dirIcon : fileIcon;
     const suffix = entry.isDirectory ? '/' : '';
     return hasSelection

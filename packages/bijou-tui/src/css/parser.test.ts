@@ -49,7 +49,7 @@ describe('parseBCSS', () => {
     
     expect(sheet.mediaQueries).toHaveLength(1);
     expect(sheet.mediaQueries[0]?.condition).toBe('(width < 80)');
-    expect(must(sheet.mediaQueries[0]!.rules[0]).selectors[0]?.classes).toContain('sidebar');
+    expect(must(must(sheet.mediaQueries[0]).rules[0]).selectors[0]?.classes).toContain('sidebar');
   });
 
   it('strips comments', () => {

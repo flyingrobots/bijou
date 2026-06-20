@@ -33,7 +33,7 @@ export function readRuntimeViewport(runtime: RuntimePort): RuntimeViewport {
  * `process.stdout.columns`) a stable, writable source of truth for scripted
  * resizes and worker-proxy synchronization.
  */
-export function installRuntimeViewportOverlay<T extends { runtime: RuntimePort }>(host: T): RuntimePort {
+export function installRuntimeViewportOverlay(host: { runtime: RuntimePort }): RuntimePort {
   const baseRuntime = host.runtime;
   const viewport = readRuntimeViewport(baseRuntime);
   const state = {

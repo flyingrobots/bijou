@@ -33,7 +33,9 @@ export function createSink(): CountingSink {
       this.writes += 1;
       this.bytesWritten += len;
     },
-    writeError() {},
+    writeError() {
+      // no-op sink for benchmark scenarios
+    },
   };
 }
 

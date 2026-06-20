@@ -147,7 +147,7 @@ describe('createProgressBar', () => {
     bar.start();
     bar.update(50);
     const updateWrite = ctx.io.written[2];
-    expect(updateWrite).toMatch(/^\r\x1b\[K/);
+    expect(updateWrite).toMatch(new RegExp(`^\\r${String.fromCharCode(27)}\\[K`, 'u'));
     expect(updateWrite).toContain('50%');
   });
 
@@ -194,7 +194,7 @@ describe('createAnimatedProgressBar', () => {
     expect(ctx.io.written[1]).toContain('0%');
   });
 
-  it('update() triggers interpolation frames', async () => {
+  it('update() triggers interpolation frames', () => {
     const clock = mockClock();
     const ctx = createTestContext({ mode: 'interactive', clock });
     const bar = createAnimatedProgressBar({ width: 10, fps: 30, duration: 300, ctx });

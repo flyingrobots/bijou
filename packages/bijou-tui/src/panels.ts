@@ -156,7 +156,8 @@ export function createPanelGroup<A>(options: PanelGroupOptions<A>): PanelGroup<A
 
       if (inputStack && panelLayerId !== undefined) {
         inputStack.remove(panelLayerId);
-        const panel = panelMap.get(id)!;
+        const panel = panelMap.get(id);
+        if (panel === undefined) return;
         panelLayerId = inputStack.push(panel.keyMap, {
           passthrough: true,
           name: `panel:${id}`,
