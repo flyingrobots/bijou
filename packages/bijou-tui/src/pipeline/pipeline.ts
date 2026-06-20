@@ -63,9 +63,9 @@ export interface RenderPipeline {
 
 /** Options for creating a programmable render pipeline. */
 export interface CreatePipelineOptions {
-  /** Optional timing source override, primarily for deterministic tests. */
+  /** Timing source override for deterministic tests. */
   now?: () => number;
-  /** Optional diagnostic hook invoked when the stage plan cache is rebuilt. */
+  /** Diagnostic hook invoked when stage plan cache rebuilds. */
   onPlanRebuild?: () => void;
 }
 
@@ -141,7 +141,7 @@ export function createPipeline(options: CreatePipelineOptions = {}): RenderPipel
         middlewares: stages[stage],
       }));
       chainDirty = false;
-      options.onPlanRebuild?.();
+      try { options.onPlanRebuild?.(); } catch { /* diag only */ }
     }
 
     return cachedPlan;
