@@ -3,9 +3,9 @@ import { existsSync, readFileSync, readdirSync, realpathSync } from 'fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
 import { resolveClock, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
 import type { NodeIOOptions, ScopedNodeIO, ScopedNodeIOOptions } from './io-types.js';
+import { createReadlineOutput } from './readline-output.js';
 
 export type { NodeIOOptions, NodeWriteStream, ScopedNodeIO, ScopedNodeIOOptions } from './io-types.js';
-
 export class ScopedNodeIOError extends Error {
   constructor(root: string, requestedPath: string) {
     super(`Scoped node IO path escapes root "${root}": ${requestedPath}`);
@@ -29,11 +29,6 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
   const stdout = options.stdout ?? process.stdout;
   const stderr = options.stderr ?? process.stderr;
   return {
-    /**
-     * Write a string directly to `process.stdout`.
-     *
-     * @param data - Text to write.
-     */
     write(data: string): void {
       stdout.write(data);
     },
@@ -56,11 +51,6 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
       }
     },
 
-    /**
-     * Write a string directly to `process.stderr`.
-     *
-     * @param data - Text to write.
-     */
     writeError(data: string): void {
       stderr.write(data);
     },
@@ -80,7 +70,7 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
     question(prompt: string): Promise<string> {
       const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output: options.stdout === undefined ? process.stdout : createReadlineOutput(stdout),
       });
       return new Promise<string>((resolve) => {
         rl.question(prompt, (answer) => {
@@ -204,7 +194,7 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
  * @returns An {@link ScopedNodeIO} rooted at the provided directory.
  */
 export function scopedNodeIO(options: ScopedNodeIOOptions): ScopedNodeIO {
-  const baseIO = options.baseIO ?? nodeIO({ clock: options.clock });
+  const baseIO = options.baseIO ?? nodeIO({ clock: options.clock, stdout: options.stdout, stderr: options.stderr });
   const root = resolve(options.root);
   const realRoot = realpathSync.native(root);
 

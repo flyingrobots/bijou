@@ -253,8 +253,7 @@ export function _resetInitializedForTesting(): void {
  * Initialize and register the global default {@link BijouContext}.
  *
  * On the first call, creates a Node.js context via {@link createNodeContext}
- * and registers it with `setDefaultContext` so that bijou components
- * omitting the optional `ctx` parameter automatically use it.
+ * and registers it with `setDefaultContext` for ambient `ctx` use.
  *
  * Subsequent calls return a fresh (unregistered) context without
  * overwriting the global default.
@@ -273,14 +272,14 @@ export function initDefaultContext(options: InitDefaultContextOptions = {}): Bij
   }
 
   try {
-    const hasExplicitThemeSelection =
+    const hasExplicitOptions =
       options.theme !== undefined
       || options.presets !== undefined
       || options.envVar !== undefined
       || options.themes !== undefined
       || options.themeMode !== undefined
-      || options.themeOverride !== undefined;
-    if (!initialized && !hasExplicitThemeSelection) {
+      || options.themeOverride !== undefined || options.io !== undefined || options.nodeIO !== undefined;
+    if (!initialized && !hasExplicitOptions) {
       const existing = resolveSafeCtx();
       if (existing != null) {
         initialized = true;

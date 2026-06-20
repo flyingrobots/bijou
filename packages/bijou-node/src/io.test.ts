@@ -96,7 +96,7 @@ describe('nodeIO()', () => {
     expect(spy).toHaveBeenCalledTimes(3); // no more calls after dispose
   });
 
-  // question() and rawInput() require a TTY stdin and are not unit-testable.
+  // rawInput() requires a TTY stdin and is not unit-testable here.
 });
 
 describe('scopedNodeIO()', () => {
