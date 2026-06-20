@@ -107,8 +107,8 @@ export function statsPanelSurface(
   const contentHeight = rowSurfaces.length;
   const contentWidth = innerWidth;
   const content = createSurface(contentWidth, contentHeight);
-  for (let i = 0; i < rowSurfaces.length; i++) {
-    content.blit(rowSurfaces[i]!, 0, i);
+  for (const [index, rowSurface] of rowSurfaces.entries()) {
+    content.blit(rowSurface, 0, index);
   }
 
   return boxSurface(content, {

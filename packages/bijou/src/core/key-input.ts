@@ -77,7 +77,8 @@ export function decodeRawKeyInput(raw: string): KeyInputMsg | null {
 export function decodeRawKeySequence(raw: string): KeyInputMsg[] {
   const messages: KeyInputMsg[] = [];
   for (let i = 0; i < raw.length; i++) {
-    const ch = raw[i]!;
+    const ch = raw[i];
+    if (ch === undefined) continue;
     if (ch === ESC) {
       const sequence = raw.slice(i, i + 3);
       const parsedSequence = decodeRawKeyInput(sequence);

@@ -34,9 +34,9 @@ describe('LX-019 DOGFOOD localization port usage', () => {
     const localization: LocalizationPort = {
       locale: base.locale,
       direction: base.direction,
-      resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
+      resolve(request: LocalizationRequest): LocalizedObject {
         requests.push(request);
-        return base.resolve<Value>(request);
+        return base.resolve(request);
       },
       formatNumber(value) { return base.formatNumber(value); },
       formatDate(value) { return base.formatDate(value); },
@@ -58,7 +58,7 @@ describe('LX-019 DOGFOOD localization port usage', () => {
     const localization: LocalizationPort = {
       locale: base.locale,
       direction: base.direction,
-      resolve<Value = unknown>(request: LocalizationRequest) { return base.resolve<Value>(request); },
+      resolve(request: LocalizationRequest) { return base.resolve(request); },
       formatNumber(value) { return base.formatNumber(value); },
       formatDate(value) { return base.formatDate(value); },
       formatTime(value) { return base.formatTime(value); },
@@ -74,7 +74,7 @@ describe('LX-019 DOGFOOD localization port usage', () => {
     const localization: LocalizationPort = {
       locale: 'fr',
       direction: 'ltr',
-      resolve<Value = unknown>(): LocalizedObject<Value> {
+      resolve(): LocalizedObject {
         throw new Error('localization adapter unavailable');
       },
       formatNumber(value) {

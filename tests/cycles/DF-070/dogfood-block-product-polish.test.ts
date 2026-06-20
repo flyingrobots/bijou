@@ -13,7 +13,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char || ' ';
+      text += frame.get(x, y).char ?? ' ';
     }
     text += '\n';
   }
@@ -72,16 +72,7 @@ describe('DF-070 DOGFOOD block product polish', () => {
       },
     }], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    const guideModel = (result.model as unknown as {
-      readonly docsModel: {
-        readonly pageModels: {
-          readonly guides: {
-            readonly selectedGuideId: string;
-            readonly guideState: { readonly focusIndex: number };
-          };
-        };
-      };
-    }).docsModel.pageModels.guides;
+    const guideModel = result.model.docsModel.pageModels.guides;
     expect(guideModel.selectedGuideId).toBe('start-here');
     expect(guideModel.guideState.focusIndex).toBe(1);
     expect(text).toContain('- Start Here');

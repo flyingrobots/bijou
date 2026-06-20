@@ -112,7 +112,7 @@ const runtime = createI18nRuntime({
 });
 const localization = createRuntimeLocalizationPort(runtime);
 
-const title = localization.resolve<string>({
+const title = localization.resolve({
   key: { namespace: 'app', id: 'title' },
 });
 ```

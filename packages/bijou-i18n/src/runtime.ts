@@ -73,9 +73,9 @@ export interface I18nRuntime extends I18nFormatterPort {
   unloadCatalog(namespace: string): void;
   preloadLocale(locale: string): Promise<void>;
   setLocale(locale: string, direction?: I18nDirection): Promise<void>;
-  localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value>;
+  localize(request: LocalizationRequest): LocalizedObject;
   t(key: I18nCatalogKey, values?: Readonly<Record<string, unknown>>): string;
-  resource<T = unknown>(key: I18nCatalogKey): T | undefined;
+  resource(key: I18nCatalogKey): unknown;
 }
 
 const DEFAULT_FORMATTER: I18nFormatterPort = {
@@ -108,13 +108,26 @@ function isReference(value: unknown): value is I18nReference {
 function interpolate(template: string, values: Readonly<Record<string, unknown>>): string {
   return template.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => {
     const value = values[rawKey];
-    return value === undefined ? `{${rawKey}}` : String(value);
+    return stringifyInterpolationValue(value) ?? `{${rawKey}}`;
   });
 }
 
-interface LocalizedResolution<T> {
+function stringifyInterpolationValue(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return 'null';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (typeof value === 'symbol') {
+    return value.description ?? '';
+  }
+  return JSON.stringify(value);
+}
+
+interface LocalizedResolution {
   readonly status: LocalizationStatus;
-  readonly value?: T;
+  readonly value?: unknown;
   readonly issues: readonly LocalizationIssue[];
 }
 
@@ -185,11 +198,11 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     };
   }
 
-  function resolveLocalizedValueResult<T>(
-    entry: I18nCatalogEntry<T>,
+  function resolveLocalizedValueResult(
+    entry: I18nCatalogEntry,
     seen: Set<string>,
     options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
-  ): LocalizedResolution<T> {
+  ): LocalizedResolution {
     const localized = entry.values[currentLocale];
     if (localized !== undefined) {
       return resolveCandidateResult(localized, seen, options, 'translated');
@@ -208,7 +221,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
           fallbackLocale,
           sourceLocale: entry.sourceLocale,
           reason: 'missing-locale',
-        }) as T,
+        }),
         issues: [
           localizationIssue(
             'missing-locale',
@@ -244,11 +257,11 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     };
   }
 
-  function resolveLocalizedValue<T>(
-    entry: I18nCatalogEntry<T>,
+  function resolveLocalizedValue(
+    entry: I18nCatalogEntry,
     seen: Set<string>,
     options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
-  ): T | undefined {
+  ): unknown {
     return resolveLocalizedValueResult(entry, seen, options).value;
   }
 
@@ -265,12 +278,12 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     return 'translated';
   }
 
-  function resolveCandidateResult<T>(
-    candidate: T | I18nReference,
+  function resolveCandidateResult(
+    candidate: unknown,
     seen: Set<string>,
     options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
     candidateStatus: LocalizationStatus,
-  ): LocalizedResolution<T> {
+  ): LocalizedResolution {
     if (isReference(candidate)) {
       const refKey = keyToString(candidate.$ref);
       if (seen.has(refKey)) {
@@ -281,7 +294,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (referencedEntry === undefined) {
         throw new Error(`Missing i18n reference: ${refKey}`);
       }
-      const resolved = resolveLocalizedValueResult<T>(referencedEntry as I18nCatalogEntry<T>, seen, options);
+      const resolved = resolveLocalizedValueResult(referencedEntry, seen, options);
       seen.delete(refKey);
       if (resolved.value !== undefined) {
         return {
@@ -342,7 +355,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     rebuildCatalogState();
   }
 
-  function localizeRequest<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
+  function localizeRequest(request: LocalizationRequest): LocalizedObject {
     const entry = entries.get(keyToString(request.key));
     const kind = request.kind ?? entry?.kind ?? 'message';
     const facts = [
@@ -362,7 +375,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
           locale: currentLocale,
           fallbackLocale,
           reason: 'missing-key',
-        }), request.values ?? {}) as Value
+        }), request.values ?? {})
         : undefined;
 
       return freezeLocalizedObject({
@@ -405,7 +418,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       });
     }
 
-    const resolved = resolveLocalizedValueResult<Value>(entry as I18nCatalogEntry<Value>, new Set<string>(), {
+    const resolved = resolveLocalizedValueResult(entry, new Set<string>(), {
       missingMessage: entry.kind === 'message' ? options.missingMessage : undefined,
     });
     let value = resolved.value;
@@ -420,7 +433,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
         ));
         value = undefined;
       } else {
-        value = interpolate(value, request.values ?? {}) as Value;
+        value = interpolate(value, request.values ?? {});
       }
     }
 
@@ -487,15 +500,15 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
         currentDirection = direction;
       }
     },
-    localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
-      return localizeRequest<Value>(request);
+    localize(request: LocalizationRequest): LocalizedObject {
+      return localizeRequest(request);
     },
     t(key, values = {}) {
       const entry = entries.get(keyToString(key));
       if (entry !== undefined && entry.kind !== 'message') {
         throw new Error(`Expected message entry for ${keyToString(key)} but found ${entry.kind}`);
       }
-      const resolved = localizeRequest<string>({ key, kind: 'message', values });
+      const resolved = localizeRequest({ key, kind: 'message', values });
       if (resolved.value === undefined) {
         throw new Error(`Missing i18n key: ${keyToString(key)}`);
       }
@@ -504,12 +517,12 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       }
       return resolved.value;
     },
-    resource<T = unknown>(key: I18nCatalogKey): T | undefined {
+    resource(key: I18nCatalogKey): unknown {
       const entry = entries.get(keyToString(key));
       if (entry === undefined) {
         return undefined;
       }
-      const resolved = resolveLocalizedValue(entry as I18nCatalogEntry<T>, new Set<string>());
+      const resolved = resolveLocalizedValue(entry, new Set<string>());
       return resolved === undefined ? undefined : freezeLocalizedValue(resolved);
     },
     formatNumber(value, locale) {

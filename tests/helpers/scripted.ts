@@ -20,7 +20,7 @@ export function createScriptTestContext(options: Omit<TestContextOptions, 'clock
   return createTestContext({
     ...options,
     clock: autoAdvancingScriptClock(),
-  }) as ScriptTestContext;
+  });
 }
 
 export function runScriptDeterministic<Model, M>(

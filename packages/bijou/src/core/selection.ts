@@ -61,7 +61,7 @@ export interface SelectionOwnerInput {
   readonly layoutNodeId: string;
   readonly rect: LayoutRect;
   readonly viewport?: SelectionViewportTransform;
-  readonly policy?: SelectionPolicy;
+  readonly policy?: string;
   readonly zIndex?: number;
   readonly content: SelectionContentModel;
 }
@@ -167,7 +167,7 @@ export function defineSelectionOwner(input: SelectionOwnerInput): SelectionOwner
   });
   const policy = input.policy ?? 'selectable';
   if (policy !== 'selectable' && policy !== 'disabled') {
-    throw new Error(`selection owner ${id}: unsupported policy ${String(policy)}`);
+    throw new Error(`selection owner ${id}: unsupported policy ${policy}`);
   }
 
   return Object.freeze<SelectionOwner>({
@@ -444,23 +444,19 @@ function freezeContentModel(content: SelectionContentModel): SelectionContentMod
       delimiter: content.delimiter,
     });
   }
-  if (content.kind === 'mixed') {
-    return Object.freeze({
-      kind: 'mixed',
-      regions: Object.freeze(content.regions.map((region) => Object.freeze({
-        id: normalizeRequiredText({
-          scope: 'selection content region',
-          field: 'id',
-          value: region.id,
-        }),
-        rect: freezeRect(normalizeRect(region.rect)),
-        content: freezeContentModel(region.content),
-      }))),
-      separator: content.separator,
-    });
-  }
-
-  throw new Error('selection owner: unsupported content model');
+  return Object.freeze({
+    kind: 'mixed',
+    regions: Object.freeze(content.regions.map((region) => Object.freeze({
+      id: normalizeRequiredText({
+        scope: 'selection content region',
+        field: 'id',
+        value: region.id,
+      }),
+      rect: freezeRect(normalizeRect(region.rect)),
+      content: freezeContentModel(region.content),
+    }))),
+    separator: content.separator,
+  });
 }
 
 function childRangeForRegion(

@@ -245,13 +245,13 @@
     },
     {
       "path": "packages/bijou-i18n/src/runtime.test.ts",
-      "lines": 554,
-      "bytes": 15625
+      "lines": 556,
+      "bytes": 15646
     },
     {
       "path": "packages/bijou-i18n/src/runtime.ts",
-      "lines": 553,
-      "bytes": 17348
+      "lines": 566,
+      "bytes": 17521
     },
     {
       "path": "tests/cycles/DF-054/dogfood-late-family-six-pack.test.ts",
@@ -320,13 +320,13 @@
     },
     {
       "path": "packages/bijou/src/core/graphql-bijou-block.test.ts",
-      "lines": 464,
-      "bytes": 18906
+      "lines": 466,
+      "bytes": 19019
     },
     {
       "path": "tests/cycles/DF-046/dogfood-choice-navigation-six-pack.test.ts",
-      "lines": 464,
-      "bytes": 15346
+      "lines": 465,
+      "bytes": 15409
     },
     {
       "path": "packages/bijou/src/core/ui-scene-ir.test.ts",
@@ -670,8 +670,8 @@
     },
     {
       "path": "packages/bijou/src/core/active-binding-collection.test.ts",
-      "lines": 336,
-      "bytes": 12796
+      "lines": 334,
+      "bytes": 12958
     },
     {
       "path": "packages/bijou/src/core/text/grapheme.ts",
@@ -1110,8 +1110,8 @@
     },
     {
       "path": "tests/cycles/WF-130/roadmap-goalpost-policy.test.ts",
-      "lines": 229,
-      "bytes": 12899
+      "lines": 240,
+      "bytes": 13199
     },
     {
       "path": "packages/bijou/src/core/components/dag.ts",
@@ -1285,8 +1285,8 @@
     },
     {
       "path": "packages/bijou/src/core/theme/resolve.test.ts",
-      "lines": 201,
-      "bytes": 7020
+      "lines": 202,
+      "bytes": 7008
     },
     {
       "path": "packages/bijou-tui/src/overlay-tooltip.test.ts",
@@ -1310,8 +1310,8 @@
     },
     {
       "path": "packages/bijou/src/core/theme/resolve.ts",
-      "lines": 199,
-      "bytes": 6919
+      "lines": 210,
+      "bytes": 7083
     },
     {
       "path": "packages/bijou-node/src/style.ts",
@@ -1400,8 +1400,8 @@
     },
     {
       "path": "packages/bijou/src/core/theme/downsample.ts",
-      "lines": 191,
-      "bytes": 6065
+      "lines": 193,
+      "bytes": 6140
     },
     {
       "path": "packages/bijou/src/core/theme/dtcg.fuzz.test.ts",
@@ -1460,8 +1460,8 @@
     },
     {
       "path": "scripts/design-system-docs-preflight.ts",
-      "lines": 181,
-      "bytes": 4723
+      "lines": 194,
+      "bytes": 5152
     },
     {
       "path": "bench/src/scenarios/component-app.ts",

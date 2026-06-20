@@ -79,7 +79,8 @@ export interface ResolvedTheme {
  */
 export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
   populateThemeRGB(theme);
-  const tokenGraph = createTokenGraph(theme as unknown as TokenDefinitions);
+  const tokenGraph = createTokenGraph(themeTokenDefinitions(theme));
+  const statusTokens = new Map(Object.entries(theme.status));
 
   return {
     theme,
@@ -92,8 +93,8 @@ export function createResolved(theme: Theme, noColor: boolean, colorScheme: Colo
     },
 
     inkStatus(status: string): InkColor {
-      const token = theme.status[status as keyof typeof theme.status] as TokenValue | undefined;
-      const fallback = theme.status['muted' as keyof typeof theme.status] as TokenValue | undefined;
+      const token = statusTokens.get(status);
+      const fallback = statusTokens.get('muted');
       if (token === undefined) return noColor ? undefined : fallback?.hex;
       return noColor ? undefined : token.hex;
     },
@@ -101,6 +102,16 @@ export function createResolved(theme: Theme, noColor: boolean, colorScheme: Colo
     hex(token: TokenValue): string {
       return token.hex;
     },
+  };
+}
+
+function themeTokenDefinitions(theme: Theme): TokenDefinitions {
+  return {
+    border: theme.border,
+    semantic: theme.semantic,
+    status: theme.status,
+    surface: theme.surface,
+    ui: theme.ui,
   };
 }
 

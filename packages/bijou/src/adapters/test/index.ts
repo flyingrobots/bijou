@@ -64,7 +64,7 @@ export interface TestContextOptions {
   style?: StylePort;
 }
 
-function isClockPort(value: MockClockOptions | MockClock | ClockPort | undefined): value is ClockPort {
+function isClockPort(value: unknown): value is ClockPort {
   return typeof value === 'object'
     && value !== null
     && 'now' in value
@@ -78,6 +78,8 @@ function isClockPort(value: MockClockOptions | MockClock | ClockPort | undefined
 export interface TestContext extends BijouContext {
   /** Mock I/O adapter with inspectable internal buffers. */
   readonly io: MockIO;
+  /** Deterministic or injected clock adapter used by the test context. */
+  readonly clock: ClockPort;
 }
 
 /**

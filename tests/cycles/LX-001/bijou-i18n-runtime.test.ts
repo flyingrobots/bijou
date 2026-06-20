@@ -66,7 +66,7 @@ describe('LX-001 bijou-i18n runtime cycle', () => {
     });
 
     expect(runtime.direction).toBe('rtl');
-    expect(runtime.resource<{ lines: string[] }>({ namespace: 'assets', id: 'logo' })).toEqual({
+    expect(runtime.resource({ namespace: 'assets', id: 'logo' })).toEqual({
       lines: ['BIJOU'],
     });
 

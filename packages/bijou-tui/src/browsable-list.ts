@@ -73,17 +73,17 @@ export interface BrowsableListOptions<T = string> {
 }
 
 /** Options for rendering the browsable list view. */
-export interface BrowsableListRenderOptions {
+export interface BrowsableListRenderOptions<T = string> {
   /** Character(s) shown next to the focused item (default: `"\u25b8"`). */
   readonly focusIndicator?: string;
   /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
   /** Optional row formatter for custom list chrome. */
-  readonly renderItem?: BrowsableListItemRenderer<any>;
+  readonly renderItem?: BrowsableListItemRenderer<T>;
 }
 
 /** Options for rendering the browsable list into a `Surface`. */
-export interface BrowsableListSurfaceOptions extends BrowsableListRenderOptions {
+export interface BrowsableListSurfaceOptions<T = string> extends BrowsableListRenderOptions<T> {
   /** Fixed viewport width. Defaults to the widest rendered row. */
   readonly width?: number;
   /** Show a scrollbar track on the right edge. Default: false. */
@@ -247,7 +247,7 @@ function renderBrowsableListLines<T>(
  */
 export function browsableList<T>(
   state: BrowsableListState<T>,
-  options?: BrowsableListRenderOptions,
+  options?: BrowsableListRenderOptions<T>,
 ): string {
   if (state.items.length === 0) return '';
 
@@ -270,14 +270,14 @@ export function browsableList<T>(
  */
 export function browsableListSurface<T>(
   state: BrowsableListState<T>,
-  options?: BrowsableListSurfaceOptions,
+  options?: BrowsableListSurfaceOptions<T>,
 ): Surface {
   const indicator = options?.focusIndicator ?? '\u25b8';
   const lines = renderBrowsableListLines(
     state,
     indicator,
     options?.ctx,
-    options?.renderItem as BrowsableListItemRenderer<T> | undefined,
+    options?.renderItem,
   );
   const width = options?.width != null
     ? Math.max(1, sanitizePositiveInt(options.width, 1))

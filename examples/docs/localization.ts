@@ -5,7 +5,22 @@ export function interpolateFallbackText(
   fallback: string,
   values: Readonly<Record<string, unknown>> = {},
 ): string {
-  return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
+  return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => {
+    const rendered = stringifyInterpolationValue(values[rawKey]);
+    return rendered ?? `{${rawKey}}`;
+  });
+}
+
+function stringifyInterpolationValue(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (typeof value === 'symbol') {
+    return value.description ?? '';
+  }
+  return JSON.stringify(value);
 }
 
 export function localizedText(
@@ -19,7 +34,7 @@ export function localizedText(
     return interpolateFallbackText(fallback, values);
   }
 
-  const resolved = localization.resolve<string>({
+  const resolved = localization.resolve({
     key: { namespace, id },
     values,
   });

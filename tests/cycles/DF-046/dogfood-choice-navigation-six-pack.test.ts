@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import {
   binaryDecisionBlock,
   binaryDecisionSchemaBlock,
@@ -313,7 +314,7 @@ describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
       ]));
     }
     for (const blockName of ['SingleChoiceBlock', 'MultipleChoiceBlock', 'BinaryDecisionBlock']) {
-      const block = CHOICE_NAVIGATION_BLOCKS.find((candidate) => candidate.metadata.blockName === blockName)!;
+      const block = must(CHOICE_NAVIGATION_BLOCKS.find((candidate) => candidate.metadata.blockName === blockName));
       expect(block.render({
         mode: 'pipe',
         slots: slotsFor(blockName),

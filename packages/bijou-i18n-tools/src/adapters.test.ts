@@ -6,21 +6,30 @@ import {
   parseExchangeSheet,
   serializeCatalogBundleJson,
   serializeExchangeSheet,
+  type TranslationWorkbookRow,
 } from './index.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('bijou-i18n-tools adapters', () => {
   it('serializes CSV cells with correct quoting and escaping', () => {
+    const row: TranslationWorkbookRow = {
+      namespace: 'shell',
+      id: 'help',
+      kind: 'message',
+      sourceLocale: 'en',
+      targetLocale: 'de',
+      status: 'missing',
+      sourceHash: '',
+      description: '',
+      sourceValueKind: 'string',
+      sourceValue: 'Help, "now"',
+      translatedValueKind: 'string',
+      translatedValue: '',
+    };
     const csv = serializeExchangeSheet({
       name: 'translations-de',
       columns: ['namespace', 'id', 'sourceValue'],
-      rows: [
-        {
-          namespace: 'shell',
-          id: 'help',
-          sourceValue: 'Help, "now"',
-        } as unknown as never,
-      ],
+      rows: [row],
     }, 'csv');
 
     expect(csv).toContain('"Help, ""now"""');

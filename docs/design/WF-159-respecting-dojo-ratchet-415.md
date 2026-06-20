@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaped.
+Implemented.
 
 ## Tracker
 
@@ -48,6 +48,35 @@ Top current ESLint offender clusters:
 
 The remaining lint debt is small enough to attempt a full ESLint clearout in
 this cycle before moving into file/context and code-size debt.
+
+## Implementation Notes
+
+WF-159 removes `51` live type-aware ESLint findings, lowering the ESLint
+baseline from `57` to `6` and the aggregate Code Dojo ceiling from `465` to
+`414`.
+
+Cleanup clusters:
+
+- i18n runtime and localization port: remove unchecked caller-selected generic
+  value claims from the runtime boundary, return unknown catalog data until a
+  caller narrows it, and make interpolation avoid implicit object
+  stringification.
+- Tests and fixtures: replace scattered non-null assertions, unsafe matcher
+  assignments, malformed active-binding input casts, fuzz fixture casts, and
+  deterministic clock conditionals with typed guards or explicit runtime
+  invocation.
+- Theme and TUI helpers: make browsable-list render options generic, resolve
+  theme status tokens through map lookups, preserve deprecated helper exports
+  through star re-exports, and avoid unsafe token-graph casts.
+- Script and parser utilities: validate package metadata JSON, parse
+  design-system headings/fields with checked captures, and keep PR-status
+  helper debt isolated for a later split.
+
+Per the operator's temporary waiver for touched-file size ratchets, existing
+file/context entries for touched legacy-large files were refreshed to their
+current measured line/byte counts, and existing code-size ceilings for the
+touched i18n runtime files were refreshed as well. No new counted
+file/context, mock-ban, or code-size entries were added.
 
 ## Scope
 
@@ -136,7 +165,7 @@ without re-running broad discovery first.
 ## Acceptance Criteria
 
 - The selected touched files reduce live findings by at least `50`.
-- Aggregate Code Dojo debt is `415` or lower.
+- Aggregate Code Dojo debt is `414` or lower.
 - The ESLint baseline records the lower live count.
 - The Code Dojo exception ledger and `package.json` report the lower ceiling.
-- The next ratchet target is documented as `365` or lower.
+- The next ratchet target is documented as `364` or lower.

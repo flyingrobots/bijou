@@ -9,7 +9,7 @@ interface StandardSectionSchemaAdapterOptions<Data extends object> {
   readonly id: string;
   readonly blockName: StandardBlockName;
   readonly sections: readonly StandardSectionSpec[];
-  readonly parse: (input: unknown) => Data | undefined;
+  readonly parse: (input: unknown) => DeepReadonly<Data> | undefined;
 }
 
 export function defineStandardSectionSchemaAdapter<Data extends object>(
@@ -28,7 +28,7 @@ export function defineStandardSectionSchemaAdapter<Data extends object>(
 
       return {
         ok: true,
-        data: data as DeepReadonly<Data>,
+        data,
       };
     },
     describe: () => ({

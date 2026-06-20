@@ -181,8 +181,7 @@ describe('EASINGS', () => {
     expect(EASINGS.linear(1)).toBe(1);
   });
 
-  it.each(Object.keys(EASINGS))('%s maps 0→0 and 1→1', (name) => {
-    const fn = EASINGS[name as keyof typeof EASINGS];
+  it.each(Object.entries(EASINGS))('%s maps 0→0 and 1→1', (_name, fn) => {
     expect(fn(0)).toBeCloseTo(0, 5);
     expect(fn(1)).toBeCloseTo(1, 5);
   });

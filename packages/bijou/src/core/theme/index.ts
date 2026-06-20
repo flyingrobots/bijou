@@ -48,8 +48,7 @@ export type {
 // Presets
 export { BIJOU_DARK, BIJOU_LIGHT, CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
 
-// Freestanding styled helpers
-export { styled, styledStatus } from './styled.js';
+export * from './styled.js';
 
 // Theme extension
 export { extendTheme } from './extend.js';

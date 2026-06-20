@@ -134,7 +134,7 @@ describe('WF-130 roadmap goalpost policy', () => {
   });
 
   it('disables Markdown line-length linting for project docs', () => {
-    const markdownlintConfig = JSON.parse(read('.markdownlint.json')) as Record<string, unknown>;
+    const markdownlintConfig = requireRecord(JSON.parse(read('.markdownlint.json')));
 
     expect(markdownlintConfig.MD013).toBe(false);
     expect(markdownlintConfig['line-length']).toBe(false);
@@ -226,3 +226,14 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(Number(beyondRow?.groups?.open)).toBe(openIssueRows.length);
   });
 });
+
+function requireRecord(value: unknown): Record<string, unknown> {
+  if (!isRecord(value)) {
+    throw new Error('Expected JSON object');
+  }
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
