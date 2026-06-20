@@ -202,7 +202,7 @@ describe('browsableList', () => {
       const rendered = surfaceToString(
         browsableListSurface(state, {
           width: 20,
-          renderItem: ({ item, focused }) => focused ? `> ${String(item.value)}` : String(item.value),
+          renderItem: ({ item, focused }) => focused ? `> ${item.value}` : item.value,
         }),
         ctx.style,
       );
