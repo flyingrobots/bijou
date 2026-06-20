@@ -19,10 +19,11 @@ describe('DX-033 remove showcase layout sludge', () => {
     const source = readRepoFile('packages/bijou-node/src/index.ts');
     const test = readRepoFile('packages/bijou-node/src/index.test.ts');
 
-    expect(source).toContain('export type StartAppOptions<M = unknown>');
+    expect(source).toContain('export type StartAppOptions<M = unknown> = RunOptions<M> & CreateNodeContextOptions;');
     expect(source).not.toContain('export type StartAppOptions<M = any>');
     expect(test).toContain('defaults StartAppOptions message payloads to unknown instead of any');
-    expect(test).toContain('expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<RunOptions & NodeThemeOptions>()');
+    expect(test).toContain('type Opts<M> = StartAppOptions<M>;');
+    expect(test).toContain('expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<Opts<unknown>>()');
   });
 
   it('moves showcase sidebar clipping to the shared browsable-list surface', () => {
