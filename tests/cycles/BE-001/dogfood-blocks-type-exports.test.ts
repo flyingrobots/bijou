@@ -1,0 +1,66 @@
+import { describe, expectTypeOf, it } from 'vitest';
+import type {
+  BlockLabWorkbenchBlockConfig,
+  BlockPreviewBlockConfig,
+  CommandPaletteBlockConfig,
+  DocumentationArticleBlockConfig,
+  DogfoodBlockCoverageReport,
+  DogfoodBlockDefinition,
+  DogfoodBlockRegistryEntry,
+  DogfoodBlockRegistryEntryInput,
+  DogfoodBlockRole,
+  DogfoodDocsSurfaceBlockConfig,
+  DogfoodDocsSurfaceProofArtifact,
+  DogfoodDocsSurfaceSchemaData,
+  DogfoodDocsSurfaceSearchState,
+  FooterHintBlockConfig,
+  GuideInspectorBlockConfig,
+  GuideInspectorBlockSection,
+  HelpOverlayBlockConfig,
+  NavigationListBlockConfig,
+  NavigationListBlockItem,
+  NotificationCenterBlockConfig,
+  PerfHudBlockConfig,
+  SearchPanelBlockConfig,
+  SettingsMenuBlockConfig,
+  SettingsMenuBlockRow,
+  SettingsMenuBlockSection,
+  StorybookWorkbenchBlockConfig,
+  TitleScreenBlockConfig,
+} from '../../../examples/docs/dogfood-blocks.js';
+
+type PublicTypeExports = readonly [
+  BlockLabWorkbenchBlockConfig,
+  BlockPreviewBlockConfig,
+  CommandPaletteBlockConfig,
+  DocumentationArticleBlockConfig,
+  DogfoodBlockCoverageReport,
+  DogfoodBlockDefinition,
+  DogfoodBlockRegistryEntry,
+  DogfoodBlockRegistryEntryInput,
+  DogfoodBlockRole,
+  DogfoodDocsSurfaceBlockConfig,
+  DogfoodDocsSurfaceProofArtifact,
+  DogfoodDocsSurfaceSchemaData,
+  DogfoodDocsSurfaceSearchState,
+  FooterHintBlockConfig,
+  GuideInspectorBlockConfig,
+  GuideInspectorBlockSection,
+  HelpOverlayBlockConfig,
+  NavigationListBlockConfig,
+  NavigationListBlockItem,
+  NotificationCenterBlockConfig,
+  PerfHudBlockConfig,
+  SearchPanelBlockConfig,
+  SettingsMenuBlockConfig,
+  SettingsMenuBlockRow,
+  SettingsMenuBlockSection,
+  StorybookWorkbenchBlockConfig,
+  TitleScreenBlockConfig,
+];
+
+describe('BE-001 DOGFOOD blocks type export surface', () => {
+  it('keeps every type-only export available through the public facade', () => {
+    expectTypeOf<PublicTypeExports>().toExtend<readonly unknown[]>();
+  });
+});
