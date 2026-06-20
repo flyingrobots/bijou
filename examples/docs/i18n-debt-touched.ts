@@ -94,7 +94,9 @@ function touchedLineageViolations(
   const violations: string[] = [];
   for (const lineage of lineages) {
     const paths = [lineage.rootPath, ...lineage.childPaths];
-    const activeExtraction = paths.some((path) => touched.has(path) && (baseCounts.get(path) ?? 0) === 0);
+    const rootBaseCount = baseCounts.get(lineage.rootPath) ?? 0;
+    const activeExtraction = rootBaseCount > 0
+      && paths.some((path) => touched.has(path) && (baseCounts.get(path) ?? 0) === 0);
     if (!activeExtraction) continue;
 
     paths.forEach((path) => handledPaths.add(path));
