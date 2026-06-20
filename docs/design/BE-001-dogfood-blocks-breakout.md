@@ -195,7 +195,9 @@ Existing focused suites remain the behavioral net:
   code-size thresholds.
 - No extracted module exceeds Code Dojo file/context or code-size thresholds.
 - The hard-limit code-size count drops from `4` to `3`.
-- Aggregate Code Dojo debt drops or stays flat without new baseline entries.
+- Aggregate Code Dojo debt does not increase, and BE-001 is not counted as a
+  completed Respecting the Dojo goalpost unless a follow-on slice lowers the
+  live aggregate count by the required 50 violations to `312` or lower.
 - Existing public imports from `./dogfood-blocks.js` continue to work.
 - Focused DOGFOOD block tests and local dojo/type/lint gates pass.
 
@@ -203,7 +205,7 @@ Existing focused suites remain the behavioral net:
 
 1. Is `dogfood-blocks.ts` no longer a hard-limit file?
 2. Did the facade preserve the public export surface used by consumers?
-3. Did the split avoid adding new Code Dojo baseline entries?
+3. Did the split avoid claiming the 50-violation goalpost prematurely?
 4. Are all new modules below file/context and code-size thresholds?
 5. Did the DOGFOOD block behavior tests pass?
 
