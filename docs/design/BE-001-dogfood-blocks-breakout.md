@@ -2,7 +2,7 @@
 
 ## Status
 
-Shaping.
+Implemented.
 
 ## Tracker
 
@@ -47,6 +47,34 @@ Current hard-limit files:
 files, but high export surface. That makes it a good first Big Extraction
 target: keep `./dogfood-blocks.js` as the public facade, move cohesive internals
 behind it, and avoid broad consumer churn.
+
+## Implementation Result
+
+BE-001 turns `examples/docs/dogfood-blocks.ts` into a `97` line / `3,740` byte
+facade and moves the registry, schema parsing, renderers, block definitions,
+and registry entries into focused modules. The largest extracted module is
+`examples/docs/dogfood-block-docs-surface-render.ts` at `143` lines /
+`5,597` bytes, so every new module stays below the Code Dojo file/context
+threshold.
+
+Live debt after the extraction:
+
+- aggregate Code Dojo debt: `362`
+- file/context baseline: `308`
+- mock-ban baseline: `0`
+- code-size baseline: `54`, including `3` hard-limit files
+- ESLint baseline: `0`
+- DOGFOOD raw-string debt: `2,372`, down from the stored `2,415` baseline
+- next aggregate target from the live count: `312` or lower
+
+The extraction removes `dogfood-blocks.ts` from both debt ledgers but only
+removes two aggregate violations. It is an honest structural reduction, not a
+50-violation goalpost by itself.
+
+The DOGFOOD raw-string baseline is also transferred from the old
+`dogfood-blocks` surface to the extracted module surfaces at exact measured
+counts, while stale slack in the docs, counter, and Storybook surfaces is
+removed.
 
 ## Scope
 

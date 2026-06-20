@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Project Big Extraction: DOGFOOD Blocks Breakout** — BE-001 splits
+  `examples/docs/dogfood-blocks.ts` into a `97` line compatibility facade plus
+  focused sub-150-line registry, schema, render, and block-family modules,
+  preserving the `./dogfood-blocks.js` public import path while removing the
+  former `2,637` line / `92,020` byte monolith from both the file/context and
+  code-size baselines. The code-size hard-limit count drops from `4` to `3`,
+  DOGFOOD raw-string debt is ratcheted from `2,415` to `2,372`, and aggregate
+  Code Dojo debt drops from `364` to `362`.
 - **Focused Code Dojo ratchet** — WF-160 clears the final `6` ESLint findings,
   removes all `22` mock-ban baseline violations with deterministic
   writer/platform fakes and pipeline observer seams, hardens Node host IO

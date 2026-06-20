@@ -24,11 +24,20 @@ Current count:
 
 | Source | Count | Meaning |
 | :--- | ---: | :--- |
-| File/context baseline | 309 | Files over the Code Dojo context threshold. |
+| File/context baseline | 308 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 0 | Existing test mock/spy violations. |
-| Code-size baseline | 55 | Files over the 500-line ratchet, including 4 over the 1000-line hard limit. |
+| Code-size baseline | 54 | Files over the 500-line ratchet, including 3 over the 1000-line hard limit. |
 | ESLint baseline | 0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total** | **364** | Aggregate Code Dojo standards debt. |
+| **Total** | **362** | Aggregate Code Dojo standards debt. |
+
+BE-001 starts Project Big Extraction by turning
+`examples/docs/dogfood-blocks.ts` from a `2,637` line / `92,020` byte hard-limit
+monolith into a `97` line / `3,740` byte compatibility facade backed by focused
+sub-150-line modules. This removes `dogfood-blocks.ts` from both the
+file/context and code-size baselines, lowers hard-limit code-size files from
+`4` to `3`, and lowers aggregate Code Dojo debt from `364` to `362`. This is an
+interim structural reduction; it does not by itself satisfy the 50-violation
+goalpost burndown policy.
 
 WF-160 clears the final ESLint and mock-ban baselines while removing `22`
 file/context entries through focused type extraction, test-support extraction,
@@ -111,8 +120,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `364`. The next met goalpost must lower the ceiling to
-`314` or lower.
+The current ceiling is `362`. The next met goalpost must lower the ceiling to
+`312` or lower.
 
 ## Updating The Ceiling
 

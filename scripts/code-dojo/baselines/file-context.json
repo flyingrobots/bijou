@@ -19,11 +19,6 @@
       "bytes": 109042
     },
     {
-      "path": "examples/docs/dogfood-blocks.ts",
-      "lines": 2638,
-      "bytes": 92020
-    },
-    {
       "path": "packages/bijou/src/core/components/table.ts",
       "lines": 991,
       "bytes": 32973
