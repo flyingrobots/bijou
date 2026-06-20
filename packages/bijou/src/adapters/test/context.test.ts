@@ -7,7 +7,7 @@ describe('createTestContext()', () => {
     const ctx = createTestContext();
     expect(typeof ctx.runtime.env).toBe('function');
     expect(typeof ctx.io.write).toBe('function');
-    expect(typeof ctx.clock?.now).toBe('function');
+    expect(typeof ctx.clock.now).toBe('function');
     expect(typeof ctx.style.bold).toBe('function');
     expect(ctx.theme.noColor).toBeTypeOf('boolean');
     expect(typeof ctx.mode).toBe('string');
@@ -50,7 +50,7 @@ describe('createTestContext()', () => {
     const clock = mockClock({ nowMs: 1234 });
     const ctx = createTestContext({ clock });
     expect(ctx.clock).toBe(clock);
-    expect(ctx.clock?.now()).toBe(1234);
+    expect(ctx.clock.now()).toBe(1234);
   });
 
   it('shares the provided clock with mock I/O scheduling', () => {

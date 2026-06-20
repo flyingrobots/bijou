@@ -111,7 +111,7 @@ describe('LocalizationPort runtime adapter', () => {
     });
     const localization = createRuntimeLocalizationPort(runtime);
 
-    const resolved = localization.resolve<string>({
+    const resolved = localization.resolve({
       key: { namespace: 'shell', id: 'greeting' },
       values: { name: 'Ada' },
     });
@@ -162,7 +162,7 @@ describe('LocalizationPort runtime adapter', () => {
       }],
     });
 
-    const resolved = createRuntimeLocalizationPort(runtime).resolve<string>({
+    const resolved = createRuntimeLocalizationPort(runtime).resolve({
       key: { namespace: 'shell', id: 'ready' },
     });
 
@@ -188,7 +188,7 @@ describe('LocalizationPort runtime adapter', () => {
       }],
     });
 
-    const resolved = createRuntimeLocalizationPort(runtime).resolve<string>({
+    const resolved = createRuntimeLocalizationPort(runtime).resolve({
       key: { namespace: 'shell', id: 'ready' },
     });
 
@@ -223,18 +223,18 @@ describe('LocalizationPort runtime adapter', () => {
       }],
     });
 
-    const resolved = createRuntimeLocalizationPort(runtime).resolve<{
-      readonly label: string;
-      readonly lines: readonly string[];
-    }>({
+    const resolved = createRuntimeLocalizationPort(runtime).resolve({
       key: { namespace: 'assets', id: 'logo' },
       kind: 'resource',
     });
 
     expect(resolved.status).toBe('translated');
     expect(resolved.value).toEqual({ label: 'Logo', lines: ['BIJOU'] });
+    if (resolved.value === null || typeof resolved.value !== 'object' || !('lines' in resolved.value)) {
+      throw new Error('Expected localized logo resource');
+    }
     expect(Object.isFrozen(resolved.value)).toBe(true);
-    expect(Object.isFrozen(resolved.value?.lines)).toBe(true);
+    expect(Object.isFrozen(resolved.value.lines)).toBe(true);
   });
 
   it('rejects non-portable localized value shapes deterministically', () => {

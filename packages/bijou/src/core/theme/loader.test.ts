@@ -4,14 +4,16 @@ import { CYAN_MAGENTA } from './presets.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('Theme loader', () => {
+  const files: Record<string, string> = {
+    'themes/theme.json': JSON.stringify(toDTCG(CYAN_MAGENTA)),
+    'themes/invalid.json': 'not-json',
+    'themes/other.txt': 'hello',
+  };
   const mockIO = {
-    files: {
-      'themes/theme.json': JSON.stringify(toDTCG(CYAN_MAGENTA)),
-      'themes/invalid.json': 'not-json',
-      'themes/other.txt': 'hello',
-    } as Record<string, string>,
+    files,
     readFile(path: string) {
-      if (this.files[path]) return this.files[path];
+      const content = this.files[path];
+      if (content !== undefined) return content;
       throw new Error(`File not found: ${path}`);
     },
     readDir(path: string) {

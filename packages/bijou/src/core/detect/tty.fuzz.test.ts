@@ -7,17 +7,17 @@ const VALID_MODES: OutputMode[] = ['interactive', 'pipe', 'static', 'accessible'
 
 const ENV_KEYS = ['NO_COLOR', 'CI', 'TERM', 'BIJOU_ACCESSIBLE', 'BIJOU_THEME'] as const;
 const ENV_VALUES = [undefined, '', '0', '1', 'true', 'dumb', 'xterm-256color', 'garbage'] as const;
+const ENV_ARBITRARIES: Record<typeof ENV_KEYS[number], fc.Arbitrary<typeof ENV_VALUES[number]>> = {
+  BIJOU_ACCESSIBLE: fc.constantFrom(...ENV_VALUES),
+  BIJOU_THEME: fc.constantFrom(...ENV_VALUES),
+  CI: fc.constantFrom(...ENV_VALUES),
+  NO_COLOR: fc.constantFrom(...ENV_VALUES),
+  TERM: fc.constantFrom(...ENV_VALUES),
+};
 
 describe('detectOutputMode fuzz (property-based)', () => {
   it('always returns a valid OutputMode for random env + TTY combos', () => {
-    const envArb = fc.record(
-      Object.fromEntries(
-        ENV_KEYS.map((key) => [
-          key,
-          fc.constantFrom(...ENV_VALUES),
-        ]),
-      ) as Record<typeof ENV_KEYS[number], fc.Arbitrary<typeof ENV_VALUES[number]>>,
-    );
+    const envArb = fc.record(ENV_ARBITRARIES);
 
     fc.assert(
       fc.property(envArb, fc.boolean(), (envMap, isTTY) => {

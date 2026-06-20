@@ -63,7 +63,7 @@ export interface LocalizedObject<Value = unknown> {
 export interface LocalizationPort {
   readonly locale: string;
   readonly direction: I18nDirection;
-  resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value>;
+  resolve(request: LocalizationRequest): LocalizedObject;
   formatNumber(value: number): string;
   formatDate(value: Date): string;
   formatTime(value: Date): string;
@@ -73,7 +73,7 @@ export interface LocalizationPort {
 export interface RuntimeLocalizationPortSource {
   readonly locale: string;
   readonly direction: I18nDirection;
-  localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value>;
+  localize(request: LocalizationRequest): LocalizedObject;
   formatNumber(value: number, locale: string): string;
   formatDate(value: Date, locale: string): string;
   formatTime(value: Date, locale: string): string;
@@ -90,8 +90,8 @@ export function createRuntimeLocalizationPort(
     get direction() {
       return runtime.direction;
     },
-    resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
-      return runtime.localize<Value>(request);
+    resolve(request: LocalizationRequest): LocalizedObject {
+      return runtime.localize(request);
     },
     formatNumber(value: number): string {
       return runtime.formatNumber(value, runtime.locale);

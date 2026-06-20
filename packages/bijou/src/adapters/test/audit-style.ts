@@ -132,13 +132,12 @@ export function auditStyle(): AuditStylePort {
      * @returns `true` if a matching `styled()` call was recorded.
      */
     wasStyled(token: TokenValue, substring: string): boolean {
-      return _calls.some(
-        (c) =>
-          c.method === 'styled'
-          && c.token?.hex === token.hex
-          && JSON.stringify([...(c.token?.modifiers ?? [])].sort()) === JSON.stringify([...(token.modifiers ?? [])].sort())
-          && c.text.includes(substring),
-      );
+      return _calls.some((c) => {
+        if (c.method !== 'styled' || c.token === undefined) return false;
+        return c.token.hex === token.hex
+          && JSON.stringify([...(c.token.modifiers ?? [])].sort()) === JSON.stringify([...(token.modifiers ?? [])].sort())
+          && c.text.includes(substring);
+      });
     },
 
     /** Clear all recorded calls. */

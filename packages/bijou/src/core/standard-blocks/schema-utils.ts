@@ -58,7 +58,7 @@ export function isPlainRecord(input: unknown): input is Record<string, unknown> 
     return false;
   }
 
-  const prototype = Object.getPrototypeOf(input);
+  const prototype: unknown = Object.getPrototypeOf(input);
   return prototype === Object.prototype || prototype === null;
 }
 

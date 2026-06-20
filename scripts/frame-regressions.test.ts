@@ -42,11 +42,24 @@ async function loadExample<Model, M = never>(
     };
   });
 
-  const module = await import(modulePath) as ExampleModule<Model, M>;
+  const loaded: unknown = await import(modulePath);
+  if (!isExampleModule<Model, M>(loaded)) {
+    throw new Error(`Example module ${modulePath} did not export an app`);
+  }
+  const module = loaded;
   return { module, ctx };
 }
 
+function isExampleModule<Model, M>(value: unknown): value is ExampleModule<Model, M> {
+  return typeof value === 'object' && value !== null && 'app' in value
+    && (value as { readonly app?: unknown }).app !== undefined;
+}
+
 describe('frame regressions', () => {
+  it('rejects modules with undefined app exports', () => {
+    expect(isExampleModule({ app: undefined })).toBe(false);
+  });
+
   it('captures stable scaffold home and split frames', async () => {
     const ctx = createTestContext({
       mode: 'interactive',

@@ -133,7 +133,7 @@ interface ResolvedNodeThemeSelection {
 }
 
 function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
-  return typeof (app as unknown as SelfRunningApp<M>).run === 'function';
+  return 'run' in app && typeof app.run === 'function';
 }
 
 function inferThemeEntryScheme(entry: NodeThemeEntry): ColorScheme | undefined {

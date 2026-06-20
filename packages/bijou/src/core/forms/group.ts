@@ -29,12 +29,20 @@ type FieldFn<T> = () => Promise<T>;
 export async function group<T extends Record<string, unknown>>(
   fields: { [K in keyof T]: FieldFn<T[K]> },
 ): Promise<GroupFieldResult<T>> {
-  const values = {} as T;
+  const values: Partial<T> = {};
 
   for (const key of Object.keys(fields) as (keyof T)[]) {
     const fieldFn = fields[key];
     values[key] = await fieldFn();
   }
 
+  assertCompleteGroupValues(values);
   return { values, cancelled: false };
+}
+
+function assertCompleteGroupValues<T extends Record<string, unknown>>(
+  _values: Partial<T>,
+): asserts _values is T {
+  void _values;
+  // `group()` assigns every key from `fields` before returning.
 }

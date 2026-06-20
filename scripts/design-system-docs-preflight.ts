@@ -28,6 +28,7 @@ const REQUIRED_FIELDS = [
 ] as const;
 
 type RequiredField = (typeof REQUIRED_FIELDS)[number];
+const REQUIRED_FIELD_NAMES: readonly string[] = REQUIRED_FIELDS;
 
 const REQUIRED_LOWERING_MODES = ['rich', 'static', 'pipe', 'accessible'] as const;
 
@@ -47,7 +48,11 @@ export function parseFamilySections(markdown: string): readonly FamilySection[] 
       if (currentTitle != null) {
         sections.push({ title: currentTitle, lines: currentLines });
       }
-      currentTitle = match[1]!.trim();
+      const title = match[1];
+      if (title === undefined) {
+        throw new Error('Malformed component family heading');
+      }
+      currentTitle = title.trim();
       currentLines = [];
       continue;
     }
@@ -77,8 +82,8 @@ function collectFieldBlocks(lines: readonly string[]): Map<RequiredField, readon
 
   for (const line of lines) {
     const match = /^- ([A-Za-z][A-Za-z ]+):\s*(.*)$/.exec(line);
-    const maybeField = match?.[1] as RequiredField | undefined;
-    if (maybeField && REQUIRED_FIELDS.includes(maybeField)) {
+    const maybeField = requiredField(match?.[1]);
+    if (maybeField !== undefined) {
       flush();
       currentField = maybeField;
       currentBlock = [];
@@ -94,6 +99,14 @@ function collectFieldBlocks(lines: readonly string[]): Map<RequiredField, readon
 
   flush();
   return blocks;
+}
+
+function requiredField(value: string | undefined): RequiredField | undefined {
+  return value !== undefined && isRequiredField(value) ? value : undefined;
+}
+
+function isRequiredField(value: string): value is RequiredField {
+  return REQUIRED_FIELD_NAMES.includes(value);
 }
 
 function hasSubstantiveContent(lines: readonly string[]): boolean {

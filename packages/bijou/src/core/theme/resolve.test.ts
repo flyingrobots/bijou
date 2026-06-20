@@ -6,6 +6,7 @@ import {
 } from './resolve.js';
 import { CYAN_MAGENTA } from './presets.js';
 import { mockRuntime } from '../../adapters/test/runtime.js';
+import type { Theme } from './tokens.js';
 
 describe('isNoColor', () => {
   it('returns true when NO_COLOR is set', () => {
@@ -90,12 +91,12 @@ describe('createThemeResolver', () => {
   });
 
   it('supports custom preset registry', () => {
-    const custom = { name: 'custom', status: {}, semantic: {}, gradient: {}, border: {}, ui: {} };
+    const custom: Theme = { ...CYAN_MAGENTA, name: 'custom' };
     const rt = mockRuntime({});
     const resolver = createThemeResolver({
-      presets: { 'custom': custom as never },
+      presets: { 'custom': custom },
       envVar: 'CUSTOM_THEME',
-      fallback: custom as never,
+      fallback: custom,
       runtime: rt,
     });
     const t = resolver.getTheme();

@@ -586,9 +586,6 @@ export {
   TEAL_ORANGE_PINK,
   PRESETS,
   tv,
-  // Freestanding styled helpers
-  styled,
-  styledStatus,
   // Theme extension
   extendTheme,
   // Theme doctor
@@ -658,6 +655,7 @@ export {
   type TokenDefinitions,
   type ColorTransform,
 } from './core/theme/index.js';
+export * from './core/theme/styled.js';
 
 // Text / grapheme utilities
 export {

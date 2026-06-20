@@ -8,6 +8,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **PR review hardening** — `mockClock.runAll()` now drains future one-shot
+  timers in deadline order instead of treating them like active intervals,
+  selection owner freezing rejects unsupported content kinds with a
+  deterministic domain error, and frame regression loading rejects modules that
+  expose an `app` key with an `undefined` value.
+- **Focused Code Dojo ratchet** — WF-159 removes `51` more type-aware ESLint
+  findings across the i18n runtime and localization port boundary, DOGFOOD
+  localization fallback interpolation, MCP package metadata parsing, TUI
+  browsable-list renderer typing, test clocks, selection policy validation,
+  theme token access and exports, GraphQL block tests, design-system docs
+  preflight parsing, and malformed active-binding test inputs, lowering
+  aggregate Code Dojo debt from `465` to `414` with the next goalpost target
+  set to `364` or lower.
 - **Focused Code Dojo ratchet** — WF-158 removes `53` more type-aware ESLint
   findings across form defaults and fuzz fixtures, DOGFOOD frame-text helpers,
   benchmark no-op and JSONL parsing, core component fallback handling, DAG

@@ -48,10 +48,17 @@ export function systemClock(): ClockPort {
 /** Resolve a clock from an explicit port or a context-like object. */
 export function resolveClock(value?: ClockPort | { clock?: ClockPort }): ClockPort {
   if (value === undefined) return SYSTEM_CLOCK;
-  if (typeof value === 'object' && value !== null && 'now' in value) {
+  if (isClockPort(value)) {
     return value;
   }
   return value.clock ?? SYSTEM_CLOCK;
+}
+
+function isClockPort(value: unknown): value is ClockPort {
+  return typeof value === 'object'
+    && value !== null
+    && 'now' in value
+    && typeof value.now === 'function';
 }
 
 /** Sleep for `ms` milliseconds using the provided clock port. */

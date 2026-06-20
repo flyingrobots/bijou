@@ -160,7 +160,9 @@ export function rgbToAnsi16(r: number, g: number, b: number): number {
   let bestDist = Infinity;
 
   for (let i = 0; i < ANSI16_PALETTE.length; i++) {
-    const [pr, pg, pb] = ANSI16_PALETTE[i]!;
+    const candidate = ANSI16_PALETTE[i];
+    if (candidate === undefined) continue;
+    const [pr, pg, pb] = candidate;
     const dist = colorDistance(r, g, b, pr, pg, pb);
     if (dist < bestDist) {
       bestDist = dist;

@@ -48,7 +48,7 @@ describe('bijou-i18n runtime', () => {
       ],
     });
 
-    expect(runtime.resource<string[]>({ namespace: 'assets', id: 'logo' })).toEqual(['BIJOU']);
+    expect(runtime.resource({ namespace: 'assets', id: 'logo' })).toEqual(['BIJOU']);
   });
 
   it('returns frozen resource values without leaking catalog state', () => {
@@ -71,17 +71,20 @@ describe('bijou-i18n runtime', () => {
       ],
     });
 
-    const resolved = runtime.resource<{ readonly label: string; readonly lines: readonly string[] }>({
+    const resolved = runtime.resource({
       namespace: 'assets',
       id: 'logo',
     });
+    if (resolved === null || typeof resolved !== 'object' || !('lines' in resolved)) {
+      throw new Error('Expected logo resource object');
+    }
 
     expect(resolved).toEqual({ label: 'Logo', lines: ['BIJOU'] });
     expect(Object.isFrozen(resolved)).toBe(true);
-    expect(Object.isFrozen(resolved?.lines)).toBe(true);
+    expect(Object.isFrozen(resolved.lines)).toBe(true);
 
     try {
-      Reflect.apply(Array.prototype.push, resolved?.lines ?? [], ['MUTATED']);
+      Reflect.apply(Array.prototype.push, resolved.lines, ['MUTATED']);
     } catch {
       // frozen
     }
@@ -488,7 +491,7 @@ describe('bijou-i18n runtime', () => {
       }],
     });
 
-    const resolved = runtime.localize<readonly string[]>({
+    const resolved = runtime.localize({
       key: { namespace: 'assets', id: 'logo' },
       kind: 'resource',
     });
@@ -538,7 +541,7 @@ describe('bijou-i18n runtime', () => {
       }],
     });
 
-    const resolved = runtime.localize<string>({
+    const resolved = runtime.localize({
       key: { namespace: 'shell', id: 'label' },
       kind: 'message',
     });

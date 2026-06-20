@@ -11,9 +11,9 @@ import { readFileSync } from 'node:fs';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
-const { version: PACKAGE_VERSION } = JSON.parse(
+const PACKAGE_VERSION = parsePackageVersion(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-) as { version: string };
+);
 
 import type { ToolRegistration } from './types.js';
 import { tableTool } from './tools/table.js';
@@ -39,6 +39,19 @@ import { progressBarTool } from './tools/progress.js';
 import { explainabilityTool } from './tools/explainability.js';
 import { inspectorTool } from './tools/inspector.js';
 import { createDocsTool } from './tools/docs.js';
+
+function parsePackageVersion(source: string): string {
+  const payload: unknown = JSON.parse(source);
+  if (
+    payload === null
+    || typeof payload !== 'object'
+    || !('version' in payload)
+    || typeof payload.version !== 'string'
+  ) {
+    throw new Error('package.json is missing a string version');
+  }
+  return payload.version;
+}
 
 const TOOLS: readonly ToolRegistration[] = [
   tableTool,

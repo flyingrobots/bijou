@@ -10,6 +10,7 @@ import {
   validateUiSceneIr,
   type UiSceneIr,
 } from './ui-scene-ir.js';
+import { must } from '../adapters/test/index.js';
 const releaseTitleSdl = `
 type ReleaseTitle
   @bijouBlock(id: "release.title", component: "ReleaseTitleBlock")
@@ -85,12 +86,13 @@ describe('GraphQL-authored Bijou block artifacts', () => {
     const artifact = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
     });
+    const sourceHashMatcher: unknown = expect.stringMatching(/^sha256:[0-9a-f]{64}$/);
     expect(artifact).toMatchObject({
       artifactVersion: 'bijou-block/1',
       id: 'release.title',
       component: 'ReleaseTitleBlock',
       rootNodeId: 'release.title.root',
-      sourceHash: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
+      sourceHash: sourceHashMatcher,
       fields: [
         {
           fieldName: 'heading',
@@ -274,7 +276,7 @@ describe('GraphQL-authored Bijou block artifacts', () => {
       fields: [
         ...validArtifact.fields,
         {
-          ...validArtifact.fields[0]!,
+          ...must(validArtifact.fields[0]),
           fieldName: 'duplicateHeading',
         },
       ],
