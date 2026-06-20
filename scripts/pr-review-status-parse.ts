@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from 'node:child_process';
 import type {
   CheckEntry,
   PageInfo,
@@ -11,12 +11,16 @@ import type {
   ReviewThreadsResponse,
 } from './pr-review-status.js';
 
+export const GH_EXEC_OPTIONS: ExecFileSyncOptionsWithStringEncoding = {
+  cwd: process.cwd(),
+  encoding: 'utf8',
+  env: { ...process.env, GH_PAGER: 'cat' },
+  timeout: 30_000,
+  maxBuffer: 2 * 1024 * 1024,
+};
+
 export function ghJson<T>(args: readonly string[], isValue: (value: unknown) => value is T): T {
-  const output = execFileSync('gh', args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, GH_PAGER: 'cat' },
-  });
+  const output = execFileSync('gh', args, GH_EXEC_OPTIONS);
   const parsed: unknown = JSON.parse(output);
   if (!isValue(parsed)) throw new Error(`unexpected gh JSON response for gh ${args.join(' ')}`);
   return parsed;
@@ -29,11 +33,7 @@ export function ghGraphql<T>(
 ): T {
   const args = ['api', 'graphql', '-f', `query=${query}`];
   for (const [key, value] of Object.entries(variables)) args.push('-F', `${key}=${value}`);
-  const output = execFileSync('gh', args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, GH_PAGER: 'cat' },
-  });
+  const output = execFileSync('gh', args, GH_EXEC_OPTIONS);
   const parsed: unknown = JSON.parse(output);
   if (!isValue(parsed)) throw new Error('unexpected gh GraphQL response shape');
   return parsed;
