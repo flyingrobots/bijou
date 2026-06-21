@@ -17,9 +17,11 @@ describe('DX-026 mode lowering linter cycle', () => {
 
   it('exports the mode lowering linter from the bijou root barrel', () => {
     const rootBarrel = readRepoFile('packages/bijou/src/index.ts');
+    const rootBarrelPart = readRepoFile('packages/bijou/src/index.part06.ts');
 
-    expect(rootBarrel).toContain('lintModeLowering');
-    expect(rootBarrel).toContain('modeLoweringReportText');
-    expect(rootBarrel).toContain('ModeLoweringReport');
+    expect(rootBarrel).toContain("export * from './index.part06.js'");
+    expect(rootBarrelPart).toContain('lintModeLowering');
+    expect(rootBarrelPart).toContain('modeLoweringReportText');
+    expect(rootBarrelPart).toContain('ModeLoweringReport');
   });
 });
