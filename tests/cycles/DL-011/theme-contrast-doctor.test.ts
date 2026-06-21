@@ -18,10 +18,12 @@ describe('DL-011 theme contrast doctor cycle', () => {
   it('exports the doctor from core and root theme barrels', () => {
     const themeBarrel = readRepoFile('packages/bijou/src/core/theme/index.ts');
     const rootBarrel = readRepoFile('packages/bijou/src/index.ts');
+    const rootBarrelPart = readRepoFile('packages/bijou/src/index.part07.ts');
 
     expect(themeBarrel).toContain('doctorTheme');
     expect(themeBarrel).toContain('themeContrastRatio');
-    expect(rootBarrel).toContain('doctorTheme');
-    expect(rootBarrel).toContain('ThemeDoctorReport');
+    expect(rootBarrel).toContain("export * from './index.part07.js'");
+    expect(rootBarrelPart).toContain('doctorTheme');
+    expect(rootBarrelPart).toContain('ThemeDoctorReport');
   });
 });

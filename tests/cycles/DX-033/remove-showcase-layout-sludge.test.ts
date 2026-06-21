@@ -17,12 +17,13 @@ describe('DX-033 remove showcase layout sludge', () => {
 
   it('tightens the Node startApp convenience type away from any', () => {
     const source = readRepoFile('packages/bijou-node/src/index.ts');
-    const test = readRepoFile('packages/bijou-node/src/index.test.ts');
+    const test = readRepoFile('packages/bijou-node/src/index.part04.test.ts');
+    const testSupport = readRepoFile('packages/bijou-node/src/index.test-support.part01.ts');
 
     expect(source).toContain('export type StartAppOptions<M = unknown> = RunOptions<M> & CreateNodeContextOptions;');
     expect(source).not.toContain('export type StartAppOptions<M = any>');
     expect(test).toContain('defaults StartAppOptions message payloads to unknown instead of any');
-    expect(test).toContain('type Opts<M> = StartAppOptions<M>;');
+    expect(testSupport).toContain('type Opts<M> = StartAppOptions<M>;');
     expect(test).toContain('expectTypeOf<StartAppOptions>().branded.toEqualTypeOf<Opts<unknown>>()');
   });
 

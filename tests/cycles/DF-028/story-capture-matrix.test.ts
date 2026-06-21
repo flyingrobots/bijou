@@ -17,9 +17,11 @@ describe('DF-028 story capture matrix cycle', () => {
 
   it('exports story capture helpers from the bijou root barrel', () => {
     const rootBarrel = readRepoFile('packages/bijou/src/index.ts');
+    const rootBarrelPart = readRepoFile('packages/bijou/src/index.part06.ts');
 
-    expect(rootBarrel).toContain('captureStoryMatrix');
-    expect(rootBarrel).toContain('storyCaptureMatrixText');
-    expect(rootBarrel).toContain('StoryCaptureMatrix');
+    expect(rootBarrel).toContain("export * from './index.part06.js'");
+    expect(rootBarrelPart).toContain('captureStoryMatrix');
+    expect(rootBarrelPart).toContain('storyCaptureMatrixText');
+    expect(rootBarrelPart).toContain('StoryCaptureMatrix');
   });
 });

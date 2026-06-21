@@ -76,19 +76,23 @@ describe('DX-031 block contract cycle', () => {
 
   it('exports public block helpers from the bijou root barrel', () => {
     const rootBarrel = readRepoFile('packages/bijou/src/index.ts');
+    const rootBarrelPart3 = readRepoFile('packages/bijou/src/index.part03.ts');
+    const rootBarrelPart4 = readRepoFile('packages/bijou/src/index.part04.ts');
 
-    expect(rootBarrel).toContain('BlockMetadata');
-    expect(rootBarrel).toContain('BlockDefinition');
-    expect(rootBarrel).toContain('BlockPackageManifest');
-    expect(rootBarrel).toContain('defineBlock');
-    expect(rootBarrel).toContain('defineBlockPackage');
-    expect(rootBarrel).toContain('validateBlockMetadata');
-    expect(rootBarrel).toContain('blockMetadataSummary');
-    expect(rootBarrel).toContain('ViewDataContract');
-    expect(rootBarrel).toContain('CommandIntent');
-    expect(rootBarrel).toContain('defineBlockSchemaAdapter');
-    expect(rootBarrel).toContain('defineSchemaBlock');
-    expect(rootBarrel).toContain('bindSchemaBlockInput');
+    expect(rootBarrel).toContain("export * from './index.part03.js'");
+    expect(rootBarrel).toContain("export * from './index.part04.js'");
+    expect(rootBarrelPart4).toContain('BlockMetadata');
+    expect(rootBarrelPart4).toContain('BlockDefinition');
+    expect(rootBarrelPart4).toContain('BlockPackageManifest');
+    expect(rootBarrelPart4).toContain('defineBlock');
+    expect(rootBarrelPart4).toContain('defineBlockPackage');
+    expect(rootBarrelPart4).toContain('validateBlockMetadata');
+    expect(rootBarrelPart4).toContain('blockMetadataSummary');
+    expect(rootBarrelPart3).toContain('ViewDataContract');
+    expect(rootBarrelPart3).toContain('CommandIntent');
+    expect(rootBarrelPart4).toContain('defineBlockSchemaAdapter');
+    expect(rootBarrelPart4).toContain('defineSchemaBlock');
+    expect(rootBarrelPart4).toContain('bindSchemaBlockInput');
   });
 
   it('lets authors define a block and package manifest without global registration', () => {

@@ -18,3 +18,13 @@ export const SHOW_CURSOR = '\x1b[?25h';
 
 /** ANSI escape: reset SGR style state. */
 export const RESET_SGR = '\x1b[0m';
+
+const ESC = '\x1b';
+
+/** ANSI escape: clear from cursor to end of line. */
+export const CLEAR_LINE = `${ESC}[K`;
+
+/** ANSI escape: move the cursor up by the requested number of lines. */
+export function cursorUp(lines: number): string {
+  return `${ESC}[${String(lines)}A`;
+}

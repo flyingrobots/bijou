@@ -17,9 +17,11 @@ describe('DF-029 fixture-to-docs promotion path cycle', () => {
 
   it('exports fixture promotion helpers from the bijou root barrel', () => {
     const rootBarrel = readRepoFile('packages/bijou/src/index.ts');
+    const rootBarrelPart = readRepoFile('packages/bijou/src/index.part06.ts');
 
-    expect(rootBarrel).toContain('createFixturePromotionRecord');
-    expect(rootBarrel).toContain('reverseFixturePromotionRecord');
-    expect(rootBarrel).toContain('FixturePromotionRecord');
+    expect(rootBarrel).toContain("export * from './index.part06.js'");
+    expect(rootBarrelPart).toContain('createFixturePromotionRecord');
+    expect(rootBarrelPart).toContain('reverseFixturePromotionRecord');
+    expect(rootBarrelPart).toContain('FixturePromotionRecord');
   });
 });

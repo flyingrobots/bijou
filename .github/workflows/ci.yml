@@ -151,13 +151,32 @@ jobs:
           packages/bijou-tui/src/eventbus.part09.test.ts
           packages/bijou-tui/src/pipeline/pipeline.part01.test.ts
           packages/bijou-tui/src/pipeline/pipeline.part02.test.ts
-          packages/bijou-node/src/index.test.ts
+          packages/bijou-node/src/index.part01.test.ts
+          packages/bijou-node/src/index.part02.test.ts
+          packages/bijou-node/src/index.part03.test.ts
+          packages/bijou-node/src/index.part04.test.ts
           scripts/check-node-version.test.ts
-          scripts/docs-preview-components.test.ts
-          scripts/docs-preview-entry.test.ts
-          scripts/docs-preview-landing.test.ts
-          scripts/docs-preview-search.test.ts
-          scripts/docs-preview-theme.test.ts
+          scripts/docs-preview-components.part01.test.ts
+          scripts/docs-preview-components.part02.test.ts
+          scripts/docs-preview-components.part03.test.ts
+          scripts/docs-preview-components.part04.test.ts
+          scripts/docs-preview-entry.part01.test.ts
+          scripts/docs-preview-entry.part02.test.ts
+          scripts/docs-preview-entry.part03.test.ts
+          scripts/docs-preview-entry.part04.test.ts
+          scripts/docs-preview-entry.part05.test.ts
+          scripts/docs-preview-landing.part01.test.ts
+          scripts/docs-preview-landing.part02.test.ts
+          scripts/docs-preview-landing.part03.test.ts
+          scripts/docs-preview-landing.part04.test.ts
+          scripts/docs-preview-landing.part05.test.ts
+          scripts/docs-preview-search.part01.test.ts
+          scripts/docs-preview-search.part02.test.ts
+          scripts/docs-preview-search.part03.test.ts
+          scripts/docs-preview-theme.part01.test.ts
+          scripts/docs-preview-theme.part02.test.ts
+          scripts/docs-preview-theme.part03.test.ts
+          scripts/docs-preview-theme.part04.test.ts
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
