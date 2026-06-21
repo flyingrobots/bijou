@@ -8,7 +8,7 @@ import { cursorGuard } from '../components/cursor-guard.js';
 
 import type { CursorHideHandle } from '../components/cursor-guard.js';
 
-import { CLEAR_LINE_RETURN } from '../ansi.js';
+import { CLEAR_LINE, CLEAR_LINE_RETURN, cursorUp } from '../ansi.js';
 
 import { decodeRawKeySequence } from '../key-input.js';
 export function formatFormTitle(title: string, ctx: BijouContext): string {
@@ -62,12 +62,12 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
     },
     moveUp(lines: number) {
       if (lines <= 0) return;
-      ctx.io.write(`\x1b[${String(lines)}A`);
+      ctx.io.write(cursorUp(lines));
     },
     clearBlock(lineCount: number) {
       if (lineCount <= 0) return;
-      for (let i = 0; i < lineCount; i++) ctx.io.write('\x1b[K\n');
-      ctx.io.write(`\x1b[${String(lineCount)}A`);
+      for (let i = 0; i < lineCount; i++) ctx.io.write(`${CLEAR_LINE}\n`);
+      ctx.io.write(cursorUp(lineCount));
     },
   };
 }
