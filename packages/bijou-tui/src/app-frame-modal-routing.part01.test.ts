@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('toggles shell theme mode from the standard command palette entry', async () => {
+  it('toggles shell theme mode from the standard command palette entry', async () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const alternateTheme = createAlternateShellTheme(explicitCtx);
 
@@ -63,13 +62,13 @@ it('toggles shell theme mode from the standard command palette entry', async () 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens the shell notification center with Shift+N and closes it with the same binding', () => {
+  it('opens the shell notification center with Shift+N and closes it with the same binding', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -84,13 +83,13 @@ it('opens the shell notification center with Shift+N and closes it with the same
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('closes the shell notification center with escape without opening quit confirm', () => {
+  it('closes the shell notification center with escape without opening quit confirm', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });

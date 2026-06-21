@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('keeps init command messages scoped to their originating page', async () => {
+  it('keeps init command messages scoped to their originating page', async () => {
     const initInc: Cmd<Msg> = () => ({ type: 'inc' });
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
       id,

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -27,13 +26,13 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('uses the active shell theme for the notification center drawer with an explicit ctx', () => {
+  it('uses the active shell theme for the notification center drawer with an explicit ctx', () => {
     const explicitCtx = createTestContext({
       mode: 'interactive',
       runtime: { columns: 90, rows: 18 },
@@ -84,15 +83,15 @@ it('uses the active shell theme for the notification center drawer with an expli
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const hooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
+  const hooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('surfaces a footer notification cue when archived shell notifications exist', async () => {
+  it('surfaces a footer notification cue when archived shell notifications exist', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });

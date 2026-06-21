@@ -19,7 +19,7 @@ import type { EmptyModel } from './app-frame-render.test-support.js';
 afterEach(() => { _resetDefaultContextForTesting(); });
 
 describe('frame shell chrome surfaces', () => {
-it('derives a stronger active-tab foreground than the base header color', () => {
+  it('derives a stronger active-tab foreground than the base header color', () => {
     const ctx = {
       ...createTestContext({ mode: 'interactive' }),
       resolveBCSS(identity: { type: string; id?: string; classes?: string[] }): Record<string, string> {
@@ -59,7 +59,7 @@ it('derives a stronger active-tab foreground than the base header color', () => 
 });
 
 describe('frame shell chrome surfaces', () => {
-it('resolves page tab text from the current page model at render time', () => {
+  it('resolves page tab text from the current page model at render time', () => {
     interface CountModel { readonly count: number }
     const activePage = panePage<CountModel>('home', (model) => `Home ${String(model.count)}`, { count: 0 });
     const pagesById = new Map([['home', activePage]]);
@@ -85,7 +85,7 @@ it('resolves page tab text from the current page model at render time', () => {
 });
 
 describe('frame shell chrome surfaces', () => {
-it('honors an explicit active-tab token override from frame options', () => {
+  it('honors an explicit active-tab token override from frame options', () => {
     const ctx = {
       ...createTestContext({ mode: 'interactive' }),
       resolveBCSS(identity: { type: string; id?: string; classes?: string[] }): Record<string, string> {

@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   colorHex,
@@ -20,9 +19,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('uses the checked-in FlyingRobots logo asset on roomy landing screens', async () => {
+  it('uses the checked-in FlyingRobots logo asset on roomy landing screens', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -87,9 +86,9 @@ it('uses the checked-in FlyingRobots logo asset on roomy landing screens', async
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('fades the FlyingRobots logo after the first three seconds', async () => {
+  it('fades the FlyingRobots logo after the first three seconds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
     const app = createDocsApp(ctx);
     const logoLines = FLYING_ROBOTS_LOGO_TEXT.split(/\r?\n/);

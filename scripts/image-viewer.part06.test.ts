@@ -1,4 +1,3 @@
-
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -48,7 +47,7 @@ function keyMsg(key: string) {
 }
 
 describe('image viewer app', () => {
-it('adjusts threshold, contrast, and ordered dithering from preview keys', () => {
+  it('adjusts threshold, contrast, and ordered dithering from preview keys', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n128 128 128\n');
     const ctx = createTestContext({ runtime: { columns: 220, rows: 28 } });
@@ -72,7 +71,7 @@ it('adjusts threshold, contrast, and ordered dithering from preview keys', () =>
 });
 
 describe('image viewer app', () => {
-it('selects the focused image file through the file picker key map', () => {
+  it('selects the focused image file through the file picker key map', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');
     writeFileSync(join(root, 'b.ppm'), 'P3\n1 1\n255\n0 0 255\n');

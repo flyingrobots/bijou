@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -13,13 +12,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('projects footer and help controls from the explicit frame layer stack', () => {
+  it('projects footer and help controls from the explicit frame layer stack', () => {
     const workspaceHelp = createKeyMap<{ type: 'noop' }>()
       .bind('tab', 'Next pane', { type: 'noop' });
     const settingsHelp = createKeyMap<{ type: 'noop' }>()

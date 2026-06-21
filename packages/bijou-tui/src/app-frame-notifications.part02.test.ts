@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('routes key ownership through the runtime view stack before page bindings', () => {
+  it('routes key ownership through the runtime view stack before page bindings', () => {
     const observed: string[] = [];
     const app = createFramedApp<PageModel, Msg>({
       pages: [makePage('home', 'Home', 'main')],
@@ -85,13 +84,13 @@ it('routes key ownership through the runtime view stack before page bindings', (
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('shows a shell-owned toast when a settings row is activated', () => {
+  it('shows a shell-owned toast when a settings row is activated', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({

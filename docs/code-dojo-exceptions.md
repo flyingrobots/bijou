@@ -1,7 +1,7 @@
 # Code Dojo Exceptions
 
-This ledger tracks the standards debt that remains after installing the
-verbatim [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
+This ledger tracks the standards debt that remains after installing the verbatim
+[TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
 artifact.
 
 Passing `npm run code-dojo:verify` means the repository did not grow the
@@ -26,7 +26,7 @@ Current count:
 | :--- | ---: | :--- |
 | File/context baseline | 136 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 0 | Existing test mock/spy violations. |
-| Code-size baseline | 26 | Files over the 500-line ratchet, including 3 over the 1000-line hard limit. |
+| Code-size baseline | 26 | Files over 500 lines; 3 exceed the 1000-line hard limit. |
 | ESLint baseline | 0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
 | **Total** | **162** | Aggregate Code Dojo standards debt. |
 

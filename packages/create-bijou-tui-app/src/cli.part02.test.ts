@@ -18,7 +18,7 @@ import {
 } from './cli.test-support.js';
 
 describe('create-bijou-tui-app cli', () => {
-it('installs a runnable packed CLI entrypoint and exports the npm bin', () => {
+  it('installs a runnable packed CLI entrypoint and exports the npm bin', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-pack-cli-'));
     const packDir = join(root, 'pack');
     const runnerDir = join(root, 'runner');

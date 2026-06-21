@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -21,9 +20,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens a quit-confirm modal from the docs screen and dismisses it with n', async () => {
+  it('opens a quit-confirm modal from the docs screen and dismisses it with n', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

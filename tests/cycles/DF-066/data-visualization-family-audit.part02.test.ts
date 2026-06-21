@@ -76,9 +76,9 @@ function renderStoryPreviewText(
 }
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps visual density in rich and static profiles only', () => {
+  it('keeps visual density in rich and static profiles only', () => {
     for (const mode of VISUAL_MODES) {
       expect(renderStoryPreviewText('sparkline', 'basic', mode), `sparkline/${mode}`).toMatch(BLOCK_GLYPH_RE);
       expect(renderStoryPreviewText('braille-chart', 'basic', mode), `braille-chart/${mode}`).toMatch(BRAILLE_GLYPH_RE);
@@ -97,9 +97,9 @@ it('keeps visual density in rich and static profiles only', () => {
 });
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves trend summaries for chart-like lowerings', () => {
+  it('preserves trend summaries for chart-like lowerings', () => {
     const sparklinePipe = renderStoryPreviewText('sparkline', 'basic', 'pipe');
     const sparklineAccessible = renderStoryPreviewText('sparkline', 'basic', 'accessible');
     const braillePipe = renderStoryPreviewText('braille-chart', 'basic', 'pipe');

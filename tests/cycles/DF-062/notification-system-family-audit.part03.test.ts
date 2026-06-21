@@ -1,4 +1,3 @@
-
 import {
   _resetDefaultContextForTesting,
   afterEach,
@@ -9,9 +8,9 @@ import {
 } from './notification-system-family-audit.test-support.js';
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps component-family guidance aligned with notification runtime truth', () => {
+  it('keeps component-family guidance aligned with notification runtime truth', () => {
     const families = readRepoFile('docs/design-system/component-families.md');
     expect(families).toContain('### Notification system');
     expect(families).toContain('- `renderNotificationStack()`');

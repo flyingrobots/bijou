@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -16,13 +15,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('runs transition animation through runScript', async () => {
+  it('runs transition animation through runScript', async () => {
     const clock = mockClock();
     const ctx = createTestContext({ clock });
     const app = createFramedApp({
@@ -49,15 +48,15 @@ it('runs transition animation through runScript', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('renders complex transition styles (melt, matrix, scramble) without error', async () => {
+  it('renders complex transition styles (melt, matrix, scramble) without error', async () => {
     const transitions: PageTransition[] = ['melt', 'matrix', 'scramble'];
-    
+
     for (const transition of transitions) {
       const clock = mockClock();
       const ctx = createTestContext({ clock });

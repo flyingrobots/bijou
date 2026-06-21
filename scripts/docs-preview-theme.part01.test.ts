@@ -1,4 +1,3 @@
-
 import {
   activeDocsPageModel,
   afterEach,
@@ -26,9 +25,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('documents every built-in token with usage guidance and dark/light UX posture', () => {
+  it('documents every built-in token with usage guidance and dark/light UX posture', () => {
     const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
     const requiredRows = [
       'semantic.primary',
@@ -80,9 +79,9 @@ it('documents every built-in token with usage guidance and dark/light UX posture
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('carries the selected landing theme into docs through the shared shell theme setting', async () => {
+  it('carries the selected landing theme into docs through the shared shell theme setting', async () => {
     const defaultCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const defaultApp = createDocsApp(defaultCtx);
     const themedCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -122,9 +121,9 @@ it('carries the selected landing theme into docs through the shared shell theme 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('shows a toast with the theme name when the landing theme changes and clears it later', async () => {
+  it('shows a toast with the theme name when the landing theme changes and clears it later', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,15 +17,15 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const commandHooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
+  const commandHooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('renders routed runtime issues through frame-managed notifications', async () => {
+  it('renders routed runtime issues through frame-managed notifications', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });

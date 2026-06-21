@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -19,9 +18,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new help story directly from component search', async () => {
+  it('can open the new help story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -47,9 +46,9 @@ it('can open the new help story directly from component search', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new app-shell story directly from component search', async () => {
+  it('can open the new app-shell story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -78,9 +77,9 @@ it('can open the new app-shell story directly from component search', async () =
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps ctrl+p as the generic command palette while / is documentation search', async () => {
+  it('keeps ctrl+p as the generic command palette while / is documentation search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const openedSearch = await runScript(app, [
@@ -101,9 +100,9 @@ it('keeps ctrl+p as the generic command palette while / is documentation search'
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('closes documentation search with escape without opening quit confirm', async () => {
+  it('closes documentation search with escape without opening quit confirm', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [

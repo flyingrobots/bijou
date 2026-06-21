@@ -20,7 +20,7 @@ import type { EmptyModel, LayoutNode } from './app-frame-render.test-support.js'
 afterEach(() => { _resetDefaultContextForTesting(); });
 
 describe('frame shell chrome surfaces', () => {
-it('preserves existing header modifiers when the active-tab override only changes color', () => {
+  it('preserves existing header modifiers when the active-tab override only changes color', () => {
     const ctx = {
       ...createTestContext({ mode: 'interactive' }),
       resolveBCSS(identity: { type: string; id?: string; classes?: string[] }): Record<string, string> {

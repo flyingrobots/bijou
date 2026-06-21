@@ -18,9 +18,9 @@ import {
 } from './dogfood-blocks-section.test-support.js';
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('does not tick the CounterDemoBlock fixture when another Blocks guide is selected', async () => {
+  it('does not tick the CounterDemoBlock fixture when another Blocks guide is selected', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [
@@ -47,9 +47,9 @@ it('does not tick the CounterDemoBlock fixture when another Blocks guide is sele
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps scripted standard block preview coverage bounded as the catalog grows', () => {
+  it('keeps scripted standard block preview coverage bounded as the catalog grows', () => {
     const caseNames = standardBlockPreviewRenderCases().map((block) => block.metadata.blockName);
     expect(caseNames).toEqual(['AppShell', 'ReaderSurface', 'TemporalDependencyBlock']);
     expect(new Set(caseNames).size).toBe(caseNames.length);
@@ -58,9 +58,9 @@ it('keeps scripted standard block preview coverage bounded as the catalog grows'
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the selected standard block preview without stacking every block page', async () => {
+  it('renders the selected standard block preview without stacking every block page', async () => {
     for (const block of standardBlockPreviewRenderCases()) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
       const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });

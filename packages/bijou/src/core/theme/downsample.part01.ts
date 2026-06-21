@@ -1,5 +1,3 @@
-
-
 export type ColorLevel = 'none' | 'ansi16' | 'ansi256' | 'truecolor';
 export function rgbToAnsi256(r: number, g: number, b: number): number {
   // Check if it's close to grayscale first

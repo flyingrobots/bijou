@@ -1,4 +1,3 @@
-
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -63,7 +62,7 @@ function brailleGlyphCells(frame: Surface): ReturnType<Surface['get']>[] {
 }
 
 describe('image viewer app', () => {
-it('resets zoom and pan when a new image is selected', () => {
+  it('resets zoom and pan when a new image is selected', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');
     writeFileSync(join(root, 'b.ppm'), 'P3\n1 1\n255\n0 0 255\n');
@@ -88,7 +87,7 @@ it('resets zoom and pan when a new image is selected', () => {
 });
 
 describe('image viewer app', () => {
-it('renders SVG preview glyphs with the terminal default foreground', () => {
+  it('renders SVG preview glyphs with the terminal default foreground', () => {
     const ctx = createTestContext({ runtime: { columns: 120, rows: 32 } });
     const app = createImageViewerApp(ctx, { initialPath: 'assets/Bijou.svg' });
     const [model] = app.init();

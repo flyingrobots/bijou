@@ -85,7 +85,7 @@ describe('renderTransition', () => {
 });
 
 describe('frame shell chrome surfaces', () => {
-it('fills the full header and help lines with BCSS background styles', () => {
+  it('fills the full header and help lines with BCSS background styles', () => {
     const ctx = {
       ...createTestContext({ mode: 'interactive' }),
       resolveBCSS(identity: { type: string; id?: string; classes?: string[] }): Record<string, string> {

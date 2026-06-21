@@ -19,7 +19,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 }
 
 describe('DF-070 DOGFOOD block product polish', () => {
-it('renders documentation article body data through DocumentationArticleBlock', () => {
+  it('renders documentation article body data through DocumentationArticleBlock', () => {
     const rendered = documentationArticleBlock.render({
       config: {
         title: 'Readable article',
@@ -48,7 +48,7 @@ it('renders documentation article body data through DocumentationArticleBlock', 
 });
 
 describe('DF-070 DOGFOOD block product polish', () => {
-it('renders concrete navigation rows through NavigationListBlock', () => {
+  it('renders concrete navigation rows through NavigationListBlock', () => {
     const rendered = navigationListBlock.render({
       config: {
         items: [
@@ -66,7 +66,7 @@ it('renders concrete navigation rows through NavigationListBlock', () => {
 });
 
 describe('DF-070 DOGFOOD block product polish', () => {
-it('marks the focused navigation row in lowered DOGFOOD nav output before selection', async () => {
+  it('marks the focused navigation row in lowered DOGFOOD nav output before selection', async () => {
     const ctx = createTestContext({ mode: 'accessible', runtime: { columns: 100, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'guides' });
     const result = await runScript(app, [{
@@ -85,7 +85,7 @@ it('marks the focused navigation row in lowered DOGFOOD nav output before select
 });
 
 describe('DF-070 DOGFOOD block product polish', () => {
-it('renders guide inspector sections through GuideInspectorBlock', () => {
+  it('renders guide inspector sections through GuideInspectorBlock', () => {
     const rendered = guideInspectorBlock.render({
       config: {
         selectionLabel: 'Blocks',

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -16,13 +15,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('supports shellThemes with an explicit ctx and emits fresh contexts without mutating the caller context', () => {
+  it('supports shellThemes with an explicit ctx and emits fresh contexts without mutating the caller context', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const originalTheme = explicitCtx.theme;
     const originalTokenGraph = explicitCtx.tokenGraph;

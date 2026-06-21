@@ -1,4 +1,3 @@
-
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -48,7 +47,7 @@ function keyMsg(key: string) {
 }
 
 describe('image viewer app', () => {
-it('zooms the image viewport and resets to fit', () => {
+  it('zooms the image viewport and resets to fit', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'sample.ppm'), 'P3\n2 1\n255\n255 0 0 0 0 255\n');
     const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });

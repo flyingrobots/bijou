@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -23,19 +22,19 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const commandRuntime = {
+  const commandRuntime = {
     onPulse: () => ({ dispose: () => undefined }),
     sleep: () => Promise.resolve(),
     now: () => 0,
   };
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('warns only once per page for frame-first binding collisions', async () => {
+  it('warns only once per page for frame-first binding collisions', async () => {
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
       id,
       title,
@@ -87,13 +86,13 @@ it('warns only once per page for frame-first binding collisions', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('can override the short help strip with page bindings only', async () => {
+  it('can override the short help strip with page bindings only', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

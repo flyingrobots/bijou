@@ -17,9 +17,9 @@ import {
 } from './dogfood-blocks-section.test-support.js';
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the pre-made block catalog without raw contract dumps', async () => {
+  it('renders the pre-made block catalog without raw contract dumps', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
@@ -42,9 +42,9 @@ it('renders the pre-made block catalog without raw contract dumps', async () => 
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps selected block pages preview-first at a normal DOGFOOD viewport', async () => {
+  it('keeps selected block pages preview-first at a normal DOGFOOD viewport', async () => {
     const readerBlock = standardBlocks.find((block) => block.metadata.blockName === 'ReaderSurface');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
@@ -68,9 +68,9 @@ it('keeps selected block pages preview-first at a normal DOGFOOD viewport', asyn
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the CounterDemoBlock fixture and applies command-intent keys', async () => {
+  it('renders the CounterDemoBlock fixture and applies command-intent keys', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const runCounterSteps = async (keys: readonly string[]) => runScript(
       createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' }),
@@ -105,9 +105,9 @@ it('renders the CounterDemoBlock fixture and applies command-intent keys', async
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('sizes the CounterDemoBlock fixture by visible terminal width', () => {
+  it('sizes the CounterDemoBlock fixture by visible terminal width', () => {
     const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 100, rows: 40 } });
     const styledCtx = {
       ...baseCtx,

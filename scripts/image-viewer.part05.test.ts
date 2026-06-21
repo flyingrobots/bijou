@@ -1,4 +1,3 @@
-
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -62,7 +61,7 @@ function brailleGlyphCells(frame: Surface): ReturnType<Surface['get']>[] {
 }
 
 describe('image viewer app', () => {
-it('can preserve sampled image colors on rendered glyphs', () => {
+  it('can preserve sampled image colors on rendered glyphs', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'sample.ppm'), 'P3\n2 1\n255\n255 255 255 0 0 0\n');
     const ctx = createTestContext({ runtime: { columns: 180, rows: 28 } });

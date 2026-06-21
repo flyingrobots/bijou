@@ -1,4 +1,3 @@
-
 import {
   _registerDefaultContextInitializerForTesting,
   _resetDefaultContextForTesting,
@@ -99,21 +98,21 @@ describe('BijouBootstrapError', () => {
 });
 
 describe('startApp()', () => {
-beforeEach(() => {
+  beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-afterEach(() => {
+  afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-it('initializes the default node context automatically when ctx is omitted', async () => {
+  it('initializes the default node context automatically when ctx is omitted', async () => {
     vi.stubEnv('TERM', 'dumb');
     const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
     setDefaultContext(ctx);

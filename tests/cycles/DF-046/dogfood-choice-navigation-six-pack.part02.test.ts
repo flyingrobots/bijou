@@ -16,7 +16,7 @@ import {
 } from './dogfood-choice-navigation-six-pack.test-support.js';
 
 describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
-it('rejects choice/navigation schema accessors without invoking them', () => {
+  it('rejects choice/navigation schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorEntry = Object.defineProperties({}, {
       label: {
@@ -49,7 +49,7 @@ it('rejects choice/navigation schema accessors without invoking them', () => {
 });
 
 describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
-it('preserves required semantic facts in lowerings for the slice', () => {
+  it('preserves required semantic facts in lowerings for the slice', () => {
     for (const block of CHOICE_NAVIGATION_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const report = lintModeLowering({
@@ -87,7 +87,7 @@ it('preserves required semantic facts in lowerings for the slice', () => {
 });
 
 describe('DF-046 to DF-052 DOGFOOD choice and navigation Blocks', () => {
-it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
+  it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
     const design = readRepoFile(DESIGN_DOC);
     const changelog = readRepoFile('docs/CHANGELOG.md');
     for (const issue of ['#232', '#233', '#234', '#235', '#236', '#237']) {

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -20,13 +19,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('uses the active shell theme for shell-owned modals and palette content with an explicit ctx', () => {
+  it('uses the active shell theme for shell-owned modals and palette content with an explicit ctx', () => {
     const explicitCtx = createTestContext({
       mode: 'interactive',
       runtime: { columns: 80, rows: 24 },
@@ -84,13 +83,13 @@ it('uses the active shell theme for shell-owned modals and palette content with 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('applies shellThemes by option id even when multiple themes share the same Theme.name', () => {
+  it('applies shellThemes by option id even when multiple themes share the same Theme.name', () => {
     const explicitCtx = createTestContext({
       mode: 'interactive',
       runtime: { columns: 80, rows: 24 },

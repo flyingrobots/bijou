@@ -17,9 +17,9 @@ import {
 } from './dogfood-blocks-section.test-support.js';
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('publishes Blocks as a top-level DOGFOOD section with the requested pages', async () => {
+  it('publishes Blocks as a top-level DOGFOOD section with the requested pages', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 44 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -49,9 +49,9 @@ it('publishes Blocks as a top-level DOGFOOD section with the requested pages', a
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens the Block Preview group on the interactive CounterDemoBlock preview', async () => {
+  it('opens the Block Preview group on the interactive CounterDemoBlock preview', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{
@@ -73,9 +73,9 @@ it('opens the Block Preview group on the interactive CounterDemoBlock preview', 
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('selects focused standard block rows from the Blocks side navigation', async () => {
+  it('selects focused standard block rows from the Blocks side navigation', async () => {
     const firstBlock = standardBlocks[0];
     expect(firstBlock).toBeDefined();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
@@ -98,9 +98,9 @@ it('selects focused standard block rows from the Blocks side navigation', async 
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('moves focus back to the Block Preview parent row from the first preview child', async () => {
+  it('moves focus back to the Block Preview parent row from the first preview child', async () => {
     const firstBlock = standardBlocks[0];
     expect(firstBlock).toBeDefined();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });

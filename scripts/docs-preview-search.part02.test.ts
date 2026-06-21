@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -17,9 +16,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new confirm story directly from component search', async () => {
+  it('can open the new confirm story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -46,9 +45,9 @@ it('can open the new confirm story directly from component search', async () => 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new tabs story directly from component search', async () => {
+  it('can open the new tabs story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -71,9 +70,9 @@ it('can open the new tabs story directly from component search', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new group and wizard story directly from component search', async () => {
+  it('can open the new group and wizard story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -96,9 +95,9 @@ it('can open the new group and wizard story directly from component search', asy
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new explainability story directly from component search', async () => {
+  it('can open the new explainability story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [

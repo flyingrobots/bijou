@@ -68,7 +68,7 @@ afterEach(() => {
 });
 
 describe('runReleaseMetadata', () => {
-it('fails on workspace mismatches', () => {
+  it('fails on workspace mismatches', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
       { dir: 'bijou-node', name: '@flyingrobots/bijou-node', version: '2.1.0' },

@@ -13,7 +13,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('lets AppShell composition inspect declarations without executing render', () => {
+  it('lets AppShell composition inspect declarations without executing render', () => {
     let renderCalls = 0;
     const spyBlock = defineBlock({
       metadata: spyMetadata,
@@ -49,7 +49,7 @@ it('lets AppShell composition inspect declarations without executing render', ()
 });
 
 describe('first-party standard block definitions', () => {
-it('renders AppShell semantic regions without placeholder output', () => {
+  it('renders AppShell semantic regions without placeholder output', () => {
     const rendered = appShellBlock.render({
       mode: 'pipe',
       slots: {
@@ -77,7 +77,7 @@ it('renders AppShell semantic regions without placeholder output', () => {
 });
 
 describe('first-party standard block definitions', () => {
-it('renders interactive and static standard blocks as surfaces while preserving text lowering modes', () => {
+  it('renders interactive and static standard blocks as surfaces while preserving text lowering modes', () => {
     const slots = {
       navigation: 'Docs nav',
       content: 'Blocks guide',

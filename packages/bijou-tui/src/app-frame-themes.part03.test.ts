@@ -1,4 +1,3 @@
-
 import {
   activeRuntimeView,
   afterAll,
@@ -16,13 +15,13 @@ import {
 import { createCommandPaletteState } from './command-palette.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('backs frame layer introspection with a runtime view stack', () => {
+  it('backs frame layer introspection with a runtime view stack', () => {
     const workspaceHelp = createKeyMap<{ type: 'noop' }>()
       .bind('tab', 'Next pane', { type: 'noop' });
     const settingsHelp = createKeyMap<{ type: 'noop' }>()

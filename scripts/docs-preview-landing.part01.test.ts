@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -16,9 +15,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens landing quit confirm with escape and quits on confirmation', async () => {
+  it('opens landing quit confirm with escape and quits on confirmation', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -39,9 +38,9 @@ it('opens landing quit confirm with escape and quits on confirmation', async () 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('dismisses the landing quit confirm with n', () => {
+  it('dismisses the landing quit confirm with n', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -55,9 +54,9 @@ it('dismisses the landing quit confirm with n', () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('quits immediately from the landing screen in pipe mode', async () => {
+  it('quits immediately from the landing screen in pipe mode', async () => {
     const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -71,9 +70,9 @@ it('quits immediately from the landing screen in pipe mode', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('animates the landing title screen on pulse', async () => {
+  it('animates the landing title screen on pulse', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

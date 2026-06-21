@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('switches tabs with [ and ]', async () => {
+  it('switches tabs with [ and ]', async () => {
     const app = createFramedApp({
       title: 'Test',
       pages: [
@@ -39,13 +38,13 @@ it('switches tabs with [ and ]', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('supports pane renderers that return a Surface', async () => {
+  it('supports pane renderers that return a Surface', async () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',
@@ -66,13 +65,13 @@ it('supports pane renderers that return a Surface', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('supports pane renderers that return a LayoutNode', async () => {
+  it('supports pane renderers that return a LayoutNode', async () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',

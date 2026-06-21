@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -20,13 +19,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('ignores search result page targets that are no longer available', async () => {
+  it('ignores search result page targets that are no longer available', async () => {
     const app = createFramedApp({
       pages: [
         {
@@ -52,13 +51,13 @@ it('ignores search result page targets that are no longer available', async () =
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('uses localized shell defaults for command palette and settings footer copy', () => {
+  it('uses localized shell defaults for command palette and settings footer copy', () => {
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
     runtime.loadCatalog(FRAME_I18N_CATALOG);
     runtime.loadCatalog({

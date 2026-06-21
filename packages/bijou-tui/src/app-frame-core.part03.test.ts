@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -17,13 +16,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('feeds frame timing and budget telemetry back into shell-owned view state when using runFramedApp()', async () => {
+  it('feeds frame timing and budget telemetry back into shell-owned view state when using runFramedApp()', async () => {
     const { clock, ctx } = createInteractiveContext();
     scheduleKeys(ctx, clock, [
       { at: 30, key: '\x03' },
@@ -46,13 +45,13 @@ it('feeds frame timing and budget telemetry back into shell-owned view state whe
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('rejects raw string pane renderers with an explicit migration error', () => {
+  it('rejects raw string pane renderers with an explicit migration error', () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',
@@ -74,13 +73,13 @@ it('rejects raw string pane renderers with an explicit migration error', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('preserves scroll per page across tab switches', async () => {
+  it('preserves scroll per page across tab switches', async () => {
     const app = createFramedApp({
       pages: [
         makePage('home', 'Home', 'main'),

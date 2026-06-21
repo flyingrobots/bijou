@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -20,9 +19,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('accepts localized shell and DOGFOOD catalogs for landing and onboarding copy', async () => {
+  it('accepts localized shell and DOGFOOD catalogs for landing and onboarding copy', async () => {
     const locale = 'qps-ploc';
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx, {
@@ -45,9 +44,9 @@ it('accepts localized shell and DOGFOOD catalogs for landing and onboarding copy
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('localizes the DOGFOOD surface block inventory page from the catalog', async () => {
+  it('localizes the DOGFOOD surface block inventory page from the catalog', async () => {
     const locale = 'qps-ploc';
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 48, refreshRate: 60 } });
     const app = createDocsApp(ctx, {

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -16,13 +15,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens settings from the standard command palette entry', async () => {
+  it('opens settings from the standard command palette entry', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       enableCommandPalette: true,

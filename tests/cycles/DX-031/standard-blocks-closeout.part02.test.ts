@@ -1,7 +1,7 @@
 import { describe, expect, it, readRepoFile, sectionBetween } from './standard-blocks-closeout.test-support.js';
 
 describe('DX-031 standard blocks closeout', () => {
-it('marks DX-031 landed in Method evidence after closing issue 181', () => {
+  it('marks DX-031 landed in Method evidence after closing issue 181', () => {
     const design = readRepoFile('docs/design/DX-031-standard-bijou-blocks.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
 
@@ -43,7 +43,7 @@ it('marks DX-031 landed in Method evidence after closing issue 181', () => {
 });
 
 describe('DX-031 standard blocks closeout', () => {
-it('keeps compressed v6 lineage pointing to issue 181 evidence', () => {
+  it('keeps compressed v6 lineage pointing to issue 181 evidence', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');

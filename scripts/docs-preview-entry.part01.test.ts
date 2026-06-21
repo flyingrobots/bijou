@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -24,9 +23,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('uses the live local runtime entrypoint instead of the packaged build', () => {
+  it('uses the live local runtime entrypoint instead of the packaged build', () => {
     const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');
     const nodeSource = readFileSync(new URL('../examples/docs/node-app.ts', import.meta.url), 'utf8');
 
@@ -40,9 +39,9 @@ it('uses the live local runtime entrypoint instead of the packaged build', () =>
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('explains DOGFOOD terminal takeover and non-TTY failure modes', () => {
+  it('explains DOGFOOD terminal takeover and non-TTY failure modes', () => {
     const ready = dogfoodTerminalReadiness(createTestContext({
       runtime: { stdinIsTTY: true, stdoutIsTTY: true },
     }));
@@ -65,9 +64,9 @@ it('explains DOGFOOD terminal takeover and non-TTY failure modes', () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('builds the Node DOGFOOD app through the locale adapter instead of process reads in view code', async () => {
+  it('builds the Node DOGFOOD app through the locale adapter instead of process reads in view code', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createNodeDocsApp(ctx, { LC_ALL: 'fr_FR.UTF-8' });
 
@@ -78,9 +77,9 @@ it('builds the Node DOGFOOD app through the locale adapter instead of process re
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
+  it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
     execFileSync(
       process.execPath,
       ['--import', 'tsx', '--input-type=module', '-e', "await import('./examples/docs/app.ts')"],
@@ -93,9 +92,9 @@ it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
+  it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
     expect(stripMarkdownFrontmatter([
       '---',
       'dogfood:',
@@ -115,9 +114,9 @@ it('strips Markdown frontmatter before DOGFOOD renders prose content', () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {
+  it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {
     _resetDefaultContextForTesting();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });

@@ -17,7 +17,7 @@ import {
 } from './status-feedback-blocks.test-support.js';
 
 describe('DF-031 to DF-038 status and feedback Blocks', () => {
-it('publishes the status and feedback block slice through the standard catalog', () => {
+  it('publishes the status and feedback block slice through the standard catalog', () => {
     expect(STATUS_FEEDBACK_BLOCKS.map((block) => block.metadata.blockName)).toEqual([
       'InlineStatusBlock',
       'InFlowStatusBlock',
@@ -59,7 +59,7 @@ it('publishes the status and feedback block slice through the standard catalog',
 });
 
 describe('DF-031 to DF-038 status and feedback Blocks', () => {
-it('renders each feedback block across visual and lower modes', () => {
+  it('renders each feedback block across visual and lower modes', () => {
     for (const block of STATUS_FEEDBACK_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const interactive = block.render({ mode: 'interactive', slots, config: { width: 56 } });
@@ -78,7 +78,7 @@ it('renders each feedback block across visual and lower modes', () => {
 });
 
 describe('DF-031 to DF-038 status and feedback Blocks', () => {
-it('binds schema-validated feedback data to render slots', () => {
+  it('binds schema-validated feedback data to render slots', () => {
     for (const spec of STATUS_FEEDBACK_SCHEMA_BLOCKS) {
       expect(isSchemaBoundBlockDefinition(spec.schemaBlock)).toBe(true);
       expect(spec.schemaBlock.block).toBe(spec.block);
@@ -109,7 +109,7 @@ it('binds schema-validated feedback data to render slots', () => {
 });
 
 describe('DF-031 to DF-038 status and feedback Blocks', () => {
-it('rejects feedback schema accessors without invoking them', () => {
+  it('rejects feedback schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorStatus = Object.defineProperties({}, {
       label: {

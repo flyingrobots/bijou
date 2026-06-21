@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -21,13 +20,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('keeps notification-center mouse interactions from leaking through to the underlying page', () => {
+  it('keeps notification-center mouse interactions from leaking through to the underlying page', () => {
     type MsgWithMouse = Msg | MouseMsg;
 
     interface NotificationPageModel extends PageModel {

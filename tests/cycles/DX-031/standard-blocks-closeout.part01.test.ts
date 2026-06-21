@@ -8,7 +8,7 @@ import {
 } from './standard-blocks-closeout.test-support.js';
 
 describe('DX-031 standard blocks closeout', () => {
-it('keeps the first standard block set concrete and mode-aware', () => {
+  it('keeps the first standard block set concrete and mode-aware', () => {
     expect(standardBlocks.map((block) => block.metadata.blockName)).toEqual([
       'AppShell',
       'ReaderSurface',
@@ -66,7 +66,7 @@ it('keeps the first standard block set concrete and mode-aware', () => {
 });
 
 describe('DX-031 standard blocks closeout', () => {
-it('keeps first-party story coverage in release scope', () => {
+  it('keeps first-party story coverage in release scope', () => {
     const storyStates = new Map(
       standardBlocks.map((block) => [
         block.metadata.blockName,

@@ -1,5 +1,3 @@
-
-
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 
 import { tmpdir } from 'node:os';
@@ -25,7 +23,7 @@ afterEach(async () => {
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-it('infers formats from file extensions for sheet and bundle helpers', async () => {
+  it('infers formats from file extensions for sheet and bundle helpers', async () => {
     const dir = await makeTempDir();
     const sheetPath = join(dir, 'translations-de.csv');
     await writeFile(
@@ -47,7 +45,7 @@ it('infers formats from file extensions for sheet and bundle helpers', async () 
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-it('fails clearly on malformed manifests or missing sheet files', async () => {
+  it('fails clearly on malformed manifests or missing sheet files', async () => {
     const dir = await makeTempDir();
     const workbookDir = join(dir, 'broken');
     await nodeTools.writeExchangeWorkbookDirectory(workbookDir, {

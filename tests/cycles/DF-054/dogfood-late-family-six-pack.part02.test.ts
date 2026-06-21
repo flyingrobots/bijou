@@ -16,7 +16,7 @@ import {
 } from './dogfood-late-family-six-pack.test-support.js';
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('accepts numeric dense-comparison values at the schema boundary', () => {
+  it('accepts numeric dense-comparison values at the schema boundary', () => {
     expect(bindSchemaBlockInput(denseComparisonSchemaBlock, {
       title: 'Compare packages',
       metric: 'tests',
@@ -41,7 +41,7 @@ it('accepts numeric dense-comparison values at the schema boundary', () => {
 });
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('rejects late-family schema accessors without invoking them', () => {
+  it('rejects late-family schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorEntry = Object.defineProperties({}, {
       title: {
@@ -82,7 +82,7 @@ it('rejects late-family schema accessors without invoking them', () => {
 });
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('preserves required semantic facts in lowerings for the slice', () => {
+  it('preserves required semantic facts in lowerings for the slice', () => {
     for (const block of LATE_FAMILY_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const report = lintModeLowering({
@@ -121,7 +121,7 @@ it('preserves required semantic facts in lowerings for the slice', () => {
 });
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
+  it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
     const design = readRepoFile(DESIGN_DOC);
     const changelog = readRepoFile('docs/CHANGELOG.md');
 

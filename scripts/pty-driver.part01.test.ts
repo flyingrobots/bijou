@@ -16,7 +16,7 @@ describe('pty-driver apply_step', () => {
     });
   }
   it('ignores late steps once the child has exited and tolerates expected shutdown races', () => {
-      const result = runPython(`
+    const result = runPython(`
 import errno
 import importlib.util
 import pathlib
@@ -50,12 +50,12 @@ module.apply_step(1, LiveProc(), {"type": "input", "input": "x"})
 module.apply_step(1, LiveProc(), {"type": "resize", "rows": 24, "cols": 80})
 
 print("ok")
-  `);
+    `);
 
-      expect(result.status).toBe(0);
-      expect(result.stdout.trim()).toBe('ok');
-      expect(result.stderr).toBe('');
-    });
+    expect(result.status).toBe(0);
+    expect(result.stdout.trim()).toBe('ok');
+    expect(result.stderr).toBe('');
+  });
 });
 
 describe('pty-driver apply_step', () => {
@@ -71,7 +71,7 @@ describe('pty-driver apply_step', () => {
     });
   }
   it('re-raises unexpected PTY write errors', () => {
-      const result = runPython(`
+    const result = runPython(`
 import errno
 import importlib.util
 import pathlib
@@ -97,10 +97,10 @@ except OSError as exc:
     raise SystemExit(0)
 
 raise SystemExit(1)
-  `);
+    `);
 
-      expect(result.status).toBe(0);
-      expect(result.stdout.trim()).toBe('9');
-      expect(result.stderr).toBe('');
-    });
+    expect(result.status).toBe(0);
+    expect(result.stdout.trim()).toBe('9');
+    expect(result.stderr).toBe('');
+  });
 });

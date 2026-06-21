@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -29,9 +28,9 @@ function runCommand(commands: ReturnType<DocsApp['update']>[1]) {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
+  it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -108,9 +107,9 @@ it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps landing F2 on the title screen because only Enter continues', () => {
+  it('keeps landing F2 on the title screen because only Enter continues', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -19,13 +18,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens settings with F2 and lets / and ctrl+p switch between search and the command palette', () => {
+  it('opens settings with F2 and lets / and ctrl+p switch between search and the command palette', () => {
     const app = createFramedApp({
       pages: [{
         ...makePage('home', 'Home', 'main'),
@@ -69,13 +68,13 @@ it('opens settings with F2 and lets / and ctrl+p switch between search and the c
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens page search with search metadata derived from the active page model', () => {
+  it('opens page search with search metadata derived from the active page model', () => {
     const page: FramePage<PageModel, Msg> = {
       ...makePage('home', 'Home', 'main'),
       searchTitle: (model) => `Search count ${String(model.count)}`,
@@ -102,13 +101,13 @@ it('opens page search with search metadata derived from the active page model', 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('lets search results dispatch to another page and activate that page', async () => {
+  it('lets search results dispatch to another page and activate that page', async () => {
     const app = createFramedApp({
       pages: [
         {

@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   colorHex,
@@ -25,9 +24,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
+  it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -69,9 +68,9 @@ it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('uses the Bijou SVG as a transparent-background title mask', async () => {
+  it('uses the Bijou SVG as a transparent-background title mask', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -93,9 +92,9 @@ it('uses the Bijou SVG as a transparent-background title mask', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('animates the Bijou SVG title mask with staggered row and fill waves', async () => {
+  it('animates the Bijou SVG title mask with staggered row and fill waves', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
     const pulseMs = 352;

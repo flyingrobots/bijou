@@ -15,7 +15,7 @@ import {
 } from './dogfood-component-family-six-pack.test-support.js';
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('rejects component-family schema accessors without invoking them', () => {
+  it('rejects component-family schema accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorEntry = Object.defineProperties({}, {
       field: {
@@ -42,7 +42,7 @@ it('rejects component-family schema accessors without invoking them', () => {
 });
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('preserves required semantic facts in lowerings for the slice', () => {
+  it('preserves required semantic facts in lowerings for the slice', () => {
     for (const block of COMPONENT_FAMILY_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const report = lintModeLowering({
@@ -79,7 +79,7 @@ it('preserves required semantic facts in lowerings for the slice', () => {
 });
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
+  it('records the six-pack Method design proof with TUI and lower-mode mockups', () => {
     const design = readRepoFile(DESIGN_DOC);
     const changelog = readRepoFile('docs/CHANGELOG.md');
 

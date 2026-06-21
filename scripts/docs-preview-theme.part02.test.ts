@@ -1,4 +1,3 @@
-
 import {
   activeDocsPageModel,
   afterEach,
@@ -25,9 +24,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('lets the landing screen adjust quality before entering the docs and shows feedback', async () => {
+  it('lets the landing screen adjust quality before entering the docs and shows feedback', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -42,9 +41,9 @@ it('lets the landing screen adjust quality before entering the docs and shows fe
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('expands a family, selects a story, and cycles its variants', async () => {
+  it('expands a family, selects a story, and cycles its variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -73,9 +72,9 @@ it('expands a family, selects a story, and cycles its variants', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens component search with / and jumps directly to a component story', async () => {
+  it('opens component search with / and jumps directly to a component story', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -101,9 +100,9 @@ it('opens component search with / and jumps directly to a component story', asyn
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens documentation search with / and prioritizes the table component result', async () => {
+  it('opens documentation search with / and prioritizes the table component result', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

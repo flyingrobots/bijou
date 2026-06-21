@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -18,9 +17,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('scrolls the Theme Inspector drawer without closing it', async () => {
+  it('scrolls the Theme Inspector drawer without closing it', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 118, rows: 20 } });
     const app = createDocsApp(ctx);
     const scrolled = await runScript(app, [
@@ -45,9 +44,9 @@ it('scrolls the Theme Inspector drawer without closing it', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
+  it('publishes the Theme Lab page with default palettes and shell gallery facts', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 44 } });
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',

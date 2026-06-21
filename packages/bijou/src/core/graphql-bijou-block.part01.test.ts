@@ -15,7 +15,7 @@ import {
 import type { UiSceneIr } from './graphql-bijou-block.test-support.js';
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('compiles constrained GraphQL SDL into a terminal scene proof', () => {
+  it('compiles constrained GraphQL SDL into a terminal scene proof', () => {
     const artifact = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
     });
@@ -113,7 +113,7 @@ it('compiles constrained GraphQL SDL into a terminal scene proof', () => {
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('keeps semantic artifact and scene hashes stable across whitespace-only SDL variants', () => {
+  it('keeps semantic artifact and scene hashes stable across whitespace-only SDL variants', () => {
     const one = compileGraphqlBijouBlock(releaseTitleSdl, {
       sourceName: 'release-title.graphql',
     });

@@ -8,7 +8,7 @@ import {
 } from './data-binding-closeout.test-support.js';
 
 describe('DX-034 data binding closeout', () => {
-it('keeps binding-state story coverage visible for DOGFOOD and lower modes', () => {
+  it('keeps binding-state story coverage visible for DOGFOOD and lower modes', () => {
     const storiesByBlock = new Map(
       ['ReaderSurface', 'InspectorPanel'].map((blockName) => [
         blockName,
@@ -40,7 +40,7 @@ it('keeps binding-state story coverage visible for DOGFOOD and lower modes', () 
 });
 
 describe('DX-034 data binding closeout', () => {
-it('marks DX-034 landed in Method evidence after closing issue 182', () => {
+  it('marks DX-034 landed in Method evidence after closing issue 182', () => {
     const design = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
 
@@ -56,7 +56,7 @@ it('marks DX-034 landed in Method evidence after closing issue 182', () => {
 });
 
 describe('DX-034 data binding closeout', () => {
-it('keeps compressed v6 lineage pointing to issue 182 evidence', () => {
+  it('keeps compressed v6 lineage pointing to issue 182 evidence', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const design = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
     const roadmap = readRepoFile('docs/ROADMAP.md');

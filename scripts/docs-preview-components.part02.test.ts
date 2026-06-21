@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   COMPONENT_STORIES,
@@ -26,9 +25,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('shows accordion-style family headers without the oversized custom help strip', async () => {
+  it('shows accordion-style family headers without the oversized custom help strip', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -48,9 +47,9 @@ it('shows accordion-style family headers without the oversized custom help strip
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps family scrolling anchored until the real viewport height is exhausted', async () => {
+  it('keeps family scrolling anchored until the real viewport height is exhausted', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -70,9 +69,9 @@ it('keeps family scrolling anchored until the real viewport height is exhausted'
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the family pane through a viewport-backed scrollbar when it overflows', async () => {
+  it('renders the family pane through a viewport-backed scrollbar when it overflows', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 16 } });
     const app = createDocsApp(ctx);
 
@@ -91,9 +90,9 @@ it('renders the family pane through a viewport-backed scrollbar when it overflow
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('shows a Bijou introduction and docs guide when no component is selected', async () => {
+  it('shows a Bijou introduction and docs guide when no component is selected', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);

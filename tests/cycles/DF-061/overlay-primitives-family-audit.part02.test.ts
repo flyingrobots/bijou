@@ -41,9 +41,9 @@ function renderOverlayVariantText(
 }
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves blocking modal prompts in constrained lowerings', () => {
+  it('preserves blocking modal prompts in constrained lowerings', () => {
     const pipe = renderOverlayVariantText('modal', 'confirm', 'pipe');
     const accessible = renderOverlayVariantText('modal', 'help', 'accessible');
     expect(pipe).toContain('modal: Confirm deploy');
@@ -56,9 +56,9 @@ it('preserves blocking modal prompts in constrained lowerings', () => {
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves supplemental drawer context in constrained lowerings', () => {
+  it('preserves supplemental drawer context in constrained lowerings', () => {
     const pipe = renderOverlayVariantText('drawer', 'supplemental-right', 'pipe');
     const accessible = renderOverlayVariantText('drawer', 'bottom-review', 'accessible');
     expect(pipe).toContain('drawer: Release context');
@@ -71,9 +71,9 @@ it('preserves supplemental drawer context in constrained lowerings', () => {
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves local tooltip explanation in constrained lowerings', () => {
+  it('preserves local tooltip explanation in constrained lowerings', () => {
     const pipe = renderOverlayVariantText('tooltip', 'local-explanation', 'pipe');
     const accessible = renderOverlayVariantText('tooltip', 'clamped-edge', 'accessible');
     expect(pipe).toContain('tooltip: Command palette');
@@ -84,9 +84,9 @@ it('preserves local tooltip explanation in constrained lowerings', () => {
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves transient toast events in constrained lowerings', () => {
+  it('preserves transient toast events in constrained lowerings', () => {
     const pipe = renderOverlayVariantText('toast', 'saved-top-right', 'pipe');
     const accessible = renderOverlayVariantText('toast', 'error-bottom-left', 'accessible');
     expect(pipe).toContain('toast: success');

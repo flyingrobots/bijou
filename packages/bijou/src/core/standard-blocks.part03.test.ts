@@ -9,7 +9,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('binds reader and inspector schema data without owning rendering or provider lifecycle', () => {
+  it('binds reader and inspector schema data without owning rendering or provider lifecycle', () => {
     expect(isSchemaBoundBlockDefinition(readerSurfaceSchemaBlock)).toBe(true);
     expect(isSchemaBoundBlockDefinition(inspectorPanelSchemaBlock)).toBe(true);
 
@@ -51,7 +51,7 @@ it('binds reader and inspector schema data without owning rendering or provider 
 });
 
 describe('first-party standard block definitions', () => {
-it('rejects schema boundary accessors without invoking them', () => {
+  it('rejects schema boundary accessors without invoking them', () => {
     let getterCalls = 0;
     const accessorArticle = Object.defineProperties({}, {
       id: {

@@ -68,7 +68,7 @@ afterEach(() => {
 });
 
 describe('runReleaseMetadata', () => {
-it('writes GitHub outputs for dry-run metadata', () => {
+  it('writes GitHub outputs for dry-run metadata', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
       {
@@ -98,7 +98,7 @@ it('writes GitHub outputs for dry-run metadata', () => {
 });
 
 describe('runReleaseMetadata', () => {
-it('writes GitHub outputs for tag metadata', () => {
+  it('writes GitHub outputs for tag metadata', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.1.0-rc.2' },
       {

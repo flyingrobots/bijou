@@ -1,5 +1,3 @@
-
-
 export interface DenseComparisonSchemaData {
   readonly title: string;
   readonly metric: string;

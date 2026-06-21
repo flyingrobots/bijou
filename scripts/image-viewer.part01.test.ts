@@ -50,7 +50,7 @@ function makePng(options: {
 }
 
 describe('image viewer codecs', () => {
-it('decodes 8-bit RGB PNG pixels into RGBA', () => {
+  it('decodes 8-bit RGB PNG pixels into RGBA', () => {
     const frame = decodePngRgba(makePng({
       width: 2,
       height: 1,
@@ -68,7 +68,7 @@ it('decodes 8-bit RGB PNG pixels into RGBA', () => {
 });
 
 describe('image viewer codecs', () => {
-it('decodes 8-bit RGBA PNG pixels without replacing alpha', () => {
+  it('decodes 8-bit RGBA PNG pixels without replacing alpha', () => {
     const frame = decodePngRgba(makePng({
       width: 1,
       height: 2,

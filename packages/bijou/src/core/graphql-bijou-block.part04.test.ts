@@ -11,7 +11,7 @@ import {
 } from './graphql-bijou-block.test-support.js';
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('emits deterministic debug summary facts for grouped SDL', () => {
+  it('emits deterministic debug summary facts for grouped SDL', () => {
     const artifact = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
     });
@@ -82,7 +82,7 @@ it('emits deterministic debug summary facts for grouped SDL', () => {
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('keeps grouped artifact, scene, and debug hashes stable across whitespace-only SDL variants', () => {
+  it('keeps grouped artifact, scene, and debug hashes stable across whitespace-only SDL variants', () => {
     const one = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
     });
@@ -98,7 +98,7 @@ it('keeps grouped artifact, scene, and debug hashes stable across whitespace-onl
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('rejects duplicate group ids and missing field group references before lowering', () => {
+  it('rejects duplicate group ids and missing field group references before lowering', () => {
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateGroup
         @bijouBlock(id: "duplicate.group", component: "DuplicateGroupBlock")

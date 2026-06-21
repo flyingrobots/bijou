@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -23,19 +22,19 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const commandRuntime = {
+  const commandRuntime = {
     onPulse: () => ({ dispose: () => undefined }),
     sleep: () => Promise.resolve(),
     now: () => 0,
   };
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('routes delayed page commands back to the originating page after tab switches', async () => {
+  it('routes delayed page commands back to the originating page after tab switches', async () => {
     const home: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -24,13 +23,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('preserves framed message typing through shell composition', () => {
+  it('preserves framed message typing through shell composition', () => {
     type TypedMsg =
       | { type: 'select'; value: string }
       | { type: 'refresh' };
@@ -70,13 +69,13 @@ it('preserves framed message typing through shell composition', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('exposes a self-running hosted runner for framed apps and enables mouse input by default', async () => {
+  it('exposes a self-running hosted runner for framed apps and enables mouse input by default', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -96,13 +95,13 @@ it('exposes a self-running hosted runner for framed apps and enables mouse input
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('rejects concurrent hosted runs on the same framed app instance', async () => {
+  it('rejects concurrent hosted runs on the same framed app instance', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });

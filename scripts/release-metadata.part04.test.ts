@@ -1,4 +1,3 @@
-
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 
 import { tmpdir } from 'node:os';
@@ -69,7 +68,7 @@ afterEach(() => {
 });
 
 describe('runReleaseMetadata', () => {
-it('prints derived outputs locally when no GitHub output file is provided', () => {
+  it('prints derived outputs locally when no GitHub output file is provided', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
       {
@@ -95,7 +94,7 @@ it('prints derived outputs locally when no GitHub output file is provided', () =
 });
 
 describe('runReleaseMetadata', () => {
-it('derives --current-version from discovered workspace packages instead of packages/bijou', () => {
+  it('derives --current-version from discovered workspace packages instead of packages/bijou', () => {
     const root = makeWorkspace(
       [
         { dir: 'core', name: '@flyingrobots/bijou', version: '3.0.0' },

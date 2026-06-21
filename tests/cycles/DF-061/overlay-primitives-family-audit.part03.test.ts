@@ -4,9 +4,9 @@ import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/tes
 import { readRepoFile } from '../repo.js';
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps component-family guidance aligned with overlay primitive truth', () => {
+  it('keeps component-family guidance aligned with overlay primitive truth', () => {
     const families = readRepoFile('docs/design-system/component-families.md');
     expect(families).toContain('### Overlay primitives');
     expect(families).toContain('- `tooltip()`');

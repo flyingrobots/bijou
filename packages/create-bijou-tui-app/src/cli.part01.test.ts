@@ -12,7 +12,7 @@ import {
 } from './cli.test-support.js';
 
 describe('create-bijou-tui-app cli', () => {
-it('prints usage for argument parsing errors', () => {
+  it('prints usage for argument parsing errors', () => {
     const result = runCliCaptured(['--definitely-not-a-real-flag']);
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Unknown option');
@@ -21,7 +21,7 @@ it('prints usage for argument parsing errors', () => {
 });
 
 describe('create-bijou-tui-app cli', () => {
-it('does not print usage for non-argument runtime failures', () => {
+  it('does not print usage for non-argument runtime failures', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetFile = join(root, 'not-a-dir');
@@ -39,7 +39,7 @@ it('does not print usage for non-argument runtime failures', () => {
 });
 
 describe('create-bijou-tui-app cli', () => {
-it('quotes target paths in next-step cd instructions', () => {
+  it('quotes target paths in next-step cd instructions', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, 'my app');
@@ -56,7 +56,7 @@ it('quotes target paths in next-step cd instructions', () => {
 });
 
 describe('create-bijou-tui-app cli', () => {
-it('escapes single quotes in cd instruction paths', () => {
+  it('escapes single quotes in cd instruction paths', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, "my app's workspace");
@@ -71,7 +71,7 @@ it('escapes single quotes in cd instruction paths', () => {
 });
 
 describe('create-bijou-tui-app cli', () => {
-it('uses Windows-safe cd quoting when process platform is win32', () => {
+  it('uses Windows-safe cd quoting when process platform is win32', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, 'my app');
@@ -88,7 +88,7 @@ it('uses Windows-safe cd quoting when process platform is win32', () => {
 });
 
 describe('create-bijou-tui-app cli', () => {
-it('escapes cmd.exe metacharacters in Windows cd instructions', () => {
+  it('escapes cmd.exe metacharacters in Windows cd instructions', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, 'my %APPDATA%^ app');

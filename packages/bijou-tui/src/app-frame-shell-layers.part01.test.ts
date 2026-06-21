@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('switches tabs when the user clicks a header tab', async () => {
+  it('switches tabs when the user clicks a header tab', async () => {
     const app = createFramedApp({
       title: 'Test',
       pages: [
@@ -49,13 +48,13 @@ it('switches tabs when the user clicks a header tab', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('toggles help with ?', async () => {
+  it('toggles help with ?', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -65,13 +64,13 @@ it('toggles help with ?', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('closes help with ? when help is open', async () => {
+  it('closes help with ? when help is open', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -81,13 +80,13 @@ it('closes help with ? when help is open', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('closes help with escape without opening quit confirm', async () => {
+  it('closes help with escape without opening quit confirm', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -98,13 +97,13 @@ it('closes help with escape without opening quit confirm', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('toggles the perf HUD from the workspace and active help layer', async () => {
+  it('toggles the perf HUD from the workspace and active help layer', async () => {
     const app = createFramedApp({
       initialColumns: 96,
       initialRows: 30,

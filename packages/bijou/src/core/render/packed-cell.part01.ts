@@ -1,5 +1,3 @@
-
-
 export const CELL_STRIDE = 10;
 export const OFF_CHAR = 0;
 export const OFF_FG_R = 2;

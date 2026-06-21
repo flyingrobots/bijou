@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -27,9 +26,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps static progress previews stable while looping previews animate on pulse', async () => {
+  it('keeps static progress previews stable while looping previews animate on pulse', async () => {
     const openDocs = [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }] as const;
     const openProgressStory = [{ msg: { type: 'docs', msg: { type: 'select-story', storyId: 'progress-bar' } } }] as const;
     const chooseLoopingVariant = [{ msg: { type: 'docs', msg: { type: 'select-variant', index: 1 } } }] as const;
@@ -61,9 +60,9 @@ it('keeps static progress previews stable while looping previews animate on puls
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('routes arrow keys to the focused docs pane instead of always driving the family nav', async () => {
+  it('routes arrow keys to the focused docs pane instead of always driving the family nav', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -87,9 +86,9 @@ it('routes arrow keys to the focused docs pane instead of always driving the fam
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('updates the footer hints to match the focused pane instead of leaving stale family controls visible', async () => {
+  it('updates the footer hints to match the focused pane instead of leaving stale family controls visible', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
 

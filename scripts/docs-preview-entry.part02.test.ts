@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   BIJOU_VERSION,
@@ -16,9 +15,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('lands on the hero page first and enters the docs on Enter', async () => {
+  it('lands on the hero page first and enters the docs on Enter', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -39,9 +38,9 @@ it('lands on the hero page first and enters the docs on Enter', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
+  it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
 

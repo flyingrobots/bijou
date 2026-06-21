@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -20,13 +19,13 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('passes pane rects to overlayFactory for panel-scoped overlays', () => {
+  it('passes pane rects to overlayFactory for panel-scoped overlays', () => {
     let captured: FrameOverlayContext<PageModel> | undefined;
 
     const app = createFramedApp({
@@ -61,13 +60,13 @@ it('passes pane rects to overlayFactory for panel-scoped overlays', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('renders mode and focused pane in the frame footer line', () => {
+  it('renders mode and focused pane in the frame footer line', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       title: 'Status Test',

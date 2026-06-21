@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -16,13 +15,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('supports mode-aware shellThemes and emits family plus mode facts', () => {
+  it('supports mode-aware shellThemes and emits family plus mode facts', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const originalTheme = explicitCtx.theme;
     const originalTokenGraph = explicitCtx.tokenGraph;

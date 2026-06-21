@@ -16,7 +16,7 @@ describe('pty-driver apply_step', () => {
     });
   }
   it('keeps resize checkpoints safe when the scheduled step runs after process exit', () => {
-      const result = runPython(`
+    const result = runPython(`
 import importlib.util
 import json
 import os
@@ -77,11 +77,11 @@ module.time.monotonic = lambda: 0.0
 result = module.main()
 assert resize_calls == [(10, 24, 80)], resize_calls
 print(result)
-  `);
+    `);
 
-      expect(result.status).toBe(0);
-      expect(result.stdout).toContain('__BIJOU_STEP__:resize-after-exit');
-      expect(result.stdout.trim().endsWith('0')).toBe(true);
-      expect(result.stderr).toBe('');
-    });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('__BIJOU_STEP__:resize-after-exit');
+    expect(result.stdout.trim().endsWith('0')).toBe(true);
+    expect(result.stderr).toBe('');
+  });
 });

@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -18,13 +17,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('dispatches selected custom commandItems actions', async () => {
+  it('dispatches selected custom commandItems actions', async () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',
@@ -63,13 +62,13 @@ it('dispatches selected custom commandItems actions', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens settings with the standard shell binding and blocks page keys while open', () => {
+  it('opens settings with the standard shell binding and blocks page keys while open', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { settingsMenuBlock } from '../../../examples/docs/dogfood-blocks.js';
 
 describe('DF-070 DOGFOOD block product polish', () => {
-it('renders concrete settings rows through SettingsMenuBlock', () => {
+  it('renders concrete settings rows through SettingsMenuBlock', () => {
     const rendered = settingsMenuBlock.render({
       config: {
         sections: [

@@ -11,7 +11,7 @@ import {
 } from './status-feedback-blocks.test-support.js';
 
 describe('DF-031 to DF-038 status and feedback Blocks', () => {
-it('preserves required semantic facts in lowerings for the slice', () => {
+  it('preserves required semantic facts in lowerings for the slice', () => {
     for (const block of STATUS_FEEDBACK_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const report = lintModeLowering({

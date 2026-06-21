@@ -1,4 +1,3 @@
-
 import {
   activeDocsPageModel,
   afterEach,
@@ -20,9 +19,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('reuses giant landing frames across small pulses within the same quality bucket', async () => {
+  it('reuses giant landing frames across small pulses within the same quality bucket', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 400, rows: 120, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -38,9 +37,9 @@ it('reuses giant landing frames across small pulses within the same quality buck
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('updates the landing refresh-rate readout from pulse cadence', async () => {
+  it('updates the landing refresh-rate readout from pulse cadence', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -53,9 +52,9 @@ it('updates the landing refresh-rate readout from pulse cadence', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('toggles the perf HUD on the landing title without entering docs', async () => {
+  it('toggles the perf HUD on the landing title without entering docs', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -91,9 +90,9 @@ it('toggles the perf HUD on the landing title without entering docs', async () =
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('switches landing-screen themes with number keys and arrow cycling', async () => {
+  it('switches landing-screen themes with number keys and arrow cycling', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

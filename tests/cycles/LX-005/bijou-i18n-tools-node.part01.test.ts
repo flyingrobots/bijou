@@ -34,7 +34,7 @@ afterEach(async () => {
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-it('ships a dedicated Node helper package for workbook and bundle files', () => {
+  it('ships a dedicated Node helper package for workbook and bundle files', () => {
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools-node/package.json'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'packages/bijou-i18n-tools-node/tsconfig.json'))).toBe(true);
     expect(existsSync(NODE_TOOLS_ENTRY)).toBe(true);
@@ -49,7 +49,7 @@ it('ships a dedicated Node helper package for workbook and bundle files', () => 
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-it('roundtrips workbook directories through disk and back into runtime-consumable catalogs', async () => {
+  it('roundtrips workbook directories through disk and back into runtime-consumable catalogs', async () => {
     const staleCatalogs = tools.markStaleTranslations([
       {
         namespace: 'shell',
@@ -97,7 +97,7 @@ it('roundtrips workbook directories through disk and back into runtime-consumabl
 });
 
 describe('LX-005 rich spreadsheet and filesystem adapters cycle', () => {
-it('roundtrips catalog bundle files through disk without losing typed values or refs', async () => {
+  it('roundtrips catalog bundle files through disk without losing typed values or refs', async () => {
     const catalogs = [
       {
         namespace: 'shell',

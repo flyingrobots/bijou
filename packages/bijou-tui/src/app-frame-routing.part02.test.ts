@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -22,13 +21,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('dispatches page keymap actions into page update', async () => {
+  it('dispatches page keymap actions into page update', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -38,13 +37,13 @@ it('dispatches page keymap actions into page update', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('can prefer page key bindings over frame scroll bindings', async () => {
+  it('can prefer page key bindings over frame scroll bindings', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -71,19 +70,19 @@ it('can prefer page key bindings over frame scroll bindings', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const commandRuntime = {
+  const commandRuntime = {
     onPulse: () => ({ dispose: () => undefined }),
     sleep: () => Promise.resolve(),
     now: () => 0,
   };
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('warns when frame-first key priority shadows page bindings', async () => {
+  it('warns when frame-first key priority shadows page bindings', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

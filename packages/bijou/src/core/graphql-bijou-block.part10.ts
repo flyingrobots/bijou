@@ -1,5 +1,3 @@
-
-
 export function normalizeSourceName(sourceName: string): string {
   const trimmed = sourceName.trim();
   if (trimmed.length === 0) {

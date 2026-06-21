@@ -20,7 +20,7 @@ import {
 import type { ArticleData, InspectorData } from './data-binding-closeout.test-support.js';
 
 describe('DX-034 data binding closeout', () => {
-it('renders a provider-bound AppShell from immutable binding frames', () => {
+  it('renders a provider-bound AppShell from immutable binding frames', () => {
     const owner = defineBindingLifecycleOwner({ id: 'docs.shell', kind: 'app-shell' });
     const navigation = defineDataRequirement({ id: 'navigation', resource: 'docs.navigation' });
     const content = defineDataRequirement({ id: 'content', resource: 'docs.article' });

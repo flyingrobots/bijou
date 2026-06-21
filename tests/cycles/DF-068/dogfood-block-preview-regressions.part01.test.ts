@@ -25,9 +25,9 @@ import {
 } from './dogfood-block-preview-regressions.test-support.js';
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the full docs-app preview regression sample bounded as the block catalog grows', () => {
+  it('keeps the full docs-app preview regression sample bounded as the block catalog grows', () => {
     expect(PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES).toHaveLength(3);
     expect(PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES.length).toBeLessThan(standardBlocks.length);
     for (const blockName of PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES) {
@@ -37,9 +37,9 @@ it('keeps the full docs-app preview regression sample bounded as the block catal
 });
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders selected standard block pages as visible preview surfaces before contract documentation', async () => {
+  it('renders selected standard block pages as visible preview surfaces before contract documentation', async () => {
     const expectedPreviewContent = new Map<string, readonly string[]>([
       ['AppShell', [
         'Navigation',
@@ -84,9 +84,9 @@ it('renders selected standard block pages as visible preview surfaces before con
 });
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps lowering summary compact instead of rendering nested mini-surfaces inside the summary', async () => {
+  it('keeps lowering summary compact instead of rendering nested mini-surfaces inside the summary', async () => {
     const { text } = await renderBlocksGuide(blockPreviewGuideId('ReaderSurface'), 150, 43);
     const loweringRegion = text
       .slice(text.indexOf('lowering summary'))
@@ -103,9 +103,9 @@ it('keeps lowering summary compact instead of rendering nested mini-surfaces ins
 });
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps unselected Blocks navigation titles readable when marker styling uses real ANSI', async () => {
+  it('keeps unselected Blocks navigation titles readable when marker styling uses real ANSI', async () => {
     const { ctx, frame } = await renderBlocksGuideWithRealAnsi(blockPreviewGuideId('ReaderSurface'), 150, 43);
     const title = findTextStart(frame, 'ReaderSurface');
     const marker = findCharBefore(frame, title.y, title.x, '•');
@@ -118,9 +118,9 @@ it('keeps unselected Blocks navigation titles readable when marker styling uses 
 });
 
 describe('DF-068 DOGFOOD block preview regressions', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the CounterDemoBlock fixture box bounded when style output contains ANSI codes', () => {
+  it('keeps the CounterDemoBlock fixture box bounded when style output contains ANSI codes', () => {
     const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 100, rows: 40 } });
     const styledCtx = {
       ...baseCtx,

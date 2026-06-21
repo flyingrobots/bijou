@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   assertReadableDogfoodTheme,
@@ -20,9 +19,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('ships one DogFood shell theme family with readable dark and light modes', () => {
+  it('ships one DogFood shell theme family with readable dark and light modes', () => {
     const shellThemes = docsShellThemesForTesting();
     const dogfood = shellThemes.find((theme) => theme.id === 'dogfood');
     const dark = dogfood?.modes?.find((mode) => mode.id === 'dark');
@@ -50,9 +49,9 @@ it('ships one DogFood shell theme family with readable dark and light modes', ()
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () => {
+  it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
     const app = createDocsApp(ctx);
 
@@ -73,9 +72,9 @@ it('opens the Theme Inspector drawer with F10 and keeps it bounded', async () =>
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () => {
+  it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30, rows: 18 } });
     const app = createDocsApp(ctx);
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }], { ctx });
@@ -88,9 +87,9 @@ it('keeps the Theme Inspector drawer inside narrow terminal bounds', async () =>
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
+  it('lets q open the normal quit confirmation while the Theme Inspector is open', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 42 } });
     const app = createDocsApp(ctx);
     const opened = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F10 }, { key: 'q' }], { ctx });

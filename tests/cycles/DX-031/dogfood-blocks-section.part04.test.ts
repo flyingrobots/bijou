@@ -17,9 +17,9 @@ import {
 } from './dogfood-blocks-section.test-support.js';
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('resets the guide content scroll when selecting another block preview', async () => {
+  it('resets the guide content scroll when selecting another block preview', async () => {
     const [firstBlock, secondBlock] = standardBlocks;
     if (firstBlock == null || secondBlock == null) throw new Error('Expected two standard blocks');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 60 } });
@@ -51,9 +51,9 @@ it('resets the guide content scroll when selecting another block preview', async
 });
 
 describe('DX-031D DOGFOOD Blocks section', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders block lowering posture from the standard block mode declarations', async () => {
+  it('renders block lowering posture from the standard block mode declarations', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 54 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
     const result = await runScript(app, [{

@@ -21,7 +21,7 @@ import type { EmptyModel } from './app-frame-render.test-support.js';
 afterEach(() => { _resetDefaultContextForTesting(); });
 
 describe('frame shell chrome surfaces', () => {
-it('paints unstyled pane text with the frame surface foreground', () => {
+  it('paints unstyled pane text with the frame surface foreground', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     setDefaultContext(ctx);
     const expectedSurface = ctx.surface('primary');
@@ -66,7 +66,7 @@ it('paints unstyled pane text with the frame surface foreground', () => {
 });
 
 describe('frame shell chrome surfaces', () => {
-it('falls back to the frame background when chrome rows have no explicit BCSS background', () => {
+  it('falls back to the frame background when chrome rows have no explicit BCSS background', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     setDefaultContext(ctx);
     const expectedBg = ctx.surface('primary').bg ?? ctx.surface('secondary').bg;

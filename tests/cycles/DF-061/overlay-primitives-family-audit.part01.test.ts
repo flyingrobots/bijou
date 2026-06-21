@@ -72,9 +72,9 @@ function renderOverlayVariantText(
 }
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the active cycle doc tied to the playback contract', () => {
+  it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md');
     expect(cycle).toContain('## Sponsored Users');
     expect(cycle).toContain('## Hills');
@@ -88,9 +88,9 @@ it('keeps the active cycle doc tied to the playback contract', () => {
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('represents every overlay primitive in the DOGFOOD story catalog', () => {
+  it('represents every overlay primitive in the DOGFOOD story catalog', () => {
     for (const expected of OVERLAY_STORIES) {
       const story = getStory(expected.id);
       expect(story.coverageFamilyIds).toContain('overlay-primitives');
@@ -104,9 +104,9 @@ it('represents every overlay primitive in the DOGFOOD story catalog', () => {
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders every overlay primitive variant in every documented profile', () => {
+  it('renders every overlay primitive variant in every documented profile', () => {
     for (const story of OVERLAY_STORIES) {
       for (const variantId of story.variants) {
         for (const mode of ['interactive', 'static', 'pipe', 'accessible'] as const) {
@@ -119,9 +119,9 @@ it('renders every overlay primitive variant in every documented profile', () => 
 });
 
 describe('DF-061 overlay primitives family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps visual overlay chrome out of constrained lowerings', () => {
+  it('keeps visual overlay chrome out of constrained lowerings', () => {
     for (const story of OVERLAY_STORIES) {
       for (const variantId of story.variants) {
         for (const mode of VISUAL_MODES) {

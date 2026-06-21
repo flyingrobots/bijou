@@ -66,9 +66,9 @@ function renderStoryPreviewText(
 }
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the active cycle doc tied to the playback contract', () => {
+  it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-066-audit-data-visualization-family-across-real-surfaces.md');
     expect(cycle).toContain('## Sponsored Users');
     expect(cycle).toContain('## Hills');
@@ -82,9 +82,9 @@ it('keeps the active cycle doc tied to the playback contract', () => {
 });
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('represents data visualization in the DOGFOOD story catalog', () => {
+  it('represents data visualization in the DOGFOOD story catalog', () => {
     for (const expected of DATA_VIZ_STORIES) {
       const story = getStory(expected.id);
       expect(story.coverageFamilyIds).toContain('data-visualization');
@@ -98,9 +98,9 @@ it('represents data visualization in the DOGFOOD story catalog', () => {
 });
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders every data visualization variant in every documented profile', () => {
+  it('renders every data visualization variant in every documented profile', () => {
     for (const story of DATA_VIZ_STORIES) {
       for (const variantId of story.variants) {
         for (const mode of ['interactive', 'static', 'pipe', 'accessible'] as const) {

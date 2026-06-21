@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -26,15 +25,15 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const hooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
+  const hooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('cycles notification-center filters through app-provided filter state', async () => {
+  it('cycles notification-center filters through app-provided filter state', async () => {
     const filters: readonly NotificationHistoryFilter[] = ['ALL', 'ERROR', 'WARNING'];
 
     type NotificationMsg =
@@ -101,13 +100,13 @@ it('cycles notification-center filters through app-provided filter state', async
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens the shell notification center from the command palette', async () => {
+  it('opens the shell notification center from the command palette', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       enableCommandPalette: true,

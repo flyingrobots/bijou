@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -22,13 +21,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('shows settings controls in help when help opens above settings', () => {
+  it('shows settings controls in help when help opens above settings', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({
@@ -64,13 +63,13 @@ it('shows settings controls in help when help opens above settings', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('uses page-provided layer registry metadata for workspace and page-modal control projection', async () => {
+  it('uses page-provided layer registry metadata for workspace and page-modal control projection', async () => {
     const workspaceHelp = createKeyMap<Msg>()
       .bind('enter', 'Open workspace command', { type: 'noop' });
     const modalHelp = createKeyMap<Msg>()

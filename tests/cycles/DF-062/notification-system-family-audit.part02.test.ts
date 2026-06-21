@@ -1,4 +1,3 @@
-
 import {
   _resetDefaultContextForTesting,
   afterEach,
@@ -25,9 +24,9 @@ import {
 import type { SaveModel, SaveMsg } from './notification-system-family-audit.test-support.js';
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('exercises notification lifecycle and renderers against real state', () => {
+  it('exercises notification lifecycle and renderers against real state', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 90, rows: 28 } });
     let state = createNotificationState<string>();
     state = pushNotification(state, {
@@ -76,9 +75,9 @@ it('exercises notification lifecycle and renderers against real state', () => {
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('routes runtime issues and page notify commands through framed notifications', async () => {
+  it('routes runtime issues and page notify commands through framed notifications', async () => {
     const app = createFramedApp<SaveModel, SaveMsg>({
       pages: [makeNotificationPage()],
       initialColumns: 88,

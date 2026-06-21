@@ -36,7 +36,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('exports valid first-party standard block definitions', () => {
+  it('exports valid first-party standard block definitions', () => {
     expect(standardBlocks).toEqual([
       appShellBlock,
       readerSurfaceBlock,
@@ -109,7 +109,7 @@ it('exports valid first-party standard block definitions', () => {
 });
 
 describe('first-party standard block definitions', () => {
-it('keeps AppShell slots semantic and content-first', () => {
+  it('keeps AppShell slots semantic and content-first', () => {
     const slotIds = appShellBlock.metadata.slots.map((slot) => slot.id);
 
     expect(slotIds).toEqual([

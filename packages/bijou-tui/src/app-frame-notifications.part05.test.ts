@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -15,13 +14,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('toggles the active shell theme family mode with ctrl+t', () => {
+  it('toggles the active shell theme family mode with ctrl+t', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const alternateTheme = createAlternateShellTheme(explicitCtx);
     const emitted: {
@@ -82,13 +81,13 @@ it('toggles the active shell theme family mode with ctrl+t', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('explains ctrl+t on a single-mode shell theme instead of silently doing nothing', () => {
+  it('explains ctrl+t on a single-mode shell theme instead of silently doing nothing', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const alternateTheme = createAlternateShellTheme(explicitCtx);
 

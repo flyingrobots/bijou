@@ -10,7 +10,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('declares data contracts and command intents for reader and inspector blocks', () => {
+  it('declares data contracts and command intents for reader and inspector blocks', () => {
     expect(readerSurfaceBlock.data?.names()).toEqual(['article', 'outline']);
     expect(readerSurfaceBlock.data?.requirementIds()).toEqual([
       'reader.article',
@@ -40,7 +40,7 @@ it('declares data contracts and command intents for reader and inspector blocks'
 });
 
 describe('first-party standard block definitions', () => {
-it('publishes deterministic stories and metadata story ids without rendering', () => {
+  it('publishes deterministic stories and metadata story ids without rendering', () => {
     const storiesByBlock = new Map<string, readonly string[]>(
       [
         'AppShell',

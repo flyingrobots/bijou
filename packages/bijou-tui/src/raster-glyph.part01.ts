@@ -1,5 +1,3 @@
-
-
 export type RasterGlyphFit = 'stretch' | 'contain' | 'fit';
 export type RasterGlyphColorMode = 'none' | 'fg' | 'fg-bg';
 export type RasterGlyphDitherMode = 'none' | 'ordered';

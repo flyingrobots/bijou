@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -16,13 +15,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('scrolls a long settings drawer independently of the underlying page', () => {
+  it('scrolls a long settings drawer independently of the underlying page', () => {
     const app = createFramedApp({
       initialColumns: 80,
       initialRows: 14,
@@ -49,13 +48,13 @@ it('scrolls a long settings drawer independently of the underlying page', () => 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('renders settings row descriptions as secondary drawer copy', () => {
+  it('renders settings row descriptions as secondary drawer copy', () => {
     const app = createFramedApp({
       initialColumns: 90,
       initialRows: 18,

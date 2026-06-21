@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -22,13 +21,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('cycles pane focus with tab and shift+tab', async () => {
+  it('cycles pane focus with tab and shift+tab', async () => {
     const splitPage: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -50,13 +49,13 @@ it('cycles pane focus with tab and shift+tab', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('routes pane keymaps only to the focused pane', async () => {
+  it('routes pane keymaps only to the focused pane', async () => {
     type PaneMsg = { type: 'left-hit' } | { type: 'right-hit' };
     interface PaneModel {
       leftHits: number;

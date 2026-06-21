@@ -16,7 +16,7 @@ import {
 } from './dogfood-late-family-six-pack.test-support.js';
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('publishes the late-family block slice through the standard catalog', () => {
+  it('publishes the late-family block slice through the standard catalog', () => {
     expect(LATE_FAMILY_BLOCKS.map((block) => block.metadata.blockName)).toEqual([
       'BrandEmphasisBlock',
       'ModeAwarePrimitiveBlock',
@@ -76,7 +76,7 @@ it('publishes the late-family block slice through the standard catalog', () => {
 });
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('renders each late-family block across visual and lower modes', () => {
+  it('renders each late-family block across visual and lower modes', () => {
     for (const block of LATE_FAMILY_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const interactive = block.render({ mode: 'interactive', slots, config: { width: 60 } });
@@ -95,7 +95,7 @@ it('renders each late-family block across visual and lower modes', () => {
 });
 
 describe('DF-054 to DF-059 DOGFOOD late-family Blocks', () => {
-it('binds schema-validated late-family data to render slots', () => {
+  it('binds schema-validated late-family data to render slots', () => {
     for (const spec of LATE_FAMILY_SCHEMA_BLOCKS) {
       expect(isSchemaBoundBlockDefinition(spec.schemaBlock)).toBe(true);
       expect(spec.schemaBlock.block).toBe(spec.block);

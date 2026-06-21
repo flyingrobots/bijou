@@ -14,7 +14,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('fits tall child surfaces within bounded parent visual sections', () => {
+  it('fits tall child surfaces within bounded parent visual sections', () => {
     const tallChild = createSurface(8, 12);
     tallChild.set(0, 0, { char: 'T' });
     tallChild.set(0, 11, { char: 'B' });
@@ -53,7 +53,7 @@ it('fits tall child surfaces within bounded parent visual sections', () => {
 });
 
 describe('first-party standard block definitions', () => {
-it('omits absent optional sections while preserving required section fallback output', () => {
+  it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',
       slots: { content: 'Blocks guide' },
@@ -94,7 +94,7 @@ it('omits absent optional sections while preserving required section fallback ou
 });
 
 describe('first-party standard block definitions', () => {
-it('renders ReaderSurface content, navigation, and outline deterministically', () => {
+  it('renders ReaderSurface content, navigation, and outline deterministically', () => {
     const outline = Object.freeze(['Why Blocks', 'Lowering']);
     const rendered = readerSurfaceBlock.render({
       mode: 'accessible',

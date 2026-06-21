@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -22,13 +21,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('fills the entire frame body with the primary surface background', () => {
+  it('fills the entire frame body with the primary surface background', () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -66,13 +65,13 @@ it('fills the entire frame body with the primary surface background', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('stacks long settings values beneath the label when inline space is too tight', () => {
+  it('stacks long settings values beneath the label when inline space is too tight', () => {
     const app = createFramedApp({
       initialColumns: 72,
       initialRows: 18,

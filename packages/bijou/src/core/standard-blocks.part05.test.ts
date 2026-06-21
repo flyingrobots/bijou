@@ -15,7 +15,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('renders nested standard blocks through the explicit block tree renderer', () => {
+  it('renders nested standard blocks through the explicit block tree renderer', () => {
     const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
       mode: 'interactive',
       config: { width: 72 },
@@ -56,7 +56,7 @@ it('renders nested standard blocks through the explicit block tree renderer', ()
 });
 
 describe('first-party standard block definitions', () => {
-it('preserves child surface cells when visual blocks render nested block output', () => {
+  it('preserves child surface cells when visual blocks render nested block output', () => {
     const childSurface = createSurface(1, 1);
     childSurface.set(0, 0, {
       char: 'X',
@@ -104,7 +104,7 @@ it('preserves child surface cells when visual blocks render nested block output'
 });
 
 describe('first-party standard block definitions', () => {
-it('fits oversized child surfaces within parent visual sections', () => {
+  it('fits oversized child surfaces within parent visual sections', () => {
     const wideChild = createSurface(96, 1);
     wideChild.set(0, 0, { char: 'A' });
     wideChild.set(95, 0, { char: 'Z' });

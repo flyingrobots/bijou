@@ -20,21 +20,21 @@ import {
 import type { App, RunOptions } from './index.test-support.js';
 
 describe('startApp()', () => {
-beforeEach(() => {
+  beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-afterEach(() => {
+  afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-it('uses an explicit ctx without overwriting the existing default context', async () => {
+  it('uses an explicit ctx without overwriting the existing default context', async () => {
     vi.stubEnv('TERM', 'dumb');
     const defaultCtx = initDefaultContext();
     const explicitCtx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
@@ -51,21 +51,21 @@ it('uses an explicit ctx without overwriting the existing default context', asyn
 });
 
 describe('startApp()', () => {
-beforeEach(() => {
+  beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-afterEach(() => {
+  afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-it('lets run() resolve the Node default context without a manual init step', async () => {
+  it('lets run() resolve the Node default context without a manual init step', async () => {
     vi.stubEnv('TERM', 'dumb');
     const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
     setDefaultContext(ctx);
@@ -82,21 +82,21 @@ it('lets run() resolve the Node default context without a manual init step', asy
 });
 
 describe('startApp()', () => {
-beforeEach(() => {
+  beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-afterEach(() => {
+  afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
     _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
-it('delegates to self-running framed apps instead of bypassing their hosted runner', async () => {
+  it('delegates to self-running framed apps instead of bypassing their hosted runner', async () => {
     const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
     let received: RunOptions | undefined;
     const app: App<number> & { run(options?: RunOptions): Promise<void> } = {

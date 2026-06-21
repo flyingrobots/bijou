@@ -1,4 +1,3 @@
-
 import { rmSync } from 'node:fs';
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -14,7 +13,7 @@ afterEach(() => {
 });
 
 describe('image viewer codecs', () => {
-it('decodes P3 PPM samples including zero values', () => {
+  it('decodes P3 PPM samples including zero values', () => {
     const frame = decodePpmRgba(Buffer.from('P3\n# sample image\n2 1\n255\n255 0 0 0 0 255\n'));
 
     expect(frame.width).toBe(2);
@@ -27,14 +26,14 @@ it('decodes P3 PPM samples including zero values', () => {
 });
 
 describe('image viewer codecs', () => {
-it('rejects P3 PPM samples above the declared max value', () => {
+  it('rejects P3 PPM samples above the declared max value', () => {
     expect(() => decodePpmRgba(Buffer.from('P3\n1 1\n127\n128 0 0\n')))
       .toThrow('PPM decoder expected red to be between 0 and 127.');
   });
 });
 
 describe('image viewer codecs', () => {
-it('decodes P6 PPM binary data without consuming pixel bytes as whitespace', () => {
+  it('decodes P6 PPM binary data without consuming pixel bytes as whitespace', () => {
     const frame = decodePpmRgba(Buffer.concat([
       Buffer.from('P6\n1 1\n255\n'),
       Buffer.from([0, 10, 32]),
@@ -45,7 +44,7 @@ it('decodes P6 PPM binary data without consuming pixel bytes as whitespace', () 
 });
 
 describe('image viewer codecs', () => {
-it('rejects P6 PPM samples above the declared max value', () => {
+  it('rejects P6 PPM samples above the declared max value', () => {
     expect(() => decodePpmRgba(Buffer.concat([
       Buffer.from('P6\n1 1\n127\n'),
       Buffer.from([128, 0, 0]),

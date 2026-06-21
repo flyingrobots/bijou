@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -19,13 +18,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('lets q remain text input inside the command palette', async () => {
+  it('lets q remain text input inside the command palette', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       enableCommandPalette: true,
@@ -43,13 +42,13 @@ it('lets q remain text input inside the command palette', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('derives footer hints from the topmost active layer input map', async () => {
+  it('derives footer hints from the topmost active layer input map', async () => {
     const app = createFramedApp({
       pages: [makeModalPage('home', 'Home', 'main')],
       settings: () => ({

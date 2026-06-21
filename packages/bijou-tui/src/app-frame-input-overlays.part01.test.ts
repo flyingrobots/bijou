@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -15,13 +14,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('uses the run-time ctx as the shell rendering context when shellThemes are configured without an ambient default', async () => {
+  it('uses the run-time ctx as the shell rendering context when shellThemes are configured without an ambient default', async () => {
     const clock = mockClock();
     const explicitCtx = createTestContext({
       mode: 'interactive',

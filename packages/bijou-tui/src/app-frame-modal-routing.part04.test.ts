@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -22,13 +21,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('renders the shell notification center with calmer section spacing and inset notice rows', () => {
+  it('renders the shell notification center with calmer section spacing and inset notice rows', () => {
     interface NotificationPageModel extends PageModel {
       readonly notifications: NotificationState<Msg>;
     }

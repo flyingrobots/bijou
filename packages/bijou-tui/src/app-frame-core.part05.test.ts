@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -21,13 +20,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the footer visible while repeated Tab gestures traverse panes', () => {
+  it('keeps the footer visible while repeated Tab gestures traverse panes', () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -72,13 +71,13 @@ it('keeps the footer visible while repeated Tab gestures traverse panes', () => 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('triggers transition animation when switching tabs', async () => {
+  it('triggers transition animation when switching tabs', async () => {
     const app = createFramedApp({
       pages: [
         makePage('p1', 'P1', 'm'),

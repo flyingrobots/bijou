@@ -75,7 +75,7 @@ function makePng(options: {
 }
 
 describe('image viewer codecs', () => {
-it('routes PNG and PPM data through the image decoder facade', () => {
+  it('routes PNG and PPM data through the image decoder facade', () => {
     const png = decodeImageRgba(makePng({
       width: 1,
       height: 1,
@@ -92,7 +92,7 @@ it('routes PNG and PPM data through the image decoder facade', () => {
 });
 
 describe('image viewer app', () => {
-it('starts with the first supported image selected from the root', () => {
+  it('starts with the first supported image selected from the root', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'notes.txt'), 'ignored');
     writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n255 255 255\n');

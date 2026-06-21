@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -25,15 +24,15 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-const commandHooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
+  const commandHooks = (now: number) => ({ onPulse: () => ({ dispose: () => undefined }), sleep: () => Promise.resolve(), now: () => now });
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('lets pages push frame-managed notifications with notify()', async () => {
+  it('lets pages push frame-managed notifications with notify()', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

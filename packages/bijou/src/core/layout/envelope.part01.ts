@@ -1,5 +1,3 @@
-
-
 export type LayoutBound = number | 'unbounded';
 export type LayoutDirection = 'ltr' | 'rtl' | 'auto';
 export type LogicalAxis = 'inline' | 'block';

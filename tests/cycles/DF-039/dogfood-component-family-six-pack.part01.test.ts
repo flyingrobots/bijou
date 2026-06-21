@@ -16,7 +16,7 @@ import {
 } from './dogfood-component-family-six-pack.test-support.js';
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('publishes the component-family block slice through the standard catalog', () => {
+  it('publishes the component-family block slice through the standard catalog', () => {
     expect(COMPONENT_FAMILY_BLOCKS.map((block) => block.metadata.blockName)).toEqual([
       'FramedGroupBlock',
       'ExplainabilityWalkthroughBlock',
@@ -76,7 +76,7 @@ it('publishes the component-family block slice through the standard catalog', ()
 });
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('renders each component-family block across visual and lower modes', () => {
+  it('renders each component-family block across visual and lower modes', () => {
     for (const block of COMPONENT_FAMILY_BLOCKS) {
       const slots = slotsFor(block.metadata.blockName);
       const interactive = block.render({ mode: 'interactive', slots, config: { width: 60 } });
@@ -95,7 +95,7 @@ it('renders each component-family block across visual and lower modes', () => {
 });
 
 describe('DF-039 to DF-045 DOGFOOD component-family Blocks', () => {
-it('binds schema-validated component-family data to render slots', () => {
+  it('binds schema-validated component-family data to render slots', () => {
     for (const spec of COMPONENT_FAMILY_SCHEMA_BLOCKS) {
       expect(isSchemaBoundBlockDefinition(spec.schemaBlock)).toBe(true);
       expect(spec.schemaBlock.block).toBe(spec.block);

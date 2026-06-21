@@ -16,7 +16,7 @@ describe('pty-driver apply_step', () => {
     });
   }
   it('preserves ordered late step markers after exit without replaying resize side effects', () => {
-      const result = runPython(`
+    const result = runPython(`
 import importlib.util
 import json
 import pathlib
@@ -84,14 +84,14 @@ module.time.monotonic = lambda: 0.0
 result = module.main()
 assert resize_calls == [(10, 24, 80)], resize_calls
 print(result)
-  `);
+    `);
 
-      expect(result.status).toBe(0);
+    expect(result.status).toBe(0);
       const inputMarker = result.stdout.indexOf('__BIJOU_STEP__:input-after-exit');
       const resizeMarker = result.stdout.indexOf('__BIJOU_STEP__:resize-after-exit');
-      expect(inputMarker).toBeGreaterThanOrEqual(0);
-      expect(resizeMarker).toBeGreaterThan(inputMarker);
-      expect(result.stdout.trim().endsWith('0')).toBe(true);
-      expect(result.stderr).toBe('');
-    });
+    expect(inputMarker).toBeGreaterThanOrEqual(0);
+    expect(resizeMarker).toBeGreaterThan(inputMarker);
+    expect(result.stdout.trim().endsWith('0')).toBe(true);
+    expect(result.stderr).toBe('');
+  });
 });

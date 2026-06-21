@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -23,13 +22,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('reuses the last rendered workspace layout when routing mouse wheel input', () => {
+  it('reuses the last rendered workspace layout when routing mouse wheel input', () => {
     let layoutCalls = 0;
     const splitPage: FramePage<PageModel, Msg> = {
       id: 'home',
@@ -81,13 +80,13 @@ it('reuses the last rendered workspace layout when routing mouse wheel input', (
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('opens command palette and dispatches selected keymap command', async () => {
+  it('opens command palette and dispatches selected keymap command', async () => {
     const global = createKeyMap<Msg>()
       .bind('z', 'Zap', { type: 'inc' });
 

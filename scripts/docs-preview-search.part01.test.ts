@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   COMPONENT_STORIES,
@@ -20,9 +19,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('demonstrates every table variant in the DOGFOOD dense-comparison story', () => {
+  it('demonstrates every table variant in the DOGFOOD dense-comparison story', () => {
     const story = COMPONENT_STORIES.find((candidate) => candidate.id === 'dense-comparison');
     expect(story).toBeDefined();
     const variantIds = story?.variants.map((variant) => variant.id);
@@ -72,9 +71,9 @@ it('demonstrates every table variant in the DOGFOOD dense-comparison story', () 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
+  it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
@@ -97,9 +96,9 @@ it('renders the Documentation Map guide tables instead of leaking raw markdown',
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders the hyperlink story without OSC 8 width corruption', async () => {
+  it('renders the hyperlink story without OSC 8 width corruption', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const result = await runScript(app, [

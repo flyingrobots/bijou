@@ -11,7 +11,7 @@ import {
 } from './graphql-bijou-block.test-support.js';
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('parses quoted directive arguments containing closing parentheses', () => {
+  it('parses quoted directive arguments containing closing parentheses', () => {
     const artifact = compileGraphqlBijouBlock(`
       type ParenText
         @bijouBlock(id: "paren.text", component: "ParenTextBlock")
@@ -32,7 +32,7 @@ it('parses quoted directive arguments containing closing parentheses', () => {
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('fails loudly when the SDL omits the block directive', () => {
+  it('fails loudly when the SDL omits the block directive', () => {
     expect(() => compileGraphqlBijouBlock(`
       type MissingBlock {
         heading: String
@@ -44,7 +44,7 @@ it('fails loudly when the SDL omits the block directive', () => {
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('rejects absolute and UNC source names', () => {
+  it('rejects absolute and UNC source names', () => {
     const backslash = String.fromCharCode(92);
     for (const sourceName of [
       '/tmp/release-title.graphql',
@@ -59,7 +59,7 @@ it('rejects absolute and UNC source names', () => {
 });
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('rejects duplicate scene identities before lowering', () => {
+  it('rejects duplicate scene identities before lowering', () => {
     expect(() => compileGraphqlBijouBlock(`
       type DuplicateNode
         @bijouBlock(id: "duplicate.node", component: "DuplicateNodeBlock")

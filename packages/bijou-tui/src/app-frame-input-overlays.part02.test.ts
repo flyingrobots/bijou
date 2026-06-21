@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -19,13 +18,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('keeps ambient default-context apps in sync when shellThemes change without explicit ctx wiring', () => {
+  it('keeps ambient default-context apps in sync when shellThemes change without explicit ctx wiring', () => {
     const defaultCtx = createTestContext({
       mode: 'interactive',
       runtime: { columns: 80, rows: 24 },

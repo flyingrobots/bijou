@@ -14,9 +14,9 @@ import {
 } from './notification-system-family-audit.test-support.js';
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps the active cycle doc tied to the playback contract', () => {
+  it('keeps the active cycle doc tied to the playback contract', () => {
     const cycle = readRepoFile('docs/design/DF-062-audit-notification-system-family-across-real-surfaces.md');
     expect(cycle).toContain('## Sponsored Users');
     expect(cycle).toContain('## Hills');
@@ -30,9 +30,9 @@ it('keeps the active cycle doc tied to the playback contract', () => {
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('represents notification system stories in the DOGFOOD story catalog', () => {
+  it('represents notification system stories in the DOGFOOD story catalog', () => {
     for (const expected of NOTIFICATION_STORIES) {
       const story = getStory(expected.id);
       expect(story.coverageFamilyIds).toContain(expected.id);
@@ -46,9 +46,9 @@ it('represents notification system stories in the DOGFOOD story catalog', () => 
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('renders every notification variant in every documented profile', () => {
+  it('renders every notification variant in every documented profile', () => {
     for (const story of NOTIFICATION_STORIES) {
       for (const variantId of story.variants) {
         for (const mode of ['interactive', 'static', 'pipe', 'accessible'] as const) {
@@ -61,9 +61,9 @@ it('renders every notification variant in every documented profile', () => {
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps visual notification chrome out of constrained lowerings', () => {
+  it('keeps visual notification chrome out of constrained lowerings', () => {
     for (const story of NOTIFICATION_STORIES) {
       for (const variantId of story.variants) {
         for (const mode of VISUAL_MODES) {
@@ -80,9 +80,9 @@ it('keeps visual notification chrome out of constrained lowerings', () => {
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves live-stack and history semantics in constrained lowerings', () => {
+  it('preserves live-stack and history semantics in constrained lowerings', () => {
     const stackPipe = renderNotificationVariantText('notification-system', 'live-stack', 'pipe');
     const historyAccessible = renderNotificationVariantText('notification-system', 'history-review', 'accessible');
     expect(stackPipe).toContain('notification stack');
@@ -97,9 +97,9 @@ it('preserves live-stack and history semantics in constrained lowerings', () => 
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves framed routing facts in constrained lowerings', () => {
+  it('preserves framed routing facts in constrained lowerings', () => {
     const pipe = renderNotificationVariantText('notification-system', 'framed-routing', 'pipe');
     const accessible = renderNotificationVariantText('notification-system', 'framed-routing', 'accessible');
     for (const text of [pipe, accessible]) {
@@ -115,9 +115,9 @@ it('preserves framed routing facts in constrained lowerings', () => {
 });
 
 describe('DF-062 notification system family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves app-owned transient notices in constrained lowerings', () => {
+  it('preserves app-owned transient notices in constrained lowerings', () => {
     const actionablePipe = renderNotificationVariantText('transient-app-notifications', 'actionable-live', 'pipe');
     const mixedAccessible = renderNotificationVariantText('transient-app-notifications', 'mixed-variants', 'accessible');
     expect(actionablePipe).toContain('transient notifications');

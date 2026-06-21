@@ -1,4 +1,3 @@
-
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -48,7 +47,7 @@ function keyMsg(key: string) {
 }
 
 describe('image viewer app', () => {
-it('keeps selected and focused image rows visually distinct', () => {
+  it('keeps selected and focused image rows visually distinct', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'a.ppm'), 'P3\n1 1\n255\n255 0 0\n');
     writeFileSync(join(root, 'b.ppm'), 'P3\n1 1\n255\n0 0 255\n');
@@ -64,7 +63,7 @@ it('keeps selected and focused image rows visually distinct', () => {
 });
 
 describe('image viewer app', () => {
-it('uses arrow keys to pan the image viewport without moving file focus', () => {
+  it('uses arrow keys to pan the image viewport without moving file focus', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'a.ppm'), 'P3\n2 1\n255\n255 0 0 0 0 255\n');
     writeFileSync(join(root, 'b.ppm'), 'P3\n2 1\n255\n0 0 255 255 0 0\n');

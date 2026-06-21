@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -21,13 +20,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('quits in pipe mode instead of opening quit confirm', async () => {
+  it('quits in pipe mode instead of opening quit confirm', async () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     setDefaultContext(pipeCtx);
     try {
@@ -53,13 +52,13 @@ it('quits in pipe mode instead of opening quit confirm', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('focuses the hovered pane and scrolls it with the mouse wheel', async () => {
+  it('focuses the hovered pane and scrolls it with the mouse wheel', async () => {
     const splitPage: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',

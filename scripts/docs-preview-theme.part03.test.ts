@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   createDocsApp,
@@ -24,9 +23,9 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 }
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('opens documentation search results on other DOGFOOD pages', async () => {
+  it('opens documentation search results on other DOGFOOD pages', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -56,9 +55,9 @@ it('opens documentation search results on other DOGFOOD pages', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('lets documentation search results be browsed with arrow keys before selection', async () => {
+  it('lets documentation search results be browsed with arrow keys before selection', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -81,9 +80,9 @@ it('lets documentation search results be browsed with arrow keys before selectio
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('can open the new inspector story directly from component search', async () => {
+  it('can open the new inspector story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 

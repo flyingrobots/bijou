@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -19,13 +18,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('blocks page mouse updates while help or the command palette is open', async () => {
+  it('blocks page mouse updates while help or the command palette is open', async () => {
     type MsgWithMouse = Msg | MouseMsg;
     const page: FramePage<PageModel, MsgWithMouse> = {
       id: 'home',

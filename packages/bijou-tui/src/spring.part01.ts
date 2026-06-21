@@ -1,5 +1,3 @@
-
-
 export interface SpringConfig {
   /** Spring stiffness (tension). Higher = snappier. Default: 170 */
   readonly stiffness: number;

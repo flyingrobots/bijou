@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -20,13 +19,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
+  it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
     const tallHelpPage: FramePage<PageModel, Msg> = {
       id: 'home',
       title: 'Home',
@@ -60,13 +59,13 @@ it('lets help scroll with frame scroll keys when the overlay is taller than the 
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('treats help as modal and ignores non-close keys', async () => {
+  it('treats help as modal and ignores non-close keys', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       globalKeys: createKeyMap<Msg>().bind('z', 'Increment', { type: 'inc' }),

@@ -43,9 +43,9 @@ function renderStoryPreviewText(
 }
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('preserves metric and performance facts in constrained lowerings', () => {
+  it('preserves metric and performance facts in constrained lowerings', () => {
     const statsPipe = renderStoryPreviewText('stats-panel', 'with-sparklines', 'pipe');
     const statsAccessible = renderStoryPreviewText('stats-panel', 'with-sparklines', 'accessible');
     const perfPipe = renderStoryPreviewText('perf-overlay', 'basic', 'pipe');
@@ -69,9 +69,9 @@ it('preserves metric and performance facts in constrained lowerings', () => {
 });
 
 describe('DF-066 data visualization family audit', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps component-family guidance aligned with data visualization runtime truth', () => {
+  it('keeps component-family guidance aligned with data visualization runtime truth', () => {
     const families = readRepoFile('docs/design-system/component-families.md');
     expect(families).toContain('### Data visualization');
     expect(families).toContain('- `sparkline()`');

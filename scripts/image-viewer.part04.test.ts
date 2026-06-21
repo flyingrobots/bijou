@@ -1,4 +1,3 @@
-
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 
 import { join } from 'node:path';
@@ -48,7 +47,7 @@ function keyMsg(key: string) {
 }
 
 describe('image viewer app', () => {
-it('focuses the selected image when directories sort before files', () => {
+  it('focuses the selected image when directories sort before files', () => {
     const root = createTempDir();
     mkdirSync(join(root, 'child'));
     writeFileSync(join(root, 'sample.ppm'), 'P3\n1 1\n255\n0 0 0\n');
@@ -64,7 +63,7 @@ it('focuses the selected image when directories sort before files', () => {
 });
 
 describe('image viewer app', () => {
-it('hot-swaps the selected image renderer from Braille to ASCII', () => {
+  it('hot-swaps the selected image renderer from Braille to ASCII', () => {
     const root = createTempDir();
     writeFileSync(join(root, 'sample.ppm'), 'P3\n2 1\n255\n255 255 255 0 0 0\n');
     const ctx = createTestContext({ runtime: { columns: 96, rows: 28 } });

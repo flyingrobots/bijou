@@ -8,7 +8,7 @@ import {
 } from './standard-blocks.test-support.js';
 
 describe('first-party standard block definitions', () => {
-it('renders InspectorPanel selection and details deterministically', () => {
+  it('renders InspectorPanel selection and details deterministically', () => {
     const details = Object.freeze(['type: block', 'state: ready']);
     const rendered = inspectorPanelBlock.render({
       mode: 'pipe',
@@ -35,7 +35,7 @@ it('renders InspectorPanel selection and details deterministically', () => {
 });
 
 describe('first-party standard block definitions', () => {
-it('preserves rendered block facts across output modes', () => {
+  it('preserves rendered block facts across output modes', () => {
     const modes = ['interactive', 'static', 'pipe', 'accessible'] as const;
     const report = lintModeLowering({
       modes: modes.map((mode) => ({

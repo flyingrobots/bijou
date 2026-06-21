@@ -1,4 +1,3 @@
-
 import {
   afterEach,
   cellsWithoutBackground,
@@ -22,9 +21,9 @@ import {
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('uses a foreground gradient across the Enter prompt letters', async () => {
+  it('uses a foreground gradient across the Enter prompt letters', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 48, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -50,9 +49,9 @@ it('uses a foreground gradient across the Enter prompt letters', async () => {
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal dims the title', async () => {
+  it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal dims the title', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 320, rows: 80, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
@@ -102,9 +101,9 @@ it('keeps FlyingRobots logo backgrounds transparent when the landing quit modal 
 });
 
 describe('docs preview app', () => {
-afterEach(() => { _resetDefaultContextForTesting(); });
+  afterEach(() => { _resetDefaultContextForTesting(); });
 
-it('keeps every landing title cell on a Bijou-owned background', async () => {
+  it('keeps every landing title cell on a Bijou-owned background', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
 

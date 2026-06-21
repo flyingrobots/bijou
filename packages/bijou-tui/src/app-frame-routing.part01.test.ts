@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -15,13 +14,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('respects transitionOverride to select animation dynamically', () => {
+  it('respects transitionOverride to select animation dynamically', () => {
     const app = createFramedApp({
       pages: [
         makePage('p1', 'P1', 'm'),
@@ -39,13 +38,13 @@ it('respects transitionOverride to select animation dynamically', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('throws for duplicate pane ids in a page layout', () => {
+  it('throws for duplicate pane ids in a page layout', () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',
@@ -66,13 +65,13 @@ it('throws for duplicate pane ids in a page layout', () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('collects pane ids from declared grid areas only', () => {
+  it('collects pane ids from declared grid areas only', () => {
     const app = createFramedApp({
       pages: [{
         id: 'home',

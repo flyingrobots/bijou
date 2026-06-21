@@ -1,5 +1,3 @@
-
-
 export interface FramedGroupSchemaData {
   readonly title: string;
   readonly items: readonly string[];

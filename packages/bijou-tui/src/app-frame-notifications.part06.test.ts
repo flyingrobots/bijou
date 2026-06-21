@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -15,13 +14,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('toggles shell theme mode through the frame action wrapper', () => {
+  it('toggles shell theme mode through the frame action wrapper', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const alternateTheme = createAlternateShellTheme(explicitCtx);
 

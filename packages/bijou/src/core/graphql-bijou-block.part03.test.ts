@@ -11,7 +11,7 @@ import {
 } from './graphql-bijou-block.test-support.js';
 
 describe('GraphQL-authored Bijou block artifacts', () => {
-it('compiles grouped GraphQL SDL into grouped block and scene facts', () => {
+  it('compiles grouped GraphQL SDL into grouped block and scene facts', () => {
     const artifact = compileGraphqlBijouBlock(releaseCardSdl, {
       sourceName: 'release-card.graphql',
     });

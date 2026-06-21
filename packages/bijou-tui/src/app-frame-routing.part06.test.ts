@@ -1,4 +1,3 @@
-
 import {
   afterAll,
   beforeAll,
@@ -23,13 +22,13 @@ import {
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('supports Shift+G for scroll-to-bottom', async () => {
+  it('supports Shift+G for scroll-to-bottom', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -39,13 +38,13 @@ it('supports Shift+G for scroll-to-bottom', async () => {
 });
 
 describe('createFramedApp', () => {
-const testCtx = createTestContext();
+  const testCtx = createTestContext();
 
-beforeAll(() => { setDefaultContext(testCtx); });
+  beforeAll(() => { setDefaultContext(testCtx); });
 
-afterAll(() => { _resetDefaultContextForTesting(); });
+  afterAll(() => { _resetDefaultContextForTesting(); });
 
-it('forwards unmapped workspace mouse messages to the active page', async () => {
+  it('forwards unmapped workspace mouse messages to the active page', async () => {
     type MsgWithMouse = Msg | MouseMsg;
     const seenMouseActions: string[] = [];
     const page: FramePage<PageModel, MsgWithMouse> = {
