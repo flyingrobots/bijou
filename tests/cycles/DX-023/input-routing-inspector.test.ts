@@ -17,10 +17,12 @@ describe('DX-023 input routing inspector cycle', () => {
 
   it('exports the input routing inspector API from the bijou-tui source barrel', () => {
     const barrel = readRepoFile('packages/bijou-tui/src/index.ts');
+    const barrelPart = readRepoFile('packages/bijou-tui/src/index.part03.ts');
 
-    expect(barrel).toContain('appendInputRoutingRecord');
-    expect(barrel).toContain('inputRoutingInspectorText');
-    expect(barrel).toContain('inputRoutingInspectorSurface');
-    expect(barrel).toContain('InputRoutingInspectorHistory');
+    expect(barrel).toContain("export * from './index.part03.js'");
+    expect(barrelPart).toContain('appendInputRoutingRecord');
+    expect(barrelPart).toContain('inputRoutingInspectorText');
+    expect(barrelPart).toContain('inputRoutingInspectorSurface');
+    expect(barrelPart).toContain('InputRoutingInspectorHistory');
   });
 });

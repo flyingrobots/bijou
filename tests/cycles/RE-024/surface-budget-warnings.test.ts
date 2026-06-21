@@ -17,10 +17,12 @@ describe('RE-024 surface budget warnings cycle', () => {
 
   it('exports the surface budget API from the bijou-tui source barrel', () => {
     const barrel = readRepoFile('packages/bijou-tui/src/index.ts');
+    const barrelPart = readRepoFile('packages/bijou-tui/src/index.part03.ts');
 
-    expect(barrel).toContain('evaluateSurfaceBudget');
-    expect(barrel).toContain('SurfaceBudgetThresholds');
-    expect(barrel).toContain('SurfaceBudgetWarning');
+    expect(barrel).toContain("export * from './index.part03.js'");
+    expect(barrelPart).toContain('evaluateSurfaceBudget');
+    expect(barrelPart).toContain('SurfaceBudgetThresholds');
+    expect(barrelPart).toContain('SurfaceBudgetWarning');
   });
 
   it('documents the runtime surfaceBudget option', () => {

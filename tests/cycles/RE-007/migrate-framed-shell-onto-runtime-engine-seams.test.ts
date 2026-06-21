@@ -25,6 +25,7 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     const layerImplementation = readRepoFile('packages/bijou-tui/src/app-frame-layers.ts');
     const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
     const index = readRepoFile('packages/bijou-tui/src/index.ts');
+    const indexPart = readRepoFile('packages/bijou-tui/src/index.part04.ts');
     const cycle = readRepoFile('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
     expect(layerImplementation).toContain('describeFrameRuntimeViewStack');
@@ -35,8 +36,9 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(appFrame).toContain('describeFrameRuntimeViewStack');
     expect(appFrame).toContain('routeRuntimeInput');
     expect(appFrame).toContain('retainRuntimeLayout');
-    expect(index).toContain('FrameRuntimeViewStack');
-    expect(index).toContain('describeFrameRuntimeViewStack');
+    expect(index).toContain("export * from './index.part04.js'");
+    expect(indexPart).toContain('FrameRuntimeViewStack');
+    expect(indexPart).toContain('describeFrameRuntimeViewStack');
     expect(cycle).toContain('key ownership through the runtime view stack');
     expect(cycle).toContain('retained shell drawer layouts');
   });

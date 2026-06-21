@@ -17,9 +17,11 @@ describe('DX-024 surface diff viewer cycle', () => {
 
   it('exports the surface diff API from the bijou-tui source barrel', () => {
     const barrel = readRepoFile('packages/bijou-tui/src/index.ts');
+    const barrelPart = readRepoFile('packages/bijou-tui/src/index.part03.ts');
 
-    expect(barrel).toContain('diffSurfaces');
-    expect(barrel).toContain('surfaceDiffSurface');
-    expect(barrel).toContain('surfaceDiffText');
+    expect(barrel).toContain("export * from './index.part03.js'");
+    expect(barrelPart).toContain('diffSurfaces');
+    expect(barrelPart).toContain('surfaceDiffSurface');
+    expect(barrelPart).toContain('surfaceDiffText');
   });
 });

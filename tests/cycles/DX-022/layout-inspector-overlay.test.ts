@@ -17,8 +17,10 @@ describe('DX-022 layout inspector overlay cycle', () => {
 
   it('exports the layout inspector API from the bijou-tui source barrel', () => {
     const barrel = readRepoFile('packages/bijou-tui/src/index.ts');
+    const barrelPart = readRepoFile('packages/bijou-tui/src/index.part03.ts');
 
-    expect(barrel).toContain('layoutInspectorOverlay');
-    expect(barrel).toContain('layoutInspectorText');
+    expect(barrel).toContain("export * from './index.part03.js'");
+    expect(barrelPart).toContain('layoutInspectorOverlay');
+    expect(barrelPart).toContain('layoutInspectorText');
   });
 });
