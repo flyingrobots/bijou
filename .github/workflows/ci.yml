@@ -138,7 +138,26 @@ jobs:
       - run: npm run build
       - run: npm run typecheck:test
       - name: Focused portable unit tests
-        run: npm run test:run -- --run packages/bijou-tui/src/eventbus.test.ts packages/bijou-tui/src/pipeline/pipeline.test.ts packages/bijou-node/src/index.test.ts scripts/check-node-version.test.ts scripts/docs-preview-components.test.ts scripts/docs-preview-entry.test.ts scripts/docs-preview-landing.test.ts scripts/docs-preview-search.test.ts scripts/docs-preview-theme.test.ts
+        run: >-
+          npm run test:run -- --run
+          packages/bijou-tui/src/eventbus.part01.test.ts
+          packages/bijou-tui/src/eventbus.part02.test.ts
+          packages/bijou-tui/src/eventbus.part03.test.ts
+          packages/bijou-tui/src/eventbus.part04.test.ts
+          packages/bijou-tui/src/eventbus.part05.test.ts
+          packages/bijou-tui/src/eventbus.part06.test.ts
+          packages/bijou-tui/src/eventbus.part07.test.ts
+          packages/bijou-tui/src/eventbus.part08.test.ts
+          packages/bijou-tui/src/eventbus.part09.test.ts
+          packages/bijou-tui/src/pipeline/pipeline.part01.test.ts
+          packages/bijou-tui/src/pipeline/pipeline.part02.test.ts
+          packages/bijou-node/src/index.test.ts
+          scripts/check-node-version.test.ts
+          scripts/docs-preview-components.test.ts
+          scripts/docs-preview-entry.test.ts
+          scripts/docs-preview-landing.test.ts
+          scripts/docs-preview-search.test.ts
+          scripts/docs-preview-theme.test.ts
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})

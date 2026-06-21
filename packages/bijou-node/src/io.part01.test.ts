@@ -1,0 +1,100 @@
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { mockClock } from '@flyingrobots/bijou/adapters/test';
+import { nodeIO } from './io.js';
+import { capturedWriter } from './io.test-support.js';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+
+describe('nodeIO()', () => {
+  let tempDir: string | undefined;
+
+  afterEach(() => {
+    if (tempDir) {
+      rmSync(tempDir, { recursive: true, force: true });
+      tempDir = undefined;
+    }
+  });
+
+  it('write() calls the configured stdout writer', () => {
+    const stdout = capturedWriter();
+    const io = nodeIO({ stdout });
+    io.write('hello');
+    expect(stdout.text()).toBe('hello');
+  });
+
+  it('writeError() calls the configured stderr writer', () => {
+    const stderr = capturedWriter();
+    const io = nodeIO({ stderr });
+    io.writeError('err');
+    expect(stderr.text()).toBe('err');
+  });
+
+  it('readFile() reads a real file', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    const filePath = join(tempDir, 'test.txt');
+    writeFileSync(filePath, 'hello bijou');
+
+    const io = nodeIO();
+    expect(io.readFile(filePath)).toBe('hello bijou');
+  });
+
+  it('readFile() throws for missing file', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    const io = nodeIO();
+    const missingFile = join(tempDir, 'missing.txt');
+    expect(() => io.readFile(missingFile)).toThrow();
+  });
+
+  it('readDir() lists real directory contents', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    writeFileSync(join(tempDir, 'a.txt'), '');
+    writeFileSync(join(tempDir, 'b.txt'), '');
+
+    const io = nodeIO();
+    const entries = io.readDir(tempDir);
+    expect(entries).toContain('a.txt');
+    expect(entries).toContain('b.txt');
+  });
+
+  it('readDir() appends trailing / to directories', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    mkdirSync(join(tempDir, 'subdir'));
+    writeFileSync(join(tempDir, 'file.txt'), '');
+
+    const io = nodeIO();
+    const entries = io.readDir(tempDir);
+    expect(entries).toContain('subdir/');
+    expect(entries).not.toContain('subdir');
+    expect(entries).toContain('file.txt');
+    expect(entries).not.toContain('file.txt/');
+  });
+
+  it('readDir() throws for missing directory', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    const io = nodeIO();
+    const missingDir = join(tempDir, 'missing-dir');
+    expect(() => io.readDir(missingDir)).toThrow();
+  });
+
+  it('joinPath() joins segments', () => {
+    const io = nodeIO();
+    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe(join('/foo', 'bar', 'baz.txt'));
+  });
+
+  it('setInterval() fires periodically and stops on dispose', () => {
+    const clock = mockClock();
+    const spy = vi.fn();
+    const io = nodeIO({ clock });
+    const handle = io.setInterval(spy, 50);
+
+    clock.advanceBy(150);
+    expect(spy).toHaveBeenCalledTimes(3);
+
+    handle.dispose();
+    clock.advanceBy(100);
+    expect(spy).toHaveBeenCalledTimes(3); // no more calls after dispose
+  });
+
+  // rawInput() requires a TTY stdin and is not unit-testable here.
+});
