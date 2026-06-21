@@ -24,11 +24,18 @@ Current count:
 
 | Source | Count | Meaning |
 | :--- | ---: | :--- |
-| File/context baseline | 217 | Files over the Code Dojo context threshold. |
+| File/context baseline | 136 | Files over the Code Dojo context threshold. |
 | Mock-ban baseline | 0 | Existing test mock/spy violations. |
-| Code-size baseline | 45 | Files over the 500-line ratchet, including 3 over the 1000-line hard limit. |
+| Code-size baseline | 26 | Files over the 500-line ratchet, including 3 over the 1000-line hard limit. |
 | ESLint baseline | 0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total** | **262** | Aggregate Code Dojo standards debt. |
+| **Total** | **162** | Aggregate Code Dojo standards debt. |
+
+WF-162 splits the remaining oversized deterministic test/support files from the
+WF-161 tranche and applies Project Big Extraction to declaration-boundary core,
+TUI, and standard-block modules. Public import paths remain facades, while
+implementation and test helpers move into sub-150-line part modules. This lowers
+file/context debt from `217` to `136`, code-size debt from `45` to `26`, and
+aggregate Code Dojo debt from `262` to `162`.
 
 WF-161 splits `91` over-threshold deterministic test/spec files into grouped
 sub-spec files that each stay under the Code Dojo file/context thresholds. Nine
@@ -127,8 +134,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `262`. The next met goalpost must lower the ceiling to
-`212` or lower.
+The current ceiling is `162`. The next met goalpost must lower the ceiling to
+`112` or lower.
 
 ## Updating The Ceiling
 

@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
+  deterministic test/support files from the WF-161 tranche and extracts
+  declaration-boundary core, TUI, and standard-block modules behind stable
+  facades, lowering file/context debt from `217` to `136`, code-size debt from
+  `45` to `26`, and aggregate Code Dojo debt from `262` to `162`.
 - **Focused Code Dojo ratchet** — WF-161 splits `91` oversized deterministic
   test/spec files into grouped sub-spec files below the file/context thresholds,
   removing `91` file/context entries and `9` matching code-size entries while

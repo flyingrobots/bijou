@@ -1,0 +1,80 @@
+// Raster glyph rendering — decoded/generated RGBA frames to terminal surfaces
+export {
+  type RasterGlyphCharsetOrder,
+  type RasterGlyphRenderer,
+  type RasterGlyphCharsetRenderer,
+  type RasterGlyphBrailleRenderer,
+  type RasterGlyphQuadRenderer,
+  type RasterGlyphFit,
+  type RasterGlyphColorMode,
+  type RasterGlyphDitherMode,
+  type RasterToGlyphSurfaceOptions,
+  type RgbaFrame,
+  RASTER_GLYPH_CHARSETS,
+  rasterToGlyphSurface,
+  validateRasterGlyphCharset,
+} from './raster-glyph.js';
+
+// Command palette
+export {
+  type CommandPaletteItem,
+  type CommandPaletteState,
+  type CommandPaletteOptions,
+  type CommandPaletteSurfaceOptions,
+  createCommandPaletteState,
+  cpFilter,
+  cpFocusNext,
+  cpFocusPrev,
+  cpPageDown,
+  cpPageUp,
+  cpSelectedItem,
+  commandPalette,
+  commandPaletteSurface,
+  commandPaletteKeyMap,
+} from './command-palette.js';
+
+// Focus area — scrollable pane with colored gutter
+export {
+  type OverflowX,
+  type FocusAreaState,
+  type FocusAreaOptions,
+  type FocusAreaRenderOptions,
+  createFocusAreaState,
+  createFocusAreaStateForSurface,
+  focusArea,
+  focusAreaSurface,
+  focusAreaScrollBy,
+  focusAreaScrollTo,
+  focusAreaScrollToTop,
+  focusAreaScrollToBottom,
+  focusAreaPageDown,
+  focusAreaPageUp,
+  focusAreaScrollByX,
+  focusAreaScrollToX,
+  focusAreaSetContent,
+  focusAreaKeyMap,
+} from './focus-area.js';
+
+// DAG pane — interactive DAG viewer
+export {
+  type DagPaneDagOptions,
+  type DagPaneState,
+  type DagPaneOptions,
+  type DagPaneRenderOptions,
+  createDagPaneState,
+  dagPane,
+  dagPaneSelectChild,
+  dagPaneSelectParent,
+  dagPaneSelectLeft,
+  dagPaneSelectRight,
+  dagPaneSelectNode,
+  dagPaneClearSelection,
+  dagPaneScrollBy,
+  dagPaneScrollToTop,
+  dagPaneScrollToBottom,
+  dagPanePageDown,
+  dagPanePageUp,
+  dagPaneScrollByX,
+  dagPaneSetSource,
+  dagPaneKeyMap,
+} from './dag-pane.js';

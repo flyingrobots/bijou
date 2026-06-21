@@ -69,6 +69,28 @@ weakening public behavior, tests, or standards.
      or have been replaced by smaller modules.
    - Lower the aggregate debt ceiling to `162` or lower.
 
+## Implementation Outcome
+
+The cycle lands exactly at `162` aggregate Code Dojo violations:
+
+- File/context baseline: `136`
+- Mock-ban baseline: `0`
+- Code-size baseline: `26`, including `3` hard-limit files
+- ESLint baseline: `0`
+
+The reduction combines:
+
+- Remaining deterministic test and test-support splits, including app-frame,
+  runtime-interactive, textarea, PTY-driver, DOGFOOD light-theme, docs-preview,
+  and test adapter support files.
+- Declaration-boundary module extraction for standard-blocks, theme helpers,
+  packed-cell, component metadata, TUI navigation/layout helpers, transition
+  shaders, block metadata, schema blocks, selection, binding lifecycle, DAG
+  pane, focus area, raster glyphs, layout envelopes, overlays, GraphQL blocks,
+  viewport, binding, and notifications.
+- Compatibility facades at the original import paths so public consumers keep
+  stable module entrypoints while implementations move into smaller part files.
+
 ## Candidate Set
 
 The starting debt pool is:
