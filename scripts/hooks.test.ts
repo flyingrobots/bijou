@@ -62,11 +62,12 @@ describe('git hooks', () => {
     expect(runIndex).toBeGreaterThanOrEqual(0);
     expect(runPaths).not.toContain('scripts/docs-preview.test.ts');
     expect(runPaths).toEqual(expect.arrayContaining([
-      'scripts/docs-preview-components.test.ts',
-      'scripts/docs-preview-entry.test.ts',
-      'scripts/docs-preview-landing.test.ts',
-      'scripts/docs-preview-search.test.ts',
-      'scripts/docs-preview-theme.test.ts',
+      'packages/bijou-node/src/index.part01.test.ts',
+      'scripts/docs-preview-components.part01.test.ts',
+      'scripts/docs-preview-entry.part01.test.ts',
+      'scripts/docs-preview-landing.part01.test.ts',
+      'scripts/docs-preview-search.part01.test.ts',
+      'scripts/docs-preview-theme.part01.test.ts',
     ]));
     for (const runPath of runPaths) {
       expect(existsSync(resolve(ROOT, runPath)), runPath).toBe(true);
