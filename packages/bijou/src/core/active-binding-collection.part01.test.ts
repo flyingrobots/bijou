@@ -1,0 +1,139 @@
+import { describe, expect, it } from 'vitest';
+import { defineDataRequirement } from './binding.js';
+import { defineBindingLifecycleOwner } from './binding-lifecycle.js';
+import { ActiveBindingCollection, activeBindingCollection, activeBindingEntry, isActiveBindingCollection, isActiveBindingEntry } from './active-binding-collection.js';
+
+describe('active binding collection primitives', () => {
+  it('creates frozen active binding collections from explicit owner and requirement entries', () => {
+      const owner = defineBindingLifecycleOwner({
+        id: ' docs.shell ',
+        kind: ' app-shell ',
+        label: ' Docs Shell ',
+      });
+      const article = defineDataRequirement({
+        id: ' article ',
+        resource: ' docs.article ',
+        facts: [{ kind: 'entity', key: 'resource', value: 'article' }],
+      });
+      const entry = activeBindingEntry({
+        owner,
+        requirement: article,
+        providerId: ' docs.articleProvider ',
+      });
+      const collection = activeBindingCollection([entry]);
+      expect(isActiveBindingEntry(entry)).toBe(true);
+      expect(isActiveBindingCollection(collection)).toBe(true);
+      expect(collection).toBeInstanceOf(ActiveBindingCollection);
+      expect(entry.owner).toBe(owner);
+      expect(entry.requirement).toBe(article);
+      expect(entry.providerId).toBe('docs.articleProvider');
+      expect(collection.entries()).toEqual([entry]);
+      expect(collection.requirements()).toEqual([article]);
+      expect(collection.owners()).toEqual([owner]);
+      expect(collection.get('docs.shell', 'article')).toBe(entry);
+      expect(collection.has('docs.shell', 'article')).toBe(true);
+      expect(collection.byOwner('docs.shell')).toEqual([entry]);
+      expect(collection.byRequirement('article')).toEqual([entry]);
+      expect(Object.isFrozen(entry)).toBe(true);
+      expect(Object.isFrozen(collection)).toBe(true);
+      expect(Object.isFrozen(collection.entries())).toBe(true);
+    });
+
+  it('produces one active lifecycle record per owner and requirement pair', () => {
+      const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+      const article = defineDataRequirement({
+        id: 'article',
+        resource: 'docs.article',
+        facts: [{ kind: 'entity', key: 'resource', value: 'article' }],
+      });
+      const outline = defineDataRequirement({
+        id: 'outline',
+        resource: 'docs.outline',
+      });
+      const collection = activeBindingCollection([
+        activeBindingEntry({
+          owner,
+          requirement: article,
+          providerId: 'docs.articleProvider',
+        }),
+        activeBindingEntry({
+          owner,
+          requirement: outline,
+        }),
+      ]);
+      expect(collection.lifecycleRecords()).toEqual([
+        {
+          owner,
+          requirementId: 'article',
+          providerId: 'docs.articleProvider',
+          state: 'active',
+          version: 1,
+          invalidations: [],
+          transitions: [],
+          facts: [{ kind: 'entity', key: 'resource', value: 'article' }],
+        },
+        {
+          owner,
+          requirementId: 'outline',
+          state: 'active',
+          version: 1,
+          invalidations: [],
+          transitions: [],
+          facts: [],
+        },
+      ]);
+      expect(Object.isFrozen(collection.lifecycleRecords())).toBe(true);
+      expect(Object.isFrozen(collection.lifecycleRecords()[0])).toBe(true);
+    });
+
+  it('treats repeated owner and requirement pairs as one logical active binding', () => {
+      const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+      const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+      const outline = defineDataRequirement({ id: 'outline', resource: 'docs.outline' });
+      const collection = activeBindingCollection([
+        activeBindingEntry({ owner, requirement: article }),
+        activeBindingEntry({
+          owner,
+          requirement: article,
+          providerId: 'docs.articleProvider',
+        }),
+        activeBindingEntry({ owner, requirement: outline }),
+      ]);
+      expect(collection.entries().map((entry) => ({
+        ownerId: entry.owner.id,
+        requirementId: entry.requirement.id,
+        providerId: entry.providerId,
+      }))).toEqual([
+        {
+          ownerId: 'reader.view',
+          requirementId: 'article',
+          providerId: 'docs.articleProvider',
+        },
+        {
+          ownerId: 'reader.view',
+          requirementId: 'outline',
+          providerId: undefined,
+        },
+      ]);
+      expect(collection.lifecycleRecords()).toHaveLength(2);
+    });
+
+  it('rejects repeated owner and requirement pairs with conflicting provider ids', () => {
+      const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+      const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+      expect(() => activeBindingCollection([
+        activeBindingEntry({
+          owner,
+          requirement: article,
+          providerId: 'docs.articleProvider',
+        }),
+        activeBindingEntry({
+          owner,
+          requirement: article,
+          providerId: 'docs.otherArticleProvider',
+        }),
+      ])).toThrow(
+        'active binding collection: conflicting providers for owner reader.view requirement article',
+      );
+    });
+});

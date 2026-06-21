@@ -1,0 +1,75 @@
+import { describe, expect, it } from 'vitest';
+import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
+import { runScript, stripAnsi } from '@flyingrobots/bijou-tui';
+import { surfaceToString } from '@flyingrobots/bijou';
+import { testRuntime } from '../../bijou-tui/src/index.js';
+import { createTuiAppSkeleton } from './index.js';
+
+function expectSurface(value: ReturnType<ReturnType<typeof createTuiAppSkeleton>['view']>) {
+  if (typeof value === 'string' || !('cells' in value)) {
+    throw new Error('expected a surface-native framed app view');
+  }
+  return value;
+}
+
+describe('createTuiAppSkeleton', () => {
+  it('renders a two-line footer with status over controls and a full-width separator', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app = createTuiAppSkeleton({
+        ctx,
+        statusMessage: 'Build green',
+        keyLegend: 'legend-controls',
+      });
+
+      const [model] = app.init();
+      const output = app.view(model);
+      const lines = surfaceToString(expectSurface(output), ctx.style).split('\n');
+
+      const statusRow = lines[model.rows - 2] ?? '';
+      const controlsRow = lines[model.rows - 1] ?? '';
+
+      expect(stripAnsi(statusRow)).toContain('Build green');
+      expect(stripAnsi(controlsRow)).toContain('legend-controls');
+
+      if (model.rows >= 4) {
+        const slashRow = lines[model.rows - 3] ?? '';
+        expect(stripAnsi(slashRow)).toHaveLength(model.columns);
+      }
+    });
+
+  it('opens quit confirmation on q and ctrl+c, and supports cancel', async () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app = createTuiAppSkeleton({ ctx });
+
+      const harness = await testRuntime(app, { ctx });
+      await harness.press('q');
+      expect(stripAnsi(surfaceToString(harness.frame, ctx.style))).toContain('Quit?');
+      expect(harness.messages).toHaveLength(1);
+
+      await harness.press('n');
+      expect(stripAnsi(surfaceToString(expectSurface(app.view(harness.model)), ctx.style))).not.toContain('Quit?');
+      expect(harness.snapshots.length).toBeGreaterThan(2);
+      await harness.teardown();
+
+      const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
+      expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1) ?? expect.fail('expected final frame'), ctx.style))).toContain('Quit?');
+    });
+
+  it('animates drawer changes via physics commands', async () => {
+      const clock = mockClock();
+      const ctx = createTestContext({ mode: 'interactive', clock });
+      const app = createTuiAppSkeleton({ ctx });
+
+      const promise = runScript(app, [
+        { key: 'o' },
+        { key: 'o', delay: 120 },
+      ], { ctx });
+      for (let i = 0; i < 80; i++) {
+        await clock.advanceByAsync(25);
+      }
+      const result = await promise;
+
+      // Initial frame + key frame + animation frames + second toggle.
+      expect(result.frames.length).toBeGreaterThan(3);
+    });
+});

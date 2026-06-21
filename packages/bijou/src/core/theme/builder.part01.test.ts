@@ -1,0 +1,130 @@
+import { describe, expect, it } from 'vitest';
+import { defineTheme } from './builder.js';
+
+function exampleTheme() {
+  return defineTheme()
+    .id('bijou.test')
+    .label('Bijou Test')
+    .mode('dark', mode => mode
+      .token('color.status.danger.bg')
+      .color({ r: 16, g: 32, b: 48 })
+      .token('color.status.danger.fg')
+      .color('#ffeeaa'))
+    .mode('light', mode => mode
+      .token('color.status.danger.bg')
+      .color([240, 232, 210])
+      .token('color.status.danger.fg')
+      .color('#7a0011'))
+    .build();
+}
+
+describe('theme builder API', () => {
+  it('builds immutable token themes with required dark and light modes', () => {
+      const theme = exampleTheme();
+
+      expect(theme.id).toBe('bijou.test');
+      expect(theme.label).toBe('Bijou Test');
+      expect(theme.requiredModes).toEqual(['dark', 'light']);
+      expect(theme.tokenIds).toEqual([
+        'color.status.danger.bg',
+        'color.status.danger.fg',
+      ]);
+      expect(theme.modes.dark.tokens['color.status.danger.bg']).toEqual({
+        hex: '#102030',
+        rgb: [16, 32, 48],
+      });
+      expect(theme.modes.light.tokens['color.status.danger.bg']).toEqual({
+        hex: '#f0e8d2',
+        rgb: [240, 232, 210],
+      });
+      expect(Object.isFrozen(theme)).toBe(true);
+      expect(Object.isFrozen(theme.modes.dark.tokens)).toBe(true);
+    });
+
+  it('supports the explicit token builder variant inside a mode', () => {
+      const theme = defineTheme()
+        .id('bijou.variant')
+        .mode('dark', mode => mode
+          .token()
+          .id('color.brand.primary')
+          .color({ r: 1, g: 2, b: 3 })
+          .register())
+        .mode('light', mode => mode
+          .token()
+          .id('color.brand.primary')
+          .color('#abcdef')
+          .register())
+        .build();
+
+      expect(theme.modes.dark.tokens['color.brand.primary']).toEqual({
+        hex: '#010203',
+        rgb: [1, 2, 3],
+      });
+      expect(theme.modes.light.tokens['color.brand.primary']?.hex).toBe('#abcdef');
+    });
+
+  it('rejects duplicate token ids within one mode', () => {
+      expect(() => defineTheme()
+        .id('bijou.duplicate')
+        .mode('dark', mode => mode
+          .token('color.text.primary')
+          .color('#ffffff')
+          .token('color.text.primary')
+          .color('#eeeeee')))
+        .toThrow(/Duplicate token "color\.text\.primary" in mode "dark"/);
+    });
+
+  it('rejects themes missing required dark or light modes', () => {
+      expect(() => defineTheme()
+        .id('bijou.missing-light')
+        .mode('dark', mode => mode
+          .token('color.text.primary')
+          .color('#ffffff'))
+        .build())
+        .toThrow(/Missing required theme mode "light"/);
+    });
+
+  it('rejects themes missing required mode values for declared tokens', () => {
+      expect(() => defineTheme()
+        .id('bijou.missing-token')
+        .mode('dark', mode => mode
+          .token('color.text.primary')
+          .color('#ffffff')
+          .token('color.text.muted')
+          .color('#999999'))
+        .mode('light', mode => mode
+          .token('color.text.primary')
+          .color('#000000'))
+        .build())
+        .toThrow(/Mode "light" is missing token "color\.text\.muted"/);
+    });
+
+  it('rejects custom modes missing values for declared tokens', () => {
+      expect(() => defineTheme()
+        .id('bijou.missing-custom-token')
+        .mode('dark', mode => mode
+          .token('color.text.primary')
+          .color('#ffffff')
+          .token('color.text.muted')
+          .color('#999999'))
+        .mode('light', mode => mode
+          .token('color.text.primary')
+          .color('#000000')
+          .token('color.text.muted')
+          .color('#555555'))
+        .mode('high-contrast', mode => mode
+          .token('color.text.primary')
+          .color('#ffffff'))
+        .build())
+        .toThrow(/Mode "high-contrast" is missing token "color\.text\.muted"/);
+    });
+
+  it('rejects RGB channels outside the byte range', () => {
+      expect(() => defineTheme()
+        .id('bijou.invalid-rgb')
+        .mode('dark', mode => mode
+          .token('color.invalid')
+          .color({ r: 300, g: 0, b: 0 })))
+        .toThrow(/RGB channels must be integers from 0 to 255/);
+    });
+});

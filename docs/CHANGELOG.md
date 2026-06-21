@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **Focused Code Dojo ratchet** — WF-161 splits `91` oversized deterministic
+  test/spec files into grouped sub-spec files below the file/context thresholds,
+  removing `91` file/context entries and `9` matching code-size entries while
+  preserving the original assertions. Aggregate Code Dojo debt drops from
+  `362` to `262`, with the next goalpost target set to `212` or lower.
 - **Project Big Extraction: DOGFOOD Blocks Breakout** — BE-001 splits
   `examples/docs/dogfood-blocks.ts` into a `97` line compatibility facade plus
   focused sub-150-line registry, schema, render, and block-family modules,
