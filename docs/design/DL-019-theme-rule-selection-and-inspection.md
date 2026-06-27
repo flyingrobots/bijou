@@ -58,8 +58,9 @@ values.
 ## Hill
 
 A Bijou theme author can define semantic theme roles through pure selector
-rules, compile them into the existing theme/token graph contract, and inspect
-which candidates were considered, rejected, and selected.
+rules, replay the product questions below with tests, compile the rules into
+the existing theme/token graph contract, and inspect which candidates were
+considered, rejected, and selected.
 
 ## Playback Questions
 
@@ -157,7 +158,7 @@ const graph = createTokenGraph({
   },
   semantic: {
     primary: bestContrastWith(
-      { ref: "surface.primary.bg" },
+      { ref: "surface.primary.bg" }, // token background slot
       scope("palette"),
     ),
     accent: mostVivid(scope("palette"), {
@@ -249,10 +250,8 @@ path still returns a resolved `TokenValue`.
 
 Rule failures are deterministic:
 
-- missing target references throw with the missing path
-- missing explicit candidate paths throw with the missing path
-- missing exclusion paths throw with the missing path
-- empty candidate scopes throw with the selector name
+- missing target, explicit candidate, candidate-scope, and exclusion paths throw
+  with the missing path
 - vividness selectors throw when `minContrast` is set without `against`
 - no minimum-contrast candidate throws unless the selector defines an explicit
   fallback
