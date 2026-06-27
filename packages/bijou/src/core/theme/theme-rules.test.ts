@@ -71,6 +71,13 @@ describe('theme rule selectors', () => {
     if (inspected.kind !== 'rule') throw new Error('Expected rule inspection.');
     expect(inspected.selected?.path).toBe('palette.blue');
     expect(inspected.candidates.find(candidate => candidate.path === 'palette.red')?.reasons).toContain('excluded');
+    expect(inspected.dependencies).toEqual(expect.arrayContaining([
+      'surface.canvas.bg',
+      'palette.red',
+      'palette.green',
+      'palette.blue',
+      'palette.gray',
+    ]));
   });
 
   it('supports deterministic ordered and closest-color selection', () => {
@@ -99,5 +106,33 @@ describe('theme rule selectors', () => {
     });
 
     expect(() => graph.get('semantic.a')).toThrow(/Circular token reference/);
+  });
+
+  it('fails malformed candidate contracts with explicit paths', () => {
+    const missingCandidate = createTokenGraph({
+      palette: { ok: '#ffffff' },
+      semantic: { bad: bestContrastWith('#000000', ['palette.missing']) },
+    });
+    const missingScope = createTokenGraph({
+      semantic: { bad: bestContrastWith('#000000', scope('palette')) },
+    });
+    const missingExclusion = createTokenGraph({
+      palette: { ok: '#ffffff' },
+      semantic: {
+        bad: mostVivid(scope('palette'), {
+          against: '#000000',
+          not: ['palette.missing'],
+        }),
+      },
+    });
+    const missingAgainst = createTokenGraph({
+      palette: { ok: '#ffffff' },
+      semantic: { bad: mostVivid(scope('palette'), { minContrast: 4.5 }) },
+    });
+
+    expect(() => missingCandidate.get('semantic.bad')).toThrow(/candidate path not found: palette\.missing/);
+    expect(() => missingScope.get('semantic.bad')).toThrow(/candidate scope not found: palette/);
+    expect(() => missingExclusion.get('semantic.bad')).toThrow(/exclusion path not found: palette\.missing/);
+    expect(() => missingAgainst.get('semantic.bad')).toThrow(/requires "against"/);
   });
 });

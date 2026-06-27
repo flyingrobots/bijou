@@ -5,6 +5,7 @@ import type {
   ThemeColorRuleDefinition,
   ThemeRuleCandidateInput,
 } from './graph-types.js';
+import { hasThemeRulePath } from './theme-rule-paths.js';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -27,15 +28,8 @@ export function collectThemeRuleCandidates(
   rule: ThemeColorRuleDefinition,
   context: ThemeRuleCandidateContext,
 ): readonly ThemeRuleCandidate[] {
-  const excluded = new Set<string>();
-  if ((rule.rule === 'most-vivid' || rule.rule === 'least-vivid') && rule.not !== undefined) {
-    for (const path of rule.not) excluded.add(path);
-  }
-
-  if (isCandidateScope(rule.candidates) && rule.candidates.not !== undefined) {
-    for (const path of rule.candidates.not) excluded.add(path);
-  }
-
+  const excluded = collectExcludedPaths(rule);
+  for (const path of excluded) assertKnownPath(context.definitions, path, 'exclusion');
   const inputs = candidateInputs(rule.candidates, context.definitions);
   return inputs.map(input => resolveCandidate(input, excluded, context));
 }
@@ -44,7 +38,16 @@ function candidateInputs(
   candidates: ThemeColorRuleDefinition['candidates'],
   definitions: ReadonlyMap<string, StoredDefinition>,
 ): readonly ThemeRuleCandidateInput[] {
-  return isCandidateScope(candidates) ? scopeInputs(candidates.path, definitions) : candidates;
+  if (!isCandidateScope(candidates)) {
+    return candidates.map(input => {
+      const path = candidatePath(input);
+      if (path !== undefined) assertKnownPath(definitions, path, 'candidate');
+      return input;
+    });
+  }
+  const inputs = scopeInputs(candidates.path, definitions);
+  if (inputs.length === 0) throw new Error(`Theme rule candidate scope not found: ${candidates.path}`);
+  return inputs;
 }
 
 function isCandidateScope(
@@ -75,24 +78,52 @@ function resolveCandidate(
   const rawValue = candidateRawValue(input);
   const label = candidateLabel(input, path, rawValue);
 
-  try {
-    const hex = path === undefined
-      ? rgbToHex(hexToRgb(rawValue ?? label))
-      : context.resolveColor({ ref: path }, context.mode, new Set(context.visited));
+  if (path !== undefined) {
+    const hex = context.resolveColor({ ref: path }, context.mode, new Set(context.visited));
     return {
       label,
-      ...(path === undefined ? {} : { path }),
+      path,
       hex,
-      excluded: path !== undefined && excluded.has(path),
+      excluded: excluded.has(path),
+      invalid: false,
+    };
+  }
+
+  try {
+    const hex = rgbToHex(hexToRgb(rawValue ?? label));
+    return {
+      label,
+      hex,
+      excluded: false,
       invalid: false,
     };
   } catch {
     return {
       label,
-      ...(path === undefined ? {} : { path }),
-      excluded: path !== undefined && excluded.has(path),
+      excluded: false,
       invalid: true,
     };
+  }
+}
+
+function collectExcludedPaths(rule: ThemeColorRuleDefinition): ReadonlySet<string> {
+  const excluded = new Set<string>();
+  if ((rule.rule === 'most-vivid' || rule.rule === 'least-vivid') && rule.not !== undefined) {
+    for (const path of rule.not) excluded.add(path);
+  }
+  if (isCandidateScope(rule.candidates) && rule.candidates.not !== undefined) {
+    for (const path of rule.candidates.not) excluded.add(path);
+  }
+  return excluded;
+}
+
+function assertKnownPath(
+  definitions: ReadonlyMap<string, StoredDefinition>,
+  path: string,
+  role: 'candidate' | 'exclusion',
+): void {
+  if (!hasThemeRulePath(definitions, path)) {
+    throw new Error(`Theme rule ${role} path not found: ${path}`);
   }
 }
 

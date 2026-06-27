@@ -56,6 +56,9 @@ function rankCandidates(
 ): readonly RankedCandidate[] {
   const target = 'target' in rule ? context.resolveColor(rule.target, context.mode, new Set(context.visited)) : undefined;
   const againstDef = vividAgainst(rule);
+  if (vividMinContrast(rule) !== undefined && againstDef === undefined) {
+    throw new Error(`Theme rule "${rule.rule}" for "${context.path}" requires "against" when "minContrast" is set.`);
+  }
   const against = againstDef !== undefined
     ? context.resolveColor(againstDef, context.mode, new Set(context.visited))
     : target;

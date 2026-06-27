@@ -61,6 +61,19 @@ A Bijou theme author can define semantic theme roles through pure selector
 rules, compile them into the existing theme/token graph contract, and inspect
 which candidates were considered, rejected, and selected.
 
+## Playback Questions
+
+- Can a semantic foreground choose a readable color from a primitive palette
+  without hard-coding the final hex value?
+- Can a vivid accent selector exclude reserved success and error roles while
+  still proving contrast against its surface?
+- Can `TokenGraph.inspect()` explain every candidate read by a rule, including
+  selected, eligible, excluded, invalid, and contrast-failed candidates?
+- Can malformed rule inputs fail with the missing target, scope, candidate, or
+  exclusion path instead of silently choosing a surprising color?
+- Can the rule layer preserve existing `TokenGraph.get()` behavior for callers
+  that only need a resolved `TokenValue`?
+
 ## Current Truth
 
 Bijou already has:
@@ -169,6 +182,11 @@ semantic: {
 }
 ```
 
+Slot-path references ending in `.bg` are part of this cycle's contract. A
+reference such as `{ ref: "surface.primary.bg" }` resolves the background color
+of the `surface.primary` token while `{ ref: "surface.primary" }` keeps the
+existing foreground-reference behavior.
+
 The graph should expose inspection facts separately from resolved values:
 
 ```ts
@@ -182,8 +200,10 @@ Inspector rows:
 semantic.accent
   rule: most-vivid
   selected: palette.cyan (#38bdf8)
-  dependencies: surface.primary.bg, palette.cyan, palette.green, palette.red
+  dependencies: surface.primary.bg, palette.ink, palette.paper, palette.cyan,
+    palette.green, palette.red
   rejected:
+    palette.paper - eligible, not selected
     palette.green - excluded
     palette.red - excluded
     palette.ink - contrast below 4.5
@@ -192,43 +212,56 @@ semantic.accent
 ## Selector Vocabulary
 
 The initial selector vocabulary should cover the high-value color decisions.
+Selectors that compare against a target put the target first. Selectors that
+rank only a candidate collection put the collection first.
 
 `bestContrastWith(target, candidates)` chooses the candidate with the highest
-contrast ratio against the target.
+contrast ratio against the target. Equal scores keep candidate order.
 
-`minContrastWith(target, candidates, minRatio)` chooses the first candidate
+`minContrastWith(target, candidates, { ratio })` chooses the first candidate
 that clears the requested contrast ratio, using deterministic candidate order.
 
 `mostVivid(candidates, options)` chooses the highest-chroma candidate, with
-optional `against`, `minContrast`, and `not` constraints.
+optional `against`, `minContrast`, and `not` constraints. First-slice chroma is
+the deterministic RGB channel spread: `max(red, green, blue) - min(red, green,
+blue)`. If `minContrast` is present, `against` is required.
 
 `leastVivid(candidates, options)` chooses the lowest-chroma candidate, with the
-same optional constraints.
+same optional constraints and the same `minContrast` rule.
 
 `closestColor(target, candidates)` chooses the closest candidate to a target
-color. A simple deterministic RGB distance is acceptable for the first slice if
-the docs name it honestly.
+color. The first slice uses squared RGB distance and keeps candidate order for
+equal distances.
 
-`nth(candidates, index)` chooses a candidate by ordered position. Integer
-indices use array-style ordering, and fractional `0` through `1` indices choose
-relative positions.
+`nthColor(candidates, index)` chooses a candidate by ordered position. Integer
+indices use array-style ordering, negative integers count from the end, and
+out-of-range integers clamp to the nearest valid candidate. Fractional indices
+clamp to `0` through `1` and use `round((length - 1) * index)`.
 
 ## Runtime Contract
 
 Selectors are pure. They do not read process state, filesystem data, terminal
 facts, or clocks.
 
-Selectors return token values compatible with the existing `TokenGraph.get()`
-path. They may carry source metadata internally, but `get()` continues to
-return a `TokenValue`.
+Selector helpers return plain `ThemeColorRuleDefinition` data. The token graph
+evaluates that intermediate rule definition, and the existing `TokenGraph.get()`
+path still returns a resolved `TokenValue`.
 
 Rule failures are deterministic:
 
 - missing target references throw with the missing path
+- missing explicit candidate paths throw with the missing path
+- missing exclusion paths throw with the missing path
 - empty candidate scopes throw with the selector name
+- vividness selectors throw when `minContrast` is set without `against`
 - no minimum-contrast candidate throws unless the selector defines an explicit
   fallback
 - cycles remain cycle errors
+
+Inspection dependencies include target and `against` references plus every
+candidate path read from explicit candidate lists or scopes, whether the
+candidate was selected, eligible-but-not-selected, excluded, invalid, or below
+the contrast floor.
 
 ## Accessibility And Assistive Posture
 
@@ -281,14 +314,14 @@ equality guessing.
 ## Implementation Outline
 
 1. Add selector definition types to the core theme graph.
-2. Add deterministic candidate collection for explicit paths and scopes.
-3. Add contrast, vividness, closeness, and ordered selection helpers.
-4. Add `TokenGraph.inspect()` or an adjacent pure inspection API.
+2. Collect deterministic candidates from explicit paths and scopes.
+3. Implement contrast, vividness, closeness, and ordered selection helpers.
+4. Expose `TokenGraph.inspect()` or an adjacent pure inspection API.
 5. Preserve existing `TokenGraph.get()` behavior for raw, ref, mode, and
    transform definitions.
-6. Export the new types/helpers from the theme barrel and root package.
+6. Wire the new types and helpers into the theme barrel and root package.
 7. Document the recipe pattern in the design-system theme authoring docs.
-8. Update `docs/CHANGELOG.md`.
+8. Record the shipped behavior in `docs/CHANGELOG.md`.
 
 ## Tests To Write First
 
@@ -313,9 +346,9 @@ equality guessing.
 - Design-system docs show the primitive -> semantic rule -> UI token workflow.
 - Local validation includes focused theme tests, `npm run typecheck:test`,
   `npm run lint`, `npm run code-dojo:changed`, and `git diff --check`.
-- The cycle either lowers aggregate Code Dojo debt to `112` or lower, or stays
-  explicitly unfinished as a shaped design/prototype and does not claim the
-  repo goalpost.
+- Code Dojo debt remains verifiable through `npm run code-dojo:debt` and
+  `npm run code-dojo:verify`; this cycle does not claim the repo goalpost
+  unless that aggregate report reaches `112` or lower.
 
 ## Retrospective
 
