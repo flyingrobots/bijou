@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- **Theme rule selection and inspection** — DL-019 adds Bijou-native selector
+  rules for contrast, vividness, closest-color, and ordered palette choices,
+  plus `TokenGraph.inspect()` facts that explain selected and rejected
+  candidates without adding an external design-token dependency.
+
 ### Fixed
 
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized

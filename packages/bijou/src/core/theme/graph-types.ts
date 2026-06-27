@@ -38,10 +38,101 @@ export interface TokenDefinition {
   bgRGB?: RGB;
 }
 
+export interface ThemeRuleCandidateScope {
+  readonly kind: 'scope';
+  readonly path: string;
+  readonly not?: readonly string[];
+}
+
+export interface ThemeRuleCandidatePath {
+  readonly kind: 'path';
+  readonly path: string;
+}
+
+export interface ThemeRuleCandidateValue {
+  readonly kind: 'value';
+  readonly value: string;
+  readonly label?: string;
+}
+
+export type ThemeRuleCandidateInput = string | ThemeRuleCandidatePath | ThemeRuleCandidateValue;
+export type ThemeRuleCandidateSource = ThemeRuleCandidateScope | readonly ThemeRuleCandidateInput[];
+
+interface ContrastRuleDefinition {
+  readonly rule: 'best-contrast-with' | 'min-contrast-with';
+  readonly target: ColorDefinition;
+  readonly candidates: ThemeRuleCandidateSource;
+  readonly ratio?: number;
+}
+
+interface VividRuleDefinition {
+  readonly rule: 'most-vivid' | 'least-vivid';
+  readonly candidates: ThemeRuleCandidateSource;
+  readonly against?: ColorDefinition;
+  readonly minContrast?: number;
+  readonly not?: readonly string[];
+}
+
+interface ClosestRuleDefinition {
+  readonly rule: 'closest-color';
+  readonly target: ColorDefinition;
+  readonly candidates: ThemeRuleCandidateSource;
+}
+
+interface NthRuleDefinition {
+  readonly rule: 'nth-color';
+  readonly candidates: ThemeRuleCandidateSource;
+  readonly index: number;
+}
+
+export type ThemeColorRuleDefinition =
+  | ContrastRuleDefinition
+  | VividRuleDefinition
+  | ClosestRuleDefinition
+  | NthRuleDefinition;
+
+export type ThemeRuleCandidateReason =
+  | 'selected'
+  | 'eligible'
+  | 'excluded'
+  | 'contrast-too-low'
+  | 'not-selected'
+  | 'invalid';
+
+export interface ThemeRuleCandidateInspection {
+  readonly path?: string;
+  readonly label: string;
+  readonly hex?: string;
+  readonly ratio?: number;
+  readonly score?: number;
+  readonly reasons: readonly ThemeRuleCandidateReason[];
+}
+
+export interface ThemeRuleInspection {
+  readonly kind: 'rule';
+  readonly path: string;
+  readonly mode: 'light' | 'dark';
+  readonly rule: ThemeColorRuleDefinition['rule'];
+  readonly hex: string;
+  readonly selected?: ThemeRuleCandidateInspection;
+  readonly candidates: readonly ThemeRuleCandidateInspection[];
+  readonly dependencies: readonly string[];
+}
+
+export interface ThemeTokenInspection {
+  readonly kind: 'token' | 'color';
+  readonly path: string;
+  readonly mode: 'light' | 'dark';
+  readonly hex: string;
+  readonly dependencies: readonly string[];
+}
+
+export type TokenGraphInspection = ThemeRuleInspection | ThemeTokenInspection;
+
 /**
  * Union of possible input values for a token path.
  */
-export type TokenInput = ColorDefinition | TokenDefinition | TokenValue;
+export type TokenInput = ColorDefinition | TokenDefinition | TokenValue | ThemeColorRuleDefinition;
 
 /**
  * A flat or nested map of token definitions.

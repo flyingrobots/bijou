@@ -1,12 +1,3 @@
-/**
- * Theme module barrel — re-exports all theme types, presets, utilities,
- * gradient helpers, resolver, DTCG interop, color downsampling, and
- * color manipulation functions.
- *
- * @module
- */
-
-// Token types
 export type {
   RGB,
   GradientStop,
@@ -45,15 +36,12 @@ export type {
   TokenThemeMode,
 } from './builder.js';
 
-// Presets
 export { BIJOU_DARK, BIJOU_LIGHT, CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
 
 export * from './styled.js';
 
-// Theme extension
 export { extendTheme } from './extend.js';
 
-// Theme doctor
 export { defineThemeSafePairs, doctorTheme, themeContrastRatio } from './doctor.js';
 export type {
   ThemeContrastPair,
@@ -68,26 +56,19 @@ export type {
   ThemeSafePairOptions,
 } from './doctor.js';
 
-// Gradient
 export { lerp3, gradientText } from './gradient.js';
 
-// Resolver
 export {
   isNoColor,
   createThemeResolver,
   createResolved,
 } from './resolve.js';
 export type { ResolvedTheme, ThemeResolver, ThemeResolverOptions } from './resolve.js';
-
-
-// Gradient options
 export type { GradientTextOptions } from './gradient.js';
 
-// DTCG interop
 export { fromDTCG, toDTCG } from './dtcg.js';
 export type { DTCGDocument, DTCGToken, DTCGGroup } from './dtcg.js';
 
-// Color downsampling
 export {
   rgbToAnsi256,
   nearestAnsi256,
@@ -95,20 +76,41 @@ export {
   ansi256ToAnsi16,
   type ColorLevel,
 } from './downsample.js';
-// Theme accessors
 export { createThemeAccessors, type ThemeAccessors } from './accessors.js';
 
-// Reactive Token Graph
 export { createTokenGraph } from './graph.js';
 export type { TokenGraph, ThemeMode } from './graph.js';
+export {
+  bestContrastWith,
+  closestColor,
+  colorCandidate,
+  isThemeColorRuleDefinition,
+  leastVivid,
+  minContrastWith,
+  mostVivid,
+  nthColor,
+  scope,
+  tokenCandidate,
+} from './theme-rules.js';
+export type { MinContrastRuleOptions, VividRuleOptions } from './theme-rules.js';
 export type {
   ColorDefinition,
   TokenDefinition,
   TokenDefinitions,
   ColorTransform,
+  ThemeColorRuleDefinition,
+  ThemeRuleCandidateInput,
+  ThemeRuleCandidateInspection,
+  ThemeRuleCandidateReason,
+  ThemeRuleCandidateScope,
+  ThemeRuleCandidateSource,
+  ThemeRuleCandidatePath,
+  ThemeRuleCandidateValue,
+  ThemeRuleInspection,
+  ThemeTokenInspection,
+  TokenGraphInspection,
 } from './graph-types.js';
 
-// Color manipulation
 export {
   color,
   colorHex,
