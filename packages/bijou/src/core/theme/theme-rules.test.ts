@@ -44,6 +44,9 @@ describe('theme rule selectors', () => {
     });
 
     expect(graph.get('semantic.muted').hex).toBe('#999999');
+    const inspected = graph.inspect('semantic.muted');
+    if (inspected.kind !== 'rule') throw new Error('Expected rule inspection.');
+    expect(inspected.candidates.find(candidate => candidate.path === 'palette.weak')?.reasons).toContain('contrast-too-low');
   });
 
   it('keeps reserved roles out of vivid accent selection and explains rejection', () => {

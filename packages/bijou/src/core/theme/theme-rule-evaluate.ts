@@ -72,7 +72,7 @@ function rankCandidate(
   against: string | undefined,
 ): RankedCandidate {
   const ratio = candidate.hex !== undefined && against !== undefined ? themeContrastRatio(candidate.hex, against) : undefined;
-  const minContrast = vividMinContrast(rule);
+  const minContrast = ruleMinContrast(rule);
   const contrastOk = minContrast === undefined || (ratio ?? 0) >= minContrast;
   const score = scoreThemeRuleCandidate(rule, candidate.hex, target, ratio);
   return {
@@ -125,6 +125,10 @@ function vividAgainst(rule: ThemeColorRuleDefinition): ColorDefinition | undefin
 
 function vividMinContrast(rule: ThemeColorRuleDefinition): number | undefined {
   return rule.rule === 'most-vivid' || rule.rule === 'least-vivid' ? rule.minContrast : undefined;
+}
+
+function ruleMinContrast(rule: ThemeColorRuleDefinition): number | undefined {
+  return rule.rule === 'min-contrast-with' ? rule.ratio ?? 4.5 : vividMinContrast(rule);
 }
 
 function addColorDeps(def: ColorDefinition, deps: Set<string>): void {

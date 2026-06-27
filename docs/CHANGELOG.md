@@ -18,6 +18,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **DOGFOOD docs validation** — Local pre-push and CI path classification now
   treat all `docs/*` changes as DOGFOOD-relevant, so documentation edits run
   the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.
+- **Theme rule inspection** — `minContrastWith()` candidates below the contrast
+  floor now report `contrast-too-low` inspection reasons instead of looking
+  eligible.
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
   deterministic test/support files from the WF-161 tranche and extracts
   declaration-boundary core, TUI, and standard-block modules behind stable
