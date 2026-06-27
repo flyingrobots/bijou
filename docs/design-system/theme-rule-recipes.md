@@ -95,9 +95,11 @@ They should not infer token ownership from RGB equality or screenshots.
 `minContrastWith(target, candidates, { ratio })` chooses the first candidate
 that reaches the requested contrast ratio.
 
-`mostVivid(candidates, options)` chooses the highest-chroma readable candidate.
+`mostVivid(candidates, options)` chooses the highest-chroma candidate; it is
+readable only when `against` and `minContrast` are provided.
 
-`leastVivid(candidates, options)` chooses the lowest-chroma readable candidate.
+`leastVivid(candidates, options)` chooses the lowest-chroma candidate; it uses
+the same readability rule.
 
 `closestColor(target, candidates)` chooses the closest RGB candidate.
 
