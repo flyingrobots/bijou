@@ -17,6 +17,12 @@ Rules live in `@flyingrobots/bijou`. They do not depend on external design
 token packages and they compile to the same `TokenValue` objects the renderer
 already consumes.
 
+Bijou dogfoods this flow for the owned `bijou-dark` and `bijou-light` presets:
+their primitive ink, brand, and surface palettes compile through `TokenGraph`
+rules into the same public `Theme` objects existing consumers already use.
+Legacy vivid themes and third-party palette fixtures remain literal
+compatibility presets.
+
 ## When To Use Rules
 
 Use a rule when a token should follow a stable decision:

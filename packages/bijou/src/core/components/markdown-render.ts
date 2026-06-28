@@ -20,8 +20,6 @@ export function renderBlocks(
   width: number,
 ): string {
   const mode = ctx.mode;
-  // `static` mode intentionally falls through to styled rendering (same as
-  // `interactive`). Only `pipe` and `accessible` get special treatment.
   const lines: string[] = [];
 
   for (const block of blocks) {
@@ -225,7 +223,9 @@ function wrapInlineMarkdown(
 ): string[] {
   const rendered = parseInline(text, ctx);
   if (ctx.mode === 'interactive' || ctx.mode === 'static') {
-    return wrapStyledInlineText(rendered, width);
+    return wrapStyledInlineText(rendered, width).map((line) => (
+      ctx.style.styled(ctx.semantic('primary'), line)
+    ));
   }
   return wordWrap(rendered, width);
 }

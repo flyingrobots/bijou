@@ -12,9 +12,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   rules for contrast, vividness, closest-color, and ordered palette choices,
   plus `TokenGraph.inspect()` facts that explain selected and rejected
   candidates without adding an external design-token dependency.
+- **Rule-authored first-party themes** — DL-020 moves the owned `bijou-dark` and
+  `bijou-light` presets onto primitive palettes plus selector rules while
+  preserving the public `Theme` shape, DTCG round trips, and resolved theme
+  accessors.
 
 ### Fixed
 
+- **DOGFOOD Theme Lab readability** — DOGFOOD docs now render Markdown prose
+  with the active semantic foreground, choose contrast-filtered docs chrome
+  colors for light shells, and show the active shell palette first in Theme
+  Lab.
 - **DOGFOOD docs validation** — Local pre-push and CI path classification now
   treat all `docs/*` changes as DOGFOOD-relevant, so documentation edits run
   the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.

@@ -13,10 +13,18 @@ import {
   KEY_ENTER,
   KEY_F10,
   runScript,
+  themeContrastRatio,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
+import {
+  docsThemeDescriptionToken,
+  docsThemeSelectedRowBgToken,
+  docsThemeSurfaceToken,
+  docsThemeUnfocusedGutterToken,
+} from '../examples/docs/app-docs-theme-tokens.js';
+import { docsVisualThemeFromShellThemeChoice } from '../examples/docs/app-landing.js';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
@@ -45,6 +53,38 @@ describe('docs preview app', () => {
     expect(dark?.theme.ui.cursor.hex).not.toBe(dark?.theme.status.info.hex);
     expect(light?.theme.semantic.primary.hex).not.toBe(light?.theme.semantic.accent.hex);
     expect(light?.theme.ui.cursor.hex).not.toBe(light?.theme.status.info.hex);
+  });
+
+  it('keeps DOGFOOD light docs chrome readable against its panel backgrounds', () => {
+    const shellThemes = docsShellThemesForTesting();
+    const dogfood = shellThemes.find((theme) => theme.id === 'dogfood');
+    const light = must(dogfood?.modes?.find((mode) => mode.id === 'light'));
+    const visualTheme = docsVisualThemeFromShellThemeChoice({
+      id: 'dogfood:light',
+      label: 'DOGFOOD / Light',
+      theme: light.theme,
+    });
+    const surfaceToken = docsThemeSurfaceToken(visualTheme);
+    const selectedToken = docsThemeSelectedRowBgToken(visualTheme);
+    const descriptionToken = docsThemeDescriptionToken(visualTheme);
+    const gutterToken = docsThemeUnfocusedGutterToken(visualTheme);
+
+    expect(themeContrastRatio(
+      surfaceToken.hex,
+      must(surfaceToken.bg),
+    )).toBeGreaterThanOrEqual(7);
+    expect(themeContrastRatio(
+      selectedToken.hex,
+      must(selectedToken.bg),
+    )).toBeGreaterThanOrEqual(7);
+    expect(themeContrastRatio(
+      descriptionToken.hex,
+      must(surfaceToken.bg),
+    )).toBeGreaterThanOrEqual(4.5);
+    expect(themeContrastRatio(
+      gutterToken.hex,
+      must(gutterToken.bg),
+    )).toBeGreaterThanOrEqual(3);
   });
 });
 
