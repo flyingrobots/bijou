@@ -99,4 +99,17 @@ describe('TokenGraph', () => {
 
     expect(graph.get('gray').hex).toBe('#808080');
   });
+
+  it('prefers exact token paths before virtual background slots', () => {
+    const graph = createTokenGraph({
+      'surface.primary': { fg: '#111111', bg: '#222222' },
+      'surface.primary.bg': '#abcdef',
+      semantic: {
+        exact: { ref: 'surface.primary.bg' },
+      },
+    });
+
+    expect(graph.get('surface.primary.bg').hex).toBe('#abcdef');
+    expect(graph.get('semantic.exact').hex).toBe('#abcdef');
+  });
 });

@@ -6,8 +6,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- **Theme rule selection and inspection** — DL-019 adds Bijou-native selector
+  rules for contrast, vividness, closest-color, and ordered palette choices,
+  plus `TokenGraph.inspect()` facts that explain selected and rejected
+  candidates without adding an external design-token dependency.
+
 ### Fixed
 
+- **DOGFOOD docs validation** — Local pre-push and CI path classification now
+  treat all `docs/*` changes as DOGFOOD-relevant, so documentation edits run
+  the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.
+- **Theme rule inspection** — `minContrastWith()` candidates below the contrast
+  floor now report `contrast-too-low` inspection reasons instead of looking
+	  eligible, and rule dependencies now include `mix` transform references used
+	  by target or `against` colors. Path candidates that resolve to invalid colors
+	  are now inspected as invalid candidates instead of looking eligible, while
+	  circular candidate references remain deterministic graph errors. Rule target
+	  and `against` colors now fail deterministically when they resolve to
+	  non-colors instead of scoring candidates against an undefined ratio. Exact
+	  token paths ending in `.bg` now take precedence over virtual background-slot
+	  fallback references.
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
   deterministic test/support files from the WF-161 tranche and extracts
   declaration-boundary core, TUI, and standard-block modules behind stable

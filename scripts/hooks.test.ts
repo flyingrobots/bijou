@@ -20,12 +20,10 @@ describe('git hooks', () => {
     const typecheckIndex = hook.indexOf('npm run typecheck:test');
     const testIndex = hook.indexOf('npm run test:run');
     const interactiveSmokeIndex = hook.indexOf('npm run verify:interactive-examples');
-
     expect(pathGateIndex).toBeGreaterThanOrEqual(0);
     expect(skipIndex).toBeGreaterThan(pathGateIndex);
     expect(fullPushIndex).toBeGreaterThan(pathGateIndex);
-    expect(hook).toContain('examples/docs/*)');
-    expect(hook).toContain('scripts/dogfood-*)');
+    for (const pattern of ['docs/*)', 'examples/docs/*)', 'scripts/dogfood-*)']) expect(hook).toContain(pattern);
     expect(i18nCompleteIndex).toBeGreaterThanOrEqual(0);
     expect(i18nCheckIndex).toBeGreaterThan(i18nCompleteIndex);
     expect(i18nDebtIndex).toBeGreaterThan(i18nCheckIndex);
@@ -38,8 +36,8 @@ describe('git hooks', () => {
   });
 
   it('CI workflow policy is parsed from the test job instead of raw string scanning', () => {
+    const workflow = readFileSync(resolve(ROOT, '.github/workflows/ci.yml'), 'utf8');
     const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
-
     expect(policy.testJob.checkoutUses).toBe('actions/checkout@v6');
     expect(policy.testJob.checkoutFetchDepth).toBeGreaterThanOrEqual(2);
     expect(policy.testJob.i18nPolicyGateName).toBe('DOGFOOD i18n policy gate');
@@ -48,6 +46,7 @@ describe('git hooks', () => {
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:complete -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:debt -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
+    expect(workflow).toContain('docs/*)');
     expect(policy.testJob.testRunCommand).toBe('npm run test:run');
   });
 

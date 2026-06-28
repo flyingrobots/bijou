@@ -32,7 +32,7 @@ describe('WF-129 path-gate DOGFOOD CI', () => {
       'scripts/smoke-dogfood*',
       'tests/cycles/DF-*',
       'tests/cycles/*dogfood*',
-      'docs/DOGFOOD.md',
+      'docs/*',
       'docs/design/DF-*',
       'docs/legends/DF-*',
       'docs/method/legends/DF-*',

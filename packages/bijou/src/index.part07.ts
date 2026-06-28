@@ -1,6 +1,4 @@
-// Theme engine
 export {
-  // Types
   type RGB,
   type GradientStop,
   type TextModifier,
@@ -31,16 +29,13 @@ export {
   type ThemeTokenRef,
   type TokenTheme,
   type TokenThemeMode,
-  // Presets
   BIJOU_DARK,
   BIJOU_LIGHT,
   CYAN_MAGENTA,
   TEAL_ORANGE_PINK,
   PRESETS,
   tv,
-  // Theme extension
   extendTheme,
-  // Theme doctor
   defineThemeSafePairs,
   doctorTheme,
   themeContrastRatio,
@@ -54,34 +49,27 @@ export {
   type ThemeSafePairBuilder,
   type ThemeSafePairKind,
   type ThemeSafePairOptions,
-  // Gradient
   lerp3,
   gradientText,
-  // Gradient options
   type GradientTextOptions,
-  // Resolver
   isNoColor,
   createThemeResolver,
   createResolved,
   type ResolvedTheme,
   type ThemeResolver,
   type ThemeResolverOptions,
-  // DTCG interop
   fromDTCG,
   toDTCG,
   type DTCGDocument,
   type DTCGToken,
   type DTCGGroup,
-  // Color downsampling
   rgbToAnsi256,
   nearestAnsi256,
   rgbToAnsi16,
   ansi256ToAnsi16,
   type ColorLevel,
-  // Theme accessors
   createThemeAccessors,
   type ThemeAccessors,
-  // Color manipulation
   color,
   colorHex,
   colorRgb,
@@ -98,14 +86,36 @@ export {
   desaturate,
   type ColorRef,
   type ResolvedColor,
-  // Reactive Token Graph
   createTokenGraph,
+  bestContrastWith,
+  closestColor,
+  colorCandidate,
+  isThemeColorRuleDefinition,
+  leastVivid,
+  minContrastWith,
+  mostVivid,
+  nthColor,
+  scope,
+  tokenCandidate,
   type TokenGraph,
   type ThemeMode,
   type ColorDefinition,
   type TokenDefinition,
   type TokenDefinitions,
   type ColorTransform,
+  type MinContrastRuleOptions,
+  type VividRuleOptions,
+  type ThemeColorRuleDefinition,
+  type ThemeRuleCandidateInput,
+  type ThemeRuleCandidateInspection,
+  type ThemeRuleCandidateReason,
+  type ThemeRuleCandidateScope,
+  type ThemeRuleCandidateSource,
+  type ThemeRuleCandidatePath,
+  type ThemeRuleCandidateValue,
+  type ThemeRuleInspection,
+  type ThemeTokenInspection,
+  type TokenGraphInspection,
 } from './core/theme/index.js';
 
 export * from './core/theme/styled.js';
