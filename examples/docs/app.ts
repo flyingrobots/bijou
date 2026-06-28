@@ -186,6 +186,15 @@ import {
   themeInspectorScrollTarget,
   themeInspectorViewportHeight,
 } from './app-theme-inspector-state.js';
+import { themeInspectorChromeTokens } from './app-theme-inspector-chrome.js';
+import {
+  renderThemeInspectorLine,
+  renderThemeInspectorSummary,
+  renderThemeInspectorUsageProof,
+  themeInspectorCloseHint,
+  themeInspectorReferenceHeader,
+  themeInspectorTitle,
+} from './app-theme-inspector-usage.js';
 import { renderThemeLabPane } from './app-theme-lab.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
@@ -422,9 +431,15 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'start-here',
     pageId: GUIDES_PAGE_ID,
-    title: 'Start Here',
-    summary: 'What Bijou is, what DOGFOOD is for, and how the docs map is now shaped.',
+    title: 'start-here',
+    summary: '',
     body: GUIDES_START_HERE_TEXT,
+    localizedTitle: (localization) => dogfoodText(localization, 'docs.guides.startHere.title', 'Start Here'),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'docs.guides.startHere.summary',
+      'What Bijou is, what DOGFOOD is for, and how the docs map is now shaped.',
+    ),
   },
   {
     id: 'navigate-dogfood',
@@ -1505,24 +1520,44 @@ function renderThemeInspectorDrawer(
   localization: LocalizationPort | undefined,
 ) {
   const activeTheme = resolveDocsShellThemeById(model.docsModel.activeShellThemeId);
+  const visualTheme = resolveDocsVisualThemeByShellThemeId(model.docsModel.activeShellThemeId);
+  const chrome = themeInspectorChromeTokens(activeTheme.theme, visualTheme);
   const drawerWidth = themeInspectorDrawerWidth(model.columns);
   const drawerHeight = Math.max(8, model.rows - 4);
   const bodyWidth = Math.max(1, drawerWidth - 4);
   const viewportHeight = Math.max(1, drawerHeight - 2);
   const body = column([
-    line(dogfoodText(localization, 'themeInspector.active', 'Active: {label}', {
-      label: activeTheme.label,
-    })),
-    line(dogfoodText(localization, 'themeInspector.theme', 'Theme: {name}', {
-      name: activeTheme.theme.name,
-    })),
-    line(dogfoodSafePairSummary(activeTheme.theme, localization)),
+    renderThemeInspectorSummary(
+      activeTheme.label,
+      activeTheme.theme.name,
+      dogfoodSafePairSummary(activeTheme.theme, localization),
+      bodyWidth,
+      localization,
+      chrome,
+    ),
+    spacer(1, 1),
+    renderThemeInspectorUsageProof(bodyWidth, localization, chrome),
+    spacer(1, 1),
+    renderThemeInspectorLine(
+      themeInspectorReferenceHeader(localization),
+      bodyWidth,
+      chrome.heading,
+    ),
     spacer(1, 1),
     renderThemeTokenPalette(activeTheme.theme, bodyWidth, localization, {
       chromeTheme: activeTheme.theme,
+      chromeTokens: {
+        group: chrome.heading,
+        label: chrome.body,
+        value: chrome.muted,
+      },
     }),
     spacer(1, 1),
-    line(dogfoodText(localization, 'themeInspector.close', 'F10/Esc close • ↑/↓ scroll • q quit')),
+    renderThemeInspectorLine(
+      themeInspectorCloseHint(localization),
+      bodyWidth,
+      chrome.muted,
+    ),
   ]);
   const viewport = viewportSurface({
     width: bodyWidth,
@@ -1537,22 +1572,22 @@ function renderThemeInspectorDrawer(
     scrollbarMode: 'overlay',
     scrollbarTrackCell: {
       char: '│',
-      fg: activeTheme.theme.ui.scrollTrack.hex,
-      bg: activeTheme.theme.surface.overlay.bg,
-      modifiers: activeTheme.theme.ui.scrollTrack.modifiers,
+      fg: chrome.scrollTrack.hex,
+      bg: chrome.scrollTrack.bg,
+      modifiers: chrome.scrollTrack.modifiers,
     },
     scrollbarThumbCell: {
       char: '█',
-      fg: activeTheme.theme.ui.scrollThumb.hex,
-      bg: activeTheme.theme.surface.overlay.bg,
-      modifiers: activeTheme.theme.ui.scrollThumb.modifiers,
+      fg: chrome.scrollThumb.hex,
+      bg: chrome.scrollThumb.bg,
+      modifiers: chrome.scrollThumb.modifiers,
     },
   });
   const surface = boxSurface(viewport, {
-    title: dogfoodText(localization, 'themeInspector.title', 'Theme Inspector'),
+    title: themeInspectorTitle(localization),
     width: drawerWidth,
-    borderToken: activeTheme.theme.border.primary,
-    bgToken: activeTheme.theme.surface.overlay,
+    borderToken: chrome.border,
+    bgToken: chrome.surface,
     padding: { left: 1, right: 1 },
     ctx,
   });
