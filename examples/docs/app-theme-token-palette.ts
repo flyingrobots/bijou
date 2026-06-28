@@ -4,6 +4,11 @@ import { dogfoodLocalizedText } from './localization.js';
 import { relativeLuminance } from './app-landing.js';
 import { SURFACE_TOKEN_FAMILY, themePaletteRows, type ThemeTokenEntry } from './app-theme-token-model.js';
 
+interface ThemePaletteChromeTokens {
+  readonly group: TokenValue;
+  readonly label: TokenValue;
+  readonly value: TokenValue;
+}
 function dogfoodText(
   localization: LocalizationPort | undefined,
   id: string,
@@ -16,7 +21,6 @@ function dogfoodText(
 function readableSwatchForeground(background: string): string {
   return relativeLuminance(background) > 0.46 ? '#111827' : '#f8fafc';
 }
-
 function writeSurfaceText(
   surface: Surface,
   x: number,
@@ -86,11 +90,7 @@ function describeThemeToken(entry: ThemeTokenEntry, localization: LocalizationPo
 
 function foregroundOnlyToken(token: TokenValue): TokenValue { return { hex: token.hex, modifiers: token.modifiers }; }
 
-function themePaletteChromeTokens(theme: Theme): {
-  readonly group: TokenValue;
-  readonly label: TokenValue;
-  readonly value: TokenValue;
-} {
+function themePaletteChromeTokens(theme: Theme): ThemePaletteChromeTokens {
   return {
     group: foregroundOnlyToken(theme.ui.sectionHeader),
     label: foregroundOnlyToken(theme.surface.primary),
@@ -105,10 +105,11 @@ export function renderThemeTokenPalette(
   options: {
     readonly maxRows?: number;
     readonly chromeTheme?: Theme;
+    readonly chromeTokens?: ThemePaletteChromeTokens;
   } = {},
 ): Surface {
   const safeWidth = Math.max(24, width);
-  const chrome = themePaletteChromeTokens(options.chromeTheme ?? theme);
+  const chrome = options.chromeTokens ?? themePaletteChromeTokens(options.chromeTheme ?? theme);
   const rows = themePaletteRows(theme);
   const visibleRows = options.maxRows === undefined
     ? rows

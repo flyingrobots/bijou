@@ -1780,6 +1780,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.startHere.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Qué es Bijou, para qué sirve DOGFOOD y cómo está organizado ahora el mapa de documentación."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.startHere.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Empieza aquí"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.page.blocks"
       },
       "kind": "message",
@@ -3654,6 +3676,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeInspector.referenceHeader"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Paleta de referencia"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeInspector.theme"
       },
       "kind": "message",
@@ -3671,6 +3704,61 @@
       "sourceLocale": "en",
       "values": {
         "es": "Inspector de temas"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.usage.drawerBorder"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "drawer.border"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.usage.drawerSurface"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "drawer.surface"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.usage.scrollThumb"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "scroll.thumb"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.usage.summaryCopy"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "summary.copy"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeInspector.usageHeader"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Uso de DOGFOOD"
       }
     },
     {

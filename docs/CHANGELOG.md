@@ -19,6 +19,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD Theme Inspector token proof** — The Theme Inspector drawer now
+  themes its own border, surface, summary copy, palette labels, and scroll
+  chrome from the active DOGFOOD docs theme, and shows a live DOGFOOD usage
+  proof before the reference token palette. The Start Here guide title and
+  summary now use the DOGFOOD string catalog, lowering docs-app raw string debt.
 - **DOGFOOD Theme Lab readability** — DOGFOOD docs now render Markdown prose
   with the active semantic foreground, choose contrast-filtered docs chrome
   colors for light shells, and show the active shell palette first in Theme

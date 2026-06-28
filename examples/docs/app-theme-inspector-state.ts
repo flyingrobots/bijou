@@ -100,5 +100,5 @@ export function themeInspectorScrollTarget(
 }
 
 function themeInspectorContentHeight(theme: Theme): number {
-  return themePaletteRows(theme).length + 6;
+  return themePaletteRows(theme).length + 14;
 }
