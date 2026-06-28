@@ -19,6 +19,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **DOGFOOD Theme Lab readability** — DOGFOOD docs now render Markdown prose
+  with the active semantic foreground, choose contrast-filtered docs chrome
+  colors for light shells, and show the active shell palette first in Theme
+  Lab.
 - **DOGFOOD docs validation** — Local pre-push and CI path classification now
   treat all `docs/*` changes as DOGFOOD-relevant, so documentation edits run
   the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.

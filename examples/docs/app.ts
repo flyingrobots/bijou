@@ -1,7 +1,5 @@
 import { readFileSync } from 'node:fs';
 import {
-  BIJOU_DARK,
-  BIJOU_LIGHT,
   boxSurface,
   createSurface,
   inspector,
@@ -178,7 +176,7 @@ import {
   standardBlockLoweringMarkdown,
   standardBlockPreviewMarkdown,
 } from './app-standard-block-docs.js';
-import { dogfoodSafePairSummary, themeColorReuseSummary } from './app-theme-diagnostics.js';
+import { dogfoodSafePairSummary } from './app-theme-diagnostics.js';
 import {
   clampThemeInspectorScroll,
   resolveThemeInspectorScrollY,
@@ -188,6 +186,7 @@ import {
   themeInspectorScrollTarget,
   themeInspectorViewportHeight,
 } from './app-theme-inspector-state.js';
+import { renderThemeLabPane } from './app-theme-lab.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
@@ -1500,89 +1499,6 @@ function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undef
   return applyShellThemeStateToContext(DOCS_SHELL_THEME_STATE, ctx, themeId);
 }
 
-function renderThemeLabPane(
-  width: number,
-  ctx: BijouContext,
-  landingTheme: LandingThemeTokens,
-  localization: LocalizationPort | undefined,
-): Surface {
-  const paneWidth = resolvePaneInnerWidth(width);
-  const bodyWidth = Math.max(24, paneWidth - 2);
-  const shellGallery = DOCS_SHELL_THEME_CHOICES
-    .map((shellTheme, index) => `${String(index + 1)}. ${shellTheme.label} -> ${shellTheme.theme.name}`)
-    .join('\n');
-  const defaultSummary = [
-    dogfoodText(localization, 'themeLab.defaultDark', 'Default dark preset: {name} ({summary})', {
-      name: BIJOU_DARK.name,
-      summary: dogfoodSafePairSummary(BIJOU_DARK, localization),
-    }),
-    dogfoodText(localization, 'themeLab.defaultLight', 'Default light preset: {name} ({summary})', {
-      name: BIJOU_LIGHT.name,
-      summary: dogfoodSafePairSummary(BIJOU_LIGHT, localization),
-    }),
-    dogfoodText(localization, 'themeLab.colorReuseLine', 'Color reuse: dark {dark}; light {light}.', {
-      dark: themeColorReuseSummary(BIJOU_DARK, localization),
-      light: themeColorReuseSummary(BIJOU_LIGHT, localization),
-    }),
-    dogfoodText(
-      localization,
-      'themeLab.swatchCoverage',
-      'Swatches include semantic.primary, surface.primary, and gradient.brand rows.',
-    ),
-    dogfoodText(
-      localization,
-      'themeLab.f10Hint',
-      'F10 opens the Theme Inspector drawer from the docs shell.',
-    ),
-  ].join('\n');
-
-  return insetPaneSurface(column([
-    themedSeparatorSurface(dogfoodText(localization, 'themeLab.separator', 'docs • Theme Lab'), paneWidth, ctx, landingTheme),
-    spacer(1, 1),
-    boxSurface(proseSurface(defaultSummary, bodyWidth), {
-      title: dogfoodText(localization, 'themeLab.postureTitle', 'theme posture'),
-      width: Math.max(28, paneWidth),
-      borderToken: docsThemeBorderToken(landingTheme),
-      bgToken: docsThemeSurfaceToken(landingTheme),
-      padding: { left: 1, right: 1 },
-      ctx,
-    }),
-    spacer(1, 1),
-    boxSurface(proseSurface(shellGallery, bodyWidth), {
-      title: dogfoodText(localization, 'themeLab.galleryTitle', 'shell gallery'),
-      width: Math.max(28, paneWidth),
-      borderToken: docsThemeMutedBorderToken(landingTheme),
-      bgToken: docsThemeSurfaceToken(landingTheme),
-      padding: { left: 1, right: 1 },
-      ctx,
-    }),
-    spacer(1, 1),
-    boxSurface(renderThemeTokenPalette(BIJOU_DARK, bodyWidth, localization, {
-      maxRows: 28,
-      chromeTheme: ctx.theme.theme,
-    }), {
-      title: dogfoodText(localization, 'themeLab.darkSwatchesTitle', 'bijou-dark token swatches'),
-      width: Math.max(28, paneWidth),
-      borderToken: docsThemeMutedBorderToken(landingTheme),
-      bgToken: docsThemeSurfaceToken(landingTheme),
-      padding: { left: 1, right: 1 },
-      ctx,
-    }),
-    spacer(1, 1),
-    boxSurface(renderThemeTokenPalette(BIJOU_LIGHT, bodyWidth, localization, {
-      maxRows: 28,
-      chromeTheme: ctx.theme.theme,
-    }), {
-      title: dogfoodText(localization, 'themeLab.lightSwatchesTitle', 'bijou-light token swatches'),
-      width: Math.max(28, paneWidth),
-      borderToken: docsThemeMutedBorderToken(landingTheme),
-      bgToken: docsThemeSurfaceToken(landingTheme),
-      padding: { left: 1, right: 1 },
-      ctx,
-    }),
-  ]), width);
-}
-
 function renderThemeInspectorDrawer(
   model: RootModel,
   ctx: BijouContext,
@@ -2049,10 +1965,19 @@ function renderGuideReaderPane(
   const doc = selectedGuide(pageId, model);
   if (doc == null) {
     return insetPaneSurface(column([
-      themedSeparatorSurface('docs', paneWidth, ctx, theme),
+      themedSeparatorSurface(
+        dogfoodText(localization, 'docs.reader.separator', 'docs'),
+        paneWidth,
+        ctx,
+        theme,
+      ),
       spacer(1, 1),
       boxSurface(paragraphSurface(
-        'This section does not have published docs yet.',
+        dogfoodText(
+          localization,
+          'docs.reader.unpublished',
+          'This section does not have published docs yet.',
+        ),
         Math.max(20, paneWidth - 6),
       ), {
         width: Math.max(22, paneWidth),
@@ -2078,7 +2003,14 @@ function renderGuideReaderPane(
     );
   }
   if (doc.id === THEME_LAB_GUIDE_ID) {
-    return renderThemeLabPane(width, ctx, theme, localization);
+    return renderThemeLabPane({
+      width,
+      ctx,
+      landingTheme: theme,
+      activeTheme: resolveDocsShellThemeById(model.activeShellThemeId),
+      shellThemes: DOCS_SHELL_THEME_CHOICES,
+      localization,
+    });
   }
 
   const docsWidth = Math.max(24, paneWidth - 2);
