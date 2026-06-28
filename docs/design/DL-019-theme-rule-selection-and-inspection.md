@@ -178,7 +178,7 @@ semantic: {
   primary: {
     rule: "best-contrast-with",
     target: { ref: "surface.primary.bg" },
-    candidates: { scope: "palette" },
+    candidates: { kind: "scope", path: "palette" },
   },
 }
 ```

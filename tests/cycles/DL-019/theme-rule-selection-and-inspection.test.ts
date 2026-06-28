@@ -15,4 +15,11 @@ describe('DL-019 theme rule selection and inspection', () => {
       'it uses the same readability rule.',
     );
   });
+
+  it('documents serialized scope data with the runtime discriminant', () => {
+    const design = readRepoFile('docs/design/DL-019-theme-rule-selection-and-inspection.md');
+
+    expect(design).toContain('candidates: { kind: "scope", path: "palette" }');
+    expect(design).not.toContain('candidates: { scope: "palette" }');
+  });
 });
