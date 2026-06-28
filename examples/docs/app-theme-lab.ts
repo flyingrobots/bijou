@@ -60,22 +60,40 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
       return `${marker}${String(index + 1)}. ${shellTheme.label} -> ${shellTheme.theme.name}`;
     })
     .join('\n');
-  const defaultSummary = [
-    dogfoodText(localization, 'themeInspector.active', 'Active: {label}', { label: activeTheme.label }),
-    dogfoodText(localization, 'themeInspector.theme', 'Theme: {name}', { name: draftTheme.name }),
+  const activeShellIndex = shellThemes.findIndex((shellTheme) => shellTheme.id === activeTheme.id);
+  const activeShellLine = activeShellIndex >= 0
+    ? `* ${String(activeShellIndex + 1)}. ${activeTheme.label} -> ${draftTheme.name}`
+    : `* ${activeTheme.label} -> ${draftTheme.name}`;
+  const activeLine = dogfoodText(localization, 'themeInspector.active', 'Active: {label}', { label: activeTheme.label });
+  const themeLine = dogfoodText(localization, 'themeInspector.theme', 'Theme: {name}', { name: draftTheme.name });
+  const defaultDarkLine = dogfoodText(localization, 'themeLab.defaultDark', 'Default dark preset: {name} ({summary})', {
+    name: BIJOU_DARK.name,
+    summary: dogfoodSafePairSummary(BIJOU_DARK, localization),
+  });
+  const defaultLightLine = dogfoodText(localization, 'themeLab.defaultLight', 'Default light preset: {name} ({summary})', {
+    name: BIJOU_LIGHT.name,
+    summary: dogfoodSafePairSummary(BIJOU_LIGHT, localization),
+  });
+  const colorReuseLine = dogfoodText(localization, 'themeLab.colorReuseLine', 'Color reuse: dark {dark}; light {light}.', {
+    dark: themeColorReuseSummary(BIJOU_DARK, localization),
+    light: themeColorReuseSummary(BIJOU_LIGHT, localization),
+  });
+  const editorContext = [
+    activeLine,
+    themeLine,
     dogfoodSafePairSummary(draftTheme, localization),
-    dogfoodText(localization, 'themeLab.defaultDark', 'Default dark preset: {name} ({summary})', {
-      name: BIJOU_DARK.name,
-      summary: dogfoodSafePairSummary(BIJOU_DARK, localization),
-    }),
-    dogfoodText(localization, 'themeLab.defaultLight', 'Default light preset: {name} ({summary})', {
-      name: BIJOU_LIGHT.name,
-      summary: dogfoodSafePairSummary(BIJOU_LIGHT, localization),
-    }),
-    dogfoodText(localization, 'themeLab.colorReuseLine', 'Color reuse: dark {dark}; light {light}.', {
-      dark: themeColorReuseSummary(BIJOU_DARK, localization),
-      light: themeColorReuseSummary(BIJOU_LIGHT, localization),
-    }),
+    defaultDarkLine,
+    defaultLightLine,
+    colorReuseLine,
+    activeShellLine,
+  ];
+  const defaultSummary = [
+    activeLine,
+    themeLine,
+    dogfoodSafePairSummary(draftTheme, localization),
+    defaultDarkLine,
+    defaultLightLine,
+    colorReuseLine,
     dogfoodText(
       localization,
       'themeLab.swatchCoverage',
@@ -88,7 +106,9 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
     themeLabSeparatorSurface(dogfoodText(localization, 'themeLab.separator', 'docs • Theme Lab'), paneWidth, ctx, landingTheme),
     spacer(1, 1),
     themeLabBox(
-      renderThemeLabEditorSurface(activeTheme.theme, editor, bodyWidth, localization, renderTokens),
+      renderThemeLabEditorSurface(activeTheme.theme, editor, bodyWidth, localization, renderTokens, {
+        contextLines: editorContext,
+      }),
       dogfoodText(localization, 'themeLab.editorTitle', 'Theme editor'),
       paneWidth,
       ctx,
