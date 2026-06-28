@@ -64,4 +64,21 @@ describe('theme rule inspection', () => {
 
     expect(() => graph.get('semantic.a')).toThrow(/Circular token reference/);
   });
+
+  it('rejects invalid rule target colors', () => {
+    const graph = createTokenGraph({
+      palette: {
+        ink: '#000000',
+        paper: '#ffffff',
+      },
+      surface: {
+        bad: 'not-a-color',
+      },
+      semantic: {
+        primary: bestContrastWith({ ref: 'surface.bad' }, scope('palette')),
+      },
+    });
+
+    expect(() => graph.get('semantic.primary')).toThrow(/invalid target color/);
+  });
 });

@@ -23,7 +23,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 	  eligible, and rule dependencies now include `mix` transform references used
 	  by target or `against` colors. Path candidates that resolve to invalid colors
 	  are now inspected as invalid candidates instead of looking eligible, while
-	  circular candidate references remain deterministic graph errors.
+	  circular candidate references remain deterministic graph errors. Rule target
+	  and `against` colors now fail deterministically when they resolve to
+	  non-colors instead of scoring candidates against an undefined ratio.
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
   deterministic test/support files from the WF-161 tranche and extracts
   declaration-boundary core, TUI, and standard-block modules behind stable

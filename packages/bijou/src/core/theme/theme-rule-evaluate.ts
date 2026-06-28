@@ -1,5 +1,6 @@
 import { themeContrastRatio } from './doctor.js';
 import type { StoredDefinition } from './graph-guards.js';
+import { normalizeThemeRuleColor } from './theme-rule-color-validation.js';
 import { collectThemeRuleCandidates, type ThemeRuleCandidate } from './theme-rule-candidates.js';
 import { nthThemeRuleIndex, scoreThemeRuleCandidate } from './theme-rule-metrics.js';
 import type {
@@ -54,13 +55,15 @@ function rankCandidates(
   candidates: readonly ThemeRuleCandidate[],
   context: ThemeRuleContext,
 ): readonly RankedCandidate[] {
-  const target = 'target' in rule ? context.resolveColor(rule.target, context.mode, new Set(context.visited)) : undefined;
+  const target = 'target' in rule
+    ? normalizeThemeRuleColor(context.resolveColor(rule.target, context.mode, new Set(context.visited)), rule.rule, context.path, 'target')
+    : undefined;
   const againstDef = vividAgainst(rule);
   if (vividMinContrast(rule) !== undefined && againstDef === undefined) {
     throw new Error(`Theme rule "${rule.rule}" for "${context.path}" requires "against" when "minContrast" is set.`);
   }
   const against = againstDef !== undefined
-    ? context.resolveColor(againstDef, context.mode, new Set(context.visited))
+    ? normalizeThemeRuleColor(context.resolveColor(againstDef, context.mode, new Set(context.visited)), rule.rule, context.path, 'against')
     : target;
   return candidates.map(candidate => rankCandidate(rule, candidate, target, against));
 }
