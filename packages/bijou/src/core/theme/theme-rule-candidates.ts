@@ -78,29 +78,23 @@ function resolveCandidate(
   const rawValue = candidateRawValue(input);
   const label = candidateLabel(input, path, rawValue);
 
-  if (path !== undefined) {
-    const hex = context.resolveColor({ ref: path }, context.mode, new Set(context.visited));
-    return {
-      label,
-      path,
-      hex,
-      excluded: excluded.has(path),
-      invalid: false,
-    };
-  }
-
   try {
-    const hex = rgbToHex(hexToRgb(rawValue ?? label));
+    const sourceColor = path === undefined
+      ? rawValue ?? label
+      : context.resolveColor({ ref: path }, context.mode, new Set(context.visited));
+    const hex = rgbToHex(hexToRgb(sourceColor));
     return {
       label,
+      ...(path === undefined ? {} : { path }),
       hex,
-      excluded: false,
+      excluded: path !== undefined && excluded.has(path),
       invalid: false,
     };
   } catch {
     return {
       label,
-      excluded: false,
+      ...(path === undefined ? {} : { path }),
+      excluded: path !== undefined && excluded.has(path),
       invalid: true,
     };
   }

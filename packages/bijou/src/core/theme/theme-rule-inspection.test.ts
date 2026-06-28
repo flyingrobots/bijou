@@ -3,6 +3,26 @@ import { createTokenGraph } from './graph.js';
 import { bestContrastWith, scope } from './theme-rules.js';
 
 describe('theme rule inspection', () => {
+  it('marks invalid resolved path candidates without aborting inspection', () => {
+    const graph = createTokenGraph({
+      palette: {
+        broken: 'not-a-color',
+        paper: '#ffffff',
+      },
+      surface: {
+        canvas: { fg: '#ffffff', bg: '#000000' },
+      },
+      semantic: {
+        primary: bestContrastWith({ ref: 'surface.canvas.bg' }, scope('palette')),
+      },
+    });
+
+    expect(graph.get('semantic.primary').hex).toBe('#ffffff');
+    const inspected = graph.inspect('semantic.primary');
+    if (inspected.kind !== 'rule') throw new Error('Expected rule inspection.');
+    expect(inspected.candidates.find(candidate => candidate.path === 'palette.broken')?.reasons).toContain('invalid');
+  });
+
   it('includes mix transform references in rule dependencies', () => {
     const graph = createTokenGraph({
       palette: {
