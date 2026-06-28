@@ -8,6 +8,7 @@ import {
   themeLabEditorSelectedHex,
 } from '../../../examples/docs/app-theme-lab-editor-model.js';
 import { themeLabGraphNodes } from '../../../examples/docs/app-theme-lab-graph.js';
+import { renderThemeLabGraphSurface } from '../../../examples/docs/app-theme-lab-editor-view.js';
 
 import { describe, expect, it } from 'vitest';
 
@@ -37,4 +38,38 @@ describe('DL-022 Theme Lab editor graph UX', () => {
     expect(accent?.edges).toContain('border.secondary');
     expect(accent?.edges).toContain('ui.cursor');
   });
+
+  it('renders the selected edit and graph node from the same draft frame', () => {
+    const initial = createThemeLabEditorState('dogfood:dark', BIJOU_DARK);
+    const accentSelected = themeLabEditorSelectChannel({
+      ...initial,
+      selectedIndex: 1,
+    }, THEME_LAB_CHANNEL_BLUE);
+    const edited = themeLabEditorNudge(accentSelected, -20);
+    const selectedHex = themeLabEditorSelectedHex(edited);
+    const graphSurface = renderThemeLabGraphSurface(BIJOU_DARK, edited.draftTheme, 80, undefined, {
+      accent: edited.draftTheme.semantic.accent,
+      body: edited.draftTheme.surface.primary,
+      muted: edited.draftTheme.surface.muted,
+    });
+    const graphText = surfaceText(graphSurface);
+
+    expect(themeLabGraphNodes(BIJOU_DARK, edited.draftTheme).find((node) => node.path === 'semantic.accent')?.hex)
+      .toBe(selectedHex);
+    expect(graphText).toContain('semantic.accent');
+    expect(graphText).toContain(selectedHex);
+    expect(graphText).toContain('edited');
+  });
 });
+
+function surfaceText(surface: { width: number; height: number; get(x: number, y: number): { char?: string } }): string {
+  const rows: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let row = '';
+    for (let x = 0; x < surface.width; x++) {
+      row += surface.get(x, y).char ?? ' ';
+    }
+    rows.push(row.trimEnd());
+  }
+  return rows.join('\n');
+}

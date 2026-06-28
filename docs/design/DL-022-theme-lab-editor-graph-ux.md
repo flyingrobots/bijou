@@ -71,6 +71,9 @@ Included:
 - deterministic key handling for selection, channel choice, nudging, and reset
 - a live graph renderer that shows token nodes, dependency edges, and edited
   nodes from the current draft
+- deterministic invalid-input handling: RGB channel nudges clamp to `0..255`,
+  unsupported keys are ignored, and this first pass exposes no free-form hex
+  parser that could accept malformed color text
 - focused preview tests for editing state and graph updates
 - changelog and DOGFOOD i18n catalog updates
 
@@ -101,20 +104,28 @@ The renderer must consume one draft object for all Theme Lab editor output:
 If a color changes, the graph changes because it is projected from the draft
 theme, not because the graph keeps its own color cache.
 
+This slice does not feed the draft into `ContextPort.tokenGraph` or replace the
+runtime `TokenGraph` exposed by `ContextPort`. The docs shell still observes the
+active runtime theme through the normal context path, while Theme Lab builds a
+local presentation graph from the unsaved draft. That keeps third-party
+`observeTheme()` guidance intact: unsaved editor previews are local to Theme
+Lab, and any future persisted theme must re-enter the canonical context and
+token-graph path.
+
 ## Editable Slots
 
 The first pass edits a deliberately small set of active DOGFOOD runtime tokens:
 
 - `semantic.primary`
 - `semantic.accent`
-- `surface.primary`
-- `surface.secondary`
+- `surface.primary.bg`
+- `surface.secondary.bg`
 - `border.primary`
 - `ui.cursor`
 - `status.success`
 - `status.error`
 
-Those slots are enough to prove text, surface, border, focus, and status
+Those slots are enough to prove text, surface, border, cursor, and status
 feedback without pretending this is a full theme persistence product.
 
 ## Graph Shape
@@ -128,12 +139,17 @@ The graph is textual and terminal-native. It should show:
 
 ```text
 semantic.accent #7aa7e8 *
-  -> border.primary
-  -> ui.scrollThumb
-surface.primary #171827
-  -> semantic.primary
-  -> surface.elevated
+  -> border.secondary
+  -> ui.cursor
+  -> ui.focusGutter
+surface.primary.bg #171827
+  -> surface.primary
+  -> ui.focusGutter.bg
 ```
+
+`A -> B` means the preview treats `B` as a consumer or dependent of editable
+source `A`. It does not mean runtime derivation has been committed to
+`ContextPort.tokenGraph`.
 
 The graph is not renderer provenance. It explains theme-token relationships and
 draft changes only.
@@ -144,17 +160,21 @@ Swatches are optional visual assistance. The selected row, current hex, RGB
 channels, edited marker, graph node names, and graph edge labels remain visible
 as text.
 
-## Localization And Directionality Posture
+## Localization Posture
 
 All new Theme Lab labels, control hints, and graph section headings are DOGFOOD
 catalog keys in every supported runtime locale. Token paths and hex values are
-developer identifiers and are not localized.
+developer identifiers and are not localized. English `dogfoodText` fallbacks are
+permitted as developer scaffolding and runtime resilience only; generated
+catalog entries for the new keys must still exist before merge.
 
 ## Tests To Write First
 
 - a pure editor-model test proving selection, channel nudge, and reset behavior
 - a graph projection test proving an edited token is marked and carries the new
   hex value
+- a same-frame coherence test proving a channel nudge updates the selected hex
+  and the rendered graph node from the same draft state
 - a DOGFOOD preview test proving Theme Lab renders editor controls and the live
   graph after scripted key input
 
