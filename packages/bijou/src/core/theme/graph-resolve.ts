@@ -60,13 +60,13 @@ export function createGraphColorResolver(
   }
 
   function resolveReferenceTarget(path: string, mode: ThemeMode, visited: Set<string>): string | undefined {
+    const target = definitions.get(path);
+    if (target !== undefined) return isTokenDefinition(target) ? resolveColor(target.fg, mode, visited) : resolveColor(target, mode, visited);
     if (path.endsWith('.bg')) {
       const base = definitions.get(path.slice(0, -3));
       if (base !== undefined && isTokenDefinition(base) && base.bg !== undefined) return resolveColor(base.bg, mode, visited);
     }
-    const target = definitions.get(path);
-    if (target === undefined) return undefined;
-    return isTokenDefinition(target) ? resolveColor(target.fg, mode, visited) : resolveColor(target, mode, visited);
+    return undefined;
   }
 
   function applyTransforms(
