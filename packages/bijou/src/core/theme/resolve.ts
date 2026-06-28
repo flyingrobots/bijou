@@ -7,6 +7,7 @@ import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA, populateTokenRGB } from './presets.js';
 import { createTokenGraph, type TokenGraph } from './graph.js';
 import type { TokenDefinitions } from './graph-types.js';
+import { ruleAuthoredDefinitions } from './preset-authoring.js';
 
 /** Walk all token values in a theme and populate fgRGB/bgRGB. */
 function populateThemeRGB(theme: Theme): void {
@@ -26,12 +27,7 @@ function populateThemeRGB(theme: Theme): void {
   }
 }
 
-/**
- * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
- *
- * @param runtime - RuntimePort for reading env vars.
- * @returns True if the `NO_COLOR` environment variable is set.
- */
+/** Check no-color.org: `NO_COLOR` defined means no color. */
 export function isNoColor(runtime: RuntimePort): boolean {
   const env = createEnvAccessor(runtime);
   return env('NO_COLOR') !== undefined;
@@ -70,16 +66,10 @@ export interface ResolvedTheme {
   hex(token: TokenValue): string;
 }
 
-/**
- * Create a ResolvedTheme from a Theme and a noColor flag.
- * @param theme - The theme to wrap.
- * @param noColor - Whether color output should be suppressed.
- * @param colorScheme - Terminal color scheme. Defaults to `'dark'`.
- * @returns ResolvedTheme with convenience accessors.
- */
+/** Create a ResolvedTheme from a Theme and noColor flag. */
 export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
   populateThemeRGB(theme);
-  const tokenGraph = createTokenGraph(themeTokenDefinitions(theme));
+  const tokenGraph = createTokenGraph(ruleAuthoredDefinitions(theme) ?? themeTokenDefinitions(theme));
   const statusTokens = new Map(Object.entries(theme.status));
 
   return {
