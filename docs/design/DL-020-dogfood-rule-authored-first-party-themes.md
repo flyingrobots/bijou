@@ -86,9 +86,19 @@ The compiled object remains a normal `Theme`. Existing consumers can continue to
 read `theme.semantic.primary.hex`, `theme.status.success`, `theme.gradient`, and
 surface tokens without knowing how first-party themes were authored.
 
-Inspection provenance is exposed through the token graph used during
-compilation. Tests may assert rule ids, selected candidate paths, dependencies,
-and selected hex values.
+The preset authoring layer records the original rule definitions against the
+compiled `Theme` identity. `createResolved()` uses those definitions when
+present, so `ResolvedTheme.tokenGraph` remains rule-authored for first-party
+presets. Cloned themes and DTCG imports fall back to concrete token graphs.
+
+Tests may assert rule ids, selected candidate paths, dependencies, and selected
+hex values from the same resolved graph inspectors consume.
+
+## Accessibility And Assistive Posture
+
+This slice improves color choice but does not make color the only carrier of
+meaning. Existing labels, text structure, `NO_COLOR` behavior, and lower-mode
+rendering remain the accessibility contract.
 
 ## Localization And Directionality Posture
 
@@ -96,6 +106,35 @@ This slice does not add DOGFOOD user-facing copy. Rule ids, token paths, design
 document prose, and changelog entries are developer-facing documentation and
 stable identifiers. Future DOGFOOD UI that renders these facts must use the
 localization catalog.
+
+## Agent Inspectability / Explainability Posture
+
+The primary agent-facing value is provenance. An audit should be able to inspect
+`semantic.accent` and `decision.primaryText`, see the selector rule, enumerate
+candidates, and explain exclusions without comparing screenshots or final hex
+equality.
+
+## Implementation Outline
+
+1. Add a small preset compiler that materializes graph definitions into `Theme`.
+2. Move `bijou-dark` and `bijou-light` into rule-authored preset modules.
+3. Preserve first-party rule definitions through `createResolved()`.
+4. Keep literal legacy and third-party presets unchanged.
+5. Update docs and changelog after the tests prove the behavior.
+
+## Tests To Write First
+
+- a red provenance test showing literal defaults expose `token` inspection
+  instead of `rule`
+- a dark-theme accent test proving `most-vivid` selects `brand.accent`
+- a light-theme primary text test proving `min-contrast-with` selects
+  `ink.primary`
+- existing preset and DTCG tests proving resolved values stay compatible
+
+## Retrospective / Closeout Notes
+
+Close this cycle when CI is green, CodeRabbit is green, review threads are
+resolved, and the PR summary records the rule probe values.
 
 ## Linked Invariants
 
