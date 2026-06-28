@@ -50,4 +50,18 @@ describe('theme rule inspection', () => {
       'support.tint',
     ]));
   });
+
+  it('propagates circular candidate reference failures', () => {
+    const graph = createTokenGraph({
+      palette: {
+        ok: '#ffffff',
+      },
+      semantic: {
+        a: bestContrastWith('#000000', ['semantic.b', 'palette.ok']),
+        b: { ref: 'semantic.a' },
+      },
+    });
+
+    expect(() => graph.get('semantic.a')).toThrow(/Circular token reference/);
+  });
 });

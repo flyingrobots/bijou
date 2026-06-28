@@ -90,7 +90,8 @@ function resolveCandidate(
       excluded: path !== undefined && excluded.has(path),
       invalid: false,
     };
-  } catch {
+  } catch (error) {
+    if (shouldPropagateCandidateError(error)) throw error;
     return {
       label,
       ...(path === undefined ? {} : { path }),
@@ -98,6 +99,10 @@ function resolveCandidate(
       invalid: true,
     };
   }
+}
+
+function shouldPropagateCandidateError(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith('Circular token reference');
 }
 
 function collectExcludedPaths(rule: ThemeColorRuleDefinition): ReadonlySet<string> {
