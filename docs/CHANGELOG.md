@@ -20,7 +20,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.
 - **Theme rule inspection** — `minContrastWith()` candidates below the contrast
   floor now report `contrast-too-low` inspection reasons instead of looking
-  eligible.
+  eligible, and rule dependencies now include `mix` transform references used
+  by target or `against` colors.
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
   deterministic test/support files from the WF-161 tranche and extracts
   declaration-boundary core, TUI, and standard-block modules behind stable

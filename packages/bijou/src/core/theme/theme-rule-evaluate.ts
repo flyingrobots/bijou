@@ -133,8 +133,12 @@ function ruleMinContrast(rule: ThemeColorRuleDefinition): number | undefined {
 
 function addColorDeps(def: ColorDefinition, deps: Set<string>): void {
   if (typeof def === 'string') return;
-  if ('ref' in def) deps.add(def.ref);
-  else if ('light' in def) {
+  if ('ref' in def) {
+    deps.add(def.ref);
+    for (const transform of def.transform ?? []) {
+      if (transform.type === 'mix') deps.add(transform.with);
+    }
+  } else if ('light' in def) {
     addColorDeps(def.light, deps);
     addColorDeps(def.dark, deps);
   }
