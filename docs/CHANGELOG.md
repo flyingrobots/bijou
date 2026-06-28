@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **DOGFOOD Theme Lab editor graph UX** — DL-022 turns Theme Lab from a static
+  swatch reference into a bounded editor surface with selectable theme color
+  rows, RGB channel nudging, reset behavior, draft-token swatches, and a live
+  token relationship graph that updates from the same in-memory draft theme.
 - **Theme rule selection and inspection** — DL-019 adds Bijou-native selector
   rules for contrast, vividness, closest-color, and ordered palette choices,
   plus `TokenGraph.inspect()` facts that explain selected and rejected
