@@ -216,13 +216,13 @@ that a cross-repository release is the next smallest honest boundary.
 
 ## Next Pull
 
-The immediate implementation pull should land the **Blocks app-binding
-snippets** repair from #342 through DX-047.
+The immediate implementation pull should land the **First-party theme variant
+coverage** repair from #343 through DL-018.
 
-That pull should add a `CounterDemoBlock` app-binding walkthrough to DOGFOOD's
-Blocks docs, show application-owned state and command-intent routing, keep the
-snippet legible in the terminal docs surface, and add deterministic proof that
-the snippet references real APIs instead of drifting into pseudo-code.
+That pull should make DOGFOOD first-party shell themes declare paired or
+single-mode coverage, expose supported dark/light variant switching, make
+unsupported theme-mode toggles explicit, and add deterministic AppShell feedback
+proof for at least one dark-to-light and one light-to-dark path.
 
 ## Forward Goalposts
 

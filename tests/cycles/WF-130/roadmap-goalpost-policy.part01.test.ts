@@ -76,10 +76,10 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).toContain('`Beyond`');
       expect(roadmap).toContain('31 | 6');
       expect(roadmap).toContain('Next Pull');
-      expect(roadmap).toContain('Blocks app-binding snippets');
-      expect(roadmap).toContain('CounterDemoBlock` app-binding walkthrough');
-      expect(roadmap).toContain('application-owned state and command-intent routing');
-      expect(roadmap).toContain('real APIs instead of drifting into pseudo-code');
+      expect(roadmap).toContain('First-party theme variant coverage');
+      expect(roadmap).toContain('DL-018');
+      expect(roadmap).toContain('#343');
+      expect(roadmap).toContain('paired or single-mode coverage');
       expect(roadmap).toContain('versioned artifact semantics');
       expect(roadmap).toContain('DOGFOOD fixtures that round-trip');
       expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/270');
