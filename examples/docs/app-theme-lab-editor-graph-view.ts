@@ -8,6 +8,7 @@ import { writeText } from './app-theme-lab-editor-draw.js';
 import {
   renderThemeTokenRow,
   shouldStackThemeLabRows,
+  ThemeLabTokenRowSelection,
 } from './app-theme-lab-editor-rendering.js';
 import {
   themeLabEditedLabel,
@@ -36,7 +37,7 @@ export function renderThemeLabGraphSurface(
       editedLabel,
       hex: node.hex,
       label: node.path,
-      selection: 'none',
+      selection: ThemeLabTokenRowSelection.none,
       tokens,
     });
     for (const edge of node.edges) {

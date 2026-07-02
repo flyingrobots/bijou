@@ -8,6 +8,7 @@ import { writeText } from './app-theme-lab-editor-draw.js';
 import {
   renderThemeTokenRow,
   shouldStackThemeLabRows,
+  ThemeLabTokenRowSelection,
   type ThemeLabTokenRowRenderTokens,
 } from './app-theme-lab-editor-rendering.js';
 import {
@@ -118,7 +119,9 @@ function renderEditorRow(
     editedLabel: themeLabEditedLabel(localization),
     hex,
     label: path,
-    selection: path === selectedPath ? 'selected' : 'unselected',
+    selection: path === selectedPath
+      ? ThemeLabTokenRowSelection.selected
+      : ThemeLabTokenRowSelection.unselected,
     tokens,
   });
 }

@@ -12,7 +12,14 @@ export interface ThemeLabTokenRowRenderTokens {
   readonly muted: TokenValue;
 }
 
-export type ThemeLabTokenRowSelection = 'none' | 'selected' | 'unselected';
+export const ThemeLabTokenRowSelection = Object.freeze({
+  none: 0,
+  selected: 1,
+  unselected: 2,
+});
+
+export type ThemeLabTokenRowSelection =
+  typeof ThemeLabTokenRowSelection[keyof typeof ThemeLabTokenRowSelection];
 
 export interface ThemeLabTokenRowOptions {
   readonly edited: boolean;
@@ -41,7 +48,7 @@ export function renderThemeTokenRow(
   options: ThemeLabTokenRowOptions,
 ): number {
   const { edited, editedLabel, hex, label, selection, tokens } = options;
-  const selected = selection === 'selected';
+  const selected = selection === ThemeLabTokenRowSelection.selected;
   if (shouldStackThemeLabRows(surface.width)) {
     writeText(
       surface,
@@ -61,7 +68,7 @@ export function renderThemeTokenRow(
     return 2;
   }
 
-  if (selection === 'none') {
+  if (selection === ThemeLabTokenRowSelection.none) {
     renderSwatch(surface, hex, 0, y, 6);
     writeText(surface, 8, y, label, tokens.body);
   } else {
@@ -77,9 +84,9 @@ export function renderThemeTokenRow(
 }
 
 function stackedLabel(label: string, selection: ThemeLabTokenRowSelection): string {
-  if (selection === 'none') {
+  if (selection === ThemeLabTokenRowSelection.none) {
     return label;
   }
 
-  return selection === 'selected' ? `> ${label}` : `  ${label}`;
+  return selection === ThemeLabTokenRowSelection.selected ? `> ${label}` : `  ${label}`;
 }
