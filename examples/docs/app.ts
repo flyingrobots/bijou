@@ -1519,7 +1519,7 @@ function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undef
 }
 
 function updateThemeLabEditorFromKey(model: RootModel, msg: KeyMsg): RootModel | undefined {
-  if (model.docsModel.activePageId !== THEME_LAB_PAGE_ID || msg.ctrl || msg.alt) return undefined;
+  if (model.docsModel.activePageId !== THEME_LAB_PAGE_ID || model.docsModel.focusedPaneByPage[THEME_LAB_PAGE_ID] !== 'guide-content' || msg.ctrl || msg.alt) return undefined;
   const pageModel = model.docsModel.pageModels[THEME_LAB_PAGE_ID];
   if (pageModel?.selectedGuideId !== THEME_LAB_GUIDE_ID) return undefined;
   const activeTheme = resolveDocsShellThemeById(pageModel.activeShellThemeId);

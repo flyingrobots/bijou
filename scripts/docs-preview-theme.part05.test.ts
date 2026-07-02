@@ -6,6 +6,7 @@ import {
   expect,
   frameText,
   it,
+  KEY_TAB,
   runScript,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
@@ -23,6 +24,7 @@ describe('docs preview app', () => {
     });
 
     const result = await runScript(app, [
+      { key: KEY_TAB },
       { key: ']' },
       { key: 'b' },
       { key: '+' },
@@ -37,5 +39,24 @@ describe('docs preview app', () => {
     expect(text).toContain('edited');
     expect(text).toContain('-> border.secondary');
     expect(text).toContain('-> ui.cursor');
+  });
+
+  it('keeps Theme Lab editor shortcuts scoped to the guide content pane', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 152, rows: 46 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const result = await runScript(app, [
+      { key: 'b' },
+      { key: '+' },
+    ], { ctx });
+    const text = frameText(must(result.frames.at(-1)));
+
+    expect(result.model.docsModel.focusedPaneByPage.themes).toBe('guide-nav');
+    expect(text).toContain('Selected: semantic.primary');
+    expect(text).toContain('Channel: red');
+    expect(text).not.toContain('edited');
   });
 });
