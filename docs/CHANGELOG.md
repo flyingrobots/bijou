@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Blocks app-binding snippets** — DOGFOOD's Blocks docs now show how
+  `CounterDemoBlock` binds to application-owned state, key-driven command
+  intents, update routing, render-time config, and pipe/accessible lower modes
+  so the release demo can explain how a reusable Block becomes app code.
 - **DOGFOOD Theme Lab editor graph UX** — DL-022 turns Theme Lab from a static
   swatch reference into a bounded editor surface with selectable theme color
   rows, RGB channel nudging, reset behavior, draft-token swatches, and a live
@@ -326,6 +330,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   #343 repair for DOGFOOD shell theme inventory, paired versus single-mode
   declarations, AppShell mode-toggle feedback, and deterministic dark/light
   switch coverage.
+- **Blocks app-binding snippets shaping** —
+  `docs/design/DX-047-blocks-app-binding-snippets.md` scopes a bounded #342
+  repair for showing how DOGFOOD's `CounterDemoBlock` binds to application
+  state, command-intent routing, render-time config, and lower-mode output.
 
 ## [7.1.0] - 2026-06-14
 

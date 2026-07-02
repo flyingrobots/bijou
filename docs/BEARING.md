@@ -112,10 +112,14 @@ Current direction and active tensions. Historical ship data is in
   mock-ban debt. The active exception ledger is
   [Code Dojo Exceptions](./code-dojo-exceptions.md): every met goalpost must
   remove at least 50 counted violations until the aggregate count reaches zero.
-- DL-018 remains the next `v7.2.0` product pull after the Code Dojo gate is
-  enforceable: make DOGFOOD first-party shell themes declare paired or
-  single-mode coverage, and make unsupported theme-mode toggles explicit for
-  #343.
+- The localization (#340), DOGFOOD shell polish (#334), and light-theme
+  readiness (#341) repairs have landed as v7.2.0 demo-integrity lineage.
+- The next selected `v7.2.0` product pull after the Code Dojo gate is DX-047:
+  add Blocks app-binding snippets for #342 so the release video can show how
+  `CounterDemoBlock` binds to application state and command routing.
+- DL-018 remains selected for #343 after DX-047: make DOGFOOD first-party shell
+  themes declare paired or single-mode coverage, and make unsupported
+  theme-mode toggles explicit.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -133,8 +137,8 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 6 open and
-  8 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is the current active stabilization lane: 4 open and
+  10 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
@@ -186,6 +190,16 @@ TypeScript Code Standards artifact
       -> 50-violation goalpost burndown until zero
 ```
 
+The next selected product pull after that gate is DX-047:
+
+```text
+CounterDemoBlock fixture
+  -> app-owned state snippet
+    -> command-intent routing
+      -> lower-mode explanation
+        -> DOGFOOD docs proof
+```
+
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
 into product contract:
 
@@ -202,18 +216,21 @@ Recommended pull order:
 
 1. Land Respectful Repo: Enter the Code Dojo so standards enforcement is active
    before more product work lands.
-2. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
+2. Land DX-047 for #342 so Blocks docs explain application-owned state,
+   command-intent routing, and render-time binding with real
+   `CounterDemoBlock` APIs.
+3. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
    visible, and covered by deterministic AppShell feedback tests.
-3. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
+4. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
    from #354.
-4. Run the normal `v7.2.0` release-prep checklist before any tag is created.
-5. Shape #302 into a V8 design packet with artifact semantics, receipt
+5. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+6. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
-6. Promote only the Runtime Graph and Scene IR issues needed for that contract
+7. Promote only the Runtime Graph and Scene IR issues needed for that contract
    out of `Beyond`.
-7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-8. Keep closed dependency PR #326 as superseded lineage, not active release
+9. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:
