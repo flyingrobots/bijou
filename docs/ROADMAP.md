@@ -13,7 +13,7 @@ requests assigned to each milestone. They are not issue-only totals. Do not
 compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items: 2026-06-15.
+Last synced from GitHub milestone items: 2026-06-16.
 
 ## Current Release State
 
@@ -47,7 +47,7 @@ count reaches zero.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
-| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 6 | 8 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
+| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 4 | 10 | Active stabilization lane for demo integrity, framework input correctness, and narrow security repairs. |
 | `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Latest shipped release lineage after the release PR merges. Complete; do not reopen for new feature work. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Shipped release lineage. Complete; do not reopen for new feature work. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 31 | 6 | Active forward backlog. Promote shaped work from here into a versioned release. |
@@ -216,19 +216,18 @@ that a cross-repository release is the next smallest honest boundary.
 
 ## Next Pull
 
-The immediate implementation pull should land the **DOGFOOD light theme
-readiness** repair from #341 through DL-017.
+The immediate implementation pull should land the **First-party theme variant
+coverage** repair from #343 through DL-018.
 
-That pull should add deterministic light-theme witnesses for settings, menu,
-or modal chrome; fix any unpainted background path those witnesses reveal; tune
-low-contrast light-theme token pairs used by borders, panels, muted text, and
-selection rows; and expand theme diagnostics so DOGFOOD chrome contrast does
-not regress silently.
+That pull should make DOGFOOD first-party shell themes declare paired or
+single-mode coverage, expose supported dark/light variant switching, make
+unsupported theme-mode toggles explicit, and add deterministic AppShell feedback
+proof for at least one dark-to-light and one light-to-dark path.
 
 ## Forward Goalposts
 
 These are planning recommendations from the open tracker state as of
-2026-06-15. `v7.1.0` is shipped lineage; `v7.2.0` is the active stabilization
+2026-06-16. `v7.1.0` is shipped lineage; `v7.2.0` is the active stabilization
 lane; `v8.0.0` and `v9.0.0` remain the intended feature horizons after the
 stabilization release.
 

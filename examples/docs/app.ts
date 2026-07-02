@@ -196,6 +196,7 @@ import {
   themeInspectorTitle,
 } from './app-theme-inspector-usage.js';
 import { renderThemeLabPane } from './app-theme-lab.js';
+import { updateThemeLabEditorFromKey, type ThemeLabEditorState } from './app-theme-lab-key-handling.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
@@ -351,6 +352,7 @@ interface DocsExplorerModel {
   readonly activeShellThemeId?: string;
   readonly landingQualityMode: LandingQualityMode;
   readonly counterBlockDemo: CounterDemoModel;
+  readonly themeLabEditor?: ThemeLabEditorState;
 }
 
 type ExplorerMsg =
@@ -444,9 +446,11 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'navigate-dogfood',
     pageId: GUIDES_PAGE_ID,
-    title: 'Navigate DOGFOOD',
-    summary: 'How to move between sections, panes, search, settings, and component stories.',
+    title: '',
+    summary: '',
     body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
+    localizedTitle: (localization) => dogfoodText(localization, 'docs.guides.navigate.title', 'Navigate DOGFOOD'),
+    localizedSummary: (localization) => dogfoodText(localization, 'docs.guides.navigate.summary', 'How to move between sections, panes, search, settings, and component stories.'),
   },
   {
     id: 'documentation-map',
@@ -648,7 +652,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     localizedSummary: (localization) => dogfoodText(
       localization,
       'themeLab.summary',
-      'Inspect first-party default themes, DOGFOOD shell palettes, token roles, and safe-pair diagnostics.',
+      'Edit DOGFOOD theme colors with a live token graph, shell palettes, and token swatches.',
     ),
     localizedBody: (localization) => [
       `# ${dogfoodText(localization, 'themeLab.title', 'Theme Lab')}`,
@@ -656,7 +660,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
       dogfoodText(
         localization,
         'themeLab.body.summary',
-        'DOGFOOD exposes Bijou theme facts as a runnable product surface: default dark/light presets, shell theme gallery, token swatches, and contrast diagnostics.',
+        'DOGFOOD exposes Bijou theme facts as an editable product surface: draft colors, live token graph, first-party presets, shell theme gallery, token swatches, and contrast diagnostics.',
       ),
       '',
       dogfoodText(
@@ -2044,6 +2048,7 @@ function renderGuideReaderPane(
       landingTheme: theme,
       activeTheme: resolveDocsShellThemeById(model.activeShellThemeId),
       shellThemes: DOCS_SHELL_THEME_CHOICES,
+      editorState: model.themeLabEditor,
       localization,
     });
   }
@@ -2215,6 +2220,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
             { paneSwitch },
           );
         case 'guide-content':
+          if (pageId === THEME_LAB_PAGE_ID && pageModel.selectedGuideId === THEME_LAB_GUIDE_ID) {
+            return dogfoodText(
+              localization,
+              'docs.footer.themeLabEditor',
+              '{paneSwitch} • [/] color • r/g/b channel • -/+ nudge • 0 reset',
+              { paneSwitch },
+            );
+          }
           if (pageId === BLOCKS_PAGE_ID && pageModel.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID) {
             return dogfoodText(
               localization,
@@ -3163,6 +3176,14 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         }
         if (shouldToggleThemeInspector(msg)) {
           return [{ ...model, themeInspectorOpen: true, themeInspectorScrollY: 0 }, []];
+        }
+        const themeLabEditDocsModel = updateThemeLabEditorFromKey(model.docsModel, msg, {
+          pageId: THEME_LAB_PAGE_ID,
+          guideId: THEME_LAB_GUIDE_ID,
+          resolveShellThemeById: resolveDocsShellThemeById,
+        });
+        if (themeLabEditDocsModel !== undefined) {
+          return [{ ...model, docsModel: themeLabEditDocsModel }, []];
         }
       }
 

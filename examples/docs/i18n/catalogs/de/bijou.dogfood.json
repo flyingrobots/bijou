@@ -1771,11 +1771,44 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.footer.themeLabEditor"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "{paneSwitch} • [/] Farbe • r/g/b Kanal • -/+ ändern • 0 zurücksetzen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.footer.variants"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "So wechselst du zwischen Bereichen, Fenstern, Suche, Einstellungen und Component-Stories."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "DOGFOOD navigieren"
+      }
     },
     {
       "key": {
@@ -3780,7 +3813,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Das Theme Lab vergleicht First-Party-Presets mit DOGFOOD-Shell-Themes und zeigt, wie Semantic-, Surface-, Border-, Status-, UI- und Gradient-Tokens aufgelöst werden."
+        "de": "DOGFOOD zeigt Bijou-Theme-Fakten als editierbare Produktfläche: Entwurfsfarben, Live-Token-Graph, First-Party-Presets, Shell-Theme-Galerie, Token-Farbfelder und Kontrastdiagnosen."
       }
     },
     {
@@ -3830,6 +3863,94 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Kanal: {channel}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.blue"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "blau"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.green"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "grün"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.red"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "rot"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.controls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Steuerung: [/] Farbe | r/g/b Kanal | -/+ ändern | 0 zurücksetzen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.edited"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "bearbeitet"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.selected"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ausgewählt: {path}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editorTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Theme-Editor"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.f10Hint"
       },
       "kind": "message",
@@ -3847,6 +3968,17 @@
       "sourceLocale": "en",
       "values": {
         "de": "Shell-Galerie"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.graphTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Live-Token-Graph"
       }
     },
     {
@@ -3890,7 +4022,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Standard-Theme-Presets, DOGFOOD-Shell-Paletten und Token-Farbfelder."
+        "de": "Bearbeite DOGFOOD-Theme-Farben mit Live-Token-Graph, Shell-Paletten und Token-Farbfeldern."
       }
     },
     {
@@ -3901,7 +4033,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Farbfelder enthalten Zeilen für semantic.primary, surface.primary und gradient.brand."
+        "de": "Entwurfs-Farbfelder enthalten semantic.primary, surface.primary und im Graph bearbeitete Token-Zeilen."
       }
     },
     {

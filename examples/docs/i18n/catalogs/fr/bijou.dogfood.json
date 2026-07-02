@@ -1771,11 +1771,44 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.footer.themeLabEditor"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "{paneSwitch} • [/] couleur • canal r/g/b • -/+ ajuster • 0 réinitialiser"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.footer.variants"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Comment passer entre sections, panneaux, recherche, réglages et stories de composants."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Naviguer dans DOGFOOD"
+      }
     },
     {
       "key": {
@@ -3780,7 +3813,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Le laboratoire de thèmes compare les presets internes aux thèmes de shell DOGFOOD et montre comment se résolvent les tokens sémantiques, de surface, de bordure, d’état, d’UI et de dégradé."
+        "fr": "DOGFOOD expose les faits de thème Bijou comme une surface éditable : couleurs de brouillon, graphe de tokens en direct, presets internes, galerie de thèmes du shell, nuanciers et diagnostics de contraste."
       }
     },
     {
@@ -3830,6 +3863,94 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Canal : {channel}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.blue"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "bleu"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.green"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "vert"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.red"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "rouge"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.controls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Contrôles : [/] couleur | canal r/g/b | -/+ ajuster | 0 réinitialiser"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.edited"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "modifié"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.selected"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Sélection : {path}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editorTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Éditeur de thème"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.f10Hint"
       },
       "kind": "message",
@@ -3847,6 +3968,17 @@
       "sourceLocale": "en",
       "values": {
         "fr": "galerie du shell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.graphTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Graphe de tokens en direct"
       }
     },
     {
@@ -3890,7 +4022,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Presets de thème par défaut, palettes du shell DOGFOOD et nuanciers de tokens."
+        "fr": "Modifiez les couleurs du thème DOGFOOD avec un graphe de tokens en direct, les palettes du shell et les nuanciers."
       }
     },
     {
@@ -3901,7 +4033,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Les nuanciers incluent les lignes semantic.primary, surface.primary et gradient.brand."
+        "fr": "Les nuanciers de brouillon incluent semantic.primary, surface.primary et les lignes de tokens modifiées dans le graphe."
       }
     },
     {

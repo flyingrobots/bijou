@@ -1771,11 +1771,44 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.footer.themeLabEditor"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "{paneSwitch} • [/] color • canal r/g/b • -/+ ajustar • 0 restablecer"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.footer.variants"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Cómo moverse entre secciones, paneles, búsqueda, ajustes e historias de componentes."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.navigate.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Navegar por DOGFOOD"
+      }
     },
     {
       "key": {
@@ -3780,7 +3813,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "El laboratorio de temas compara presets propios con temas de shell de DOGFOOD y muestra cómo se resuelven los tokens semánticos, de superficie, borde, estado, UI y gradiente."
+        "es": "DOGFOOD expone los datos de tema de Bijou como una superficie editable: colores de borrador, grafo de tokens en vivo, presets propios, galería de temas de shell, muestras de tokens y diagnósticos de contraste."
       }
     },
     {
@@ -3830,6 +3863,94 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Canal: {channel}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.blue"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "azul"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.green"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "verde"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.channel.red"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "rojo"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.controls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Controles: [/] color | canal r/g/b | -/+ ajustar | 0 restablecer"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.edited"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "editado"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editor.selected"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Seleccionado: {path}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.editorTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Editor de temas"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.f10Hint"
       },
       "kind": "message",
@@ -3847,6 +3968,17 @@
       "sourceLocale": "en",
       "values": {
         "es": "galería de shell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.graphTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Grafo de tokens en vivo"
       }
     },
     {
@@ -3890,7 +4022,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "Presets de tema predeterminados, paletas de shell DOGFOOD y muestras de tokens."
+        "es": "Edita colores del tema DOGFOOD con un grafo de tokens en vivo, paletas de shell y muestras de tokens."
       }
     },
     {
@@ -3901,7 +4033,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "Las muestras incluyen filas semantic.primary, surface.primary y gradient.brand."
+        "es": "Las muestras de borrador incluyen semantic.primary, surface.primary y filas de tokens editadas en el grafo."
       }
     },
     {
