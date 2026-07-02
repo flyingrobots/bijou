@@ -196,7 +196,7 @@ import {
   themeInspectorTitle,
 } from './app-theme-inspector-usage.js';
 import { renderThemeLabPane } from './app-theme-lab.js';
-import { themeLabEditorStateFor, themeLabEditorUpdateForKey, type ThemeLabEditorState } from './app-theme-lab-editor-model.js';
+import { updateThemeLabEditorFromKey, type ThemeLabEditorState } from './app-theme-lab-key-handling.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 export { DOGFOOD_THEME_SAFE_PAIRS } from './dogfood-shell-themes.js';
 export { stripMarkdownFrontmatter } from './app-markdown.js';
@@ -1516,22 +1516,6 @@ function resolveDocsVisualThemeByShellThemeId(id: string | undefined): LandingTh
 
 function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
   return applyShellThemeStateToContext(DOCS_SHELL_THEME_STATE, ctx, themeId);
-}
-
-function updateThemeLabEditorFromKey(model: RootModel, msg: KeyMsg): RootModel | undefined {
-  if (model.docsModel.activePageId !== THEME_LAB_PAGE_ID || model.docsModel.focusedPaneByPage[THEME_LAB_PAGE_ID] !== 'guide-content' || model.docsModel.commandPalette !== undefined || model.docsModel.helpOpen || model.docsModel.notificationCenterOpen || model.docsModel.quitConfirmOpen || model.docsModel.settingsOpen || msg.ctrl || msg.alt || msg.shift) return undefined;
-  const pageModel = model.docsModel.pageModels[THEME_LAB_PAGE_ID];
-  if (pageModel?.selectedGuideId !== THEME_LAB_GUIDE_ID) return undefined;
-  const activeTheme = resolveDocsShellThemeById(pageModel.activeShellThemeId);
-  const nextEditor = themeLabEditorUpdateForKey(themeLabEditorStateFor(activeTheme.id, activeTheme.theme, pageModel.themeLabEditor), activeTheme.theme, msg.key);
-  if (nextEditor === undefined) return undefined;
-  return {
-    ...model,
-    docsModel: {
-      ...model.docsModel,
-      pageModels: { ...model.docsModel.pageModels, [THEME_LAB_PAGE_ID]: { ...pageModel, themeLabEditor: nextEditor } },
-    },
-  };
 }
 
 function renderThemeInspectorDrawer(
@@ -3193,9 +3177,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         if (shouldToggleThemeInspector(msg)) {
           return [{ ...model, themeInspectorOpen: true, themeInspectorScrollY: 0 }, []];
         }
-        const themeLabEditModel = updateThemeLabEditorFromKey(model, msg);
-        if (themeLabEditModel !== undefined) {
-          return [themeLabEditModel, []];
+        const themeLabEditDocsModel = updateThemeLabEditorFromKey(model.docsModel, msg, {
+          pageId: THEME_LAB_PAGE_ID,
+          guideId: THEME_LAB_GUIDE_ID,
+          resolveShellThemeById: resolveDocsShellThemeById,
+        });
+        if (themeLabEditDocsModel !== undefined) {
+          return [{ ...model, docsModel: themeLabEditDocsModel }, []];
         }
       }
 
