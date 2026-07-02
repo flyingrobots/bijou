@@ -4,9 +4,9 @@ import {
   type Theme,
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
-import { renderSwatch, writeText } from './app-theme-lab-editor-draw.js';
+import { writeText } from './app-theme-lab-editor-draw.js';
 import {
-  hexWithEditedLabel,
+  renderThemeTokenRow,
   shouldStackThemeLabRows,
 } from './app-theme-lab-editor-rendering.js';
 import {
@@ -31,20 +31,14 @@ export function renderThemeLabGraphSurface(
   const editedLabel = themeLabEditedLabel(localization);
   let y = 0;
   for (const node of nodes) {
-    if (stackedRows) {
-      writeText(surface, 0, y, node.path, tokens.body);
-      renderSwatch(surface, node.hex, 2, y + 1, 6);
-      writeText(surface, 10, y + 1, hexWithEditedLabel(node.hex, node.edited, editedLabel), tokens.muted);
-      y += 2;
-    } else {
-      renderSwatch(surface, node.hex, 0, y, 6);
-      writeText(surface, 8, y, node.path, tokens.body);
-      writeText(surface, Math.min(surface.width - 1, 34), y, node.hex, tokens.muted);
-      if (node.edited) {
-        writeText(surface, Math.min(surface.width - 1, 43), y, editedLabel, tokens.accent);
-      }
-      y += 1;
-    }
+    y += renderThemeTokenRow(surface, y, {
+      edited: node.edited,
+      editedLabel,
+      hex: node.hex,
+      label: node.path,
+      selection: 'none',
+      tokens,
+    });
     for (const edge of node.edges) {
       writeText(surface, 2, y, `-> ${edge}`, tokens.muted);
       y += 1;

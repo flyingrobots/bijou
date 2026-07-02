@@ -2,13 +2,13 @@ import {
   createSurface,
   type Surface,
   type Theme,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
-import { renderSwatch, writeText } from './app-theme-lab-editor-draw.js';
+import { writeText } from './app-theme-lab-editor-draw.js';
 import {
-  hexWithEditedLabel,
+  renderThemeTokenRow,
   shouldStackThemeLabRows,
+  type ThemeLabTokenRowRenderTokens,
 } from './app-theme-lab-editor-rendering.js';
 import {
   THEME_LAB_EDITABLE_PATHS,
@@ -20,9 +20,7 @@ import {
 } from './app-theme-lab-editor-model.js';
 import { dogfoodLocalizedText } from './localization.js';
 
-export interface ThemeLabEditorRenderTokens {
-  readonly accent: TokenValue; readonly body: TokenValue; readonly muted: TokenValue;
-}
+export type ThemeLabEditorRenderTokens = ThemeLabTokenRowRenderTokens;
 
 export interface ThemeLabEditorSurfaceOptions {
   readonly contextLines?: readonly string[];
@@ -80,13 +78,25 @@ export function renderThemeLabEditorSurface(
     surface,
     0,
     contextLines.length + 2,
-    dogfoodText(localization, 'themeLab.editor.controls', 'Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset'),
+    dogfoodText(
+      localization,
+      'themeLab.editor.controls',
+      'Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset',
+    ),
     tokens.muted,
   );
   let rowY = editorRowsStart;
   for (const path of THEME_LAB_EDITABLE_PATHS) {
-    renderEditorRow(surface, rowY, path, selectedPath, baseTheme, state, localization, tokens);
-    rowY += editorRowHeight;
+    rowY += renderEditorRow(
+      surface,
+      rowY,
+      path,
+      selectedPath,
+      baseTheme,
+      state,
+      localization,
+      tokens,
+    );
   }
   return surface;
 }
@@ -100,49 +110,33 @@ function renderEditorRow(
   state: ThemeLabEditorState,
   localization: LocalizationPort | undefined,
   tokens: ThemeLabEditorRenderTokens,
-): void {
+): number {
   const hex = themeLabEditableHex(state.draftTheme, path);
   const edited = themeLabEditableHex(baseTheme, path) !== hex;
-  if (shouldStackThemeLabRows(surface.width)) {
-    writeText(
-      surface,
-      0,
-      y,
-      path === selectedPath ? `> ${path}` : `  ${path}`,
-      path === selectedPath ? tokens.accent : tokens.body,
-    );
-    renderSwatch(surface, hex, 2, y + 1, 6);
-    writeText(
-      surface,
-      10,
-      y + 1,
-      hexWithEditedLabel(hex, edited, themeLabEditedLabel(localization)),
-      tokens.muted,
-    );
-    return;
-  }
-  writeText(surface, 0, y, path === selectedPath ? '>' : ' ', tokens.accent);
-  renderSwatch(surface, hex, 2, y, 6);
-  writeText(surface, 10, y, path, path === selectedPath ? tokens.accent : tokens.body);
-  writeText(surface, Math.min(surface.width - 1, 34), y, hex, tokens.muted);
-  if (edited) {
-    writeText(
-      surface,
-      Math.min(surface.width - 1, 43),
-      y,
-      themeLabEditedLabel(localization),
-      tokens.accent,
-    );
-  }
+  return renderThemeTokenRow(surface, y, {
+    edited,
+    editedLabel: themeLabEditedLabel(localization),
+    hex,
+    label: path,
+    selection: path === selectedPath ? 'selected' : 'unselected',
+    tokens,
+  });
 }
 
 export function themeLabEditedLabel(localization: LocalizationPort | undefined): string {
   return dogfoodText(localization, 'themeLab.editor.edited', 'edited');
 }
-function channelLabel(channel: ThemeLabEditorState['channel'], localization: LocalizationPort | undefined): string {
+function channelLabel(
+  channel: ThemeLabEditorState['channel'],
+  localization: LocalizationPort | undefined,
+): string {
   switch (channel) {
     case 0: return dogfoodText(localization, 'themeLab.editor.channel.red', 'red');
-    case THEME_LAB_CHANNEL_GREEN: return dogfoodText(localization, 'themeLab.editor.channel.green', 'green');
-    case THEME_LAB_CHANNEL_BLUE: return dogfoodText(localization, 'themeLab.editor.channel.blue', 'blue');
+    case THEME_LAB_CHANNEL_GREEN: {
+      return dogfoodText(localization, 'themeLab.editor.channel.green', 'green');
+    }
+    case THEME_LAB_CHANNEL_BLUE: {
+      return dogfoodText(localization, 'themeLab.editor.channel.blue', 'blue');
+    }
   }
 }
