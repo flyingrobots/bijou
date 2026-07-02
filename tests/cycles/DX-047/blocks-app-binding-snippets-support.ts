@@ -28,30 +28,33 @@ export function lastFrame(frames: readonly TextFrame[]): TextFrame {
 
 export function typecheck(root: string, relativePath: string): readonly string[] {
   const rootFile = resolve(root, relativePath);
-  const program = ts.createProgram([rootFile], {
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.NodeNext,
-    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-    strict: true,
-    noUncheckedIndexedAccess: true,
-    exactOptionalPropertyTypes: true,
-    noImplicitOverride: true,
-    noFallthroughCasesInSwitch: true,
-    noImplicitReturns: true,
-    noPropertyAccessFromIndexSignature: true,
-    useUnknownInCatchVariables: true,
-    isolatedModules: true,
-    verbatimModuleSyntax: true,
-    esModuleInterop: true,
-    skipLibCheck: true,
-    noEmit: true,
-    baseUrl: root,
-    paths: {
-      '@flyingrobots/bijou': ['packages/bijou/src/index.ts'],
-    },
-  });
+  const program = ts.createProgram([rootFile], testCompilerOptions(root));
 
   return ts.getPreEmitDiagnostics(program)
     .filter((diagnostic) => diagnostic.file?.fileName === rootFile)
     .map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+}
+
+function testCompilerOptions(root: string): ts.CompilerOptions {
+  const configPath = resolve(root, 'tsconfig.tests.json');
+  const configFile = ts.readConfigFile(configPath, (path) => ts.sys.readFile(path));
+  if (configFile.error !== undefined) {
+    throw new Error(formatDiagnostic(configFile.error));
+  }
+  const config: unknown = configFile.config;
+  if (config === undefined) {
+    throw new Error(`Missing TypeScript config content: ${configPath}`);
+  }
+  const parsed = ts.parseJsonConfigFileContent(config, ts.sys, root);
+  if (parsed.errors.length > 0) {
+    throw new Error(parsed.errors.map(formatDiagnostic).join('\n'));
+  }
+  return {
+    ...parsed.options,
+    noEmit: true,
+  };
+}
+
+function formatDiagnostic(diagnostic: ts.Diagnostic): string {
+  return ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
 }

@@ -25,6 +25,7 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const BLOCKS_MAKE_YOUR_OWN_PATH = 'examples/docs/content/blocks-make-your-own.md';
 const COUNTER_BINDING_SNIPPET_PATH = 'examples/docs/content/blocks-counter-app-binding.snippet.ts';
+const SNIPPET_SUPPORT_PATH = 'tests/cycles/DX-047/blocks-app-binding-snippets-support.ts';
 const COUNTER_BINDING_HEADING = '## Bind CounterDemoBlock in an App';
 
 function read(relativePath: string): string {
@@ -109,5 +110,13 @@ describe('DX-047 Blocks app-binding snippets', () => {
     expect(typeof tickCounterDemoModel).toBe('function');
     expect(typeof counterDemoBlockConfig).toBe('function');
     expect(typeof counterDemoBlockSurface).toBe('function');
+  });
+
+  it('typechecks the binding snippet with the project test tsconfig', () => {
+    const support = read(SNIPPET_SUPPORT_PATH);
+
+    expect(support).toContain('ts.readConfigFile');
+    expect(support).toContain('ts.parseJsonConfigFileContent');
+    expect(support).not.toContain('ts.createProgram([rootFile], {');
   });
 });
