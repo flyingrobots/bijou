@@ -6,7 +6,10 @@ import {
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { renderSwatch, writeText } from './app-theme-lab-editor-draw.js';
-import { themeLabGraphNodes } from './app-theme-lab-graph.js';
+import {
+  hexWithEditedLabel,
+  shouldStackThemeLabRows,
+} from './app-theme-lab-editor-rendering.js';
 import {
   THEME_LAB_EDITABLE_PATHS,
   THEME_LAB_CHANNEL_BLUE,
@@ -18,9 +21,7 @@ import {
 import { dogfoodLocalizedText } from './localization.js';
 
 export interface ThemeLabEditorRenderTokens {
-  readonly accent: TokenValue;
-  readonly body: TokenValue;
-  readonly muted: TokenValue;
+  readonly accent: TokenValue; readonly body: TokenValue; readonly muted: TokenValue;
 }
 
 export interface ThemeLabEditorSurfaceOptions {
@@ -47,17 +48,34 @@ export function renderThemeLabEditorSurface(
   const safeWidth = Math.max(32, width);
   const contextLines = options.contextLines ?? [];
   const editorRowsStart = contextLines.length + 4;
-  const surface = createSurface(safeWidth, THEME_LAB_EDITABLE_PATHS.length + editorRowsStart);
+  const stackedRows = shouldStackThemeLabRows(safeWidth);
+  const editorRowHeight = stackedRows ? 2 : 1;
+  const surface = createSurface(
+    safeWidth,
+    editorRowsStart + (THEME_LAB_EDITABLE_PATHS.length * editorRowHeight),
+  );
   const selectedPath = themeLabEditorSelectedPath(state);
   contextLines.forEach((line, index) => {
     writeText(surface, 0, index, line, index === 0 ? tokens.accent : tokens.muted);
   });
-  writeText(surface, 0, contextLines.length, dogfoodText(localization, 'themeLab.editor.selected', 'Selected: {path}', {
-    path: selectedPath,
-  }), tokens.accent);
-  writeText(surface, 0, contextLines.length + 1, dogfoodText(localization, 'themeLab.editor.channel', 'Channel: {channel}', {
-    channel: channelLabel(state.channel, localization),
-  }), tokens.body);
+  writeText(
+    surface,
+    0,
+    contextLines.length,
+    dogfoodText(localization, 'themeLab.editor.selected', 'Selected: {path}', {
+      path: selectedPath,
+    }),
+    tokens.accent,
+  );
+  writeText(
+    surface,
+    0,
+    contextLines.length + 1,
+    dogfoodText(localization, 'themeLab.editor.channel', 'Channel: {channel}', {
+      channel: channelLabel(state.channel, localization),
+    }),
+    tokens.body,
+  );
   writeText(
     surface,
     0,
@@ -65,35 +83,10 @@ export function renderThemeLabEditorSurface(
     dogfoodText(localization, 'themeLab.editor.controls', 'Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset'),
     tokens.muted,
   );
-  THEME_LAB_EDITABLE_PATHS.forEach((path, index) => {
-    renderEditorRow(surface, index + editorRowsStart, path, selectedPath, baseTheme, state, localization, tokens);
-  });
-  return surface;
-}
-
-export function renderThemeLabGraphSurface(
-  baseTheme: Theme,
-  draftTheme: Theme,
-  width: number,
-  localization: LocalizationPort | undefined,
-  tokens: ThemeLabEditorRenderTokens,
-): Surface {
-  const nodes = themeLabGraphNodes(baseTheme, draftTheme);
-  const height = nodes.reduce((sum, node) => sum + 1 + node.edges.length, 0);
-  const surface = createSurface(Math.max(32, width), Math.max(1, height));
-  let y = 0;
-  for (const node of nodes) {
-    renderSwatch(surface, node.hex, 0, y, 6);
-    writeText(surface, 8, y, node.path, tokens.body);
-    writeText(surface, Math.min(surface.width - 1, 34), y, node.hex, tokens.muted);
-    if (node.edited) {
-      writeText(surface, Math.min(surface.width - 1, 43), y, editedLabel(localization), tokens.accent);
-    }
-    y += 1;
-    for (const edge of node.edges) {
-      writeText(surface, 2, y, `-> ${edge}`, tokens.muted);
-      y += 1;
-    }
+  let rowY = editorRowsStart;
+  for (const path of THEME_LAB_EDITABLE_PATHS) {
+    renderEditorRow(surface, rowY, path, selectedPath, baseTheme, state, localization, tokens);
+    rowY += editorRowHeight;
   }
   return surface;
 }
@@ -110,19 +103,42 @@ function renderEditorRow(
 ): void {
   const hex = themeLabEditableHex(state.draftTheme, path);
   const edited = themeLabEditableHex(baseTheme, path) !== hex;
+  if (shouldStackThemeLabRows(surface.width)) {
+    writeText(
+      surface,
+      0,
+      y,
+      path === selectedPath ? `> ${path}` : `  ${path}`,
+      path === selectedPath ? tokens.accent : tokens.body,
+    );
+    renderSwatch(surface, hex, 2, y + 1, 6);
+    writeText(
+      surface,
+      10,
+      y + 1,
+      hexWithEditedLabel(hex, edited, themeLabEditedLabel(localization)),
+      tokens.muted,
+    );
+    return;
+  }
   writeText(surface, 0, y, path === selectedPath ? '>' : ' ', tokens.accent);
   renderSwatch(surface, hex, 2, y, 6);
   writeText(surface, 10, y, path, path === selectedPath ? tokens.accent : tokens.body);
   writeText(surface, Math.min(surface.width - 1, 34), y, hex, tokens.muted);
   if (edited) {
-    writeText(surface, Math.min(surface.width - 1, 43), y, editedLabel(localization), tokens.accent);
+    writeText(
+      surface,
+      Math.min(surface.width - 1, 43),
+      y,
+      themeLabEditedLabel(localization),
+      tokens.accent,
+    );
   }
 }
 
-function editedLabel(localization: LocalizationPort | undefined): string {
+export function themeLabEditedLabel(localization: LocalizationPort | undefined): string {
   return dogfoodText(localization, 'themeLab.editor.edited', 'edited');
 }
-
 function channelLabel(channel: ThemeLabEditorState['channel'], localization: LocalizationPort | undefined): string {
   switch (channel) {
     case 0: return dogfoodText(localization, 'themeLab.editor.channel.red', 'red');

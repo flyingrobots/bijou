@@ -1,13 +1,17 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript';
 import { afterEach, describe, expect, it } from 'vitest';
 import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
 } from '../../helpers/scripted.js';
+import {
+  frameText,
+  lastFrame,
+  typecheck,
+} from './blocks-app-binding-snippets-support.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   applyCounterDemoIntent,
@@ -20,13 +24,8 @@ import {
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const BLOCKS_MAKE_YOUR_OWN_PATH = 'examples/docs/content/blocks-make-your-own.md';
+const COUNTER_BINDING_SNIPPET_PATH = 'examples/docs/content/blocks-counter-app-binding.snippet.ts';
 const COUNTER_BINDING_HEADING = '## Bind CounterDemoBlock in an App';
-
-interface TextFrame {
-  readonly width: number;
-  readonly height: number;
-  get(x: number, y: number): { readonly char?: string };
-}
 
 function read(relativePath: string): string {
   return readFileSync(resolve(ROOT, relativePath), 'utf8');
@@ -45,33 +44,6 @@ function extractFencedTsBlockAfterHeading(source: string, heading: string): stri
   }
 
   return match[1];
-}
-
-function resolveDocumentedSourceImport(markdownPath: string, importPath: string): string {
-  const markdownDirectory = dirname(resolve(ROOT, markdownPath));
-  const documentedTarget = resolve(markdownDirectory, importPath);
-  return documentedTarget.endsWith('.js')
-    ? documentedTarget.replace(/\.js$/, '.ts')
-    : documentedTarget;
-}
-
-function frameText(frame: TextFrame): string {
-  let text = '';
-  for (let y = 0; y < frame.height; y++) {
-    for (let x = 0; x < frame.width; x++) {
-      text += frame.get(x, y).char ?? ' ';
-    }
-    text += '\n';
-  }
-  return text;
-}
-
-function lastFrame(frames: readonly TextFrame[]): TextFrame {
-  const frame = frames.at(-1);
-  if (frame === undefined) {
-    throw new Error('Missing rendered frame');
-  }
-  return frame;
 }
 
 const REQUIRED_COUNTER_BINDING_APIS = [
@@ -113,6 +85,9 @@ describe('DX-047 Blocks app-binding snippets', () => {
   it('keeps the documented binding snippet anchored to real CounterDemoBlock helpers', () => {
     const source = read(BLOCKS_MAKE_YOUR_OWN_PATH);
     const snippet = extractFencedTsBlockAfterHeading(source, COUNTER_BINDING_HEADING);
+    const canonicalSnippet = read(COUNTER_BINDING_SNIPPET_PATH).trim();
+
+    expect(snippet).toBe(canonicalSnippet);
 
     for (const api of REQUIRED_COUNTER_BINDING_APIS) {
       expect(snippet).toContain(api);
@@ -122,22 +97,11 @@ describe('DX-047 Blocks app-binding snippets', () => {
     expect(snippet).toContain('CounterAppModel');
     expect(snippet).toContain('counterBlock: createCounterDemoModel(5)');
 
-    const transpiled = ts.transpileModule(snippet, {
-      compilerOptions: {
-        module: ts.ModuleKind.ESNext,
-        target: ts.ScriptTarget.ES2022,
-      },
-      reportDiagnostics: true,
-    });
-    expect(transpiled.diagnostics ?? []).toEqual([]);
+    expect(typecheck(ROOT, COUNTER_BINDING_SNIPPET_PATH)).toEqual([]);
 
     const relativeImports = [...snippet.matchAll(/from ['"](\.[^'"]+)['"]/g)]
       .map((match) => match[1]);
     expect(relativeImports).toEqual(['../counter-block-demo.js']);
-    for (const importPath of relativeImports) {
-      const sourcePath = resolveDocumentedSourceImport(BLOCKS_MAKE_YOUR_OWN_PATH, importPath);
-      expect(existsSync(sourcePath)).toBe(true);
-    }
 
     expect(typeof createCounterDemoModel).toBe('function');
     expect(typeof counterDemoIntentForKey).toBe('function');

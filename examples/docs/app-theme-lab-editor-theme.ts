@@ -5,7 +5,7 @@ import type {
 
 export function cloneThemeForThemeLabEditor(theme: Theme): Theme {
   return {
-    name: `${theme.name}-draft`,
+    name: draftThemeName(theme.name),
     semantic: {
       success: cloneToken(theme.semantic.success),
       error: cloneToken(theme.semantic.error),
@@ -54,6 +54,10 @@ export function cloneThemeForThemeLabEditor(theme: Theme): Theme {
       muted: cloneToken(theme.surface.muted),
     },
   };
+}
+
+function draftThemeName(name: string): string {
+  return `${name.replace(/(?:-draft)+$/u, '')}-draft`;
 }
 
 function cloneToken(token: TokenValue): TokenValue {

@@ -23,7 +23,8 @@ fixture:
 - show the application state/update path that owns counter state
 - show how keyboard actions become command-intent emissions
 - show how the app renders the block from model-owned state
-- prove the snippet is not stale by compiling it or testing its source text
+- prove the snippet is not stale by compiling a canonical source file and
+  testing that the rendered docs fence matches it exactly
 
 ## Sponsored Human
 
@@ -136,30 +137,32 @@ The proof should not depend on screenshots.
 
 ## Implementation Outline
 
-1. Add a reusable app-binding snippet source for `CounterDemoBlock`.
-2. Render that snippet in `examples/docs/content/blocks-make-your-own.md` or a
-   nearby generated docs path.
+1. Add a reusable app-binding snippet source for `CounterDemoBlock` at
+   `examples/docs/content/blocks-counter-app-binding.snippet.ts`.
+2. Render that exact snippet in `examples/docs/content/blocks-make-your-own.md`;
+   generated copies must derive from the canonical snippet source.
 3. Add prose explaining app-owned state, command intent routing, render-time
    config, and lower-mode output.
 4. Add focused tests that render the Blocks guide and assert the app-binding
    section is visible and legible.
-5. Add a compile or source-integrity test so the snippet cannot drift from the
-   real helper API.
+5. Add compile and source-integrity tests so the snippet cannot drift from the
+   canonical source file or the real helper API.
 6. Update `docs/CHANGELOG.md`, `docs/BEARING.md`, and `docs/ROADMAP.md`.
 
 ## Tests To Write First
 
 - A DOGFOOD Blocks render test fails unless "How to Make Your Own Blocks"
   includes a visible `CounterDemoBlock` app-binding section.
-- A snippet integrity test fails unless the documented code references the real
-  counter model, config, command-intent, update, and render helpers.
+- A snippet integrity test fails unless the documented code matches the
+  canonical source file and references the real counter model, config,
+  command-intent, update, and render helpers.
 - Existing CounterDemoBlock preview and intent-key tests continue to pass.
 
 ## Acceptance Criteria
 
 - Blocks docs include at least one complete app-binding snippet.
-- The snippet uses real Bijou / DOGFOOD APIs and is covered by deterministic
-  test proof.
+- The snippet uses real Bijou / DOGFOOD APIs from a canonical source file and is
+  covered by deterministic type and source-integrity proof.
 - Interactive block docs explain state ownership and command routing.
 - DOGFOOD renders the snippet legibly in the Blocks section.
 - The release/video script can explain "how to use this in your app" from the

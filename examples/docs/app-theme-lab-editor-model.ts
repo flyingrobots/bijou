@@ -5,40 +5,34 @@ import {
   type Theme,
 } from '../../packages/bijou/src/index.js';
 import { cloneThemeForThemeLabEditor } from './app-theme-lab-editor-theme.js';
+import {
+  THEME_LAB_CHANNEL_BLUE,
+  THEME_LAB_CHANNEL_GREEN,
+  THEME_LAB_CHANNEL_RED,
+  THEME_LAB_EDITABLE_PATHS,
+  type ThemeLabEditorChannel,
+  type ThemeLabEditableTokenPath,
+} from './app-theme-lab-editor-types.js';
 import { writeThemeLabEditableHex } from './app-theme-lab-editor-write.js';
 
-export type ThemeLabEditorChannel = 0 | 1 | 2;
-export type ThemeLabEditableTokenPath =
-  | 'semantic.primary'
-  | 'semantic.accent'
-  | 'surface.primary.bg'
-  | 'surface.secondary.bg'
-  | 'border.primary'
-  | 'ui.cursor'
-  | 'status.success'
-  | 'status.error';
+export {
+  THEME_LAB_CHANNEL_BLUE,
+  THEME_LAB_CHANNEL_GREEN,
+  THEME_LAB_CHANNEL_RED,
+  THEME_LAB_EDITABLE_PATHS,
+} from './app-theme-lab-editor-types.js';
+export type {
+  ThemeLabEditorChannel,
+  ThemeLabEditableTokenPath,
+} from './app-theme-lab-editor-types.js';
 
 export interface ThemeLabEditorState {
   readonly sourceThemeId: string;
   readonly selectedIndex: number;
   readonly channel: ThemeLabEditorChannel;
   readonly draftTheme: Theme;
+  readonly directlyEditedPaths: readonly ThemeLabEditableTokenPath[];
 }
-
-export const THEME_LAB_CHANNEL_RED = 0 satisfies ThemeLabEditorChannel;
-export const THEME_LAB_CHANNEL_GREEN = 1 satisfies ThemeLabEditorChannel;
-export const THEME_LAB_CHANNEL_BLUE = 2 satisfies ThemeLabEditorChannel;
-
-export const THEME_LAB_EDITABLE_PATHS: readonly ThemeLabEditableTokenPath[] = Object.freeze([
-  'semantic.primary',
-  'semantic.accent',
-  'surface.primary.bg',
-  'surface.secondary.bg',
-  'border.primary',
-  'ui.cursor',
-  'status.success',
-  'status.error',
-]);
 
 export function createThemeLabEditorState(sourceThemeId: string, theme: Theme): ThemeLabEditorState {
   return {
@@ -46,6 +40,7 @@ export function createThemeLabEditorState(sourceThemeId: string, theme: Theme): 
     selectedIndex: 0,
     channel: THEME_LAB_CHANNEL_RED,
     draftTheme: cloneThemeForThemeLabEditor(theme),
+    directlyEditedPaths: [],
   };
 }
 
@@ -96,13 +91,18 @@ export function themeLabEditorSelectChannel(
 export function themeLabEditorNudge(state: ThemeLabEditorState, delta: number): ThemeLabEditorState {
   const path = themeLabEditorSelectedPath(state);
   const rgb = hexToRgb(themeLabEditableHex(state.draftTheme, path));
-  const channelIndex = channelIndexFor(state.channel);
   const nextRgb: RGB = [...rgb];
-  const channelValue = nextRgb[channelIndex] ?? 0;
-  nextRgb[channelIndex] = Math.max(0, Math.min(255, channelValue + delta));
+  const channelValue = nextRgb[state.channel];
+  nextRgb[state.channel] = Math.max(0, Math.min(255, channelValue + delta));
   return {
     ...state,
-    draftTheme: writeThemeLabEditableHex(state.draftTheme, path, rgbToHex(nextRgb)),
+    draftTheme: writeThemeLabEditableHex(
+      state.draftTheme,
+      path,
+      rgbToHex(nextRgb),
+      state.directlyEditedPaths,
+    ),
+    directlyEditedPaths: rememberDirectEdit(state.directlyEditedPaths, path),
   };
 }
 
@@ -114,13 +114,16 @@ export function themeLabEditorReset(state: ThemeLabEditorState, theme: Theme): T
   };
 }
 
-function channelIndexFor(channel: ThemeLabEditorChannel): number {
-  return channel;
-}
-
 function clampIndex(index: number): number {
   if (!Number.isFinite(index)) return 0;
   return Math.max(0, Math.min(THEME_LAB_EDITABLE_PATHS.length - 1, Math.floor(index)));
+}
+
+function rememberDirectEdit(
+  paths: readonly ThemeLabEditableTokenPath[],
+  path: ThemeLabEditableTokenPath,
+): readonly ThemeLabEditableTokenPath[] {
+  return paths.includes(path) ? paths : [...paths, path];
 }
 
 export function themeLabEditorUpdateForKey(

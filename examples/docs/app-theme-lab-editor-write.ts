@@ -10,13 +10,19 @@ export function writeThemeLabEditableHex(
   theme: Theme,
   path: ThemeLabEditableTokenPath,
   hex: string,
+  protectedPaths: readonly ThemeLabEditableTokenPath[] = [],
 ): Theme {
   const draft = cloneThemeForThemeLabEditor(theme);
-  applyEditableHex(draft, path, hex);
+  applyEditableHex(draft, path, hex, protectedPaths);
   return draft;
 }
 
-function applyEditableHex(theme: Theme, path: ThemeLabEditableTokenPath, hex: string): void {
+function applyEditableHex(
+  theme: Theme,
+  path: ThemeLabEditableTokenPath,
+  hex: string,
+  protectedPaths: readonly ThemeLabEditableTokenPath[],
+): void {
   switch (path) {
     case 'semantic.primary':
       theme.semantic.primary = tokenWithHex(theme.semantic.primary, hex);
@@ -26,7 +32,9 @@ function applyEditableHex(theme: Theme, path: ThemeLabEditableTokenPath, hex: st
     case 'semantic.accent':
       theme.semantic.accent = tokenWithHex(theme.semantic.accent, hex);
       theme.border.secondary = tokenWithHex(theme.border.secondary, hex);
-      theme.ui.cursor = tokenWithHex(theme.ui.cursor, hex);
+      if (!protectedPaths.includes('ui.cursor')) {
+        theme.ui.cursor = tokenWithHex(theme.ui.cursor, hex);
+      }
       theme.ui.focusGutter = tokenWithHex(theme.ui.focusGutter, hex);
       theme.ui.logo = tokenWithHex(theme.ui.logo, hex);
       theme.ui.sectionHeader = tokenWithHex(theme.ui.sectionHeader, hex);
