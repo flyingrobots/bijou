@@ -90,16 +90,19 @@ export function themeLabEditorSelectChannel(
 
 export function themeLabEditorNudge(state: ThemeLabEditorState, delta: number): ThemeLabEditorState {
   const path = themeLabEditorSelectedPath(state);
-  const rgb = hexToRgb(themeLabEditableHex(state.draftTheme, path));
+  const hex = themeLabEditableHex(state.draftTheme, path);
+  const rgb = hexToRgb(hex);
   const nextRgb: RGB = [...rgb];
   const channelValue = nextRgb[state.channel];
   nextRgb[state.channel] = Math.max(0, Math.min(255, channelValue + delta));
+  const nextHex = rgbToHex(nextRgb);
+  if (nextHex === hex) return state;
   return {
     ...state,
     draftTheme: writeThemeLabEditableHex(
       state.draftTheme,
       path,
-      rgbToHex(nextRgb),
+      nextHex,
       state.directlyEditedPaths,
     ),
     directlyEditedPaths: rememberDirectEdit(state.directlyEditedPaths, path),

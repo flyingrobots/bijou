@@ -13,6 +13,7 @@ import { renderThemeLabGraphSurface } from '../../../examples/docs/app-theme-lab
 import {
   renderThemeLabEditorSurface,
 } from '../../../examples/docs/app-theme-lab-editor-view.js';
+import { writeThemeLabEditableHex } from '../../../examples/docs/app-theme-lab-editor-write.js';
 
 import { describe, expect, it } from 'vitest';
 
@@ -52,6 +53,23 @@ describe('DL-022 Theme Lab editor graph UX', () => {
     expect(themeLabEditableHex(accentEdited.draftTheme, 'semantic.accent'))
       .not.toBe(BIJOU_DARK.semantic.accent.hex);
     expect(themeLabEditableHex(accentEdited.draftTheme, 'ui.cursor')).toBe(cursorHex);
+  });
+
+  it('does not protect cursor after a clamped no-op cursor nudge', () => {
+    const cursorMaxTheme = writeThemeLabEditableHex(BIJOU_DARK, 'ui.cursor', '#ffc45d');
+    const initial = createThemeLabEditorState('cursor-max', cursorMaxTheme);
+    const noOpCursorNudge = themeLabEditorNudge({
+      ...initial,
+      selectedIndex: 5,
+    }, 8);
+    const accentEdited = themeLabEditorNudge({
+      ...noOpCursorNudge,
+      selectedIndex: 1,
+    }, -8);
+
+    expect(noOpCursorNudge.directlyEditedPaths).toEqual([]);
+    expect(themeLabEditableHex(accentEdited.draftTheme, 'ui.cursor'))
+      .toBe(themeLabEditableHex(accentEdited.draftTheme, 'semantic.accent'));
   });
 
   it('marks edited graph nodes and keeps dependency edges visible', () => {
