@@ -29,7 +29,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
       }).surface;
       assertTokenTextColors(
         labFrame,
-        'semantic.success',
+        'status.success',
         must(lightTheme).surface.primary.hex,
         must(lightTheme).surface.muted.hex,
         'Theme Lab',

@@ -79,9 +79,10 @@ function firstTextCell(
 ): { readonly x: number; readonly y: number; readonly cell: ReturnType<Surface['get']> } {
   for (let y = 0; y < surface.height; y += 1) {
     const line = Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).join('');
-    const x = line.indexOf(text);
-    if (x !== -1) {
-      return { x, y, cell: surface.get(x, y) };
+    for (let x = line.indexOf(text); x !== -1; x = line.indexOf(text, x + 1)) {
+      if (line.slice(Math.max(0, x - 3), x) !== '-> ') {
+        return { x, y, cell: surface.get(x, y) };
+      }
     }
   }
   throw new Error(`No row containing "${text}".`);
