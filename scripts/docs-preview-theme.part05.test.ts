@@ -6,6 +6,8 @@ import {
   expect,
   frameText,
   it,
+  KEY_CTRL_P,
+  KEY_F2,
   KEY_TAB,
   runScript,
   _resetDefaultContextForTesting,
@@ -58,5 +60,65 @@ describe('docs preview app', () => {
     expect(text).toContain('Selected: semantic.primary');
     expect(text).toContain('Channel: red');
     expect(text).not.toContain('edited');
+  });
+
+  it('lets Theme Lab search overlays receive printable editor shortcuts', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 152, rows: 46 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_TAB },
+      { key: '/' },
+      { key: 'b' },
+    ], { ctx });
+    const pageModel = result.model.docsModel.pageModels.themes;
+
+    expect(result.model.docsModel.commandPaletteKind).toBe('search');
+    expect(result.model.docsModel.commandPalette?.query).toBe('b');
+    expect(pageModel?.themeLabEditor).toBeUndefined();
+  });
+
+  it('does not consume shifted frame scroll keys as Theme Lab editor shortcuts', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 152, rows: 46 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_TAB },
+      { key: 'G' },
+    ], { ctx });
+    const pageModel = result.model.docsModel.pageModels.themes;
+
+    expect(pageModel?.themeLabEditor).toBeUndefined();
+  });
+
+  it('keeps Theme Lab shortcuts behind settings and command palette overlays', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 152, rows: 46 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'themes',
+    });
+
+    const settingsResult = await runScript(app, [
+      { key: KEY_TAB },
+      { key: KEY_F2 },
+      { key: 'b' },
+    ], { ctx });
+    const paletteResult = await runScript(app, [
+      { key: KEY_TAB },
+      { key: KEY_CTRL_P },
+      { key: 'b' },
+    ], { ctx });
+
+    expect(settingsResult.model.docsModel.settingsOpen).toBe(true);
+    expect(settingsResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
+    expect(paletteResult.model.docsModel.commandPaletteKind).toBe('command');
+    expect(paletteResult.model.docsModel.commandPalette?.query).toBe('b');
+    expect(paletteResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
   });
 });
