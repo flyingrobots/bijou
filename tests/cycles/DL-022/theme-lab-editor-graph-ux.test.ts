@@ -10,9 +10,7 @@ import {
 } from '../../../examples/docs/app-theme-lab-editor-model.js';
 import { themeLabGraphNodes } from '../../../examples/docs/app-theme-lab-graph.js';
 import { renderThemeLabGraphSurface } from '../../../examples/docs/app-theme-lab-editor-graph-view.js';
-import {
-  renderThemeLabEditorSurface,
-} from '../../../examples/docs/app-theme-lab-editor-view.js';
+import { renderThemeLabEditorSurface } from '../../../examples/docs/app-theme-lab-editor-view.js';
 import { writeThemeLabEditableHex } from '../../../examples/docs/app-theme-lab-editor-write.js';
 
 import { describe, expect, it } from 'vitest';
@@ -85,6 +83,8 @@ describe('DL-022 Theme Lab editor graph UX', () => {
     expect(accent?.hex).toBe(themeLabEditorSelectedHex(accentState));
     expect(accent?.edges).toContain('border.secondary');
     expect(accent?.edges).toContain('ui.cursor');
+    expect(accent?.edges).toContain('ui.logo');
+    expect(accent?.edges).toContain('ui.sectionHeader');
   });
 
   it('renders the selected edit and graph node from the same draft frame', () => {

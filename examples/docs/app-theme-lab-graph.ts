@@ -21,6 +21,8 @@ const THEME_LAB_GRAPH_EDGES: Readonly<Record<ThemeLabEditableTokenPath, readonly
     'border.secondary',
     'ui.cursor',
     'ui.focusGutter',
+    'ui.logo',
+    'ui.sectionHeader',
     'status.active',
   ]),
   'surface.primary.bg': Object.freeze([
@@ -37,9 +39,11 @@ const THEME_LAB_GRAPH_EDGES: Readonly<Record<ThemeLabEditableTokenPath, readonly
     'focus.current',
   ]),
   'status.success': Object.freeze([
+    'semantic.success',
     'border.success',
   ]),
   'status.error': Object.freeze([
+    'semantic.error',
     'border.error',
   ]),
 });
