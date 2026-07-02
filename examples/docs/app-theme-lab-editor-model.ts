@@ -14,7 +14,6 @@ import {
   type ThemeLabEditableTokenPath,
 } from './app-theme-lab-editor-types.js';
 import { writeThemeLabEditableHex } from './app-theme-lab-editor-write.js';
-
 export {
   THEME_LAB_CHANNEL_BLUE,
   THEME_LAB_CHANNEL_GREEN,
