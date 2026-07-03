@@ -139,5 +139,4 @@ describe('worker proxy runtime', () => {
     expect(runCalls).toBe(1);
     expect(posted).toContainEqual({ type: 'quit' });
   });
-
 });
