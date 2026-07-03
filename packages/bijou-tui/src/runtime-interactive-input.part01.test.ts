@@ -49,13 +49,13 @@ describe('run', () => {
 describe('run', () => {
   describe('interactive mode', () => {
     it('enables any-event mouse tracking when requested', async () => {
-          const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
-          const promise = run(counterApp(), { ctx, mouseMode: 'any' });
-          await clock.advanceByAsync(50);
-          await promise;
-          expect(ctx.io.written).toContain(ENABLE_MOUSE_ANY);
-          expect(ctx.io.written).toContain(DISABLE_MOUSE);
-        });
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
+      const promise = run(counterApp(), { ctx, mouseMode: 'any' });
+      await clock.advanceByAsync(50);
+      await promise;
+      expect(ctx.io.written).toContain(ENABLE_MOUSE_ANY);
+      expect(ctx.io.written).toContain(DISABLE_MOUSE);
+    });
   });
 });
 
