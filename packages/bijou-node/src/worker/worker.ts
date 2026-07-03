@@ -16,6 +16,13 @@ import {
   type BijouWorkerData,
   type WorkerSerializableOptions,
 } from './worker-data.js';
+import {
+  DISABLE_MOUSE,
+  mouseModeEnableSequence,
+  resolveWorkerMouseMode,
+} from './worker-mouse-mode.js';
+import type { RunWorkerOptions, WorkerHandle } from './worker-options.js';
+export type { RunWorkerOptions, WorkerHandle } from './worker-options.js';
 
 interface WorkerInstance {
   postMessage(message: unknown): void;
@@ -93,40 +100,6 @@ export function sendToMain(payload: unknown): void {
 }
 
 /**
- * Options for starting an app in a background worker.
- */
-export interface RunWorkerOptions {
-  /** The absolute path to the file containing the worker entry point. */
-  entry: string;
-  /** Optional Bijou context for the host thread. */
-  ctx?: BijouContext;
-  /** Enter the alternate screen buffer on startup. */
-  altScreen?: boolean;
-  /** Hide the cursor on startup. */
-  hideCursor?: boolean;
-  /** Enable mouse input (SGR mode). */
-  mouse?: boolean;
-  /** Optional BCSS stylesheet string. */
-  css?: string;
-  /** Optional callback for custom data messages sent from the worker via `sendToMain`. */
-  onMessage?: (payload: unknown) => void;
-  /** Optional arguments passed to the Node.js worker process (e.g. ['--import', 'tsx']). */
-  execArgv?: string[];
-}
-
-/**
- * Handle for a running background worker.
- */
-export interface WorkerHandle {
-  /** Sends a custom data message to the worker thread. */
-  send(payload: unknown): void;
-  /** Forcefully terminates the worker thread. */
-  terminate(): Promise<void>;
-  /** A promise that resolves when the worker exits cleanly. */
-  onExit: Promise<void>;
-}
-
-/**
  * Spawns a background worker thread to run the TEA application.
  * The main thread delegates all logic to the worker, only handling raw I/O
  * and frame rendering (to keep the TTY responsive).
@@ -146,20 +119,22 @@ export function runInWorker(
   installRuntimeViewportOverlay(ctx);
   const useAltScreen = options.altScreen ?? true;
   const useHideCursor = options.hideCursor ?? true;
-  const useMouse = options.mouse ?? false;
+  const mouseMode = resolveWorkerMouseMode(options);
+  const useMouse = mouseMode !== undefined;
 
   if (useAltScreen || useHideCursor) {
     ctx.io.write('\x1b[?1049h'); // ENTER_ALT_SCREEN
     if (useHideCursor) ctx.io.write('\x1b[?25l'); // HIDE_CURSOR
   }
   if (useMouse) {
-    ctx.io.write('\x1b[?1000h\x1b[?1002h\x1b[?1006h'); // ENABLE_MOUSE
+    ctx.io.write(mouseModeEnableSequence(mouseMode)); // ENABLE_MOUSE
   }
 
   const serializableOptions: WorkerSerializableOptions = {
     altScreen: options.altScreen,
     hideCursor: options.hideCursor,
     mouse: options.mouse,
+    mouseMode: options.mouseMode,
     css: options.css,
   };
   const worker = bindings.createWorker(resolvePath(options.entry), {
@@ -215,7 +190,7 @@ export function runInWorker(
       inputHandle.dispose();
       resizeHandle.dispose();
       if (useMouse) {
-        ctx.io.write('\x1b[?1000l\x1b[?1002l\x1b[?1006l'); // DISABLE_MOUSE
+        ctx.io.write(DISABLE_MOUSE);
       }
       if (useAltScreen || useHideCursor) {
         ctx.io.write('\x1b[?1049l'); // EXIT_ALT_SCREEN
@@ -229,6 +204,7 @@ export function runInWorker(
     onExit
   };
 }
+
 /**
  * The entry point for the worker thread. Must be called in the file
  * specified by `options.entry` in `runInWorker()`.
@@ -256,20 +232,27 @@ export async function startWorkerApp<Model, M>(
     initData.runtime.rows,
   );
 
+  const proxyMouseMode = resolveWorkerMouseMode(initData.options);
+  const ignoredProxyWrites = new Set<string>([DISABLE_MOUSE]);
+  if (proxyMouseMode !== undefined) {
+    ignoredProxyWrites.add(mouseModeEnableSequence(proxyMouseMode));
+  }
+
   proxyCtx.io.write = (data: string) => {
+    if (ignoredProxyWrites.has(data)) return;
     port.postMessage({ type: 'render:frame', output: data } satisfies MainMessage);
   };
   proxyCtx.io.writeError = (data: string) => {
     port.postMessage({ type: 'error', message: data } satisfies MainMessage);
   };
-  // We need to bypass the standard run() setup since the main thread
-  // already handled alt screen and mouse modes. We tell run() to do nothing.
+  // The main thread owns terminal mode; the worker still parses forwarded input.
   const proxyOptions: RunOptions<M> = {
-    ...initData.options,
+    css: initData.options.css,
     ctx: proxyCtx,
     altScreen: false,
     hideCursor: false,
-    mouse: false,
+    mouse: initData.options.mouse,
+    mouseMode: initData.options.mouseMode,
   };
   proxyCtx.io.rawInput = (handler) => {
     const listener = (msg: unknown) => {

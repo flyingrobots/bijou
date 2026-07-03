@@ -26,7 +26,7 @@ describe('worker runtime', () => {
     expect(ctx.io.written.some((chunk) => chunk.includes('worker:from-main'))).toBe(true);
   });
 
-  it('disables only the mouse modes it enables', async () => {
+  it('restores all mouse tracking modes after mouse-enabled apps exit', async () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const here = dirname(fileURLToPath(import.meta.url));
     const entry = resolve(here, 'fixtures/echo-worker.mjs');
@@ -44,8 +44,29 @@ describe('worker runtime', () => {
     await handle.onExit;
 
     const output = ctx.io.written.join('');
-    expect(output).toContain('\x1b[?1000h\x1b[?1002h\x1b[?1006h');
-    expect(output).toContain('\x1b[?1000l\x1b[?1002l\x1b[?1006l');
-    expect(output).not.toContain('\x1b[?1003l');
+    expect(output).toContain('\x1b[?1000h\x1b[?1002h\x1b[?1003l\x1b[?1006h');
+    expect(output).toContain('\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l');
+  });
+
+  it('enables any-event mouse tracking for hover-driven worker apps', async () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const here = dirname(fileURLToPath(import.meta.url));
+    const entry = resolve(here, 'fixtures/echo-worker.mjs');
+
+    const handle = runInWorker({
+      ctx,
+      entry,
+      mouseMode: 'any',
+      onMessage() {
+        // no-op for terminal mode
+      },
+    });
+
+    handle.send({ type: 'host-note', text: 'from-main' });
+    await handle.onExit;
+
+    const output = ctx.io.written.join('');
+    expect(output).toContain('\x1b[?1000h\x1b[?1002l\x1b[?1003h\x1b[?1006h');
+    expect(output).toContain('\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l');
   });
 });

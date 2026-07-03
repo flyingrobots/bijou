@@ -19,7 +19,8 @@ import {
 } from './screen.js';
 import { scheduleKeys, scheduleResizes } from './runtime-schedule.test-support.js';
 
-const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
+const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
+const ENABLE_MOUSE_ANY = '\x1b[?1000h\x1b[?1002l\x1b[?1003h\x1b[?1006h';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
 function counterApp(quitKey = 'q'): App<number> {
@@ -99,6 +100,7 @@ export {
   createTrackingClock,
   describe,
   DISABLE_MOUSE,
+  ENABLE_MOUSE_ANY,
   ENTER_ALT_SCREEN,
   EXIT_ALT_SCREEN,
   expect,

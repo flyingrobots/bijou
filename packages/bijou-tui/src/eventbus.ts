@@ -29,7 +29,7 @@ import type { IOPort } from '@flyingrobots/bijou';
 import { defer, resolveClock, sleep, type ClockPort } from '@flyingrobots/bijou';
 import type { Cmd, CmdCleanup, CmdDisposable, CmdResult, KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from './types.js';
 import { QUIT, isCmdCleanup } from './types.js';
-import { parseKey, parseMouse } from './keys.js';
+import { parseRawInputMessages } from './input-parser.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -332,20 +332,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       // Keyboard (and optionally mouse) input
       const inputHandle = io.rawInput((raw: string) => {
         if (disposed) return;
-
-        // When mouse is enabled, try parsing as mouse first
-        if (mouseEnabled) {
-          const mouseMsg = parseMouse(raw);
-          if (mouseMsg) {
-            emit(mouseMsg);
-            return;
-          }
-        }
-
-        const keyMsg = parseKey(raw);
-        // Skip unknown sequences (unrecognized escape sequences)
-        if (keyMsg.key === 'unknown') return;
-        emit(keyMsg);
+        for (const msg of parseRawInputMessages(raw, mouseEnabled)) emit(msg);
       });
 
       // Resize events

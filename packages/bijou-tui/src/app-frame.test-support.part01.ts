@@ -23,7 +23,7 @@ export const KEY_CTRL_P = '\x10';
 export const KEY_ENTER = '\r';
 export const KEY_DOWN = '\x1b[B';
 export const KEY_BACKTICK = '`';
-export const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+export const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1003l\x1b[?1006h';
 export function ctrlKey(key: string) {
   return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
 }

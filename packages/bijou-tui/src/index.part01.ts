@@ -19,6 +19,7 @@ export type {
   MouseMsg,
   MouseButton,
   MouseAction,
+  MouseTrackingMode,
   QuitSignal,
   RunOptions,
   RuntimeIssue,

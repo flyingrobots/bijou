@@ -6,9 +6,13 @@ import { runInWorker, startWorkerApp, type MainMessage, type RunWorkerOptions } 
 
 describe('worker proxy runtime', () => {
   it('only accepts worker-safe run options at type level', () => {
-    const options: RunWorkerOptions = { entry: '/tmp/worker.mjs', mouse: true };
+    const options: RunWorkerOptions = {
+      entry: '/tmp/worker.mjs',
+      mouseMode: 'any',
+    };
 
     expect(options.entry).toBe('/tmp/worker.mjs');
+    expect(options.mouseMode).toBe('any');
 
     // @ts-expect-error worker rejects bus middleware hooks.
     const withMiddlewares: RunWorkerOptions = { entry: '/tmp/worker.mjs', middlewares: [] };
@@ -54,7 +58,7 @@ describe('worker proxy runtime', () => {
     };
 
     const handle = runInWorker(
-      { ctx, entry: '/tmp/worker.mjs' },
+      { ctx, entry: '/tmp/worker.mjs', mouseMode: 'any' },
       {
         isMainThread: true,
         parentPort: null,
@@ -71,6 +75,7 @@ describe('worker proxy runtime', () => {
     expect(ctorCalls).toHaveLength(1);
     expect(ctorCalls[0]?.options.workerData).toMatchObject({
       isBijouWorker: true,
+      options: { mouseMode: 'any' },
       runtime: { columns: 120, rows: 40 },
     });
 
@@ -134,4 +139,5 @@ describe('worker proxy runtime', () => {
     expect(runCalls).toBe(1);
     expect(posted).toContainEqual({ type: 'quit' });
   });
+
 });

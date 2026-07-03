@@ -43,8 +43,9 @@ export interface PulseMsg {
 /** Mouse button identifier. `"none"` is used for scroll and motion events without a button. */
 export type MouseButton = 'left' | 'middle' | 'right' | 'none';
 
-/** Mouse action type including press, release, move, and scroll directions. */
 export type MouseAction = 'press' | 'release' | 'move' | 'scroll-up' | 'scroll-down';
+
+export type MouseTrackingMode = 'press' | 'drag' | 'any';
 
 /** Represent a mouse input event with button, action, position, and modifiers. */
 export interface MouseMsg {
@@ -220,11 +221,6 @@ export interface App<Model, M = never> {
 
 // --- Runtime options ---
 
-/**
- * Configuration options for the TEA runtime.
- * 
- * @template M - Custom application message type.
- */
 export interface RunOptions<M = unknown> {
   /** Enter the alternate screen buffer on startup. */
   altScreen?: boolean;
@@ -232,6 +228,8 @@ export interface RunOptions<M = unknown> {
   hideCursor?: boolean;
   /** Enable mouse input (SGR mode). Default: false. */
   mouse?: boolean;
+  /** Mouse mode: `press`, `drag` (default), or hover-capable `any`. */
+  mouseMode?: MouseTrackingMode;
   /** Bijou context providing I/O and runtime ports. */
   ctx?: BijouContext;
   /** Optional middleware to intercept or modify messages. */
