@@ -177,26 +177,15 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-Before returning to `v7.2.0` stabilization, the immediate focus is
-**Respectful Repo: Enter the Code Dojo**.
-
-The current pull is a standards gate:
+With Code Dojo, DX-047/#342, and DL-018/#343 landed, the immediate
+`v7.2.0` focus is #335: DOGFOOD release-story surfaces through DF-078.
 
 ```text
-TypeScript Code Standards artifact
-  -> Code Dojo scripts, hooks, and CI
-    -> file/context and mock-ban baselines
-      -> 50-violation goalpost burndown until zero
-```
-
-The next selected product pull after that gate is DX-047:
-
-```text
-CounterDemoBlock fixture
-  -> app-owned state snippet
-    -> command-intent routing
-      -> lower-mode explanation
-        -> DOGFOOD docs proof
+Current What's New
+  -> release-story entry point
+    -> NavigationListBlock GraphQL proof walkthrough
+      -> CHANGELOG version boundaries
+        -> #354 demo-integrity closure
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
