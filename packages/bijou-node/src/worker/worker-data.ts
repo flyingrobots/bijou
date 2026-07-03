@@ -2,6 +2,7 @@ export interface WorkerSerializableOptions {
   altScreen?: boolean;
   hideCursor?: boolean;
   mouse?: boolean;
+  mouseMode?: 'press' | 'drag' | 'any';
   css?: string;
 }
 
@@ -51,6 +52,7 @@ function isWorkerSerializableOptions(value: unknown): value is WorkerSerializabl
     && optionalBoolean(value['altScreen'])
     && optionalBoolean(value['hideCursor'])
     && optionalBoolean(value['mouse'])
+    && optionalMouseMode(value['mouseMode'])
     && optionalString(value['css']);
 }
 
@@ -62,6 +64,10 @@ function isRuntimeViewportData(value: unknown): value is BijouWorkerData['runtim
 
 function optionalBoolean(value: unknown): boolean {
   return value === undefined || typeof value === 'boolean';
+}
+
+function optionalMouseMode(value: unknown): boolean {
+  return value === undefined || value === 'press' || value === 'drag' || value === 'any';
 }
 
 function optionalString(value: unknown): boolean {

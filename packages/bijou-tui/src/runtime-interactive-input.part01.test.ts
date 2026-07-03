@@ -1,4 +1,4 @@
-import { App, CLEAR_SCREEN, counterApp, createInteractiveContext, describe, DISABLE_MOUSE, ENTER_ALT_SCREEN, EXIT_ALT_SCREEN, expect, HIDE_CURSOR, HOME, it, quit, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_DISABLE, WRAP_ENABLE } from './runtime.test-support.js';
+import { App, CLEAR_SCREEN, counterApp, createInteractiveContext, describe, DISABLE_MOUSE, ENABLE_MOUSE_ANY, ENTER_ALT_SCREEN, EXIT_ALT_SCREEN, expect, HIDE_CURSOR, HOME, it, quit, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_DISABLE, WRAP_ENABLE } from './runtime.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('run', () => {
@@ -43,6 +43,19 @@ describe('run', () => {
           expect(ctx.io.written[ctx.io.written.length - 2]).toBe(DISABLE_MOUSE);
           expect(ctx.io.written[ctx.io.written.length - 1]).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
         });
+  });
+});
+
+describe('run', () => {
+  describe('interactive mode', () => {
+    it('enables any-event mouse tracking when requested', async () => {
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
+      const promise = run(counterApp(), { ctx, mouseMode: 'any' });
+      await clock.advanceByAsync(50);
+      await promise;
+      expect(ctx.io.written).toContain(ENABLE_MOUSE_ANY);
+      expect(ctx.io.written).toContain(DISABLE_MOUSE);
+    });
   });
 });
 

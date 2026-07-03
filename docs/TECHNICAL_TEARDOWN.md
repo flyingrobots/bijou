@@ -729,6 +729,7 @@ Configuration is intentionally small and host-centered.
 | `LANG`, `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` | DOGFOOD locale adapter | Seed the initial DOGFOOD locale if no saved preference wins first. |
 | `HOME`, `XDG_STATE_HOME` | DOGFOOD locale adapter | Determine the default path for saving the selected DOGFOOD locale. |
 | `RunOptions.mouse` | TUI runtime | Enables SGR mouse reporting and parsing. |
+| `RunOptions.mouseMode` | TUI runtime | Selects `press`, `drag`, or any-event `1003` mouse tracking. |
 | `RunOptions.commandBackpressureThreshold` | TUI runtime | Sets the pending-command warning threshold. `0` disables the warning. |
 | `RunOptions.surfaceBudget` | TUI runtime | Enables non-fatal surface budget warnings after render. |
 | `RunOptions.css` | TUI runtime | Installs BCSS resolver and middleware for component styling. |

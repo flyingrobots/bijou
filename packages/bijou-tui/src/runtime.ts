@@ -13,6 +13,7 @@ import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
+import { DISABLE_MOUSE, mouseModeSequence, resolveMouseMode } from './mouse-mode.js';
 import {
   createPipeline,
   getRenderStageTimings,
@@ -30,8 +31,6 @@ import type { RuntimeIssue } from './types.js';
 
 type ErrorWritePort = Pick<WritePort, 'write'> & Partial<Pick<WritePort, 'writeError'>>;
 
-const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
-const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
@@ -72,7 +71,8 @@ export async function runWithLifecycleHooks<Model, M>(
   installRuntimeViewportOverlay(ctx);
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
-  const useMouse = options?.mouse ?? false;
+  const mouseMode = resolveMouseMode(options);
+  const useMouse = mouseMode !== undefined;
   const surfaceBudget = options?.surfaceBudget;
   const routedSurfaceBudgetWarnings = new Set<string>();
   installBCSSResolver(ctx, options?.css);
@@ -352,17 +352,15 @@ export async function runWithLifecycleHooks<Model, M>(
     if (resolveQuit) resolveQuit();
   }
 
-  // Setup screen
   if (useAltScreen || useHideCursor) {
     enterScreen(ctx.io);
   }
   if (useMouse) {
-    ctx.io.write(ENABLE_MOUSE);
+    ctx.io.write(mouseModeSequence(mouseMode));
   } else {
     ctx.io.write(DISABLE_MOUSE);
   }
 
-  // Render helper
   let renderQueued = false;
   let renderInFlight = false;
   let renderHandle: TimerHandle | null = null;
