@@ -40,14 +40,15 @@ export interface PulseMsg {
 
 // --- Mouse messages ---
 
-/** Mouse button identifier. `"none"` is used for scroll and motion events without a button. */
+/** Mouse button; `"none"` covers scroll and unbuttoned motion. */
 export type MouseButton = 'left' | 'middle' | 'right' | 'none';
 
+/** Mouse action. */
 export type MouseAction = 'press' | 'release' | 'move' | 'scroll-up' | 'scroll-down';
-
+/** SGR mouse tracking mode. */
 export type MouseTrackingMode = 'press' | 'drag' | 'any';
 
-/** Represent a mouse input event with button, action, position, and modifiers. */
+/** Mouse input event. */
 export interface MouseMsg {
   /** Discriminant tag identifying this as a mouse message. */
   readonly type: 'mouse';
@@ -221,6 +222,7 @@ export interface App<Model, M = never> {
 
 // --- Runtime options ---
 
+/** TEA runtime options. */
 export interface RunOptions<M = unknown> {
   /** Enter the alternate screen buffer on startup. */
   altScreen?: boolean;
