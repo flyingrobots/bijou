@@ -334,6 +334,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/design/DX-047-blocks-app-binding-snippets.md` scopes a bounded #342
   repair for showing how DOGFOOD's `CounterDemoBlock` binds to application
   state, command-intent routing, render-time config, and lower-mode output.
+- **DOGFOOD release-story surfaces shaping** —
+  `docs/design/DF-078-dogfood-release-story-surfaces.md` scopes #335 into a
+  bounded v7.2 DOGFOOD release-story repair: a visible release entry point,
+  current What's New path, real NavigationListBlock GraphQL proof walkthrough,
+  and changelog viewer with version boundaries.
 
 ## [7.1.0] - 2026-06-14
 

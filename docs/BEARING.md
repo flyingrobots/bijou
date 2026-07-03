@@ -105,8 +105,8 @@ Current direction and active tensions. Historical ship data is in
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
-- Before the next `v7.2.0` pull, the active goalpost is **Respectful Repo:
-  Enter the Code Dojo**. The repository must live under the verbatim
+- The **Respectful Repo: Enter the Code Dojo** goalpost has landed. The
+  repository now lives under the verbatim
   [TypeScript Code Standards Editor's Edition](./typescript-code-standards.editors-edition.md)
   artifact with enforceable baselines for existing file/context, mega-file, and
   mock-ban debt. The active exception ledger is
@@ -114,12 +114,11 @@ Current direction and active tensions. Historical ship data is in
   remove at least 50 counted violations until the aggregate count reaches zero.
 - The localization (#340), DOGFOOD shell polish (#334), and light-theme
   readiness (#341) repairs have landed as v7.2.0 demo-integrity lineage.
-- The next selected `v7.2.0` product pull after the Code Dojo gate is DX-047:
-  add Blocks app-binding snippets for #342 so the release video can show how
-  `CounterDemoBlock` binds to application state and command routing.
-- DL-018 remains selected for #343 after DX-047: make DOGFOOD first-party shell
-  themes declare paired or single-mode coverage, and make unsupported
-  theme-mode toggles explicit.
+- The Blocks app-binding (#342) and first-party theme variant (#343) repairs
+  have landed as v7.2.0 demo-integrity lineage.
+- The remaining selected `v7.2.0` DOGFOOD product pull is #335: make release
+  story surfaces inside DOGFOOD explain What's New, the real GraphQL proof
+  chain, and changelog history.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -137,8 +136,8 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 4 open and
-  10 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is the current active stabilization lane: 2 open and
+  15 closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
@@ -214,23 +213,18 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land Respectful Repo: Enter the Code Dojo so standards enforcement is active
-   before more product work lands.
-2. Land DX-047 for #342 so Blocks docs explain application-owned state,
-   command-intent routing, and render-time binding with real
-   `CounterDemoBlock` APIs.
-3. Land DL-018 for #343 so DOGFOOD first-party theme mode coverage is honest,
-   visible, and covered by deterministic AppShell feedback tests.
-4. Move through the remaining selected `v7.2.0` DOGFOOD demo-integrity items
-   from #354.
-5. Run the normal `v7.2.0` release-prep checklist before any tag is created.
-6. Shape #302 into a V8 design packet with artifact semantics, receipt
+1. Land #335 release-story surfaces so DOGFOOD can explain What's New, the real
+   GraphQL proof chain, and changelog history from inside the app.
+2. Close the remaining #354 umbrella criteria once #335 is merged and the
+   dependency advisory audit remains clean.
+3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+4. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
-7. Promote only the Runtime Graph and Scene IR issues needed for that contract
+5. Promote only the Runtime Graph and Scene IR issues needed for that contract
    out of `Beyond`.
-8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-9. Keep closed dependency PR #326 as superseded lineage, not active release
+7. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:
