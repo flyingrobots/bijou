@@ -126,4 +126,22 @@ describe('connectIO mouse', () => {
       { type: 'mouse', button: 'left', action: 'press', col: 4, row: 5 },
     ]);
   });
+
+  it('tokenizes bundled keyboard spans around SGR mouse packets', () => {
+    const bus = createEventBus<TestMsg>();
+    const { io, simulateKey } = createMockIO();
+    const received: BusMsg<TestMsg>[] = [];
+    bus.on((msg) => received.push(msg));
+
+    bus.connectIO(io, { mouse: true });
+    simulateKey('ab\x1b[<0;5;6Mcd');
+
+    expect(received).toMatchObject([
+      { type: 'key', key: 'a' },
+      { type: 'key', key: 'b' },
+      { type: 'mouse', button: 'left', action: 'press', col: 4, row: 5 },
+      { type: 'key', key: 'c' },
+      { type: 'key', key: 'd' },
+    ]);
+  });
 });
