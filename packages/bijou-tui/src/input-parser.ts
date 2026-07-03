@@ -3,6 +3,8 @@ import { parseKey, parseMouse } from './keys.js';
 
 const ESCAPE = String.fromCharCode(0x1b);
 const ESCAPE_CODE = 0x1b;
+const X10_MOUSE_PACKET_LENGTH = 6;
+const X10_MOUSE_PREFIX = `${ESCAPE}[M`;
 const SGR_MOUSE_PACKET_RE = new RegExp(`${ESCAPE}\\[<\\d+;\\d+;\\d+[Mm]`, 'gu');
 
 interface KeyToken {
@@ -64,6 +66,9 @@ function readEscapeKeyToken(raw: string, index: number): KeyToken {
 }
 
 function findEscapeSequenceEnd(raw: string, index: number): number {
+  if (raw.startsWith(X10_MOUSE_PREFIX, index)) {
+    return Math.min(index + X10_MOUSE_PACKET_LENGTH, raw.length);
+  }
   if (raw[index + 1] === '[') {
     for (let end = index + 2; end < raw.length; end += 1) {
       if (isCsiFinalByte(raw.charCodeAt(end))) return end + 1;
