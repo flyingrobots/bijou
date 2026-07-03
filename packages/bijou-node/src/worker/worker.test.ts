@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runInWorker } from './worker.js';
+import { DISABLE_MOUSE } from './worker-mouse-mode.js';
 
 describe('worker runtime', () => {
   it('forwards custom data messages between the main thread and worker app', async () => {
@@ -24,6 +25,28 @@ describe('worker runtime', () => {
 
     expect(received).toEqual([{ type: 'ack', text: 'from-main' }]);
     expect(ctx.io.written.some((chunk) => chunk.includes('worker:from-main'))).toBe(true);
+  });
+
+  it('clears stale mouse tracking before non-mouse worker apps render', async () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const here = dirname(fileURLToPath(import.meta.url));
+    const entry = resolve(here, 'fixtures/echo-worker.mjs');
+
+    const handle = runInWorker({
+      ctx,
+      entry,
+      onMessage() {
+        // no-op for terminal mode
+      },
+    });
+
+    handle.send({ type: 'host-note', text: 'from-main' });
+    await handle.onExit;
+
+    const disableIndex = ctx.io.written.indexOf(DISABLE_MOUSE);
+    const firstWorkerFrameIndex = ctx.io.written.findIndex((chunk) => chunk.includes('worker:'));
+    expect(disableIndex).toBeGreaterThanOrEqual(0);
+    expect(firstWorkerFrameIndex).toBeGreaterThan(disableIndex);
   });
 
   it('restores all mouse tracking modes after mouse-enabled apps exit', async () => {

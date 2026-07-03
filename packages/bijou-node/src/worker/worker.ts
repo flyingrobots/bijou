@@ -128,6 +128,8 @@ export function runInWorker(
   }
   if (useMouse) {
     ctx.io.write(mouseModeEnableSequence(mouseMode)); // ENABLE_MOUSE
+  } else {
+    ctx.io.write(DISABLE_MOUSE);
   }
 
   const serializableOptions: WorkerSerializableOptions = {
