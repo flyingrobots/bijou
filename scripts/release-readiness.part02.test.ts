@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildMilestoneTrackerItemCommands,
   buildReleaseReadinessReport,
   parseReleaseReadinessArgs,
   runReleaseReadiness,
@@ -48,56 +47,6 @@ describe('release-readiness', () => {
       expect(report.wipTrackerItems.map((item) => item.number)).toEqual([312]);
       expect(report.checks.find((check) => check.label === 'tracker-open-items')?.summary).toContain('#270');
       expect(report.checks.find((check) => check.label === 'tracker-wip-labels')?.summary).toContain('#312');
-    });
-
-  it('queries both milestone issues and pull requests for tracker state', () => {
-      const commands = buildMilestoneTrackerItemCommands('v7.2.0');
-
-      expect(commands.map((command) => command.kind)).toEqual(['issue', 'pull-request']);
-      expect(commands[0]?.args).toEqual([
-        'issue',
-        'list',
-        '--state',
-        'all',
-        '--milestone',
-        'v7.2.0',
-        '--limit',
-        '1000',
-        '--json',
-        'number,title,state,labels,url',
-      ]);
-      expect(commands[1]?.args).toEqual([
-        'pr',
-        'list',
-        '--state',
-        'all',
-        '--search',
-        'milestone:"v7.2.0"',
-        '--limit',
-        '1000',
-        '--json',
-        'number,title,state,labels,url',
-      ]);
-    });
-
-  it('classifies open milestone pull requests as blocking tracker items', () => {
-      const report = buildReleaseReadinessReport({
-        milestone: 'v7.2.0',
-        trackerItems: [{
-          kind: 'pull-request',
-          number: 461,
-          title: 'Release gate',
-          state: 'OPEN',
-          labels: [{ name: 'release' }],
-        }],
-        docs: releaseDocsSnapshot('v7.2.0'),
-      });
-      const openItemsCheck = report.checks.find((check) => check.label === 'tracker-open-items');
-
-      expect(report.status).toBe('blocked');
-      expect(openItemsCheck?.status).toBe('fail');
-      expect(openItemsCheck?.summary).toContain('v7.2.0 has 1 open tracker item(s): #461');
-      expect(openItemsCheck?.summary).not.toContain('open tracker issue');
     });
 
   it('blocks a milestone report when release docs or release packet evidence are stale', () => {

@@ -96,7 +96,7 @@ export function buildReleaseReadinessReport(options: {
   const milestone = options.milestone;
   const version = milestone.replace(/^v/, '');
   const plan = options.plan ?? buildReleaseReadinessPlan();
-  const openTrackerItems = options.trackerItems.filter((item) => item.state.toUpperCase() !== 'CLOSED');
+  const openTrackerItems = options.trackerItems.filter((item) => !isClosedTrackerItem(item));
   const wipTrackerItems = options.trackerItems.filter((item) => (
     trackerItemLabelNames(item).includes('work-in-progress')
   ));
@@ -158,6 +158,11 @@ export function buildReleaseReadinessReport(options: {
     openTrackerItems: Object.freeze(openTrackerItems.map((item) => Object.freeze({ ...item }))),
     wipTrackerItems: Object.freeze(wipTrackerItems.map((item) => Object.freeze({ ...item }))),
   });
+}
+
+function isClosedTrackerItem(item: ReleaseReadinessTrackerItem): boolean {
+  const state = item.state.toUpperCase();
+  return state === 'CLOSED' || state === 'MERGED';
 }
 
 export function formatReleaseReadinessReport(report: ReleaseReadinessReport): string {
