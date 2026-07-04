@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -39,5 +39,22 @@ describe('WF-130 roadmap goalpost policy', () => {
     for (const proofFile of proofFiles) {
       expect(releaseEvidence).toContain(proofFile);
     }
+  });
+
+  it('publishes discoverable v7.2 release docs before the version bump', () => {
+    const releaseDocs = [
+      'docs/releases/7.2.0/README.md',
+      'docs/releases/7.2.0/whats-new.md',
+      'docs/releases/7.2.0/migration-guide.md',
+    ];
+
+    for (const releaseDoc of releaseDocs) {
+      expect(existsSync(resolve(ROOT, releaseDoc))).toBe(true);
+    }
+
+    const releaseIndex = read('docs/releases/README.md');
+    expect(releaseIndex).toContain('[Release Evidence (v7.2.0)](./7.2.0/README.md)');
+    expect(releaseIndex).toContain('[What\'s New (v7.2.0)](./7.2.0/whats-new.md)');
+    expect(releaseIndex).toContain('[Migration Guide (v7.2.0)](./7.2.0/migration-guide.md)');
   });
 });
