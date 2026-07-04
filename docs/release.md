@@ -415,8 +415,9 @@ npm audit --omit=dev --audit-level=high
 `release:readiness` is the repo-native local gauntlet. With `--milestone`, it
 first prints a release-readiness report and blocks before the gauntlet if:
 
-- the target GitHub milestone has open tracker issues
-- any milestone tracker issue still has `work-in-progress`
+- the target GitHub milestone has open tracker items, including issues or pull
+  requests
+- any milestone tracker item still has `work-in-progress`
 - `ROADMAP.md` and `BEARING.md` do not mention the target milestone
 - `CHANGELOG.md` does not have an `Unreleased` or versioned release boundary
 - `docs/releases/X.Y.Z/README.md` release evidence packet is missing

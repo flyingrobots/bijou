@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildReleaseReadinessReport, parseReleaseReadinessArgs, runReleaseReadiness, type ReleaseReadinessDocsSnapshot } from './release-readiness.js';
+import {
+  buildReleaseReadinessReport,
+  parseReleaseReadinessArgs,
+  runReleaseReadiness,
+  type ReleaseReadinessDocsSnapshot,
+} from './release-readiness.js';
 
 function releaseDocsSnapshot(
   milestone: string,

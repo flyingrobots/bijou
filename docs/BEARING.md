@@ -116,9 +116,9 @@ Current direction and active tensions. Historical ship data is in
   readiness (#341) repairs have landed as v7.2.0 demo-integrity lineage.
 - The Blocks app-binding (#342) and first-party theme variant (#343) repairs
   have landed as v7.2.0 demo-integrity lineage.
-- The selected `v7.2.0` DOGFOOD product pull is #335: keep release-story
-  surfaces inside DOGFOOD's main reader flow so What's New, the real GraphQL
-  proof chain, and changelog history are visible without wide-only side
+- The selected `v7.2.0` DOGFOOD product pull #335 has landed: release-story
+  surfaces now stay inside DOGFOOD's main reader flow so What's New, the real
+  GraphQL proof chain, and changelog history are visible without wide-only side
   metadata.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
@@ -137,9 +137,11 @@ Current direction and active tensions. Historical ship data is in
 
 ### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current active stabilization lane: 2 open and
-  15 closed milestone items as of the latest roadmap sync.
-- The `Beyond` milestone is the current post-v7 backlog: 31 open and 6 closed
+- The `v7.2.0` milestone is the current release-gate stabilization lane: 1 open
+  and 16 closed milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is staged as the next feature horizon: 3 open and 0
+  closed milestone items as of the latest roadmap sync.
+- The `Beyond` milestone is the current post-v7 backlog: 39 open and 6 closed
   milestone items as of the latest roadmap sync.
 - `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
   issues selected in #354, plus narrow security repairs such as #357.
@@ -178,15 +180,14 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-With Code Dojo, DX-047/#342, and DL-018/#343 landed, the immediate
-`v7.2.0` focus is landing #335: DOGFOOD release-story surfaces through DF-078.
+With Code Dojo, DX-047/#342, DL-018/#343, and #335 landed, the immediate
+`v7.2.0` focus is closing #354 through release-gate validation.
 
 ```text
-Current What's New
-  -> release-story entry point
-    -> NavigationListBlock GraphQL proof walkthrough
-      -> CHANGELOG version boundaries
-        -> #354 demo-integrity closure
+DOGFOOD release-story surfaces
+  -> #354 criteria audit
+    -> release-readiness and preflight
+      -> v7.2.0 version/tag decision
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
@@ -203,11 +204,10 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Merge #335 release-story surfaces so DOGFOOD can explain What's New, the
-   real GraphQL proof chain, and changelog history from inside the app.
-2. Close the remaining #354 umbrella criteria once #335 is merged and the
-   dependency advisory audit remains clean.
-3. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+1. Run the normal `v7.2.0` release-prep checklist before any tag is created.
+2. Close the remaining #354 umbrella criteria once release-readiness and
+   preflight remain clean.
+3. Prepare the `v7.2.0` version/tag release packet from merged `main`.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
 5. Promote only the Runtime Graph and Scene IR issues needed for that contract
