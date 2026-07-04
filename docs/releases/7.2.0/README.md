@@ -6,10 +6,11 @@ DOGFOOD localization and themes, Blocks documentation, release-story surfaces,
 dependency posture, and release bookkeeping.
 
 This packet was started on the release-gate branch before the public tag
-exists. The version bump, final release dry run, tag creation, publish
-workflow, npm registry verification, and GitHub Release verification remain
-final-main steps and must run only from the merged `origin/main` release
-commit.
+exists. The release-prep branch still owns the version bump, changelog
+boundary, package metadata validation, release-readiness replay, and Release
+Dry Run before merge. Tag creation, publish automation, npm registry
+verification, and GitHub Release verification remain final-main work and must
+run only from the merged `origin/main` release commit.
 
 ## Release Summary
 
@@ -249,8 +250,61 @@ disposition.
 | `docs/ROADMAP.md` | Updated on 2026-07-04 from GitHub milestone state: v7.2 has one open release-gate issue, Beyond has 39 open items, and v8 is staged separately. |
 | `docs/BEARING.md` | Updated so the next target is #354 release-gate validation, not #335 implementation. |
 | `docs/releases/7.2.0/README.md` | This packet records initial release evidence and the remaining final-main checks. |
+| `docs/releases/7.2.0/whats-new.md` | Staged before the version bump so DOGFOOD can load the v7.2 release overview when package metadata changes. |
+| `docs/releases/7.2.0/migration-guide.md` | Staged before the version bump so DOGFOOD can load the v7.2 migration guide when package metadata changes. |
 | Package READMEs | No package front-door API positioning was changed by this release-gate branch. |
 | `ARCHITECTURE.md` | No port, adapter, package boundary, storage, or rendering-contract update is required by this release-gate branch. |
+
+## Package And Registry Verification Plan
+
+The release-prep PR must perform and validate the package metadata mutation
+before it merges:
+
+```bash
+npm run version 7.2.0
+npm run release:preflight
+npm run docs:inventory
+npm run release:readiness -- --milestone v7.2.0
+```
+
+The **Release Dry Run** workflow must run against the release-prep branch or PR
+commit before the release PR merges. That dry run is the current authoritative
+packed-file and npm publish dry-run evidence for the automated publish matrix.
+
+After the release-prep PR merges and local `main` exactly matches
+`origin/main`, final tag preparation must replay the metadata and docs checks
+from that merged commit:
+
+```bash
+git fetch origin main --tags --prune
+git switch main
+git merge --ff-only origin/main
+git status --porcelain=v1
+git rev-parse HEAD origin/main
+test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+npm run release:preflight
+npm run docs:inventory
+```
+
+After the `v7.2.0` tag is pushed and the publish workflow passes, verify every
+published package resolves to version `7.2.0` with the stable `latest` dist-tag:
+
+```bash
+npm view @flyingrobots/bijou version dist-tags --json
+npm view @flyingrobots/bijou-node version dist-tags --json
+npm view @flyingrobots/bijou-tui version dist-tags --json
+npm view @flyingrobots/bijou-tui-app version dist-tags --json
+npm view create-bijou-tui-app version dist-tags --json
+npm view @flyingrobots/bijou-i18n version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools-node version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools-xlsx version dist-tags --json
+npm view @flyingrobots/bijou-mcp version dist-tags --json
+```
+
+Tag creation, publish automation, npm registry verification, and GitHub Release
+verification remain final-main work. They must not run from this release-gate
+branch or from the release-prep branch before it has merged.
 
 ## Deterministic Reproducibility
 
@@ -267,15 +321,16 @@ npm run release:readiness
 Before the public tag is created from merged `main`, run:
 
 ```bash
-npm run release:readiness -- --milestone v7.2.0
+npm run version 7.2.0
 npm run release:preflight
 npm run docs:inventory
+npm run release:readiness -- --milestone v7.2.0
 npm audit --omit=dev --audit-level=high
 ```
 
-The final tag must be created only after #354 is closed, the local checkout is
-clean, `main` exactly matches `origin/main`, the release-prep PR has merged,
-and CI / release dry-run evidence is green.
+The final tag must be created only after #354 is closed, the release-prep PR
+has merged, the local checkout is clean, `main` exactly matches `origin/main`,
+and CI / Release Dry Run evidence is green.
 
 ## Residual Risk
 

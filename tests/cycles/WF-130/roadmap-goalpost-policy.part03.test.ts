@@ -57,4 +57,32 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(releaseIndex).toContain('[What\'s New (v7.2.0)](./7.2.0/whats-new.md)');
     expect(releaseIndex).toContain('[Migration Guide (v7.2.0)](./7.2.0/migration-guide.md)');
   });
+
+  it('keeps the v7.2 release packet aligned with release-prep and registry gates', () => {
+    const releasePacket = read('docs/releases/7.2.0/README.md');
+    const publishedPackages = [
+      '@flyingrobots/bijou',
+      '@flyingrobots/bijou-node',
+      '@flyingrobots/bijou-tui',
+      '@flyingrobots/bijou-tui-app',
+      'create-bijou-tui-app',
+      '@flyingrobots/bijou-i18n',
+      '@flyingrobots/bijou-i18n-tools',
+      '@flyingrobots/bijou-i18n-tools-node',
+      '@flyingrobots/bijou-i18n-tools-xlsx',
+      '@flyingrobots/bijou-mcp',
+    ];
+
+    expect(releasePacket).toContain('## Package And Registry Verification Plan');
+    expect(releasePacket).toContain('npm run version 7.2.0');
+    expect(releasePacket).toContain('Release Dry Run');
+    expect(releasePacket).toMatch(
+      /Tag creation, publish automation, npm registry\s+verification, and GitHub Release verification remain final-main work/,
+    );
+    expect(releasePacket).not.toContain('The version bump, final release dry run, tag creation');
+
+    for (const packageName of publishedPackages) {
+      expect(releasePacket).toContain(`npm view ${packageName} version dist-tags --json`);
+    }
+  });
 });
