@@ -317,6 +317,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧭 Planning
 
+- **v7.2.0 release-gate sync** — `docs/ROADMAP.md` and `docs/BEARING.md` now
+  mark #335 as landed, refresh the GitHub milestone counts, stage the new
+  `v8.0.0` VISOR tracker separately from the v7.2 stabilization lane, and make
+  #354 release-readiness/preflight closure the next pull before any tag is
+  created.
 - **v7.2.0 stabilization train** —
   `docs/ROADMAP.md`, `docs/BEARING.md`, `docs/release.md`, and
   `docs/design/RE-041-v72-framework-input-stabilization.md` now select
