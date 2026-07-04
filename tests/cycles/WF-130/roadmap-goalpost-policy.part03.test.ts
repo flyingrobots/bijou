@@ -20,6 +20,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+function extractBashCommandBlocks(markdown: string): string[] {
+  return Array.from(markdown.matchAll(/```bash\n(?<command>[\s\S]*?)```/g)).map(
+    (match) => match.groups?.command.trim() ?? '',
+  );
+}
+
+function extractReferencedTestPaths(markdown: string): string[] {
+  const paths = Array.from(markdown.matchAll(/\b((?:packages|scripts|tests)\/[A-Za-z0-9._/-]+\.test\.ts)\b/g)).map(
+    (match) => match[1],
+  );
+
+  return Array.from(new Set(paths)).sort();
+}
+
 describe('WF-130 roadmap goalpost policy', () => {
   it('disables Markdown line-length linting for project docs', () => {
     const markdownlintConfig = requireRecord(JSON.parse(read('.markdownlint.json')));
@@ -30,6 +44,10 @@ describe('WF-130 roadmap goalpost policy', () => {
 
   it('keeps v7.2 release evidence replay commands aligned with split WF-130 proof files', () => {
     const releaseEvidence = read('docs/releases/7.2.0/README.md');
+    const commandBlocks = extractBashCommandBlocks(releaseEvidence);
+    const roadmapReplay = commandBlocks.find((commandBlock) =>
+      commandBlock.includes('tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts'),
+    );
     const proofFiles = [
       'tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts',
       'tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts',
@@ -37,8 +55,16 @@ describe('WF-130 roadmap goalpost policy', () => {
     ];
 
     for (const proofFile of proofFiles) {
-      expect(releaseEvidence).toContain(proofFile);
+      expect(roadmapReplay ?? '').toContain(proofFile);
     }
+  });
+
+  it('keeps v7.2 release evidence test paths replayable from the checkout', () => {
+    const releaseEvidence = read('docs/releases/7.2.0/README.md');
+    const referencedTestPaths = extractReferencedTestPaths(releaseEvidence);
+    const missingTestPaths = referencedTestPaths.filter((testPath) => !existsSync(resolve(ROOT, testPath)));
+
+    expect(missingTestPaths).toEqual([]);
   });
 
   it('publishes discoverable v7.2 release docs before the version bump', () => {

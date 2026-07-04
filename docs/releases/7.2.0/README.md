@@ -78,10 +78,13 @@ disposition.
   from the `@flyingrobots/bijou-tui` root; scripted driver helpers can generate
   deterministic move, press, release, wheel, and raw SGR mouse sequences.
 - Canonical proof inputs:
-  `packages/bijou-tui/src/driver.test.ts`,
+  `packages/bijou-tui/src/driver.part02.test.ts`,
+  `packages/bijou-tui/src/driver.part03.test.ts`,
   `packages/bijou-tui/src/index.test.ts`,
-  `packages/bijou-tui/src/app-frame.test.ts`, and WF-130 roadmap tests.
-- Replay: `npm test -- --run packages/bijou-tui/src/driver.test.ts packages/bijou-tui/src/index.test.ts packages/bijou-tui/src/app-frame.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts`.
+  `packages/bijou-tui/src/app-frame-core.part02.test.ts`,
+  `packages/bijou-tui/src/app-frame-routing.part06.test.ts`, and WF-130
+  roadmap tests.
+- Replay: `npx vitest run --config vitest.config.ts packages/bijou-tui/src/driver.part02.test.ts packages/bijou-tui/src/driver.part03.test.ts packages/bijou-tui/src/index.test.ts packages/bijou-tui/src/app-frame-core.part02.test.ts packages/bijou-tui/src/app-frame-routing.part06.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts`.
 - Witness: PR #355 closed all three trackers and merged on 2026-06-15 at
   `94db990f`.
 - Residual risk: no accepted release risk.
@@ -126,13 +129,20 @@ disposition.
   DOGFOOD theme diagnostics cover chrome tokens used by borders, scrollbars,
   focus gutters, and modal surfaces.
 - Canonical proof inputs:
-  `tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts`,
+  `tests/cycles/DL-017/dogfood-light-theme-readiness.part01.test.ts`,
+  `tests/cycles/DL-017/dogfood-light-theme-readiness.part02.test.ts`,
+  `tests/cycles/DL-017/dogfood-light-theme-readiness.part03.test.ts`,
+  `tests/cycles/DL-017/dogfood-light-theme-readiness.part04.test.ts`,
+  `tests/cycles/DL-017/dogfood-light-theme-readiness.part05.test.ts`,
   `tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts`,
   `packages/bijou-tui/src/app-frame-overlays.test.ts`,
-  `packages/bijou-tui/src/app-frame.test.ts`,
+  `packages/bijou-tui/src/app-frame-render.part01.test.ts`,
+  `packages/bijou-tui/src/app-frame-render.part02.test.ts`,
+  `packages/bijou-tui/src/app-frame-input-overlays.part03.test.ts`,
+  `packages/bijou-tui/src/app-frame-settings.part02.test.ts`,
   `packages/bijou/src/core/theme/presets.test.ts`, and
   `packages/bijou/src/core/theme/doctor.test.ts`.
-- Replay: `npm test -- --run tests/cycles/DL-017/dogfood-light-theme-readiness.test.ts tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts packages/bijou-tui/src/app-frame-overlays.test.ts packages/bijou-tui/src/app-frame.test.ts packages/bijou/src/core/theme/presets.test.ts packages/bijou/src/core/theme/doctor.test.ts`.
+- Replay: `npx vitest run --config vitest.config.ts tests/cycles/DL-017/dogfood-light-theme-readiness.part01.test.ts tests/cycles/DL-017/dogfood-light-theme-readiness.part02.test.ts tests/cycles/DL-017/dogfood-light-theme-readiness.part03.test.ts tests/cycles/DL-017/dogfood-light-theme-readiness.part04.test.ts tests/cycles/DL-017/dogfood-light-theme-readiness.part05.test.ts tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts packages/bijou-tui/src/app-frame-overlays.test.ts packages/bijou-tui/src/app-frame-render.part01.test.ts packages/bijou-tui/src/app-frame-render.part02.test.ts packages/bijou-tui/src/app-frame-input-overlays.part03.test.ts packages/bijou-tui/src/app-frame-settings.part02.test.ts packages/bijou/src/core/theme/presets.test.ts packages/bijou/src/core/theme/doctor.test.ts`.
 - Witness: PR #360 closed #341 and merged on 2026-06-16 at `d06f8cd4`.
 - Residual risk: no accepted release risk.
 
@@ -165,8 +175,11 @@ disposition.
   render-time config, and pipe/accessibility lower-mode output.
 - Canonical proof inputs:
   `tests/cycles/DX-047/blocks-app-binding-snippets.test.ts` and
-  `tests/cycles/DX-031/dogfood-blocks-section.test.ts`.
-- Replay: `npx vitest run --config vitest.config.ts tests/cycles/DX-047/blocks-app-binding-snippets.test.ts tests/cycles/DX-031/dogfood-blocks-section.test.ts`.
+  `tests/cycles/DX-031/dogfood-blocks-section.part01.test.ts`,
+  `tests/cycles/DX-031/dogfood-blocks-section.part02.test.ts`,
+  `tests/cycles/DX-031/dogfood-blocks-section.part03.test.ts`, and
+  `tests/cycles/DX-031/dogfood-blocks-section.part04.test.ts`.
+- Replay: `npx vitest run --config vitest.config.ts tests/cycles/DX-047/blocks-app-binding-snippets.test.ts tests/cycles/DX-031/dogfood-blocks-section.part01.test.ts tests/cycles/DX-031/dogfood-blocks-section.part02.test.ts tests/cycles/DX-031/dogfood-blocks-section.part03.test.ts tests/cycles/DX-031/dogfood-blocks-section.part04.test.ts`.
 - Witness: PR #361 closed #342 and merged on 2026-07-02 at `6b56a97a`.
 - Residual risk: no accepted release risk.
 
