@@ -160,39 +160,10 @@ const LOCALIZED_MESSAGE_FUNCTIONS = new Set(['dogfoodMessage']);
 const LOCALIZED_FALLBACK_FUNCTIONS = new Set(['dogfoodText', 'shellText']);
 const PATH_FUNCTIONS = new Set(['join','readMarkdownDoc','readMarkdownDocExcerpt','readFileSync','writeFileSync']);
 const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
-  'aliases',
-  'command',
-  'colorMode',
-  'coverageFamilyIds',
-  'direction',
-  'family',
-  'familyId',
-  'fit',
-  'bg',
-  'fg',
-  'hex',
-  'id',
-  'ids',
-  'importPath',
-  'key',
-  'kind',
-  'align',
-  'mode',
-  'modifiers',
-  'namespace',
-  'overflowX',
-  'packageName',
-  'path',
-  'pipeFormat',
-  'renderer',
-  'sourceLocale',
-  'scrollbarMode',
-  'supportsModes',
-  'tags',
-  'tone',
-  'type',
-  'variant',
-  'version',
+  'aliases','command','colorMode','coverageFamilyIds','direction','family','familyId','fit',
+  'bg','fg','hex','id','ids','importPath','key','kind','align','mode','modifiers',
+  'namespace','overflowX','packageName','path','pageId','pipeFormat','renderer','sourceLocale',
+  'scrollbarMode','supportsModes','tags','tone','type','variant','version',
 ]);
 
 export function collectDogfoodI18nDebt(
@@ -589,6 +560,7 @@ function maybeAddEntry(
 function normalizeLocalizableText(rawValue: string): string | undefined {
   const value = rawValue.replace(/\s+/g, ' ').trim();
   if (value === '') return undefined;
+  if (/^{{[A-Z0-9_]+}}$/.test(value)) return undefined;
   if (!/[A-Za-z]/.test(value)) return undefined;
   if (/^--[a-z0-9-]+$/i.test(value)) return undefined;
   if (value.startsWith('.') || value.startsWith('/')) return undefined;

@@ -52,7 +52,7 @@ describe('DOGFOOD i18n debt inventory', () => {
             "import value from './local-module.js';",
             "const cataloged = dogfoodMessage('settings.title', 'Settings');",
             "const fallback = dogfoodText(i18n, 'docs.page.guides', 'Guides');",
-            "const token = 'docs.page.guides';",
+            "const token = 'docs.page.guides';\nconst marker = '{{CHANGELOG_VERSION_BOUNDARIES}}';",
             "const loadingLabel = 'loading';",
             "const continueLabel = 'continue';",
             "const requiredModes: readonly OutputMode[] = ['interactive', 'static'];",

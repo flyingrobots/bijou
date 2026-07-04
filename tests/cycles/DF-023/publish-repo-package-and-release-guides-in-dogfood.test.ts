@@ -94,6 +94,45 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(frameText(must(migration.frames.at(-1)))).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);
   });
 
+  it('publishes the v7.2 release-story proof chain in the main reader flow', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 48 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
+
+    const story = await runScript(app, [
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'release-story-current' } } },
+    ], { ctx });
+    const storyText = frameText(must(story.frames.at(-1)));
+
+    expect(storyText).toContain('Current Release Story');
+    expect(storyText).toContain('What\'s New');
+    expect(storyText).toContain('GraphQL proof walkthrough');
+    expect(storyText).toContain('CHANGELOG');
+
+    const proof = await runScript(app, [
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'release-graphql-proof' } } },
+    ], { ctx });
+    const proofText = frameText(must(proof.frames.at(-1)));
+
+    expect(proofText).toContain('NavigationListBlock');
+    expect(proofText).toContain('examples/docs/fixtures/graphql/navigation-list.graphql');
+    expect(proofText).toContain('GraphQL SDL');
+    expect(proofText).toContain('bijou-block/1');
+    expect(proofText).toContain('ui-scene-ir/1');
+    expect(proofText).toContain('terminal Surface proof');
+    expect(proofText).toContain('graphql-bijou-block-debug/1');
+
+    const changelog = await runScript(app, [
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'release-changelog-history' } } },
+    ], { ctx });
+    const changelogText = frameText(must(changelog.frames.at(-1)));
+
+    expect(changelogText).toContain('CHANGELOG.md');
+    expect(changelogText).toContain('[Unreleased]');
+    expect(changelogText).toContain('[7.1.0]');
+    expect(changelogText).toContain('[5.0.0]');
+    expect(changelogText).not.toContain('[6.0.0] - skipped public package release');
+  });
+
   it('moves DF-023 out of the active 4.1.0 blocker list', () => {
     expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(false);

@@ -118,6 +118,7 @@ import {
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
 } from './release-title.js';
+import { RELEASE_STORY_GUIDES, localizedReleaseStoryMarkdownBody, type ReleaseStoryMarkdownPaths } from './app-release-story.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   documentationArticleBlock,
@@ -229,7 +230,7 @@ const PHILOSOPHY_ARCHITECTURE_TEXT = readMarkdownDoc('../../docs/ARCHITECTURE.md
 const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-ux-doctrine.md');
 const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
 const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
-const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
+const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md'), RELEASE_OVERVIEW_MARKDOWN_PATHS: ReleaseStoryMarkdownPaths = Object.freeze({ en: './content/release-overview.md', de: './content/release-overview.de.md', es: './content/release-overview.es.md', fr: './content/release-overview.fr.md' });
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
@@ -455,9 +456,19 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'documentation-map',
     pageId: GUIDES_PAGE_ID,
-    title: 'Documentation Map',
-    summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    title: 'documentation-map',
+    summary: '',
     body: GUIDES_DOCUMENTATION_MAP_TEXT,
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      'docs.guides.documentationMap.title',
+      'Documentation Map',
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'docs.guides.documentationMap.summary',
+      'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    ),
   },
   {
     id: 'guides-i18n-workflow',
@@ -676,7 +687,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     pageId: RELEASE_PAGE_ID,
     title: 'Release Overview',
     summary: `How the current release line is shaped and where to read the detailed ${BIJOU_VERSION} release docs.`,
-    body: RELEASE_OVERVIEW_TEXT,
+    body: RELEASE_OVERVIEW_TEXT, localizedBody: localizedReleaseStoryMarkdownBody(RELEASE_OVERVIEW_MARKDOWN_PATHS),
   },
   {
     id: `release-whats-new-${BIJOU_VERSION.replaceAll('.', '-')}`,
@@ -685,6 +696,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     summary: `The long-form release story for the ${BIJOU_VERSION} line.`,
     body: RELEASE_WHATS_NEW_TEXT,
   },
+  ...RELEASE_STORY_GUIDES,
   {
     id: `release-migration-${BIJOU_VERSION.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,

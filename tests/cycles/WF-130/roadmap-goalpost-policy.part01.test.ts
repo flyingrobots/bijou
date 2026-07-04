@@ -86,7 +86,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/312');
       expect(roadmap).toContain('https://github.com/flyingrobots/bijou/issues/329');
       expect(roadmap).toContain('Forward Goalposts');
-      expect(roadmap).toContain('remaining #335 release-story surfaces implemented');
+      expect(roadmap).toContain('#335 release-story surfaces implemented');
       expect(roadmap).toContain('Decision Points');
       expect(roadmap).toContain('Demo Integrity And Framework Input Stabilization');
       expect(roadmap).toContain('Runtime Graph And Scene IR Product Contract');
@@ -121,10 +121,10 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
       expect(bearing).toContain('The latest shipped public release is `v7.1.0`');
       expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
-      expect(bearing).toContain('the immediate `v7.2.0` focus is #335');
+      expect(bearing).toContain('the immediate `v7.2.0` focus is landing #335');
       expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
       expect(bearing).toContain('`v7.2.0` milestone is the current active stabilization lane: 2 open and 15 closed milestone items');
-      expect(bearing).toContain('The remaining selected `v7.2.0` DOGFOOD product pull is #335');
+      expect(bearing).toContain('The selected `v7.2.0` DOGFOOD product pull is #335');
       expect(bearing).toContain('Stabilize V7.2, Then Shape V8 And V9 From Beyond');
       expect(bearing).not.toContain('The next selected product pull after that gate is DX-047');
       expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
