@@ -85,4 +85,14 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(releasePacket).toContain(`npm view ${packageName} version dist-tags --json`);
     }
   });
+
+  it('keeps dev-tooling dependency security in the v7.2 audit replay', () => {
+    const releasePacket = read('docs/releases/7.2.0/README.md');
+
+    expect(releasePacket).toContain('Dev-tooling dependency audit');
+    expect(releasePacket).toContain('`npm audit --audit-level=high`');
+    expect(releasePacket).toContain('`npm audit --omit=dev --audit-level=high`');
+    expect(releasePacket).toContain('`esbuild` resolves to `0.28.1`');
+    expect(releasePacket).toContain('`node_modules/esbuild`');
+  });
 });

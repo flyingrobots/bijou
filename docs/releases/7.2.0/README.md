@@ -58,8 +58,9 @@ disposition.
   the final release prep branch is merged.
 - Witness: local release-gate validation on 2026-07-04 passed
   `npm run release:preflight`, `npm run docs:inventory`,
-  `npm audit --omit=dev --audit-level=high`, and `npm run release:readiness`
-  without `--milestone`.
+  `npm audit --audit-level=high`,
+  `npm audit --omit=dev --audit-level=high`, and
+  `npm run release:readiness` without `--milestone`.
 - Residual risk: final milestone-aware readiness is expected to remain blocked
   while #354 is open. After this release-gate PR lands and #354 closes, rerun
   the milestone-aware command before any version tag is created.
@@ -223,12 +224,17 @@ disposition.
   Dependabot security update in
   [#363](https://github.com/flyingrobots/bijou/pull/363).
 - Completed slices: `esbuild` resolves to `0.28.1`; `hono` resolves to
-  `4.12.25`; default-branch audit and Dependabot alert checks were verified
+  `4.12.25`; `package-lock.json` records `node_modules/esbuild` as a dev
+  dependency; default-branch audit and Dependabot alert checks were verified
   before #370 closed.
-- Canonical proof inputs: npm lockfile, `npm audit`, and Dependabot alert API.
-- Replay: `npm audit --omit=dev --audit-level=high`.
+- Canonical proof inputs: npm lockfile, dev-inclusive `npm audit`, runtime-only
+  `npm audit --omit=dev`, and Dependabot alert API.
+- Replay: run `npm audit --audit-level=high` for the full dependency graph,
+  then `npm audit --omit=dev --audit-level=high` for the runtime-only release
+  boundary.
 - Witness: release-gate validation on 2026-07-04 reported
-  `found 0 vulnerabilities`.
+  `found 0 vulnerabilities` for the dev-inclusive audit and the runtime-only
+  audit.
 - Residual risk: no accepted release risk.
 
 ## Automated Evidence Matrix
@@ -237,6 +243,7 @@ disposition.
 | :--- | :--- | :--- | :--- |
 | Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | Passed on branch; current package version remains `7.1.0` until the release-prep PR bumps to `7.2.0`. |
 | Docs inventory | `npm run docs:inventory` | Documentation manifest remains valid. | Passed on branch. |
+| Dev-tooling dependency audit | `npm audit --audit-level=high` | Zero high or critical vulnerabilities across production and development dependencies, including dev-tooling packages such as `esbuild`. | Passed: `found 0 vulnerabilities`. |
 | Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Passed: `found 0 vulnerabilities`. |
 | Focused roadmap proof | `npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts` | Roadmap snapshot, release posture, Beyond count, and Markdown policy are self-consistent. | Passed on branch. |
 | Release gauntlet | `npm run release:readiness` | Local release-readiness gauntlet passes without live milestone checks. | Passed on branch. |
@@ -264,6 +271,7 @@ before it merges:
 npm run version 7.2.0
 npm run release:preflight
 npm run docs:inventory
+npm audit --audit-level=high
 npm run release:readiness -- --milestone v7.2.0
 ```
 
@@ -313,6 +321,7 @@ All branch-local claims above are replayable from the branch tip with:
 ```bash
 npm run release:preflight
 npm run docs:inventory
+npm audit --audit-level=high
 npm audit --omit=dev --audit-level=high
 npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts
 npm run release:readiness
@@ -325,6 +334,7 @@ npm run version 7.2.0
 npm run release:preflight
 npm run docs:inventory
 npm run release:readiness -- --milestone v7.2.0
+npm audit --audit-level=high
 npm audit --omit=dev --audit-level=high
 ```
 
