@@ -1,25 +1,26 @@
-# Release and Migration
+# Release y migración
 
-This section publishes the current-line release story and migration
-guidance inside DOGFOOD. The version number is read from package.json
-at startup — see the Release pages for the current version.
+Esta sección publica dentro de DOGFOOD la historia de la línea actual y la guía
+de migración. El número de versión se lee desde package.json al iniciar; las
+páginas Release muestran la versión actual.
 
-## Published now
+## Publicado ahora
 
-- `What's New` for the current release
-- `Current Release Story` for the release-story reader path
-- `GraphQL Proof Walkthrough` for the real NavigationListBlock chain
-- `CHANGELOG History` for version boundaries from `docs/CHANGELOG.md`
-- `Migration Guide` for the current release
-- the short-form `CHANGELOG.md` remains the release ledger and is now readable
-  from DOGFOOD without making a second release-history source
+- `Novedades` para la versión actual
+- `Historia actual de la versión` para la ruta de lectura de la historia
+- `Recorrido de prueba GraphQL` para la cadena real NavigationListBlock
+- `Historial de CHANGELOG` para límites desde `docs/CHANGELOG.md`
+- `Guía de migración` para la versión actual
+- el `CHANGELOG.md` breve sigue siendo el libro de releases y ahora se puede
+  leer desde DOGFOOD sin crear una segunda fuente histórica
 
-## How to use this section
+## Cómo usar esta sección
 
-- read the overview first if you want the release boundary and story
-- open `What's New` for the long-form explanation of the release line
-- open `Current Release Story` when presenting the v7.2 demo-integrity path
-- open `GraphQL Proof Walkthrough` to show the checked-in GraphQL SDL,
-  `bijou-block/1`, `ui-scene-ir/1`, terminal proof, and debug facts
-- open `CHANGELOG History` to move through release version boundaries
-- open `Migration Guide` if you are upgrading from a prior major/minor
+- Lee primero la vista general si necesitas el límite y la historia de release.
+- Abre `Novedades` para la explicación larga de la línea de versión.
+- Abre `Historia actual de la versión` cuando presentes la ruta de integridad
+  de demo v7.2.
+- Abre `Recorrido de prueba GraphQL` para mostrar el GraphQL SDL versionado,
+  `bijou-block/1`, `ui-scene-ir/1`, la prueba de terminal y los hechos debug.
+- Abre `Historial de CHANGELOG` para recorrer límites de versión.
+- Abre `Guía de migración` si actualizas desde un major/minor anterior.

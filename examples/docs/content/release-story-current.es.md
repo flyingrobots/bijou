@@ -1,19 +1,19 @@
-# Current Release Story
+# Historia actual de la versión
 
-DOGFOOD now keeps the v7.2 release story in the main reader flow. A presenter
-can open Release and walk the current line without relying on hidden side
-metadata.
+DOGFOOD mantiene ahora la historia de v7.2 dentro del flujo principal de
+lectura. Una demo puede abrir Release y recorrer la línea actual sin depender
+de metadatos escondidos en un panel lateral.
 
-## Reader Path
+## Ruta de lectura
 
-- `What's New` remains the long-form release document.
-- `GraphQL proof walkthrough` shows the real NavigationListBlock proof chain.
-- `CHANGELOG` history keeps version boundaries visible from the same Release
-  section.
+- `Novedades` sigue siendo el documento largo de la versión.
+- `Recorrido de prueba GraphQL` muestra la cadena real de NavigationListBlock.
+- El historial de `CHANGELOG` mantiene visibles los límites de versión en la
+  misma sección Release.
 
-## Demo Integrity
+## Integridad de la demo
 
-The release story is intentionally narrow: explain the shipped V7 proof, make
-the GraphQL chain inspectable, and preserve changelog history. First-run
-persistence, version-memory ports, and broad V8 artifact work stay out of this
-v7.2 slice.
+La historia de release es deliberadamente estrecha: explicar la prueba V7
+entregada, hacer inspeccionable la cadena GraphQL y preservar el historial del
+changelog. La persistencia de primer arranque, los puertos de memoria de
+versión y el trabajo amplio de artefactos V8 quedan fuera de este corte v7.2.

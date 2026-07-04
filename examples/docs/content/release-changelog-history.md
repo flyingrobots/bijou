@@ -22,10 +22,7 @@ format.
 
 ## Version Boundaries
 
-- [Unreleased]
-- [7.1.0] - 2026-06-14
-- [7.0.0] - 2026-06-03
-- [6.0.0] - skipped public package release
+{{CHANGELOG_VERSION_BOUNDARIES}}
 
 ## Reader Contract
 

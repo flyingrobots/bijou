@@ -1,25 +1,27 @@
-# Release and Migration
+# Release und Migration
 
-This section publishes the current-line release story and migration
-guidance inside DOGFOOD. The version number is read from package.json
-at startup — see the Release pages for the current version.
+Dieser Bereich veröffentlicht die Release-Geschichte der aktuellen Linie und
+die Migrationshinweise in DOGFOOD. Die Versionsnummer wird beim Start aus
+package.json gelesen; die Release-Seiten zeigen die aktuelle Version.
 
-## Published now
+## Jetzt veröffentlicht
 
-- `What's New` for the current release
-- `Current Release Story` for the release-story reader path
-- `GraphQL Proof Walkthrough` for the real NavigationListBlock chain
-- `CHANGELOG History` for version boundaries from `docs/CHANGELOG.md`
-- `Migration Guide` for the current release
-- the short-form `CHANGELOG.md` remains the release ledger and is now readable
-  from DOGFOOD without making a second release-history source
+- `Was ist neu` für das aktuelle Release
+- `Aktuelle Release-Geschichte` für den Release-Story-Lesepfad
+- `GraphQL-Proof-Walkthrough` für die echte NavigationListBlock-Kette
+- `CHANGELOG-Verlauf` für Versionsgrenzen aus `docs/CHANGELOG.md`
+- `Migrationsleitfaden` für das aktuelle Release
+- das kurze `CHANGELOG.md` bleibt das Release-Ledger und ist jetzt aus DOGFOOD
+  lesbar, ohne eine zweite Quelle für Release-Verlauf zu erzeugen
 
-## How to use this section
+## So nutzt du diesen Bereich
 
-- read the overview first if you want the release boundary and story
-- open `What's New` for the long-form explanation of the release line
-- open `Current Release Story` when presenting the v7.2 demo-integrity path
-- open `GraphQL Proof Walkthrough` to show the checked-in GraphQL SDL,
-  `bijou-block/1`, `ui-scene-ir/1`, terminal proof, and debug facts
-- open `CHANGELOG History` to move through release version boundaries
-- open `Migration Guide` if you are upgrading from a prior major/minor
+- Lies zuerst die Übersicht, wenn du Release-Grenze und Geschichte brauchst.
+- Öffne `Was ist neu` für die ausführliche Erklärung der Release-Linie.
+- Öffne `Aktuelle Release-Geschichte`, wenn du den v7.2-Demo-Integritätspfad
+  präsentierst.
+- Öffne `GraphQL-Proof-Walkthrough`, um das eingecheckte GraphQL SDL,
+  `bijou-block/1`, `ui-scene-ir/1`, Terminal-Proof und Debug-Fakten zu zeigen.
+- Öffne `CHANGELOG-Verlauf`, um durch Versionsgrenzen zu gehen.
+- Öffne `Migrationsleitfaden`, wenn du von einem früheren Major/Minor
+  aktualisierst.

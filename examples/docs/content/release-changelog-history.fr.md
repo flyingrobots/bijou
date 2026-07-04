@@ -1,20 +1,17 @@
-# CHANGELOG History
+# Historique du CHANGELOG
 
-Source: `docs/CHANGELOG.md`
+Source : `docs/CHANGELOG.md`
 
-The changelog remains the release-history ledger. DOGFOOD exposes its version
-boundaries in the Release section instead of inventing another release-history
-format.
+Le changelog reste le registre de l'historique des versions. DOGFOOD expose
+ses bornes de version dans la section Release au lieu d'inventer un second
+format d'historique.
 
-## Version Boundaries
+## Bornes de version
 
-- [Unreleased]
-- [7.1.0] - 2026-06-14
-- [7.0.0] - 2026-06-03
-- [6.0.0] - skipped public package release
+{{CHANGELOG_VERSION_BOUNDARIES}}
 
-## Reader Contract
+## Contrat de lecture
 
-The in-app path preserves the changelog heading shape, keeps the current
-unreleased section visible, and gives historical version boundaries a
-reader-first route inside DOGFOOD.
+Le chemin dans l'app préserve la forme des titres du changelog, garde la
+section Unreleased actuelle visible et donne aux bornes historiques une route
+centrée lecteur dans DOGFOOD.

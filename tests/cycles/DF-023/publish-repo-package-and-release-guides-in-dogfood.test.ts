@@ -129,6 +129,8 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(changelogText).toContain('CHANGELOG.md');
     expect(changelogText).toContain('[Unreleased]');
     expect(changelogText).toContain('[7.1.0]');
+    expect(changelogText).toContain('[5.0.0]');
+    expect(changelogText).not.toContain('[6.0.0] - skipped public package release');
   });
 
   it('moves DF-023 out of the active 4.1.0 blocker list', () => {

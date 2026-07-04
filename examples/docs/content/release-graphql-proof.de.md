@@ -1,21 +1,21 @@
-# GraphQL Proof Walkthrough
+# GraphQL-Proof-Walkthrough
 
-Source fixture: `examples/docs/fixtures/graphql/navigation-list.graphql`
+Quell-Fixture: `examples/docs/fixtures/graphql/navigation-list.graphql`
 
-This guide ties the release story to the real `NavigationListBlock` fixture
-instead of a synthetic example.
+Dieser Leitfaden verbindet die Release-Geschichte mit dem echten
+`NavigationListBlock`-Fixture statt mit einem synthetischen Beispiel.
 
-## Proof Chain
+## Proof-Kette
 
-1. `GraphQL SDL` declares the DOGFOOD navigation fixture.
-2. `bijou-block/1` records the grouped block artifact.
-3. `ui-scene-ir/1` carries the portable scene facts.
-4. `terminal Surface proof` renders the DOGFOOD result.
-5. `graphql-bijou-block-debug/1` exposes deterministic debug facts.
+1. `GraphQL SDL` deklariert das DOGFOOD-Navigations-Fixture.
+2. `bijou-block/1` zeichnet das gruppierte Block-Artefakt auf.
+3. `ui-scene-ir/1` trägt die portablen Szenenfakten.
+4. `terminal Surface proof` rendert das DOGFOOD-Ergebnis.
+5. `graphql-bijou-block-debug/1` legt deterministische Debug-Fakten offen.
 
-## Fixture Anchor
+## Fixture-Anker
 
-The checked-in SDL fixture defines `DogfoodNavigationList`, targets
-`bijou-terminal`, groups header and item regions, binds the active navigation
-item, carries i18n fallback keys, and names the `NavigationListBlock`
-component.
+Das eingecheckte SDL-Fixture definiert `DogfoodNavigationList`, zielt auf
+`bijou-terminal`, gruppiert Header- und Item-Regionen, bindet das aktive
+Navigationselement, trägt i18n-Fallback-Keys und benennt die
+`NavigationListBlock`-Komponente.
