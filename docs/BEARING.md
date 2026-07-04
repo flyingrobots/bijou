@@ -116,9 +116,10 @@ Current direction and active tensions. Historical ship data is in
   readiness (#341) repairs have landed as v7.2.0 demo-integrity lineage.
 - The Blocks app-binding (#342) and first-party theme variant (#343) repairs
   have landed as v7.2.0 demo-integrity lineage.
-- The remaining selected `v7.2.0` DOGFOOD product pull is #335: make release
-  story surfaces inside DOGFOOD explain What's New, the real GraphQL proof
-  chain, and changelog history.
+- The selected `v7.2.0` DOGFOOD product pull is #335: keep release-story
+  surfaces inside DOGFOOD's main reader flow so What's New, the real GraphQL
+  proof chain, and changelog history are visible without wide-only side
+  metadata.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
   product contract built from the proof chain that v7.1.0 shipped.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
@@ -178,7 +179,7 @@ Current direction and active tensions. Historical ship data is in
 ## Next Target
 
 With Code Dojo, DX-047/#342, and DL-018/#343 landed, the immediate
-`v7.2.0` focus is #335: DOGFOOD release-story surfaces through DF-078.
+`v7.2.0` focus is landing #335: DOGFOOD release-story surfaces through DF-078.
 
 ```text
 Current What's New
@@ -202,8 +203,8 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land #335 release-story surfaces so DOGFOOD can explain What's New, the real
-   GraphQL proof chain, and changelog history from inside the app.
+1. Merge #335 release-story surfaces so DOGFOOD can explain What's New, the
+   real GraphQL proof chain, and changelog history from inside the app.
 2. Close the remaining #354 umbrella criteria once #335 is merged and the
    dependency advisory audit remains clean.
 3. Run the normal `v7.2.0` release-prep checklist before any tag is created.

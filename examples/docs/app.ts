@@ -118,6 +118,7 @@ import {
   type DogfoodReleaseTitle,
   dogfoodReleaseTitleMarkdown,
 } from './release-title.js';
+import { RELEASE_STORY_GUIDES } from './app-release-story.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
   documentationArticleBlock,
@@ -455,9 +456,19 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'documentation-map',
     pageId: GUIDES_PAGE_ID,
-    title: 'Documentation Map',
-    summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    title: 'documentation-map',
+    summary: '',
     body: GUIDES_DOCUMENTATION_MAP_TEXT,
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      'docs.guides.documentationMap.title',
+      'Documentation Map',
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'docs.guides.documentationMap.summary',
+      'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    ),
   },
   {
     id: 'guides-i18n-workflow',
@@ -685,6 +696,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     summary: `The long-form release story for the ${BIJOU_VERSION} line.`,
     body: RELEASE_WHATS_NEW_TEXT,
   },
+  ...RELEASE_STORY_GUIDES,
   {
     id: `release-migration-${BIJOU_VERSION.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,

@@ -1,17 +1,3 @@
----
-dogfood:
-  localization:
-    sourceLocale: en
-    locales:
-      - de
-      - es
-      - fr
-    localized:
-      de: ./release-overview.de.md
-      es: ./release-overview.es.md
-      fr: ./release-overview.fr.md
----
-
 # Release and Migration
 
 This section publishes the current-line release story and migration

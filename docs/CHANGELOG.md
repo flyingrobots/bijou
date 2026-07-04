@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **DOGFOOD release-story reader path** — DOGFOOD's Release section now keeps
+  the current release story, real NavigationListBlock GraphQL proof chain, and
+  CHANGELOG version boundaries in the main reader flow so the v7.2 demo can
+  explain What's New, `bijou-block/1`, `ui-scene-ir/1`, terminal proof, and
+  `graphql-bijou-block-debug/1` facts without relying on hidden side metadata.
 - **Blocks app-binding snippets** — DOGFOOD's Blocks docs now show how
   `CounterDemoBlock` binds to application-owned state, key-driven command
   intents, update routing, render-time config, and pipe/accessible lower modes
