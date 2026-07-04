@@ -260,7 +260,7 @@ disposition.
 | Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Passed: `found 0 vulnerabilities`. |
 | Focused roadmap proof | `npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts` | Roadmap snapshot, release posture, Beyond count, and Markdown policy are self-consistent. | Passed on branch. |
 | Release gauntlet | `npm run release:readiness` | Local release-readiness gauntlet passes without live milestone checks. | Passed on branch. |
-| Milestone-aware readiness | `npm run release:readiness -- --milestone v7.2.0` | Blocks until the target milestone has zero open tracker items and no WIP labels. | Blocked only by open #354 after this packet was added and stale WIP labels were cleared. Rerun after this release-gate PR lands and #354 closes. |
+| Milestone-aware readiness | `npm run release:readiness -- --milestone v7.2.0` | Blocks until the target milestone has zero open tracker items, including issues or pull requests, and no WIP labels. | Blocked by open #354 after this packet was added and stale WIP labels were cleared. The same gate will block any `v7.2.0` milestone PR left open. Rerun after this release-gate PR lands and #354 closes. |
 
 ## Human Review Matrix
 

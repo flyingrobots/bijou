@@ -4,6 +4,12 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  formatTrackerItems,
+  readMilestoneTrackerItems,
+  trackerItemLabelNames,
+  type ReleaseReadinessTrackerItem,
+} from './release-readiness-tracker.js';
 
 export interface ReleaseReadinessStep {
   readonly label: string;
@@ -11,17 +17,13 @@ export interface ReleaseReadinessStep {
   readonly args: readonly string[];
 }
 
-export interface ReleaseReadinessTrackerLabel {
-  readonly name: string;
-}
-
-export interface ReleaseReadinessTrackerItem {
-  readonly number: number;
-  readonly title: string;
-  readonly state: string;
-  readonly labels?: readonly (string | ReleaseReadinessTrackerLabel)[];
-  readonly url?: string;
-}
+export { buildMilestoneTrackerItemCommands } from './release-readiness-tracker.js';
+export type {
+  ReleaseReadinessTrackerItem,
+  ReleaseReadinessTrackerItemCommand,
+  ReleaseReadinessTrackerItemKind,
+  ReleaseReadinessTrackerLabel,
+} from './release-readiness-tracker.js';
 
 export interface ReleaseReadinessDocsSnapshot {
   readonly roadmap: string;
@@ -109,8 +111,8 @@ export function buildReleaseReadinessReport(options: {
       label: 'tracker-open-items',
       status: openTrackerItems.length === 0 ? 'pass' : 'fail',
       summary: openTrackerItems.length === 0
-        ? `${milestone} has zero open tracker issues`
-        : `${milestone} has ${String(openTrackerItems.length)} open tracker issue(s): ${formatTrackerItems(openTrackerItems)}`,
+        ? `${milestone} has zero open tracker items`
+        : `${milestone} has ${String(openTrackerItems.length)} open tracker item(s): ${formatTrackerItems(openTrackerItems)}`,
     },
     {
       label: 'tracker-wip-labels',
@@ -242,31 +244,6 @@ export function parseReleaseReadinessArgs(args: readonly string[]): { readonly m
   return milestone == null ? {} : { milestone };
 }
 
-function readMilestoneTrackerItems(milestone: string, cwd: string): readonly ReleaseReadinessTrackerItem[] {
-  const result = spawnSync('gh', [
-    'issue',
-    'list',
-    '--state',
-    'all',
-    '--milestone',
-    milestone,
-    '--limit',
-    '1000',
-    '--json',
-    'number,title,state,labels,url',
-  ], {
-    cwd,
-    encoding: 'utf8',
-  });
-
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(`gh issue list exited with status ${String(result.status ?? 'null')}: ${result.stderr.trim()}`);
-  }
-
-  return parseTrackerItems(result.stdout);
-}
-
 function readReleaseReadinessDocs(cwd: string, milestone: string): ReleaseReadinessDocsSnapshot {
   const version = milestone.replace(/^v/, '');
   return Object.freeze({
@@ -276,58 +253,6 @@ function readReleaseReadinessDocs(cwd: string, milestone: string): ReleaseReadin
     releaseGuide: readFileSync(resolve(cwd, 'docs/release.md'), 'utf8'),
     releasePacketExists: existsSync(resolve(cwd, 'docs/releases', version, 'README.md')),
   });
-}
-
-function trackerItemLabelNames(item: ReleaseReadinessTrackerItem): readonly string[] {
-  return Object.freeze((item.labels ?? []).map((label) => (
-    typeof label === 'string' ? label : label.name
-  )));
-}
-
-function formatTrackerItems(items: readonly ReleaseReadinessTrackerItem[]): string {
-  return items.map((item) => `#${String(item.number)}`).join(', ');
-}
-
-function parseTrackerItems(stdout: string): readonly ReleaseReadinessTrackerItem[] {
-  const parsed: unknown = JSON.parse(stdout);
-  if (!Array.isArray(parsed)) throw new Error('gh issue list did not return an array');
-  return Object.freeze(parsed.map((value) => {
-    const item = requireJsonRecord(value, 'gh issue list item');
-    const number = item['number'];
-    const title = item['title'];
-    const state = item['state'];
-    const url = item['url'];
-    if (typeof number !== 'number' || typeof title !== 'string' || typeof state !== 'string') {
-      throw new Error('gh issue list returned an item with an unexpected shape');
-    }
-    const base = {
-      number,
-      title,
-      state,
-      labels: parseTrackerLabels(item['labels']),
-    };
-    return Object.freeze(typeof url === 'string' ? { ...base, url } : base);
-  }));
-}
-
-function parseTrackerLabels(value: unknown): readonly (string | ReleaseReadinessTrackerLabel)[] {
-  if (!Array.isArray(value)) return Object.freeze([]);
-  return Object.freeze(value.map((label) => {
-    if (typeof label === 'string') return label;
-    const record = requireJsonRecord(label, 'gh issue label');
-    const name = record['name'];
-    if (typeof name !== 'string') throw new Error('gh issue label is missing name');
-    return { name };
-  }));
-}
-
-function requireJsonRecord(value: unknown, label: string): Record<string, unknown> {
-  if (!isRecord(value)) throw new Error(`${label} is not an object`);
-  return value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function escapeMarkdownTableCell(text: string): string {
