@@ -139,10 +139,20 @@ Release gate:
 `v8.0.0` should be the next major release. Its job is to turn the portable scene
 and GraphQL block proof into a product contract, not just a compiler demo.
 
-Primary tracker:
+Primary staged milestone trackers:
 
-- [#302](https://github.com/flyingrobots/bijou/issues/302) for GraphQL-authored
-  UI scenes into Bijou Blocks
+- [#457](https://github.com/flyingrobots/bijou/issues/457) TRACKER: VISOR
+  warpspace for v8 Runtime Graph And Scene IR
+- [#458](https://github.com/flyingrobots/bijou/issues/458) VISOR: emit GraphQL
+  block artifact bundle with replay and visual scene facts
+- [#459](https://github.com/flyingrobots/bijou/issues/459) VISOR: validate
+  packed-bijou-cells/1 and adapt to Surface
+
+Candidate source lineage remains in `Beyond` until a staged V8 tracker pulls it
+into implementation scope:
+
+- [#302](https://github.com/flyingrobots/bijou/issues/302) remains the broad
+  GraphQL-authored UI scenes into Bijou Blocks source tracker
 - [#202](https://github.com/flyingrobots/bijou/issues/202),
   [#209](https://github.com/flyingrobots/bijou/issues/209),
   [#210](https://github.com/flyingrobots/bijou/issues/210),
@@ -358,6 +368,8 @@ gh issue list --state all --milestone v7.1.0
 gh pr list --state all --search 'milestone:"v7.1.0"'
 gh issue list --state all --milestone v7.2.0
 gh pr list --state all --search 'milestone:"v7.2.0"'
+gh issue list --state all --milestone v8.0.0
+gh pr list --state all --search 'milestone:"v8.0.0"'
 gh issue list --state all --milestone v7.0.0
 gh pr list --state all --search 'milestone:"v7.0.0"'
 gh issue list --state all --milestone Beyond

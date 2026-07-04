@@ -51,6 +51,29 @@ describe('WF-130 roadmap goalpost policy', () => {
       );
     });
 
+  it('keeps staged v8 tracker details and sync commands aligned to the milestone', () => {
+      const roadmap = read('docs/ROADMAP.md');
+      const v8Section = sectionBetween(
+        roadmap,
+        '### `v8.0.0`: Runtime Graph And Scene IR Product Contract',
+        '### `v9.0.0`: Product Workbench And Operator Surfaces',
+      );
+      const normalizedV8Section = normalizeWhitespace(v8Section);
+      const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
+
+      expect(v8Section).toContain('[#457](https://github.com/flyingrobots/bijou/issues/457)');
+      expect(normalizedV8Section).toContain('TRACKER: VISOR warpspace for v8 Runtime Graph And Scene IR');
+      expect(v8Section).toContain('[#458](https://github.com/flyingrobots/bijou/issues/458)');
+      expect(normalizedV8Section).toContain('VISOR: emit GraphQL block artifact bundle with replay and visual scene facts');
+      expect(v8Section).toContain('[#459](https://github.com/flyingrobots/bijou/issues/459)');
+      expect(normalizedV8Section).toContain('VISOR: validate packed-bijou-cells/1 and adapt to Surface');
+      expect(normalizedV8Section).toContain('Candidate source lineage remains in `Beyond`');
+      expect(v8Section).toContain('[#302](https://github.com/flyingrobots/bijou/issues/302)');
+      expect(v8Section).not.toContain('- [#302](https://github.com/flyingrobots/bijou/issues/302) for GraphQL-authored');
+      expect(maintenanceRule).toContain('gh issue list --state all --milestone v8.0.0');
+      expect(maintenanceRule).toContain('gh pr list --state all --search \'milestone:"v8.0.0"\'');
+    });
+
   it('requires audit comments for moves across all release horizons', () => {
       const bearing = normalizeWhitespace(read('docs/BEARING.md'));
 
