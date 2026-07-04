@@ -237,7 +237,7 @@ disposition.
 | Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | Passed on branch; current package version remains `7.1.0` until the release-prep PR bumps to `7.2.0`. |
 | Docs inventory | `npm run docs:inventory` | Documentation manifest remains valid. | Passed on branch. |
 | Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Passed: `found 0 vulnerabilities`. |
-| Focused roadmap proof | `npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts` | Roadmap snapshot, release posture, and Beyond count are self-consistent. | Passed on branch. |
+| Focused roadmap proof | `npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts` | Roadmap snapshot, release posture, Beyond count, and Markdown policy are self-consistent. | Passed on branch. |
 | Release gauntlet | `npm run release:readiness` | Local release-readiness gauntlet passes without live milestone checks. | Passed on branch. |
 | Milestone-aware readiness | `npm run release:readiness -- --milestone v7.2.0` | Blocks until the target milestone has zero open tracker items and no WIP labels. | Blocked only by open #354 after this packet was added and stale WIP labels were cleared. Rerun after this release-gate PR lands and #354 closes. |
 
@@ -260,7 +260,7 @@ All branch-local claims above are replayable from the branch tip with:
 npm run release:preflight
 npm run docs:inventory
 npm audit --omit=dev --audit-level=high
-npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts
+npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts
 npm run release:readiness
 ```
 

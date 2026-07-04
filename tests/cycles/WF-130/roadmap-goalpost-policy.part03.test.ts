@@ -22,9 +22,22 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 describe('WF-130 roadmap goalpost policy', () => {
   it('disables Markdown line-length linting for project docs', () => {
-      const markdownlintConfig = requireRecord(JSON.parse(read('.markdownlint.json')));
+    const markdownlintConfig = requireRecord(JSON.parse(read('.markdownlint.json')));
 
-      expect(markdownlintConfig.MD013).toBe(false);
-      expect(markdownlintConfig['line-length']).toBe(false);
-    });
+    expect(markdownlintConfig.MD013).toBe(false);
+    expect(markdownlintConfig['line-length']).toBe(false);
+  });
+
+  it('keeps v7.2 release evidence replay commands aligned with split WF-130 proof files', () => {
+    const releaseEvidence = read('docs/releases/7.2.0/README.md');
+    const proofFiles = [
+      'tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts',
+      'tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts',
+      'tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts',
+    ];
+
+    for (const proofFile of proofFiles) {
+      expect(releaseEvidence).toContain(proofFile);
+    }
+  });
 });
