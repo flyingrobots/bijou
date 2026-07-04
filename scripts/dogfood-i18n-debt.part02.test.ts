@@ -91,11 +91,11 @@ describe('DOGFOOD i18n debt inventory', () => {
       const result = evaluateDogfoodMarkdownLocalizationRatchet(inventory);
 
       expect(inventory.documents.length).toBeGreaterThan(0);
-      expect(inventory.total).toBe(75);
+      expect(inventory.total).toBe(78);
       expect(inventory.byLocale).toEqual([
-        { locale: 'fr', count: 25 },
-        { locale: 'es', count: 25 },
-        { locale: 'de', count: 25 },
+        { locale: 'fr', count: 26 },
+        { locale: 'es', count: 26 },
+        { locale: 'de', count: 26 },
       ]);
       expect(result.ok).toBe(true);
       expect(result.violations).toEqual([]);
