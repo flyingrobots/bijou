@@ -5,25 +5,28 @@ Bijou 7.2.0 is a narrow stabilization and demo-integrity release after the
 DOGFOOD localization and themes, Blocks documentation, release-story surfaces,
 dependency posture, and release bookkeeping.
 
-This packet was started on the release-gate branch and finalized on the
-release-prep branch before the public tag exists. The release-prep branch owns
-the lock-step package version bump, changelog boundary, README update, package
-metadata validation, release-readiness replay, and Release Dry Run before
-merge. Tag creation, publish automation, npm registry verification, and GitHub
-Release verification remain final-main work and must run only from the merged
-`origin/main` release commit.
+This packet was started on the release-gate branch, finalized on the
+release-prep branch, and closed from the verified `origin/main` release commit.
+The public `v7.2.0` tag was created from
+`123f4a6150963932118cbf763a8a6ec03487e227` on 2026-07-05 after final-main
+validation passed. Tag Guard, Release workflow, tag CI, GitHub Release
+verification, and npm registry verification all passed after the tag was
+pushed.
 
 ## Release Summary
 
 - Version: `7.2.0`
-- Tag: `v7.2.0` (pending final-main release step)
+- Tag: [`v7.2.0`](https://github.com/flyingrobots/bijou/releases/tag/v7.2.0)
 - Previous public tag: `v7.1.0`
+- Release commit: `123f4a6150963932118cbf763a8a6ec03487e227`
 - Release type: stable minor
 - npm dist-tag after publish: `latest`
 - Release-prep branch: `cycle/v72-release-prep`
 - Release-gate lineage branch: `cycle/v72-release-gate-354`
 - Release date: 2026-07-05
 - Publish surface: npm workspace packages only
+- Release workflow:
+  <https://github.com/flyingrobots/bijou/actions/runs/28736930944>
 
 ## Tracker And Goalpost Map
 
@@ -56,8 +59,8 @@ disposition.
   in-app release-story surfaces.
 - Canonical proof inputs: the tests and DOGFOOD fixtures named in the
   per-slice sections below.
-- Replay: run `npm run release:readiness` from the release-prep branch and
-  then run `npm run release:readiness -- --milestone v7.2.0` again from the
+- Replay: run `npm run release:readiness` from the release-prep branch, then
+  run `npm run release:readiness -- --milestone v7.2.0` again from the exact
   merged final-main release commit before tagging.
 - Witness: local release-gate validation on 2026-07-04 passed
   `npm run release:preflight`, `npm run docs:inventory`,
@@ -66,9 +69,12 @@ disposition.
   `npm run release:readiness` without `--milestone`. Release-prep validation
   on 2026-07-05 passed
   `npm run release:readiness -- --milestone v7.2.0` after the lock-step
-  version bump and dated changelog boundary.
-- Residual risk: no accepted release risk. Final-main validation must still
-  replay the milestone-aware command before any version tag is created.
+  version bump and dated changelog boundary. Final-main validation on
+  2026-07-05 passed `npm run release:preflight`, `npm run docs:inventory`,
+  `npm audit --omit=dev --audit-level=high`, and the milestone-aware
+  readiness gate from commit `123f4a61`; the Release Dry Run, Tag Guard,
+  Release workflow, tag CI, GitHub Release, and npm registry checks all passed.
+- Residual risk: no accepted release risk.
 
 ### Framework Input Stabilization
 
@@ -259,13 +265,19 @@ disposition.
 
 | Gate | Command or source | Expected result | Status |
 | :--- | :--- | :--- | :--- |
-| Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | Passed on release-prep branch after the lock-step `7.2.0` manifest and lockfile bump. |
-| Docs inventory | `npm run docs:inventory` | Documentation manifest remains valid. | Passed on release-prep branch. |
+| Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | Passed on release-prep branch and final-main release commit. |
+| Docs inventory | `npm run docs:inventory` | Documentation manifest remains valid. | Passed on release-prep branch and final-main release commit. |
 | Dev-tooling dependency audit | `npm audit --audit-level=high` | Zero high or critical vulnerabilities across production and development dependencies, including dev-tooling packages such as `esbuild`. | Passed: `found 0 vulnerabilities`. |
-| Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Passed: `found 0 vulnerabilities`. |
+| Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Passed on release-prep branch and final-main release commit: `found 0 vulnerabilities`. |
 | Focused roadmap proof | `npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts` | Roadmap snapshot, release posture, Beyond count, and Markdown policy are self-consistent. | Passed on release-prep branch. |
-| Release gauntlet | `npm run release:readiness` | Local release-readiness gauntlet passes without live milestone checks. | Covered by the milestone-aware release-readiness pass on release-prep branch. |
-| Milestone-aware readiness | `npm run release:readiness -- --milestone v7.2.0` | Blocks until the target milestone has zero open tracker items, including issues or pull requests, and no WIP labels. | Passed on release-prep branch on 2026-07-05; final-main must rerun it before tagging. |
+| Release gauntlet | `npm run release:readiness` | Local release-readiness gauntlet passes without live milestone checks. | Passed on release-gate and release-prep lineage. |
+| Milestone-aware readiness | `npm run release:readiness -- --milestone v7.2.0` | Blocks until the target milestone has zero open tracker items, including issues or pull requests, and no WIP labels. | Passed on release-prep branch and final-main release commit on 2026-07-05. |
+| Release Dry Run | GitHub Actions run `28736681371` | Packed files, publish dry-runs, DOGFOOD smokes, and release evidence stay green from `main`. | Passed before tag creation. |
+| Tag Guard | GitHub Actions run `28736930947` | The pushed tag resolves to the intended release commit and metadata is valid. | Passed after `v7.2.0` tag push. |
+| Publish workflow | GitHub Actions run `28736930944` | Automated npm publishing succeeds for every workspace package. | Publish workflow passed on 2026-07-05. |
+| Tag CI | GitHub Actions run `28736930919` | The tag build/test lane succeeds. | Passed after `v7.2.0` tag push. |
+| GitHub Release | <https://github.com/flyingrobots/bijou/releases/tag/v7.2.0> | Release notes are published for the public tag. | Published on 2026-07-05. |
+| npm registry verification | `npm view <package> version dist-tags --json` | Every automated package reports version `7.2.0` with `latest`. | npm registry verification passed for every automated package. |
 
 ## Human Review Matrix
 
@@ -274,8 +286,8 @@ disposition.
 | `docs/CHANGELOG.md` | v7.2 framework input, mouse tracking, DOGFOOD demo integrity, Code Dojo, and security changes now live under the dated `7.2.0` boundary. |
 | `README.md` | Front-door What's New now describes v7.2.0 and links to the v7.2 release docs. |
 | `docs/ROADMAP.md` | Updated on 2026-07-05 from GitHub milestone state: v7.2 has zero open and seventeen closed milestone items, Beyond has 39 open items, and v8 is staged separately. |
-| `docs/BEARING.md` | Updated so the next target is final v7.2 release prep and the next feature horizon is V8. |
-| `docs/releases/7.2.0/README.md` | This packet records release-prep evidence and the remaining final-main checks. |
+| `docs/BEARING.md` | Updated after release so the next target is #457 and the next feature horizon is V8. |
+| `docs/releases/7.2.0/README.md` | This packet records release-prep, final-main, tag, publish, GitHub Release, and npm registry evidence. |
 | `docs/releases/7.2.0/whats-new.md` | Versioned v7.2 release overview is ready for DOGFOOD and public release docs. |
 | `docs/releases/7.2.0/migration-guide.md` | Versioned v7.2 migration guidance is ready for DOGFOOD and public release docs. |
 | Package READMEs | No package front-door API positioning was changed by this release-gate branch. |
@@ -283,8 +295,8 @@ disposition.
 
 ## Package And Registry Verification Plan
 
-The release-prep PR performs the package metadata mutation and must validate
-the resulting branch before it merges:
+The release-prep PR performed the package metadata mutation and validated the
+resulting branch before it merged:
 
 ```bash
 npm run version 7.2.0
@@ -295,13 +307,15 @@ npm audit --audit-level=high
 npm run release:readiness -- --milestone v7.2.0
 ```
 
-The **Release Dry Run** workflow must run against the release-prep branch or PR
-commit before the release PR merges. That dry run is the current authoritative
-packed-file and npm publish dry-run evidence for the automated publish matrix.
+The **Release Dry Run** workflow ran against release-prep before merge and
+again from final `main` before tag creation. The final-main run
+<https://github.com/flyingrobots/bijou/actions/runs/28736681371> is the
+authoritative packed-file and npm publish dry-run evidence for the automated
+publish matrix.
 
-After the release-prep PR merges and local `main` exactly matches
-`origin/main`, final tag preparation must replay the metadata and docs checks
-from that merged commit:
+After the release-prep PR merged and local `main` exactly matched
+`origin/main`, final tag preparation replayed the metadata and docs checks from
+the merged commit:
 
 ```bash
 git fetch origin main --tags --prune
@@ -314,8 +328,9 @@ npm run release:preflight
 npm run docs:inventory
 ```
 
-After the `v7.2.0` tag is pushed and the publish workflow passes, verify every
-published package resolves to version `7.2.0` with the stable `latest` dist-tag:
+After the `v7.2.0` tag was pushed and the publish workflow passed, registry
+verification confirmed every published package resolves to version `7.2.0`
+with the stable `latest` dist-tag:
 
 ```bash
 npm view @flyingrobots/bijou version dist-tags --json
@@ -330,13 +345,37 @@ npm view @flyingrobots/bijou-i18n-tools-xlsx version dist-tags --json
 npm view @flyingrobots/bijou-mcp version dist-tags --json
 ```
 
+## Release-Time Registry Snapshot
+
+The table below is the immutable release evidence. It records the registry
+state observed during post-publish verification on 2026-07-05 after Release
+workflow run `28736930944` completed at `2026-07-05T10:03:04Z` from release
+commit `123f4a6150963932118cbf763a8a6ec03487e227`. The `npm view` commands
+above are operational replay aids and may report a later `latest` value after a
+future release; this table is the historical `v7.2.0` snapshot.
+
+| Package | Observed version | Observed `latest` dist-tag |
+| :--- | :--- | :--- |
+| `@flyingrobots/bijou` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-node` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-tui` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-tui-app` | `7.2.0` | `7.2.0` |
+| `create-bijou-tui-app` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools-node` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools-xlsx` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-mcp` | `7.2.0` | `7.2.0` |
+
 Tag creation, publish automation, npm registry verification, and GitHub Release
-verification remain final-main work. They must not run from the release-prep
-branch before it has merged.
+verification all ran from the merged release commit after the release-prep
+branch landed. The public release is
+<https://github.com/flyingrobots/bijou/releases/tag/v7.2.0>.
 
 ## Deterministic Reproducibility
 
-All branch-local claims above are replayable from the branch tip with:
+All historical release-prep claims above are replayable from the release-prep
+branch tip with:
 
 ```bash
 npm run release:preflight
@@ -347,7 +386,7 @@ npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-po
 npm run release:readiness
 ```
 
-Before the public tag is created from merged `main`, run:
+The public tag was created only after the final merged `main` checks passed:
 
 ```bash
 npm run release:preflight
@@ -357,14 +396,11 @@ npm audit --audit-level=high
 npm audit --omit=dev --audit-level=high
 ```
 
-The final tag must be created only after #354 is closed, the release-prep PR
-has merged, the local checkout is clean, `main` exactly matches `origin/main`,
-and CI / Release Dry Run evidence is green.
+The final tag was created after #354 closed, the release-prep PR merged, the
+local checkout was clean, `main` exactly matched `origin/main`, and CI /
+Release Dry Run evidence was green.
 
 ## Residual Risk
 
-- The release-prep branch intentionally does not create or push `v7.2.0`.
-- The Release Dry Run workflow, final tag, publish workflow, npm registry
-  verification, and GitHub Release verification remain final-main work.
 - Code Dojo debt remains tracked by ratcheting baselines. This release improves
   enforcement and lowers debt, but does not claim zero standards debt.

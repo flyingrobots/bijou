@@ -186,19 +186,21 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-With Code Dojo, DX-047/#342, DL-018/#343, #335, and #354 landed, the immediate
-`v7.2.0` focus is final release prep: version metadata, dated changelog,
-front-door release copy, release-readiness, and final-main tag validation.
+With `v7.2.0` tagged, published, and verified, the immediate target is #457:
+shape the V8 Runtime Graph and Scene IR product contract before implementation
+continues.
 
 ```text
-DOGFOOD release-story surfaces
-  -> #354 criteria audit
-    -> release-readiness and preflight
-      -> v7.2.0 tag decision
+VISOR v8 tracker (#457)
+  -> GraphQL Blocks source contract
+    -> bijou-block/1 artifact contract
+      -> ui-scene-ir/1 lowering contract
+        -> receipts, source maps, lower modes, and debug facts
+          -> DOGFOOD round-trip witness
 ```
 
-After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
-into product contract:
+The proof chain that V7 shipped must become a product contract before Bijou
+pulls in broad Geordi, Wesley, browser, or native-render work:
 
 ```text
 GraphQL SDL fixture
@@ -211,18 +213,19 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Finish the `v7.2.0` release-prep branch and Release Dry Run before any tag
-   is created.
-2. Merge release prep, sync local `main` to `origin/main`, and rerun
-   milestone-aware release-readiness from the exact tag commit.
-3. Create `v7.2.0` only from synced `main` after final-main evidence is green.
-4. Shape #302 into a V8 design packet with artifact semantics, receipt
-   invariants, source-map ownership, lower-mode contracts, and failure cases.
-5. Promote only the Runtime Graph and Scene IR issues needed for that contract
+1. Land the #457 design packet that defines GraphQL Blocks source model,
+   `bijou-block/1` artifact semantics, `ui-scene-ir/1` lowering contract,
+   receipt and source-map ownership, lower-mode rules, debug facts, failure
+   cases, and DOGFOOD witness criteria.
+2. Promote only the Runtime Graph and Scene IR issues needed for that contract
    out of `Beyond`.
-6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
+3. Pull #458 as the first implementation proof: emit a GraphQL block artifact
+   bundle with replay and visual scene facts.
+4. Pull #459 after #458 fixes the bundle shape: validate
+   `packed-bijou-cells/1` and adapt it to `Surface`.
+5. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
    the source/artifact/IR contract.
-7. Keep closed dependency PR #326 as superseded lineage, not active release
+6. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:

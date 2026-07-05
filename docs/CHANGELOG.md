@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
+## [Unreleased]
+
+### Changed
+
+- **V8 Runtime Graph contract shaping** — `docs/BEARING.md` now treats #457 as
+  the immediate post-`v7.2.0` target,
+  [`DX-048`](design/DX-048-v8-runtime-graph-scene-ir-contract.md) records the
+  GraphQL Blocks, `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps,
+  lower modes, debug facts, and DOGFOOD round-trip contract, and the `v7.2.0`
+  release packet now records the completed tag, publish, GitHub Release, and
+  npm registry verification evidence.
+
 ## [7.2.0] - 2026-07-05
 
 ### Added
@@ -2558,6 +2570,7 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v7.2.0...HEAD
 [7.2.0]: https://github.com/flyingrobots/bijou/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/flyingrobots/bijou/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/flyingrobots/bijou/compare/v5.0.0...v7.0.0
