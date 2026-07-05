@@ -102,9 +102,11 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(releasePacket).toContain('## Package And Registry Verification Plan');
     expect(releasePacket).toContain('npm run version 7.2.0');
     expect(releasePacket).toContain('Release Dry Run');
-    expect(releasePacket).toMatch(
-      /Tag creation, publish automation, npm registry\s+verification, and GitHub Release\s+verification remain final-main work/,
-    );
+    expect(releasePacket).toContain('https://github.com/flyingrobots/bijou/releases/tag/v7.2.0');
+    expect(releasePacket).toContain('Publish workflow passed on 2026-07-05');
+    expect(releasePacket).toContain('npm registry verification passed for every automated package');
+    expect(releasePacket).not.toContain('pending final-main release step');
+    expect(releasePacket).not.toContain('verification remain final-main work');
     expect(releasePacket).not.toContain('The version bump, final release dry run, tag creation');
 
     for (const packageName of publishedPackages) {

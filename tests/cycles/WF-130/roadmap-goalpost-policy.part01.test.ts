@@ -37,6 +37,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       const bearing = normalizeWhitespace(read('docs/BEARING.md'));
       const releaseRunbook = normalizeWhitespace(read('docs/release.md'));
       const dx046Design = normalizeWhitespace(read('docs/design/DX-046-graphql-authored-dogfood-block-fixture.md'));
+      const dx048Design = normalizeWhitespace(read('docs/design/DX-048-v8-runtime-graph-scene-ir-contract.md'));
 
       expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-07-05.');
       expect(roadmap).toContain('The latest shipped public release is');
@@ -66,6 +67,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).toContain('`Beyond`');
       expect(roadmap).toContain('39 | 6');
       expect(roadmap).toContain('Next Pull');
+      expect(roadmap).toContain('[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)');
       expect(roadmap).toContain('Runtime Graph and Scene IR product contract');
       expect(roadmap).toContain('VISOR');
       expect(roadmap).toContain('#335');
@@ -111,12 +113,13 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
       expect(bearing).toContain('The latest shipped public release is `v7.2.0`');
       expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
-      expect(bearing).toContain('the immediate `v7.2.0` focus is final release prep');
+      expect(bearing).toContain('the immediate target is #457: shape the V8 Runtime Graph and Scene IR product contract');
       expect(bearing).toContain('`v7.2.0` completed as a narrow stabilization and demo-integrity release');
       expect(bearing).toContain('`v7.2.0` milestone is complete release lineage: 0 open and 17 closed milestone items');
       expect(bearing).toContain('`v8.0.0` milestone is staged as the next feature horizon: 3 open and 0 closed milestone items');
       expect(bearing).toContain('The selected `v7.2.0` DOGFOOD product pull #335 has landed');
       expect(bearing).toContain('Shape V8 And V9 From Beyond');
+      expect(bearing).not.toContain('final-main tag validation');
       expect(bearing).not.toContain('The next selected product pull after that gate is DX-047');
       expect(bearing).not.toContain('The next release-facing action is release-readiness validation');
 
@@ -129,6 +132,13 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(dx046Design).toContain('Parent tracker: [#302](https://github.com/flyingrobots/bijou/issues/302)');
       expect(dx046Design).toContain('NavigationListBlock');
       expect(dx046Design).toContain('Tests To Write First');
+
+      expect(dx048Design).toContain('Goalpost tracker: [#457](https://github.com/flyingrobots/bijou/issues/457)');
+      expect(dx048Design).toContain('GraphQL Blocks source model');
+      expect(dx048Design).toContain('`bijou-block/1` artifact semantics');
+      expect(dx048Design).toContain('`ui-scene-ir/1` lowering contract');
+      expect(dx048Design).toContain('receipt and source-map ownership');
+      expect(dx048Design).toContain('DOGFOOD round-trip fixture');
     });
 
 });

@@ -5,9 +5,9 @@ surface. It keeps the public Runtime Graph direction intentionally narrow while
 tightening framework input behavior, DOGFOOD readability, Blocks documentation,
 release evidence, and dependency review.
 
-The public tag is created only after the release-prep branch merges and
-final-main validation passes. This document is the versioned release overview
-DOGFOOD and the repository front door use for 7.2.0.
+The public tag was created from the verified 2026-07-05 `main` release commit.
+This document is the versioned release overview DOGFOOD and the repository
+front door use for 7.2.0.
 
 ## Framework Input Stabilization
 
@@ -56,8 +56,8 @@ security audit scope, registry verification, release-readiness posture, and
 residual risk.
 
 Maintainers should treat the release evidence packet as the authoritative 7.2
-release-prep checklist until the final tag is created from the merged
-`origin/main` release commit.
+release record: it includes the public GitHub Release, final-main validation,
+publish workflow, tag CI, Tag Guard, and npm registry verification evidence.
 
 ## V8 Posture
 

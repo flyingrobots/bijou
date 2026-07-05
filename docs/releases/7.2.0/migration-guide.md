@@ -3,9 +3,8 @@
 Bijou 7.2.0 is a minor release from 7.1.0. It is intended to be additive for
 applications using documented public APIs.
 
-The public tag is created only after the release-prep branch merges and
-final-main validation passes. These instructions are the versioned migration
-guide for the 7.2.0 package set.
+The public tag was created from the verified 2026-07-05 `main` release commit.
+These instructions are the versioned migration guide for the 7.2.0 package set.
 
 ## Recommended Upgrade
 
@@ -59,17 +58,18 @@ when preparing or validating a release branch.
 
 ## Release Tooling
 
-Maintainers preparing the release should use both release-readiness modes:
+Maintainers replaying or auditing the release should use both release-readiness
+modes:
 
 ```bash
 npm run release:readiness
 npm run release:readiness -- --milestone v7.2.0
 ```
 
-The plain command validates local release evidence before the milestone is
-closed. The milestone-aware command is the final release gate and must pass
-after the release-prep PR has merged, the target milestone has zero open
-tracker items, and no tracked work carries a `work-in-progress` label.
+The plain command validates local release evidence without live milestone
+checks. The milestone-aware command is the release gate that passed from the
+merged `main` release commit after the target milestone had zero open tracker
+items and no tracked work carried a `work-in-progress` label.
 
 ## Compatibility Stance
 
