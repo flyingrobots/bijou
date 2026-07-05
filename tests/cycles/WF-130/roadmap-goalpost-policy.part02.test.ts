@@ -47,7 +47,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(v72Row).toContain('https://github.com/flyingrobots/bijou/issues/353');
       expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
       expect(normalizedRoadmap).toContain(
-        'The broad #302 tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns #329 as closed DX-046 lineage plus #270 and #312 as release-prep guardrails.',
+        'Current release**: `v7.2.0` is shipped demo-integrity and framework-input stabilization lineage. The broad #302 tracker stays in `Beyond` for `v8.0.0`.',
       );
     });
 

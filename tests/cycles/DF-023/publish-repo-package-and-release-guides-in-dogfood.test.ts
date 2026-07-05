@@ -127,7 +127,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     const changelogText = frameText(must(changelog.frames.at(-1)));
 
     expect(changelogText).toContain('CHANGELOG.md');
-    expect(changelogText).toContain('[Unreleased]');
+    expect(changelogText).toContain('[7.2.0]');
     expect(changelogText).toContain('[7.1.0]');
     expect(changelogText).toContain('[5.0.0]');
     expect(changelogText).not.toContain('[6.0.0] - skipped public package release');

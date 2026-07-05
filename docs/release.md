@@ -191,8 +191,12 @@ substitute for the command and immutable input that produced it.
 
 ### Latest Shipped Release
 
-The latest shipped release is **`7.1.0`**.
+The latest shipped release is **`7.2.0`**.
 
+- `7.2.0` - TUI mouse tracking and fallthrough stabilization, public
+  page-scoped frame helpers, scripted mouse driver builders, DOGFOOD release
+  story surfaces, Blocks app-binding snippets, theme and localization demo
+  readiness, dependency audit cleanup, and Code Dojo ratchet progress
 - `7.1.0` - portable `ui-scene-ir/1` proof, GraphQL-authored
   `bijou-block/1` artifacts, grouped debug facts, a real DOGFOOD
   NavigationListBlock fixture, terminal-rendering fixes, release-readiness
@@ -218,17 +222,18 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-`7.2.0` is selected as a narrow stabilization and demo-integrity release, not
-as a broad feature train.
+`8.0.0` is the next feature horizon: the Runtime Graph and Scene IR product
+contract built from the proof chain that `7.1.0` shipped and the release
+surface that `7.2.0` stabilized.
 
-The latest shipped package release is `7.1.0`. The older `v6.0.0`, `v7.0.0`,
-and `v7.1.0` milestones are zero-open tracker lanes retained as release lineage,
-not as the next target. The current target is the `v7.2.0` milestone.
+The latest shipped package release is `7.2.0`. The older `v6.0.0`, `v7.0.0`,
+`v7.1.0`, and `v7.2.0` milestones are zero-open tracker lanes retained as
+release lineage, not as the next target. The current target is the `v8.0.0`
+milestone.
 
-New feature work should still shape toward `8.0.0`: the Runtime Graph and Scene
-IR product contract built from the proof chain that `7.1.0` shipped. Use
-`7.2.0` for the selected framework-input and DOGFOOD demo-integrity repair
-lane only.
+New feature work should shape toward `8.0.0`. Do not reopen `7.2.0` for broad
+Theme Lab, BlockLab, localization workbench, VISOR, Geordi, or Runtime Graph
+product work.
 
 Before the next release-prep cycle begins, keep the selected scope reflected in
 [`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live

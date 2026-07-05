@@ -3,8 +3,9 @@
 Bijou 7.2.0 is a minor release from 7.1.0. It is intended to be additive for
 applications using documented public APIs.
 
-The release is still pending its final tag. These instructions are staged so
-the migration guide is available before the version bump lands.
+The public tag is created only after the release-prep branch merges and
+final-main validation passes. These instructions are the versioned migration
+guide for the 7.2.0 package set.
 
 ## Recommended Upgrade
 
@@ -54,7 +55,7 @@ prefer the package exports after upgrading.
 
 The DOGFOOD release pages for 7.2.0 depend on the versioned docs in this
 directory. Keep `whats-new.md`, `migration-guide.md`, and `README.md` together
-when preparing a release branch, before changing package metadata to `7.2.0`.
+when preparing or validating a release branch.
 
 ## Release Tooling
 
@@ -67,8 +68,8 @@ npm run release:readiness -- --milestone v7.2.0
 
 The plain command validates local release evidence before the milestone is
 closed. The milestone-aware command is the final release gate and must pass
-after the release-gate PR has merged, the target milestone has zero open tracker
-items, and no tracked work carries a `work-in-progress` label.
+after the release-prep PR has merged, the target milestone has zero open
+tracker items, and no tracked work carries a `work-in-progress` label.
 
 ## Compatibility Stance
 

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
-## [Unreleased]
+## [7.2.0] - 2026-07-05
 
 ### Added
 
@@ -319,9 +319,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **v7.2.0 release-gate sync** — `docs/ROADMAP.md` and `docs/BEARING.md` now
   mark #335 as landed, refresh the GitHub milestone counts, stage the new
-  `v8.0.0` VISOR tracker separately from the v7.2 stabilization lane, and make
-  #354 release-readiness/preflight closure the next pull before any tag is
-  created.
+  `v8.0.0` VISOR tracker separately from the v7.2 stabilization lane, and
+  recorded #354 release-readiness/preflight closure as the final release-gate
+  step before the version/tag release prep.
 - **v7.2.0 stabilization train** —
   `docs/ROADMAP.md`, `docs/BEARING.md`, `docs/release.md`, and
   `docs/design/RE-041-v72-framework-input-stabilization.md` now select
@@ -2558,7 +2558,7 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v7.1.0...HEAD
+[7.2.0]: https://github.com/flyingrobots/bijou/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/flyingrobots/bijou/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/flyingrobots/bijou/compare/v5.0.0...v7.0.0
 [5.0.0]: https://github.com/flyingrobots/bijou/compare/v4.4.1...v5.0.0

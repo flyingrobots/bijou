@@ -38,7 +38,7 @@ interface CommandOptions {
 }
 
 const TUI_CANARY_STEPS: readonly PtyStep[] = [
-  inputStep('', 600, 'initial', 150),
+  inputStep('', 600, 'initial', 900),
   inputStep(']', 200, 'split', 650),
   inputStep('[', 200, 'home-return', 500),
   inputStep('o', 200, 'drawer-closed', 1200),
