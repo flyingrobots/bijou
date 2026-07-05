@@ -139,6 +139,8 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(dx048Design).toContain('`ui-scene-ir/1` lowering contract');
       expect(dx048Design).toContain('receipt and source-map ownership');
       expect(dx048Design).toContain('DOGFOOD round-trip fixture');
+      expect(dx048Design).toContain('[flyingrobots/visor](https://github.com/flyingrobots/visor)');
+      expect(dx048Design).not.toContain('VISOR coordination surface: https://github.com/flyingrobots/visor');
     });
 
 });

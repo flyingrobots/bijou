@@ -345,6 +345,28 @@ npm view @flyingrobots/bijou-i18n-tools-xlsx version dist-tags --json
 npm view @flyingrobots/bijou-mcp version dist-tags --json
 ```
 
+## Release-Time Registry Snapshot
+
+The table below is the immutable release evidence. It records the registry
+state observed during post-publish verification on 2026-07-05 after Release
+workflow run `28736930944` completed at `2026-07-05T10:03:04Z` from release
+commit `123f4a6150963932118cbf763a8a6ec03487e227`. The `npm view` commands
+above are operational replay aids and may report a later `latest` value after a
+future release; this table is the historical `v7.2.0` snapshot.
+
+| Package | Observed version | Observed `latest` dist-tag |
+| :--- | :--- | :--- |
+| `@flyingrobots/bijou` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-node` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-tui` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-tui-app` | `7.2.0` | `7.2.0` |
+| `create-bijou-tui-app` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools-node` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-i18n-tools-xlsx` | `7.2.0` | `7.2.0` |
+| `@flyingrobots/bijou-mcp` | `7.2.0` | `7.2.0` |
+
 Tag creation, publish automation, npm registry verification, and GitHub Release
 verification all ran from the merged release commit after the release-prep
 branch landed. The public release is

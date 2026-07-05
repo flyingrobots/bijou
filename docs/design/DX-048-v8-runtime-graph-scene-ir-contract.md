@@ -28,7 +28,8 @@ Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
   [#459](https://github.com/flyingrobots/bijou/issues/459)
 - Broad source lineage:
   [#302](https://github.com/flyingrobots/bijou/issues/302)
-- VISOR coordination surface: https://github.com/flyingrobots/visor
+- VISOR coordination surface:
+  [flyingrobots/visor](https://github.com/flyingrobots/visor)
 - Prior Bijou proof:
   [DX-046 GraphQL Authored DOGFOOD Block Fixture](./DX-046-graphql-authored-dogfood-block-fixture.md)
 

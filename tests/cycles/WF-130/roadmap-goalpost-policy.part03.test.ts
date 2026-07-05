@@ -105,12 +105,19 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(releasePacket).toContain('https://github.com/flyingrobots/bijou/releases/tag/v7.2.0');
     expect(releasePacket).toContain('Publish workflow passed on 2026-07-05');
     expect(releasePacket).toContain('npm registry verification passed for every automated package');
+    expect(releasePacket).toContain('## Release-Time Registry Snapshot');
+    expect(releasePacket).toContain(
+      'workflow run `28736930944` completed at `2026-07-05T10:03:04Z`',
+    );
+    expect(releasePacket).toContain('The `npm view` commands');
+    expect(releasePacket).toContain('may report a later `latest` value');
     expect(releasePacket).not.toContain('pending final-main release step');
     expect(releasePacket).not.toContain('verification remain final-main work');
     expect(releasePacket).not.toContain('The version bump, final release dry run, tag creation');
 
     for (const packageName of publishedPackages) {
       expect(releasePacket).toContain(`npm view ${packageName} version dist-tags --json`);
+      expect(releasePacket).toContain(`| \`${packageName}\` | \`7.2.0\` | \`7.2.0\` |`);
     }
   });
 
