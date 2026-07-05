@@ -5,9 +5,9 @@ surface. It keeps the public Runtime Graph direction intentionally narrow while
 tightening framework input behavior, DOGFOOD readability, Blocks documentation,
 release evidence, and dependency review.
 
-The release is still pending its final tag. This document is staged before the
-version bump so DOGFOOD can load the 7.2.0 release copy when package metadata
-moves to the new version.
+The public tag is created only after the release-prep branch merges and
+final-main validation passes. This document is the versioned release overview
+DOGFOOD and the repository front door use for 7.2.0.
 
 ## Framework Input Stabilization
 
@@ -50,12 +50,14 @@ evidence rather than opening a broader design-system expansion.
 
 ## Release Evidence
 
-The release gate now carries a versioned evidence packet before the version
-bump. That packet records trackers, landed PRs, replay commands, security audit
-scope, registry verification, release-readiness posture, and residual risk.
+The release gate now carries a versioned evidence packet alongside the package
+metadata bump. That packet records trackers, landed PRs, replay commands,
+security audit scope, registry verification, release-readiness posture, and
+residual risk.
 
-Maintainers should treat this as the authoritative 7.2 release-prep checklist
-until the final tag is created from the merged `origin/main` release commit.
+Maintainers should treat the release evidence packet as the authoritative 7.2
+release-prep checklist until the final tag is created from the merged
+`origin/main` release commit.
 
 ## V8 Posture
 

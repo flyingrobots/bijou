@@ -6,10 +6,10 @@ describe('WF-126 v7 closeout tracker sync', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const normalizedBearing = bearing.replace(/\s+/g, ' ').trim();
 
-    expect(bearing).toContain('The latest shipped public release is `v7.1.0`');
+    expect(bearing).toContain('The latest shipped public release is `v7.2.0`');
     expect(normalizedBearing).toContain('are complete release lineage, not the next implementation target');
     expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
-    expect(bearing).toContain('`v7.2.0` is now selected as a narrow stabilization and demo-integrity release');
+    expect(bearing).toContain('`v7.2.0` completed as a narrow stabilization and demo-integrity release');
     expect(bearing).not.toContain('Its current open count is three');
     expect(bearing).not.toContain('https://github.com/flyingrobots/bijou/issues/245');
     expect(bearing).not.toContain('https://github.com/flyingrobots/bijou/issues/246');

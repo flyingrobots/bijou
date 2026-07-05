@@ -67,7 +67,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(missingTestPaths).toEqual([]);
   });
 
-  it('publishes discoverable v7.2 release docs before the version bump', () => {
+  it('publishes discoverable v7.2 release docs for the versioned package set', () => {
     const releaseDocs = [
       'docs/releases/7.2.0/README.md',
       'docs/releases/7.2.0/whats-new.md',
@@ -103,7 +103,7 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(releasePacket).toContain('npm run version 7.2.0');
     expect(releasePacket).toContain('Release Dry Run');
     expect(releasePacket).toMatch(
-      /Tag creation, publish automation, npm registry\s+verification, and GitHub Release verification remain final-main work/,
+      /Tag creation, publish automation, npm registry\s+verification, and GitHub Release\s+verification remain final-main work/,
     );
     expect(releasePacket).not.toContain('The version bump, final release dry run, tag creation');
 

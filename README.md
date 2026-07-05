@@ -337,30 +337,29 @@ npm run blocklab:index
 API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
 script names remain as compatibility aliases during the rename window.
 
-## What's New in v7.1.0
+## What's New in v7.2.0
 
-Bijou `v7.1.0` is a focused post-V7 minor release for portable UI proof and
-release-readiness hardening.
+Bijou `v7.2.0` is a focused stabilization release for the V7 demo, TUI mouse
+input, DOGFOOD documentation, and release evidence.
 
-- `@flyingrobots/bijou` now exposes the first `ui-scene-ir/1` proof contract
-  with deterministic receipts, source maps, terminal lowering, and lower-mode
-  facts.
-- GraphQL-authored Bijou Blocks can compile into `bijou-block/1`, lower into
-  `ui-scene-ir/1`, and emit deterministic debug facts; DOGFOOD now includes a
-  real NavigationListBlock fixture through that path.
-- Theme tokens gained first-party dark/light presets, safe-pair contracts, and
-  DOGFOOD Theme Lab / Theme Inspector proof surfaces.
-- Terminal and DOGFOOD fixes cover resize repaint recovery, scoped ANSI color
-  resets, Blocks preview navigation, title perf HUD ownership, and quit-copy
-  cleanup.
-- Release prep is more auditable with milestone-aware
-  `release:readiness -- --milestone v7.1.0` and source-complete DOGFOOD i18n
-  debt discovery.
+- TUI apps can request `press`, `drag`, or any-event SGR mouse tracking, and
+  the event bus now splits bundled mouse packets before parsing so hover-heavy
+  surfaces do not lose movement events.
+- Framework mouse fallthrough, page-scoped frame helper exports, and scripted
+  mouse driver builders make pointer regressions easier to replay and test.
+- DOGFOOD's release section now surfaces What's New, the real GraphQL Blocks
+  proof chain, and changelog history in the main reader flow instead of hiding
+  release-critical context in side metadata.
+- DOGFOOD demo surfaces are more honest for localization fallback, light-theme
+  readability, first-party theme variants, and Blocks app-binding snippets.
+- Release validation now records the v7.2.0 evidence packet, milestone-aware
+  tracker state for issues and pull requests, dev-inclusive security audit
+  proof, and Code Dojo ratchet progress.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/7.1.0/whats-new.md), the
-[migration guide](./docs/releases/7.1.0/migration-guide.md), and the
-[release evidence packet](./docs/releases/7.1.0/README.md).
+[What's New guide](./docs/releases/7.2.0/whats-new.md), the
+[migration guide](./docs/releases/7.2.0/migration-guide.md), and the
+[release evidence packet](./docs/releases/7.2.0/README.md).
 
 ## Tests, Soak, and Performance
 

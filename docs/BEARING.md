@@ -5,6 +5,11 @@ Current direction and active tensions. Historical ship data is in
 
 ## Recent Ships
 
+- `7.2.0` — demo-integrity stabilization shipped: TUI mouse tracking and
+  fallthrough repairs, public page-scoped frame helpers, scripted mouse driver
+  builders, DOGFOOD release-story surfaces, Blocks app-binding snippets,
+  theme/localization demo readiness, dependency audit cleanup, and Code Dojo
+  ratchet progress.
 - `7.1.0` — post-V7 portable UI proof shipped: `ui-scene-ir/1`,
   GraphQL-authored `bijou-block/1` artifacts, grouped block debug facts, a real
   DOGFOOD NavigationListBlock fixture, terminal-rendering fixes, and
@@ -96,12 +101,12 @@ Current direction and active tensions. Historical ship data is in
 
 ### 1. Keep The Release Posture Honest
 
-- The latest shipped public release is `v7.1.0`, published from the post-V7
-  release packet on 2026-06-14.
-- The `v6.0.0`, `v7.0.0`, and `v7.1.0` GitHub milestone lanes are complete
-  release lineage, not the next implementation target.
-- `v7.2.0` is now selected as a narrow stabilization and demo-integrity release,
-  not as a broad feature train.
+- The latest shipped public release is `v7.2.0`, published from the
+  demo-integrity release packet on 2026-07-05.
+- The `v6.0.0`, `v7.0.0`, `v7.1.0`, and `v7.2.0` GitHub milestone lanes are
+  complete release lineage, not the next implementation target.
+- `v7.2.0` completed as a narrow stabilization and demo-integrity release, not
+  as a broad feature train.
 - The first `v7.2.0` demo-integrity pull was RE-041: fix framework mouse
   fallthrough (#344), expose page-scoped frame helpers (#345), and add scripted
   mouse builders (#353).
@@ -121,7 +126,8 @@ Current direction and active tensions. Historical ship data is in
   GraphQL proof chain, and changelog history are visible without wide-only side
   metadata.
 - The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
-  product contract built from the proof chain that v7.1.0 shipped.
+  product contract built from the proof chain that v7.1.0 shipped and the
+  release surface that v7.2.0 stabilized.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
   the release process lives in [release.md](./release.md).
 
@@ -135,15 +141,15 @@ Current direction and active tensions. Historical ship data is in
   `v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` /
   `v7.0.0` lanes, should get a GitHub comment and a matching roadmap update.
 
-### 3. Stabilize V7.2, Then Shape V8 And V9 From Beyond
+### 3. Shape V8 And V9 From Beyond
 
-- The `v7.2.0` milestone is the current release-gate stabilization lane: 1 open
-  and 16 closed milestone items as of the latest roadmap sync.
+- The `v7.2.0` milestone is complete release lineage: 0 open and 17 closed
+  milestone items as of the latest roadmap sync.
 - The `v8.0.0` milestone is staged as the next feature horizon: 3 open and 0
   closed milestone items as of the latest roadmap sync.
 - The `Beyond` milestone is the current post-v7 backlog: 39 open and 6 closed
   milestone items as of the latest roadmap sync.
-- `v7.2.0` should stay bounded to the framework input and DOGFOOD demo-integrity
+- `v7.2.0` must stay closed to the framework input and DOGFOOD demo-integrity
   issues selected in #354, plus narrow security repairs such as #357.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
   versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
@@ -157,11 +163,11 @@ Current direction and active tensions. Historical ship data is in
 
 ## Tensions
 
-- **Closed Release Gravity**: `v6.0.0`, `v7.0.0`, and `v7.1.0` are complete
-  release lineage. Do not use those lanes for new feature work.
-- **Minor-Release Temptation**: Do not let `v7.2.0` become a full feature train.
-  Adding a full workbench, theme lab, localization suite, Wesley path, or Geordi
-  path turns the work into V8/V9 scope.
+- **Closed Release Gravity**: `v6.0.0`, `v7.0.0`, `v7.1.0`, and `v7.2.0` are
+  complete release lineage. Do not use those lanes for new feature work.
+- **Minor-Release Temptation**: Do not reopen `v7.2.0` as a full feature train.
+  Adding a full workbench, theme lab, localization suite, Wesley path, or
+  Geordi path turns the work into V8/V9 scope.
 - **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
   New product-facing work should consume geometry contracts, not bypass them
   with bespoke string/surface measurement.
@@ -180,14 +186,15 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-With Code Dojo, DX-047/#342, DL-018/#343, and #335 landed, the immediate
-`v7.2.0` focus is closing #354 through release-gate validation.
+With Code Dojo, DX-047/#342, DL-018/#343, #335, and #354 landed, the immediate
+`v7.2.0` focus is final release prep: version metadata, dated changelog,
+front-door release copy, release-readiness, and final-main tag validation.
 
 ```text
 DOGFOOD release-story surfaces
   -> #354 criteria audit
     -> release-readiness and preflight
-      -> v7.2.0 version/tag decision
+      -> v7.2.0 tag decision
 ```
 
 After `v7.2.0` stabilizes the current V7 surface, V8 must turn the proof chain
@@ -204,10 +211,11 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Run the normal `v7.2.0` release-prep checklist before any tag is created.
-2. Close the remaining #354 umbrella criteria once release-readiness and
-   preflight remain clean.
-3. Prepare the `v7.2.0` version/tag release packet from merged `main`.
+1. Finish the `v7.2.0` release-prep branch and Release Dry Run before any tag
+   is created.
+2. Merge release prep, sync local `main` to `origin/main`, and rerun
+   milestone-aware release-readiness from the exact tag commit.
+3. Create `v7.2.0` only from synced `main` after final-main evidence is green.
 4. Shape #302 into a V8 design packet with artifact semantics, receipt
    invariants, source-map ownership, lower-mode contracts, and failure cases.
 5. Promote only the Runtime Graph and Scene IR issues needed for that contract

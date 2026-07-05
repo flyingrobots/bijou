@@ -13,28 +13,28 @@ requests assigned to each milestone. They are not issue-only totals. Do not
 compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items: 2026-07-04.
+Last synced from GitHub milestone items: 2026-07-05.
 
 ## Current Release State
 
 The latest shipped public release is
-[`v7.1.0`](https://github.com/flyingrobots/bijou/releases/tag/v7.1.0),
-published from the post-V7 release packet on 2026-06-14.
+[`v7.2.0`](https://github.com/flyingrobots/bijou/releases/tag/v7.2.0),
+published from the demo-integrity release packet on 2026-07-05.
 
 `v6.0.0` was never published as a public package release. Its GitHub milestone
 is complete tracker lineage whose work was absorbed before Bijou shipped
 `v7.0.0`; do not use that lane for new release work.
 
-`v7.1.0` is complete post-V7 minor release lineage: accumulated `Unreleased`
-work after `v7.0.0`, the landed DX-046 DOGFOOD GraphQL fixture, #270
-release-readiness guardrails, #312 DOGFOOD i18n debt coverage, and the
-versioned release evidence packet.
+`v7.1.0` is complete post-V7 minor release lineage: accumulated work after
+`v7.0.0`, the landed DX-046 DOGFOOD GraphQL fixture, #270 release-readiness
+guardrails, #312 DOGFOOD i18n debt coverage, and the versioned release
+evidence packet.
 
-`v7.2.0` is now selected as a narrow stabilization and demo-integrity release.
-It is not a broad feature train and does not replace the `v8.0.0` Runtime Graph
-and Scene IR product-contract horizon. Its purpose is to repair the concrete
-post-`v7.1.0` video-rehearsal and framework-input issues that make the current
-V7 story harder to use, test, or demonstrate.
+`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.
+It did not become a broad feature train and does not replace the `v8.0.0`
+Runtime Graph and Scene IR product-contract horizon. Its purpose was to repair
+the concrete post-`v7.1.0` video-rehearsal and framework-input issues that made
+the V7 story harder to use, test, or demonstrate.
 
 The **Respectful Repo: Enter the Code Dojo** pre-release quality goalpost has
 landed. The verbatim
@@ -47,18 +47,18 @@ count reaches zero.
 
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
-| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 1 | 16 | Release-gate lane for demo integrity, framework input correctness, and narrow security repairs. |
+| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 17 | Shipped demo-integrity and framework-input stabilization lineage. |
 | `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 0 | Staged next feature horizon for VISOR and the Runtime Graph / Scene IR contract. |
-| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Latest shipped release lineage after the release PR merges. Complete; do not reopen for new feature work. |
+| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Previous shipped release lineage. Complete; do not reopen for new feature work. |
 | `v7.0.0` | [v7.0.0](https://github.com/flyingrobots/bijou/milestone/2) | 0 | 27 | Shipped release lineage. Complete; do not reopen for new feature work. |
 | `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) | 39 | 6 | Active forward backlog. Promote shaped work from here into a versioned release. |
 | `v6.0.0` | [v6.0.0](https://github.com/flyingrobots/bijou/milestone/1) | 0 | 30 | Skipped public release lane. Complete lineage retained for issue history. |
 
 ## Release Train Decision
 
-### `v7.1.0`: Shipped Post-V7 Minor
+### `v7.1.0`: Previous Shipped Post-V7 Minor
 
-`v7.1.0` is the current shipped public release boundary.
+`v7.1.0` is the previous shipped public release boundary.
 
 Shipped scope:
 
@@ -93,11 +93,11 @@ The `v7.1.0` GitHub milestone is closed release lineage. Keep #329, #270, #312,
 and the release PR there for history, leave parent #302 in `Beyond`, and do not
 move new feature work into `v7.1.0`.
 
-### `v7.2.0`: Stabilization And Demo Integrity
+### `v7.2.0`: Shipped Stabilization And Demo Integrity
 
-`v7.2.0` is the selected narrow repair release after the failed release-video
-rehearsal. Its job is to make the existing V7 surface more honest and
-demonstrable without pulling the broad V8 product contract forward.
+`v7.2.0` is the shipped narrow repair release after the failed release-video
+rehearsal. It made the existing V7 surface more honest and demonstrable without
+pulling the broad V8 product contract forward.
 
 Primary tracker:
 
@@ -228,19 +228,18 @@ that a cross-repository release is the next smallest honest boundary.
 
 ## Next Pull
 
-The immediate pull should close the **v7.2.0 release gate** for #354.
+The immediate product pull after `v7.2.0` should shape the **v8.0.0 Runtime
+Graph and Scene IR product contract**.
 
-That pull should synchronize the roadmap with the now-landed #335 DOGFOOD
-release-story surfaces, run the normal release-readiness and preflight checks,
-and leave the branch ready for the `v7.2.0` version/tag decision if every gate
-is green. It should not add new product scope to the stabilization lane.
+That pull should keep the V8 tracker staged around VISOR, artifact semantics,
+receipts, source maps, lower modes, debug facts, DOGFOOD round-trip fixtures,
+and capture evidence. It should not reopen `v7.2.0` for broad product scope.
 
 ## Forward Goalposts
 
 These are planning recommendations from the open tracker state as of
-2026-07-04. `v7.1.0` is shipped lineage; `v7.2.0` is the release-gate
-stabilization lane; `v8.0.0` and `v9.0.0` remain the intended feature horizons
-after the stabilization release.
+2026-07-05. `v7.1.0` and `v7.2.0` are shipped lineage; `v8.0.0` and `v9.0.0`
+remain the intended feature horizons after the stabilization release.
 
 | Target | Goalpost | Tracker | Why It Belongs There | Release Gate |
 | :--- | :--- | :--- | :--- | :--- |
@@ -252,12 +251,11 @@ after the stabilization release.
 
 ## Decision Points
 
-- **Current release**: `v7.1.0` is shipped post-V7 minor lineage. The broad #302
-  tracker stays in `Beyond` for `v8.0.0`; `v7.1.0` owns #329 as closed DX-046
-  lineage plus #270 and #312 as release-prep guardrails.
-- **Next release**: `v7.2.0` is the active narrow stabilization release. It
-  should fix demo-integrity and framework-input seams without becoming the next
-  feature train.
+- **Current release**: `v7.2.0` is shipped demo-integrity and framework-input
+  stabilization lineage. The broad #302 tracker stays in `Beyond` for
+  `v8.0.0`.
+- **Next release**: `v8.0.0` is the active feature horizon for Runtime Graph and
+  Scene IR product-contract work.
 - **Next feature version**: `v8.0.0` is still the next intended feature horizon.
 - **V7.2 boundary**: do not pull broad Runtime Graph, BlockLab, Theme Lab,
   localization workbench, worker rendering, adaptive frame budgeting, or
