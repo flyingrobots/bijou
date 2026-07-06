@@ -71,6 +71,30 @@ export {
 } from './core/graphql-bijou-block.js';
 
 export {
+  VISOR_ARTIFACT_BUNDLE_VERSION,
+  VISOR_REPLAY_METADATA_VERSION,
+  VISOR_VISUAL_SCENE_FACTS_VERSION,
+  createVisorArtifactBundle,
+  createVisorArtifactBundleFromGraphql,
+  type CreateVisorArtifactBundleFromGraphqlOptions,
+  type CreateVisorArtifactBundleInput,
+  type VisorArtifactBundle,
+  type VisorArtifactBundleArtifacts,
+  type VisorArtifactBundleFixture,
+  type VisorArtifactBundleHashes,
+  type VisorArtifactBundleReceipt,
+  type VisorArtifactBundleSource,
+  type VisorArtifactBundleVersion,
+  type VisorReplayMetadata,
+  type VisorReplayMetadataVersion,
+  type VisorReplayStep,
+  type VisorVisualLowerModeFact,
+  type VisorVisualNodeFact,
+  type VisorVisualSceneFacts,
+  type VisorVisualSceneFactsVersion,
+} from './core/visor-artifact-bundle.js';
+
+export {
   UI_SCENE_IR_VERSION,
   UI_SCENE_RECEIPT_VERSION,
   createUiSceneTerminalReceipt,
