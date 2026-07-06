@@ -47,7 +47,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(v72Row).toContain('https://github.com/flyingrobots/bijou/issues/353');
       expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
       expect(normalizedRoadmap).toContain(
-        'Current release**: `v7.2.0` is shipped demo-integrity and framework-input stabilization lineage. The broad #302 tracker stays in `Beyond` for `v8.0.0`.',
+        'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
       );
     });
 
@@ -56,7 +56,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       const v8Section = sectionBetween(
         roadmap,
         '### `v8.0.0`: Runtime Graph And Scene IR Product Contract',
-        '### `v9.0.0`: Product Workbench And Operator Surfaces',
+        '### `v8.1.0`: Replay, Capture, And Render Witnesses',
       );
       const normalizedV8Section = normalizeWhitespace(v8Section);
       const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
@@ -67,8 +67,8 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(normalizedV8Section).toContain('VISOR: emit GraphQL block artifact bundle with replay and visual scene facts');
       expect(v8Section).toContain('[#459](https://github.com/flyingrobots/bijou/issues/459)');
       expect(normalizedV8Section).toContain('VISOR: validate packed-bijou-cells/1 and adapt to Surface');
-      expect(normalizedV8Section).toContain('Candidate source lineage remains in `Beyond`');
       expect(v8Section).toContain('[#302](https://github.com/flyingrobots/bijou/issues/302)');
+      expect(normalizedV8Section).toContain('as the broad GraphQL-authored UI scenes into Bijou Blocks source tracker');
       expect(v8Section).not.toContain('- [#302](https://github.com/flyingrobots/bijou/issues/302) for GraphQL-authored');
       expect(maintenanceRule).toContain('gh issue list --state all --milestone v8.0.0');
       expect(maintenanceRule).toContain('gh pr list --state all --search \'milestone:"v8.0.0"\'');
@@ -78,7 +78,9 @@ describe('WF-130 roadmap goalpost policy', () => {
       const bearing = normalizeWhitespace(read('docs/BEARING.md'));
 
       expect(bearing).toContain('Any issue or pull request moved between release horizons');
-      expect(bearing).toContain('`v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`');
+      expect(bearing).toContain(
+        '`v7.1.0`, `v7.2.0`, `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, `v10.0.0`, `Beyond`',
+      );
       expect(bearing).not.toContain('Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond`');
     });
 
