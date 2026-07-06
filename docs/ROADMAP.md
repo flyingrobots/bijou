@@ -148,7 +148,9 @@ Primary staged milestone trackers:
 - [#457](https://github.com/flyingrobots/bijou/issues/457) TRACKER: VISOR
   warpspace for v8 Runtime Graph And Scene IR
 - [#458](https://github.com/flyingrobots/bijou/issues/458) VISOR: emit GraphQL
-  block artifact bundle with replay and visual scene facts
+  block artifact bundle with replay and visual scene facts, shaped by
+  [`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md) as the first
+  `visor-artifact-bundle/1` proof
 - [#459](https://github.com/flyingrobots/bijou/issues/459) VISOR: validate
   packed-bijou-cells/1 and adapt to Surface
 - [#302](https://github.com/flyingrobots/bijou/issues/302) as the broad
@@ -301,7 +303,12 @@ Primary tracker:
 The immediate product pull after
 [`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md) should be
 [#458](https://github.com/flyingrobots/bijou/issues/458): emit the first
-GraphQL block artifact bundle with replay and visual scene facts.
+GraphQL block artifact bundle with replay and visual scene facts. Its cycle
+design is
+[`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md), which scopes the
+first `visor-artifact-bundle/1` proof around existing GraphQL block facts,
+`bijou-block/1`, `ui-scene-ir/1`, replay metadata, visual scene facts, and
+stable hashes.
 
 That pull should keep the V8 tracker staged around VISOR, artifact semantics,
 receipts, source maps, lower modes, debug facts, DOGFOOD round-trip fixtures,

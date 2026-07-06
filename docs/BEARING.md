@@ -212,7 +212,12 @@ Current direction and active tensions. Historical ship data is in
 
 With `v7.2.0` tagged, published, verified, and the #457 design packet landed,
 the immediate target is #458: emit the first GraphQL block artifact bundle with
-replay and visual scene facts.
+replay and visual scene facts. The #458 cycle design is
+[DX-049](./design/DX-049-visor-artifact-bundle-proof.md): a narrow
+`visor-artifact-bundle/1` proof that wraps existing GraphQL block facts,
+`bijou-block/1`, `ui-scene-ir/1`, replay metadata, visual scene facts, and
+stable hashes without pulling in #459 packed-cell validation or external
+renderer/debugger work.
 
 ```text
 VISOR v8 tracker (#457)

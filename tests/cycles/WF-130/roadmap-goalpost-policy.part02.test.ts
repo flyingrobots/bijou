@@ -65,6 +65,8 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(normalizedV8Section).toContain('TRACKER: VISOR warpspace for v8 Runtime Graph And Scene IR');
       expect(v8Section).toContain('[#458](https://github.com/flyingrobots/bijou/issues/458)');
       expect(normalizedV8Section).toContain('VISOR: emit GraphQL block artifact bundle with replay and visual scene facts');
+      expect(v8Section).toContain('[`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md)');
+      expect(normalizedV8Section).toContain('first `visor-artifact-bundle/1` proof');
       expect(v8Section).toContain('[#459](https://github.com/flyingrobots/bijou/issues/459)');
       expect(normalizedV8Section).toContain('VISOR: validate packed-bijou-cells/1 and adapt to Surface');
       expect(v8Section).toContain('[#302](https://github.com/flyingrobots/bijou/issues/302)');
