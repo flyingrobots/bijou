@@ -161,8 +161,13 @@ Current direction and active tensions. Historical ship data is in
 - No open issue is currently unmilestoned; keep open unmilestoned searches
   empty unless a maintainer is deliberately shaping work before release
   assignment.
-- Stale completed work-in-progress issues #450 and #383 were verified against
-  their merged PRs, assigned to `v7.2.0`, commented, and closed as completed.
+- Stale completed work-in-progress issues
+  [#450](https://github.com/flyingrobots/bijou/issues/450) and
+  [#383](https://github.com/flyingrobots/bijou/issues/383) were verified
+  against merged implementation PRs
+  [#451](https://github.com/flyingrobots/bijou/pull/451) and
+  [#384](https://github.com/flyingrobots/bijou/pull/384), assigned to
+  `v7.2.0`, commented, and closed as completed.
 - `v7.2.0` must stay closed to the framework input and DOGFOOD demo-integrity
   issues selected in #354, plus narrow security repairs such as #357.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:

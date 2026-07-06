@@ -327,9 +327,14 @@ These are planning recommendations from the open tracker state as of
 ## Decision Points
 
 - **Current release**: `v7.2.0` is shipped demo-integrity and framework-input
-  stabilization lineage. Stale completed work-in-progress items #450 and #383
-  were verified against their merged PRs, assigned to `v7.2.0`, commented, and
-  closed as completed during the 2026-07-05 tracker triage.
+  stabilization lineage. Stale completed work-in-progress items
+  [#450](https://github.com/flyingrobots/bijou/issues/450) and
+  [#383](https://github.com/flyingrobots/bijou/issues/383) were verified
+  against merged implementation PRs
+  [#451](https://github.com/flyingrobots/bijou/pull/451) and
+  [#384](https://github.com/flyingrobots/bijou/pull/384), assigned to
+  `v7.2.0`, commented, and closed as completed during the 2026-07-05 tracker
+  triage.
 - **Next release**: `v8.0.0` is the active feature horizon for Runtime Graph and
   Scene IR product-contract work.
 - **Next feature version**: `v8.0.0` is still the next intended feature horizon.
