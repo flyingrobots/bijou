@@ -85,9 +85,9 @@ Current direction and active tensions. Historical ship data is in
   the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
   deterministic debug facts, and the first real GraphQL-authored DOGFOOD
   NavigationListBlock fixture for #302.
-- The broad #302 tracker remains in `Beyond` for V8. The v7.1 feature proof and
-  release-prep guardrails are complete release lineage, not the full Runtime
-  Graph product.
+- The broad #302 tracker now lives in `v8.0.0` with the VISOR Runtime Graph
+  and Scene IR contract work. The v7.1 feature proof and release-prep
+  guardrails are complete release lineage, not the full Runtime Graph product.
 - The proof path that v7.1 now carries is:
 
   ```text
@@ -138,28 +138,52 @@ Current direction and active tensions. Historical ship data is in
 - `ROADMAP.md` is the human-readable mirror of milestone triage, not an
   independent source of truth.
 - Any issue or pull request moved between release horizons, including
-  `v7.1.0`, `v7.2.0`, `v8.0.0`, `v9.0.0`, `Beyond`, or historical `v6.0.0` /
-  `v7.0.0` lanes, should get a GitHub comment and a matching roadmap update.
+  `v7.1.0`, `v7.2.0`, `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, `v10.0.0`,
+  `Beyond`, or historical `v6.0.0` / `v7.0.0` lanes, should get a GitHub
+  comment and a matching roadmap update.
 
-### 3. Shape V8 And V9 From Beyond
+### 3. Keep Future Releases Explicit
 
-- The `v7.2.0` milestone is complete release lineage: 0 open and 17 closed
+- The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is staged as the next feature horizon: 3 open and 0
-  closed milestone items as of the latest roadmap sync.
-- The `Beyond` milestone is the current post-v7 backlog: 39 open and 6 closed
+- The `v8.0.0` milestone is the active feature horizon: 4 open and 0 closed
   milestone items as of the latest roadmap sync.
+- The `v8.1.0` milestone is replay, capture, debugger, and render-witness
+  follow-through: 13 open and 0 closed milestone items.
+- The `v8.2.0` milestone is quality automation and Method hardening: 13 open
+  and 0 closed milestone items.
+- The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
+  and 0 closed milestone items.
+- The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
+  0 closed milestone items.
+- The `Beyond` milestone is now a parking lane, not the active queue: 0 open
+  and 6 closed milestone items as of the latest roadmap sync.
+- No open issue is currently unmilestoned; keep open unmilestoned searches
+  empty unless a maintainer is deliberately shaping work before release
+  assignment.
+- Stale completed work-in-progress issues
+  [#450](https://github.com/flyingrobots/bijou/issues/450) and
+  [#383](https://github.com/flyingrobots/bijou/issues/383) were verified
+  against merged implementation PRs
+  [#451](https://github.com/flyingrobots/bijou/pull/451) and
+  [#384](https://github.com/flyingrobots/bijou/pull/384), assigned to
+  `v7.2.0`, commented, and closed as completed.
 - `v7.2.0` must stay closed to the framework input and DOGFOOD demo-integrity
   issues selected in #354, plus narrow security repairs such as #357.
 - `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
   versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
   modes, debug facts, DOGFOOD round-trip fixtures, and capture evidence.
+- `v8.1.0` should harden replay, capture, debugger, render-witness, and Runtime
+  Graph visualization proof after the first V8 contract lands.
+- `v8.2.0` should make Code Dojo, Method, tracker sync, and fixture-backed test
+  gates easier to inspect and harder to drift.
 - `v9.0.0` should organize the Product Workbench and operator surfaces:
-  BlockLab, Theme Lab and Theme Inspector provenance, localization operations,
-  artifact matrices, and terminal input controls if #316 becomes product scope.
-- Unmilestoned work such as the fluid-triangle title direction, Theme Inspector
-  pointer provenance, keyboard transport, playback harness, and technical
-  teardown gate should be shaped before being treated as release work.
+  BlockLab, DOGFOOD drawer/focus language, Theme Lab and Theme Inspector
+  provenance, localization operations, artifact matrices, and product-review
+  docs.
+- `v10.0.0` should hold Geordi/Wesley follow-through, renderer and host
+  systems, terminal shader/raster work, native-surface foundations, and
+  advanced host input controls.
 
 ## Tensions
 
@@ -167,7 +191,7 @@ Current direction and active tensions. Historical ship data is in
   complete release lineage. Do not use those lanes for new feature work.
 - **Minor-Release Temptation**: Do not reopen `v7.2.0` as a full feature train.
   Adding a full workbench, theme lab, localization suite, Wesley path, or
-  Geordi path turns the work into V8/V9 scope.
+  Geordi path turns the work into `v9.0.0` or `v10.0.0` scope.
 - **Geometry Before Product Chrome**: RE-035 landed the structural layout floor.
   New product-facing work should consume geometry contracts, not bypass them
   with bespoke string/surface measurement.
@@ -180,23 +204,23 @@ Current direction and active tensions. Historical ship data is in
 - **DOGFOOD Truth Debt**: DF-030 converted the docs app into a named Block
   contract. New DOGFOOD truth work should be shaped as a post-v7 candidate
   goalpost or a Beyond issue rather than reopening the closed V7 queue.
-- **Unmilestoned WIP**: Work with `work-in-progress`, `roadmap`, or
-  `needs-design` labels but no milestone must be made explicit in roadmap
-  triage before agents treat it as a release target.
+- **Unmilestoned Regression Risk**: Open unmilestoned work is currently empty.
+  Work with `work-in-progress`, `roadmap`, or `needs-design` labels but no
+  milestone must be made explicit before agents treat it as a release target.
 
 ## Next Target
 
-With `v7.2.0` tagged, published, and verified, the immediate target is #457:
-shape the V8 Runtime Graph and Scene IR product contract before implementation
-continues.
+With `v7.2.0` tagged, published, verified, and the #457 design packet landed,
+the immediate target is #458: emit the first GraphQL block artifact bundle with
+replay and visual scene facts.
 
 ```text
 VISOR v8 tracker (#457)
-  -> GraphQL Blocks source contract
+  -> GraphQL block artifact bundle (#458)
     -> bijou-block/1 artifact contract
       -> ui-scene-ir/1 lowering contract
         -> receipts, source maps, lower modes, and debug facts
-          -> DOGFOOD round-trip witness
+          -> packed-cell Surface adapter (#459)
 ```
 
 The proof chain that V7 shipped must become a product contract before Bijou
@@ -213,19 +237,21 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land the #457 design packet that defines GraphQL Blocks source model,
-   `bijou-block/1` artifact semantics, `ui-scene-ir/1` lowering contract,
-   receipt and source-map ownership, lower-mode rules, debug facts, failure
-   cases, and DOGFOOD witness criteria.
-2. Promote only the Runtime Graph and Scene IR issues needed for that contract
-   out of `Beyond`.
-3. Pull #458 as the first implementation proof: emit a GraphQL block artifact
+1. Pull #458 as the first implementation proof: emit a GraphQL block artifact
    bundle with replay and visual scene facts.
-4. Pull #459 after #458 fixes the bundle shape: validate
+2. Pull #459 after #458 fixes the bundle shape: validate
    `packed-bijou-cells/1` and adapt it to `Surface`.
-5. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes
-   the source/artifact/IR contract.
-6. Keep closed dependency PR #326 as superseded lineage, not active release
+3. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
+   the smallest stable contract.
+4. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+   follow-through after V8 lands.
+5. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
+   automation.
+6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
+   stabilizes the source/artifact/IR contract.
+7. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
+   surface work after the Bijou contracts are proven.
+8. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:
