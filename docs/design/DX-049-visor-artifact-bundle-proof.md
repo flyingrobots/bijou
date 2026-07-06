@@ -164,9 +164,14 @@ visor-artifact-bundle/1
   receipts[]
 ```
 
-`bundleHash` is computed from the canonical bundle payload with the hash field
-itself omitted. Hashing must use the same deterministic JSON rules already used
-by the GraphQL block and scene IR proof path.
+`sourceHash` records the raw source text hash. `normalizedSourceHash` records
+the semantic source hash inherited from the compiled `bijou-block/1` artifact.
+`bundleHash` is computed from the canonical semantic bundle payload with raw
+`source.text`, raw `sourceHash` copies, and `bundleHash` itself omitted. That
+lets VISOR inspect exact source text and raw source identity while preserving a
+stable semantic bundle hash across whitespace-only SDL edits. Hashing must use
+the same deterministic JSON rules already used by the GraphQL block and scene
+IR proof path.
 
 ## Replay Metadata Contract
 
@@ -298,10 +303,14 @@ An agent should be able to answer, from the bundle alone:
 
 ## Validation Plan
 
-Current design PR validation:
+Current implementation validation:
 
 ```bash
-npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part04.test.ts
+npx vitest run --config vitest.config.ts tests/cycles/DX-049
+npx vitest run --config vitest.config.ts \
+  tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts \
+  tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts \
+  tests/cycles/WF-130/roadmap-goalpost-policy.part04.test.ts
 npm run docs:inventory
 npm run typecheck:test
 npm run code-dojo:changed
@@ -309,15 +318,12 @@ npm run lint
 git diff --check
 ```
 
-Future implementation validation after the RED-test slice creates
-`tests/cycles/DX-049`:
-
-```bash
-npx vitest run --config vitest.config.ts tests/cycles/DX-049
-```
-
 ## Closeout Notes
 
-Open. This design starts #458. Keep `needs-design` on the issue until the
-design PR lands; keep `work-in-progress` on the issue while the branch and PR
-carry the cycle.
+Implementation in progress. The design PR has landed, so #458 no longer needs
+`needs-design`. The implementation branch now carries focused
+`tests/cycles/DX-049` coverage for the public bundle builder, exported bundle
+type, raw-versus-semantic source hashes, replay metadata, visual scene facts,
+absolute source-name rejection, malformed source rejection, duplicate visual
+node rejection, and hash-mismatch rejection. Keep `work-in-progress` on the
+issue while the branch and PR carry the implementation cycle.
