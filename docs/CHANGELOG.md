@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **Future release milestone triage** — The GitHub backlog is now assigned to
+  explicit `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, and `v10.0.0` horizons;
+  `Beyond` and open unmilestoned issue queues are empty; and
+  `docs/ROADMAP.md` / `docs/BEARING.md` mirror the tracker counts and release
+  sequence.
 - **V8 Runtime Graph contract shaping** — `docs/BEARING.md` now treats #457 as
   the immediate post-`v7.2.0` target,
   [`DX-048`](design/DX-048-v8-runtime-graph-scene-ir-contract.md) records the
