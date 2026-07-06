@@ -13,12 +13,22 @@ function normalizeWhitespace(source: string): string {
   return source.replace(/\s+/g, ' ').trim();
 }
 
+function sectionBetween(source: string, startHeading: string, endHeading: string): string {
+  const start = source.indexOf(startHeading);
+  if (start === -1) throw new Error(`Missing start heading ${startHeading}`);
+  const end = source.indexOf(endHeading, start + startHeading.length);
+  if (end === -1) throw new Error(`Missing end heading ${endHeading}`);
+  return source.slice(start, end);
+}
+
 describe('WF-130 roadmap goalpost policy', () => {
   it('links the #458 VISOR artifact bundle cycle to DX-049', () => {
     const designPath = 'docs/design/DX-049-visor-artifact-bundle-proof.md';
     const roadmap = normalizeWhitespace(read('docs/ROADMAP.md'));
     const bearing = normalizeWhitespace(read('docs/BEARING.md'));
-    const design = normalizeWhitespace(read(designPath));
+    const designSource = read(designPath);
+    const design = normalizeWhitespace(designSource);
+    const nonGoals = normalizeWhitespace(sectionBetween(designSource, '## Non-Goals', '## Bundle Contract'));
 
     expect(existsSync(resolve(ROOT, designPath))).toBe(true);
     expect(roadmap).toContain('[`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md)');
@@ -32,6 +42,6 @@ describe('WF-130 roadmap goalpost policy', () => {
     expect(design).toContain('replay metadata');
     expect(design).toContain('visual scene facts');
     expect(design).toContain('Tests To Write First');
-    expect(design).toContain('implement #459 packed-cell-to-`Surface` validation');
+    expect(nonGoals).toContain('implement #459 packed-cell-to-`Surface` validation');
   });
 });

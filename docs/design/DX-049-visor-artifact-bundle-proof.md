@@ -1,8 +1,8 @@
 ---
 title: DX-049 VISOR Artifact Bundle Proof
 legend: DX
-lane: cool-ideas
-priority: medium
+lane: release
+priority: high
 github_issue: 458
 parent_issue: 457
 status: active
@@ -16,6 +16,8 @@ keywords:
   - replay
   - v8.0.0
 ---
+
+<!-- markdownlint-disable MD025 -->
 
 # DX-049 VISOR Artifact Bundle Proof
 
@@ -44,9 +46,9 @@ terminal proof, and emit deterministic `graphql-bijou-block-debug/1` facts.
 DX-048 then defined the V8 contract boundary that VISOR needs to coordinate
 across Bijou, WARP TTD, Geordi, Bunny, Wesley, and follow-on render targets.
 
-#458 should be the smallest implementation bridge between those two facts. It
-should introduce a deterministic `visor-artifact-bundle/1` object that wraps
-the existing GraphQL fixture source, `bijou-block/1` artifact,
+Issue #458 should be the smallest implementation bridge between those two
+facts. It should introduce a deterministic `visor-artifact-bundle/1` object
+that wraps the existing GraphQL fixture source, `bijou-block/1` artifact,
 `ui-scene-ir/1` scene, debug summary, replay metadata, visual scene facts, and
 stable hashes. The bundle is a Bijou-emitted proof artifact for VISOR to index;
 it is not a new VISOR runtime dependency inside Bijou.
@@ -296,14 +298,22 @@ An agent should be able to answer, from the bundle alone:
 
 ## Validation Plan
 
+Current design PR validation:
+
 ```bash
-npx vitest run --config vitest.config.ts tests/cycles/DX-049
 npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part04.test.ts
 npm run docs:inventory
 npm run typecheck:test
 npm run code-dojo:changed
 npm run lint
 git diff --check
+```
+
+Future implementation validation after the RED-test slice creates
+`tests/cycles/DX-049`:
+
+```bash
+npx vitest run --config vitest.config.ts tests/cycles/DX-049
 ```
 
 ## Closeout Notes
