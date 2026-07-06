@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **VISOR artifact bundle shaping** —
+  [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md) scopes #458 around a
+  deterministic `visor-artifact-bundle/1` that wraps the existing GraphQL
+  fixture path, `bijou-block/1`, `ui-scene-ir/1`, replay metadata, visual scene
+  facts, and stable hashes while leaving #459 packed-cell validation and
+  external renderer/debugger work out of scope.
 - **Future release milestone triage** — The GitHub backlog is now assigned to
   explicit `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, and `v10.0.0` horizons;
   `Beyond` and open unmilestoned issue queues are empty; and
