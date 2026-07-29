@@ -1,4 +1,4 @@
-import type { LayoutNode, LayoutRect, WritePort } from '@flyingrobots/bijou';
+import type { LayoutNode, WritePort } from '@flyingrobots/bijou';
 import {
   resolveSpringConfig,
   resolveTweenConfig,
@@ -7,8 +7,13 @@ import {
   type SpringConfig,
 } from '../spring.js';
 import type { MotionOptions, TrackedMotion } from './types.js';
-
-type MotionNode = LayoutNode & { readonly motion?: MotionOptions };
+import {
+  hasMotion,
+  isSameRect,
+  lerpRect,
+  resolveInitialRect,
+  roundRect,
+} from './reconciler-geometry.js';
 
 /**
  * Registry of active motion components across frames.
@@ -135,44 +140,4 @@ export class MotionReconciler {
     const s = springStep({ value: curr, velocity: vel, done: false }, target, config, dt);
     return { val: s.value, vel: s.velocity, done: s.done };
   }
-}
-
-function hasMotion(node: LayoutNode): node is MotionNode {
-  return 'motion' in node;
-}
-
-function isSameRect(a: LayoutRect, b: LayoutRect): boolean {
-  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-}
-
-function resolveInitialRect(target: LayoutRect, initial?: Partial<LayoutRect>): LayoutRect {
-  if (initial == null) return { ...target };
-  return {
-    x: target.x + (initial.x ?? 0),
-    y: target.y + (initial.y ?? 0),
-    width: initial.width ?? target.width,
-    height: initial.height ?? target.height,
-  };
-}
-
-function lerpRect(from: LayoutRect, to: LayoutRect, progress: number): LayoutRect {
-  return {
-    x: lerp(from.x, to.x, progress),
-    y: lerp(from.y, to.y, progress),
-    width: lerp(from.width, to.width, progress),
-    height: lerp(from.height, to.height, progress),
-  };
-}
-
-function lerp(from: number, to: number, progress: number): number {
-  return from + (to - from) * progress;
-}
-
-function roundRect(rect: LayoutRect): LayoutRect {
-  return {
-    x: Math.round(rect.x),
-    y: Math.round(rect.y),
-    width: Math.max(0, Math.round(rect.width)),
-    height: Math.max(0, Math.round(rect.height)),
-  };
 }
