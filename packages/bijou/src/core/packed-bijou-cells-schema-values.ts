@@ -41,7 +41,7 @@ export function canonicalIdAt(
     typeof value !== 'string' ||
     value.length === 0 ||
     value !== value.trim() ||
-    hasAsciiControl(value)
+    hasIdentifierControl(value)
   ) {
     failPackedCells(code, path, 'expected a canonical non-empty id');
   }
@@ -73,9 +73,15 @@ function escapeJsonString(value: string): string {
   return result;
 }
 
-function hasAsciiControl(value: string): boolean {
+function hasIdentifierControl(value: string): boolean {
   return Array.from(value).some((character) => {
     const codePoint = character.codePointAt(0);
-    return codePoint !== undefined && (codePoint <= 0x1f || codePoint === 0x7f);
+    return (
+      codePoint !== undefined &&
+      (codePoint <= 0x1f ||
+        (codePoint >= 0x7f && codePoint <= 0x9f) ||
+        codePoint === 0x2028 ||
+        codePoint === 0x2029)
+    );
   });
 }
