@@ -1,112 +1,16 @@
-import { createSurface, isPackedSurface, segmentGraphemes, type BijouContext, type Surface, type TextModifier, type TokenValue } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  isPackedSurface,
+  segmentGraphemes,
+  type BijouContext,
+  type Surface,
+} from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
-
-export interface StyledTextToken {
-  hex?: string;
-  bg?: string;
-  fgRGB?: [number, number, number];
-  bgRGB?: [number, number, number];
-  modifiers?: string[];
-}
-
-export interface BCSSIdentity {
-  type: string;
-  id?: string;
-  classes?: string[];
-}
-
-type BCSSStyles = Record<string, string>;
-
-export function mergeBCSSModifiers(
-  base: readonly string[] | undefined,
-  styles: BCSSStyles,
-): string[] | undefined {
-  const modifiers = new Set(base ?? []);
-
-  const fontWeight = styles['font-weight']?.trim().toLowerCase();
-  if (fontWeight === 'bold' || fontWeight === '700' || fontWeight === '800' || fontWeight === '900') {
-    modifiers.add('bold');
-  } else if (fontWeight === 'normal' || fontWeight === '400') {
-    modifiers.delete('bold');
-  }
-
-  const fontStyle = styles['font-style']?.trim().toLowerCase();
-  if (fontStyle === 'italic') {
-    modifiers.add('italic');
-  } else if (fontStyle === 'normal') {
-    modifiers.delete('italic');
-  }
-
-  const decoration = styles['text-decoration']?.trim().toLowerCase();
-  if (decoration === 'none') {
-    modifiers.delete('underline');
-    modifiers.delete('curly-underline');
-    modifiers.delete('dotted-underline');
-    modifiers.delete('dashed-underline');
-    modifiers.delete('strikethrough');
-    modifiers.delete('strike');
-  } else if (decoration) {
-    if (decoration.includes('underline')) {
-      modifiers.add('underline');
-    }
-    if (decoration.includes('line-through')) {
-      modifiers.add('strikethrough');
-      modifiers.delete('strike');
-    }
-  }
-
-  return modifiers.size > 0 ? Array.from(modifiers) : undefined;
-}
-
-function styleModifiers(modifiers: readonly string[] | undefined): TextModifier[] | undefined {
-  return modifiers?.filter((modifier): modifier is TextModifier => /^(?:bold|dim|strikethrough|inverse|(?:curly-|dotted-|dashed-)?underline)$/u.test(modifier));
-}
-
-export function toStyleToken(token: StyledTextToken): TokenValue {
-  return { hex: token.hex ?? '', bg: token.bg, fgRGB: token.fgRGB, bgRGB: token.bgRGB, modifiers: styleModifiers(token.modifiers) };
-}
-
-export function resolveBCSSTextToken(
-  ctx: BijouContext,
-  identity: BCSSIdentity,
-  base: StyledTextToken = {},
-): StyledTextToken {
-  const styles = ctx.resolveBCSS(identity);
-  const hex = styles['color'] ?? base.hex;
-  const bg = styles['background'] ?? base.bg;
-  return {
-    hex,
-    bg,
-    fgRGB: styles['color'] != null ? (hex ? parseHex(hex) : undefined) : base.fgRGB,
-    bgRGB: styles['background'] != null ? (bg ? parseHex(bg) : undefined) : base.bgRGB,
-    modifiers: mergeBCSSModifiers(base.modifiers, styles),
-  };
-}
-
-export function styleTextWithBCSS(
-  text: string,
-  ctx: BijouContext | undefined,
-  identity: BCSSIdentity,
-  base: StyledTextToken = {},
-): string {
-  if (!ctx) return text;
-  const styles = ctx.resolveBCSS(identity);
-  const hex = styles['color'] ?? base.hex;
-  const bg = styles['background'] ?? base.bg;
-  const token: StyledTextToken = {
-    hex,
-    bg,
-    fgRGB: styles['color'] != null ? (hex ? parseHex(hex) : undefined) : base.fgRGB,
-    bgRGB: styles['background'] != null ? (bg ? parseHex(bg) : undefined) : base.bgRGB,
-    modifiers: mergeBCSSModifiers(base.modifiers, styles),
-  };
-
-  if (token.hex == null && token.bg == null && (token.modifiers == null || token.modifiers.length === 0)) {
-    return text;
-  }
-
-  return ctx.style.styled(toStyleToken(token), text);
-}
+import {
+  resolveBCSSTextToken,
+  type BCSSIdentity,
+  type StyledTextToken,
+} from './text-style-token.js';
 
 function fillStyledText(
   surface: Surface,
@@ -140,12 +44,20 @@ function fillStyledText(
   });
   const graphemes = segmentGraphemes(text);
   const packed = isPackedSurface(surface);
-  const fg = packed ? (token.fgRGB ?? (token.hex ? parseHex(token.hex) : undefined)) : undefined;
+  const fg = packed
+    ? (token.fgRGB ?? (token.hex ? parseHex(token.hex) : undefined))
+    : undefined;
   if (packed && fg) {
     const [fR, fG, fB] = fg;
     const bg = token.bgRGB ?? (token.bg ? parseHex(token.bg) : undefined);
-    let bR = -1, bG = 0, bB = 0;
-    if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
+    let bR = -1,
+      bG = 0,
+      bB = 0;
+    if (bg) {
+      bR = bg[0];
+      bG = bg[1];
+      bB = bg[2];
+    }
     const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
       surface.setRGB(x, 0, graphemes[x] ?? ' ', fR, fG, fB, bR, bG, bB, flags);
@@ -162,6 +74,14 @@ function fillStyledText(
     }
   }
 }
+
+export {
+  mergeBCSSModifiers,
+  resolveBCSSTextToken,
+  styleTextWithBCSS,
+  toStyleToken,
+} from './text-style-token.js';
+export type { BCSSIdentity, StyledTextToken } from './text-style-token.js';
 
 export function createStyledTextSurfaceWithBCSS(
   text: string,

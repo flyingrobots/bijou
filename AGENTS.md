@@ -86,6 +86,8 @@ Do not audit the repository by recursively walking the filesystem. Follow the au
 - **`ARCHITECTURE.md`**: The authoritative structural reference (Ports, Adapters, Package Stack).
 - **`docs/VISION.md`**: Core tenets and project identity.
 - **`docs/METHOD.md`**: Repo work doctrine (Backlog lanes, Cycle loop).
+- **`docs/DOCUMENTATION_STANDARDS.md`**: Reader-task documentation policy,
+  corpus ownership, examples, accessibility, and upkeep gates.
 - **`docs/typescript-code-standards.editors-edition.md`**: Verbatim TypeScript Code Standards doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture.
 - **`docs/code-dojo-exceptions.md`**: Human exception ledger and 50-violation-per-goalpost burndown policy.
 

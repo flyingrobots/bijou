@@ -1,37 +1,17 @@
-import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
-import type { TokenValue } from '../theme/tokens.js';
-import { colorRgb } from '../theme/color.js';
-import { graphemeClusterWidth, sanitizePlainTerminalText, segmentGraphemes } from '../text/grapheme.js';
-import { encodeModifiers } from '../render/packed-cell.js';
-
-export type CellTextStyle = Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>;
-
-/** Pre-parsed numeric style for setRGB fast path. */
-interface NumericStyle {
-  fgR: number; fgG: number; fgB: number; fgSet: boolean;
-  bgR: number; bgG: number; bgB: number; bgSet: boolean;
-  flags: number;
-}
-
-function parseNumericStyle(style: CellTextStyle): NumericStyle | undefined {
-  let fgR = 0, fgG = 0, fgB = 0, fgSet = false;
-  let bgR = 0, bgG = 0, bgB = 0, bgSet = false;
-  const fgRgb = style.fgRGB ?? colorRgb(style.fg);
-  if (style.fg != null && fgRgb == null) return undefined;
-  if (fgRgb) {
-    fgR = fgRgb[0]; fgG = fgRgb[1]; fgB = fgRgb[2]; fgSet = true;
-  }
-  const bgRgb = style.bgRGB ?? colorRgb(style.bg);
-  if (style.bg != null && bgRgb == null) return undefined;
-  if (bgRgb) {
-    bgR = bgRgb[0]; bgG = bgRgb[1]; bgB = bgRgb[2]; bgSet = true;
-  }
-  return {
-    fgR, fgG, fgB, fgSet,
-    bgR, bgG, bgB, bgSet,
-    flags: encodeModifiers(style.modifiers),
-  };
-}
+import {
+  createSurface,
+  isPackedSurface,
+  type Surface,
+} from '../../ports/surface.js';
+import {
+  graphemeClusterWidth,
+  sanitizePlainTerminalText,
+  segmentGraphemes,
+} from '../text/grapheme.js';
+import {
+  parseNumericCellTextStyle,
+  type CellTextStyle,
+} from './surface-text-style.js';
 
 export interface SurfaceTextSegment {
   readonly text: string;
@@ -46,10 +26,14 @@ const SURFACE_NARROW_OVERRIDES = new Set<string>();
 function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
   const graphemes = segmentGraphemes(text);
   const wide = graphemes.find(
-    (grapheme) => graphemeClusterWidth(grapheme) !== 1 && !SURFACE_NARROW_OVERRIDES.has(grapheme),
+    (grapheme) =>
+      graphemeClusterWidth(grapheme) !== 1 &&
+      !SURFACE_NARROW_OVERRIDES.has(grapheme),
   );
   if (wide) {
-    throw new Error(`${purpose} does not yet support wide graphemes like "${wide}" in surface rendering.`);
+    throw new Error(
+      `${purpose} does not yet support wide graphemes like "${wide}" in surface rendering.`,
+    );
   }
   return graphemes;
 }
@@ -61,35 +45,33 @@ function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
  * graphemes for cell writes. Callers that intentionally preserve ANSI styling
  * should use `parseAnsiToSurface()` instead.
  */
-export function segmentSurfaceText(text: string, purpose = 'Surface text'): string[] {
+export function segmentSurfaceText(
+  text: string,
+  purpose = 'Surface text',
+): string[] {
   return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text), purpose);
 }
 
-export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
-  if (token == null) return {};
-  // Pass both hex string and pre-parsed RGB bytes. encodeCellIntoBuf
-  // in the packed surface path will prefer fgRGB/bgRGB when present,
-  // skipping inlineHexRGB entirely. See docs/perf/RE-017-byte-pipeline.md.
-  const style: CellTextStyle = {
-    fg: token.hex,
-    bg: token.bg,
-    modifiers: token.modifiers,
-  };
-  if (token.fgRGB) style.fgRGB = token.fgRGB;
-  if (token.bgRGB) style.bgRGB = token.bgRGB;
-  return style;
-}
-
-export function createTextSurface(text: string, style: CellTextStyle = {}): Surface {
+export function createTextSurface(
+  text: string,
+  style: CellTextStyle = {},
+): Surface {
   const safeText = sanitizePlainTerminalText(text, { preserveNewlines: true });
   const lines = safeText.split('\n');
-  const lineGraphemes = lines.map((line) => segmentSanitizedSurfaceText(line, 'createTextSurface'));
-  const width = lineGraphemes.reduce((max, graphemes) => Math.max(max, graphemes.length), 0);
+  const lineGraphemes = lines.map((line) =>
+    segmentSanitizedSurfaceText(line, 'createTextSurface'),
+  );
+  const width = lineGraphemes.reduce(
+    (max, graphemes) => Math.max(max, graphemes.length),
+    0,
+  );
   const height = Math.max(1, lines.length);
   const surface = createSurface(width, height);
 
   // Fast path: use setRGB when surface is packed and style has valid hex colors
-  const numStyle = isPackedSurface(surface) ? parseNumericStyle(style) : undefined;
+  const numStyle = isPackedSurface(surface)
+    ? parseNumericCellTextStyle(style)
+    : undefined;
   if (numStyle && isPackedSurface(surface)) {
     const { fgR, fgG, fgB, bgR, bgG, bgB, flags } = numStyle;
     // -1 signals "terminal default" to setRGB; fgG/fgB and bgG/bgB are ignored when fR/bR === -1
@@ -111,15 +93,22 @@ export function createTextSurface(text: string, style: CellTextStyle = {}): Surf
   return surface;
 }
 
-export function createSegmentSurface(segments: readonly SurfaceTextSegment[]): Surface {
+export function createSegmentSurface(
+  segments: readonly SurfaceTextSegment[],
+): Surface {
   if (segments.length === 0) return createTextSurface('');
 
   const segmented = segments.map((segment) => ({
     style: segment.style,
-    numStyle: segment.style ? parseNumericStyle(segment.style) : undefined,
+    numStyle: segment.style
+      ? parseNumericCellTextStyle(segment.style)
+      : undefined,
     graphemes: segmentSurfaceText(segment.text, 'createSegmentSurface'),
   }));
-  const width = segmented.reduce((sum, segment) => sum + segment.graphemes.length, 0);
+  const width = segmented.reduce(
+    (sum, segment) => sum + segment.graphemes.length,
+    0,
+  );
   const surface = createSurface(width, 1);
   const packed = isPackedSurface(surface);
   let x = 0;
@@ -130,7 +119,18 @@ export function createSegmentSurface(segments: readonly SurfaceTextSegment[]): S
       const fR = ns.fgSet ? ns.fgR : -1;
       const bR = ns.bgSet ? ns.bgR : -1;
       for (const char of segment.graphemes) {
-        surface.setRGB(x, 0, char, fR, ns.fgG, ns.fgB, bR, ns.bgG, ns.bgB, ns.flags);
+        surface.setRGB(
+          x,
+          0,
+          char,
+          fR,
+          ns.fgG,
+          ns.fgB,
+          bR,
+          ns.bgG,
+          ns.bgB,
+          ns.flags,
+        );
         x++;
       }
     } else {
@@ -144,54 +144,6 @@ export function createSegmentSurface(segments: readonly SurfaceTextSegment[]): S
   return surface;
 }
 
-export function padSurface(
-  surface: Surface,
-  width: number,
-  height: number,
-  fill?: CellTextStyle,
-): Surface {
-  const result = fill == null
-    ? createSurface(width, height)
-    : createSurface(width, height, { char: ' ', ...fill, empty: false });
-  result.blit(surface, 0, 0);
-  return result;
-}
-
-export function wrapSurfaceToWidth(surface: Surface, width: number): Surface {
-  if (width <= 0) return createSurface(0, Math.max(1, surface.height));
-  if (surface.width <= width) return surface;
-
-  const rows: Cell[][] = [];
-
-  for (let y = 0; y < surface.height; y++) {
-    let effectiveWidth = 0;
-    for (let x = surface.width - 1; x >= 0; x--) {
-      if (!surface.get(x, y).empty) {
-        effectiveWidth = x + 1;
-        break;
-      }
-    }
-
-    if (effectiveWidth === 0) {
-      rows.push([]);
-      continue;
-    }
-
-    const cells: Cell[] = [];
-    for (let x = 0; x < effectiveWidth; x++) {
-      cells.push({ ...surface.get(x, y) });
-    }
-
-    for (let offset = 0; offset < cells.length; offset += width) {
-      rows.push(cells.slice(offset, offset + width));
-    }
-  }
-
-  const result = createSurface(width, Math.max(1, rows.length));
-  rows.forEach((row, y) => {
-    row.forEach((cell, x) => {
-      result.set(x, y, cell);
-    });
-  });
-  return result;
-}
+export { padSurface, wrapSurfaceToWidth } from './surface-text-layout.js';
+export { tokenToCellStyle } from './surface-text-style.js';
+export type { CellTextStyle } from './surface-text-style.js';

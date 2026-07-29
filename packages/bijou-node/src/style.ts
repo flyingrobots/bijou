@@ -1,5 +1,6 @@
 import chalk, { Chalk, type ChalkInstance } from 'chalk';
 import type { StylePort, TokenValue } from '@flyingrobots/bijou';
+import { createChalkTokenStyler } from './chalk-token-styler.js';
 
 /**
  * Configuration options for {@link chalkStyle}.
@@ -20,90 +21,11 @@ export interface ChalkStyleOptions {
 export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const opts = typeof arg === 'boolean' ? { noColor: arg } : (arg ?? {});
   const isNoColor = opts.noColor ?? false;
-  const instance: ChalkInstance = opts.level !== undefined
-    ? new Chalk({ level: opts.level })
-    : chalk;
+  const instance: ChalkInstance =
+    opts.level !== undefined ? new Chalk({ level: opts.level }) : chalk;
   /** Whether ANSI styling is active (respects both noColor flag and chalk level). */
   const ansiEnabled = !isNoColor && instance.level > 0;
-  const styledCache = new Map<string, (text: string) => string>();
-
-  /** SGR codes for underline variants (not supported by chalk natively). */
-  const UNDERLINE_VARIANT_SGR: Record<string, string> = {
-    'curly-underline': '\x1b[4:3m',
-    'dotted-underline': '\x1b[4:4m',
-    'dashed-underline': '\x1b[4:5m',
-  };
-  /** SGR 24 resets underline. */
-  const UNDERLINE_RESET = '\x1b[24m';
-
-  /**
-   * Chain text-decoration modifiers onto a chalk instance.
-   *
-   * @param c - Base chalk instance (already color-configured).
-   * @param modifiers - Optional array of modifier names from a {@link TokenValue}.
-   * @returns The chalk instance with all modifiers applied.
-   */
-  function applyModifiers(c: ChalkInstance, modifiers?: TokenValue['modifiers']): ChalkInstance {
-    if (modifiers === undefined) return c;
-    let result = c;
-    for (const mod of modifiers) {
-      switch (mod) {
-        case 'bold':          result = result.bold; break;
-        case 'dim':           result = result.dim; break;
-        case 'strikethrough': result = result.strikethrough; break;
-        case 'inverse':       result = result.inverse; break;
-        case 'underline':     result = result.underline; break;
-        // Underline variants are handled after chalk styling via raw SGR wrapping
-        case 'curly-underline':
-        case 'dotted-underline':
-        case 'dashed-underline': break;
-        default: {
-          const _exhaustive: never = mod;
-          void _exhaustive;
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Wrap text with raw SGR sequences for underline variants that chalk
-   * doesn't support natively. Called after chalk styling is applied.
-   */
-  function applyUnderlineVariants(text: string, modifiers?: TokenValue['modifiers']): string {
-    if (!ansiEnabled || modifiers === undefined) return text;
-    let result = text;
-    for (const mod of modifiers) {
-      const sgr = UNDERLINE_VARIANT_SGR[mod];
-      if (sgr) {
-        result = sgr + result + UNDERLINE_RESET;
-      }
-    }
-    return result;
-  }
-
-  function styleCacheKey(token: TokenValue): string {
-    return [
-      token.hex,
-      token.bg,
-      token.modifiers?.join(',') ?? '',
-    ].join('|');
-  }
-
-  function compileStyled(token: TokenValue): (text: string) => string {
-    const base = applyModifiers(token.hex ? instance.hex(token.hex) : instance, token.modifiers);
-    const background = token.bg ? instance.bgHex(token.bg) : null;
-    const modifiers = token.modifiers;
-
-    return (text: string): string => {
-      let result = base(text);
-      result = applyUnderlineVariants(result, modifiers);
-      if (background) {
-        result = background(result);
-      }
-      return result;
-    };
-  }
+  const styleToken = createChalkTokenStyler(instance, ansiEnabled);
 
   return {
     /**
@@ -114,14 +36,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      * @returns Styled text, or unmodified text when ANSI output is disabled via `noColor` or `level: 0`.
      */
     styled(token: TokenValue, text: string): string {
-      if (!ansiEnabled) return text;
-      const key = styleCacheKey(token);
-      let styler = styledCache.get(key);
-      if (styler == null) {
-        styler = compileStyled(token);
-        styledCache.set(key, styler);
-      }
-      return styler(text);
+      return styleToken(token, text);
     },
     /**
      * Apply a 24-bit RGB foreground color to text.

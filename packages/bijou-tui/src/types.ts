@@ -3,177 +3,14 @@ import type { Middleware } from './eventbus.js';
 import type { RenderPipeline } from './pipeline/pipeline.js';
 import type { SurfaceBudgetThresholds } from './surface-budget.js';
 import type { ViewOutput } from './view-output.js';
-
-// --- Messages ---
-
-/** Represent a keyboard input event with key name and modifier flags. */
-export interface KeyMsg {
-  /** Discriminant tag identifying this as a keyboard message. */
-  readonly type: 'key';
-  /** Key name (e.g. `"a"`, `"enter"`, `"up"`, `"space"`). */
-  readonly key: string;
-  /** Whether the Ctrl modifier was held. */
-  readonly ctrl: boolean;
-  /** Whether the Alt/Option modifier was held. */
-  readonly alt: boolean;
-  /** Whether the Shift modifier was held. */
-  readonly shift: boolean;
-}
-
-/** Represent a terminal resize event with new dimensions. */
-export interface ResizeMsg {
-  /** Discriminant tag identifying this as a resize message. */
-  readonly type: 'resize';
-  /** New terminal width in columns. */
-  readonly columns: number;
-  /** New terminal height in rows. */
-  readonly rows: number;
-}
-
-/** Represent a system animation pulse event. */
-export interface PulseMsg {
-  /** Discriminant tag identifying this as a pulse message. */
-  readonly type: 'pulse';
-  /** Time delta in seconds since the last pulse. */
-  readonly dt: number;
-}
-
-// --- Mouse messages ---
-
-/** Mouse button; `"none"` covers scroll and unbuttoned motion. */
-export type MouseButton = 'left' | 'middle' | 'right' | 'none';
-
-/** Mouse action. */
-export type MouseAction = 'press' | 'release' | 'move' | 'scroll-up' | 'scroll-down';
-/** SGR mouse tracking mode. */
-export type MouseTrackingMode = 'press' | 'drag' | 'any';
-
-/** Mouse input event. */
-export interface MouseMsg {
-  /** Discriminant tag identifying this as a mouse message. */
-  readonly type: 'mouse';
-  /** Which mouse button is involved (or `"none"` for scroll/motion). */
-  readonly button: MouseButton;
-  /** The mouse action performed. */
-  readonly action: MouseAction;
-  /** 0-based column position. */
-  readonly col: number;
-  /** 0-based row position. */
-  readonly row: number;
-  /** Whether the Shift modifier was held. */
-  readonly shift: boolean;
-  /** Whether the Alt/Option modifier was held. */
-  readonly alt: boolean;
-  /** Whether the Ctrl modifier was held. */
-  readonly ctrl: boolean;
-}
-
-// --- Type guards ---
-
-export function isKeyMsg(msg: unknown): msg is KeyMsg {
-  return messageType(msg) === 'key';
-}
-
-export function isResizeMsg(msg: unknown): msg is ResizeMsg {
-  return messageType(msg) === 'resize';
-}
-
-export function isPulseMsg(msg: unknown): msg is PulseMsg {
-  return messageType(msg) === 'pulse';
-}
-
-export function isMouseMsg(msg: unknown): msg is MouseMsg {
-  return messageType(msg) === 'mouse';
-}
-
-function messageType(msg: unknown): unknown {
-  if (typeof msg !== 'object' || msg === null || !('type' in msg)) return undefined;
-  return msg.type;
-}
-
-// --- Commands ---
-
-/** Sentinel symbol signaling that the application should quit. */
-export const QUIT: unique symbol = Symbol('QUIT');
-
-/** The type of the {@link QUIT} sentinel symbol. */
-export type QuitSignal = typeof QUIT;
-
-/** Disposable cleanup handle returned by long-lived command effects. */
-export interface CmdDisposable {
-  dispose(): void;
-}
-
-/** Cleanup forms a command may return after installing a long-lived effect. */
-export type CmdCleanup = CmdDisposable | (() => void);
-
-/** Final output a command may resolve to. */
-export type CmdResult<M> = M | QuitSignal | CmdCleanup | undefined;
-
-/** Narrow an unknown value to a disposable command handle. */
-export function isCmdDisposable(value: unknown): value is CmdDisposable {
-  return typeof value === 'object'
-    && value !== null
-    && 'dispose' in value
-    && typeof value.dispose === 'function';
-}
-
-/** Narrow an unknown value to a supported command cleanup form. */
-export function isCmdCleanup(value: unknown): value is CmdCleanup {
-  return typeof value === 'function' || isCmdDisposable(value);
-}
-
-/**
- * A side-effect function that can emit messages back to the application.
- *
- * Receive an `emit` callback for dispatching intermediate messages during
- * execution. It may resolve synchronously or asynchronously to:
- * - a final message
- * - a {@link QuitSignal}
- * - a cleanup handle/function for a long-lived effect
- * - `void`
- *
- * @template M - Application message type.
- */
-export type Cmd<M> = (
-  emit: (msg: M) => void,
-  capabilities: CmdCapabilities,
-) => CmdResult<M> | Promise<CmdResult<M>>;
-
-/** Capabilities provided to commands by the runtime. */
-export interface CmdCapabilities {
-  /** 
-   * Subscribe to the system animation pulse. 
-   * Returns a dispose function.
-   */
-  onPulse(handler: (dt: number) => void): CmdDisposable;
-  /** Sleep for a bounded amount of time using the runtime clock. */
-  sleep?(ms: number): Promise<void>;
-  /** Yield to the next microtask using the runtime clock. */
-  defer?(): Promise<void>;
-  /** Read the current wall-clock time from the runtime clock. */
-  now?(): number;
-}
-
-/** Severity of a runtime issue surfaced by the framework itself. */
-export type RuntimeIssueLevel = 'warning' | 'error';
-
-/** Origin of a runtime issue surfaced by the framework itself. */
-export type RuntimeIssueSource = 'command' | 'eventbus' | 'runtime';
-
-/** Framework-level issue routed alongside normal app messages when supported. */
-export interface RuntimeIssue {
-  /** Warning or error severity. */
-  readonly level: RuntimeIssueLevel;
-  /** Subsystem that surfaced the issue. */
-  readonly source: RuntimeIssueSource;
-  /** Human-readable issue text. */
-  readonly message: string;
-  /** Runtime clock timestamp for deterministic routing. */
-  readonly atMs: number;
-  /** Original thrown value when available. */
-  readonly error?: unknown;
-}
+import type {
+  KeyMsg,
+  MouseMsg,
+  MouseTrackingMode,
+  PulseMsg,
+  ResizeMsg,
+} from './runtime-messages.js';
+import type { Cmd, RuntimeIssue } from './runtime-commands.js';
 
 // --- App definition ---
 
@@ -201,7 +38,10 @@ export interface App<Model, M = never> {
    * @param model - Current application state.
    * @returns A tuple of `[updatedModel, commands]`.
    */
-  update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];
+  update(
+    msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M,
+    model: Model,
+  ): [Model, Cmd<M>[]];
 
   /**
    * Render the current model as a Surface or LayoutNode.
@@ -248,3 +88,6 @@ export interface RunOptions<M = unknown> {
   /** Optional BCSS stylesheet string. */
   css?: string;
 }
+
+export * from './runtime-commands.js';
+export * from './runtime-messages.js';

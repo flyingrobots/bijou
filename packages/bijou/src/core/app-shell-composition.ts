@@ -5,23 +5,24 @@ import {
   type ProviderScope,
   type ViewDataContract,
 } from './binding.js';
+import { type BlockDefinition } from './block-metadata.js';
 import {
-  isBlockDefinition,
-  type BlockDefinition,
-} from './block-metadata.js';
+  EMPTY_APP_SHELL_BLOCKS,
+  freezeAppShellFacts,
+  normalizeAppShellSlotId,
+  normalizeAppShellSlots,
+  optionalTrimmedText,
+} from './app-shell-composition-normalize.js';
 
-const APP_SHELL_COMPOSITION_BRAND: unique symbol = Symbol('AppShellComposition');
+const APP_SHELL_COMPOSITION_BRAND: unique symbol = Symbol(
+  'AppShellComposition',
+);
 
 export type AppShellSlotId =
-  | 'navigation'
-  | 'content'
-  | 'inspector'
-  | 'status'
-  | 'overlays';
+  'navigation' | 'content' | 'inspector' | 'status' | 'overlays';
 
 export type AppShellSlotContent =
-  | BlockDefinition
-  | readonly AppShellSlotContent[];
+  BlockDefinition | readonly AppShellSlotContent[];
 
 export interface AppShellSlots {
   readonly navigation?: AppShellSlotContent;
@@ -45,16 +46,6 @@ export interface AppShellSlot {
   readonly blocks: readonly BlockDefinition[];
 }
 
-const APP_SHELL_SLOT_IDS: readonly AppShellSlotId[] = [
-  'navigation',
-  'content',
-  'inspector',
-  'status',
-  'overlays',
-];
-const EMPTY_FACTS = Object.freeze([]) as readonly BindingFact[];
-const EMPTY_BLOCKS = Object.freeze([]) as readonly BlockDefinition[];
-
 export class AppShellComposition {
   readonly [APP_SHELL_COMPOSITION_BRAND] = true;
   readonly #slotsById: ReadonlyMap<AppShellSlotId, AppShellSlot>;
@@ -70,10 +61,12 @@ export class AppShellComposition {
       throw new Error('app shell composition: input must be an object');
     }
     if (input.providers !== undefined && !isProviderScope(input.providers)) {
-      throw new Error('app shell composition: providers must be created by providerScope()');
+      throw new Error(
+        'app shell composition: providers must be created by providerScope()',
+      );
     }
 
-    const slotsById = normalizeSlots(input.slots);
+    const slotsById = normalizeAppShellSlots(input.slots);
     if (!slotsById.has('content')) {
       throw new Error('app shell composition: content slot is required');
     }
@@ -83,7 +76,7 @@ export class AppShellComposition {
     this.id = optionalTrimmedText(input.id);
     this.label = optionalTrimmedText(input.label);
     this.description = optionalTrimmedText(input.description);
-    this.facts = freezeFacts(input.facts);
+    this.facts = freezeAppShellFacts(input.facts);
     Object.freeze(this);
   }
 
@@ -96,7 +89,10 @@ export class AppShellComposition {
   }
 
   slot(slotId: AppShellSlotId): readonly BlockDefinition[] {
-    return this.#slotsById.get(normalizeSlotId(slotId))?.blocks ?? EMPTY_BLOCKS;
+    return (
+      this.#slotsById.get(normalizeAppShellSlotId(slotId))?.blocks ??
+      EMPTY_APP_SHELL_BLOCKS
+    );
   }
 
   blocks(): readonly BlockDefinition[] {
@@ -107,7 +103,9 @@ export class AppShellComposition {
 
   dataContracts(): readonly ViewDataContract[] {
     return Object.freeze(
-      this.blocks().flatMap((block) => (block.data === undefined ? [] : [block.data])),
+      this.blocks().flatMap((block) =>
+        block.data === undefined ? [] : [block.data],
+      ),
     );
   }
 
@@ -128,88 +126,17 @@ export function defineAppShellComposition(
   return new AppShellComposition(input);
 }
 
-export function isAppShellComposition(value: unknown): value is AppShellComposition {
+export function isAppShellComposition(
+  value: unknown,
+): value is AppShellComposition {
   return Boolean(
-    value
-      && typeof value === 'object'
-      && (value as AppShellCompositionBrandCarrier)[APP_SHELL_COMPOSITION_BRAND] === true,
+    value &&
+    typeof value === 'object' &&
+    (value as AppShellCompositionBrandCarrier)[APP_SHELL_COMPOSITION_BRAND] ===
+      true,
   );
 }
 
 interface AppShellCompositionBrandCarrier {
   readonly [APP_SHELL_COMPOSITION_BRAND]?: true;
-}
-
-function normalizeSlots(slots: unknown): ReadonlyMap<AppShellSlotId, AppShellSlot> {
-  if (slots === undefined || slots === null || typeof slots !== 'object' || Array.isArray(slots)) {
-    throw new Error('app shell composition: slots must be an object');
-  }
-
-  const slotsById = new Map<AppShellSlotId, AppShellSlot>();
-  for (const [rawSlotId, content] of Object.entries(slots)) {
-    if (content === undefined) {
-      continue;
-    }
-
-    const slotId = normalizeSlotId(rawSlotId);
-    if (slotsById.has(slotId)) {
-      throw new Error(`app shell composition: duplicate slot ${slotId}`);
-    }
-
-    const blocks = normalizeSlotContent(content, `slots.${slotId}`);
-    if (blocks.length === 0) {
-      throw new Error(`app shell composition: slot ${slotId} must include at least one block`);
-    }
-
-    slotsById.set(slotId, Object.freeze({
-      id: slotId,
-      blocks,
-    }));
-  }
-
-  return slotsById;
-}
-
-function normalizeSlotContent(
-  content: unknown,
-  path: string,
-): readonly BlockDefinition[] {
-  if (Array.isArray(content)) {
-    return Object.freeze(
-      content.flatMap((item, index) => normalizeSlotContent(item, `${path}[${String(index)}]`)),
-    );
-  }
-
-  if (!isBlockDefinition(content)) {
-    throw new Error(`${path}: slot content must be created by defineBlock()`);
-  }
-
-  return Object.freeze([content]);
-}
-
-function normalizeSlotId(slotId: string): AppShellSlotId {
-  const normalized = slotId.trim();
-  for (const id of APP_SHELL_SLOT_IDS) {
-    if (normalized === id) return id;
-  }
-  throw new Error(`app shell composition: unsupported slot ${normalized}`);
-}
-
-function optionalTrimmedText(value: string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  const normalized = value.trim();
-  return normalized === '' ? undefined : normalized;
-}
-
-function freezeFacts(facts: readonly BindingFact[] | undefined): readonly BindingFact[] {
-  if (facts === undefined || facts.length === 0) {
-    return EMPTY_FACTS;
-  }
-
-  return Object.freeze(
-    facts.map((fact) => Object.freeze({ ...fact })),
-  );
 }
