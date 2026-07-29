@@ -1,0 +1,18 @@
+Keep · /projects/keep/
+
+Keep
+Content-addressed storage library.
+Documentation → https://github.com/flyingrobots/keep#readme
+Source → https://github.com/flyingrobots/keep
+
+One project identity, every surface.
+Rust library · flyingrobots · Flying Robots Lab
+Developer Tools & Libraries / Rust
+
+Documentation stays beside implementation.
+Documentation → https://github.com/flyingrobots/keep#readme
+
+Nearby projects in Rust.
+Bunny → /projects/bunny/
+Geordi → /projects/geordi/
+Nine Lives → /projects/nine-lives/
