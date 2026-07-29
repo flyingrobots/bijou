@@ -43,19 +43,24 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
     ]);
   });
 
-  it('makes #459 the active roadmap and bearing target', () => {
+  it('records #459 as landed before the next roadmap prerequisite', () => {
     const roadmap = normalized('docs/ROADMAP.md');
     const bearing = normalized('docs/BEARING.md');
 
     expectClaims(roadmap, [
-      'The active V8 product pull is [#459](https://github.com/flyingrobots/bijou/issues/459)',
-      '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
+      'The V8 source-side contract pulls are landed:',
+      '[#483](https://github.com/flyingrobots/bijou/pull/483)',
+      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 20 | 2 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
     ]);
     expectClaims(bearing, [
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
-      'The active v8 product pull is #459',
+      'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
+      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
     ]);
   });
