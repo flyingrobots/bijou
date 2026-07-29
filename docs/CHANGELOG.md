@@ -36,9 +36,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   metadata, visual scene facts, raw and semantic source hashes, and stable
   receipts while leaving #459 packed-cell validation and external
   renderer/debugger work out of scope.
-
-### Changed
-
 - **RE-036 packed-cell receipt validation and `Surface` adaptation** —
   [`RE-036`](design/RE-036-packed-bijou-cells-surface-adapter.md) defines the
   fail-closed `packed-bijou-cells/1` shape, canonical packed-byte and
@@ -47,6 +44,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `parsePackedBijouCellsReceipt()` rejects malformed or non-canonical receipts
   before allocation, while `adaptPackedBijouCellsToSurface()` copies validated
   bytes and side-table entries without re-encoding cells.
+
+### Changed
+
 - **DX-050 Code Dojo prerequisite, tranche B** — `24` additional production
   and repository-tooling entrypoints are now stable compatibility facades over
   focused sub-150-line modules. File/context debt falls from `61` to `37`,

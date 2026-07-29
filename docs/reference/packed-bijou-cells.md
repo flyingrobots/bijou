@@ -10,29 +10,54 @@ cells, render a terminal frame, or validate the complete source scene.
 
 ## Public API
 
-Import the validator, adapter, error, constants, and types from
-`@flyingrobots/bijou`:
+The package exports:
+
+| Export | Contract |
+| :--- | :--- |
+| `parsePackedBijouCellsReceipt()` | Validate unknown input and return a fresh receipt |
+| `adaptPackedBijouCellsToSurface()` | Validate unknown input and copy it into a packed `Surface` |
+| `PackedBijouCellsValidationError` | Typed failure with `code`, `path`, and `detail` |
+| `PACKED_BIJOU_CELLS_VERSION` | `packed-bijou-cells/1` |
+| `PACKED_BIJOU_CELL_FORMAT` | `bijou-packed-cell-u8x10-le/1` |
+| `PACKED_BIJOU_CELL_STRIDE` | `10` |
+| `PACKED_BIJOU_GLYPH_POLICY` | `unicode-grapheme-side-table/1` |
+| `PACKED_BIJOU_SCENE_VERSION` | `ui-scene-ir/1` |
+| `MAX_PACKED_BIJOU_CELLS` | `100,000` |
+| `MAX_PACKED_BIJOU_GLYPH_CODE_UNITS` | `256` per glyph |
+| `MAX_PACKED_BIJOU_SIDE_TABLE_ENTRIES` | `4,096` |
+| `PACKED_BIJOU_CELLS_VALIDATION_CODES` | Ordered validation-code inventory |
+| `PackedBijouCellsReceipt` | Complete receipt type |
+| `PackedBijouCellsScene` | Scene identity and per-cell ownership |
+| `PackedBijouCellsFocus` | Focused and focusable scene identities |
+| `PackedBijouCellsChroma` | Exact accepted chroma profile |
+| `PackedBijouCellsValidationCode` | Validation-code union |
+
+Import the functions and receipt type from `@flyingrobots/bijou`:
 
 ```typescript
 import {
   adaptPackedBijouCellsToSurface,
-  PACKED_BIJOU_CELLS_VERSION,
-  PackedBijouCellsValidationError,
   parsePackedBijouCellsReceipt,
   type PackedBijouCellsReceipt,
-} from "@flyingrobots/bijou";
+} from '@flyingrobots/bijou';
 ```
 
 Validate unknown input without constructing a `Surface`:
 
 ```typescript
-const receipt: PackedBijouCellsReceipt = parsePackedBijouCellsReceipt(input);
+export function validateReceipt(
+  input: unknown,
+): PackedBijouCellsReceipt {
+  return parsePackedBijouCellsReceipt(input);
+}
 ```
 
 Adapt unknown input after validation:
 
 ```typescript
-const surface = adaptPackedBijouCellsToSurface(input);
+export function adaptReceipt(input: unknown) {
+  return adaptPackedBijouCellsToSurface(input);
+}
 ```
 
 Both functions reject invalid input with
@@ -41,20 +66,20 @@ fields instead of parsing the message.
 
 ## Receipt Shape
 
-Every field is required. Unknown fields, accessors, symbols, sparse arrays, and
-non-JSON-shaped objects are rejected.
+Every field is required. Unknown or non-enumerable fields, accessors, symbols,
+sparse arrays, and non-JSON-shaped objects are rejected.
 
 ```typescript
 interface PackedBijouCellsReceipt {
-  readonly receiptVersion: "packed-bijou-cells/1";
+  readonly receiptVersion: 'packed-bijou-cells/1';
   readonly widthCells: number;
   readonly heightCells: number;
-  readonly cellFormatId: "bijou-packed-cell-u8x10-le/1";
-  readonly glyphPolicyId: "unicode-grapheme-side-table/1";
+  readonly cellFormatId: 'bijou-packed-cell-u8x10-le/1';
+  readonly glyphPolicyId: 'unicode-grapheme-side-table/1';
   readonly bytes: readonly number[];
   readonly sideTable: readonly string[];
   readonly scene: {
-    readonly sceneVersion: "ui-scene-ir/1";
+    readonly sceneVersion: 'ui-scene-ir/1';
     readonly sceneHash: string;
     readonly nodeIds: readonly string[];
     readonly cellNodeIds: readonly string[];
@@ -64,10 +89,10 @@ interface PackedBijouCellsReceipt {
     readonly focusableNodeIds: readonly string[];
   };
   readonly chroma: {
-    readonly colorSpace: "srgb";
-    readonly channelEncoding: "uint8";
-    readonly alphaEncoding: "uint6";
-    readonly terminalDefaultEncoding: "presence-bits";
+    readonly colorSpace: 'srgb';
+    readonly channelEncoding: 'uint8';
+    readonly alphaEncoding: 'uint6';
+    readonly terminalDefaultEncoding: 'presence-bits';
   };
 }
 ```
