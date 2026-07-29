@@ -204,7 +204,8 @@ byte-length-mismatched dimensions fail.
 - every side-table entry is non-empty, terminal-control safe, and exactly one
   grapheme with terminal width `1`
 - format-control and mark-only graphemes are rejected
-- every side-table entry contains at most `256` UTF-16 code units
+- every side-table entry contains at most `256` UTF-16 code units and `32`
+  UTF-8 bytes
 - directly encodable values below `0xF000` are not valid side-table entries
 - side-table entries are unique
 - every side-table entry is referenced by at least one cell

@@ -1,3 +1,5 @@
+import { MAX_PACKED_CELL_UTF8_BYTES } from './render/packed-cell.js';
+
 export const PACKED_BIJOU_CELLS_VERSION = 'packed-bijou-cells/1' as const;
 export const PACKED_BIJOU_CELL_FORMAT = 'bijou-packed-cell-u8x10-le/1' as const;
 export const PACKED_BIJOU_GLYPH_POLICY =
@@ -6,6 +8,8 @@ export const PACKED_BIJOU_SCENE_VERSION = 'ui-scene-ir/1' as const;
 export const PACKED_BIJOU_CELL_STRIDE = 10;
 export const MAX_PACKED_BIJOU_CELLS = 100_000;
 export const MAX_PACKED_BIJOU_GLYPH_CODE_UNITS = 256;
+export const MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES =
+  MAX_PACKED_CELL_UTF8_BYTES;
 export const MAX_PACKED_BIJOU_SIDE_TABLE_ENTRIES = 0x1000;
 
 export const PACKED_BIJOU_CELLS_VALIDATION_CODES = [

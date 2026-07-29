@@ -1,5 +1,8 @@
 import { describe, it } from 'vitest';
-import { MAX_PACKED_BIJOU_GLYPH_CODE_UNITS } from '@flyingrobots/bijou';
+import {
+  MAX_PACKED_BIJOU_GLYPH_CODE_UNITS,
+  MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES,
+} from '@flyingrobots/bijou';
 import {
   arrayField,
   expectReceiptError,
@@ -57,6 +60,15 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
     arrayField(oversized, 'sideTable')[0] =
       `a${'\u0301'.repeat(MAX_PACKED_BIJOU_GLYPH_CODE_UNITS)}`;
     expectReceiptError(oversized, 'invalid-glyph', '$.sideTable[0]');
+
+    const overRendererBudget = validPackedCellsInput();
+    arrayField(overRendererBudget, 'sideTable')[0] =
+      `a${'\u0301'.repeat(MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES / 2)}`;
+    expectReceiptError(
+      overRendererBudget,
+      'invalid-glyph',
+      '$.sideTable[0]',
+    );
   });
 
   it('rejects absent colors with nonzero channels', () => {

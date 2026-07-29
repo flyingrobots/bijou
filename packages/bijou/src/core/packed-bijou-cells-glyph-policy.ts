@@ -4,7 +4,12 @@ import {
   segmentGraphemes,
 } from './text/grapheme.js';
 import { SIDE_TABLE_THRESHOLD } from './render/packed-cell.js';
-import { MAX_PACKED_BIJOU_GLYPH_CODE_UNITS } from './packed-bijou-cells-contract.js';
+import {
+  MAX_PACKED_BIJOU_GLYPH_CODE_UNITS,
+  MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES,
+} from './packed-bijou-cells-contract.js';
+
+const utf8Encoder = new TextEncoder();
 
 export function isCanonicalSideTableGlyph(value: string): boolean {
   return isSafeUnitGlyph(value) && !isDirectlyEncodableGlyph(value);
@@ -14,6 +19,7 @@ export function isSafeUnitGlyph(value: string): boolean {
   return (
     value.length > 0 &&
     value.length <= MAX_PACKED_BIJOU_GLYPH_CODE_UNITS &&
+    utf8Encoder.encode(value).length <= MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES &&
     !hasTerminalControl(value) &&
     !hasUnsafeFormat(value) &&
     hasVisibleBase(value) &&
