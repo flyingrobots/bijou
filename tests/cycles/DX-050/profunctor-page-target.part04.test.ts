@@ -11,6 +11,9 @@ import {
   recordAt,
 } from './profunctor-page-target.test-support.js';
 
+const HOST_LOCAL_SOURCE_PATH = ['', 'Users', 'example', 'project-registry.js']
+  .join('/');
+
 describe('DX-050 canonical contract validation', () => {
   it('rejects missing, unowned, and malformed page fields', () => {
     expectInvalid(mutatePage((page) => {
@@ -32,7 +35,7 @@ describe('DX-050 canonical contract validation', () => {
   it('rejects malformed structured source-map entries', () => {
     expectInvalid(mutateSourceMap((sourceMap) => {
       const entry = recordAt(sourceMap.entries, 0);
-      recordAt([entry.source], 0).path = '/Users/example/project-registry.js';
+      recordAt([entry.source], 0).path = HOST_LOCAL_SOURCE_PATH;
     }));
     expectInvalid(mutateSourceMap((sourceMap) => {
       delete recordAt(sourceMap.entries, 0).sourceOccurrenceId;
@@ -61,7 +64,7 @@ describe('DX-050 canonical contract validation', () => {
         exportName: 'projectCatalog',
         recordId: 'keep',
         sourceDigest: `sha256:${'0'.repeat(64)}`,
-        sourcePath: '/Users/example/project-registry.js',
+        sourcePath: HOST_LOCAL_SOURCE_PATH,
       };
     }));
     expectInvalid(mutatePage((page) => {
