@@ -1,13 +1,11 @@
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { makeBgFill } from '../bg-fill.js';
-import { graphemeWidth } from '../text/grapheme.js';
-import { clipToWidth } from '../text/clip.js';
-import { wrapToWidth } from '../text/wrap.js';
 import { renderByMode } from '../mode-render.js';
 import type { BijouNodeOptions } from './types.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import type { OverflowBehavior } from './types.js';
+import { drawBox } from './box-render.js';
+import { resolveFillChar } from './box-fill.js';
 
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions extends BijouNodeOptions {
@@ -29,108 +27,6 @@ export interface BoxOptions extends BijouNodeOptions {
   fillChar?: string;
 }
 
-/** Unicode box-drawing characters for single-line borders. */
-const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2500', v: '\u2502' };
-
-/**
- * Draw a unicode box around the given content string.
- *
- * Supports both auto-width (measured from content) and fixed-width modes.
- * Content lines wider than the available space wrap by default. Set
- * `overflow: 'truncate'` to preserve the previous hard-clipping behavior.
- *
- * @param content - Multiline string to place inside the box.
- * @param borderColor - Function that wraps border characters with color styling.
- * @param padding - Resolved padding values (top, bottom, left, right).
- * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
- * @param bgFill - Optional function to wrap interior content with background color styling.
- * @param fillChar - Single-width character for padding areas (defaults to space).
- * @param title - Optional title displayed in the top border.
- * @returns The rendered box as a multiline string.
- */
-function drawBox(
-  content: string,
-  borderColor: (s: string) => string,
-  padding: { top: number; bottom: number; left: number; right: number },
-  fixedWidth?: number,
-  bgFill?: (s: string) => string,
-  fillChar = ' ',
-  title?: string,
-  overflow: OverflowBehavior = 'wrap',
-): string {
-  const rawContentLines = content.split('\n');
-
-  let innerWidth: number;
-  let contentWidth: number;
-
-  if (fixedWidth !== undefined) {
-    // Fixed outer width: outer = border(1) + inner + border(1)
-    innerWidth = Math.max(0, fixedWidth - 2);
-    contentWidth = Math.max(0, innerWidth - padding.left - padding.right);
-  } else {
-    // Auto width: measure content
-    const titleWidth = title ? graphemeWidth(title) + 2 : 0;
-    const maxWidth = rawContentLines.reduce((max, line) => Math.max(max, graphemeWidth(line)), 0);
-    contentWidth = maxWidth;
-    innerWidth = Math.max(titleWidth, maxWidth + padding.left + padding.right);
-  }
-
-  // When fixed width, padding may exceed innerWidth — clamp to fit
-  const effectiveLeft = fixedWidth !== undefined ? Math.min(padding.left, innerWidth) : padding.left;
-  const effectiveRight = fixedWidth !== undefined ? Math.min(padding.right, Math.max(0, innerWidth - effectiveLeft)) : padding.right;
-  const contentLines = fixedWidth !== undefined && overflow === 'wrap'
-    ? rawContentLines.flatMap((line) => wrapToWidth(line, contentWidth))
-    : rawContentLines;
-
-  const pad = (line: string): string => {
-    const visible = graphemeWidth(line);
-    let processed = line;
-    if (visible > contentWidth) {
-      processed = clipToWidth(line, contentWidth);
-    }
-    const processedVisible = graphemeWidth(processed);
-    const leftPad = fillChar.repeat(effectiveLeft);
-    const rightPad = fillChar.repeat(effectiveRight + Math.max(0, contentWidth - processedVisible));
-    return leftPad + processed + rightPad;
-  };
-
-  const fill = bgFill ?? ((s: string) => s);
-  
-  // Render top border with optional title
-  let topBorder = BORDER.h.repeat(innerWidth);
-  if (title && innerWidth >= 4) {
-    const label = ` ${title} `;
-    const labelWidth = graphemeWidth(label);
-    if (labelWidth <= innerWidth - 2) {
-      const start = 1;
-      const before = BORDER.h.repeat(start);
-      const after = BORDER.h.repeat(innerWidth - start - labelWidth);
-      topBorder = before + label + after;
-    } else {
-      // Title too long, clip it
-      const clippedLabel = clipToWidth(label, innerWidth - 2);
-      const start = 1;
-      const before = BORDER.h.repeat(start);
-      const after = BORDER.h.repeat(innerWidth - start - graphemeWidth(clippedLabel));
-      topBorder = before + clippedLabel + after;
-    }
-  }
-  
-  const top = borderColor(BORDER.tl + topBorder + BORDER.tr);
-  const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth) + BORDER.br);
-  const emptyLine = borderColor(BORDER.v) + fill(fillChar.repeat(innerWidth)) + borderColor(BORDER.v);
-
-  const lines: string[] = [top];
-  for (let i = 0; i < padding.top; i++) lines.push(emptyLine);
-  for (const line of contentLines) {
-    lines.push(borderColor(BORDER.v) + fill(pad(line)) + borderColor(BORDER.v));
-  }
-  for (let i = 0; i < padding.bottom; i++) lines.push(emptyLine);
-  lines.push(bottom);
-
-  return lines.join('\n');
-}
-
 /**
  * Render content inside a bordered box.
  *
@@ -142,33 +38,54 @@ function drawBox(
  * @param options - Box configuration.
  * @returns The rendered box string, or plain content in non-visual modes.
  */
-export function box(content: string | null | undefined, options: BoxOptions = {}): string {
+export function box(
+  content: string | null | undefined,
+  options: BoxOptions = {},
+): string {
   const ctx = resolveCtx(options.ctx);
   const safeContent = content ?? '';
 
-  return renderByMode(ctx.mode, {
-    pipe: () => safeContent,
-    accessible: () => safeContent,
-    interactive: () => {
-      const borderToken = options.borderToken ?? ctx.border('primary');
-      const padding = {
-        top: options.padding?.top ?? 0,
-        bottom: options.padding?.bottom ?? 0,
-        left: options.padding?.left ?? 1,
-        right: options.padding?.right ?? 1,
-      };
+  return renderByMode(
+    ctx.mode,
+    {
+      pipe: () => safeContent,
+      accessible: () => safeContent,
+      interactive: () => {
+        const borderToken = options.borderToken ?? ctx.border('primary');
+        const padding = {
+          top: options.padding?.top ?? 0,
+          bottom: options.padding?.bottom ?? 0,
+          left: options.padding?.left ?? 1,
+          right: options.padding?.right ?? 1,
+        };
 
-      const colorize = (s: string): string => ctx.style.styled(borderToken, s);
-      const bgFill = makeBgFill(options.bgToken, ctx);
-      const resolvedFill = resolveFillChar(options.fillChar);
-      const overflow = resolveOverflowBehavior(
-        options.overflow,
-        ctx.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }),
-      );
+        const colorize = (s: string): string =>
+          ctx.style.styled(borderToken, s);
+        const bgFill = makeBgFill(options.bgToken, ctx);
+        const resolvedFill = resolveFillChar(options.fillChar);
+        const overflow = resolveOverflowBehavior(
+          options.overflow,
+          ctx.resolveBCSS({
+            type: 'Box',
+            id: options.id,
+            classes: options.class?.split(' '),
+          }),
+        );
 
-      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill, options.title, overflow);
+        return drawBox(
+          safeContent,
+          colorize,
+          padding,
+          options.width,
+          bgFill,
+          resolvedFill,
+          options.title,
+          overflow,
+        );
+      },
     },
-  }, options);
+    options,
+  );
 }
 
 /** Configuration for {@link headerBox}, extending {@link BoxOptions} with label support. */
@@ -190,37 +107,39 @@ export interface HeaderBoxOptions extends BoxOptions {
  * @param options - Header box configuration.
  * @returns The rendered header box string.
  */
-export function headerBox(label: string | null | undefined, options: HeaderBoxOptions = {}): string {
+export function headerBox(
+  label: string | null | undefined,
+  options: HeaderBoxOptions = {},
+): string {
   const ctx = resolveCtx(options.ctx);
   const detail = options.detail ?? '';
   const safeLabel = label ?? '';
 
-  return renderByMode(ctx.mode, {
-    pipe: () => (safeLabel && detail ? `${safeLabel}  ${detail}` : safeLabel || detail),
-    accessible: () => (safeLabel && detail ? `${safeLabel}: ${detail}` : safeLabel || detail),
-    interactive: () => {
-      const labelToken = options.labelToken ?? ctx.semantic('primary');
-      const content = safeLabel && detail
-        ? ctx.style.styled(labelToken, safeLabel) + ctx.style.styled(ctx.semantic('muted'), `  ${detail}`)
-        : safeLabel
-          ? ctx.style.styled(labelToken, safeLabel)
-          : detail
-            ? ctx.style.styled(ctx.semantic('muted'), detail)
-            : '';
+  return renderByMode(
+    ctx.mode,
+    {
+      pipe: () =>
+        safeLabel && detail ? `${safeLabel}  ${detail}` : safeLabel || detail,
+      accessible: () =>
+        safeLabel && detail ? `${safeLabel}: ${detail}` : safeLabel || detail,
+      interactive: () => {
+        const labelToken = options.labelToken ?? ctx.semantic('primary');
+        const content =
+          safeLabel && detail
+            ? ctx.style.styled(labelToken, safeLabel) +
+              ctx.style.styled(ctx.semantic('muted'), `  ${detail}`)
+            : safeLabel
+              ? ctx.style.styled(labelToken, safeLabel)
+              : detail
+                ? ctx.style.styled(ctx.semantic('muted'), detail)
+                : '';
 
-      return box(content, options);
+        return box(content, options);
+      },
     },
-  }, options);
+    options,
+  );
 }
 
-/**
- * Validate and resolve a fill character option.
- *
- * Returns the character if it is a single-width grapheme cluster,
- * otherwise falls back to a space.
- */
-export function resolveFillChar(fillChar: string | undefined): string {
-  if (fillChar == null || fillChar.length === 0) return ' ';
-  if (graphemeWidth(fillChar) !== 1) return ' ';
-  return fillChar;
-}
+/** Resolve a single-width fill character, falling back to a space. */
+export { resolveFillChar } from './box-fill.js';
