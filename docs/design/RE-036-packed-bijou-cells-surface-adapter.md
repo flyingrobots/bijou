@@ -183,14 +183,15 @@ handles, or mutable renderer objects.
 
 - `widthCells` and `heightCells` are positive safe integers.
 - `widthCells * heightCells` is a safe integer.
+- the receipt contains at most `100,000` cells.
 - `cellCount * 10` is a safe integer.
 - `bytes.length` equals `cellCount * 10`.
 - every byte is an integer in the inclusive range `0` through `255`
 - `cellFormatId` fixes the stride at `10`; no receipt-defined stride exists
 
 The validator checks those laws before calling `createSurface()`. Zero,
-negative, fractional, infinite, `NaN`, unsafe, overflowing, or byte-length
-mismatched dimensions fail.
+negative, fractional, infinite, `NaN`, unsafe, overflowing, excessive, or
+byte-length-mismatched dimensions fail.
 
 ## Glyph Laws
 
@@ -198,6 +199,7 @@ mismatched dimensions fail.
   16-bit little-endian
 - direct value `0` represents the empty character
 - direct values below `0xF000` must not be UTF-16 surrogate code points
+- non-empty direct values are terminal-control safe graphemes of width `1`
 - values at or above `0xF000` must reference an existing side-table entry
 - every side-table entry is non-empty, terminal-control safe, and exactly one
   grapheme with terminal width `1`
@@ -279,8 +281,8 @@ packed-bijou-cells/1 <code> at <path>: <detail>
 
 Codes distinguish invalid shape, unknown field, wrong literal, invalid
 dimension, invalid byte, byte-length mismatch, invalid glyph, invalid color,
-invalid scene mapping, invalid focus, and invalid chroma. Paths use
-JSON-compatible segments such as `$.bytes[17]` and
+invalid modifier, invalid scene mapping, invalid focus, and invalid chroma.
+Paths use JSON-compatible segments such as `$.bytes[17]` and
 `$.focus.focusedNodeId`.
 
 Validation returns a fresh receipt value only after the entire object passes.
@@ -413,7 +415,7 @@ Package and static proof:
 ```bash
 npm run typecheck
 npm run lint
-npm run code-dojo
+npm run code-dojo:verify
 npm run docs:inventory
 git diff --check
 ```
@@ -422,7 +424,7 @@ Full repository proof:
 
 ```bash
 npm test
-npm run prepush
+npm run code-dojo:prepush
 ```
 
 If repository script names differ, use the documented owning commands and

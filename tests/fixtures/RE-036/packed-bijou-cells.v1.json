@@ -1,0 +1,28 @@
+{
+  "receiptVersion": "packed-bijou-cells/1",
+  "widthCells": 2,
+  "heightCells": 2,
+  "cellFormatId": "bijou-packed-cell-u8x10-le/1",
+  "glyphPolicyId": "unicode-grapheme-side-table/1",
+  "bytes": [
+    65, 0, 255, 64, 32, 0, 0, 0, 1, 127, 0, 240, 0, 0, 0, 10, 20, 200, 16, 191,
+    1, 240, 0, 200, 80, 1, 2, 3, 112, 255, 32, 0, 0, 0, 0, 0, 0, 0, 128, 0
+  ],
+  "sideTable": ["é", ""],
+  "scene": {
+    "sceneVersion": "ui-scene-ir/1",
+    "sceneHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "nodeIds": ["scene.root", "scene.title", "scene.status"],
+    "cellNodeIds": ["scene.title", "scene.title", "scene.status", "scene.root"]
+  },
+  "focus": {
+    "focusedNodeId": "scene.status",
+    "focusableNodeIds": ["scene.title", "scene.status"]
+  },
+  "chroma": {
+    "colorSpace": "srgb",
+    "channelEncoding": "uint8",
+    "alphaEncoding": "uint6",
+    "terminalDefaultEncoding": "presence-bits"
+  }
+}

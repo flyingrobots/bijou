@@ -24,3 +24,5 @@ export * from './index.part08.js';
 export * from './index.part09.js';
 
 export * from './index.part10.js';
+
+export * from './index.part11.js';
