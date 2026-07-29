@@ -17,7 +17,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   landmark, and action identities. Unsupported browser semantics remain
   explicit capability residuals; semantic-document sources, application
   islands, and visible unsupported blocks fail closed; hidden unsupported
-  blocks receive explicit target residuals.
+  blocks receive explicit target residuals. Generated evidence uses staged,
+  rollback-safe directory replacement that preserves the prior authoritative
+  output when installation fails.
 - **VISOR artifact bundle proof** — `@flyingrobots/bijou` now exports
   `createVisorArtifactBundleFromGraphql()`, `createVisorArtifactBundle()`, and
   `visor-artifact-bundle/1` types for #458 / [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md).

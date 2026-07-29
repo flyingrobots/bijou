@@ -32,6 +32,10 @@ Regenerate the Bijou-owned output:
 npm run generate:profunctor-page-target
 ```
 
+Generation stages the complete inventory before replacing `generated/`. A
+failed installation preserves the previous directory or its explicit
+`.previous` recovery directory.
+
 Verify the checked inventory and exact bytes:
 
 ```bash

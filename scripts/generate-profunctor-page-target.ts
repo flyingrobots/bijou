@@ -1,16 +1,14 @@
 import {
   existsSync,
-  mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
-  renameSync,
-  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lowerProfunctorPageArtifacts } from '../packages/bijou/src/core/profunctor-page-target.js';
+import { replaceGeneratedDirectory } from './replace-generated-directory.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE = resolve(ROOT, 'fixtures/profunctor-page/project-keep');
@@ -58,26 +56,8 @@ function checkGenerated(): void {
 
 function replaceGenerated(): void {
   const stage = mkdtempSync(resolve(FIXTURE, '.generated-stage-'));
-  const backup = `${OUTPUT}.previous`;
   for (const [filename, source] of expected) {
     writeFileSync(resolve(stage, filename), source, 'utf8');
   }
-  rmSync(backup, { force: true, recursive: true });
-  let movedExisting = false;
-  try {
-    if (existsSync(OUTPUT)) {
-      renameSync(OUTPUT, backup);
-      movedExisting = true;
-    }
-    renameSync(stage, OUTPUT);
-    rmSync(backup, { force: true, recursive: true });
-  } catch (error) {
-    rmSync(OUTPUT, { force: true, recursive: true });
-    if (movedExisting && existsSync(backup)) {
-      renameSync(backup, OUTPUT);
-    }
-    rmSync(stage, { force: true, recursive: true });
-    throw error;
-  }
-  mkdirSync(OUTPUT, { recursive: true });
+  replaceGeneratedDirectory(stage, OUTPUT, `${OUTPUT}.previous`);
 }
