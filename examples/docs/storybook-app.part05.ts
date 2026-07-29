@@ -31,6 +31,7 @@ export function createStorybookPage(
   stories: readonly ComponentStory[] = COMPONENT_STORIES,
   title = DEFAULT_TITLE,
   initialStoryId?: string,
+  localization?: StorybookAppOptions['localization'],
 ): FramePage<StorybookModel, StorybookPageMsg> {
   return {
     id: 'storybook',
@@ -48,7 +49,7 @@ export function createStorybookPage(
         ...model,
         columns: width,
         rows: height,
-      }, ctx, stories),
+      }, ctx, stories, localization),
     }) satisfies FrameLayoutNode,
   };
 }
@@ -67,7 +68,15 @@ export function createStorybookFrameApp(
     initialRows: ctx.runtime.rows,
     keyPriority: 'page-first',
     helpLineSource: () => FOOTER_HINT,
-    pages: [createStorybookPage(ctx, stories, title, options.initialStoryId)],
+    pages: [
+      createStorybookPage(
+        ctx,
+        stories,
+        title,
+        options.initialStoryId,
+        options.localization,
+      ),
+    ],
   });
 }
 

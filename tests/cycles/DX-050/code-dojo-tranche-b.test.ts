@@ -2,25 +2,15 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { stripAnsi, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import {
-  createI18nRuntime,
-  createRuntimeLocalizationPort,
-} from '@flyingrobots/bijou-i18n';
+import { createI18nRuntime, createRuntimeLocalizationPort } from '@flyingrobots/bijou-i18n';
 import { describe, expect, it } from 'vitest';
-import {
-  counterDemoBlockConfig,
-  counterDemoBlockSurface,
-  createCounterDemoModel,
-} from '../../../examples/docs/counter-block-demo.js';
+import { counterDemoBlockConfig, counterDemoBlockSurface, createCounterDemoModel } from '../../../examples/docs/counter-block-demo.js';
 import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
-import { createStorybookApp } from '../../../examples/docs/storybook-app.js';
+import { createStorybookApp, createStorybookFrameApp } from '../../../examples/docs/storybook-app.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { CODE_SIZE_BASELINE } from '../../../scripts/code-size-gate.js';
 import { splitModuleFamily } from './split-module-family.js';
-import {
-  TRANCHE_B_CLEARED_PATHS,
-  TRANCHE_B_CODE_SIZE_PATHS,
-} from './tranche-b-paths.js';
+import { TRANCHE_B_CLEARED_PATHS, TRANCHE_B_CODE_SIZE_PATHS } from './tranche-b-paths.js';
 
 const ROOT = resolve(import.meta.dirname, '../../..');
 const MAX_LINES = 150;
@@ -31,12 +21,8 @@ interface FileContextBaseline {
 }
 
 function readFileContextBaseline(): FileContextBaseline {
-  const parsed: unknown = JSON.parse(
-    readFileSync(
-      resolve(ROOT, 'scripts/code-dojo/baselines/file-context.json'),
-      'utf8',
-    ),
-  );
+  const path = resolve(ROOT, 'scripts/code-dojo/baselines/file-context.json');
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));
   if (
     parsed == null
     || typeof parsed !== 'object'
@@ -144,6 +130,19 @@ describe('DX-050 Code Dojo tranche B', () => {
     ).surface;
 
     expect(stripAnsi(surfaceToString(storybookSurface, storybookCtx.style)))
+      .toContain('Katalog');
+
+    const framedStorybook = createStorybookFrameApp(
+      storybookCtx,
+      { localization },
+    );
+    const [framedModel] = framedStorybook.init();
+    const framedSurface = normalizeViewOutput(
+      framedStorybook.view(framedModel),
+      { width: 120, height: 40 },
+    ).surface;
+
+    expect(stripAnsi(surfaceToString(framedSurface, storybookCtx.style)))
       .toContain('Katalog');
   });
 });
