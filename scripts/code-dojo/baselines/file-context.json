@@ -30,8 +30,8 @@
     },
     {
       "path": "packages/bijou/src/core/render/differ.ts",
-      "lines": 902,
-      "bytes": 30645
+      "lines": 901,
+      "bytes": 30600
     },
     {
       "path": "packages/bijou/src/core/ui-scene-ir.ts",
