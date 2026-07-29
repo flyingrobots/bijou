@@ -4,57 +4,15 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { boxSurface, type BijouContext, kbd } from '@flyingrobots/bijou';
 import {
   run,
-  createKeyMap,
   createFramedApp,
-  createSplitPaneState,
   inspectorDrawer,
-  type FramePage,
 } from '@flyingrobots/bijou-tui';
-
-type Msg =
-  | { type: 'inc' }
-  | { type: 'toggle-inspector' };
-
-interface PageModel {
-  count: number;
-  inspector: boolean;
-  editorSplit: ReturnType<typeof createSplitPaneState>;
-}
-
-function createInitialPageModel(): PageModel {
-  return {
-    count: 0,
-    inspector: false,
-    editorSplit: createSplitPaneState({ ratio: 0.38 }),
-  };
-}
-
-function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
-  if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
-  return [{ ...model, inspector: !model.inspector }, []];
-}
-
-function createPageKeyMap() {
-  return createKeyMap<Msg>().bind('x', 'Increment counter', { type: 'inc' });
-}
-
-function createPage(
-  id: string,
-  title: string,
-  layout: FramePage<PageModel, Msg>['layout'],
-): FramePage<PageModel, Msg> {
-  return {
-    id,
-    title,
-    init: () => [createInitialPageModel(), []],
-    update: updatePageModel,
-    keyMap: createPageKeyMap(),
-    layout,
-  };
-}
-
-const globalKeys = createKeyMap<Msg>()
-  .bind('o', 'Toggle inspector drawer', { type: 'toggle-inspector' });
+import {
+  createPage,
+  globalKeys,
+  type Msg,
+  type PageModel,
+} from './page-model.js';
 
 export function createAppFrameDemo(ctx: BijouContext = initDefaultContext()) {
   const editorPage = createPage('editor', 'Editor', (model) => ({
