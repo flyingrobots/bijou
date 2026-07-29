@@ -24,19 +24,25 @@ Current count:
 
 | Source                |   Count | Meaning                                                           |
 | :-------------------- | ------: | :---------------------------------------------------------------- |
-| File/context baseline |      61 | Files over the Code Dojo context threshold.                       |
+| File/context baseline |      37 | Files over the Code Dojo context threshold.                       |
 | Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
-| Code-size baseline    |      26 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
+| Code-size baseline    |      25 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
 | ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total**             |  **87** | Aggregate Code Dojo standards debt.                               |
+| **Total**             |  **62** | Aggregate Code Dojo standards debt.                               |
+
+WF-164 tranche B splits `24` more production and repository-tooling
+entrypoints into focused modules while keeping their public import paths stable.
+The file/context baseline falls from `61` to `37`; the code-size baseline falls
+from `26` to `25`; mock-ban and ESLint debt remain `0`; and aggregate debt
+falls from `87` to `62`. Together, DX-050 tranches A and B remove the required
+`50` counted violations from the `112` goalpost without weakening a threshold
+or introducing a new runtime import cycle.
 
 DX-050 tranche A splits `25` production and repository-tooling entrypoints into
 focused modules while preserving their public import paths as compatibility
 facades. The file/context baseline falls from `86` to `61`; code-size debt holds
 at `26`; mock-ban and ESLint debt remain `0`; and aggregate debt falls from
-`112` to `87`. This is an in-flight prerequisite, not a met goalpost. The
-encoded ceiling remains `112` until tranche B reaches the required `62` or
-lower boundary.
+`112` to `87`. This was the first half of the goalpost completed by WF-164.
 
 WF-163 applies responsibility-preserving extractions across examples, core,
 TUI, Node, i18n tooling, benchmarks, and repository scripts. Public entrypoints
@@ -149,9 +155,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The encoded ceiling remains `112` while the DX-050 prerequisite is in flight.
-Measured debt is `87`. The next met goalpost must lower the ceiling to `62` or
-lower.
+The encoded ceiling is `62`. The next met goalpost must lower the ceiling to
+`12` or lower.
 
 ## Updating The Ceiling
 

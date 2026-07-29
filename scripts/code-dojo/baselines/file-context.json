@@ -109,11 +109,6 @@
       "bytes": 19545
     },
     {
-      "path": "examples/docs/storybook-app.ts",
-      "lines": 608,
-      "bytes": 17800
-    },
-    {
       "path": "packages/bijou-i18n/src/runtime.ts",
       "lines": 566,
       "bytes": 17521
@@ -134,49 +129,9 @@
       "bytes": 15909
     },
     {
-      "path": "packages/bijou-tui/src/flex.ts",
-      "lines": 501,
-      "bytes": 16572
-    },
-    {
-      "path": "scripts/smoke-canaries.ts",
-      "lines": 496,
-      "bytes": 15504
-    },
-    {
-      "path": "packages/bijou-tui/src/runtime-binding.ts",
-      "lines": 492,
-      "bytes": 15444
-    },
-    {
-      "path": "packages/bijou/src/core/standard-blocks/metadata-standard.ts",
-      "lines": 472,
-      "bytes": 21637
-    },
-    {
-      "path": "packages/bijou/src/core/theme/presets.ts",
-      "lines": 307,
-      "bytes": 8736
-    },
-    {
-      "path": "packages/bijou/src/core/standard-blocks/render.ts",
-      "lines": 440,
-      "bytes": 15305
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062
-    },
-    {
-      "path": "packages/bijou/src/core/components/preference-list.ts",
-      "lines": 421,
-      "bytes": 13876
-    },
-    {
-      "path": "packages/bijou-tui/src/command-palette.ts",
-      "lines": 419,
-      "bytes": 14796
     },
     {
       "path": "packages/bijou/src/core/components/markdown-render.ts",
@@ -194,29 +149,9 @@
       "bytes": 12515
     },
     {
-      "path": "packages/bijou/src/core/theme/builder.ts",
-      "lines": 378,
-      "bytes": 10555
-    },
-    {
-      "path": "packages/bijou-tui/src/keybindings.ts",
-      "lines": 377,
-      "bytes": 11371
-    },
-    {
-      "path": "packages/bijou/src/core/theme/doctor.ts",
-      "lines": 376,
-      "bytes": 10881
-    },
-    {
       "path": "packages/bijou-node/src/index.ts",
       "lines": 241,
       "bytes": 7364
-    },
-    {
-      "path": "packages/bijou/src/core/components/markdown-parse.ts",
-      "lines": 374,
-      "bytes": 12540
     },
     {
       "path": "examples/showcase/app.ts",
@@ -224,64 +159,14 @@
       "bytes": 12003
     },
     {
-      "path": "packages/bijou-mcp/src/tools/docs.ts",
-      "lines": 373,
-      "bytes": 15045
-    },
-    {
       "path": "packages/bijou/src/core/components/dag-source.ts",
       "lines": 372,
       "bytes": 13096
     },
     {
-      "path": "scripts/release-metadata.ts",
-      "lines": 371,
-      "bytes": 12957
-    },
-    {
-      "path": "examples/image-viewer/image-codecs.ts",
-      "lines": 371,
-      "bytes": 11770
-    },
-    {
-      "path": "packages/bijou-tui/src/canvas.ts",
-      "lines": 359,
-      "bytes": 10953
-    },
-    {
-      "path": "packages/bijou-i18n-tools/src/exchange.ts",
-      "lines": 357,
-      "bytes": 11397
-    },
-    {
-      "path": "packages/bijou-node/src/recorder.ts",
-      "lines": 356,
-      "bytes": 10639
-    },
-    {
-      "path": "packages/bijou-tui/src/browsable-list.ts",
-      "lines": 352,
-      "bytes": 12227
-    },
-    {
-      "path": "packages/bijou-i18n-tools-node/src/filesystem.ts",
-      "lines": 351,
-      "bytes": 11181
-    },
-    {
-      "path": "examples/docs/counter-block-demo.ts",
-      "lines": 345,
-      "bytes": 12059
-    },
-    {
       "path": "bench/src/soak-runner.ts",
       "lines": 338,
       "bytes": 12454
-    },
-    {
-      "path": "packages/create-bijou-tui-app/src/index.ts",
-      "lines": 338,
-      "bytes": 10106
     },
     {
       "path": "packages/bijou/src/core/forms/filter-interactive.ts",
@@ -292,11 +177,6 @@
       "path": "packages/bijou-node/src/io.ts",
       "lines": 248,
       "bytes": 9079
-    },
-    {
-      "path": "packages/bijou/src/core/components/box-v3.ts",
-      "lines": 247,
-      "bytes": 9629
     },
     {
       "path": "packages/bijou-tui/src/pipeline/pipeline.ts",

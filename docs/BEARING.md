@@ -150,8 +150,8 @@ Current direction and active tensions. Historical ship data is in
   milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 14 open
-  and 0 closed milestone items.
+- The `v8.2.0` milestone is quality automation and Method hardening: 16 open
+  and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
 - The `v10.0.0` milestone is renderer and host-systems integration: 10 open and
@@ -211,14 +211,14 @@ Current direction and active tensions. Historical ship data is in
 ## Next Target
 
 The Code Dojo ratchet
-[#469](https://github.com/flyingrobots/bijou/issues/469) has met its contract:
-DX-050 tranche A has reduced measured debt from `112` to `87`, comprising `61`
-file/context and `26` code-size violations with no mock-ban or ESLint debt. The
-goalpost remains open until tranche B lowers the encoded ceiling to `62` or
-lower.
+[#477](https://github.com/flyingrobots/bijou/issues/477) has met its
+`112 -> 62` contract. Landed tranche A
+[#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B
+each removed `25` counted violations. Current debt comprises `37`
+file/context and `25` code-size violations with no mock-ban or ESLint debt.
 
-The immediate target is now
-[#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
+The next bounded target is
+[#468](https://github.com/flyingrobots/bijou/issues/468). It consumes the
 canonical website specimen through
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
 boundaries. This temporarily pulls one v10 integration proof ahead for the
