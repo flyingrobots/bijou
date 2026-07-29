@@ -1,9 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { detectPackageManager } from './index.part01.js';
+import { detectPackageManager, resolveTarget } from './index.part01.js';
 import type { PackageManager, ScaffoldOptions, ScaffoldResult } from './index.part01.js';
-import { resolveTarget } from './index.part02.js';
 import { createTemplateFiles } from './index.part03.js';
 
 /**

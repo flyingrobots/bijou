@@ -1,8 +1,8 @@
-import { isPackedSurface, type Surface, type Cell } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, type Surface, type Cell } from '@flyingrobots/bijou';
 import { fitCellGlyph, type CellGlyphFitOptions } from './cell-glyph-fit.js';
 import { accumulateCellStyle, averagedCellStyle, createStyleAccumulator } from './canvas.part01.js';
-import type { ShaderCell, ShaderFn } from './canvas.part01.js';
-import { setCellFast } from './canvas.part02.js';
+import type { CanvasOptions, ShaderCell, ShaderFn } from './canvas.part01.js';
+import { renderCellResolution, renderQuadResolution, setCellFast } from './canvas.part02.js';
 
 function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, unknown>) {
   const { width, height } = surface;
@@ -112,6 +112,35 @@ function renderGlyphResolution(
       });
     }
   }
+}
+
+export function canvas(
+  cols: number,
+  rows: number,
+  shader: ShaderFn,
+  options: CanvasOptions = {},
+): Surface {
+  const { resolution = 'cell', time = 0, uniforms = {}, glyphFit } = options;
+  const surface = createSurface(cols, rows);
+
+  if (cols <= 0 || rows <= 0) return surface;
+
+  switch (resolution) {
+    case 'cell':
+      renderCellResolution(surface, shader, time, uniforms);
+      break;
+    case 'quad':
+      renderQuadResolution(surface, shader, time, uniforms);
+      break;
+    case 'braille':
+      renderBrailleResolution(surface, shader, time, uniforms);
+      break;
+    case 'glyph':
+      renderGlyphResolution(surface, shader, time, uniforms, glyphFit);
+      break;
+  }
+
+  return surface;
 }
 
 export { renderBrailleResolution, renderGlyphResolution };

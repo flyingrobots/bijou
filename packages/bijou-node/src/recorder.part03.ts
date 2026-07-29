@@ -1,9 +1,10 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { sanitizePositiveInt, type Surface } from '@flyingrobots/bijou';
+import { runScript } from '@flyingrobots/bijou-tui';
 import { applyGifPalette, createGifEncoder, quantizeColors } from './gifenc-runtime.js';
 import { DEFAULT_BACKGROUND, DEFAULT_FOREGROUND, fillRect, mixRgb, normalizeRgb, normalizeSurfaceFrame, parseHex, resolvedColorHex, resolvedColorRgb } from './recorder.part01.js';
-import type { RasterizeOptions, RecorderResult, SurfaceGifOptions } from './recorder.part01.js';
+import type { NativeDemoSpec, RasterizeOptions, RecorderResult, SurfaceGifOptions } from './recorder.part01.js';
 import { drawBitmapGlyph, drawSpecialGlyph } from './recorder.part02.js';
 
 function drawCell(
@@ -126,4 +127,23 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
     width: width * rasterOptions.cellWidth,
     height: height * rasterOptions.cellHeight,
   };
+}
+
+export async function recordDemoGif<Model, M = never>(
+  spec: NativeDemoSpec<Model, M>,
+): Promise<RecorderResult> {
+  const result = await runScript(spec.app, spec.steps, {
+    ctx: spec.ctx,
+    css: spec.css,
+  });
+
+  return writeSurfaceGif({
+    outputPath: spec.outputPath,
+    frames: result.frames,
+    frameDelayMs: spec.frameDelayMs,
+    cellWidth: spec.cellWidth,
+    cellHeight: spec.cellHeight,
+    foreground: spec.foreground,
+    background: spec.background,
+  });
 }

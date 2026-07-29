@@ -1,6 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { stripAnsi, surfaceToString } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import {
+  createI18nRuntime,
+  createRuntimeLocalizationPort,
+} from '@flyingrobots/bijou-i18n';
 import { describe, expect, it } from 'vitest';
+import {
+  counterDemoBlockConfig,
+  counterDemoBlockSurface,
+  createCounterDemoModel,
+} from '../../../examples/docs/counter-block-demo.js';
+import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
+import { createStorybookApp } from '../../../examples/docs/storybook-app.js';
+import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { CODE_SIZE_BASELINE } from '../../../scripts/code-size-gate.js';
 import { splitModuleFamily } from './split-module-family.js';
 import {
@@ -95,5 +109,41 @@ describe('DX-050 Code Dojo tranche B', () => {
         ).toBe(true);
       }
     }
+  });
+
+  it('localizes the touched DOGFOOD counter and storybook surfaces', () => {
+    const runtime = createI18nRuntime({
+      locale: 'de',
+      direction: 'ltr',
+      catalogs: dogfoodI18nCatalogsForLocale('de'),
+    });
+    const localization = createRuntimeLocalizationPort(runtime);
+    const counterCtx = createTestContext({
+      mode: 'static',
+      runtime: { columns: 80, rows: 24 },
+    });
+    const counter = counterDemoBlockSurface(counterDemoBlockConfig(
+      createCounterDemoModel(5),
+      counterCtx,
+      70,
+      localization,
+    ));
+
+    expect(stripAnsi(surfaceToString(counter, counterCtx.style)))
+      .toContain('CounterDemoBlock statisch');
+
+    const storybookCtx = createTestContext({
+      mode: 'interactive',
+      runtime: { columns: 120, rows: 40 },
+    });
+    const storybook = createStorybookApp(storybookCtx, { localization });
+    const [model] = storybook.init();
+    const storybookSurface = normalizeViewOutput(
+      storybook.view(model),
+      { width: 120, height: 40 },
+    ).surface;
+
+    expect(stripAnsi(surfaceToString(storybookSurface, storybookCtx.style)))
+      .toContain('Katalog');
   });
 });

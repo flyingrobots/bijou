@@ -1,10 +1,12 @@
 import { boxSurface, markdown, separatorSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { browsableListSurface, viewportSurface } from '../../packages/bijou-tui/src/index.js';
 import { createStoryProfileContext, storyDocsMarkdown, storyPreviewSurface, type ComponentStory } from '../_stories/protocol.js';
 import { column, line, proseSurface, spacer } from '../_shared/example-surfaces.js';
 import { syncStoryListHeight } from './storybook-app.part01.js';
 import type { StorybookModel } from './storybook-app.part01.js';
 import { selectedProfile, selectedVariant } from './storybook-app.part02.js';
+import { dogfoodText } from './story-preview-style.js';
 
 function fit(text: string, width: number): string {
   const targetWidth = Math.max(1, Math.floor(width));
@@ -54,6 +56,7 @@ function renderCatalogPane(
   width: number,
   height: number,
   ctx: BijouContext,
+  localization?: LocalizationPort,
 ): Surface {
   const listHeight = Math.max(1, height - 6);
   const listState = syncStoryListHeight(model.storyState, listHeight);
@@ -72,7 +75,13 @@ function renderCatalogPane(
     list,
   ]);
 
-  return paneSurface('catalog', content, width, height, ctx);
+  return paneSurface(
+    dogfoodText(localization, 'storybook.catalog.title', 'catalog'),
+    content,
+    width,
+    height,
+    ctx,
+  );
 }
 
 function renderPreviewPane(

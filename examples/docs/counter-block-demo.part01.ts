@@ -1,4 +1,5 @@
 import { commandIntent, defineDataRequirement, defineViewData, progressBar, type BijouContext, type BlockRenderInput, type BlockRenderResult, type OutputMode } from '@flyingrobots/bijou';
+import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 
 export const COUNTER_DEMO_MIN = 0;
 
@@ -36,6 +37,7 @@ export interface CounterDemoBlockConfig {
   readonly animationTimeMs?: number;
   readonly width?: number;
   readonly ctx?: BijouContext;
+  readonly localization?: LocalizationPort;
 }
 
 export const counterDemoValueRequirement = defineDataRequirement({

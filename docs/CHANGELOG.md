@@ -26,6 +26,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   to `62`. Together, tranches A and B remove the required `50` counted
   violations from the `112` goalpost while preserving public exports,
   behavior, and acyclic runtime imports.
+- **Touched DOGFOOD localization debt** — The counter fixture accepts a
+  `LocalizationPort` in its render configuration, and the standalone BlockLab
+  accepts one in its application options. Their counter titles and catalog
+  pane title now resolve through the generated DOGFOOD catalogs in English,
+  German, Spanish, and French. Raw-string debt falls from `48` to `46` for the
+  counter root and from `32` to `31` for the BlockLab root.
 - **DOGFOOD split-source debt identity** — Numbered `*.partNN.ts` extraction
   modules now retain their canonical root path in touched-file debt
   comparisons, preventing physical module splits from resetting per-source

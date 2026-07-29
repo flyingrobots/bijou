@@ -80,7 +80,7 @@ export function renderCounterDemoPreviewPane(
     ),
     spacer(1, 1),
     boxSurface(column([
-      counterDemoBlockSurface(counterDemoBlockConfig(counterBlockDemo, ctx, cardWidth)),
+      counterDemoBlockSurface(counterDemoBlockConfig(counterBlockDemo, ctx, cardWidth, localization)),
       spacer(1, 1),
       boxSurface(chrome.paragraphSurface(counterDemoLoweringPreviewText(counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
         title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),

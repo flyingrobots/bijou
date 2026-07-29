@@ -6,6 +6,6 @@
  */
 
 export type { BlockType } from './markdown-parse.part01.js';
+export { wordWrap } from './markdown-parse.part01.js';
 export { parseBlocks } from './markdown-parse.part02.js';
 export { parseInline } from './markdown-parse.part03.js';
-export { wordWrap } from './markdown-parse.part04.js';

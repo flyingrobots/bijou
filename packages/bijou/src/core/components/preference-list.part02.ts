@@ -3,7 +3,7 @@ import { FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
 import { colorRgb } from '../theme/color.js';
 import type { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { preferenceRowGlyph } from './preference-list.part01.js';
-import type { PreferenceListTheme, PreferenceRow } from './preference-list.part01.js';
+import type { PreferenceColorStyle, PreferenceListTheme, PreferenceRow } from './preference-list.part01.js';
 
 function resolvePreferenceRowBg(
   ctx: ReturnType<typeof resolveCtx>,
@@ -90,4 +90,55 @@ function buildPreferenceLeftText(row: PreferenceRow, selected: boolean): string 
   return `${prefix} ${preferenceRowGlyph(row)} ${row.label}`;
 }
 
-export { buildPreferenceLeftText, fillPreferenceRow, resolvePreferenceRowBg, resolvePreferenceRowBgRGB, writePreferenceLine };
+function resolvePreferenceValueStyle(
+  row: PreferenceRow,
+  ctx: ReturnType<typeof resolveCtx>,
+  theme: PreferenceListTheme | undefined,
+): PreferenceColorStyle {
+  if (row.kind === 'toggle' && row.checked === true) {
+    return {
+      fg: theme?.toggleOnToken?.hex ?? ctx?.semantic('accent').hex,
+      fgRGB: theme?.toggleOnToken?.fgRGB
+        ?? colorRgb(theme?.toggleOnToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
+    };
+  }
+  if (row.kind === 'toggle' && row.checked === false) {
+    return {
+      fg: theme?.toggleOffToken?.hex ?? ctx?.semantic('muted').hex,
+      fgRGB: theme?.toggleOffToken?.fgRGB
+        ?? colorRgb(theme?.toggleOffToken?.hex)
+        ?? ctx?.semantic('muted').fgRGB,
+    };
+  }
+  if (row.kind === 'choice') {
+    return {
+      fg: theme?.choiceToken?.hex ?? ctx?.semantic('accent').hex,
+      fgRGB: theme?.choiceToken?.fgRGB
+        ?? colorRgb(theme?.choiceToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
+    };
+  }
+  if (row.kind === 'info' || row.kind === 'action') {
+    return {
+      fg: theme?.infoToken?.hex ?? ctx?.semantic('primary').hex,
+      fgRGB: theme?.infoToken?.fgRGB
+        ?? colorRgb(theme?.infoToken?.hex)
+        ?? ctx?.semantic('primary').fgRGB,
+    };
+  }
+  if (ctx == null) return {};
+  return {
+    fg: ctx.semantic('primary').hex,
+    fgRGB: ctx.semantic('primary').fgRGB,
+  };
+}
+
+export {
+  buildPreferenceLeftText,
+  fillPreferenceRow,
+  resolvePreferenceRowBg,
+  resolvePreferenceRowBgRGB,
+  resolvePreferenceValueStyle,
+  writePreferenceLine,
+};

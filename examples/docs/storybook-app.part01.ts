@@ -1,4 +1,5 @@
 import type { BijouContext, OutputMode } from '@flyingrobots/bijou';
+import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { createBrowsableListState, listFocusNext, listFocusPrev, listPageDown, listPageUp, type BrowsableListItem, type BrowsableListState, type FramePageMsg, type KeyMsg, type ResizeMsg } from '../../packages/bijou-tui/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
 import { COMPONENT_STORIES } from './stories.js';
@@ -13,6 +14,7 @@ const NEXT = 'Next story';
 
 export interface StorybookAppOptions {
   readonly initialStoryId?: string;
+  readonly localization?: LocalizationPort;
   readonly stories?: readonly ComponentStory[];
   readonly title?: string;
 }

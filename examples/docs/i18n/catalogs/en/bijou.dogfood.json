@@ -1731,6 +1731,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "counterDemo.surfaceTitle.fixture"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "CounterDemoBlock fixture"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "counterDemo.surfaceTitle.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "CounterDemoBlock static"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",
@@ -3981,6 +4003,17 @@
       "sourceLocale": "en",
       "values": {
         "en": "width={value}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "storybook.catalog.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "catalog"
       }
     },
     {

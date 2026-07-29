@@ -63,6 +63,7 @@ function renderStorybookBody(
   model: StorybookModel,
   ctx: BijouContext,
   stories: readonly ComponentStory[],
+  localization?: StorybookAppOptions['localization'],
 ): Surface {
   const screen = createSurface(model.columns, model.rows);
   const story = selectedStorybookStory(model, stories);
@@ -71,13 +72,13 @@ function renderStorybookBody(
     const catalogWidth = 34;
     const testingWidth = 36;
     const previewWidth = Math.max(20, model.columns - catalogWidth - testingWidth);
-    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx), 0, 0);
+    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx, localization), 0, 0);
     screen.blit(renderPreviewPane(model, story, previewWidth, model.rows, ctx), catalogWidth, 0);
     screen.blit(renderTestingPane(model, story, testingWidth, model.rows, ctx), catalogWidth + previewWidth, 0);
   } else if (model.columns >= 76 && model.rows >= 10) {
     const catalogWidth = 30;
     const previewWidth = Math.max(20, model.columns - catalogWidth);
-    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx), 0, 0);
+    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx, localization), 0, 0);
     screen.blit(renderPreviewPane(model, story, previewWidth, model.rows, ctx), catalogWidth, 0);
   } else {
     screen.blit(renderPreviewPane(model, story, model.columns, model.rows, ctx), 0, 0);
@@ -90,6 +91,7 @@ function renderStorybook(
   model: StorybookModel,
   ctx: BijouContext,
   stories: readonly ComponentStory[],
+  localization?: StorybookAppOptions['localization'],
 ): Surface {
   const screen = createSurface(model.columns, model.rows);
   const story = selectedStorybookStory(model, stories);
@@ -100,7 +102,11 @@ function renderStorybook(
 
   const bodyTop = 1;
   const bodyHeight = Math.max(1, model.rows - 2);
-  screen.blit(renderStorybookBody({ ...model, rows: bodyHeight }, ctx, stories), 0, bodyTop);
+  screen.blit(
+    renderStorybookBody({ ...model, rows: bodyHeight }, ctx, stories, localization),
+    0,
+    bodyTop,
+  );
 
   screen.blit(line(fit(FOOTER_HINT, model.columns), model.columns), 0, model.rows - 1);
   return screen;
@@ -123,7 +129,7 @@ export function createStorybookApp(
     },
 
     view(model) {
-      return renderStorybook(model, ctx, stories);
+      return renderStorybook(model, ctx, stories, options.localization);
     },
   };
 }

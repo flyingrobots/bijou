@@ -4,8 +4,7 @@ import { colorRgb } from '../theme/color.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { isPreparedPreferenceRow, preparePreferenceRow, resolvePreferenceRowLayout } from './preference-list.part01.js';
 import type { PreferenceRow, PreferenceRowSurfaceOptions, PreparedPreferenceRow } from './preference-list.part01.js';
-import { buildPreferenceLeftText, fillPreferenceRow, resolvePreferenceRowBg, resolvePreferenceRowBgRGB, writePreferenceLine } from './preference-list.part02.js';
-import { resolvePreferenceValueStyle } from './preference-list.part03.js';
+import { buildPreferenceLeftText, fillPreferenceRow, resolvePreferenceRowBg, resolvePreferenceRowBgRGB, resolvePreferenceValueStyle, writePreferenceLine } from './preference-list.part02.js';
 
 export function preferenceRowSurface(
   row: PreferenceRow | PreparedPreferenceRow,
