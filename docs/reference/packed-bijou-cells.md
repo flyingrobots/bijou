@@ -114,8 +114,9 @@ contain exactly ten unsigned bytes per cell.
 | `9`     | Six-bit opacity plus foreground/background presence bits |
 
 Character values below `0xF000` are direct Basic Multilingual Plane values.
-Non-empty direct values must be terminal-control safe and have terminal width
-`1`; UTF-16 surrogate values are rejected. Values at or above `0xF000` select
+Direct values must be terminal-control safe and have terminal width `1`;
+UTF-16 surrogate values and the NUL sentinel are rejected. An empty cell uses
+a space glyph plus the empty-cell flag. Values at or above `0xF000` select
 `sideTable[characterValue - 0xF000]`.
 
 Each side-table entry must be unique, terminal-control safe, and exactly one

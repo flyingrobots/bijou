@@ -197,9 +197,10 @@ byte-length-mismatched dimensions fail.
 
 - the character value is decoded from byte offsets `0` and `1` as unsigned
   16-bit little-endian
-- direct value `0` represents the empty character
+- direct value `0` is rejected; an empty cell uses a space glyph plus the
+  empty-cell flag
 - direct values below `0xF000` must not be UTF-16 surrogate code points
-- non-empty direct values are terminal-control safe graphemes of width `1`
+- direct values are terminal-control safe graphemes of width `1`
 - values at or above `0xF000` must reference an existing side-table entry
 - every side-table entry is non-empty, terminal-control safe, and exactly one
   grapheme with terminal width `1`

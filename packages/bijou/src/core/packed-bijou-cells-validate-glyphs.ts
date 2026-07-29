@@ -79,7 +79,7 @@ function validateCellGlyphs(
         `$.bytes[${String(offset)}]`,
         'direct glyph cannot be a UTF-16 surrogate',
       );
-    } else if (code !== 0 && !isSafeUnitGlyph(String.fromCharCode(code))) {
+    } else if (!isSafeUnitGlyph(String.fromCharCode(code))) {
       failPackedCells(
         'invalid-glyph',
         `$.bytes[${String(offset)}]`,
