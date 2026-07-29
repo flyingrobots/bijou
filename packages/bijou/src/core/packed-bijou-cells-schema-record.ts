@@ -1,5 +1,8 @@
 import { MAX_PACKED_BIJOU_CELLS } from './packed-bijou-cells-contract.js';
-import { failPackedCells } from './packed-bijou-cells-schema-values.js';
+import {
+  failPackedCells,
+  jsonPropertyPath,
+} from './packed-bijou-cells-schema-values.js';
 
 export type JsonRecord = Record<string, unknown>;
 
@@ -31,7 +34,7 @@ export function recordAt(
     ) {
       failPackedCells(
         'invalid-shape',
-        propertyPath(path, key),
+        jsonPropertyPath(path, key),
         'accessors and non-enumerable fields are not allowed',
       );
     }
@@ -82,7 +85,7 @@ export function arrayAt(
   if (extra !== undefined) {
     failPackedCells(
       'unknown-field',
-      propertyPath(path, extra),
+      jsonPropertyPath(path, extra),
       'field is not allowed',
     );
   }
@@ -114,7 +117,7 @@ function assertExactFields(
   if (unknown !== undefined) {
     failPackedCells(
       'unknown-field',
-      propertyPath(path, unknown),
+      jsonPropertyPath(path, unknown),
       'field is not allowed',
     );
   }
@@ -127,12 +130,4 @@ function assertExactFields(
       );
     }
   }
-}
-
-function propertyPath(path: string, key: string): string {
-  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(key)) {
-    return `${path}.${key}`;
-  }
-  const encoded = JSON.stringify(key);
-  return `${path}[${encoded}]`;
 }

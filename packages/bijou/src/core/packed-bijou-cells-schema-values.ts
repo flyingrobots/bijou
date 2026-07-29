@@ -48,6 +48,31 @@ export function canonicalIdAt(
   return value;
 }
 
+export function jsonPropertyPath(path: string, key: string): string {
+  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(key)) {
+    return `${path}.${key}`;
+  }
+  return `${path}[${escapeJsonString(key)}]`;
+}
+
+function escapeJsonString(value: string): string {
+  let result = '';
+  for (const character of JSON.stringify(value)) {
+    const codePoint = character.codePointAt(0);
+    if (
+      codePoint !== undefined &&
+      ((codePoint >= 0x7f && codePoint <= 0x9f) ||
+        codePoint === 0x2028 ||
+        codePoint === 0x2029)
+    ) {
+      result += `\\u${codePoint.toString(16).padStart(4, '0')}`;
+    } else {
+      result += character;
+    }
+  }
+  return result;
+}
+
 function hasAsciiControl(value: string): boolean {
   return Array.from(value).some((character) => {
     const codePoint = character.codePointAt(0);
