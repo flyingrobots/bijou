@@ -42,8 +42,8 @@ describe('DX-050 Profunctor Page inspection design', () => {
       'fail closed',
       'byte-identical',
       '`62` aggregate violations or lower',
-      'Focused contract evidence passes `37` tests',
-      'Full local verification passes `4,014` tests',
+      'Focused contract evidence passes `38` tests',
+      'Full local verification passes `4,015` tests',
       'Hidden unsupported blocks become `hidden-unsupported-block` residuals',
       'Visible unsupported blocks',
     ]);
