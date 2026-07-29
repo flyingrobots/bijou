@@ -150,8 +150,8 @@ Current direction and active tensions. Historical ship data is in
   milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 14 open
-  and 0 closed milestone items.
+- The `v8.2.0` milestone is quality automation and Method hardening: 15 open
+  and 1 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
 - The `v10.0.0` milestone is renderer and host-systems integration: 10 open and
@@ -222,6 +222,8 @@ Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
 boundaries. This temporarily pulls one v10 integration proof ahead for the
 active cross-repository campaign; it does not move the issue out of v10 or
 replace the v8 product sequence.
+The accepted cycle design is
+[DX-050](./design/DX-050-profunctor-page-inspection.md).
 
 The #458 GraphQL block artifact bundle has landed as the first v8
 implementation proof. Its cycle design remains

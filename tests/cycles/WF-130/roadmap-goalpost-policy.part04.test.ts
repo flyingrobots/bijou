@@ -50,7 +50,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
       '`v8.0.0` milestone is the active feature horizon: 3 open and 1 closed milestone items',
       '`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through',
-      '`v8.2.0` milestone is quality automation and Method hardening',
+      '`v8.2.0` milestone is quality automation and Method hardening: 15 open and 1 closed milestone items',
       'No open issue is currently unmilestoned',
       'The selected `v7.2.0` DOGFOOD product pull #335 has landed',
       'Keep Future Releases Explicit',
