@@ -4,6 +4,10 @@ import {
   ProfunctorPageTargetError,
 } from '../../../packages/bijou/src/core/profunctor-page-target.js';
 import {
+  renderId,
+  renderLineId,
+} from '../../../packages/bijou/src/core/profunctor-page-scene.js';
+import {
   mutatePage,
   recordAt,
   records,
@@ -71,6 +75,11 @@ describe('DX-050 page composition graph validation', () => {
       const projects = recordAt([related.props], 0).relatedProjects;
       recordAt(projects, 0).route = '/projects/bad\u0007route/';
     }));
+  });
+
+  it('keeps derived line identities disjoint from page render identities', () => {
+    const nodeId = 'page-node:project.keep#facts';
+    expect(renderLineId(nodeId, 0)).not.toBe(renderId(`${nodeId}/line-0`));
   });
 });
 

@@ -116,7 +116,7 @@ function planNodes(
     const height = isRoot ? PAGE_TARGET_ROWS : Math.max(1, lines.length);
     const region = { x: 0, y, width: PAGE_TARGET_COLS, height };
     const renderNodeId = renderId(pageNodeId);
-    const lineIds = lines.map((_, index) => `${renderNodeId}/line-${String(index)}`);
+    const lineIds = lines.map((_, index) => renderLineId(pageNodeId, index));
     y = isRoot ? lines.length + 1 : y + height + 1;
     return [{ node, renderNodeId, region, lines, lineIds }];
   });
@@ -124,4 +124,8 @@ function planNodes(
 
 export function renderId(pageNodeId: string): string {
   return `bijou-render:${pageNodeId}`;
+}
+
+export function renderLineId(pageNodeId: string, index: number): string {
+  return `bijou-render-line:${pageNodeId}/${String(index)}`;
 }

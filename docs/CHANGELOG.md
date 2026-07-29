@@ -23,7 +23,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   evidence, and treats cleanup after successful installation as best-effort.
   Canonical route validation rejects whitespace and control characters before
   action or terminal evidence can be emitted. Profiled source spans reject end
-  positions that precede their declared starts.
+  positions that precede their declared starts. Derived line identities use a
+  namespace disjoint from page render identities.
 - **VISOR artifact bundle proof** — `@flyingrobots/bijou` now exports
   `createVisorArtifactBundleFromGraphql()`, `createVisorArtifactBundle()`, and
   `visor-artifact-bundle/1` types for #458 / [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md).
