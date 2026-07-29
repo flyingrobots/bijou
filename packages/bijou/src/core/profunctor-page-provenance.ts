@@ -20,7 +20,7 @@ export function readPageSourceProvenance(
   required: boolean,
 ): PageSourceProvenance | null {
   const value = node.props.sourceProvenance;
-  if (value === undefined) {
+  if (value == null) {
     if (required) {
       invalid(`${node.pageNodeId}.props.sourceProvenance`, 'missing required field');
     }

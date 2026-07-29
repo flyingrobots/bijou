@@ -67,6 +67,7 @@ describe('DX-050 terminal inspection evidence', () => {
       const node = recordAt(page.nodes, 4);
       node.blockDefinitionId = 'block:future';
       node.hidden = true;
+      recordAt([node.props], 0).sourceProvenance = null;
     }));
     expect(proof.targetMap.entries[4]).toMatchObject({
       renderNodeId: null,
