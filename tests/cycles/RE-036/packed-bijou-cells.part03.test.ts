@@ -32,6 +32,7 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
       ['\u0301', '$.sideTable[0]'],
       ['\u200d', '$.sideTable[0]'],
       ['\u202e', '$.sideTable[0]'],
+      ['A', '$.sideTable[0]'],
       ['ab', '$.sideTable[0]'],
       ['界', '$.sideTable[0]'],
     ];
