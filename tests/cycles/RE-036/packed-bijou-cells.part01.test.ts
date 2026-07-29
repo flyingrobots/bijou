@@ -25,14 +25,16 @@ describe('RE-036 packed-bijou-cells/1 valid receipt', () => {
 
   it('adapts bytes and side-table order exactly into a packed Surface', () => {
     const input = validPackedCellsInput();
+    const expectedBytes = [...arrayField(input, 'bytes')];
+    const expectedSideTable = [...arrayField(input, 'sideTable')];
     const receipt = parsePackedBijouCellsReceipt(input);
     const surface = adaptPackedBijouCellsToSurface(input);
 
     expect(isPackedSurface(surface)).toBe(true);
     expect(surface.width).toBe(receipt.widthCells);
     expect(surface.height).toBe(receipt.heightCells);
-    expect(Array.from(surface.buffer)).toEqual(receipt.bytes);
-    expect(surface.sideTable).toEqual(receipt.sideTable);
+    expect(Array.from(surface.buffer)).toEqual(expectedBytes);
+    expect(surface.sideTable).toEqual(expectedSideTable);
     expect(surface.get(0, 0)).toMatchObject({
       char: 'A',
       fgRGB: [255, 64, 32],
