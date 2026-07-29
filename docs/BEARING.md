@@ -150,8 +150,8 @@ Current direction and active tensions. Historical ship data is in
   milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 17 open
-  and 1 closed milestone item.
+- The `v8.2.0` milestone is quality automation and Method hardening: 16 open
+  and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
 - The `v10.0.0` milestone is renderer and host-systems integration: 10 open and
@@ -210,17 +210,15 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The first Code Dojo ratchet
-[#469](https://github.com/flyingrobots/bijou/issues/469) has met its `112`
-contract. [#477](https://github.com/flyingrobots/bijou/issues/477) owns the
-next `112 -> 62` goalpost. Its landed tranche A
-[#475](https://github.com/flyingrobots/bijou/pull/475) reduced measured debt to
-`87`, comprising `61` file/context and `26` code-size violations with no
-mock-ban or ESLint debt. Tranche B is the immediate target and must lower the
-encoded ceiling to `62` or lower.
+The Code Dojo ratchet
+[#477](https://github.com/flyingrobots/bijou/issues/477) has met its
+`112 -> 62` contract. Landed tranche A
+[#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B
+each removed `25` counted violations. Current debt comprises `37`
+file/context and `25` code-size violations with no mock-ban or ESLint debt.
 
-The following bounded target is
-[#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
+The next bounded target is
+[#468](https://github.com/flyingrobots/bijou/issues/468). It consumes the
 canonical website specimen through
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
 boundaries. This temporarily pulls one v10 integration proof ahead for the
@@ -255,24 +253,22 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land the Code Dojo tranche-B goalpost in #477 at `62` aggregate debt or
-   lower.
-2. Land the bounded Profunctor Page inspection proof in #468.
-3. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
+1. Land the bounded Profunctor Page inspection proof in #468.
+2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
    replay facts, and visual scene facts are implemented.
-4. Pull #459 as the next v8 implementation proof: validate
+3. Pull #459 as the next v8 implementation proof: validate
    `packed-bijou-cells/1` and adapt it to `Surface`.
-5. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and
+4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and
    active #459 prove the smallest stable contract.
-6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
-7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
+6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
    automation.
-8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
+7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
    stabilizes the source/artifact/IR contract.
-9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
+8. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
    surface work after the Bijou contracts are proven.
-10. Keep closed dependency PR #326 as superseded lineage, not active release
+9. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:

@@ -1,0 +1,30 @@
+export const TRANCHE_B_CLEARED_PATHS = [
+  'examples/docs/counter-block-demo.ts',
+  'examples/docs/storybook-app.ts',
+  'examples/image-viewer/image-codecs.ts',
+  'packages/bijou-i18n-tools-node/src/filesystem.ts',
+  'packages/bijou-i18n-tools/src/exchange.ts',
+  'packages/bijou-mcp/src/tools/docs.ts',
+  'packages/bijou-node/src/recorder.ts',
+  'packages/bijou-tui/src/browsable-list.ts',
+  'packages/bijou-tui/src/canvas.ts',
+  'packages/bijou-tui/src/command-palette.ts',
+  'packages/bijou-tui/src/flex.ts',
+  'packages/bijou-tui/src/keybindings.ts',
+  'packages/bijou-tui/src/runtime-binding.ts',
+  'packages/bijou/src/core/components/box-v3.ts',
+  'packages/bijou/src/core/components/markdown-parse.ts',
+  'packages/bijou/src/core/components/preference-list.ts',
+  'packages/bijou/src/core/standard-blocks/metadata-standard.ts',
+  'packages/bijou/src/core/standard-blocks/render.ts',
+  'packages/bijou/src/core/theme/builder.ts',
+  'packages/bijou/src/core/theme/doctor.ts',
+  'packages/bijou/src/core/theme/presets.ts',
+  'packages/create-bijou-tui-app/src/index.ts',
+  'scripts/release-metadata.ts',
+  'scripts/smoke-canaries.ts',
+] as const;
+
+export const TRANCHE_B_CODE_SIZE_PATHS = [
+  'examples/docs/storybook-app.ts',
+] as const;

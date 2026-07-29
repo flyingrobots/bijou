@@ -19,6 +19,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **DX-050 Code Dojo prerequisite, tranche B** — `24` additional production
+  and repository-tooling entrypoints are now stable compatibility facades over
+  focused sub-150-line modules. File/context debt falls from `61` to `37`,
+  code-size debt falls from `26` to `25`, and aggregate debt falls from `87`
+  to `62`. Together, tranches A and B remove the required `50` counted
+  violations from the `112` goalpost while preserving public exports,
+  behavior, and acyclic runtime imports.
 - **DOGFOOD split-source debt identity** — Numbered `*.partNN.ts` extraction
   modules now retain their canonical root path in touched-file debt
   comparisons, preventing physical module splits from resetting per-source

@@ -1,0 +1,148 @@
+import { createSurface, isPackedSurface, type Surface, type Cell } from '../../ports/surface.js';
+import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { clipToWidth } from '../text/clip.js';
+import { sanitizePlainTerminalText } from '../text/index.js';
+import { wrapToWidth } from '../text/wrap.js';
+import { resolveFillChar, type BoxOptions } from './box.js';
+import { applyBCSSCellTextStyles } from './bcss-style.js';
+import { createTextSurface, segmentSurfaceText, wrapSurfaceToWidth } from './surface-text.js';
+import { resolveOverflowBehavior } from './overflow.js';
+import { BORDER, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
+
+/**
+ * Render a bordered box around a Surface.
+ *
+ * Returns a new Surface containing the box and the nested content.
+ */
+export function boxSurface(content: Surface | string, options: BoxOptions = {}): Surface {
+  const ctx = resolveCtx(options.ctx);
+  const { title, width: fixedWidth, padding = {} } = options;
+  const safeTitle = title != null ? sanitizePlainTerminalText(title) : '';
+  const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
+  const overflow = resolveOverflowBehavior(options.overflow, bcss);
+  const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
+
+  const pt = padding.top ?? 0;
+  const pb = padding.bottom ?? 0;
+  const pl = padding.left ?? 0;
+  const pr = padding.right ?? 0;
+
+  let contentSurf: Surface;
+  if (typeof content === 'string') {
+    const wrapped = normalizedFixedWidth !== undefined && overflow === 'wrap'
+      ? wrapToWidth(content, Math.max(0, normalizedFixedWidth - 2 - pl - pr)).join('\n')
+      : content;
+    contentSurf = createTextSurface(wrapped);
+  } else {
+    contentSurf = normalizedFixedWidth !== undefined && overflow === 'wrap'
+      ? wrapSurfaceToWidth(content, Math.max(0, normalizedFixedWidth - 2 - pl - pr))
+      : content;
+  }
+
+  const autoTitleWidth = normalizedFixedWidth === undefined && safeTitle.length > 0
+    ? segmentSurfaceText(` ${safeTitle} `, 'boxSurface title').length
+    : 0;
+  const innerW = normalizedFixedWidth === undefined
+    ? Math.max(contentSurf.width + pl + pr, autoTitleWidth)
+    : contentSurf.width + pl + pr;
+  const innerH = contentSurf.height + pt + pb;
+
+  const outerW = normalizedFixedWidth ?? (innerW + 2);
+  const outerH = innerH + 2;
+  const boundedInnerW = Math.max(0, outerW - 2);
+  const effectiveLeft = normalizedFixedWidth !== undefined ? Math.min(pl, boundedInnerW) : pl;
+  const effectiveRight = normalizedFixedWidth !== undefined ? Math.min(pr, Math.max(0, boundedInnerW - effectiveLeft)) : pr;
+  const contentBoxWidth = Math.max(0, boundedInnerW - effectiveLeft - effectiveRight);
+
+  const surface = createSurface(outerW, outerH);
+  const resolvedFillChar = resolveFillChar(options.fillChar);
+  const fillStyle = applyBCSSCellTextStyles({
+    fg: undefined,
+    bg: options.bgToken?.bg,
+    modifiers: undefined,
+  }, bcss);
+  surface.fill({
+    char: resolvedFillChar,
+    bg: fillStyle.bg,
+    fg: fillStyle.fg,
+    modifiers: fillStyle.modifiers,
+    empty: false,
+  });
+
+  const borderToken = options.borderToken ?? ctx?.border('primary');
+  const borderStyle = applyBCSSCellTextStyles({
+    fg: borderToken?.hex ?? '#ffffff',
+    bg: borderToken?.bg,
+    modifiers: borderToken?.modifiers,
+  }, bcss);
+
+  const bRGB = isPackedSurface(surface) ? parseStyleRGB(borderStyle) : undefined;
+  if (bRGB && isPackedSurface(surface)) {
+    const { fgR, fgG, fgB, bgR, bgG, bgB, flags } = bRGB;
+    const H = BORDER.h, V = BORDER.v;
+    for (let x = 0; x < outerW; x++) {
+      surface.setRGB(x, 0, H, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      surface.setRGB(x, outerH - 1, H, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    }
+    for (let y = 0; y < outerH; y++) {
+      surface.setRGB(0, y, V, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      surface.setRGB(outerW - 1, y, V, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    }
+    surface.setRGB(0, 0, BORDER.tl, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(outerW - 1, 0, BORDER.tr, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(0, outerH - 1, BORDER.bl, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(outerW - 1, outerH - 1, BORDER.br, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+
+    if (safeTitle.length > 0 && outerW >= 4) {
+      const available = Math.max(0, outerW - 4);
+      const titleText = clipToWidth(` ${safeTitle} `, available);
+      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleLen = Math.min(titleGs.length, available);
+      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+        surface.setRGB(i + 2, 0, char, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      }
+    }
+  } else {
+    const borderCell: Cell = {
+      char: ' ',
+      fg: borderStyle.fg,
+      bg: borderStyle.bg,
+      modifiers: borderStyle.modifiers,
+    };
+    for (let x = 0; x < outerW; x++) {
+      surface.set(x, 0, { ...borderCell, char: BORDER.h });
+      surface.set(x, outerH - 1, { ...borderCell, char: BORDER.h });
+    }
+    for (let y = 0; y < outerH; y++) {
+      surface.set(0, y, { ...borderCell, char: BORDER.v });
+      surface.set(outerW - 1, y, { ...borderCell, char: BORDER.v });
+    }
+    surface.set(0, 0, { ...borderCell, char: BORDER.tl });
+    surface.set(outerW - 1, 0, { ...borderCell, char: BORDER.tr });
+    surface.set(0, outerH - 1, { ...borderCell, char: BORDER.bl });
+    surface.set(outerW - 1, outerH - 1, { ...borderCell, char: BORDER.br });
+
+    if (safeTitle.length > 0 && outerW >= 4) {
+      const available = Math.max(0, outerW - 4);
+      const titleText = clipToWidth(` ${safeTitle} `, available);
+      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleLen = Math.min(titleGs.length, available);
+      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+        surface.set(i + 2, 0, { ...borderCell, char });
+      }
+    }
+  }
+
+  // Blit content
+  surface.blit(
+    withInheritedBackground(contentSurf, fillStyle.bg),
+    effectiveLeft + 1,
+    pt + 1,
+    0,
+    0,
+    contentBoxWidth,
+    contentSurf.height,
+  );
+
+  return surface;
+}
