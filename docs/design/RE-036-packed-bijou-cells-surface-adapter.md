@@ -203,6 +203,7 @@ byte-length-mismatched dimensions fail.
 - values at or above `0xF000` must reference an existing side-table entry
 - every side-table entry is non-empty, terminal-control safe, and exactly one
   grapheme with terminal width `1`
+- format-control and mark-only graphemes are rejected
 - every side-table entry contains at most `256` UTF-16 code units
 - side-table entries are unique
 - every side-table entry is referenced by at least one cell

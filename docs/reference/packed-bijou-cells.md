@@ -119,8 +119,8 @@ Non-empty direct values must be terminal-control safe and have terminal width
 
 Each side-table entry must be unique, terminal-control safe, and exactly one
 grapheme with terminal width `1`. An entry contains at most `256` UTF-16 code
-units. Every entry must be referenced by at least one cell. Side-table order
-is authoritative.
+units. Format-control and mark-only graphemes are rejected. Every entry must
+be referenced by at least one cell. Side-table order is authoritative.
 
 When a foreground or background presence bit is unset, the corresponding
 three color channels must be zero. An absent color means terminal default, not

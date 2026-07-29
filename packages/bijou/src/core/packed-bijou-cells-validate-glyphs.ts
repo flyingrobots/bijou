@@ -97,10 +97,33 @@ function isCanonicalUnitGlyph(value: string): boolean {
     value.length > 0 &&
     value.length <= MAX_PACKED_BIJOU_GLYPH_CODE_UNITS &&
     !hasTerminalControl(value) &&
+    !hasUnsafeFormat(value) &&
+    hasVisibleBase(value) &&
     sanitizePlainTerminalText(value) === value &&
     segmentGraphemes(value).length === 1 &&
     graphemeClusterWidth(value) === 1
   );
+}
+
+function hasVisibleBase(value: string): boolean {
+  return Array.from(value).some(
+    (character) => !/^[\p{M}\p{Cf}]$/u.test(character),
+  );
+}
+
+function hasUnsafeFormat(value: string): boolean {
+  return Array.from(value).some((character) => {
+    const codePoint = character.codePointAt(0);
+    if (codePoint === 0x200c || codePoint === 0x200d) return false;
+    if (
+      codePoint !== undefined &&
+      codePoint >= 0xe0020 &&
+      codePoint <= 0xe007f
+    ) {
+      return false;
+    }
+    return /^\p{Cf}$/u.test(character);
+  });
 }
 
 function hasTerminalControl(value: string): boolean {
