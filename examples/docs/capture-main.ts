@@ -1,7 +1,11 @@
-import { createBijou, setDefaultContext } from '../../packages/bijou/src/index.js';
-import { chalkStyle, nodeIO, nodeRuntime } from '../../packages/bijou-node/src/index.js';
-import { run, type App, type Cmd, type KeyMsg } from '../../packages/bijou-tui/src/index.js';
+import {
+  run,
+  type App,
+  type Cmd,
+  type KeyMsg,
+} from '../../packages/bijou-tui/src/index.js';
 import { createDocsApp } from './app.js';
+import { createCaptureContext } from './capture-context.js';
 
 type InnerApp = ReturnType<typeof createDocsApp>;
 type CaptureModel = ReturnType<InnerApp['init']>[0];
@@ -11,9 +15,6 @@ type CaptureScenarioName = 'landing' | 'docs';
 
 const LANDING: CaptureScenarioName = 'landing';
 const DOCS: CaptureScenarioName = 'docs';
-const TERM = 'TERM';
-const COLORTERM = 'COLORTERM';
-
 interface WalkthroughStep {
   readonly delayMs: number;
   readonly key: string;
@@ -64,13 +65,6 @@ const CAPTURE_SCENARIOS: Record<CaptureScenarioName, CaptureScenario> = {
   },
 };
 
-function readIntEnv(name: string, fallback: number): number {
-  const raw = process.env[name];
-  if (raw == null || raw.trim() === '') return fallback;
-  const parsed = Number.parseInt(raw, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
 function readNumberEnv(name: string, fallback: number): number {
   const raw = process.env[name];
   if (raw == null || raw.trim() === '') return fallback;
@@ -95,7 +89,12 @@ function keyMsg(step: WalkthroughStep): KeyMsg {
 
 function autoplayCmd(scenario: CaptureScenario): Cmd<CaptureMsg> {
   return async (emit, capabilities) => {
-    const sleep = capabilities.sleep?.bind(capabilities) ?? ((ms: number) => new Promise<void>((resolve) => { setTimeout(resolve, ms); }));
+    const sleep =
+      capabilities.sleep?.bind(capabilities) ??
+      ((ms: number) =>
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, ms);
+        }));
     const pace = readNumberEnv('DOGFOOD_CAPTURE_PACE', scenario.pace);
     for (const step of scenario.steps) {
       const delayMs = Math.max(0, Math.round(step.delayMs * pace));
@@ -128,58 +127,6 @@ function createCaptureApp(
       return inner.routeRuntimeIssue?.(issue);
     },
   };
-}
-
-function createCaptureContext() {
-  const baseRuntime = nodeRuntime();
-  const baseIO = nodeIO();
-  const columns = readIntEnv('DOGFOOD_CAPTURE_COLUMNS', readIntEnv('COLUMNS', 160));
-  const rows = readIntEnv('DOGFOOD_CAPTURE_ROWS', readIntEnv('LINES', 44));
-
-  const runtime = {
-    env(key: string): string | undefined {
-      if (key === TERM) {
-        return process.env[TERM] && process.env[TERM] !== 'dumb'
-          ? process.env[TERM]
-          : 'xterm-256color';
-      }
-      if (key === COLORTERM) return process.env[COLORTERM] ?? 'truecolor';
-      if (key === 'CI' || key === 'NO_COLOR' || key === 'BIJOU_ACCESSIBLE') return undefined;
-      return baseRuntime.env(key);
-    },
-    get stdoutIsTTY(): boolean {
-      return true;
-    },
-    get stdinIsTTY(): boolean {
-      return true;
-    },
-    get columns(): number {
-      return columns;
-    },
-    get rows(): number {
-      return rows;
-    },
-    get refreshRate(): number {
-      return baseRuntime.refreshRate;
-    },
-  };
-
-  const io = {
-    ...baseIO,
-    rawInput() {
-      return {
-        dispose: () => undefined,
-      };
-    },
-  };
-
-  const ctx = createBijou({
-    runtime,
-    io,
-    style: chalkStyle({ noColor: false, level: 3 }),
-  });
-  setDefaultContext(ctx);
-  return ctx;
 }
 
 const scenario = CAPTURE_SCENARIOS[readScenarioEnv()];
