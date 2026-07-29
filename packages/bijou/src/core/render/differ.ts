@@ -560,10 +560,10 @@ function packedCellsSemanticallyEqual(
 /**
  * Fixed byte budget for the cursor move + full SGR prelude + trailing
  * reset that bookend a batch. The variable per-batch cost comes from
- * the char writes, which are bounded by `width * MAX_CHAR_BYTES`.
+ * the char writes, bounded by `width * MAX_PACKED_CELL_UTF8_BYTES`.
  * The full batch budget is computed inside `renderDiffPacked` as
- * `BATCH_FIXED_BUDGET + width * MAX_CHAR_BYTES` so it scales with
- * terminal width and never overflows on ultra-wide monitors.
+ * `BATCH_FIXED_BUDGET + width * MAX_PACKED_CELL_UTF8_BYTES` so it
+ * scales with terminal width and never overflows on ultra-wide monitors.
  */
 const BATCH_FIXED_BUDGET = 128;
 function renderDiffPacked(
