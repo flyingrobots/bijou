@@ -7,8 +7,8 @@ describe('DOGFOOD i18n debt inventory', () => {
         paths: [
           'examples/docs/app.ts',
           'examples/docs/dogfood-shell-themes.ts',
-          'examples/docs/i18n/new-docs-module.ts',
           'examples/docs/i18n-debt.ts',
+          'examples/docs/release-title.part01.ts',
           'examples/docs/content/guide.md',
           'examples/hello/hello.ts',
         ],
@@ -17,7 +17,7 @@ describe('DOGFOOD i18n debt inventory', () => {
       expect(sources).toEqual([
         { surface: 'docs-app', path: 'examples/docs/app.ts' },
         { surface: 'dogfood-shell-themes', path: 'examples/docs/dogfood-shell-themes.ts' },
-        { surface: 'i18n-new-docs-module', path: 'examples/docs/i18n/new-docs-module.ts' },
+        { surface: 'release-title', path: 'examples/docs/release-title.part01.ts' },
       ]);
       expect(DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS).toContainEqual({
         path: 'examples/docs/i18n-debt.ts',

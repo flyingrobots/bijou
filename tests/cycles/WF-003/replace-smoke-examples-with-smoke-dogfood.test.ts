@@ -15,7 +15,9 @@ describe('WF-003 replace smoke examples with smoke dogfood', () => {
 
   it('replaces the public smoke commands and release-readiness gate', () => {
     const packageJson = readRepoFile('package.json');
-    const releaseReadiness = readRepoFile('scripts/release-readiness.ts');
+    const releaseReadiness = readRepoFile(
+      'scripts/release-readiness.part01.ts',
+    );
     const migration = readRepoFile('docs/MIGRATING_TO_V4.md');
 
     expect(packageJson).toContain('smoke:dogfood');

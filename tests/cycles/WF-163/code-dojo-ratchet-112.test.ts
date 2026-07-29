@@ -57,7 +57,7 @@ function parseFileContextBaseline(source: string): FileContextBaseline {
 }
 
 describe('WF-163 Code Dojo ratchet', () => {
-  it('binds the measured 112-debt ceiling to live file evidence', () => {
+  it('binds the in-flight 87-debt measurement to live file evidence', () => {
     const packageJson: unknown = JSON.parse(read('package.json'));
     if (!isRecord(packageJson) || !isRecord(packageJson.scripts)) {
       throw new Error('package.json scripts must be an object');
@@ -68,7 +68,7 @@ describe('WF-163 Code Dojo ratchet', () => {
       'tsx scripts/code-dojo-debt.ts --max 112',
     );
     expect(baseline.schema).toBe('code-dojo.file-context-baseline.v1');
-    expect(baseline.files).toHaveLength(86);
+    expect(baseline.files).toHaveLength(61);
 
     for (const entry of baseline.files) {
       expect(existsSync(resolve(ROOT, entry.path)), entry.path).toBe(true);
@@ -85,12 +85,12 @@ describe('WF-163 Code Dojo ratchet', () => {
     const exceptions = read('docs/code-dojo-exceptions.md');
     const design = read('docs/design/WF-163-respecting-dojo-ratchet-112.md');
 
-    expect(exceptions).toMatch(/\| File\/context baseline\s+\|\s+86\s+\|/u);
-    expect(exceptions).toMatch(/\| \*\*Total\*\*\s+\|\s+\*\*112\*\*\s+\|/u);
+    expect(exceptions).toMatch(/\| File\/context baseline\s+\|\s+61\s+\|/u);
+    expect(exceptions).toMatch(/\| \*\*Total\*\*\s+\|\s+\*\*87\*\*\s+\|/u);
     expect(exceptions).toContain(
       'The next met goalpost must lower the ceiling to',
     );
-    expect(exceptions).toContain('`62` or lower.');
+    expect(exceptions).toMatch(/`62` or\s+lower\./u);
     expect(design).toContain(
       '- Removed debt: `50` of the required `50` violations',
     );

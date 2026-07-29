@@ -115,7 +115,7 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
   },
 ]);
 
-const DOGFOOD_I18N_DEBT_SURFACE_NAMES: Readonly<Record<string, string>> = Object.freeze({
+const SURFACE_NAMES: Readonly<Record<string, string>> = Object.freeze({
   'examples/docs/app.ts': 'docs-app',
   'examples/docs/locale.ts': 'dogfood-locale',
   'examples/docs/stories.ts': 'component-stories',
@@ -171,10 +171,10 @@ export function collectDogfoodI18nDebt(
 ): DogfoodI18nDebtInventory {
   const sources = options.sources ?? DOGFOOD_I18N_DEBT_SOURCES;
   const entries = sources.flatMap((source) => collectDogfoodSourceDebt(source));
-  const bySurface = sources
-    .map((source) => ({
-      surface: source.surface,
-      count: entries.filter((entry) => entry.surface === source.surface).length,
+  const bySurface = [...new Set(sources.map((source) => source.surface))]
+    .map((surface) => ({
+      surface,
+      count: entries.filter((entry) => entry.surface === surface).length,
     }))
     .filter((entry) => entry.count > 0);
 
@@ -297,11 +297,11 @@ function listRepoTypescriptFiles(rootPath: string): readonly string[] {
 }
 
 function dogfoodI18nDebtSurface(path: string, rootPath: string): string {
-  const explicit = DOGFOOD_I18N_DEBT_SURFACE_NAMES[path];
+  const explicit = SURFACE_NAMES[path];
   if (explicit != null) return explicit;
   return path
     .slice(rootPath.length + 1)
-    .replace(/\.tsx?$/, '')
+    .replace(/(\.part\d+)?\.tsx?$/, '')
     .replaceAll('/', '-');
 }
 

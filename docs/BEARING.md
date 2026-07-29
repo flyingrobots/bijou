@@ -212,8 +212,10 @@ Current direction and active tensions. Historical ship data is in
 
 The Code Dojo ratchet
 [#469](https://github.com/flyingrobots/bijou/issues/469) has met its contract:
-aggregate debt is `112`, comprising `86` file/context and `26` code-size
-violations with no mock-ban or ESLint debt. The next goalpost ceiling is `62`.
+DX-050 tranche A has reduced measured debt from `112` to `87`, comprising `61`
+file/context and `26` code-size violations with no mock-ban or ESLint debt. The
+goalpost remains open until tranche B lowers the encoded ceiling to `62` or
+lower.
 
 The immediate target is now
 [#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the

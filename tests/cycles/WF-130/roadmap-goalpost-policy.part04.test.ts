@@ -44,7 +44,7 @@ describe('WF-130 roadmap supporting contracts', () => {
     expectClaims(bearing, [
       'The latest shipped public release is `v7.2.0`',
       'The next feature horizon remains `v8.0.0`',
-      'The Code Dojo ratchet [#469](https://github.com/flyingrobots/bijou/issues/469) has met its contract: aggregate debt is `112`, comprising `86` file/context and `26` code-size violations with no mock-ban or ESLint debt. The next goalpost ceiling is `62`.',
+      'DX-050 tranche A has reduced measured debt from `112` to `87`, comprising `61` file/context and `26` code-size violations with no mock-ban or ESLint debt. The goalpost remains open until tranche B lowers the encoded ceiling to `62` or lower.',
       'The immediate target is now [#468](https://github.com/flyingrobots/bijou/issues/468)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
