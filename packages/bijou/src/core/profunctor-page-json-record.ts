@@ -1,5 +1,6 @@
 export interface JsonRecord extends Record<string, unknown> {
   artifactVersion?: unknown;
+  applicationIslands?: unknown;
   capabilityRequirements?: unknown;
   compositionRef?: unknown;
   contentRefs?: unknown;
@@ -8,6 +9,7 @@ export interface JsonRecord extends Record<string, unknown> {
   landmarks?: unknown;
   nodes?: unknown;
   outline?: unknown;
+  overrideRefs?: unknown;
   pageId?: unknown;
   pageNodeId?: unknown;
   publicationRef?: unknown;
@@ -39,10 +41,16 @@ export interface JsonRecord extends Record<string, unknown> {
   entity?: unknown;
   artifactDigest?: unknown;
   claims?: unknown;
+  compiler?: unknown;
   dependencies?: unknown;
   entityDigest?: unknown;
   entityId?: unknown;
+  obstructions?: unknown;
+  profile?: unknown;
+  path?: unknown;
+  reason?: unknown;
   routes?: unknown;
+  sources?: unknown;
   relatedProjects?: unknown;
   displayTitle?: unknown;
   categoryPaths?: unknown;
@@ -53,4 +61,16 @@ export interface JsonRecord extends Record<string, unknown> {
   sourcePath?: unknown;
   exportName?: unknown;
   recordId?: unknown;
+  selector?: unknown;
+  sourceDigest?: unknown;
+  recordDigest?: unknown;
+  parserProfile?: unknown;
+  span?: unknown;
+  spanResidual?: unknown;
+  start?: unknown;
+  end?: unknown;
+  offset?: unknown;
+  line?: unknown;
+  column?: unknown;
+  fieldPath?: unknown;
 }

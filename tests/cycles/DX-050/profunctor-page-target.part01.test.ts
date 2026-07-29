@@ -7,7 +7,9 @@ import {
   fixtureInputs,
   generatedSource,
   mutatePage,
+  mutatePageAndSourceMap,
   recordAt,
+  records,
   sha256,
 } from './profunctor-page-target.test-support.js';
 
@@ -76,6 +78,26 @@ describe('DX-050 Profunctor Page target proof', () => {
       lowerProfunctorPageArtifacts(fixtureInputs(), { mode: 'composition' })
         .witness,
     ).toContain('composition:project-page@0');
+  });
+
+  it('accepts multiple structured source occurrences owned by one page node', () => {
+    const secondOccurrence = 'source-occurrence:projectCatalog.keep#fact.summary';
+    const proof = lowerProfunctorPageArtifacts(mutatePageAndSourceMap(
+      (page) => {
+        recordAt(page.nodes, 0).sourceBindings = {
+          record: 'source-occurrence:projectCatalog.keep#record',
+          summary: secondOccurrence,
+        };
+      },
+      (sourceMap) => {
+        const entries = records(sourceMap.entries);
+        entries.push({
+          ...recordAt(entries, 0),
+          sourceOccurrenceId: secondOccurrence,
+        });
+      },
+    ));
+    expect(proof.targetMap.sourceOccurrences).toContain(secondOccurrence);
   });
 
   it('keeps the checked target evidence byte-identical to the lowerer', () => {

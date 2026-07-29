@@ -25,6 +25,7 @@ export function createProfunctorPageTargetMap(
     artifactVersion: 'bijou-profunctor-page-map/1',
     pageId: page.pageId,
     compositionRef: page.compositionRef,
+    overrideRefs: page.overrideRefs,
     route: page.route,
     sceneId,
     targetProfile: 'bijou-terminal-project-page/1',

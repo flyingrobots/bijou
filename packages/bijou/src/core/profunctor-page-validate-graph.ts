@@ -6,8 +6,12 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
   unique(page.nodes.map((node) => node.templateNodeId), 'page.templateNodeIds');
   unique(page.readingOrder, 'page.readingOrder');
   const contentRefs = unique(page.contentRefs, 'page.contentRefs');
+  unique(page.overrideRefs, 'page.overrideRefs');
+  unique(page.dependencyDigests, 'page.dependencyDigests');
   unique(page.tokenRefs, 'page.tokenRefs');
   unique(page.capabilityRequirements, 'page.capabilityRequirements');
+  unique(page.outline.map((item) => JSON.stringify(item)), 'page.outline');
+  unique(page.landmarks.map((item) => JSON.stringify(item)), 'page.landmarks');
 
   if (!nodeIds.has(page.rootNodeId)) {
     invalid('page.rootNodeId', `missing node ${page.rootNodeId}`);
@@ -17,6 +21,10 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
   const ownedChildren: string[] = [];
   for (const node of page.nodes) {
     unique(node.slots.map((slot) => slot.name), `${node.pageNodeId}.slots`);
+    unique(
+      node.requiredCapabilities,
+      `${node.pageNodeId}.requiredCapabilities`,
+    );
     for (const slot of node.slots) {
       for (const childId of slot.childPageNodeIds) {
         if (!nodeIds.has(childId)) {

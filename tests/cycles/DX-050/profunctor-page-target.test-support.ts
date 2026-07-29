@@ -56,6 +56,22 @@ export function mutatePage(
   };
 }
 
+export function mutatePageAndSourceMap(
+  mutatePageRecord: (page: Record<string, unknown>) => void,
+  mutateSourceMapRecord: (sourceMap: Record<string, unknown>) => void,
+): ArtifactInputs {
+  const inputs = mutatePage(mutatePageRecord);
+  const sourceMap = parseRecord(inputs.sourceMap.source);
+  mutateSourceMapRecord(sourceMap);
+  return {
+    ...inputs,
+    sourceMap: {
+      ...inputs.sourceMap,
+      source: `${JSON.stringify(sourceMap)}\n`,
+    },
+  };
+}
+
 export function mutateSourceMap(
   mutate: (sourceMap: Record<string, unknown>) => void,
 ): ArtifactInputs {
@@ -67,6 +83,21 @@ export function mutateSourceMap(
     sourceMap: {
       ...inputs.sourceMap,
       source: `${JSON.stringify(sourceMap)}\n`,
+    },
+  };
+}
+
+export function mutateBuildManifest(
+  mutate: (manifest: Record<string, unknown>) => void,
+): ArtifactInputs {
+  const inputs = fixtureInputs();
+  const manifest = parseRecord(inputs.buildManifest.source);
+  mutate(manifest);
+  return {
+    ...inputs,
+    buildManifest: {
+      ...inputs.buildManifest,
+      source: `${JSON.stringify(manifest)}\n`,
     },
   };
 }

@@ -26,6 +26,8 @@ export function validateProfunctorArtifactFamily(
   if (!sameOrdered(buildManifest.dependencies, page.dependencyDigests)) {
     identity('dependencies', 'page and build manifest dependencies must agree in order');
   }
+  uniqueStrings(buildManifest.dependencies, 'buildManifest.dependencies');
+  uniqueStrings(buildManifest.claims, 'buildManifest.claims');
 
   validatePageGraph(page);
   for (const node of page.nodes) {
@@ -37,7 +39,6 @@ export function validateProfunctorArtifactFamily(
 function validateSourceMap(family: ProfunctorArtifactFamily): void {
   const { page, sourceMap } = family;
   const nodes = new Map(page.nodes.map((node) => [node.pageNodeId, node]));
-  const pageIds = new Set<string>();
   const occurrenceOwners = new Map<string, string>();
   for (const [index, entry] of sourceMap.entries.entries()) {
     const path = `sourceMap.entries[${String(index)}]`;
@@ -45,16 +46,15 @@ function validateSourceMap(family: ProfunctorArtifactFamily): void {
     if (node?.templateNodeId !== entry.templateNodeId) {
       identity(path, 'page and template identities must match a page node');
     }
-    if (
-      pageIds.has(entry.pageNodeId)
-      || occurrenceOwners.has(entry.sourceOccurrenceId)
-    ) {
-      reference(path, 'page-node and source-occurrence identities must be unique');
+    if (occurrenceOwners.has(entry.sourceOccurrenceId)) {
+      reference(path, 'source-occurrence identities must be unique');
+    }
+    if (!Object.values(node.sourceBindings).includes(entry.sourceOccurrenceId)) {
+      identity(path, 'source occurrence must be bound by its page node');
     }
     if (entry.renderNodeId !== null || entry.residual !== null) {
       identity(path, 'compiler-owned source map must remain target-uncompleted');
     }
-    pageIds.add(entry.pageNodeId);
     occurrenceOwners.set(entry.sourceOccurrenceId, entry.pageNodeId);
   }
   for (const node of page.nodes) {
@@ -76,6 +76,12 @@ function validateSourceMap(family: ProfunctorArtifactFamily): void {
 function sameOrdered(left: readonly string[], right: readonly string[]): boolean {
   return left.length === right.length
     && left.every((value, index) => value === right[index]);
+}
+
+function uniqueStrings(values: readonly string[], path: string): void {
+  if (new Set(values).size !== values.length) {
+    reference(path, 'values must be unique');
+  }
 }
 
 function identity(path: string, detail: string): never {

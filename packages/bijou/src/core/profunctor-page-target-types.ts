@@ -52,6 +52,7 @@ export interface ProfunctorPageTargetMap {
   readonly artifactVersion: 'bijou-profunctor-page-map/1';
   readonly pageId: string;
   readonly compositionRef: string;
+  readonly overrideRefs: readonly string[];
   readonly route: string;
   readonly sceneId: string;
   readonly targetProfile: 'bijou-terminal-project-page/1';

@@ -46,6 +46,7 @@ export interface ProfunctorPageArtifact {
     readonly pageNodeId: string;
     readonly text: string;
   }[];
+  readonly overrideRefs: readonly string[];
   readonly pageId: string;
   readonly publicationRef: string;
   readonly readingOrder: readonly string[];
