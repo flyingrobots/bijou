@@ -39,7 +39,7 @@ describe('WF-130 roadmap goalpost policy', () => {
       const dx046Design = normalizeWhitespace(read('docs/design/DX-046-graphql-authored-dogfood-block-fixture.md'));
       const dx048Design = normalizeWhitespace(read('docs/design/DX-048-v8-runtime-graph-scene-ir-contract.md'));
 
-      expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-07-05.');
+      expect(roadmap).toContain('Last synced from GitHub milestone items: 2026-07-28.');
       expect(roadmap).toContain('The latest shipped public release is');
       expect(roadmap).toContain('v7.2.0');
       expect(roadmap).toContain('v7.0.0');
@@ -56,11 +56,11 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).toContain('`v10.0.0`: Renderer And Host Systems Integration');
       expect(roadmap).toContain('v6.0.0` was never published as a public package release');
       expect(roadmap).toContain('| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |');
-      expect(roadmap).toContain('| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 4 | 0 |');
+      expect(roadmap).toContain('| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 1 |');
       expect(roadmap).toContain('| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |');
-      expect(roadmap).toContain('| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 13 | 0 |');
+      expect(roadmap).toContain('| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 14 | 0 |');
       expect(roadmap).toContain('| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |');
-      expect(roadmap).toContain('| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 0 |');
+      expect(roadmap).toContain('| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 10 | 0 |');
       expect(roadmap).toContain('| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |');
       expect(roadmap).toContain('`Beyond`');
       expect(roadmap).toContain('0 | 6');
@@ -69,6 +69,8 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).toContain('Runtime Graph And Scene IR Product Contract');
       expect(roadmap).toContain('#458');
       expect(roadmap).toContain('#459');
+      expect(roadmap).toContain('#468');
+      expect(roadmap).toContain('#469');
       expect(roadmap).toContain('VISOR');
       expect(roadmap).toContain('#335');
       expect(roadmap).toContain('#354');
@@ -109,10 +111,10 @@ describe('WF-130 roadmap goalpost policy', () => {
       expect(roadmap).not.toContain('Workflow, Capture, And CI Determinism');
       expect(bearing).toContain('The latest shipped public release is `v7.2.0`');
       expect(bearing).toContain('The next feature horizon remains `v8.0.0`');
-      expect(bearing).toContain('the immediate target is #458: emit the first GraphQL block artifact bundle');
+      expect(bearing).toContain('The immediate target is the Code Dojo ratchet');
       expect(bearing).toContain('`v7.2.0` completed as a narrow stabilization and demo-integrity release');
       expect(bearing).toContain('`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items');
-      expect(bearing).toContain('`v8.0.0` milestone is the active feature horizon: 4 open and 0 closed milestone items');
+      expect(bearing).toContain('`v8.0.0` milestone is the active feature horizon: 3 open and 1 closed milestone items');
       expect(bearing).toContain('`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through');
       expect(bearing).toContain('`v8.2.0` milestone is quality automation and Method hardening');
       expect(bearing).toContain('No open issue is currently unmilestoned');

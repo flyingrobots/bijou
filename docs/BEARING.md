@@ -223,7 +223,7 @@ active cross-repository campaign; it does not move the issue out of v10 or
 replace the v8 product sequence.
 
 The next v8 product pull remains #458: emit the first GraphQL block artifact
-bundle with replay and visual scene facts. Its cycle design is
+bundle with replay and visual scene facts. The #458 cycle design is
 [DX-049](./design/DX-049-visor-artifact-bundle-proof.md).
 
 ```text
