@@ -199,9 +199,9 @@ unsupported blocks, semantic-document sources, application islands, inherited
 semantic-HTML claims, and output that exceeds the fixed terminal profile fail
 closed or remain explicit target obstructions.
 
-Focused contract evidence passes `30` tests across the five target suites, the
+Focused contract evidence passes `33` tests across the five target suites, the
 generator suite, and this design contract. Full local verification passes
-`4,007` tests. Code Dojo reports `62` aggregate violations: `37` file/context,
+`4,010` tests. Code Dojo reports `62` aggregate violations: `37` file/context,
 `25` code-size, `0` mock-ban, and `0` ESLint.
 
 The follow-on path remains the `v8.0.0` Runtime Graph And Scene IR milestone,
