@@ -146,15 +146,15 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 4 open and 0 closed
+- The `v8.0.0` milestone is the active feature horizon: 3 open and 1 closed
   milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 13 open
+- The `v8.2.0` milestone is quality automation and Method hardening: 14 open
   and 0 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
-- The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
+- The `v10.0.0` milestone is renderer and host-systems integration: 10 open and
   0 closed milestone items.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
   and 6 closed milestone items as of the latest roadmap sync.
@@ -210,14 +210,21 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-With `v7.2.0` tagged, published, verified, and the #457 design packet landed,
-the immediate target is #458: emit the first GraphQL block artifact bundle with
-replay and visual scene facts. The #458 cycle design is
-[DX-049](./design/DX-049-visor-artifact-bundle-proof.md): a narrow
-`visor-artifact-bundle/1` proof that wraps existing GraphQL block facts,
-`bijou-block/1`, `ui-scene-ir/1`, replay metadata, visual scene facts, and
-stable hashes without pulling in #459 packed-cell validation or external
-renderer/debugger work.
+The immediate target is the Code Dojo ratchet
+[#469](https://github.com/flyingrobots/bijou/issues/469). It reduces the
+measured aggregate debt from `162` to `112` or lower and satisfies the explicit
+quality prerequisite for the bounded Profunctor Page inspection target
+[#468](https://github.com/flyingrobots/bijou/issues/468).
+
+After #469 lands, #468 consumes the canonical website specimen through
+Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
+boundaries. This temporarily pulls one v10 integration proof ahead for the
+active cross-repository campaign; it does not move the issue out of v10 or
+replace the v8 product sequence.
+
+The next v8 product pull remains #458: emit the first GraphQL block artifact
+bundle with replay and visual scene facts. Its cycle design is
+[DX-049](./design/DX-049-visor-artifact-bundle-proof.md).
 
 ```text
 VISOR v8 tracker (#457)
@@ -242,21 +249,23 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Pull #458 as the first implementation proof: emit a GraphQL block artifact
-   bundle with replay and visual scene facts.
-2. Pull #459 after #458 fixes the bundle shape: validate
+1. Land #469 at `112` aggregate Code Dojo violations or lower.
+2. Land the bounded Profunctor Page inspection proof in #468.
+3. Pull #458 as the first v8 implementation proof: emit a GraphQL block
+   artifact bundle with replay and visual scene facts.
+4. Pull #459 after #458 fixes the bundle shape: validate
    `packed-bijou-cells/1` and adapt it to `Surface`.
-3. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
+5. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
    the smallest stable contract.
-4. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
-5. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
+7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
    automation.
-6. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
+8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
    stabilizes the source/artifact/IR contract.
-7. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
+9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
    surface work after the Bijou contracts are proven.
-8. Keep closed dependency PR #326 as superseded lineage, not active release
+10. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:
