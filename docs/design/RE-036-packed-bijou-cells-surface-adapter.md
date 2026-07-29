@@ -296,11 +296,10 @@ No partial receipt or partially created `Surface` escapes a failure.
 
 1. Parse and validate the unknown input.
 2. Create a packed `Surface` with the validated positive dimensions.
-3. Verify that the result exposes the packed `Surface` contract.
-4. Copy the validated bytes into `surface.buffer`.
-5. Copy side-table entries in their declared order.
-6. Mark all cells dirty for the first terminal render.
-7. Return the packed `Surface`.
+3. Copy the validated bytes into `surface.buffer`.
+4. Copy side-table entries in their declared order.
+5. Mark all cells dirty for the first terminal render.
+6. Return the packed `Surface`.
 
 The following round-trip assertions are mandatory:
 
