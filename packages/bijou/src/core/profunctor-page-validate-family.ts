@@ -38,26 +38,36 @@ function validateSourceMap(family: ProfunctorArtifactFamily): void {
   const { page, sourceMap } = family;
   const nodes = new Map(page.nodes.map((node) => [node.pageNodeId, node]));
   const pageIds = new Set<string>();
-  const occurrences = new Set<string>();
+  const occurrenceOwners = new Map<string, string>();
   for (const [index, entry] of sourceMap.entries.entries()) {
     const path = `sourceMap.entries[${String(index)}]`;
     const node = nodes.get(entry.pageNodeId);
     if (node?.templateNodeId !== entry.templateNodeId) {
       identity(path, 'page and template identities must match a page node');
     }
-    if (pageIds.has(entry.pageNodeId) || occurrences.has(entry.sourceOccurrenceId)) {
+    if (
+      pageIds.has(entry.pageNodeId)
+      || occurrenceOwners.has(entry.sourceOccurrenceId)
+    ) {
       reference(path, 'page-node and source-occurrence identities must be unique');
     }
     if (entry.renderNodeId !== null || entry.residual !== null) {
       identity(path, 'compiler-owned source map must remain target-uncompleted');
     }
     pageIds.add(entry.pageNodeId);
-    occurrences.add(entry.sourceOccurrenceId);
+    occurrenceOwners.set(entry.sourceOccurrenceId, entry.pageNodeId);
   }
   for (const node of page.nodes) {
     for (const occurrence of Object.values(node.sourceBindings)) {
-      if (!occurrences.has(occurrence)) {
+      const owner = occurrenceOwners.get(occurrence);
+      if (owner == null) {
         reference(node.pageNodeId, `missing source occurrence ${occurrence}`);
+      }
+      if (owner !== node.pageNodeId) {
+        identity(
+          node.pageNodeId,
+          `source occurrence ${occurrence} belongs to ${owner}`,
+        );
       }
     }
   }

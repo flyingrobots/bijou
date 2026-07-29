@@ -68,6 +68,17 @@ describe('DX-050 fail-closed input validation', () => {
     );
   });
 
+  it('rejects source bindings reassigned across page nodes', () => {
+    expectCode(
+      () => lowerProfunctorPageArtifacts(mutatePage((page) => {
+        recordAt(page.nodes, 0).sourceBindings = {
+          record: 'source-occurrence:projectCatalog.keep#fact.title',
+        };
+      })),
+      'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH',
+    );
+  });
+
   it('rejects unsupported visible blocks instead of approximating them', () => {
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
