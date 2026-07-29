@@ -1,5 +1,15 @@
 # WF-163 Respecting the Dojo Ratchet 112
 
+Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+
+## Sponsor Human
+
+James Ross.
+
+## Sponsor Agent
+
+Codex.
+
 ## Decision Summary
 
 Cut at least `50` counted Code Dojo debt items from the merged `162` baseline
@@ -65,7 +75,7 @@ measured from live files; no threshold, exception marker, or rule was weakened.
 - No new standards exception or large-file marker.
 - No weakened threshold, skipped gate, or hand-edited aspirational count.
 
-## Implementation Strategy
+## Implementation Outline
 
 1. Inventory the remaining ledger entries through bounded repository
    projections.
@@ -78,7 +88,16 @@ measured from live files; no threshold, exception marker, or rule was weakened.
 6. Regenerate ledgers only after live files fall below their thresholds.
 7. Run the full Code Dojo and repository gates before review.
 
-## Tests And Validation
+## Tests To Write First
+
+- Add a goalpost regression that binds the aggregate ceiling to the measured
+  file/context ledger.
+- Add a roadmap regression that binds the completed prerequisite and next
+  bounded target.
+- Add focused regressions before any extraction that changes behavior-bearing
+  seams.
+
+## Validation Plan
 
 - Focused Vitest runs for every split test or module family.
 - `npm run code-dojo:changed`
@@ -109,6 +128,25 @@ measured from live files; no threshold, exception marker, or rule was weakened.
 4. Did the cycle avoid new exceptions and unrelated product work?
 5. Is issue #468 unblocked by merged evidence rather than a local claim?
 
+## Accessibility And Assistive Posture
+
+This is a structural standards cycle. Extracted modules must preserve existing
+text, focus, lower-mode, and assistive semantics. No visual or interaction
+redesign is in scope.
+
+## Localization And Directionality Posture
+
+Extracted modules must preserve catalog keys, localized values, reading order,
+and direction-sensitive behavior. Any touched DOGFOOD localization surface
+must keep the completeness and raw-string ratchets flat or lower.
+
+## Agent Inspectability And Explainability Posture
+
+Every extraction must retain a stable public facade or an explicit internal
+call site, focused verification evidence, and ledger-measured closure. The
+final package ceiling, exception ledger, roadmap, and design result must agree
+without requiring agents to infer progress from commit count.
+
 ## Linked Invariants
 
 - TypeScript standards:
@@ -116,3 +154,12 @@ measured from live files; no threshold, exception marker, or rule was weakened.
 - Code Dojo exception ledger: `docs/code-dojo-exceptions.md`
 - Work doctrine: `docs/METHOD.md`
 - Tracker issue: #469
+
+## Retrospective And Closeout
+
+The cycle removed exactly `50` measured file/context violations without adding
+mock-ban, ESLint, or code-size debt. Compatibility facades preserved public
+entrypoints while responsibility-bounded modules moved below the enforced
+thresholds. A separate 13-file MCP catalog precursor kept the final review at
+the repository's 140-path limit. The next bounded Code Dojo target is `62`;
+issue #468 is unblocked only after this result reaches `main`.

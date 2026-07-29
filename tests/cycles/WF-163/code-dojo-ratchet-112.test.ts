@@ -108,4 +108,23 @@ describe('WF-163 Code Dojo ratchet', () => {
       '- Next goalpost target: `62` aggregate violations or lower',
     );
   });
+
+  it('records the complete modern-cycle ownership and review contract', () => {
+    const design = read('docs/design/WF-163-respecting-dojo-ratchet-112.md');
+    const requiredClaims = [
+      'Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)',
+      '## Sponsor Human',
+      '## Sponsor Agent',
+      '## Accessibility And Assistive Posture',
+      '## Localization And Directionality Posture',
+      '## Agent Inspectability And Explainability Posture',
+      '## Implementation Outline',
+      '## Tests To Write First',
+      '## Retrospective And Closeout',
+    ];
+
+    for (const claim of requiredClaims) {
+      expect(design, claim).toContain(claim);
+    }
+  });
 });
