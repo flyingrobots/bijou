@@ -14,6 +14,7 @@ import {
   sceneNodes,
   tokenUses,
 } from './profunctor-page-scene-nodes.js';
+import { validatePageSceneBounds } from './profunctor-page-scene-bounds.js';
 
 export const PAGE_TARGET_COLS = 100;
 export const PAGE_TARGET_ROWS = 28;
@@ -46,6 +47,12 @@ export function buildProfunctorPageScene(
   mode: ProfunctorPageInspectionMode,
 ): PageSceneBuild {
   const plans = planNodes(page, actions, outcomes, mode);
+  validatePageSceneBounds(
+    plans,
+    page.rootNodeId,
+    PAGE_TARGET_COLS,
+    PAGE_TARGET_ROWS,
+  );
   const root = plans.find((plan) => plan.node.pageNodeId === page.rootNodeId);
   if (root == null) {
     throw new Error(`Missing planned root ${page.rootNodeId}`);

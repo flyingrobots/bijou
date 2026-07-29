@@ -82,6 +82,8 @@ The bounded target supports these visible block definitions:
 
 A visible unsupported block fails with `BIJOU_PAGE_BLOCK_UNSUPPORTED`. A hidden
 unsupported block becomes an explicit `hidden-unsupported-block` residual.
+Content that cannot fit the bounded 100-column by 28-row terminal profile also
+fails instead of being clipped.
 
 Semantic-document source-map entries, build-manifest document sources, and
 application islands are outside this target. They fail explicitly instead of

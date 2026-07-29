@@ -37,6 +37,28 @@ describe('DX-050 page composition graph validation', () => {
       }];
     }));
   });
+
+  it('rejects content that exceeds the bounded terminal surface', () => {
+    expectUnsupported(mutatePage((page) => {
+      const root = recordAt(page.nodes, 0);
+      recordAt([root.props], 0).displayTitle = 'x'.repeat(101);
+    }));
+    expectUnsupported(mutatePage((page) => {
+      const relatedNode = recordAt(page.nodes, 4);
+      const relatedProjects = records(
+        recordAt([relatedNode.props], 0).relatedProjects,
+      );
+      const seed = recordAt(relatedProjects, 0);
+      for (let index = 0; index < 30; index++) {
+        relatedProjects.push({
+          ...seed,
+          displayTitle: `Project ${String(index)}`,
+          entityId: `entity:project.item-${String(index)}`,
+          route: `/projects/item-${String(index)}/`,
+        });
+      }
+    }));
+  });
 });
 
 function expectInvalid(
@@ -45,6 +67,16 @@ function expectInvalid(
   expect(() => lowerProfunctorPageArtifacts(inputs)).toThrow(
     expect.objectContaining<Partial<ProfunctorPageTargetError>>({
       code: 'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
+    }),
+  );
+}
+
+function expectUnsupported(
+  inputs: Parameters<typeof lowerProfunctorPageArtifacts>[0],
+): void {
+  expect(() => lowerProfunctorPageArtifacts(inputs)).toThrow(
+    expect.objectContaining<Partial<ProfunctorPageTargetError>>({
+      code: 'BIJOU_PAGE_BLOCK_UNSUPPORTED',
     }),
   );
 }
