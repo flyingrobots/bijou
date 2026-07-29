@@ -12,6 +12,26 @@ import { describe, expect, it } from 'vitest';
 import { replaceGeneratedDirectory } from '../../../scripts/replace-generated-directory.js';
 
 describe('DX-050 generated artifact replacement', () => {
+  it('replaces generated output and removes the transient backup', () => {
+    const root = mkdtempSync(resolve(tmpdir(), 'bijou-generated-'));
+    const output = resolve(root, 'generated');
+    const stage = resolve(root, 'stage');
+    const backup = resolve(root, 'generated.previous');
+    mkdirSync(output);
+    mkdirSync(stage);
+    writeFileSync(resolve(output, 'authority.txt'), 'authority', 'utf8');
+    writeFileSync(resolve(stage, 'replacement.txt'), 'replacement', 'utf8');
+    try {
+      replaceGeneratedDirectory(stage, output, backup);
+      expect(readFileSync(resolve(output, 'replacement.txt'), 'utf8')).toBe('replacement');
+      expect(existsSync(resolve(output, 'authority.txt'))).toBe(false);
+      expect(existsSync(stage)).toBe(false);
+      expect(existsSync(backup)).toBe(false);
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
+
   it('keeps an installed stage authoritative when backup cleanup fails', () => {
     const root = mkdtempSync(resolve(tmpdir(), 'bijou-generated-'));
     const output = resolve(root, 'generated');
