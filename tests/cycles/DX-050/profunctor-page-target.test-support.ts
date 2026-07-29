@@ -109,6 +109,13 @@ export function records(value: unknown): Record<string, unknown>[] {
   return value;
 }
 
+export function strings(value: unknown): string[] {
+  if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) {
+    throw new Error('Expected string array');
+  }
+  return value;
+}
+
 export function generatedSource(filename: string): string {
   return readFileSync(resolve(FIXTURE, '../generated', filename), 'utf8');
 }

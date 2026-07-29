@@ -17,6 +17,9 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
     invalid('page.rootNodeId', `missing node ${page.rootNodeId}`);
   }
   assertExactSet(page.readingOrder, nodeIds, 'page.readingOrder');
+  if (page.readingOrder[0] !== page.rootNodeId) {
+    invalid('page.readingOrder', 'root node must be first');
+  }
 
   const ownedChildren: string[] = [];
   for (const node of page.nodes) {
@@ -53,6 +56,7 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
     new Set([...nodeIds].filter((id) => id !== page.rootNodeId)),
     'page.slotChildren',
   );
+  validateRootedSlots(page);
 
   for (const [index, item] of page.outline.entries()) {
     if (!nodeIds.has(item.pageNodeId) || !Number.isInteger(item.level) || item.level < 1) {
@@ -63,6 +67,26 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
     if (!nodeIds.has(landmark.pageNodeId)) {
       invalid(`page.landmarks[${String(index)}]`, `missing node ${landmark.pageNodeId}`);
     }
+  }
+}
+
+function validateRootedSlots(page: ProfunctorPageArtifact): void {
+  const nodes = new Map(page.nodes.map((node) => [node.pageNodeId, node]));
+  const reachable = new Set<string>();
+  const pending = [page.rootNodeId];
+  while (pending.length > 0) {
+    const nodeId = pending.pop();
+    if (nodeId === undefined || reachable.has(nodeId)) {
+      continue;
+    }
+    reachable.add(nodeId);
+    const node = nodes.get(nodeId);
+    if (node !== undefined) {
+      pending.push(...node.slots.flatMap((slot) => slot.childPageNodeIds));
+    }
+  }
+  if (reachable.size !== page.nodes.length) {
+    invalid('page.slotChildren', 'every page node must be reachable from the root');
   }
 }
 

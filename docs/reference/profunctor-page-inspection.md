@@ -66,7 +66,9 @@ manifest entity must agree with the page entity, its sole route must equal the
 page route, and its dependencies must equal the page dependency digests in the
 same order. Every source-map source and record digest, node provenance source
 digest, and build entity digest must occur in that dependency list. The page
-root must be a visible `block:page` whose route agrees with the page route.
+root must be a visible `block:page` whose route agrees with the page route. It
+must appear first in reading order, and every page node must be reachable from
+it through the declared slots.
 
 ## Supported Blocks
 
@@ -167,5 +169,6 @@ npx vitest run \
   tests/cycles/DX-050/profunctor-page-target.part01.test.ts \
   tests/cycles/DX-050/profunctor-page-target.part02.test.ts \
   tests/cycles/DX-050/profunctor-page-target.part03.test.ts \
-  tests/cycles/DX-050/profunctor-page-target.part04.test.ts
+  tests/cycles/DX-050/profunctor-page-target.part04.test.ts \
+  tests/cycles/DX-050/profunctor-page-target.part05.test.ts
 ```
