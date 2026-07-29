@@ -6,121 +6,6 @@
 
 import type { DagNode } from './dag.js';
 
-// ── Layer Assignment ───────────────────────────────────────────────
-
-/**
- * Assign each node to a layer using longest-path layer assignment.
- *
- * Detects cycle-forming back-edges with a DFS, ignores those edges for the
- * layering pass, then assigns each node to the layer one past its deepest
- * remaining parent. Root nodes (in-degree 0) are placed on layer 0.
- *
- * @param nodes - The graph nodes to lay out.
- * @returns Map from node ID to its zero-based layer index.
- */
-export function assignLayers(nodes: DagNode[]): Map<string, number> {
-  const nodeIds = new Set<string>();
-  for (const n of nodes) {
-    if (nodeIds.has(n.id)) {
-      throw new Error(`[bijou] dag(): duplicate node id "${n.id}"`);
-    }
-    nodeIds.add(n.id);
-  }
-
-  const children = new Map<string, string[]>();
-  const parents = new Map<string, string[]>();
-  const inDegree = new Map<string, number>();
-  const ignoredEdges = new Set<string>();
-
-  for (const n of nodes) {
-    children.set(n.id, (n.edges ?? []).filter(e => nodeIds.has(e)));
-  }
-
-  const edgeKey = (fromId: string, toId: string): string => `${fromId}\u0000${toId}`;
-  const visitState = new Map<string, 'visiting' | 'done'>();
-  const visit = (id: string): void => {
-    const state = visitState.get(id);
-    if (state === 'visiting' || state === 'done') return;
-    visitState.set(id, 'visiting');
-    for (const childId of children.get(id) ?? []) {
-      const childState = visitState.get(childId);
-      if (childState === 'visiting') {
-        ignoredEdges.add(edgeKey(id, childId));
-        continue;
-      }
-      if (childState !== 'done') visit(childId);
-    }
-    visitState.set(id, 'done');
-  };
-
-  for (const n of nodes) visit(n.id);
-
-  const layerChildren = new Map<string, string[]>();
-  for (const n of nodes) {
-    const filteredChildren = (children.get(n.id) ?? []).filter(
-      childId => !ignoredEdges.has(edgeKey(n.id, childId)),
-    );
-    layerChildren.set(n.id, filteredChildren);
-    inDegree.set(n.id, 0);
-    if (!parents.has(n.id)) parents.set(n.id, []);
-  }
-
-  for (const n of nodes) {
-    for (const childId of layerChildren.get(n.id) ?? []) {
-      const parentList = parents.get(childId);
-      if (parentList === undefined) parents.set(childId, [n.id]); else parentList.push(n.id);
-      inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);
-    }
-  }
-
-  const queue: string[] = [];
-  let head = 0;
-  for (const [id, deg] of inDegree) {
-    if (deg === 0) queue.push(id);
-  }
-
-  // Kahn's algorithm: in-degree tracking guarantees each node is queued exactly
-  // once (when its in-degree reaches 0), so no visited set is needed.
-  const topoOrder: string[] = [];
-  while (head < queue.length) {
-    const id = queue[head++];
-    if (id === undefined) break;
-    topoOrder.push(id);
-    for (const childId of layerChildren.get(id) ?? []) {
-      const newDeg = (inDegree.get(childId) ?? 1) - 1;
-      inDegree.set(childId, newDeg);
-      if (newDeg === 0) queue.push(childId);
-    }
-  }
-
-  if (topoOrder.length !== nodes.length) {
-    // DFS back-edge stripping should leave an acyclic layering graph. If a
-    // residual cycle survives, keep the renderer graceful by appending the
-    // unscheduled nodes in source order instead of failing the whole render.
-    const scheduled = new Set(topoOrder);
-    for (const n of nodes) {
-      if (!scheduled.has(n.id)) topoOrder.push(n.id);
-    }
-  }
-
-  // Longest-path layer assignment
-  const layerMap = new Map<string, number>();
-  for (const id of topoOrder) {
-    const pars = parents.get(id) ?? [];
-    if (pars.length === 0) {
-      layerMap.set(id, 0);
-    } else {
-      let maxParent = 0;
-      for (const p of pars) {
-        maxParent = Math.max(maxParent, layerMap.get(p) ?? 0);
-      }
-      layerMap.set(id, maxParent + 1);
-    }
-  }
-
-  return layerMap;
-}
-
 // ── Column Ordering ────────────────────────────────────────────────
 
 /**
@@ -165,7 +50,8 @@ export function orderColumns(layers: string[][], nodes: DagNode[]): void {
   for (const n of nodes) {
     for (const c of n.edges ?? []) {
       const parents = parentsMap.get(c);
-      if (parents === undefined) parentsMap.set(c, [n.id]); else parents.push(n.id);
+      if (parents === undefined) parentsMap.set(c, [n.id]);
+      else parents.push(n.id);
     }
   }
 
@@ -178,15 +64,18 @@ export function orderColumns(layers: string[][], nodes: DagNode[]): void {
 
     const bary = new Map<string, number>();
     for (const id of curLayer) {
-      const pars = (parentsMap.get(id) ?? []).filter(p => prevIndex.has(p));
+      const pars = (parentsMap.get(id) ?? []).filter((p) => prevIndex.has(p));
       if (pars.length === 0) {
         bary.set(id, Infinity);
       } else {
-        const avg = pars.reduce((s, p) => s + (prevIndex.get(p) ?? 0), 0) / pars.length;
+        const avg =
+          pars.reduce((s, p) => s + (prevIndex.get(p) ?? 0), 0) / pars.length;
         bary.set(id, avg);
       }
     }
-    curLayer.sort((a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity));
+    curLayer.sort(
+      (a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity),
+    );
   }
 
   // Bottom-up pass
@@ -198,14 +87,19 @@ export function orderColumns(layers: string[][], nodes: DagNode[]): void {
 
     const bary = new Map<string, number>();
     for (const id of curLayer) {
-      const chlds = (childrenMap.get(id) ?? []).filter(c => nextIndex.has(c));
+      const chlds = (childrenMap.get(id) ?? []).filter((c) => nextIndex.has(c));
       if (chlds.length === 0) {
         bary.set(id, Infinity);
       } else {
-        const avg = chlds.reduce((s, c) => s + (nextIndex.get(c) ?? 0), 0) / chlds.length;
+        const avg =
+          chlds.reduce((s, c) => s + (nextIndex.get(c) ?? 0), 0) / chlds.length;
         bary.set(id, avg);
       }
     }
-    curLayer.sort((a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity));
+    curLayer.sort(
+      (a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity),
+    );
   }
 }
+
+export { assignLayers } from './dag-layers.js';
