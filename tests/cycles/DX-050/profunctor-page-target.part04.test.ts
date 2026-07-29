@@ -131,7 +131,6 @@ describe('DX-050 canonical contract validation', () => {
       }),
     );
   });
-
 });
 
 function expectInvalid(inputs: Parameters<typeof lowerProfunctorPageArtifacts>[0]): void {
