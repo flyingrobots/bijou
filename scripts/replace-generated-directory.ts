@@ -28,7 +28,7 @@ export function replaceGeneratedDirectory(
     try {
       cleanupBackup(backup);
     } catch {
-      // Installation succeeded. Retain the backup for explicit recovery.
+      // Installation succeeded. Leave any remaining backup for inspection.
     }
   } catch (error) {
     if (movedExisting && !installedStage && !existsSync(output)) {
