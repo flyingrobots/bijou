@@ -36,6 +36,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   metadata, visual scene facts, raw and semantic source hashes, and stable
   receipts while leaving #459 packed-cell validation and external
   renderer/debugger work out of scope.
+- **RE-036 packed-cell receipt validation and `Surface` adaptation** —
+  [`RE-036`](design/RE-036-packed-bijou-cells-surface-adapter.md) defines the
+  fail-closed `packed-bijou-cells/1` shape, canonical packed-byte and
+  side-table laws, scene-node provenance, focus and chroma metadata, typed
+  diagnostics, and byte-exact `Surface` adapter boundary for #459.
+  `parsePackedBijouCellsReceipt()` rejects malformed or non-canonical receipts
+  before `Surface` allocation while producing normalized arrays;
+  `adaptPackedBijouCellsToSurface()` then copies validated bytes and side-table
+  entries without re-encoding cells.
 
 ### Changed
 

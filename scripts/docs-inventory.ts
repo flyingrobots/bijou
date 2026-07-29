@@ -37,6 +37,7 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/ARCHITECTURE.md',
       'docs/MIGRATING_TO_V4.md',
       'docs/EXAMPLES.md',
+      'docs/reference/packed-bijou-cells.md',
       'docs/reference/profunctor-page-inspection.md',
       'docs/TECHNICAL_TEARDOWN.md',
       'docs/release.md',

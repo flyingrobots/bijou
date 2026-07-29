@@ -21,7 +21,9 @@ describe('WF-130 roadmap pull order', () => {
       'Next Pull',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
       'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
-      'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) is active in [#474](https://github.com/flyingrobots/bijou/pull/474).',
+      'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
+      'The active V8 product pull is [#459](https://github.com/flyingrobots/bijou/issues/459)',
+      '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
       'VISOR',
@@ -39,7 +41,7 @@ describe('WF-130 roadmap pull order', () => {
     ]);
     expectOrderedClaims(bearing, [
       'Recommended pull order:',
-      '1. Land the bounded Profunctor Page inspection proof in #468.',
+      '1. Treat the bounded Profunctor Page inspection proof in #468 as landed.',
       '2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle, replay facts, and visual scene facts are implemented.',
       '3. Pull #459 as the next v8 implementation proof: validate `packed-bijou-cells/1` and adapt it to `Surface`.',
       '4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and active #459 prove the smallest stable contract.',

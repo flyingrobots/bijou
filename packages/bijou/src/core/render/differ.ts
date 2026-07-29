@@ -9,6 +9,7 @@ import {
   FLAG_BOLD, FLAG_DIM, FLAG_STRIKETHROUGH, FLAG_INVERSE,
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
   FLAG_DASHED,
+  MAX_PACKED_CELL_UTF8_BYTES,
   SIDE_TABLE_THRESHOLD,
   decodeChar,
 } from './packed-cell.js';
@@ -559,15 +560,12 @@ function packedCellsSemanticallyEqual(
 /**
  * Fixed byte budget for the cursor move + full SGR prelude + trailing
  * reset that bookend a batch. The variable per-batch cost comes from
- * the char writes, which are bounded by `width * MAX_CHAR_BYTES`.
+ * the char writes, bounded by `width * MAX_PACKED_CELL_UTF8_BYTES`.
  * The full batch budget is computed inside `renderDiffPacked` as
- * `BATCH_FIXED_BUDGET + width * MAX_CHAR_BYTES` so it scales with
- * terminal width and never overflows on ultra-wide monitors.
+ * `BATCH_FIXED_BUDGET + width * MAX_PACKED_CELL_UTF8_BYTES` so it
+ * scales with terminal width and never overflows on ultra-wide monitors.
  */
 const BATCH_FIXED_BUDGET = 128;
-/** Worst-case UTF-8 bytes per cell character (side-table emoji cluster). */
-const MAX_CHAR_BYTES = 32;
-
 function renderDiffPacked(
   current: PackedSurface,
   target: PackedSurface,
@@ -665,7 +663,8 @@ function renderDiffPacked(
   // Per-batch byte budget computed from the current surface width so
   // the inner char-write loop never needs a per-cell capacity check,
   // even on ultra-wide terminals.
-  const batchBudget = BATCH_FIXED_BUDGET + width * MAX_CHAR_BYTES;
+  const batchBudget =
+    BATCH_FIXED_BUDGET + width * MAX_PACKED_CELL_UTF8_BYTES;
 
   for (let y = 0; y < height; y++) {
     let x = 0;

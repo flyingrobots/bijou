@@ -55,15 +55,16 @@ describe('DX-050 Profunctor Page inspection design', () => {
 
     expectClaims(roadmap, [
       'Last synced from GitHub milestone items: 2026-07-29.',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 18 | 2 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 20 | 2 |',
       '[#472](https://github.com/flyingrobots/bijou/issues/472)',
       '[#473](https://github.com/flyingrobots/bijou/issues/473)',
       '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
     ]);
     expectClaims(bearing, [
-      '`v8.2.0` milestone is quality automation and Method hardening: 18 open and 2 closed milestone items',
+      '`v8.2.0` milestone is quality automation and Method hardening: 20 open and 2 closed milestone items',
       '`v8.0.0` milestone is the active feature horizon: 3 open milestone items and 1 closed milestone item',
       '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
+      '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       'Current debt comprises `37` file/context and `25` code-size violations',
     ]);
   });

@@ -24,6 +24,7 @@ export const OPACITY_MASK  = 0b00111111;
 export const FLAG_FG_SET   = 1 << 6;
 export const FLAG_BG_SET   = 1 << 7;
 export const SIDE_TABLE_THRESHOLD = 0xF000;
+export const MAX_PACKED_CELL_UTF8_BYTES = 32;
 export const MODIFIER_TO_FLAG: Record<string, number> = {
   'bold': FLAG_BOLD,
   'dim': FLAG_DIM,
