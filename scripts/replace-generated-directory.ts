@@ -8,6 +8,7 @@ export function replaceGeneratedDirectory(
   stage: string,
   output: string,
   backup: string,
+  cleanupBackup: (path: string) => void = removeDirectory,
 ): void {
   if (existsSync(backup)) {
     throw new Error(
@@ -24,7 +25,11 @@ export function replaceGeneratedDirectory(
     }
     renameSync(stage, output);
     installedStage = true;
-    rmSync(backup, { force: true, recursive: true });
+    try {
+      cleanupBackup(backup);
+    } catch {
+      // Installation succeeded. Retain the backup for explicit recovery.
+    }
   } catch (error) {
     if (movedExisting && !installedStage && !existsSync(output)) {
       try {
@@ -41,4 +46,8 @@ export function replaceGeneratedDirectory(
     rmSync(stage, { force: true, recursive: true });
     throw error;
   }
+}
+
+function removeDirectory(path: string): void {
+  rmSync(path, { force: true, recursive: true });
 }
