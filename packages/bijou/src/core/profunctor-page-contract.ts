@@ -90,7 +90,10 @@ export function expectRepositoryPath(value: unknown, path: string): string {
 
 export function expectRoute(value: unknown, path: string): string {
   const result = expectString(value, path);
-  if (!/^\/(?:[^/?#]+\/)*$/.test(result)) {
+  if (
+    !/^\/(?:[^/?#]+\/)*$/.test(result)
+    || /[\s\p{Cc}]/u.test(result)
+  ) {
     invalid(path, 'expected canonical trailing-slash route');
   }
   return result;

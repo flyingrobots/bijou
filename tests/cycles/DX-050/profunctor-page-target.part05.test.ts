@@ -59,6 +59,19 @@ describe('DX-050 page composition graph validation', () => {
       }
     }));
   });
+
+  it('rejects whitespace and control characters in canonical routes', () => {
+    expectInvalid(mutatePage((page) => {
+      const related = recordAt(page.nodes, 4);
+      const projects = recordAt([related.props], 0).relatedProjects;
+      recordAt(projects, 0).route = '/projects/bad route/';
+    }));
+    expectInvalid(mutatePage((page) => {
+      const related = recordAt(page.nodes, 4);
+      const projects = recordAt([related.props], 0).relatedProjects;
+      recordAt(projects, 0).route = '/projects/bad\u0007route/';
+    }));
+  });
 });
 
 function expectInvalid(

@@ -21,6 +21,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   rollback-safe directory replacement that preserves the prior authoritative
   output when installation fails, refuses to overwrite existing recovery
   evidence, and treats cleanup after successful installation as best-effort.
+  Canonical route validation rejects whitespace and control characters before
+  action or terminal evidence can be emitted.
 - **VISOR artifact bundle proof** — `@flyingrobots/bijou` now exports
   `createVisorArtifactBundleFromGraphql()`, `createVisorArtifactBundle()`, and
   `visor-artifact-bundle/1` types for #458 / [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md).
