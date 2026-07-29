@@ -20,7 +20,16 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
     setCharCode(surrogate, 0, 0xd800);
     expectReceiptError(surrogate, 'invalid-glyph', '$.bytes[0]');
 
-    for (const code of [0, 0x1b, 0x85, 0x0301, 0x200d, 0x202e, 0x754c]) {
+    for (const code of [
+      0,
+      0x1b,
+      0x85,
+      0x0301,
+      0x1160,
+      0x200d,
+      0x202e,
+      0x754c,
+    ]) {
       const input = validPackedCellsInput();
       setCharCode(input, 0, code);
       expectReceiptError(input, 'invalid-glyph', '$.bytes[0]');
@@ -33,6 +42,7 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
       ['\u001b[31m', '$.sideTable[0]'],
       ['\u009b', '$.sideTable[0]'],
       ['\u0301', '$.sideTable[0]'],
+      ['\u1160', '$.sideTable[0]'],
       ['\u200d', '$.sideTable[0]'],
       ['\u202e', '$.sideTable[0]'],
       ['A', '$.sideTable[0]'],

@@ -121,10 +121,10 @@ a space glyph plus the empty-cell flag. Values at or above `0xF000` select
 
 Each side-table entry must be unique, terminal-control safe, and exactly one
 grapheme with terminal width `1`. An entry contains at most `256` UTF-16 code
-units and encodes to at most `32` UTF-8 bytes. Format-control and mark-only
-graphemes are rejected. Every entry must be referenced by at least one cell.
-A directly encodable value below `0xF000` is rejected from the side table.
-Side-table order is authoritative.
+units and encodes to at most `32` UTF-8 bytes. Format-control, mark-only, and
+default-ignorable-only graphemes are rejected. Every entry must be referenced
+by at least one cell. A directly encodable value below `0xF000` is rejected
+from the side table. Side-table order is authoritative.
 
 When a foreground or background presence bit is unset, the corresponding
 three color channels must be zero. An absent color means terminal default, not

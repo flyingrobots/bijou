@@ -35,7 +35,8 @@ function isDirectlyEncodableGlyph(value: string): boolean {
 
 function hasVisibleBase(value: string): boolean {
   return Array.from(value).some(
-    (character) => !/^[\p{M}\p{Cf}]$/u.test(character),
+    (character) =>
+      !/^[\p{M}\p{Cf}\p{Default_Ignorable_Code_Point}]$/u.test(character),
   );
 }
 
