@@ -26,6 +26,14 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
       value: {},
     });
     expectReceiptError(prototypeField, 'unknown-field', '$.__proto__');
+
+    const escapedField = validPackedCellsInput();
+    escapedField['line\nbreak'] = true;
+    expectReceiptError(
+      escapedField,
+      'unknown-field',
+      '$["line\\nbreak"]',
+    );
   });
 
   it('rejects non-JSON objects, accessors, symbols, and sparse arrays', () => {
@@ -39,6 +47,13 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
       get: () => 'packed-bijou-cells/1',
     });
     expectReceiptError(accessor, 'invalid-shape', '$.receiptVersion');
+
+    const nonEnumerable = validPackedCellsInput();
+    Object.defineProperty(nonEnumerable, 'receiptVersion', {
+      enumerable: false,
+      value: 'packed-bijou-cells/1',
+    });
+    expectReceiptError(nonEnumerable, 'invalid-shape', '$.receiptVersion');
 
     const symbol = validPackedCellsInput();
     Object.defineProperty(symbol, Symbol('extra'), { value: true });

@@ -24,11 +24,15 @@ export function recordAt(
   const record: JsonRecord = {};
   for (const key of Object.getOwnPropertyNames(value).sort()) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    if (!descriptor || !Object.hasOwn(descriptor, 'value')) {
+    if (
+      !descriptor ||
+      !Object.hasOwn(descriptor, 'value') ||
+      !descriptor.enumerable
+    ) {
       failPackedCells(
         'invalid-shape',
-        `${path}.${key}`,
-        'accessors are not allowed',
+        propertyPath(path, key),
+        'accessors and non-enumerable fields are not allowed',
       );
     }
     Object.defineProperty(record, key, {
@@ -78,7 +82,7 @@ export function arrayAt(
   if (extra !== undefined) {
     failPackedCells(
       'unknown-field',
-      `${path}.${extra}`,
+      propertyPath(path, extra),
       'field is not allowed',
     );
   }
@@ -110,7 +114,7 @@ function assertExactFields(
   if (unknown !== undefined) {
     failPackedCells(
       'unknown-field',
-      `${path}.${unknown}`,
+      propertyPath(path, unknown),
       'field is not allowed',
     );
   }
@@ -123,4 +127,12 @@ function assertExactFields(
       );
     }
   }
+}
+
+function propertyPath(path: string, key: string): string {
+  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(key)) {
+    return `${path}.${key}`;
+  }
+  const encoded = JSON.stringify(key);
+  return `${path}[${encoded}]`;
 }
