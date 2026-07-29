@@ -54,7 +54,7 @@ The example is illustrative. `pageSource`, `sourceMapSource`, and
 | :--- | :--- | :--- |
 | `page` | `profunctor-page/0` | ProjectPage composition using only the supported block definitions |
 | `sourceMap` | `profunctor-page-source-map/0` | Structured source occurrences with repository-relative paths |
-| `buildManifest` | `profunctor-build-manifest/0` | One route, no semantic-document sources, and a digest matching the page bytes |
+| `buildManifest` | `profunctor-build-manifest/0` | One route, no sources or obstructions, and a digest matching the page bytes |
 
 Each source must be canonical JSON with either no trailing newline or exactly
 one trailing newline. The parser rejects unknown fields, missing fields,
@@ -64,7 +64,8 @@ drift, and cross-artifact disagreement.
 The page, source map, and build manifest must agree on the page identity. The
 manifest entity must agree with the page entity, its sole route must equal the
 page route, and its dependencies must equal the page dependency digests in the
-same order.
+same order. Every source-map source and record digest, node provenance source
+digest, and build entity digest must occur in that dependency list.
 
 ## Supported Blocks
 

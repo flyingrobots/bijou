@@ -1,6 +1,7 @@
 import { validateBlockContract } from './profunctor-page-block-contract.js';
 import { failPageTarget } from './profunctor-page-error.js';
 import type { ProfunctorArtifactFamily } from './profunctor-page-model.js';
+import { validatePageDependencyLineage } from './profunctor-page-validate-dependencies.js';
 import { validatePageGraph } from './profunctor-page-validate-graph.js';
 
 export function validateProfunctorArtifactFamily(
@@ -28,6 +29,7 @@ export function validateProfunctorArtifactFamily(
   }
   uniqueStrings(buildManifest.dependencies, 'buildManifest.dependencies');
   uniqueStrings(buildManifest.claims, 'buildManifest.claims');
+  validatePageDependencyLineage(family);
 
   validatePageGraph(page);
   validateProjectPageRoot(page);

@@ -88,7 +88,17 @@ export function parseBuildManifest(
       'document sources are outside the bounded ProjectPage target',
     );
   }
-  expectArray(raw.obstructions, `${input.filename}.obstructions`);
+  const obstructions = expectArray(
+    raw.obstructions,
+    `${input.filename}.obstructions`,
+  );
+  if (obstructions.length > 0) {
+    failPageTarget(
+      'BIJOU_PAGE_BLOCK_UNSUPPORTED',
+      `${input.filename}.obstructions`,
+      'obstructed builds are outside the bounded ProjectPage target',
+    );
+  }
   const entity = expectRecord(raw.entity, `${input.filename}.entity`);
   expectExactKeys(entity, `${input.filename}.entity`, ['entityId', 'entityDigest']);
   return {

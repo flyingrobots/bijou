@@ -72,6 +72,25 @@ describe('DX-050 canonical contract validation', () => {
       recordAt([root.props], 0).route = '/projects/not-keep/';
     }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
   });
+
+  it('rejects undeclared digests and obstructed builds', () => {
+    const undeclaredDigest = `sha256:${'0'.repeat(64)}`;
+    expectCode(mutateSourceMap((sourceMap) => {
+      const entry = recordAt(sourceMap.entries, 0);
+      recordAt([entry.source], 0).sourceDigest = undeclaredDigest;
+    }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
+    expectCode(mutatePage((page) => {
+      const root = recordAt(page.nodes, 0);
+      recordAt([recordAt([root.props], 0).sourceProvenance], 0).sourceDigest =
+        undeclaredDigest;
+    }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
+    expectCode(mutateBuildManifest((manifest) => {
+      recordAt([manifest.entity], 0).entityDigest = undeclaredDigest;
+    }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
+    expectCode(mutateBuildManifest((manifest) => {
+      manifest.obstructions = [{ code: 'source-obstructed' }];
+    }), 'BIJOU_PAGE_BLOCK_UNSUPPORTED');
+  });
 });
 
 function expectInvalid(inputs: Parameters<typeof lowerProfunctorPageArtifacts>[0]): void {
