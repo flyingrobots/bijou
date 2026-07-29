@@ -37,6 +37,10 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     const controlField = validPackedCellsInput();
     controlField['\u009b'] = true;
     expectReceiptError(controlField, 'unknown-field', '$["\\u009b"]');
+
+    const bidiField = validPackedCellsInput();
+    bidiField['\u202e'] = true;
+    expectReceiptError(bidiField, 'unknown-field', '$["\\u202e"]');
   });
 
   it('rejects non-JSON objects, accessors, symbols, and sparse arrays', () => {

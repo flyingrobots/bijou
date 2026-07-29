@@ -59,13 +59,8 @@ function escapeJsonString(value: string): string {
   let result = '';
   for (const character of JSON.stringify(value)) {
     const codePoint = character.codePointAt(0);
-    if (
-      codePoint !== undefined &&
-      ((codePoint >= 0x7f && codePoint <= 0x9f) ||
-        codePoint === 0x2028 ||
-        codePoint === 0x2029)
-    ) {
-      result += `\\u${codePoint.toString(16).padStart(4, '0')}`;
+    if (codePoint !== undefined && isUnsafeControl(character, codePoint)) {
+      result += unicodeEscape(codePoint);
     } else {
       result += character;
     }
@@ -76,12 +71,26 @@ function escapeJsonString(value: string): string {
 function hasIdentifierControl(value: string): boolean {
   return Array.from(value).some((character) => {
     const codePoint = character.codePointAt(0);
-    return (
-      codePoint !== undefined &&
-      (codePoint <= 0x1f ||
-        (codePoint >= 0x7f && codePoint <= 0x9f) ||
-        codePoint === 0x2028 ||
-        codePoint === 0x2029)
-    );
+    return codePoint !== undefined && isUnsafeControl(character, codePoint);
   });
+}
+
+function isUnsafeControl(character: string, codePoint: number): boolean {
+  return (
+    codePoint <= 0x1f ||
+    (codePoint >= 0x7f && codePoint <= 0x9f) ||
+    codePoint === 0x2028 ||
+    codePoint === 0x2029 ||
+    /^\p{Default_Ignorable_Code_Point}$/u.test(character)
+  );
+}
+
+function unicodeEscape(codePoint: number): string {
+  if (codePoint <= 0xffff) {
+    return `\\u${codePoint.toString(16).padStart(4, '0')}`;
+  }
+  const scalar = codePoint - 0x10000;
+  const high = 0xd800 + (scalar >> 10);
+  const low = 0xdc00 + (scalar & 0x3ff);
+  return `\\u${high.toString(16)}\\u${low.toString(16)}`;
 }

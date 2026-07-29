@@ -288,7 +288,8 @@ Codes distinguish invalid shape, unknown field, wrong literal, invalid
 dimension, invalid byte, byte-length mismatch, invalid glyph, invalid color,
 invalid modifier, invalid scene mapping, invalid focus, and invalid chroma.
 Paths use JSON-compatible segments such as `$.bytes[17]` and
-`$.focus.focusedNodeId`.
+`$.focus.focusedNodeId`. Control and default-ignorable characters are escaped
+as Unicode escape sequences before entering a diagnostic path.
 
 Validation returns a fresh receipt value only after the entire object passes.
 No partial receipt or partially created `Surface` escapes a failure.

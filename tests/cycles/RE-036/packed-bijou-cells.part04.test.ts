@@ -22,6 +22,15 @@ describe('RE-036 packed-bijou-cells/1 metadata', () => {
       'scene.\u009broot';
     expectReceiptError(control, 'invalid-scene', '$.scene.nodeIds[0]');
 
+    const bidiControl = validPackedCellsInput();
+    arrayField(recordField(bidiControl, 'scene'), 'nodeIds')[0] =
+      'scene.\u202eroot';
+    expectReceiptError(
+      bidiControl,
+      'invalid-scene',
+      '$.scene.nodeIds[0]',
+    );
+
     const short = validPackedCellsInput();
     arrayField(recordField(short, 'scene'), 'cellNodeIds').pop();
     expectReceiptError(short, 'invalid-scene', '$.scene.cellNodeIds');

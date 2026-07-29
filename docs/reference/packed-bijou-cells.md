@@ -158,6 +158,9 @@ The deterministic message format is:
 packed-bijou-cells/1 <code> at <path>: <detail>
 ```
 
+Paths escape control and default-ignorable characters as Unicode escape
+sequences so diagnostics remain visually stable.
+
 | Code                   | Meaning                                                     |
 | :--------------------- | :---------------------------------------------------------- |
 | `invalid-shape`        | The value is not the required exact JSON shape              |
