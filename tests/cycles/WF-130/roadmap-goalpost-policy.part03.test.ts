@@ -20,8 +20,8 @@ describe('WF-130 roadmap pull order', () => {
     expectClaims(roadmap, [
       'Next Pull',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
-      'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B each removed `25` counted violations.',
-      'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) is now the next pull.',
+      'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
+      'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) is active in [#474](https://github.com/flyingrobots/bijou/pull/474).',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
       'VISOR',

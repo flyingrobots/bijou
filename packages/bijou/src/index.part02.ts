@@ -95,6 +95,19 @@ export {
 } from './core/visor-artifact-bundle.js';
 
 export {
+  lowerProfunctorPageArtifacts,
+  ProfunctorPageTargetError,
+  type ProfunctorArtifactInput,
+  type ProfunctorArtifactInputs,
+  type ProfunctorPageInspectionMode,
+  type ProfunctorPageTargetEntry,
+  type ProfunctorPageTargetMap,
+  type ProfunctorPageTargetOptions,
+  type ProfunctorPageTargetProof,
+  type ProfunctorPageTargetReceipt,
+} from './core/profunctor-page-target.js';
+
+export {
   UI_SCENE_IR_VERSION,
   UI_SCENE_RECEIPT_VERSION,
   createUiSceneTerminalReceipt,

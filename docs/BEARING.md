@@ -146,11 +146,11 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 3 open and 1 closed
-  milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is the active feature horizon: 3 open milestone items
+  and 1 closed milestone item as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 16 open
+- The `v8.2.0` milestone is quality automation and Method hardening: 18 open
   and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
@@ -213,17 +213,21 @@ Current direction and active tensions. Historical ship data is in
 The Code Dojo ratchet
 [#477](https://github.com/flyingrobots/bijou/issues/477) has met its
 `112 -> 62` contract. Landed tranche A
-[#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B
-each removed `25` counted violations. Current debt comprises `37`
-file/context and `25` code-size violations with no mock-ban or ESLint debt.
+[#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
+[#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
+counted violations. Current debt comprises `37` file/context and `25`
+code-size violations with no mock-ban or ESLint debt.
 
-The next bounded target is
-[#468](https://github.com/flyingrobots/bijou/issues/468). It consumes the
+The active bounded target is
+[#468](https://github.com/flyingrobots/bijou/issues/468), implemented in
+[#474](https://github.com/flyingrobots/bijou/pull/474). It consumes the
 canonical website specimen through
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
 boundaries. This temporarily pulls one v10 integration proof ahead for the
 active cross-repository campaign; it does not move the issue out of v10 or
 replace the v8 product sequence.
+The accepted cycle design is
+[DX-050](./design/DX-050-profunctor-page-inspection.md).
 
 The #458 GraphQL block artifact bundle has landed as the first v8
 implementation proof. Its cycle design remains

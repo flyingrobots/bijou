@@ -8,6 +8,26 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Profunctor Page terminal inspection target** —
+  `lowerProfunctorPageArtifacts()` validates the canonical Keep
+  `profunctor-page/0` family and emits deterministic
+  `ui-scene-ir/1`, `Surface`, target-map, receipt, cell-source-map, and text
+  evidence. Six inspection modes preserve page, composition, override,
+  template, content, source-occurrence, token, reading-order, outline,
+  landmark, and action identities. Unsupported browser semantics remain
+  explicit capability residuals; semantic-document sources, application
+  islands, and visible unsupported blocks fail closed; hidden unsupported
+  blocks receive explicit target residuals. Generated evidence uses staged,
+  rollback-safe directory replacement that preserves the prior authoritative
+  output when installation fails, refuses to overwrite existing recovery
+  evidence, and treats cleanup after successful installation as best-effort.
+  Canonical route validation rejects whitespace and control characters before
+  action or terminal evidence can be emitted. Profiled source spans reject end
+  positions that precede their declared starts. Derived line identities use a
+  namespace disjoint from page render identities. Every planned node region,
+  including zero-line obstruction views, must fit within the terminal target.
+  Lines must also fit the width and height of their assigned regions. Visible
+  text fails closed when terminal sanitization would alter it.
 - **VISOR artifact bundle proof** — `@flyingrobots/bijou` now exports
   `createVisorArtifactBundleFromGraphql()`, `createVisorArtifactBundle()`, and
   `visor-artifact-bundle/1` types for #458 / [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md).

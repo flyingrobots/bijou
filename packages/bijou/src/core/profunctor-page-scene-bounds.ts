@@ -1,0 +1,63 @@
+import { segmentSurfaceText } from './components/surface-text.js';
+import { failPageTarget } from './profunctor-page-error.js';
+import type { PlannedPageNode } from './profunctor-page-scene.js';
+import { sanitizePlainTerminalText } from './text/grapheme.js';
+
+export function validatePageSceneBounds(
+  plans: readonly PlannedPageNode[],
+  rootNodeId: string,
+  cols: number,
+  rows: number,
+): void {
+  for (const plan of plans) {
+    const regionPath = `${plan.node.pageNodeId}.region`;
+    if (
+      plan.region.x < 0
+      || plan.region.y < 0
+      || plan.region.width < 1
+      || plan.region.height < 1
+      || plan.region.x + plan.region.width > cols
+      || plan.region.y + plan.region.height > rows
+    ) {
+      unsupported(
+        regionPath,
+        `region must fit within ${String(cols)}x${String(rows)} target`,
+      );
+    }
+    for (const [index, line] of plan.lines.entries()) {
+      const path = `${plan.node.pageNodeId}.lines[${String(index)}]`;
+      const isRoot = plan.node.pageNodeId === rootNodeId;
+      if (/[\r\n\u2028\u2029]/u.test(line.text)) {
+        unsupported(path, 'terminal inspection lines must not contain line breaks');
+      }
+      if (sanitizePlainTerminalText(line.text) !== line.text) {
+        unsupported(path, 'terminal inspection lines must preserve input text exactly');
+      }
+      const width = segmentSurfaceText(line.text, path).length;
+      const availableWidth = isRoot ? cols : plan.region.width;
+      if (width > availableWidth) {
+        unsupported(
+          path,
+          `line width ${String(width)} exceeds region width ${String(availableWidth)}`,
+        );
+      }
+      if (!isRoot && index >= plan.region.height) {
+        unsupported(
+          path,
+          `line index ${String(index)} exceeds region height ${String(plan.region.height)}`,
+        );
+      }
+      const y = isRoot ? index : plan.region.y + index;
+      if (y >= rows) {
+        unsupported(
+          path,
+          `line row ${String(y)} exceeds target row ${String(rows - 1)}`,
+        );
+      }
+    }
+  }
+}
+
+function unsupported(path: string, detail: string): never {
+  failPageTarget('BIJOU_PAGE_BLOCK_UNSUPPORTED', path, detail);
+}

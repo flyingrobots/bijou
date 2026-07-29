@@ -35,8 +35,8 @@
     },
     {
       "path": "packages/bijou/src/core/ui-scene-ir.ts",
-      "lines": 890,
-      "bytes": 26319
+      "lines": 740,
+      "bytes": 21659
     },
     {
       "path": "packages/bijou-tui/src/app-frame-overlays.ts",
