@@ -52,12 +52,39 @@ describe('DX-050 canonical contract validation', () => {
       delete manifest.compiler;
     }));
   });
+
+  it('rejects unsafe or contradictory ProjectPage facts', () => {
+    expectInvalid(mutatePage((page) => {
+      const root = recordAt(page.nodes, 0);
+      recordAt([root.props], 0).sourceProvenance = {
+        exportName: 'projectCatalog',
+        recordId: 'keep',
+        sourceDigest: `sha256:${'0'.repeat(64)}`,
+        sourcePath: '/Users/example/project-registry.js',
+      };
+    }));
+    expectInvalid(mutatePage((page) => {
+      const hero = recordAt(page.nodes, 1);
+      recordAt([hero.props], 0).documentationUrl = 'javascript:alert(1)';
+    }));
+    expectCode(mutatePage((page) => {
+      const root = recordAt(page.nodes, 0);
+      recordAt([root.props], 0).route = '/projects/not-keep/';
+    }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
+  });
 });
 
 function expectInvalid(inputs: Parameters<typeof lowerProfunctorPageArtifacts>[0]): void {
+  expectCode(inputs, 'BIJOU_PAGE_INPUT_REFERENCE_INVALID');
+}
+
+function expectCode(
+  inputs: Parameters<typeof lowerProfunctorPageArtifacts>[0],
+  code: ProfunctorPageTargetError['code'],
+): void {
   expect(() => lowerProfunctorPageArtifacts(inputs)).toThrow(
     expect.objectContaining<Partial<ProfunctorPageTargetError>>({
-      code: 'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
+      code,
     }),
   );
 }

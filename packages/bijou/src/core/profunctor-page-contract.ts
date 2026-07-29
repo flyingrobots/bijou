@@ -98,6 +98,25 @@ export function expectIntegerAtLeast(
   return value;
 }
 
+export function expectHttpUrl(value: unknown, path: string): string {
+  const result = expectString(value, path);
+  let parsed: URL;
+  try {
+    parsed = new URL(result);
+  } catch {
+    invalid(path, 'expected absolute HTTP or HTTPS URL');
+  }
+  if (
+    (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')
+    || parsed.username !== ''
+    || parsed.password !== ''
+    || /\s/u.test(result)
+  ) {
+    invalid(path, 'expected credential-free HTTP or HTTPS URL');
+  }
+  return result;
+}
+
 function invalid(path: string, detail: string): never {
   failPageTarget('BIJOU_PAGE_INPUT_REFERENCE_INVALID', path, detail);
 }

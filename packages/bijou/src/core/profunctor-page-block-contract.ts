@@ -1,6 +1,12 @@
 import { failPageTarget } from './profunctor-page-error.js';
 import { expectRecords, expectString, expectStrings } from './profunctor-page-json.js';
 import type { ProfunctorPageNode } from './profunctor-page-model.js';
+import {
+  expectContractId,
+  expectHttpUrl,
+  expectRoute,
+} from './profunctor-page-contract.js';
+import { readPageSourceProvenance } from './profunctor-page-provenance.js';
 
 export const SUPPORTED_PAGE_BLOCKS = new Set([
   'block:page',
@@ -11,7 +17,9 @@ export const SUPPORTED_PAGE_BLOCKS = new Set([
 ]);
 
 export function validateBlockContract(node: ProfunctorPageNode): void {
-  if (!SUPPORTED_PAGE_BLOCKS.has(node.blockDefinitionId)) {
+  const supported = SUPPORTED_PAGE_BLOCKS.has(node.blockDefinitionId);
+  readPageSourceProvenance(node, supported);
+  if (!supported) {
     if (node.hidden) {
       return;
     }
@@ -25,6 +33,7 @@ export function validateBlockContract(node: ProfunctorPageNode): void {
   switch (node.blockDefinitionId) {
     case 'block:page':
       requiredStrings(node, path, ['displayTitle', 'route', 'summary']);
+      expectRoute(node.props.route, `${path}.route`);
       break;
     case 'block:project-hero':
       requiredStrings(node, path, [
@@ -33,6 +42,8 @@ export function validateBlockContract(node: ProfunctorPageNode): void {
         'documentationUrl',
         'sourceUrl',
       ]);
+      expectHttpUrl(node.props['documentationUrl'], `${path}.documentationUrl`);
+      expectHttpUrl(node.props['sourceUrl'], `${path}.sourceUrl`);
       break;
     case 'block:project-facts':
       requiredStrings(node, path, ['kind', 'organization', 'program']);
@@ -40,6 +51,7 @@ export function validateBlockContract(node: ProfunctorPageNode): void {
       break;
     case 'block:project-documentation':
       requiredStrings(node, path, ['displayTitle', 'documentationUrl']);
+      expectHttpUrl(node.props['documentationUrl'], `${path}.documentationUrl`);
       break;
     case 'block:project-related':
       requiredStrings(node, path, ['displayTitle', 'primaryCategoryLabel']);
@@ -65,8 +77,8 @@ function validateRelated(node: ProfunctorPageNode, path: string): void {
   ).entries()) {
     const itemPath = `${path}.relatedProjects[${String(index)}]`;
     expectString(related.displayTitle, `${itemPath}.displayTitle`);
-    expectString(related.entityId, `${itemPath}.entityId`);
+    expectContractId(related.entityId, `${itemPath}.entityId`, 'entity:');
     expectString(related.kind, `${itemPath}.kind`);
-    expectString(related.route, `${itemPath}.route`);
+    expectRoute(related.route, `${itemPath}.route`);
   }
 }

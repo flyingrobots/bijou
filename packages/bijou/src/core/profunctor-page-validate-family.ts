@@ -30,10 +30,26 @@ export function validateProfunctorArtifactFamily(
   uniqueStrings(buildManifest.claims, 'buildManifest.claims');
 
   validatePageGraph(page);
+  validateProjectPageRoot(page);
   for (const node of page.nodes) {
     validateBlockContract(node);
   }
   validateSourceMap(family);
+}
+
+function validateProjectPageRoot(page: ProfunctorArtifactFamily['page']): void {
+  const root = page.nodes.find((node) => node.pageNodeId === page.rootNodeId);
+  if (root?.blockDefinitionId !== 'block:page') {
+    reference('page.rootNodeId', 'bounded ProjectPage root must use block:page');
+  }
+  if (root.props.route !== page.route) {
+    identity('page.route', 'page and root block routes must agree');
+  }
+  if (page.nodes.some(
+    (node) => node !== root && node.blockDefinitionId === 'block:page',
+  )) {
+    reference('page.nodes', 'block:page may appear only at the root');
+  }
 }
 
 function validateSourceMap(family: ProfunctorArtifactFamily): void {

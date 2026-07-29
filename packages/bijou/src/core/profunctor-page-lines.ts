@@ -7,8 +7,8 @@ import type {
   ProfunctorPageInspectionMode,
 } from './profunctor-page-target-types.js';
 import type { PageAction } from './profunctor-page-actions.js';
-import type { JsonRecord } from './profunctor-page-json-record.js';
-import { expectRecord, expectStrings } from './profunctor-page-json.js';
+import { expectStrings } from './profunctor-page-json.js';
+import { readPageSourceProvenance } from './profunctor-page-provenance.js';
 
 export interface PageLine {
   readonly text: string;
@@ -103,12 +103,10 @@ export function sourceRefs(node: ProfunctorPageNode): string[] {
   if (occurrences.length > 0) {
     return occurrences;
   }
-  const provenance: JsonRecord | undefined = node.props.sourceProvenance === undefined
-    ? undefined
-    : expectRecord(node.props.sourceProvenance, `${node.pageNodeId}.props.sourceProvenance`);
+  const provenance = readPageSourceProvenance(node, false);
   return provenance == null
     ? ['none']
-    : [`${String(provenance.sourcePath)}#${String(provenance.exportName)}.${String(provenance.recordId)}`];
+    : [`${provenance.sourcePath}#${provenance.exportName}.${provenance.recordId}`];
 }
 
 function tokenRefs(node: ProfunctorPageNode): string[] {
