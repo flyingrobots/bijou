@@ -2,7 +2,6 @@ import {
   expectContractId,
   expectDigest,
   expectExactKeys,
-  expectIntegerAtLeast,
   expectKebabCase,
   expectNonWhitespaceString,
   expectRepositoryPath,
@@ -14,6 +13,7 @@ import {
   expectStrings,
   type JsonRecord,
 } from './profunctor-page-json.js';
+import { validateSpan } from './profunctor-page-source-span.js';
 import { validateSourceTargetState } from './profunctor-page-source-target-state.js';
 
 export function validateStructuredSourceMapEntry(
@@ -114,19 +114,6 @@ function validateSelector(selector: JsonRecord, path: string): void {
       }
     }
   }
-}
-
-function validateSpan(span: JsonRecord, path: string): void {
-  expectExactKeys(span, path, ['start', 'end']);
-  validatePosition(expectRecord(span.start, `${path}.start`), `${path}.start`);
-  validatePosition(expectRecord(span.end, `${path}.end`), `${path}.end`);
-}
-
-function validatePosition(position: JsonRecord, path: string): void {
-  expectExactKeys(position, path, ['offset', 'line', 'column']);
-  expectIntegerAtLeast(position.offset, `${path}.offset`, 0);
-  expectIntegerAtLeast(position.line, `${path}.line`, 1);
-  expectIntegerAtLeast(position.column, `${path}.column`, 1);
 }
 
 function validateSpanResidual(residual: JsonRecord, path: string): void {

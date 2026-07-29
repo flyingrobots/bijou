@@ -57,6 +57,16 @@ describe('DX-050 canonical contract validation', () => {
         reason: 'unknown',
       };
     }));
+    expectInvalid(mutateSourceMap((sourceMap) => {
+      const source = recordAt([recordAt(sourceMap.entries, 0).source], 0);
+      source.parserProfile = 'typescript-estree@1';
+      delete source.spanResidual;
+      source.span = {
+        end: { column: 1, line: 1, offset: 1 },
+        start: { column: 1, line: 10, offset: 100 },
+      };
+      source.spanResidual = null;
+    }));
   });
 
   it('rejects missing build-manifest contract fields', () => {
