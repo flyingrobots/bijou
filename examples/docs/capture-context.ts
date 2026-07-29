@@ -8,35 +8,33 @@ import {
   nodeRuntime,
 } from '../../packages/bijou-node/src/index.js';
 
-const TERM = 'TERM';
-const COLORTERM = 'COLORTERM';
+export interface CaptureContextOptions {
+  readonly captureColumns?: string;
+  readonly captureRows?: string;
+  readonly columns?: string;
+  readonly rows?: string;
+  readonly environment: Readonly<Record<string, string | undefined>>;
+}
 
-function readIntEnv(name: string, fallback: number): number {
-  const raw = process.env[name];
+function readIntEnv(raw: string | undefined, fallback: number): number {
   if (raw == null || raw.trim() === '') return fallback;
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-export function createCaptureContext() {
+export function createCaptureContext(options: CaptureContextOptions) {
   const baseRuntime = nodeRuntime();
   const baseIO = nodeIO();
   const columns = readIntEnv(
-    'DOGFOOD_CAPTURE_COLUMNS',
-    readIntEnv('COLUMNS', 160),
+    options.captureColumns,
+    readIntEnv(options.columns, 160),
   );
-  const rows = readIntEnv('DOGFOOD_CAPTURE_ROWS', readIntEnv('LINES', 44));
+  const rows = readIntEnv(options.captureRows, readIntEnv(options.rows, 44));
 
   const runtime = {
     env(key: string): string | undefined {
-      if (key === TERM) {
-        return process.env[TERM] && process.env[TERM] !== 'dumb'
-          ? process.env[TERM]
-          : 'xterm-256color';
-      }
-      if (key === COLORTERM) return process.env[COLORTERM] ?? 'truecolor';
-      if (key === 'CI' || key === 'NO_COLOR' || key === 'BIJOU_ACCESSIBLE') {
-        return undefined;
+      if (Object.hasOwn(options.environment, key)) {
+        return options.environment[key];
       }
       return baseRuntime.env(key);
     },

@@ -3,7 +3,6 @@ import type {
   ComponentStory,
   StoryProfilePreset,
 } from '../_stories/protocol.js';
-import { COMPONENT_STORIES } from './stories.js';
 
 export const REQUIRED_STORY_MODES: readonly OutputMode[] = [
   'interactive',
@@ -39,14 +38,15 @@ export interface DogfoodStorybookWorkbenchModel {
 }
 
 export function createDogfoodStorybookWorkbenchModel(
-  stories: readonly ComponentStory[] = COMPONENT_STORIES,
+  stories: readonly ComponentStory[],
+  title: string,
 ): DogfoodStorybookWorkbenchModel {
   const families = new Map<
     string,
     { label: string; stories: DogfoodStorybookStorySummary[] }
   >();
   for (const story of stories) {
-    const familyId = slugify(story.family);
+    const familyId = slugify(story.family, story.id);
     const existing = families.get(familyId);
     const summary = summarizeStory(story);
     if (existing == null) {
@@ -69,7 +69,7 @@ export function createDogfoodStorybookWorkbenchModel(
     }))
     .sort((left, right) => left.label.localeCompare(right.label));
   return {
-    title: 'Bijou BlockLab Workstation',
+    title,
     storyCount: stories.length,
     familyCount: familySummaries.length,
     variantCount: stories.reduce(
@@ -82,7 +82,8 @@ export function createDogfoodStorybookWorkbenchModel(
 }
 
 export function renderDogfoodStorybookIndex(
-  model = createDogfoodStorybookWorkbenchModel(),
+  model: DogfoodStorybookWorkbenchModel,
+  requiredModesLabel: string,
 ): string {
   const lines = [
     `# ${model.title}`,
@@ -90,7 +91,7 @@ export function renderDogfoodStorybookIndex(
     `Stories: ${String(model.storyCount)}`,
     `Families: ${String(model.familyCount)}`,
     `Variants: ${String(model.variantCount)}`,
-    `Required modes: ${model.requiredModes.join(', ')}`,
+    `${requiredModesLabel}: ${model.requiredModes.join(', ')}`,
   ];
   for (const family of model.families) {
     lines.push('', `## ${family.label}`);
@@ -131,11 +132,11 @@ function uniqueModes(
   return [...new Set(profiles.map((profile) => profile.mode))];
 }
 
-function slugify(value: string): string {
+function slugify(value: string, fallback: string): string {
   return (
     value
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'family'
+      .replace(/^-+|-+$/g, '') || fallback
   );
 }

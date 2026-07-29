@@ -17,8 +17,25 @@ import {
 import { COMPONENT_STORIES } from './stories.js';
 import {
   REQUIRED_STORY_MODES,
-  renderDogfoodStorybookIndex,
+  createDogfoodStorybookWorkbenchModel as createWorkbenchModel,
+  renderDogfoodStorybookIndex as renderWorkbenchIndex,
+  type DogfoodStorybookWorkbenchModel,
 } from './storybook-workstation-model.js';
+
+const WORKSTATION_TITLE = 'Bijou BlockLab Workstation';
+const REQUIRED_MODES_LABEL = 'Required modes';
+
+export function createDogfoodStorybookWorkbenchModel(
+  stories: readonly ComponentStory[] = COMPONENT_STORIES,
+): DogfoodStorybookWorkbenchModel {
+  return createWorkbenchModel(stories, WORKSTATION_TITLE);
+}
+
+export function renderDogfoodStorybookIndex(
+  model = createDogfoodStorybookWorkbenchModel(),
+): string {
+  return renderWorkbenchIndex(model, REQUIRED_MODES_LABEL);
+}
 
 export interface CaptureDogfoodStorybookMatrixOptions {
   readonly storyId: string;
@@ -120,10 +137,6 @@ if (
   cli(process.argv.slice(2));
 }
 
-export {
-  createDogfoodStorybookWorkbenchModel,
-  renderDogfoodStorybookIndex,
-} from './storybook-workstation-model.js';
 export type {
   DogfoodStorybookFamilySummary,
   DogfoodStorybookStorySummary,

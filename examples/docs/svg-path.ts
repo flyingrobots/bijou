@@ -7,7 +7,15 @@ export interface SvgPolygon {
   readonly points: readonly SvgPoint[];
 }
 
-type PathCommand = 'M' | 'L' | 'Q' | 'Z';
+const PATH_MOVE = 77;
+const PATH_LINE = 76;
+const PATH_QUADRATIC = 81;
+const PATH_CLOSE = 90;
+type PathCommand =
+  | typeof PATH_MOVE
+  | typeof PATH_LINE
+  | typeof PATH_QUADRATIC
+  | typeof PATH_CLOSE;
 const PATH_COMMAND_RE = /[MLQZ]|-?(?:\d+\.?\d*|\.\d+)/g;
 const QUADRATIC_SEGMENTS = 12;
 
@@ -23,30 +31,31 @@ export function parsePathPolygons(path: string): readonly SvgPolygon[] {
   while (index < tokens.length) {
     const token = tokens[index];
     if (token == null) break;
-    if (isPathCommand(token)) {
-      command = token;
+    const nextCommand = pathCommand(token);
+    if (nextCommand !== undefined) {
+      command = nextCommand;
       index++;
-      if (command === 'Z') closeCurrentPolygon();
+      if (command === PATH_CLOSE) closeCurrentPolygon();
       continue;
     }
     if (command === undefined) {
       throw new Error('SVG path needs a command.');
     }
-    if (command === 'M' || command === 'L') {
+    if (command === PATH_MOVE || command === PATH_LINE) {
       const point = readPoint(tokens, index);
       index += 2;
-      if (command === 'M') {
+      if (command === PATH_MOVE) {
         closeCurrentPolygon();
         start = point;
         points = [point];
-        command = 'L';
+        command = PATH_LINE;
       } else {
         points.push(point);
       }
       current = point;
       continue;
     }
-    if (command === 'Q') {
+    if (command === PATH_QUADRATIC) {
       if (current === undefined) {
         throw new Error('SVG quadratic point missing.');
       }
@@ -107,8 +116,19 @@ function quadraticPoint(
   };
 }
 
-function isPathCommand(token: string): token is PathCommand {
-  return /^[MLQZ]$/.exec(token) != null;
+function pathCommand(token: string): PathCommand | undefined {
+  switch (token.charCodeAt(0)) {
+    case PATH_MOVE:
+      return PATH_MOVE;
+    case PATH_LINE:
+      return PATH_LINE;
+    case PATH_QUADRATIC:
+      return PATH_QUADRATIC;
+    case PATH_CLOSE:
+      return PATH_CLOSE;
+    default:
+      return undefined;
+  }
 }
 
 function samePoint(left: SvgPoint, right: SvgPoint): boolean {

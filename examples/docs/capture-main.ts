@@ -130,5 +130,18 @@ function createCaptureApp(
 }
 
 const scenario = CAPTURE_SCENARIOS[readScenarioEnv()];
-const ctx = createCaptureContext();
+const term = process.env.TERM;
+const ctx = createCaptureContext({
+  captureColumns: process.env.DOGFOOD_CAPTURE_COLUMNS,
+  captureRows: process.env.DOGFOOD_CAPTURE_ROWS,
+  columns: process.env.COLUMNS,
+  rows: process.env.LINES,
+  environment: {
+    TERM: term != null && term !== 'dumb' ? term : 'xterm-256color',
+    COLORTERM: process.env.COLORTERM ?? 'truecolor',
+    CI: undefined,
+    NO_COLOR: undefined,
+    BIJOU_ACCESSIBLE: undefined,
+  },
+});
 await run(createCaptureApp(ctx, scenario), { ctx, mouse: false });
