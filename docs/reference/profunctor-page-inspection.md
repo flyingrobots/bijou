@@ -99,7 +99,8 @@ Omit `mode` to use `normal`.
 | `obstructions` | Required capabilities, target dispositions, and residual explanations |
 
 Modes change the terminal witness. They do not change the input identities or
-claim browser semantics.
+claim browser semantics. Unsupported modes and unowned option fields fail with
+`BIJOU_PAGE_INPUT_REFERENCE_INVALID`.
 
 ## Outputs
 

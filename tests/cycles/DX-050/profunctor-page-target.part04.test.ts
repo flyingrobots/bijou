@@ -4,6 +4,7 @@ import {
   ProfunctorPageTargetError,
 } from '../../../packages/bijou/src/core/profunctor-page-target.js';
 import {
+  fixtureInputs,
   mutateBuildManifest,
   mutatePage,
   mutateSourceMap,
@@ -93,6 +94,21 @@ describe('DX-050 canonical contract validation', () => {
     expectCode(mutateBuildManifest((manifest) => {
       manifest.obstructions = [{ code: 'source-obstructed' }];
     }), 'BIJOU_PAGE_BLOCK_UNSUPPORTED');
+  });
+
+  it('rejects unsupported inspection modes at the public boundary', () => {
+    expect(() => {
+      Reflect.apply(
+        lowerProfunctorPageArtifacts,
+        undefined,
+        [fixtureInputs(), { mode: 'unknown' }],
+      );
+    }).toThrow(
+      expect.objectContaining<Partial<ProfunctorPageTargetError>>({
+        code: 'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
+        path: 'options.mode',
+      }),
+    );
   });
 });
 

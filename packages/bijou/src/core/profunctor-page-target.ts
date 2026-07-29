@@ -16,6 +16,7 @@ import {
 import { parseProfunctorArtifactFamily } from './profunctor-page-parse.js';
 import { buildProfunctorPageScene } from './profunctor-page-scene.js';
 import type {
+  ProfunctorPageInspectionMode,
   ProfunctorPageTargetOptions,
   ProfunctorPageTargetProof,
 } from './profunctor-page-target-types.js';
@@ -42,8 +43,8 @@ export function lowerProfunctorPageArtifacts(
   inputs: ProfunctorArtifactInputs,
   options: ProfunctorPageTargetOptions = {},
 ): ProfunctorPageTargetProof {
-  const mode = options.mode ?? 'normal';
   try {
+    const mode = inspectionMode(options);
     const family = parseProfunctorArtifactFamily(inputs);
     validateProfunctorArtifactFamily(family);
     const outcomes = capabilityOutcomes(family.page.capabilityRequirements);
@@ -105,4 +106,41 @@ export function lowerProfunctorPageArtifacts(
       error,
     );
   }
+}
+
+function inspectionMode(options: unknown): ProfunctorPageInspectionMode {
+  if (
+    typeof options !== 'object'
+    || options === null
+    || Array.isArray(options)
+  ) {
+    invalidMode('expected options object');
+  }
+  const keys = Object.keys(options);
+  const unowned = keys.find((key) => key !== 'mode');
+  if (unowned !== undefined) {
+    failPageTarget(
+      'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
+      `options.${unowned}`,
+      'field is not owned by this contract',
+    );
+  }
+  const mode = 'mode' in options ? options.mode : undefined;
+  switch (mode) {
+    case undefined:
+    case 'normal':
+      return 'normal';
+    case 'node-ids':
+    case 'source-refs':
+    case 'token-refs':
+    case 'composition':
+    case 'obstructions':
+      return mode;
+    default:
+      invalidMode('unsupported Profunctor Page inspection mode');
+  }
+}
+
+function invalidMode(detail: string): never {
+  failPageTarget('BIJOU_PAGE_INPUT_REFERENCE_INVALID', 'options.mode', detail);
 }
