@@ -9,6 +9,7 @@ import {
   expectDigest,
   expectExactKeys,
   expectRoute,
+  TOKEN_REFERENCE_PREFIX,
 } from './profunctor-page-contract.js';
 import { failPageTarget } from './profunctor-page-error.js';
 import type {
@@ -114,6 +115,13 @@ export function parsePageArtifact(input: ProfunctorArtifactInput): ProfunctorPag
       'page-node:',
     ),
     route: expectRoute(raw.route, `${input.filename}.route`),
-    tokenRefs: expectStrings(raw.tokenRefs, `${input.filename}.tokenRefs`),
+    tokenRefs: expectStrings(
+      raw.tokenRefs,
+      `${input.filename}.tokenRefs`,
+    ).map((id, index) => expectContractId(
+      id,
+      `${input.filename}.tokenRefs[${String(index)}]`,
+      TOKEN_REFERENCE_PREFIX,
+    )),
   };
 }

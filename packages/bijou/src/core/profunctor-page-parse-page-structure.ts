@@ -2,6 +2,7 @@ import {
   expectContractId,
   expectExactKeys,
   expectIntegerAtLeast,
+  expectTokenReferences,
 } from './profunctor-page-contract.js';
 import { failPageTarget } from './profunctor-page-error.js';
 import {
@@ -73,7 +74,7 @@ export function parsePageNode(raw: JsonRecord, path: string): ProfunctorPageNode
       `${path}.templateNodeId`,
       'template:',
     ),
-    tokens: expectStringRecord(raw.tokens, `${path}.tokens`),
+    tokens: expectTokenReferences(raw.tokens, `${path}.tokens`),
   };
 }
 

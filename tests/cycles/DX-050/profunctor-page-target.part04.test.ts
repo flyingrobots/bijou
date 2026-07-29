@@ -9,6 +9,7 @@ import {
   mutatePage,
   mutateSourceMap,
   recordAt,
+  strings,
 } from './profunctor-page-target.test-support.js';
 
 const HOST_LOCAL_SOURCE_PATH = ['', 'Users', 'example', 'project-registry.js']
@@ -29,6 +30,13 @@ describe('DX-050 canonical contract validation', () => {
       recordAt(page.nodes, 0).sourceBindings = {
         '': 'source-occurrence:projectCatalog.keep#record',
       };
+    }));
+    expectInvalid(mutatePage((page) => {
+      page.tokenRefs = [...strings(page.tokenRefs), 'surface'];
+    }));
+    expectInvalid(mutatePage((page) => {
+      page.tokenRefs = [...strings(page.tokenRefs), 'surface'];
+      recordAt(page.nodes, 0).tokens = { surface: 'surface' };
     }));
   });
 

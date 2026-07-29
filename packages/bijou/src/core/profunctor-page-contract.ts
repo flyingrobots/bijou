@@ -1,7 +1,12 @@
 import { failPageTarget } from './profunctor-page-error.js';
-import { expectString, type JsonRecord } from './profunctor-page-json.js';
+import {
+  expectString,
+  expectStringRecord,
+  type JsonRecord,
+} from './profunctor-page-json.js';
 
 const DIGEST = /^sha256:[0-9a-f]{64}$/;
+export const TOKEN_REFERENCE_PREFIX = 'semantic.';
 
 export function expectExactKeys(
   record: JsonRecord,
@@ -36,6 +41,18 @@ export function expectContractId(
     invalid(path, `expected ${prefix} identity`);
   }
   return result;
+}
+
+export function expectTokenReferences(
+  value: unknown,
+  path: string,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(expectStringRecord(value, path)).map(([key, token]) => [
+      key,
+      expectContractId(token, `${path}.${key}`, TOKEN_REFERENCE_PREFIX),
+    ]),
+  );
 }
 
 export function expectDigest(value: unknown, path: string): string {
