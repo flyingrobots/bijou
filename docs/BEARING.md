@@ -223,17 +223,18 @@ boundaries. This temporarily pulls one v10 integration proof ahead for the
 active cross-repository campaign; it does not move the issue out of v10 or
 replace the v8 product sequence.
 
-The next v8 product pull remains #458: emit the first GraphQL block artifact
-bundle with replay and visual scene facts. The #458 cycle design is
-[DX-049](./design/DX-049-visor-artifact-bundle-proof.md).
+The #458 GraphQL block artifact bundle has landed as the first v8
+implementation proof. Its cycle design remains
+[DX-049](./design/DX-049-visor-artifact-bundle-proof.md). The next v8 product
+pull is #459: validate `packed-bijou-cells/1` and adapt it to `Surface`.
 
 ```text
 VISOR v8 tracker (#457)
-  -> GraphQL block artifact bundle (#458)
+  -> landed GraphQL block artifact bundle (#458)
     -> bijou-block/1 artifact contract
       -> ui-scene-ir/1 lowering contract
         -> receipts, source maps, lower modes, and debug facts
-          -> packed-cell Surface adapter (#459)
+          -> active packed-cell Surface adapter (#459)
 ```
 
 The proof chain that V7 shipped must become a product contract before Bijou
@@ -251,12 +252,12 @@ GraphQL SDL fixture
 Recommended pull order:
 
 1. Land the bounded Profunctor Page inspection proof in #468.
-2. Pull #458 as the first v8 implementation proof: emit a GraphQL block
-   artifact bundle with replay and visual scene facts.
-3. Pull #459 after #458 fixes the bundle shape: validate
+2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
+   replay facts, and visual scene facts are implemented.
+3. Pull #459 as the next v8 implementation proof: validate
    `packed-bijou-cells/1` and adapt it to `Surface`.
-4. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
-   the smallest stable contract.
+4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and
+   active #459 prove the smallest stable contract.
 5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
 6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality

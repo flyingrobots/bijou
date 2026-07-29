@@ -32,9 +32,9 @@ describe('WF-130 roadmap pull order', () => {
     expectOrderedClaims(bearing, [
       'Recommended pull order:',
       '1. Land the bounded Profunctor Page inspection proof in #468.',
-      '2. Pull #458 as the first v8 implementation proof: emit a GraphQL block artifact bundle with replay and visual scene facts.',
-      '3. Pull #459 after #458 fixes the bundle shape: validate `packed-bijou-cells/1` and adapt it to `Surface`.',
-      '4. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove the smallest stable contract.',
+      '2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle, replay facts, and visual scene facts are implemented.',
+      '3. Pull #459 as the next v8 implementation proof: validate `packed-bijou-cells/1` and adapt it to `Surface`.',
+      '4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and active #459 prove the smallest stable contract.',
       '5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
       '6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality automation.',
       '7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes the source/artifact/IR contract.',

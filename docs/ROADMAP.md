@@ -308,13 +308,14 @@ aggregate-debt contract. The next repository pull is
 [#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
 canonical website specimen and proves one
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt path.
-The active V8 product sequence remains #458 followed by #459; it resumes after
-the bounded target proof instead of being redefined by it.
+The active V8 product sequence resumes at #459 after the landed #458 artifact
+bundle proof; it continues after the bounded target proof instead of being
+redefined by it.
 
 ## Forward Goalposts
 
 These are planning recommendations from the open tracker state as of
-2026-07-05. `v7.1.0` and `v7.2.0` are shipped lineage; `v8.0.0`, `v8.1.0`,
+2026-07-28. `v7.1.0` and `v7.2.0` are shipped lineage; `v8.0.0`, `v8.1.0`,
 `v8.2.0`, `v9.0.0`, and `v10.0.0` are the explicit forward release horizons.
 
 | Target | Goalpost | Tracker | Why It Belongs There | Release Gate |

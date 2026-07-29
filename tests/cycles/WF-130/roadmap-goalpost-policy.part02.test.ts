@@ -11,6 +11,7 @@ describe('WF-130 roadmap release state', () => {
     expectClaims(roadmap, [
       'This roadmap is the forward-looking release horizon for Bijou.',
       'Last synced from GitHub milestone items: 2026-07-28.',
+      'These are planning recommendations from the open tracker state as of 2026-07-28.',
       'The latest shipped public release is',
       '`v7.1.0` is complete post-V7 minor release lineage',
       '`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.',
