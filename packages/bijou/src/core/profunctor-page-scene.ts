@@ -117,7 +117,7 @@ function planNodes(
     const region = { x: 0, y, width: PAGE_TARGET_COLS, height };
     const renderNodeId = renderId(pageNodeId);
     const lineIds = lines.map((_, index) => `${renderNodeId}/line-${String(index)}`);
-    y = isRoot ? 2 : y + height + 1;
+    y = isRoot ? lines.length + 1 : y + height + 1;
     return [{ node, renderNodeId, region, lines, lineIds }];
   });
 }

@@ -28,7 +28,7 @@ export function linesForPageNode(
     case 'source-refs':
       return [{ text: `source · ${sourceRefs(node).join(' · ')}` }];
     case 'token-refs':
-      return [{ text: `tokens · ${tokenRefs(node).join(' · ')}` }];
+      return tokenRefs(node).map((token) => ({ text: `token · ${token}` }));
     case 'composition':
       return [{
         text: `${page.compositionRef} · ${node.templateNodeId} · ${node.blockDefinitionId}`,

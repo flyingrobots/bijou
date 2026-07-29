@@ -46,6 +46,22 @@ describe('DX-050 terminal inspection evidence', () => {
     expect(first.witness).toContain(expected);
   });
 
+  it('wraps token facts without overlapping the following page node', () => {
+    const proof = lowerProfunctorPageArtifacts(fixtureInputs(), {
+      mode: 'token-refs',
+    });
+    for (const token of proof.targetMap.tokenRefs) {
+      expect(proof.witness).toContain(`token · ${token}`);
+    }
+    const rootRows = proof.targetMap.cellSourceMap
+      .filter((entry) => entry.nodeId.includes('project-page.root/line-'))
+      .map((entry) => entry.y);
+    const heroRows = proof.targetMap.cellSourceMap
+      .filter((entry) => entry.nodeId.includes('project-page.hero/line-'))
+      .map((entry) => entry.y);
+    expect(Math.min(...heroRows)).toBeGreaterThan(Math.max(...rootRows));
+  });
+
   it('residualizes an unsupported hidden block explicitly', () => {
     const proof = lowerProfunctorPageArtifacts(mutatePage((page) => {
       const node = recordAt(page.nodes, 4);

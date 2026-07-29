@@ -104,7 +104,8 @@ Omit `mode` to use `normal`.
 
 Modes change the terminal witness. They do not change the input identities or
 claim browser semantics. Unsupported modes and unowned option fields fail with
-`BIJOU_PAGE_INPUT_REFERENCE_INVALID`.
+`BIJOU_PAGE_INPUT_REFERENCE_INVALID`. Multi-value diagnostic facts use one
+bounded terminal row per value so the witness preserves every fact.
 
 ## Outputs
 
