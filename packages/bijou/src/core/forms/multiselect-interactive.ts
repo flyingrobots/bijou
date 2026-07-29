@@ -76,11 +76,15 @@ export async function interactiveMultiselect<T>(
         ? styledFn(ctx.semantic('muted'), ` \u2014 ${opt.description}`)
         : '';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), prefix)} ${styledFn(ctx.semantic('info'), check)} ${boldFn(opt.label)}${desc}\n`);
+        term.writeLine(
+          `  ${styledFn(ctx.semantic('info'), prefix)} ${styledFn(ctx.semantic('info'), check)} ${boldFn(opt.label)}${desc}`,
+        );
       } else if (isSelected && !noColor) {
-        ctx.io.write(`\x1b[K  ${prefix} ${styledFn(ctx.status('success'), check)} ${opt.label}${desc}\n`);
+        term.writeLine(
+          `  ${prefix} ${styledFn(ctx.status('success'), check)} ${opt.label}${desc}`,
+        );
       } else {
-        ctx.io.write(`\x1b[K  ${prefix} ${check} ${opt.label}${desc}\n`);
+        term.writeLine(`  ${prefix} ${check} ${opt.label}${desc}`);
       }
     }
   }
@@ -100,7 +104,7 @@ export async function interactiveMultiselect<T>(
       formatFormTitle(options.title, ctx) +
       ' ' +
       styledFn(ctx.semantic('info'), selectedLabels);
-    ctx.io.write(`\x1b[K${label}\n`);
+    term.writeLine(label);
     term.showCursor();
   }
 
