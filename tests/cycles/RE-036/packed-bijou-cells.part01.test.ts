@@ -35,6 +35,11 @@ describe('RE-036 packed-bijou-cells/1 valid receipt', () => {
     expect(surface.height).toBe(receipt.heightCells);
     expect(Array.from(surface.buffer)).toEqual(expectedBytes);
     expect(surface.sideTable).toEqual(expectedSideTable);
+    expect(surface.cells[0]).toMatchObject({
+      char: 'A',
+      fgRGB: [255, 64, 32],
+      empty: false,
+    });
     expect(surface.get(0, 0)).toMatchObject({
       char: 'A',
       fgRGB: [255, 64, 32],
