@@ -5,6 +5,7 @@ import {
 } from './text/grapheme.js';
 import { SIDE_TABLE_THRESHOLD } from './render/packed-cell.js';
 import {
+  MAX_PACKED_BIJOU_GLYPH_CODE_UNITS,
   MAX_PACKED_BIJOU_SIDE_TABLE_ENTRIES,
   PACKED_BIJOU_CELL_STRIDE,
 } from './packed-bijou-cells-contract.js';
@@ -94,10 +95,22 @@ function validateCellGlyphs(
 function isCanonicalUnitGlyph(value: string): boolean {
   return (
     value.length > 0 &&
+    value.length <= MAX_PACKED_BIJOU_GLYPH_CODE_UNITS &&
+    !hasTerminalControl(value) &&
     sanitizePlainTerminalText(value) === value &&
     segmentGraphemes(value).length === 1 &&
     graphemeClusterWidth(value) === 1
   );
+}
+
+function hasTerminalControl(value: string): boolean {
+  return Array.from(value).some((character) => {
+    const codePoint = character.codePointAt(0);
+    return (
+      codePoint !== undefined &&
+      (codePoint <= 0x1f || (codePoint >= 0x7f && codePoint <= 0x9f))
+    );
+  });
 }
 
 function byte(bytes: readonly number[], index: number): number {

@@ -1,4 +1,5 @@
 import { describe, it } from 'vitest';
+import { MAX_PACKED_BIJOU_GLYPH_CODE_UNITS } from '@flyingrobots/bijou';
 import {
   arrayField,
   expectReceiptError,
@@ -16,7 +17,7 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
     setCharCode(surrogate, 0, 0xd800);
     expectReceiptError(surrogate, 'invalid-glyph', '$.bytes[0]');
 
-    for (const code of [0x1b, 0x754c]) {
+    for (const code of [0x1b, 0x85, 0x754c]) {
       const input = validPackedCellsInput();
       setCharCode(input, 0, code);
       expectReceiptError(input, 'invalid-glyph', '$.bytes[0]');
@@ -27,6 +28,7 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
     const cases: readonly [unknown, string][] = [
       ['', '$.sideTable[0]'],
       ['\u001b[31m', '$.sideTable[0]'],
+      ['\u009b', '$.sideTable[0]'],
       ['ab', '$.sideTable[0]'],
       ['界', '$.sideTable[0]'],
     ];
@@ -46,6 +48,11 @@ describe('RE-036 packed-bijou-cells/1 glyphs and colors', () => {
     const unreferenced = validPackedCellsInput();
     setCharCode(unreferenced, 2, 65);
     expectReceiptError(unreferenced, 'invalid-glyph', '$.sideTable[1]');
+
+    const oversized = validPackedCellsInput();
+    arrayField(oversized, 'sideTable')[0] =
+      `a${'\u0301'.repeat(MAX_PACKED_BIJOU_GLYPH_CODE_UNITS)}`;
+    expectReceiptError(oversized, 'invalid-glyph', '$.sideTable[0]');
   });
 
   it('rejects absent colors with nonzero channels', () => {

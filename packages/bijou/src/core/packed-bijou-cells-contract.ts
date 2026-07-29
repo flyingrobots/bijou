@@ -5,6 +5,7 @@ export const PACKED_BIJOU_GLYPH_POLICY =
 export const PACKED_BIJOU_SCENE_VERSION = 'ui-scene-ir/1' as const;
 export const PACKED_BIJOU_CELL_STRIDE = 10;
 export const MAX_PACKED_BIJOU_CELLS = 100_000;
+export const MAX_PACKED_BIJOU_GLYPH_CODE_UNITS = 256;
 export const MAX_PACKED_BIJOU_SIDE_TABLE_ENTRIES = 0x1000;
 
 export const PACKED_BIJOU_CELLS_VALIDATION_CODES = [
