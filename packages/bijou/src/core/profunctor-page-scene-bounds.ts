@@ -1,6 +1,7 @@
 import { segmentSurfaceText } from './components/surface-text.js';
 import { failPageTarget } from './profunctor-page-error.js';
 import type { PlannedPageNode } from './profunctor-page-scene.js';
+import { sanitizePlainTerminalText } from './text/grapheme.js';
 
 export function validatePageSceneBounds(
   plans: readonly PlannedPageNode[],
@@ -27,6 +28,9 @@ export function validatePageSceneBounds(
       const path = `${plan.node.pageNodeId}.lines[${String(index)}]`;
       if (/[\r\n\u2028\u2029]/u.test(line.text)) {
         unsupported(path, 'terminal inspection lines must not contain line breaks');
+      }
+      if (sanitizePlainTerminalText(line.text) !== line.text) {
+        unsupported(path, 'terminal inspection lines must preserve input text exactly');
       }
       const width = segmentSurfaceText(line.text, path).length;
       if (width > cols) {

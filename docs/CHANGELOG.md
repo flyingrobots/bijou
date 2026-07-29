@@ -26,6 +26,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   positions that precede their declared starts. Derived line identities use a
   namespace disjoint from page render identities. Every planned node region,
   including zero-line obstruction views, must fit within the terminal target.
+  Visible text fails closed when terminal sanitization would alter it.
 - **VISOR artifact bundle proof** — `@flyingrobots/bijou` now exports
   `createVisorArtifactBundleFromGraphql()`, `createVisorArtifactBundle()`, and
   `visor-artifact-bundle/1` types for #458 / [`DX-049`](design/DX-049-visor-artifact-bundle-proof.md).

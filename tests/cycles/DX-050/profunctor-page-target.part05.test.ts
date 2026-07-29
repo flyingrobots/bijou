@@ -104,6 +104,17 @@ describe('DX-050 page composition graph validation', () => {
       }),
     );
   });
+
+  it('rejects visible text changed by terminal sanitization', () => {
+    expectUnsupported(mutatePage((page) => {
+      const hero = recordAt(page.nodes, 1);
+      recordAt([hero.props], 0).summary = 'before\u001b[31mafter';
+    }));
+    expectUnsupported(mutatePage((page) => {
+      const hero = recordAt(page.nodes, 1);
+      recordAt([hero.props], 0).summary = 'before\tafter';
+    }));
+  });
 });
 
 function expectInvalid(
