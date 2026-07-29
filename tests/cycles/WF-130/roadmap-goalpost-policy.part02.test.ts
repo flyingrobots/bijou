@@ -27,7 +27,7 @@ describe('WF-130 roadmap release state', () => {
       '`v9.0.0`: Product Workbench And Operator Surfaces',
       '`v10.0.0`: Renderer And Host Systems Integration',
       '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
-      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 1 |',
+      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 |',
       '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
       '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 20 | 2 |',
       '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |',
