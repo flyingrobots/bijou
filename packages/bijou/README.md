@@ -140,6 +140,20 @@ fake duplication rather than a real second API.
 - **`fixturePromotionText()`**: Render that promotion record for review and
   agent output.
 
+### Profunctor Page Inspection
+
+- **`lowerProfunctorPageArtifacts()`**: Validate one canonical
+  `profunctor-page/0`, `profunctor-page-source-map/0`, and
+  `profunctor-build-manifest/0` family, then emit a deterministic
+  `ui-scene-ir/1` scene, terminal `Surface`, target map, receipt, and text
+  witness.
+- **`ProfunctorPageTargetError`**: Inspect stable `code`, `path`, and `detail`
+  fields when the bounded ProjectPage target rejects malformed,
+  contradictory, or unsupported input.
+- **[Profunctor Page Inspection reference](../../docs/reference/profunctor-page-inspection.md)**:
+  Review the exact input versions, supported blocks, inspection modes, output
+  contracts, diagnostics, and verification commands.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.

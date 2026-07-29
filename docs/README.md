@@ -43,6 +43,7 @@ entrypoints below. For live work tracking, use open GitHub Issues and labels;
 | :--- | :--- |
 | **[CLI](./CLI.md)** | Command surface: binaries and operator scripts. |
 | **[MCP](./MCP.md)** | MCP server posture and tool reference. |
+| **[Profunctor Page Inspection](./reference/profunctor-page-inspection.md)** | Exact `lowerProfunctorPageArtifacts()` inputs, modes, outputs, diagnostics, and bounded target posture. |
 | **[Technical Teardown](./TECHNICAL_TEARDOWN.md)** | End-to-end architecture and runtime explanation for new readers. |
 | **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |

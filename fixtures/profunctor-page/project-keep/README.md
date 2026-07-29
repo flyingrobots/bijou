@@ -14,6 +14,18 @@ The website remains authoritative for these bytes. Refresh all three files,
 their hashes, and the pinned revision together after an intentional contract
 change. Bijou owns only its target lowering, map, receipt, and terminal witness.
 
+The target profile is `bijou-terminal-project-page/1`. It supports the five
+visible ProjectPage block definitions recorded in the fixture and emits:
+
+- `generated/page.bijou.scene.json`
+- `generated/page.bijou.map.json`
+- `generated/page.bijou.receipt.json`
+- `generated/page.bijou.txt`
+
+See the
+[Profunctor Page Inspection reference](../../../docs/reference/profunctor-page-inspection.md)
+for the public API, modes, output contracts, and diagnostics.
+
 Regenerate the Bijou-owned output:
 
 ```bash

@@ -311,10 +311,12 @@ Primary tracker:
 The Code Dojo prerequisite
 [#477](https://github.com/flyingrobots/bijou/issues/477) has met the
 `112 -> 62` goalpost. Its landed tranche A
-[#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B
-each removed `25` counted violations. The bounded Profunctor Page inspection
-story [#468](https://github.com/flyingrobots/bijou/issues/468) is now the next
-pull. It consumes the canonical website specimen and proves one Bijou-owned
+[#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
+[#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
+counted violations. The bounded Profunctor Page inspection story
+[#468](https://github.com/flyingrobots/bijou/issues/468) is active in
+[#474](https://github.com/flyingrobots/bijou/pull/474). It consumes the
+canonical website specimen and proves one Bijou-owned
 `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt path.
 The accepted cycle design is
 [DX-050](./design/DX-050-profunctor-page-inspection.md).
@@ -366,7 +368,8 @@ These are planning recommendations from the open tracker state as of
 - **Immediate target**: the `62` aggregate Code Dojo prerequisite
   [#477](https://github.com/flyingrobots/bijou/issues/477) is met. Pull the
   bounded Profunctor Page inspection story
-  [#468](https://github.com/flyingrobots/bijou/issues/468) next.
+  [#468](https://github.com/flyingrobots/bijou/issues/468) through active
+  [#474](https://github.com/flyingrobots/bijou/pull/474).
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

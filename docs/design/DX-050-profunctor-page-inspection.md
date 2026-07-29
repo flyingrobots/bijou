@@ -20,6 +20,8 @@ Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
 ## Linked Work
 
 - Bijou story: [#468](https://github.com/flyingrobots/bijou/issues/468)
+- Implementation pull request:
+  [#474](https://github.com/flyingrobots/bijou/pull/474)
 - Website campaign:
   [profunctor-optics-website#14](https://github.com/flyingrobots/profunctor-optics-website/issues/14)
 - Canonical website specimen revision:
