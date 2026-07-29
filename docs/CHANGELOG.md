@@ -29,8 +29,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   repository-tooling entrypoints are now stable compatibility facades over
   focused sub-150-line modules. File/context debt falls from `86` to `61`, and
   aggregate debt falls from `112` to `87` without changing the code-size,
-  mock-ban, or ESLint baselines. The goalpost remains open until tranche B
-  reaches `62` aggregate violations or lower.
+  mock-ban, or ESLint baselines. The worker extraction also removes the
+  package-barrel runtime cycle between `bijou-node` context construction and
+  worker utilities. The goalpost remains open until tranche B reaches `62`
+  aggregate violations or lower.
 - **Focused Code Dojo ratchet** — WF-163 preserves public entrypoints while
   extracting coherent responsibilities across examples, core, TUI, Node, i18n
   tooling, benchmarks, and repository scripts. File/context debt falls from

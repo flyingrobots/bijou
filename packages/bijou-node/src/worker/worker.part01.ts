@@ -7,7 +7,7 @@ import {
 import { type BijouContext } from '@flyingrobots/bijou';
 import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
-import { createNodeContext } from '../index.js';
+import { createNodeContext } from '../node-context.js';
 import { hasBijouWorkerFlag } from './worker-data.js';
 
 export interface WorkerInstance {

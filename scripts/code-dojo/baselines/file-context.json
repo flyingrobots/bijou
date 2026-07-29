@@ -210,8 +210,8 @@
     },
     {
       "path": "packages/bijou-node/src/index.ts",
-      "lines": 375,
-      "bytes": 11741
+      "lines": 241,
+      "bytes": 7364
     },
     {
       "path": "packages/bijou/src/core/components/markdown-parse.ts",
