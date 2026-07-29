@@ -115,8 +115,8 @@ measured from live files; no threshold, exception marker, or rule was weakened.
 - Mock-ban and ESLint baselines remain `0`.
 - No split loses assertions, exports, runtime behavior, or deterministic
   output.
-- No new file exceeds `150` lines or `12,000` bytes unless it remains in the
-  shrinking ledger.
+- No newly created file exceeds `150` lines or `12,000` bytes.
+- Only pre-existing baselined paths may remain in the shrinking ledger.
 - Full local and GitHub validation gates pass.
 - Main at the resulting merge revision unblocks issue #468.
 

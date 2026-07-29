@@ -127,4 +127,18 @@ describe('WF-163 Code Dojo ratchet', () => {
       expect(design, claim).toContain(claim);
     }
   });
+
+  it('forbids newly created files from entering the shrinking ledger', () => {
+    const design = read('docs/design/WF-163-respecting-dojo-ratchet-112.md');
+
+    expect(design).toContain(
+      '- No newly created file exceeds `150` lines or `12,000` bytes.',
+    );
+    expect(design).toContain(
+      '- Only pre-existing baselined paths may remain in the shrinking ledger.',
+    );
+    expect(design).not.toContain(
+      'No new file exceeds `150` lines or `12,000` bytes unless it remains in the',
+    );
+  });
 });
