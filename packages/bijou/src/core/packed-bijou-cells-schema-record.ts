@@ -93,11 +93,15 @@ export function arrayAt(
   const result: unknown[] = [];
   for (let index = 0; index < value.length; index += 1) {
     const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
-    if (!descriptor || !Object.hasOwn(descriptor, 'value')) {
+    if (
+      !descriptor ||
+      !Object.hasOwn(descriptor, 'value') ||
+      !descriptor.enumerable
+    ) {
       failPackedCells(
         'invalid-shape',
         `${path}[${String(index)}]`,
-        'sparse entries and accessors are not allowed',
+        'sparse, accessor, and non-enumerable entries are not allowed',
       );
     }
     result.push(descriptor.value);

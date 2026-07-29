@@ -72,6 +72,18 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     sparse.bytes = sparseBytes;
     expectReceiptError(sparse, 'invalid-shape', '$.bytes[0]');
 
+    const nonEnumerableArrayEntry = validPackedCellsInput();
+    const nonEnumerableBytes = arrayField(nonEnumerableArrayEntry, 'bytes');
+    Object.defineProperty(nonEnumerableBytes, '0', {
+      enumerable: false,
+      value: nonEnumerableBytes[0],
+    });
+    expectReceiptError(
+      nonEnumerableArrayEntry,
+      'invalid-shape',
+      '$.bytes[0]',
+    );
+
     const nonPlainArray = validPackedCellsInput();
     Object.setPrototypeOf(arrayField(nonPlainArray, 'bytes'), {});
     expectReceiptError(nonPlainArray, 'invalid-shape', '$.bytes');
