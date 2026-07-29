@@ -210,13 +210,14 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The immediate target is the Code Dojo ratchet
-[#469](https://github.com/flyingrobots/bijou/issues/469). It reduces the
-measured aggregate debt from `162` to `112` or lower and satisfies the explicit
-quality prerequisite for the bounded Profunctor Page inspection target
-[#468](https://github.com/flyingrobots/bijou/issues/468).
+The Code Dojo ratchet
+[#469](https://github.com/flyingrobots/bijou/issues/469) has met its contract:
+aggregate debt is `112`, comprising `86` file/context and `26` code-size
+violations with no mock-ban or ESLint debt. The next goalpost ceiling is `62`.
 
-After #469 lands, #468 consumes the canonical website specimen through
+The immediate target is now
+[#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
+canonical website specimen through
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
 boundaries. This temporarily pulls one v10 integration proof ahead for the
 active cross-repository campaign; it does not move the issue out of v10 or
@@ -249,23 +250,22 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land #469 at `112` aggregate Code Dojo violations or lower.
-2. Land the bounded Profunctor Page inspection proof in #468.
-3. Pull #458 as the first v8 implementation proof: emit a GraphQL block
+1. Land the bounded Profunctor Page inspection proof in #468.
+2. Pull #458 as the first v8 implementation proof: emit a GraphQL block
    artifact bundle with replay and visual scene facts.
-4. Pull #459 after #458 fixes the bundle shape: validate
+3. Pull #459 after #458 fixes the bundle shape: validate
    `packed-bijou-cells/1` and adapt it to `Surface`.
-5. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
+4. Keep #302 in `v8.0.0` as the broad source tracker while #458 and #459 prove
    the smallest stable contract.
-6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
-7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
+6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
    automation.
-8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
+7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
    stabilizes the source/artifact/IR contract.
-9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
+8. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
    surface work after the Bijou contracts are proven.
-10. Keep closed dependency PR #326 as superseded lineage, not active release
+9. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:

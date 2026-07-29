@@ -132,7 +132,8 @@ stateDiagram-v2
     Branch --> Shape: issue + design doc + non-draft PR
     Shape --> Red: failing tests
     Red --> Green: passing tests
-    Green --> Review: validation + self-review
+    Green --> Docs: documentation upkeep
+    Docs --> Review: validation + self-review
     Review --> Ship: ready PR to main
     Ship --> [*]
 ```
@@ -147,13 +148,17 @@ stateDiagram-v2
    and apply `work-in-progress` to the GitHub Issue.
 4. **Red**: Write failing tests based on the design's playback questions.
 5. **Green**: Implement the solution until tests pass.
-6. **Review**: Update witness/retro/debt notes, run local validation, and do the
+6. **Document**: Before final review, update every living contract affected by
+   the change. Follow `docs/DOCUMENTATION_STANDARDS.md`; update `README.md`,
+   `docs/README.md`, `docs/CHANGELOG.md`, `docs/ROADMAP.md`, evidence ledgers,
+   and reference pages when their reader job or current truth changed.
+7. **Review**: Update witness/retro/debt notes, run local validation, and do the
    required self-review before requesting final review. Use the GitHub Comment
    Safety pattern in `docs/WORKFLOW.md` when posting Markdown-heavy
    self-review, Code Lawyer, or activity-summary comments. Do not use inline
    `--body "..."` for review bodies that contain backticks, `$()` text, command
    examples, or Markdown tables.
-7. **Ship**: Keep the PR linked from the issue, and update `BEARING.md` and
+8. **Ship**: Keep the PR linked from the issue, and update `BEARING.md` and
    `CHANGELOG.md` when the change affects direction or user-facing behavior.
 
 ## Naming Convention

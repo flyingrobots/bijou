@@ -19,6 +19,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **Focused Code Dojo ratchet** — WF-163 preserves public entrypoints while
+  extracting coherent responsibilities across examples, core, TUI, Node, i18n
+  tooling, benchmarks, and repository scripts. File/context debt falls from
+  `136` to `86`; code-size debt holds at `26`; mock-ban and ESLint debt remain
+  `0`; and aggregate Code Dojo debt falls from `162` to `112`.
+- **Documentation contract** — Bijou now defines task-oriented documentation
+  types, corpus ownership, example safety, accessibility expectations, and the
+  documentation-upkeep step that precedes final review.
 - **Future release milestone triage** — The GitHub backlog is now assigned to
   explicit `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, and `v10.0.0` horizons;
   `Beyond` and open unmilestoned issue queues are empty; and

@@ -21,14 +21,28 @@ implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `162`
-- File/context baseline: `136`
+- Aggregate Code Dojo debt before this cycle: `162`
+- File/context baseline before this cycle: `136`
 - Mock-ban baseline: `0`
 - Code-size baseline: `26`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required target: `112` aggregate violations or lower
 - Tracker issue: #469
 - Downstream issue: #468
+
+## Result
+
+- Aggregate Code Dojo debt: `112`
+- File/context baseline: `86`
+- Mock-ban baseline: `0`
+- Code-size baseline: `26`, including `3` hard-limit files
+- ESLint baseline: `0`
+- Removed debt: `50` of the required `50` violations
+- Next goalpost target: `62` aggregate violations or lower
+
+The cycle preserves public entrypoints and deterministic output while moving
+coherent responsibilities into focused modules. The resulting baseline is
+measured from live files; no threshold, exception marker, or rule was weakened.
 
 ## Scope
 

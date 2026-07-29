@@ -302,14 +302,11 @@ Primary tracker:
 
 ## Next Pull
 
-The immediate repository pull is the explicit Code Dojo prerequisite
-[#469](https://github.com/flyingrobots/bijou/issues/469). It reduces the
-measured aggregate debt from `162` to `112` or lower before
-[#468](https://github.com/flyingrobots/bijou/issues/468) begins the bounded
-Profunctor Page inspection target. This cross-repository campaign dependency
-does not move either issue out of its owning milestone.
-
-After #469 lands, #468 consumes the canonical website specimen and proves one
+The Code Dojo prerequisite
+[#469](https://github.com/flyingrobots/bijou/issues/469) has met its `112`
+aggregate-debt contract. The next repository pull is
+[#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
+canonical website specimen and proves one
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt path.
 The active V8 product sequence remains #458 followed by #459; it resumes after
 the bounded target proof instead of being redefined by it.

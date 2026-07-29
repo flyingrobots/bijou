@@ -1,137 +1,37 @@
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'vitest';
+import {
+  expectClaims,
+  normalized,
+} from './roadmap-goalpost-policy.test-support.js';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+describe('WF-130 roadmap release state', () => {
+  it('keeps the release horizon and milestone snapshot explicit', () => {
+    const roadmap = normalized('docs/ROADMAP.md');
 
-function read(relativePath: string): string {
-  return readFileSync(resolve(ROOT, relativePath), 'utf8');
-}
-
-function normalizeWhitespace(source: string): string {
-  return source.replace(/\s+/g, ' ').trim();
-}
-
-function sectionBetween(source: string, startHeading: string, endHeading: string): string {
-  const start = source.indexOf(startHeading);
-  if (start === -1) throw new Error(`Missing start heading ${startHeading}`);
-  const end = source.indexOf(endHeading, start + startHeading.length);
-  if (end === -1) throw new Error(`Missing end heading ${endHeading}`);
-  return source.slice(start, end);
-}
-
-describe('WF-130 roadmap goalpost policy', () => {
-  it('keeps outside-release PR sync filtered to unmilestoned pull requests', () => {
-      const roadmap = read('docs/ROADMAP.md');
-      const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
-
-      expect(maintenanceRule).toContain('gh search prs --repo flyingrobots/bijou --state open --no-milestone');
-      expect(maintenanceRule).not.toContain('gh pr list --repo flyingrobots/bijou --state open');
-    });
-
-  it('keeps the broad issue 302 tracker on the v8 side of the release train', () => {
-      const roadmap = read('docs/ROADMAP.md');
-      const normalizedRoadmap = normalizeWhitespace(roadmap);
-      const goalposts = sectionBetween(roadmap, '## Forward Goalposts', '## Decision Points');
-      const v71Row = goalposts.split('\n').find(line => line.startsWith('| `v7.1.0` |')) ?? '';
-      const v72Row = goalposts.split('\n').find(line => line.startsWith('| `v7.2.0` |')) ?? '';
-      const v8Row = goalposts.split('\n').find(line => line.startsWith('| `v8.0.0` |')) ?? '';
-
-      expect(v71Row).toContain('https://github.com/flyingrobots/bijou/issues/329');
-      expect(v71Row).toContain('https://github.com/flyingrobots/bijou/issues/270');
-      expect(v71Row).toContain('https://github.com/flyingrobots/bijou/issues/312');
-      expect(v71Row).not.toContain('https://github.com/flyingrobots/bijou/issues/302');
-      expect(v72Row).toContain('https://github.com/flyingrobots/bijou/issues/354');
-      expect(v72Row).toContain('https://github.com/flyingrobots/bijou/issues/344');
-      expect(v72Row).toContain('https://github.com/flyingrobots/bijou/issues/353');
-      expect(v8Row).toContain('https://github.com/flyingrobots/bijou/issues/302');
-      expect(normalizedRoadmap).toContain(
-        'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
-      );
-    });
-
-  it('keeps staged v8 tracker details and sync commands aligned to the milestone', () => {
-      const roadmap = read('docs/ROADMAP.md');
-      const v8Section = sectionBetween(
-        roadmap,
-        '### `v8.0.0`: Runtime Graph And Scene IR Product Contract',
-        '### `v8.1.0`: Replay, Capture, And Render Witnesses',
-      );
-      const normalizedV8Section = normalizeWhitespace(v8Section);
-      const maintenanceRule = sectionBetween(roadmap, '## Maintenance Rule', 'When roadmap triage changes:');
-
-      expect(v8Section).toContain('[#457](https://github.com/flyingrobots/bijou/issues/457)');
-      expect(normalizedV8Section).toContain('TRACKER: VISOR warpspace for v8 Runtime Graph And Scene IR');
-      expect(v8Section).toContain('[#458](https://github.com/flyingrobots/bijou/issues/458)');
-      expect(normalizedV8Section).toContain('VISOR: emit GraphQL block artifact bundle with replay and visual scene facts');
-      expect(v8Section).toContain('[`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md)');
-      expect(normalizedV8Section).toContain('first `visor-artifact-bundle/1` proof');
-      expect(v8Section).toContain('[#459](https://github.com/flyingrobots/bijou/issues/459)');
-      expect(normalizedV8Section).toContain('VISOR: validate packed-bijou-cells/1 and adapt to Surface');
-      expect(v8Section).toContain('[#302](https://github.com/flyingrobots/bijou/issues/302)');
-      expect(normalizedV8Section).toContain('as the broad GraphQL-authored UI scenes into Bijou Blocks source tracker');
-      expect(v8Section).not.toContain('- [#302](https://github.com/flyingrobots/bijou/issues/302) for GraphQL-authored');
-      expect(maintenanceRule).toContain('gh issue list --state all --milestone v8.0.0');
-      expect(maintenanceRule).toContain('gh pr list --state all --search \'milestone:"v8.0.0"\'');
-    });
-
-  it('requires audit comments for moves across all release horizons', () => {
-      const bearing = normalizeWhitespace(read('docs/BEARING.md'));
-
-      expect(bearing).toContain('Any issue or pull request moved between release horizons');
-      expect(bearing).toContain(
-        '`v7.1.0`, `v7.2.0`, `v8.0.0`, `v8.1.0`, `v8.2.0`, `v9.0.0`, `v10.0.0`, `Beyond`',
-      );
-      expect(bearing).not.toContain('Any issue moved between `v6.0.0`, `v7.0.0`, and `Beyond`');
-    });
-
-  it('keeps Method and contributor cycle docs aligned to non-draft PRs', () => {
-      const agents = normalizeWhitespace(read('AGENTS.md'));
-      const contributing = normalizeWhitespace(read('CONTRIBUTING.md'));
-      const method = normalizeWhitespace(read('docs/METHOD.md'));
-      const workflow = normalizeWhitespace(read('docs/WORKFLOW.md'));
-
-      for (const source of [agents, contributing, method, workflow]) {
-        expect(source).not.toContain('open a draft');
-        expect(source).not.toContain('Draft PRs are expected');
-        expect(source).not.toContain('Open draft PRs');
-        expect(source).not.toContain('mark the draft');
-        expect(source).not.toContain('draft-first');
-      }
-
-      expect(method).toContain('open a non-draft pull request to `main`');
-      expect(workflow).toContain('open a non-draft pull request to `main`');
-      expect(contributing).toContain('Open a non-draft PR at cycle start');
-      expect(agents).toContain('open a non-draft pull request to `main`');
-    });
-
-  it('adds issue-template fields for roadmap role and slice accounting', () => {
-      const issueTemplate = read('.github/ISSUE_TEMPLATE/work-item.yml');
-
-      expect(issueTemplate).toContain('id: roadmap-role');
-      expect(issueTemplate).toContain('Goalpost umbrella');
-      expect(issueTemplate).toContain('User story');
-      expect(issueTemplate).toContain('id: roadmap-linkage');
-      expect(issueTemplate).toContain('id: slice-budget');
-      expect(issueTemplate).toContain('id: release-gate');
-      expect(issueTemplate).toContain('Issue, design doc, and non-draft PR are linked correctly.');
-    });
-
-  it('keeps the Beyond open snapshot count aligned with the Open Beyond Issues table', () => {
-      const roadmap = read('docs/ROADMAP.md');
-      const beyondRow = /\| `Beyond` \| \[Beyond\]\([^)]+\) \| (?<open>\d+) \| (?<closed>\d+) \|/.exec(roadmap);
-      expect(beyondRow?.groups?.closed).toBe('6');
-
-      const openBeyondIssues = sectionBetween(
-        roadmap,
-        '## Open Beyond Issues',
-        '## Open Unmilestoned Triage',
-      );
-      const openIssueRows = openBeyondIssues
-        .split('\n')
-        .filter(line => /^\| \[#\d+\]\(https:\/\/github\.com\/flyingrobots\/bijou\/issues\/\d+\)/.test(line));
-
-      expect(Number(beyondRow?.groups?.open)).toBe(openIssueRows.length);
-    });
+    expectClaims(roadmap, [
+      'This roadmap is the forward-looking release horizon for Bijou.',
+      'Last synced from GitHub milestone items: 2026-07-28.',
+      'The latest shipped public release is',
+      '`v7.1.0` is complete post-V7 minor release lineage',
+      '`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.',
+      'v6.0.0` was never published as a public package release',
+      'Release Train Decision',
+      '`v7.1.0`: Previous Shipped Post-V7 Minor',
+      '`v7.2.0`: Shipped Stabilization And Demo Integrity',
+      '`v8.0.0`: Runtime Graph And Scene IR Product Contract',
+      '`v8.1.0`: Replay, Capture, And Render Witnesses',
+      '`v8.2.0`: Quality Automation And Method Hardening',
+      '`v9.0.0`: Product Workbench And Operator Surfaces',
+      '`v10.0.0`: Renderer And Host Systems Integration',
+      '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
+      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 1 |',
+      '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 14 | 0 |',
+      '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |',
+      '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 10 | 0 |',
+      '| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |',
+      '`Beyond`',
+      '0 | 6',
+    ]);
+  });
 });

@@ -34,6 +34,7 @@ entrypoints below. For live work tracking, use open GitHub Issues and labels;
 | **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
 | **[TypeScript Code Standards](./typescript-code-standards.editors-edition.md)** | Verbatim Code Dojo doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture. |
 | **[Code Dojo Exceptions](./code-dojo-exceptions.md)** | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
+| **[Documentation Standards](./DOCUMENTATION_STANDARDS.md)** | Reader-task page types, corpus ownership, examples, accessibility, and upkeep policy. |
 | **[Design System](./design-system/README.md)** | Foundations, patterns, and component families. |
 
 ## Reference

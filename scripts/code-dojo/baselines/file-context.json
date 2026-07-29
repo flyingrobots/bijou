@@ -11,7 +11,7 @@
     {
       "path": "examples/docs/app.ts",
       "lines": 3307,
-      "bytes": 114972
+      "bytes": 114774
     },
     {
       "path": "packages/bijou-tui/src/app-frame.ts",
@@ -45,8 +45,8 @@
     },
     {
       "path": "examples/docs/i18n-debt.ts",
-      "lines": 832,
-      "bytes": 28978
+      "lines": 804,
+      "bytes": 28956
     },
     {
       "path": "packages/bijou/src/ports/surface.ts",
@@ -100,8 +100,8 @@
     },
     {
       "path": "packages/bijou-tui/src/runtime.ts",
-      "lines": 670,
-      "bytes": 19491
+      "lines": 668,
+      "bytes": 19486
     },
     {
       "path": "packages/bijou-tui/src/timeline.ts",
@@ -130,8 +130,8 @@
     },
     {
       "path": "packages/bijou-tui/src/eventbus.ts",
-      "lines": 535,
-      "bytes": 16224
+      "lines": 522,
+      "bytes": 15909
     },
     {
       "path": "packages/bijou-tui/src/flex.ts",
@@ -155,8 +155,8 @@
     },
     {
       "path": "packages/bijou/src/core/theme/presets.ts",
-      "lines": 452,
-      "bytes": 12756
+      "lines": 307,
+      "bytes": 8736
     },
     {
       "path": "packages/bijou/src/core/standard-blocks/render.ts",
@@ -179,14 +179,9 @@
       "bytes": 14796
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-types.ts",
-      "lines": 409,
-      "bytes": 17015
-    },
-    {
       "path": "packages/bijou/src/core/components/markdown-render.ts",
       "lines": 399,
-      "bytes": 11732
+      "bytes": 11660
     },
     {
       "path": "packages/bijou/src/core/components/table-v3.ts",
@@ -275,8 +270,8 @@
     },
     {
       "path": "scripts/release-readiness.ts",
-      "lines": 350,
-      "bytes": 13401
+      "lines": 280,
+      "bytes": 11108
     },
     {
       "path": "examples/docs/counter-block-demo.ts",
@@ -310,8 +305,8 @@
     },
     {
       "path": "packages/bijou-node/src/worker/worker.ts",
-      "lines": 319,
-      "bytes": 10676
+      "lines": 304,
+      "bytes": 10200
     },
     {
       "path": "packages/bijou-i18n-tools/src/tools.ts",
@@ -352,11 +347,6 @@
       "path": "packages/bijou/src/core/mode-lowering.ts",
       "lines": 298,
       "bytes": 8289
-    },
-    {
-      "path": "examples/showcase/registry-tui.ts",
-      "lines": 297,
-      "bytes": 8802
     },
     {
       "path": "packages/bijou-i18n/src/localization.ts",
@@ -404,11 +394,6 @@
       "bytes": 10343
     },
     {
-      "path": "examples/showcase/registry-display.ts",
-      "lines": 270,
-      "bytes": 8270
-    },
-    {
       "path": "packages/bijou-tui/src/input-map.ts",
       "lines": 270,
       "bytes": 7568
@@ -422,16 +407,6 @@
       "path": "packages/bijou/src/core/layout/geometry.ts",
       "lines": 268,
       "bytes": 8769
-    },
-    {
-      "path": "examples/showcase/registry-data.ts",
-      "lines": 257,
-      "bytes": 7619
-    },
-    {
-      "path": "packages/bijou-tui/src/types.ts",
-      "lines": 251,
-      "bytes": 8345
     },
     {
       "path": "packages/bijou-node/src/io.ts",
@@ -449,239 +424,14 @@
       "bytes": 7898
     },
     {
-      "path": "packages/bijou-mcp/src/tools/docs-catalog/authoring.ts",
-      "lines": 238,
-      "bytes": 8974
-    },
-    {
-      "path": "packages/bijou-mcp/src/tools/docs-catalog/workflow.ts",
-      "lines": 238,
-      "bytes": 8073
-    },
-    {
-      "path": "packages/bijou/src/core/theme/graph.ts",
-      "lines": 236,
-      "bytes": 7013
-    },
-    {
-      "path": "packages/bijou-mcp/src/tools/docs-catalog/structure.ts",
-      "lines": 234,
-      "bytes": 8173
-    },
-    {
-      "path": "packages/bijou-tui/src/help.ts",
-      "lines": 232,
-      "bytes": 7495
-    },
-    {
       "path": "scripts/workflow-shell-preflight.ts",
       "lines": 232,
       "bytes": 6599
     },
     {
-      "path": "examples/docs/storybook-workstation.ts",
-      "lines": 230,
-      "bytes": 6891
-    },
-    {
-      "path": "examples/showcase/registry-forms.ts",
-      "lines": 230,
-      "bytes": 5820
-    },
-    {
       "path": "packages/bijou/src/core/forms/textarea-editor.ts",
       "lines": 229,
       "bytes": 7631
-    },
-    {
-      "path": "packages/bijou/src/core/components/box.ts",
-      "lines": 227,
-      "bytes": 9150
-    },
-    {
-      "path": "packages/bijou/src/core/binding-frame-update.ts",
-      "lines": 225,
-      "bytes": 7282
-    },
-    {
-      "path": "examples/docs/svg-raster.ts",
-      "lines": 224,
-      "bytes": 6531
-    },
-    {
-      "path": "packages/bijou/src/core/text/wrap.ts",
-      "lines": 220,
-      "bytes": 6533
-    },
-    {
-      "path": "packages/bijou-tui/src/panels.ts",
-      "lines": 218,
-      "bytes": 6634
-    },
-    {
-      "path": "packages/bijou/src/core/app-shell-composition.ts",
-      "lines": 216,
-      "bytes": 6063
-    },
-    {
-      "path": "packages/bijou/src/core/components/enumerated-list.ts",
-      "lines": 214,
-      "bytes": 7015
-    },
-    {
-      "path": "packages/bijou/src/core/components/dag-layout.ts",
-      "lines": 212,
-      "bytes": 7228
-    },
-    {
-      "path": "packages/bijou-tui/src/notification-card.ts",
-      "lines": 212,
-      "bytes": 6815
-    },
-    {
-      "path": "packages/bijou/src/core/theme/resolve.ts",
-      "lines": 210,
-      "bytes": 7083
-    },
-    {
-      "path": "scripts/dogfood-i18n-export.ts",
-      "lines": 209,
-      "bytes": 6178
-    },
-    {
-      "path": "packages/bijou-tui/src/focus-map.ts",
-      "lines": 208,
-      "bytes": 5672
-    },
-    {
-      "path": "scripts/record-gifs.ts",
-      "lines": 206,
-      "bytes": 5702
-    },
-    {
-      "path": "packages/bijou-tui/src/inputstack.ts",
-      "lines": 204,
-      "bytes": 5968
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-i18n.ts",
-      "lines": 203,
-      "bytes": 7610
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-utils.ts",
-      "lines": 200,
-      "bytes": 8431
-    },
-    {
-      "path": "packages/bijou-tui/src/status-bar.ts",
-      "lines": 199,
-      "bytes": 6368
-    },
-    {
-      "path": "packages/bijou/src/core/components/guided-flow.ts",
-      "lines": 199,
-      "bytes": 6133
-    },
-    {
-      "path": "packages/bijou/src/core/components/surface-text.ts",
-      "lines": 198,
-      "bytes": 6835
-    },
-    {
-      "path": "bench/src/harnesses/wall-time/runner.ts",
-      "lines": 198,
-      "bytes": 6074
-    },
-    {
-      "path": "packages/bijou-tui/src/css/text-style.ts",
-      "lines": 196,
-      "bytes": 6196
-    },
-    {
-      "path": "examples/_stories/protocol.ts",
-      "lines": 196,
-      "bytes": 5746
-    },
-    {
-      "path": "bench/src/scenarios/flame.ts",
-      "lines": 194,
-      "bytes": 6505
-    },
-    {
-      "path": "scripts/design-system-docs-preflight.ts",
-      "lines": 194,
-      "bytes": 5152
-    },
-    {
-      "path": "scripts/code-size-gate.ts",
-      "lines": 191,
-      "bytes": 7687
-    },
-    {
-      "path": "packages/bijou-node/src/style.ts",
-      "lines": 190,
-      "bytes": 6370
-    },
-    {
-      "path": "examples/docs/capture-main.ts",
-      "lines": 188,
-      "bytes": 5472
-    },
-    {
-      "path": "bench/src/scenarios/soak.ts",
-      "lines": 187,
-      "bytes": 7298
-    },
-    {
-      "path": "bench/src/scenarios/component-app.ts",
-      "lines": 180,
-      "bytes": 6056
-    },
-    {
-      "path": "packages/bijou-tui/src/subapp/mount.ts",
-      "lines": 180,
-      "bytes": 5701
-    },
-    {
-      "path": "packages/bijou-tui/src/motion/reconciler.ts",
-      "lines": 179,
-      "bytes": 6498
-    },
-    {
-      "path": "packages/bijou-tui/src/layout-preset.ts",
-      "lines": 178,
-      "bytes": 5834
-    },
-    {
-      "path": "packages/bijou-tui/src/layout.ts",
-      "lines": 178,
-      "bytes": 5576
-    },
-    {
-      "path": "packages/bijou-i18n-tools/src/adapters.ts",
-      "lines": 178,
-      "bytes": 4647
-    },
-    {
-      "path": "packages/bijou-mcp/src/tools/docs-catalog/motion.ts",
-      "lines": 176,
-      "bytes": 6791
-    },
-    {
-      "path": "packages/bijou/src/core/forms/multiselect.ts",
-      "lines": 174,
-      "bytes": 6142
-    },
-    {
-      "path": "examples/split-editors/main.ts",
-      "lines": 173,
-      "bytes": 4929
-    },
-    {
-      "path": "examples/app-frame/main.ts",
-      "lines": 161,
-      "bytes": 4571
     }
   ]
 }

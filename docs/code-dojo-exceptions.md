@@ -22,13 +22,20 @@ standards violations.
 
 Current count:
 
-| Source | Count | Meaning |
-| :--- | ---: | :--- |
-| File/context baseline | 136 | Files over the Code Dojo context threshold. |
-| Mock-ban baseline | 0 | Existing test mock/spy violations. |
-| Code-size baseline | 26 | Files over 500 lines; 3 exceed the 1000-line hard limit. |
-| ESLint baseline | 0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total** | **162** | Aggregate Code Dojo standards debt. |
+| Source                |   Count | Meaning                                                           |
+| :-------------------- | ------: | :---------------------------------------------------------------- |
+| File/context baseline |      86 | Files over the Code Dojo context threshold.                       |
+| Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
+| Code-size baseline    |      26 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
+| ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
+| **Total**             | **112** | Aggregate Code Dojo standards debt.                               |
+
+WF-163 applies responsibility-preserving extractions across examples, core,
+TUI, Node, i18n tooling, benchmarks, and repository scripts. Public entrypoints
+remain stable facades while focused helpers move below the file/context
+threshold. The file/context baseline falls from `136` to `86`; mock-ban and
+ESLint debt remain `0`; code-size debt holds at `26`, including `3` hard-limit
+files; and aggregate Code Dojo debt falls from `162` to `112`.
 
 WF-162 splits the remaining oversized deterministic test/support files from the
 WF-161 tranche and applies Project Big Extraction to declaration-boundary core,
@@ -134,8 +141,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The current ceiling is `162`. The next met goalpost must lower the ceiling to
-`112` or lower.
+The current ceiling is `112`. The next met goalpost must lower the ceiling to
+`62` or lower.
 
 ## Updating The Ceiling
 
