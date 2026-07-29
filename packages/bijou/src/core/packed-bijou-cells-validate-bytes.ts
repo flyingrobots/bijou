@@ -30,13 +30,14 @@ export function validatePackedBytes(
     if (
       typeof value !== 'number' ||
       !Number.isInteger(value) ||
+      Object.is(value, -0) ||
       value < 0 ||
       value > 255
     ) {
       failPackedCells(
         'invalid-byte',
         `$.bytes[${String(index)}]`,
-        'expected 0..255',
+        'expected canonical unsigned byte 0..255',
       );
     }
     return value;

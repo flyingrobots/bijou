@@ -101,7 +101,7 @@ interface PackedBijouCellsReceipt {
 
 The maximum accepted receipt contains `100,000` cells, with no axis longer
 than `9,999` cells. The byte payload must contain exactly ten unsigned bytes
-per cell.
+per cell. Negative zero is not a canonical unsigned byte and is rejected.
 
 ## Cell And Glyph Rules
 

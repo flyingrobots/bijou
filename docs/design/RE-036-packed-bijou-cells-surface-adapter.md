@@ -188,7 +188,8 @@ handles, or mutable renderer objects.
 - the receipt contains at most `100,000` cells.
 - `cellCount * 10` is a safe integer.
 - `bytes.length` equals `cellCount * 10`.
-- every byte is an integer in the inclusive range `0` through `255`
+- every byte is a canonical integer in the inclusive range `0` through `255`;
+  negative zero is rejected
 - `cellFormatId` fixes the stride at `10`; no receipt-defined stride exists
 
 The validator checks those laws before calling `createSurface()`. Zero,

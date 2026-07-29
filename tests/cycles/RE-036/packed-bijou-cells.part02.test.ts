@@ -121,7 +121,7 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     arrayField(long, 'bytes').push(0);
     expectReceiptError(long, 'byte-length-mismatch', '$.bytes');
 
-    for (const value of [-1, 1.5, 256, '0']) {
+    for (const value of [-1, -0, 1.5, 256, '0']) {
       const input = validPackedCellsInput();
       arrayField(input, 'bytes')[4] = value;
       expectReceiptError(input, 'invalid-byte', '$.bytes[4]');
