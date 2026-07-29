@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   lowerProfunctorPageArtifacts,
   type ProfunctorPageInspectionMode,
+  ProfunctorPageTargetError,
 } from '../../../packages/bijou/src/core/profunctor-page-target.js';
+import { validatePageSceneBounds } from '../../../packages/bijou/src/core/profunctor-page-scene-bounds.js';
+import type { PlannedPageNode } from '../../../packages/bijou/src/core/profunctor-page-scene.js';
 import { fixtureInputs, mutatePage, recordAt } from './profunctor-page-target.test-support.js';
 
 describe('DX-050 terminal inspection evidence', () => {
@@ -77,4 +80,42 @@ describe('DX-050 terminal inspection evidence', () => {
       },
     });
   });
+
+  it('rejects lines that escape their assigned non-root region', () => {
+    const plan = {
+      node: {
+        blockDefinitionId: 'block:test',
+        contentNodeId: null,
+        hidden: false,
+        pageNodeId: 'page-node:test',
+        props: {},
+        requiredCapabilities: [],
+        slots: [],
+        sourceBindings: {},
+        templateNodeId: 'template:test',
+        tokens: {},
+      },
+      renderNodeId: 'bijou-render:page-node:test',
+      region: { x: 5, y: 2, width: 2, height: 1 },
+      lines: [{ text: 'abc' }],
+      lineIds: ['bijou-render-line:page-node:test/0'],
+    } satisfies PlannedPageNode;
+    expectUnsupportedPlan(plan);
+    expectUnsupportedPlan({
+      ...plan,
+      region: { ...plan.region, width: 3 },
+      lines: [...plan.lines, { text: 'x' }],
+      lineIds: [...plan.lineIds, 'bijou-render-line:page-node:test/1'],
+    });
+  });
 });
+
+function expectUnsupportedPlan(plan: PlannedPageNode): void {
+  expect(() => {
+    validatePageSceneBounds([plan], 'page-node:root', 100, 28);
+  }).toThrow(
+    expect.objectContaining<Partial<ProfunctorPageTargetError>>({
+      code: 'BIJOU_PAGE_BLOCK_UNSUPPORTED',
+    }),
+  );
+}

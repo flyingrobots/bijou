@@ -26,6 +26,7 @@ export function validatePageSceneBounds(
     }
     for (const [index, line] of plan.lines.entries()) {
       const path = `${plan.node.pageNodeId}.lines[${String(index)}]`;
+      const isRoot = plan.node.pageNodeId === rootNodeId;
       if (/[\r\n\u2028\u2029]/u.test(line.text)) {
         unsupported(path, 'terminal inspection lines must not contain line breaks');
       }
@@ -33,15 +34,20 @@ export function validatePageSceneBounds(
         unsupported(path, 'terminal inspection lines must preserve input text exactly');
       }
       const width = segmentSurfaceText(line.text, path).length;
-      if (width > cols) {
+      const availableWidth = isRoot ? cols : plan.region.width;
+      if (width > availableWidth) {
         unsupported(
           path,
-          `line width ${String(width)} exceeds target width ${String(cols)}`,
+          `line width ${String(width)} exceeds region width ${String(availableWidth)}`,
         );
       }
-      const y = plan.node.pageNodeId === rootNodeId
-        ? index
-        : plan.region.y + index;
+      if (!isRoot && index >= plan.region.height) {
+        unsupported(
+          path,
+          `line index ${String(index)} exceeds region height ${String(plan.region.height)}`,
+        );
+      }
+      const y = isRoot ? index : plan.region.y + index;
       if (y >= rows) {
         unsupported(
           path,
