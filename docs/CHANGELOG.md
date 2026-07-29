@@ -19,6 +19,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **DOGFOOD split-source debt identity** — Numbered `*.partNN.ts` extraction
+  modules now retain their canonical root path in touched-file debt
+  comparisons, preventing physical module splits from resetting per-source
+  localization debt. The release-title split also moves its first visible
+  title fallback through the existing catalog boundary, lowering that surface
+  from `33` raw strings to `32`.
 - **DX-050 Code Dojo prerequisite, tranche A** — `25` production and
   repository-tooling entrypoints are now stable compatibility facades over
   focused sub-150-line modules. File/context debt falls from `86` to `61`, and

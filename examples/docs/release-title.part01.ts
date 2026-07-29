@@ -1,5 +1,6 @@
 import type { OutputMode } from '@flyingrobots/bijou';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
+import { dogfoodLocalizedText as dogfoodText } from './localization.js';
 
 export interface DogfoodReleaseTitleProofLane {
   readonly id: string;
@@ -71,7 +72,11 @@ export const V7_DOGFOOD_RELEASE_TITLE: DogfoodReleaseTitle = Object.freeze({
 export const V7_LAUNCH_DOGFOOD_RELEASE_TITLE: DogfoodReleaseTitle =
   Object.freeze({
     id: 'v7-launch',
-    title: 'V7 Launch Wake',
+    title: dogfoodText(
+      undefined,
+      'release.title.v7Launch.title',
+      'V7 Launch Wake',
+    ),
     titleKey: 'release.title.v7Launch.title',
     summary:
       'Post-release title treatment, visible release proof, and lower-mode facts for DOGFOOD.',

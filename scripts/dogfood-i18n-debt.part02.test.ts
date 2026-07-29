@@ -84,7 +84,7 @@ describe('DOGFOOD i18n debt inventory', () => {
       expect(inventory.bySurface.map((surface) => surface.surface)).toContain('component-stories');
       expect(inventory.bySurface).toContainEqual({
         surface: 'release-title',
-        count: 33,
+        count: 32,
       });
       expect(result.ok).toBe(true);
       expect(result.violations).toEqual([]);
