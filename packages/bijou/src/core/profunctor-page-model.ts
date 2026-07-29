@@ -1,3 +1,5 @@
+import type { JsonRecord } from './profunctor-page-json-record.js';
+
 export interface ProfunctorArtifactInput {
   readonly filename: string;
   readonly source: string;
@@ -31,6 +33,7 @@ export interface ProfunctorPageArtifact {
   readonly artifactVersion: 'profunctor-page/0';
   readonly capabilityRequirements: readonly string[];
   readonly compositionRef: string;
+  readonly contentRefs: readonly string[];
   readonly dependencyDigests: readonly string[];
   readonly entityRef: string;
   readonly landmarks: readonly {
@@ -89,4 +92,3 @@ export interface ProfunctorArtifactFamily {
     readonly buildManifest: string;
   };
 }
-import type { JsonRecord } from './profunctor-page-json-record.js';

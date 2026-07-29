@@ -16,6 +16,7 @@ export type ProfunctorPageInspectionMode =
 export interface ProfunctorPageTargetEntry {
   readonly pageNodeId: string;
   readonly templateNodeId: string;
+  readonly contentNodeId: string | null;
   readonly blockDefinitionId: string;
   readonly renderNodeId: string | null;
   readonly region: {
@@ -50,6 +51,7 @@ export interface ProfunctorPageCapabilityOutcome {
 export interface ProfunctorPageTargetMap {
   readonly artifactVersion: 'bijou-profunctor-page-map/1';
   readonly pageId: string;
+  readonly compositionRef: string;
   readonly route: string;
   readonly sceneId: string;
   readonly targetProfile: 'bijou-terminal-project-page/1';

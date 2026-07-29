@@ -2,6 +2,7 @@ export interface JsonRecord extends Record<string, unknown> {
   artifactVersion?: unknown;
   capabilityRequirements?: unknown;
   compositionRef?: unknown;
+  contentRefs?: unknown;
   dependencyDigests?: unknown;
   entityRef?: unknown;
   landmarks?: unknown;

@@ -5,6 +5,7 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
   const nodeIds = unique(page.nodes.map((node) => node.pageNodeId), 'page.nodes');
   unique(page.nodes.map((node) => node.templateNodeId), 'page.templateNodeIds');
   unique(page.readingOrder, 'page.readingOrder');
+  const contentRefs = unique(page.contentRefs, 'page.contentRefs');
   unique(page.tokenRefs, 'page.tokenRefs');
   unique(page.capabilityRequirements, 'page.capabilityRequirements');
 
@@ -33,6 +34,9 @@ export function validatePageGraph(page: ProfunctorPageArtifact): void {
       if (!page.tokenRefs.includes(token)) {
         invalid(node.pageNodeId, `undeclared token ${token}`);
       }
+    }
+    if (node.contentNodeId != null && !contentRefs.has(node.contentNodeId)) {
+      invalid(node.pageNodeId, `undeclared content node ${node.contentNodeId}`);
     }
   }
   unique(ownedChildren, 'page.slotChildren');

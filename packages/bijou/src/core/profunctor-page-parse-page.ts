@@ -27,6 +27,7 @@ export function parsePageArtifact(input: ProfunctorArtifactInput): ProfunctorPag
       `${input.filename}.capabilityRequirements`,
     ),
     compositionRef: expectString(raw.compositionRef, `${input.filename}.compositionRef`),
+    contentRefs: expectStrings(raw.contentRefs, `${input.filename}.contentRefs`),
     dependencyDigests: expectStrings(
       raw.dependencyDigests,
       `${input.filename}.dependencyDigests`,

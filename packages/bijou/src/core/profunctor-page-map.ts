@@ -24,6 +24,7 @@ export function createProfunctorPageTargetMap(
   return {
     artifactVersion: 'bijou-profunctor-page-map/1',
     pageId: page.pageId,
+    compositionRef: page.compositionRef,
     route: page.route,
     sceneId,
     targetProfile: 'bijou-terminal-project-page/1',
@@ -37,6 +38,7 @@ export function createProfunctorPageTargetMap(
       return {
         pageNodeId,
         templateNodeId: node.templateNodeId,
+        contentNodeId: node.contentNodeId,
         blockDefinitionId: node.blockDefinitionId,
         renderNodeId: region == null ? null : renderId(pageNodeId),
         region,

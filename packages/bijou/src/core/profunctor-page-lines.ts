@@ -30,7 +30,9 @@ export function linesForPageNode(
     case 'token-refs':
       return [{ text: `tokens · ${tokenRefs(node).join(' · ')}` }];
     case 'composition':
-      return [{ text: `${node.templateNodeId} · ${node.blockDefinitionId}` }];
+      return [{
+        text: `${page.compositionRef} · ${node.templateNodeId} · ${node.blockDefinitionId}`,
+      }];
     case 'obstructions':
       return obstructionLines(node, outcomes);
     case 'normal':

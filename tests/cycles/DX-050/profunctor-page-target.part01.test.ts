@@ -6,6 +6,8 @@ import {
 import {
   fixtureInputs,
   generatedSource,
+  mutatePage,
+  recordAt,
   sha256,
 } from './profunctor-page-target.test-support.js';
 
@@ -58,6 +60,22 @@ describe('DX-050 Profunctor Page target proof', () => {
     expect(proof.targetMap.cellSourceMap.some(
       (entry) => entry.source?.includes('source-occurrence:projectCatalog.keep'),
     )).toBe(true);
+  });
+
+  it('preserves composition and content identities in target facts', () => {
+    const proof = lowerProfunctorPageArtifacts(mutatePage((page) => {
+      const contentNodeId = 'content:project.keep#summary';
+      page.contentRefs = [contentNodeId];
+      recordAt(page.nodes, 1).contentNodeId = contentNodeId;
+    }));
+    expect(proof.targetMap.compositionRef).toBe('composition:project-page@0');
+    expect(proof.targetMap.entries[1]?.contentNodeId).toBe(
+      'content:project.keep#summary',
+    );
+    expect(
+      lowerProfunctorPageArtifacts(fixtureInputs(), { mode: 'composition' })
+        .witness,
+    ).toContain('composition:project-page@0');
   });
 
   it('keeps the checked target evidence byte-identical to the lowerer', () => {
