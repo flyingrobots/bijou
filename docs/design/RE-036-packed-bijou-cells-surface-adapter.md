@@ -5,7 +5,7 @@ lane: release
 priority: high
 github_issue: 459
 parent_issue: 457
-status: active
+status: complete
 keywords:
   - runtime-engine
   - visor
@@ -407,7 +407,7 @@ is required to explain success or failure.
 Focused proof:
 
 ```bash
-npm test -- tests/cycles/RE-036
+npx vitest run tests/cycles/RE-036
 ```
 
 Package and static proof:
@@ -423,8 +423,7 @@ git diff --check
 Full repository proof:
 
 ```bash
-npm test
-npm run code-dojo:prepush
+npm run code-dojo:ci
 ```
 
 If repository script names differ, use the documented owning commands and
@@ -447,8 +446,28 @@ record the exact successful commands in closeout.
 
 ## Closeout Notes
 
-Implementation is in progress. Keep `work-in-progress` and `needs-design` on
-[#459](https://github.com/flyingrobots/bijou/issues/459) until the design commit
-lands. Remove `needs-design` after the accepted contract is committed. Remove
-`work-in-progress` only after implementation, documentation, local
-verification, review, CI, and issue closeout are complete.
+RE-036 exports `parsePackedBijouCellsReceipt()` and
+`adaptPackedBijouCellsToSurface()` from `@flyingrobots/bijou`. The validator
+rejects non-plain or inexact JSON shapes, unsafe or excessive dimensions,
+non-byte payloads, non-canonical glyphs, terminal-default color drift, invalid
+modifier combinations, incomplete scene ownership, inconsistent focus, and
+unsupported chroma before surface allocation.
+
+The checked `2` by `2` fixture preserves all `40` bytes and both side-table
+entries through adaptation. It includes direct, combining, and private-use
+glyph evidence; explicit and terminal-default colors; per-cell scene
+ownership; and focus metadata. The adapter copies the payload directly into a
+packed `Surface`, preserves side-table order, and marks every cell dirty
+without calling `Surface.set()` or `Surface.setRGB()`.
+
+Focused RE-036 verification passes `16` tests across `5` suites. Full
+`npm run code-dojo:ci` verification passes `4,031` tests across `891` test
+files.
+Code Dojo holds its `62`-violation aggregate baseline: `37` file/context,
+`25` code-size, `0` mock-ban, and `0` ESLint. `npm run docs:inventory`,
+targeted Markdown lint, and `git diff --check` pass.
+
+Contract shaping is commit `b1d57e95`; implementation and public documentation
+are commit `669d10c7`. Remove `work-in-progress` from
+[#459](https://github.com/flyingrobots/bijou/issues/459) only after review, CI,
+merge, and issue closeout complete.

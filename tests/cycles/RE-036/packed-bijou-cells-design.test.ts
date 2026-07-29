@@ -17,7 +17,7 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
     expectClaims(design, [
       'github_issue: 459',
       'parent_issue: 457',
-      'status: active',
+      'status: complete',
       'Legend: [RE - Runtime Engine](../legends/RE-runtime-engine.md)',
       '## Current Truth',
       '## Receipt Contract',
