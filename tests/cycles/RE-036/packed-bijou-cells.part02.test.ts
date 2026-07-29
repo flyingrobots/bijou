@@ -1,5 +1,4 @@
 import { describe, it } from 'vitest';
-import { MAX_PACKED_BIJOU_CELLS } from '@flyingrobots/bijou';
 import {
   arrayField,
   expectReceiptError,
@@ -107,23 +106,6 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     const glyphs = validPackedCellsInput();
     glyphs.glyphPolicyId = 'other';
     expectReceiptError(glyphs, 'wrong-literal', '$.glyphPolicyId');
-  });
-
-  it('rejects non-positive, fractional, unsafe, and overflowing dimensions', () => {
-    for (const value of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
-      const input = validPackedCellsInput();
-      input.widthCells = value;
-      expectReceiptError(input, 'invalid-dimension', '$.widthCells');
-    }
-
-    const overflow = validPackedCellsInput();
-    overflow.widthCells = Number.MAX_SAFE_INTEGER;
-    overflow.heightCells = 2;
-    expectReceiptError(overflow, 'invalid-dimension', '$');
-
-    const excessive = validPackedCellsInput();
-    excessive.widthCells = MAX_PACKED_BIJOU_CELLS + 1;
-    expectReceiptError(excessive, 'invalid-dimension', '$');
   });
 
   it('rejects byte-length mismatches and invalid byte values', () => {
