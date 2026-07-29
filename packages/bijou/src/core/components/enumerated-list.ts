@@ -1,6 +1,11 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import {
+  generateListPrefix,
+  generatePipeListPrefix,
+  renderEnumeratedItems,
+} from './enumerated-list-format.js';
 
 /**
  * Enumeration style for list item prefixes.
@@ -12,7 +17,8 @@ import { renderByMode } from '../mode-render.js';
  * - `'dash'` - En-dash character
  * - `'none'` - No prefix
  */
-export type BulletStyle = 'arabic' | 'alpha' | 'roman' | 'bullet' | 'dash' | 'none';
+export type BulletStyle =
+  'arabic' | 'alpha' | 'roman' | 'bullet' | 'dash' | 'none';
 
 /** Configuration options for the {@link enumeratedList} component. */
 export interface EnumeratedListOptions {
@@ -24,144 +30,6 @@ export interface EnumeratedListOptions {
   readonly start?: number;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
-}
-
-function toRoman(n: number): string {
-  let result = '';
-  for (const [value, symbol] of [
-    [1000, 'm'], [900, 'cm'], [500, 'd'], [400, 'cd'], [100, 'c'], [90, 'xc'], [50, 'l'],
-    [40, 'xl'], [10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i'],
-  ] as const) {
-    while (n >= value) {
-      result += symbol;
-      n -= value;
-    }
-  }
-  return result;
-}
-
-/**
- * Convert a positive integer to a lowercase alphabetic label (a, b, ..., z, aa, ab, ...).
- *
- * @param n - The 1-based integer to convert.
- * @returns The alphabetic label string.
- */
-function toAlpha(n: number): string {
-  let result = '';
-  while (n > 0) {
-    n--;
-    result = String.fromCharCode(97 + (n % 26)) + result;
-    n = Math.floor(n / 26);
-  }
-  return result;
-}
-
-/**
- * Generate a Unicode list-item prefix for rich/interactive rendering.
- *
- * @param style - The bullet style to use.
- * @param index - The 1-based item index (used for ordered styles).
- * @returns The prefix string (e.g. `"3."`, `"b."`, `"•"`).
- */
-function generatePrefix(style: BulletStyle, index: number): string {
-  switch (style) {
-    case 'arabic':
-      return `${String(index)}.`;
-    case 'alpha':
-      return `${toAlpha(index)}.`;
-    case 'roman':
-      return `${toRoman(index)}.`;
-    case 'bullet':
-      return '\u2022';
-    case 'dash':
-      return '\u2013';
-    case 'none':
-      return '';
-  }
-}
-
-/**
- * Generate an ASCII list-item prefix for pipe-mode rendering.
- *
- * Falls back to `*` for bullets and `-` for dashes instead of Unicode characters.
- *
- * @param style - The bullet style to use.
- * @param index - The 1-based item index (used for ordered styles).
- * @returns The ASCII prefix string.
- */
-function generatePipePrefix(style: BulletStyle, index: number): string {
-  switch (style) {
-    case 'arabic':
-      return `${String(index)}.`;
-    case 'alpha':
-      return `${toAlpha(index)}.`;
-    case 'roman':
-      return `${toRoman(index)}.`;
-    case 'bullet':
-      return '*';
-    case 'dash':
-      return '-';
-    case 'none':
-      return '';
-  }
-}
-
-/**
- * Check whether a bullet style produces sequentially numbered prefixes.
- *
- * @param style - The bullet style to test.
- * @returns `true` if the style is `'arabic'`, `'alpha'`, or `'roman'`.
- */
-function isOrderedStyle(style: BulletStyle): boolean {
-  return style === 'arabic' || style === 'alpha' || style === 'roman';
-}
-
-/**
- * Render list items with bullet or numbered prefixes and continuation indentation.
- *
- * @param items - The text items to render.
- * @param style - Bullet or numbering style.
- * @param start - Starting index for ordered styles.
- * @param indent - Number of leading spaces for indentation.
- * @param indentStr - Whitespace prefix for the current depth.
- * @param prefixFn - Produces the bullet/number prefix for a given style and index.
- * @returns The formatted list as a single string.
- */
-function renderItems(
-  items: readonly string[],
-  style: BulletStyle,
-  start: number,
-  indent: number,
-  indentStr: string,
-  prefixFn: (style: BulletStyle, index: number) => string,
-): string {
-  const prefixes = items.map((_, i) => prefixFn(style, start + i));
-  const maxPrefixLen = isOrderedStyle(style)
-    ? Math.max(...prefixes.map(p => p.length))
-    : 0;
-
-  return items
-    .map((item, i) => {
-      const prefix = prefixes[i] ?? '';
-      const lines = item.split('\n');
-      const first = lines[0] ?? '';
-
-      if (style === 'none') {
-        const firstLine = `${indentStr}${first}`;
-        if (lines.length === 1) return firstLine;
-        const contIndent = indentStr;
-        return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-      }
-
-      const paddedPrefix = isOrderedStyle(style)
-        ? prefix.padStart(maxPrefixLen)
-        : prefix;
-      const firstLine = `${indentStr}${paddedPrefix} ${first}`;
-      if (lines.length === 1) return firstLine;
-      const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
-      return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-    })
-    .join('\n');
 }
 
 /**
@@ -179,7 +47,10 @@ function renderItems(
  * @param options - Rendering options including style, indent, start, and context.
  * @returns The formatted list string, or an empty string if `items` is empty.
  */
-export function enumeratedList(items: readonly string[], options?: EnumeratedListOptions): string {
+export function enumeratedList(
+  items: readonly string[],
+  options?: EnumeratedListOptions,
+): string {
   if (items.length === 0) return '';
 
   const style = options?.style ?? 'arabic';
@@ -190,24 +61,54 @@ export function enumeratedList(items: readonly string[], options?: EnumeratedLis
   const indentStr = ' '.repeat(indent);
 
   if (!ctx) {
-    return renderItems(items, style, start, indent, indentStr, generatePrefix);
+    return renderEnumeratedItems(
+      items,
+      style,
+      start,
+      indent,
+      indentStr,
+      generateListPrefix,
+    );
   }
 
-  return renderByMode(ctx.mode, {
-    accessible: () => {
-      return items
-        .map((item, i) => {
-          const num = start + i;
-          const prefix = `${String(num)}.`;
-          const lines = item.split('\n');
-          const firstLine = `${indentStr}${prefix} ${lines[0] ?? ''}`;
-          if (lines.length === 1) return firstLine;
-          const contIndent = ' '.repeat(indent + prefix.length + 1);
-          return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-        })
-        .join('\n');
+  return renderByMode(
+    ctx.mode,
+    {
+      accessible: () => {
+        return items
+          .map((item, i) => {
+            const num = start + i;
+            const prefix = `${String(num)}.`;
+            const lines = item.split('\n');
+            const firstLine = `${indentStr}${prefix} ${lines[0] ?? ''}`;
+            if (lines.length === 1) return firstLine;
+            const contIndent = ' '.repeat(indent + prefix.length + 1);
+            return [
+              firstLine,
+              ...lines.slice(1).map((l) => `${contIndent}${l}`),
+            ].join('\n');
+          })
+          .join('\n');
+      },
+      pipe: () =>
+        renderEnumeratedItems(
+          items,
+          style,
+          start,
+          indent,
+          indentStr,
+          generatePipeListPrefix,
+        ),
+      interactive: () =>
+        renderEnumeratedItems(
+          items,
+          style,
+          start,
+          indent,
+          indentStr,
+          generateListPrefix,
+        ),
     },
-    pipe: () => renderItems(items, style, start, indent, indentStr, generatePipePrefix),
-    interactive: () => renderItems(items, style, start, indent, indentStr, generatePrefix),
-  }, options ?? {});
+    options ?? {},
+  );
 }
