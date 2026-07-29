@@ -9,14 +9,16 @@ import {
 const DESIGN_PATH = 'docs/design/DX-050-profunctor-page-inspection.md';
 
 describe('DX-050 Profunctor Page inspection design', () => {
-  it('binds the complete cycle contract before implementation', () => {
+  it('records the completed cycle contract and closeout evidence', () => {
     expect(existsSync(`${ROOT}/${DESIGN_PATH}`)).toBe(true);
     const design = normalized(DESIGN_PATH);
 
     expectClaims(design, [
       'github_issue: 468',
-      'status: active',
+      'status: complete',
       'Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)',
+      '## Current Truth',
+      '## Acceptance Criteria',
       '## Sponsor Human',
       '## Sponsor Agent',
       '## Hill',
@@ -31,11 +33,19 @@ describe('DX-050 Profunctor Page inspection design', () => {
       '## Tests To Write First',
       '## Retrospective And Closeout',
       '`profunctor-page/0`',
+      '`profunctor-page-source-map/0`',
+      '`profunctor-build-manifest/0`',
       '`ui-scene-ir/1`',
       '`Surface`',
-      'source map',
-      'build manifest',
+      '`6a411d7`',
+      'SHA-256',
+      'fail closed',
+      'byte-identical',
       '`62` aggregate violations or lower',
+      'Focused contract evidence passes `30` tests',
+      'Full local verification passes `4,007` tests',
+      'Hidden unsupported blocks become `hidden-unsupported-block` residuals',
+      'Visible unsupported blocks',
     ]);
   });
 
@@ -52,6 +62,7 @@ describe('DX-050 Profunctor Page inspection design', () => {
     ]);
     expectClaims(bearing, [
       '`v8.2.0` milestone is quality automation and Method hardening: 18 open and 2 closed milestone items',
+      '`v8.0.0` milestone is the active feature horizon: 3 open milestone items and 1 closed milestone item',
       '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
       'Current debt comprises `37` file/context and `25` code-size violations',
     ]);

@@ -4,7 +4,7 @@ legend: DX
 lane: release
 priority: high
 github_issue: 468
-status: active
+status: complete
 keywords:
   - developer-experience
   - profunctor-page
@@ -12,8 +12,6 @@ keywords:
   - target-inspection
   - v10.0.0
 ---
-
-# DX-050 Profunctor Page Inspection
 
 Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
 
@@ -43,6 +41,34 @@ The website remains authoritative for page composition and source occurrences.
 Bijou owns terminal render identities, inspection facts, residuals, and its
 receipt. Geordi is sibling evidence, not a package dependency or authority.
 
+## Current Truth
+
+Before DX-050, Bijou could lower Bijou-owned scenes and blocks to terminal
+surfaces, but it could not validate, inspect, or lower the website-owned
+`profunctor-page/0` family. The canonical ProjectPage specimen existed only in
+the website repository at revision `6a411d7`; Bijou had no pinned copy, page
+target profile, cross-artifact validation, source-to-render map, target receipt,
+or terminal witness for that family.
+
+## Acceptance Criteria
+
+- Pin byte-identical `profunctor-page/0`,
+  `profunctor-page-source-map/0`, and `profunctor-build-manifest/0` inputs to
+  website revision `6a411d7` with exact SHA-256 digests.
+- Validate versions, identities, references, dependency digests, root
+  reachability, reading order, and target capabilities before lowering.
+- Reject visible unsupported blocks and obstructed or clipped output with a
+  stable diagnostic and no target artifact.
+- Residualize only hidden unsupported blocks, with the unsupported block
+  identity preserved in the target map.
+- Emit deterministic scene, target-map, receipt, and terminal-witness bytes
+  through the existing layout and `Surface` contracts.
+- Preserve page, template, source-occurrence, token, reading-order, landmark,
+  and action facts across all supported inspection modes.
+- Hold the Code Dojo debt ceiling at `62` aggregate violations or lower and
+  pass the focused contract, generation, documentation, and full repository
+  gates.
+
 ## Sponsor Human
 
 James Ross.
@@ -55,8 +81,9 @@ Codex.
 
 Given the canonical Keep specimen, Bijou emits deterministic terminal
 inspection evidence that preserves page, template, source-occurrence, token,
-reading-order, and link identities; assigns every visible node a Bijou render
-identity or explicit residual; and rejects malformed or contradictory inputs.
+reading-order, and link identities; assigns every supported visible node a
+Bijou render identity; residualizes hidden unsupported nodes; and rejects
+malformed, contradictory, or visibly unsupported inputs.
 
 ## Playback Questions
 
@@ -92,8 +119,9 @@ The target accepts exact UTF-8 bytes for `profunctor-page/0`,
 Bijou-owned scene, target-map, receipt, and terminal-witness artifacts or one
 stable diagnostic with a code, input path, and detail.
 
-Visible page nodes receive injective render identities. Hidden or unsupported
-nodes receive explicit residuals. Target output records upstream claims as not
+Supported visible page nodes receive injective render identities. Hidden
+unsupported nodes receive explicit residuals. Visible unsupported nodes fail
+closed without target artifacts. Target output records upstream claims as not
 inherited and binds every output digest to the exact input family.
 
 ## Accessibility And Assistive Posture
@@ -117,7 +145,9 @@ without scraping screenshots or executing the website.
 ## Linked Invariants
 
 - Canonical bytes stay owned by the website at revision `6a411d7`.
-- Every visible page node maps to one target identity or one residual.
+- Every supported visible page node maps to one target identity.
+- Every hidden unsupported page node maps to one explicit residual.
+- Every visible unsupported page node fails closed before output.
 - Render identities are injective and target-owned.
 - Reading order, tokens, actions, and source occurrences remain inspectable.
 - Unsupported versions, references, blocks, or claims fail closed.
@@ -139,7 +169,9 @@ without scraping screenshots or executing the website.
 
 - Reject malformed JSON, unsupported versions, digest drift, and identity drift.
 - Reject duplicate nodes, invalid slots, references, tokens, and actions.
-- Prove every visible node maps injectively or residualizes explicitly.
+- Prove every supported visible node maps injectively.
+- Prove hidden unsupported nodes residualize and visible unsupported nodes
+  fail closed.
 - Prove exact reading order, token, action, and source-occurrence preservation.
 - Prove repeated output and receipts are byte-identical.
 - Prove fixture inventory, website revision, and all three hashes are pinned.
@@ -147,6 +179,34 @@ without scraping screenshots or executing the website.
 
 ## Retrospective And Closeout
 
-Complete this section only after the proof, documentation, debt reduction, full
-local gates, and review evidence have landed. Record actual artifact names,
-diagnostics, test counts, hashes, residuals, Code Dojo result, and follow-ons.
+DX-050 emits `page.bijou.scene.json`, `page.bijou.map.json`,
+`page.bijou.receipt.json`, and `page.bijou.txt`. The public failure boundary is
+the seven-code `BIJOU_PAGE_*` diagnostic family documented in the
+[inspection reference](../reference/profunctor-page-inspection.md#diagnostics).
+
+The canonical inputs remain pinned to website revision `6a411d7`:
+
+- Page SHA-256:
+  `12b90184b4e238bc6bd7db944af8651900b830ea76ba775ab7c7ee20be051e73`.
+- Source-map SHA-256:
+  `a40e97f2fd513519092d2a131c0d7107517b92bd7e9cfd5e79df70a65a3fe044`.
+- Build-manifest SHA-256:
+  `975efc9c701cbd7a6981787150748b76d1e53fd83cd424128667bc8014687ab7`.
+
+The bounded target supports the five ProjectPage block definitions. Hidden
+unsupported blocks become `hidden-unsupported-block` residuals. Visible
+unsupported blocks, semantic-document sources, application islands, inherited
+semantic-HTML claims, and output that exceeds the fixed terminal profile fail
+closed or remain explicit target obstructions.
+
+Focused contract evidence passes `30` tests across the five target suites, the
+generator suite, and this design contract. Full local verification passes
+`4,007` tests. Code Dojo reports `62` aggregate violations: `37` file/context,
+`25` code-size, `0` mock-ban, and `0` ESLint.
+
+The follow-on path remains the `v8.0.0` Runtime Graph And Scene IR milestone,
+the website publication campaign in
+[profunctor-optics-website#14](https://github.com/flyingrobots/profunctor-optics-website/issues/14),
+and the sibling Geordi proof in
+[geordi#52](https://github.com/flyingrobots/geordi/issues/52) and
+[geordi#53](https://github.com/flyingrobots/geordi/pull/53).

@@ -146,8 +146,8 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 3 open and 1 closed
-  milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is the active feature horizon: 3 open milestone items
+  and 1 closed milestone item as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 18 open

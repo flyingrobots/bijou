@@ -50,7 +50,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       'The active bounded target is [#468](https://github.com/flyingrobots/bijou/issues/468), implemented in [#474](https://github.com/flyingrobots/bijou/pull/474)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
-      '`v8.0.0` milestone is the active feature horizon: 3 open and 1 closed milestone items',
+      '`v8.0.0` milestone is the active feature horizon: 3 open milestone items and 1 closed milestone item',
       '`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through',
       '`v8.2.0` milestone is quality automation and Method hardening: 18 open and 2 closed milestone items',
       'No open issue is currently unmilestoned',
