@@ -10,7 +10,6 @@ export const REQUIRED_STORY_MODES: readonly OutputMode[] = [
   'pipe',
   'accessible',
 ];
-
 export interface DogfoodStorybookStorySummary {
   readonly id: string;
   readonly title: string;
@@ -21,13 +20,11 @@ export interface DogfoodStorybookStorySummary {
   readonly sourcePath?: string;
   readonly tags: readonly string[];
 }
-
 export interface DogfoodStorybookFamilySummary {
   readonly id: string;
   readonly label: string;
   readonly stories: readonly DogfoodStorybookStorySummary[];
 }
-
 export interface DogfoodStorybookWorkbenchModel {
   readonly title: string;
   readonly storyCount: number;
@@ -36,48 +33,48 @@ export interface DogfoodStorybookWorkbenchModel {
   readonly requiredModes: readonly OutputMode[];
   readonly families: readonly DogfoodStorybookFamilySummary[];
 }
-
 export function createDogfoodStorybookWorkbenchModel(
   stories: readonly ComponentStory[],
   title: string,
 ): DogfoodStorybookWorkbenchModel {
-  const families = new Map<
-    string,
-    { label: string; stories: DogfoodStorybookStorySummary[] }
-  >();
+  const families = new Map<string, DogfoodStorybookStorySummary[]>();
   for (const story of stories) {
-    const familyId = slugify(story.family);
-    const existing = families.get(familyId);
+    const existing = families.get(story.family);
     const summary = summarizeStory(story);
     if (existing == null) {
-      families.set(familyId, {
-        label: story.family,
-        stories: [summary],
-      });
+      families.set(story.family, [summary]);
     } else {
-      existing.stories.push(summary);
+      existing.push(summary);
     }
   }
-
   const familySummaries = [...families.entries()]
-    .map(([id, family]) => ({
-      id,
-      label: family.label,
-      stories: family.stories
+    .map(([label, familyStories]) => ({
+      id: slugify(label),
+      label,
+      stories: familyStories
         .slice()
         .sort((left, right) => left.title.localeCompare(right.title)),
     }))
     .sort((left, right) => left.label.localeCompare(right.label));
+  const idCounts = new Map<string, number>();
+  for (const family of familySummaries) {
+    idCounts.set(family.id, (idCounts.get(family.id) ?? 0) + 1);
+  }
+  const uniqueFamilySummaries = familySummaries.map((family) =>
+    idCounts.get(family.id) === 1
+      ? family
+      : { ...family, id: `${family.id}--${encodeIdentity(family.label)}` },
+  );
   return {
     title,
     storyCount: stories.length,
-    familyCount: familySummaries.length,
+    familyCount: uniqueFamilySummaries.length,
     variantCount: stories.reduce(
       (total, story) => total + story.variants.length,
       0,
     ),
     requiredModes: REQUIRED_STORY_MODES,
-    families: familySummaries,
+    families: uniqueFamilySummaries,
   };
 }
 
@@ -139,11 +136,13 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, '');
   if (asciiSlug !== '') return asciiSlug;
 
+  return encodeIdentity(value);
+}
+
+function encodeIdentity(value: string): string {
   return (
-    Array.from(
-      value,
-      (character) =>
-        character.codePointAt(0)?.toString(36) ?? String(value.length),
+    Array.from(value, (character) =>
+      (character.codePointAt(0) ?? value.length).toString(36),
     ).join('-') || String(value.length)
   );
 }

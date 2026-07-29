@@ -132,17 +132,18 @@ describe('WF-163 Code Dojo ratchet', () => {
     );
   });
 
-  it('preserves family grouping when an extracted label has no ASCII slug', () => {
+  it('preserves distinct family grouping across slug collisions', () => {
     const [first, second] = COMPONENT_STORIES;
     if (first == null || second == null)
       throw new Error('storybook regression requires two canonical stories');
-    const family = '状態';
+    const family = 'é';
     const model = createDogfoodStorybookWorkbenchModel([
       { ...first, id: 'localized-family-a', family },
       { ...second, id: 'localized-family-b', family },
+      { ...first, id: 'ascii-family', family: '6h' },
     ]);
-
-    expect(model.familyCount).toBe(1);
-    expect(model.families[0]?.stories).toHaveLength(2);
+    expect(model.familyCount).toBe(2);
+    expect(model.families.find((entry) => entry.label === family)?.stories)
+      .toHaveLength(2);
   });
 });
