@@ -93,6 +93,12 @@ a DOGFOOD TypeScript source file that still has raw visible-copy debt,
 proved non-localizable by scanner policy. This prevents old localization debt
 from surviving in files that are actively being edited.
 
+Numbered extraction modules such as `release-title.part01.ts` retain the
+canonical `release-title.ts` source identity for touched-file comparisons. The
+gate sums debt across the numbered parts and requires that total to fall below
+the merge-base root count; splitting a file cannot reset or merely redistribute
+its debt.
+
 The same source table can also be exported through the i18n workbook adapters
 instead of requiring translators to edit the docs app source directly:
 ```bash

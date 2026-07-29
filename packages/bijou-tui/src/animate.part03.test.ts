@@ -3,7 +3,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 
-const sourcePath = resolve(dirname(fileURLToPath(import.meta.url)), 'animate.ts');
+const sourceDirectory = dirname(fileURLToPath(import.meta.url));
+const sourcePaths = ['animate.part02.ts', 'animate.part03.ts'].map((name) =>
+  resolve(sourceDirectory, name),
+);
 
 function docsForInternalCommand(source: string, functionName: string): string {
   const functionIndex = source.indexOf(`function ${functionName}`);
@@ -20,7 +23,9 @@ function docsForInternalCommand(source: string, functionName: string): string {
 
 describe('animation command docs', () => {
   it('documents pulse-driven spring and tween commands', () => {
-    const source = readFileSync(sourcePath, 'utf8');
+    const source = sourcePaths
+      .map((sourcePath) => readFileSync(sourcePath, 'utf8'))
+      .join('\n');
     const springDocs = docsForInternalCommand(source, 'createSpringCmd');
     const tweenDocs = docsForInternalCommand(source, 'createTweenCmd');
     expect(springDocs).toContain('runtime pulses');

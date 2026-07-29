@@ -19,7 +19,9 @@ describe('WF-130 roadmap pull order', () => {
 
     expectClaims(roadmap, [
       'Next Pull',
-      'The Code Dojo prerequisite [#469](https://github.com/flyingrobots/bijou/issues/469) has met its `112` aggregate-debt contract. The next repository pull is [#468](https://github.com/flyingrobots/bijou/issues/468)',
+      '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
+      'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and WF-164 tranche B each removed `25` counted violations.',
+      'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) is now the next pull.',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
       'VISOR',
