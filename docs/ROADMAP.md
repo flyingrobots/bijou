@@ -304,9 +304,10 @@ Primary tracker:
 
 The Code Dojo prerequisite
 [#469](https://github.com/flyingrobots/bijou/issues/469) has met its `112`
-aggregate-debt contract. The next repository pull is
-[#468](https://github.com/flyingrobots/bijou/issues/468), which consumes the
-canonical website specimen and proves one
+aggregate-debt contract. DX-050 tranche A has since reduced measured debt to
+`87` by clearing `25` file/context violations. Tranche B must reach `62` or
+lower before [#468](https://github.com/flyingrobots/bijou/issues/468) can close.
+The bounded target proof consumes the canonical website specimen and proves one
 Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt path.
 The active V8 product sequence resumes at #459 after the landed #458 artifact
 bundle proof; it continues after the bounded target proof instead of being

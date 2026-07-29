@@ -34,9 +34,16 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
   });
 
   it('backs frame layer introspection with runtime engine objects and public exports', () => {
-    const layerImplementation = readRepoFile(
-      'packages/bijou-tui/src/app-frame-layers.ts',
-    );
+    const layerImplementation = [
+      'part01',
+      'part02',
+      'part03',
+      'part04',
+    ]
+      .map((part) =>
+        readRepoFile(`packages/bijou-tui/src/app-frame-layers.${part}.ts`),
+      )
+      .join('\n');
     const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
     const index = readRepoFile('packages/bijou-tui/src/index.ts');
     const indexPart = readRepoFile('packages/bijou-tui/src/index.part04.ts');

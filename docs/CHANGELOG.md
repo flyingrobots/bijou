@@ -19,6 +19,20 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **DOGFOOD split-source debt identity** — Numbered `*.partNN.ts` extraction
+  modules now retain their canonical root path in touched-file debt
+  comparisons, preventing physical module splits from resetting per-source
+  localization debt. The release-title split also moves its first visible
+  title fallback through the existing catalog boundary, lowering that surface
+  from `33` raw strings to `32`.
+- **DX-050 Code Dojo prerequisite, tranche A** — `25` production and
+  repository-tooling entrypoints are now stable compatibility facades over
+  focused sub-150-line modules. File/context debt falls from `86` to `61`, and
+  aggregate debt falls from `112` to `87` without changing the code-size,
+  mock-ban, or ESLint baselines. The worker extraction also removes the
+  package-barrel runtime cycle between `bijou-node` context construction and
+  worker utilities. The goalpost remains open until tranche B reaches `62`
+  aggregate violations or lower.
 - **Focused Code Dojo ratchet** — WF-163 preserves public entrypoints while
   extracting coherent responsibilities across examples, core, TUI, Node, i18n
   tooling, benchmarks, and repository scripts. File/context debt falls from

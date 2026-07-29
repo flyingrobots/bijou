@@ -33,7 +33,7 @@ const ALLOWED = new Set([
   'core/components/hyperlink.ts',   // OSC 8 sequences
   'core/components/table.ts',       // ANSI-aware table clipping/wrapping with OSC 8 and SGR parsing
   'core/text/clip.ts',              // ANSI-aware text clipping
-  'core/text/grapheme.ts',          // ANSI strip for width measurement
+  'core/text/grapheme.part02.ts',   // ANSI strip for width measurement
   'core/render/differ.ts',          // CUP escape codes for differential rendering
   'adapters/test/assertions.ts',    // assertion helpers reference ANSI patterns
 ]);

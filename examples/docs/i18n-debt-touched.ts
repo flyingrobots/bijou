@@ -54,7 +54,7 @@ export function evaluateDogfoodTouchedI18nDebt(
   baseInventory?: DogfoodI18nDebtInventory,
   lineages: readonly DogfoodTouchedI18nDebtLineage[] = DOGFOOD_I18N_DEBT_SPLIT_LINEAGES,
 ): DogfoodTouchedI18nDebtResult {
-  const touched = new Set(touchedPaths);
+  const touched = new Set(touchedPaths.map(canonicalDogfoodDebtPath));
   const currentCounts = debtCountsByPath(inventory);
   const baseCounts = baseInventory === undefined ? undefined : debtCountsByPath(baseInventory);
   const handledPaths = new Set<string>();
@@ -79,7 +79,7 @@ export function evaluateDogfoodTouchedI18nDebt(
 
   return Object.freeze({
     ok: lineageViolations.length === 0 && violations.length === 0,
-    touchedPaths: Object.freeze([...touched].sort()),
+    touchedPaths: Object.freeze([...new Set(touchedPaths)].sort()),
     violations: Object.freeze([...lineageViolations, ...violations]),
   });
 }
@@ -120,7 +120,12 @@ function sumDebtCounts(paths: readonly string[], counts: ReadonlyMap<string, num
 function debtCountsByPath(inventory: DogfoodI18nDebtInventory): ReadonlyMap<string, number> {
   const counts = new Map<string, number>();
   for (const entry of inventory.entries) {
-    counts.set(entry.path, (counts.get(entry.path) ?? 0) + 1);
+    const path = canonicalDogfoodDebtPath(entry.path);
+    counts.set(path, (counts.get(path) ?? 0) + 1);
   }
   return counts;
+}
+
+function canonicalDogfoodDebtPath(path: string): string {
+  return path.replace(/\.part\d+(?=\.tsx?$)/u, '');
 }

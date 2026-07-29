@@ -19,7 +19,7 @@ describe('WF-130 roadmap pull order', () => {
 
     expectClaims(roadmap, [
       'Next Pull',
-      'The Code Dojo prerequisite [#469](https://github.com/flyingrobots/bijou/issues/469) has met its `112` aggregate-debt contract. The next repository pull is [#468](https://github.com/flyingrobots/bijou/issues/468)',
+      'DX-050 tranche A has since reduced measured debt to `87` by clearing `25` file/context violations. Tranche B must reach `62` or lower before [#468](https://github.com/flyingrobots/bijou/issues/468) can close.',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
       'VISOR',

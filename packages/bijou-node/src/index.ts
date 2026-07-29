@@ -9,23 +9,17 @@
  * @packageDocumentation
  */
 
-import type { BijouContext, Theme, ColorScheme } from '@flyingrobots/bijou';
+import type { BijouContext } from '@flyingrobots/bijou';
 import {
-  createBijou,
-  detectColorScheme,
   resolveSafeCtx,
   setDefaultContext,
   setDefaultContextInitializer,
 } from '@flyingrobots/bijou';
 import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
-import { nodeRuntime } from './runtime.js';
-import { nodeIO } from './io.js';
-import { chalkStyle } from './style.js';
+import { createNodeContext } from './node-context.js';
 import type {
   CreateNodeContextOptions,
   InitDefaultContextOptions,
-  NodeThemeEntry,
-  NodeThemeOptions,
 } from './options.js';
 
 /** Re-export the Node.js {@link RuntimePort} factory. */
@@ -49,6 +43,7 @@ export type {
   NodeThemeMode,
   NodeThemeOptions,
 } from './options.js';
+export { createNodeContext } from './node-context.js';
 
 /** Re-export Worker utilities for multi-threaded applications. */
 export { isBijouWorker, runInWorker, sendToMain, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
@@ -60,8 +55,6 @@ export {
   type RecorderResult,
   type SurfaceGifOptions,
 } from './recorder.js';
-
-const DISABLED_THEME_ENV_VAR = '__BIJOU_THEME_DISABLED__';
 
 /** Structured bootstrap failure for Node host initialization. */
 export class BijouBootstrapError extends Error {
@@ -95,140 +88,13 @@ interface SelfRunningApp<M = unknown> {
   run(options?: RunOptions<M>): Promise<void>;
 }
 
-interface ResolvedNodeThemeSelection {
-  readonly fallbackTheme: Theme | undefined;
-  readonly colorScheme: ColorScheme;
-  readonly envVar: string | undefined;
-  readonly presets: Record<string, Theme> | undefined;
-}
-
 function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
   return 'run' in app && typeof app.run === 'function';
-}
-
-function inferThemeEntryScheme(entry: NodeThemeEntry): ColorScheme | undefined {
-  if (entry.scheme !== undefined) return entry.scheme;
-  if (entry.id === 'light' || entry.id === 'dark') return entry.id;
-  return undefined;
-}
-
-function mergeNodeThemePresets(options: NodeThemeOptions): Record<string, Theme> | undefined {
-  if (options.themes === undefined || options.themes.length === 0) {
-    return options.presets;
-  }
-  const merged: Record<string, Theme> = { ...(options.presets ?? {}) };
-  for (const entry of options.themes) {
-    merged[entry.id] = entry.theme;
-  }
-  return merged;
-}
-
-function resolveRequestedColorScheme(
-  runtime: ReturnType<typeof nodeRuntime>,
-  options: NodeThemeOptions,
-): ColorScheme {
-  const mode = options.themeMode ?? 'auto';
-  return mode === 'auto' ? detectColorScheme(runtime) : mode;
-}
-
-function resolveAutomaticThemeEntry(
-  options: NodeThemeOptions,
-  targetScheme: ColorScheme,
-): NodeThemeEntry | undefined {
-  if (options.themes === undefined || options.themes.length === 0) {
-    return undefined;
-  }
-  const byScheme = options.themes.find((entry) => inferThemeEntryScheme(entry) === targetScheme);
-  if (byScheme !== undefined) return byScheme;
-
-  const byId = options.themes.find((entry) => entry.id === targetScheme);
-  if (byId !== undefined) return byId;
-
-  return options.themes[0];
-}
-
-function resolveNodeThemeSelection(
-  runtime: ReturnType<typeof nodeRuntime>,
-  options: NodeThemeOptions,
-): ResolvedNodeThemeSelection {
-  const colorScheme = resolveRequestedColorScheme(runtime, options);
-  const presets = mergeNodeThemePresets(options);
-  const envVar = options.envVar;
-
-  if (options.themeOverride !== undefined) {
-    const match = options.themes?.find((entry) => entry.id === options.themeOverride);
-    if (match !== undefined) {
-      return {
-        fallbackTheme: match.theme,
-        colorScheme: inferThemeEntryScheme(match) ?? colorScheme,
-        envVar: DISABLED_THEME_ENV_VAR,
-        presets,
-      };
-    }
-  }
-
-  const selectionEnvVar = envVar ?? 'BIJOU_THEME';
-  const envSelection = runtime.env(selectionEnvVar);
-  if (envSelection !== undefined) {
-    const envThemeEntry = options.themes?.find((entry) => entry.id === envSelection);
-    if (envThemeEntry !== undefined) {
-      return {
-        fallbackTheme: envThemeEntry.theme,
-        colorScheme: inferThemeEntryScheme(envThemeEntry) ?? colorScheme,
-        envVar: DISABLED_THEME_ENV_VAR,
-        presets,
-      };
-    }
-
-    return {
-      fallbackTheme: options.theme ?? resolveAutomaticThemeEntry(options, colorScheme)?.theme,
-      colorScheme,
-      envVar,
-      presets,
-    };
-  }
-
-  const automaticThemeEntry = resolveAutomaticThemeEntry(options, colorScheme);
-  return {
-    fallbackTheme: automaticThemeEntry?.theme ?? options.theme,
-    colorScheme: automaticThemeEntry != null
-      ? (inferThemeEntryScheme(automaticThemeEntry) ?? colorScheme)
-      : colorScheme,
-    envVar,
-    presets,
-  };
 }
 
 /** Test-only helper that restores the Node ambient-context initializer after resets. */
 export function _registerDefaultContextInitializerForTesting(): void {
   setDefaultContextInitializer(() => createNodeContext());
-}
-
-/**
- * Create a {@link BijouContext} wired to Node.js adapters.
- *
- * Assembles {@link nodeRuntime}, {@link nodeIO}, and {@link chalkStyle}
- * into a single context via `createBijou`. Automatically respects the
- * `NO_COLOR` environment variable by passing it through to the style
- * adapter.
- *
- * @returns A fresh {@link BijouContext} backed by the current Node.js process.
- */
-export function createNodeContext(options: CreateNodeContextOptions = {}): BijouContext {
-  const runtime = nodeRuntime();
-  const noColor = runtime.env('NO_COLOR') !== undefined;
-  const selection = resolveNodeThemeSelection(runtime, options);
-  // Force level 3 (truecolor) if NO_COLOR is not set, 
-  // as the user is explicitly requesting a rich dashboard experience.
-  return createBijou({
-    runtime,
-    io: options.io ?? nodeIO(options.nodeIO),
-    style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
-    theme: selection.fallbackTheme,
-    presets: selection.presets,
-    envVar: selection.envVar,
-    colorScheme: selection.colorScheme,
-  });
 }
 
 _registerDefaultContextInitializerForTesting();
