@@ -42,8 +42,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   side-table laws, scene-node provenance, focus and chroma metadata, typed
   diagnostics, and byte-exact `Surface` adapter boundary for #459.
   `parsePackedBijouCellsReceipt()` rejects malformed or non-canonical receipts
-  before allocation, while `adaptPackedBijouCellsToSurface()` copies validated
-  bytes and side-table entries without re-encoding cells.
+  before `Surface` allocation while producing normalized arrays;
+  `adaptPackedBijouCellsToSurface()` then copies validated bytes and side-table
+  entries without re-encoding cells.
 
 ### Changed
 
