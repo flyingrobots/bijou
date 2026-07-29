@@ -1,5 +1,6 @@
 import {
   MAX_PACKED_BIJOU_CELLS,
+  MAX_PACKED_BIJOU_DIMENSION,
   PACKED_BIJOU_CELL_FORMAT,
   PACKED_BIJOU_CELL_STRIDE,
   PACKED_BIJOU_CELLS_VERSION,
@@ -47,11 +48,11 @@ export function parsePackedBijouCellsReceipt(
     PACKED_BIJOU_GLYPH_POLICY,
     '$.glyphPolicyId',
   );
-  const widthCells = positiveSafeIntegerAt(
+  const widthCells = renderableDimensionAt(
     record['widthCells'],
     '$.widthCells',
   );
-  const heightCells = positiveSafeIntegerAt(
+  const heightCells = renderableDimensionAt(
     record['heightCells'],
     '$.heightCells',
   );
@@ -77,6 +78,18 @@ export function parsePackedBijouCellsReceipt(
     sideTable,
     ...metadata,
   };
+}
+
+function renderableDimensionAt(value: unknown, path: string): number {
+  const dimension = positiveSafeIntegerAt(value, path);
+  if (dimension > MAX_PACKED_BIJOU_DIMENSION) {
+    failPackedCells(
+      'invalid-dimension',
+      path,
+      `dimension exceeds ${String(MAX_PACKED_BIJOU_DIMENSION)}`,
+    );
+  }
+  return dimension;
 }
 
 function checkedCellCount(width: number, height: number): number {

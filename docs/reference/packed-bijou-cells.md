@@ -23,6 +23,7 @@ The package exports:
 | `PACKED_BIJOU_GLYPH_POLICY` | `unicode-grapheme-side-table/1` |
 | `PACKED_BIJOU_SCENE_VERSION` | `ui-scene-ir/1` |
 | `MAX_PACKED_BIJOU_CELLS` | `100,000` |
+| `MAX_PACKED_BIJOU_DIMENSION` | `9,999` cells per axis |
 | `MAX_PACKED_BIJOU_GLYPH_CODE_UNITS` | `256` per glyph |
 | `MAX_PACKED_BIJOU_GLYPH_UTF8_BYTES` | `32` per glyph |
 | `MAX_PACKED_BIJOU_SIDE_TABLE_ENTRIES` | `4,096` |
@@ -98,8 +99,9 @@ interface PackedBijouCellsReceipt {
 }
 ```
 
-The maximum accepted receipt contains `100,000` cells. The byte payload must
-contain exactly ten unsigned bytes per cell.
+The maximum accepted receipt contains `100,000` cells, with no axis longer
+than `9,999` cells. The byte payload must contain exactly ten unsigned bytes
+per cell.
 
 ## Cell And Glyph Rules
 

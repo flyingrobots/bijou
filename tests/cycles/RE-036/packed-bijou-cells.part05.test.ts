@@ -1,5 +1,8 @@
 import { describe, it } from 'vitest';
-import { MAX_PACKED_BIJOU_CELLS } from '@flyingrobots/bijou';
+import {
+  MAX_PACKED_BIJOU_CELLS,
+  MAX_PACKED_BIJOU_DIMENSION,
+} from '@flyingrobots/bijou';
 import {
   expectReceiptError,
   validPackedCellsInput,
@@ -20,19 +23,37 @@ describe('RE-036 packed-bijou-cells/1 dimensions', () => {
     const widthOverflow = validPackedCellsInput();
     widthOverflow.widthCells = Number.MAX_SAFE_INTEGER;
     widthOverflow.heightCells = 2;
-    expectReceiptError(widthOverflow, 'invalid-dimension', '$');
+    expectReceiptError(widthOverflow, 'invalid-dimension', '$.widthCells');
 
     const heightOverflow = validPackedCellsInput();
     heightOverflow.widthCells = 2;
     heightOverflow.heightCells = Number.MAX_SAFE_INTEGER;
-    expectReceiptError(heightOverflow, 'invalid-dimension', '$');
+    expectReceiptError(heightOverflow, 'invalid-dimension', '$.heightCells');
 
     const excessiveWidth = validPackedCellsInput();
     excessiveWidth.widthCells = MAX_PACKED_BIJOU_CELLS + 1;
-    expectReceiptError(excessiveWidth, 'invalid-dimension', '$');
+    expectReceiptError(excessiveWidth, 'invalid-dimension', '$.widthCells');
 
     const excessiveHeight = validPackedCellsInput();
     excessiveHeight.heightCells = MAX_PACKED_BIJOU_CELLS + 1;
-    expectReceiptError(excessiveHeight, 'invalid-dimension', '$');
+    expectReceiptError(excessiveHeight, 'invalid-dimension', '$.heightCells');
+
+    const unrenderableWidth = validPackedCellsInput();
+    unrenderableWidth.widthCells = MAX_PACKED_BIJOU_DIMENSION + 1;
+    unrenderableWidth.heightCells = 1;
+    expectReceiptError(
+      unrenderableWidth,
+      'invalid-dimension',
+      '$.widthCells',
+    );
+
+    const unrenderableHeight = validPackedCellsInput();
+    unrenderableHeight.widthCells = 1;
+    unrenderableHeight.heightCells = MAX_PACKED_BIJOU_DIMENSION + 1;
+    expectReceiptError(
+      unrenderableHeight,
+      'invalid-dimension',
+      '$.heightCells',
+    );
   });
 });

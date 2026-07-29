@@ -182,6 +182,8 @@ handles, or mutable renderer objects.
 ## Dimension And Byte Laws
 
 - `widthCells` and `heightCells` are positive safe integers.
+- neither dimension exceeds the renderer's `9,999`-cell cursor-coordinate
+  limit.
 - `widthCells * heightCells` is a safe integer.
 - the receipt contains at most `100,000` cells.
 - `cellCount * 10` is a safe integer.
@@ -392,7 +394,8 @@ is required to explain success or failure.
 - The valid fixture adapts with exact dimensions, bytes, and side-table order.
 - Unknown top-level and nested fields fail.
 - Wrong version and policy literals fail.
-- Zero, negative, fractional, unsafe, and overflowing dimensions fail.
+- Zero, negative, fractional, unsafe, overflowing, and above-`9,999`
+  dimensions fail.
 - Byte-length mismatch and non-byte values fail.
 - Missing side-table references fail instead of decoding as spaces.
 - Surrogate direct glyph values fail.
