@@ -81,6 +81,29 @@ describe('DX-050 page composition graph validation', () => {
     const nodeId = 'page-node:project.keep#facts';
     expect(renderLineId(nodeId, 0)).not.toBe(renderId(`${nodeId}/line-0`));
   });
+
+  it('rejects zero-line node regions beyond the terminal surface', () => {
+    const inputs = mutatePage((page) => {
+      const capabilities = Array.from(
+        { length: 27 },
+        (_, index) => `capability-${String(index)}`,
+      );
+      page.capabilityRequirements = capabilities;
+      const nodes = records(page.nodes);
+      nodes.forEach((node) => {
+        node.requiredCapabilities = [];
+      });
+      recordAt(nodes, 0).requiredCapabilities = capabilities;
+    });
+    expect(() => lowerProfunctorPageArtifacts(
+      inputs,
+      { mode: 'obstructions' },
+    )).toThrow(
+      expect.objectContaining<Partial<ProfunctorPageTargetError>>({
+        code: 'BIJOU_PAGE_BLOCK_UNSUPPORTED',
+      }),
+    );
+  });
 });
 
 function expectInvalid(

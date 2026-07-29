@@ -9,6 +9,20 @@ export function validatePageSceneBounds(
   rows: number,
 ): void {
   for (const plan of plans) {
+    const regionPath = `${plan.node.pageNodeId}.region`;
+    if (
+      plan.region.x < 0
+      || plan.region.y < 0
+      || plan.region.width < 1
+      || plan.region.height < 1
+      || plan.region.x + plan.region.width > cols
+      || plan.region.y + plan.region.height > rows
+    ) {
+      unsupported(
+        regionPath,
+        `region must fit within ${String(cols)}x${String(rows)} target`,
+      );
+    }
     for (const [index, line] of plan.lines.entries()) {
       const path = `${plan.node.pageNodeId}.lines[${String(index)}]`;
       if (/[\r\n\u2028\u2029]/u.test(line.text)) {
