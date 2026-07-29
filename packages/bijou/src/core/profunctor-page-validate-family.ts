@@ -44,6 +44,9 @@ function validateProjectPageRoot(page: ProfunctorArtifactFamily['page']): void {
   if (root?.blockDefinitionId !== 'block:page') {
     reference('page.rootNodeId', 'bounded ProjectPage root must use block:page');
   }
+  if (root.hidden) {
+    reference('page.rootNodeId', 'bounded ProjectPage root must remain visible');
+  }
   if (root.props.route !== page.route) {
     identity('page.route', 'page and root block routes must agree');
   }

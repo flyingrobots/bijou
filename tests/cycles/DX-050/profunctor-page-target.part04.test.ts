@@ -71,6 +71,9 @@ describe('DX-050 canonical contract validation', () => {
       const root = recordAt(page.nodes, 0);
       recordAt([root.props], 0).route = '/projects/not-keep/';
     }), 'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH');
+    expectInvalid(mutatePage((page) => {
+      recordAt(page.nodes, 0).hidden = true;
+    }));
   });
 
   it('rejects undeclared digests and obstructed builds', () => {

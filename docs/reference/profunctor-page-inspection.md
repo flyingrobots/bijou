@@ -65,7 +65,8 @@ The page, source map, and build manifest must agree on the page identity. The
 manifest entity must agree with the page entity, its sole route must equal the
 page route, and its dependencies must equal the page dependency digests in the
 same order. Every source-map source and record digest, node provenance source
-digest, and build entity digest must occur in that dependency list.
+digest, and build entity digest must occur in that dependency list. The page
+root must be a visible `block:page` whose route agrees with the page route.
 
 ## Supported Blocks
 
