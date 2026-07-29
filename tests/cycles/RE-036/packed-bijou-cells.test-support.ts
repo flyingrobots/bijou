@@ -58,7 +58,9 @@ export function expectReceiptError(
     if (!(error instanceof PackedBijouCellsValidationError)) throw error;
     expect(error.code).toBe(code);
     expect(error.path).toBe(path);
-    expect(error.message).toContain(`packed-bijou-cells/1 ${code} at ${path}:`);
+    expect(error.message).toBe(
+      `packed-bijou-cells/1 ${code} at ${path}: ${error.detail}`,
+    );
   }
 }
 
