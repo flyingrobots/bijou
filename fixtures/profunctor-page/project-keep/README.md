@@ -34,7 +34,8 @@ npm run generate:profunctor-page-target
 
 Generation stages the complete inventory before replacing `generated/`. A
 failed installation preserves the previous directory or its explicit
-`.previous` recovery directory.
+`.previous` recovery directory. A later run refuses to overwrite that recovery
+directory until an operator resolves it.
 
 Verify the checked inventory and exact bytes:
 

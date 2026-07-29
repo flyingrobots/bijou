@@ -9,7 +9,12 @@ export function replaceGeneratedDirectory(
   output: string,
   backup: string,
 ): void {
-  rmSync(backup, { force: true, recursive: true });
+  if (existsSync(backup)) {
+    throw new Error(
+      `Refusing to overwrite existing backup at ${backup}; `
+      + 'resolve or recover it before retrying',
+    );
+  }
   let movedExisting = false;
   let installedStage = false;
   try {
