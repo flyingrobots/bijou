@@ -150,12 +150,12 @@ Current direction and active tensions. Historical ship data is in
   and 1 closed milestone item as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 18 open
+- The `v8.2.0` milestone is quality automation and Method hardening: 20 open
   and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
-- The `v10.0.0` milestone is renderer and host-systems integration: 10 open and
-  0 closed milestone items.
+- The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
+  1 closed milestone item.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
   and 6 closed milestone items as of the latest roadmap sync.
 - No open issue is currently unmilestoned; keep open unmilestoned searches
@@ -218,21 +218,19 @@ The Code Dojo ratchet
 counted violations. Current debt comprises `37` file/context and `25`
 code-size violations with no mock-ban or ESLint debt.
 
-The active bounded target is
-[#468](https://github.com/flyingrobots/bijou/issues/468), implemented in
+The bounded target
+[#468](https://github.com/flyingrobots/bijou/issues/468) landed through
 [#474](https://github.com/flyingrobots/bijou/pull/474). It consumes the
-canonical website specimen through
-Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt
-boundaries. This temporarily pulls one v10 integration proof ahead for the
-active cross-repository campaign; it does not move the issue out of v10 or
-replace the v8 product sequence.
-The accepted cycle design is
+canonical website specimen through Bijou-owned `ui-scene-ir/1`, layout,
+`Surface`, source-map, and receipt boundaries. Its completed cycle design is
 [DX-050](./design/DX-050-profunctor-page-inspection.md).
 
 The #458 GraphQL block artifact bundle has landed as the first v8
 implementation proof. Its cycle design remains
-[DX-049](./design/DX-049-visor-artifact-bundle-proof.md). The next v8 product
-pull is #459: validate `packed-bijou-cells/1` and adapt it to `Surface`.
+[DX-049](./design/DX-049-visor-artifact-bundle-proof.md). The active v8
+product pull is #459: validate `packed-bijou-cells/1` and adapt it to
+`Surface`. Its accepted cycle design is
+[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md).
 
 ```text
 VISOR v8 tracker (#457)
@@ -257,7 +255,7 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Land the bounded Profunctor Page inspection proof in #468.
+1. Treat the bounded Profunctor Page inspection proof in #468 as landed.
 2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
    replay facts, and visual scene facts are implemented.
 3. Pull #459 as the next v8 implementation proof: validate
