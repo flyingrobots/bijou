@@ -46,7 +46,7 @@ export function createDogfoodStorybookWorkbenchModel(
     { label: string; stories: DogfoodStorybookStorySummary[] }
   >();
   for (const story of stories) {
-    const familyId = slugify(story.family, story.id);
+    const familyId = slugify(story.family);
     const existing = families.get(familyId);
     const summary = summarizeStory(story);
     if (existing == null) {
@@ -132,11 +132,18 @@ function uniqueModes(
   return [...new Set(profiles.map((profile) => profile.mode))];
 }
 
-function slugify(value: string, fallback: string): string {
+function slugify(value: string): string {
+  const asciiSlug = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (asciiSlug !== '') return asciiSlug;
+
   return (
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || fallback
+    Array.from(
+      value,
+      (character) =>
+        character.codePointAt(0)?.toString(36) ?? String(value.length),
+    ).join('-') || String(value.length)
   );
 }

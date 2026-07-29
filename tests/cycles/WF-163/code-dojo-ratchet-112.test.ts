@@ -2,21 +2,21 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { createDogfoodStorybookWorkbenchModel } from '../../../examples/docs/storybook-workstation.js';
+import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const BASELINE_PATH = 'scripts/code-dojo/baselines/file-context.json';
-
-interface FileContextEntry {
-  readonly path: string;
-  readonly lines: number;
-  readonly bytes: number;
-}
 
 interface FileContextBaseline {
   readonly schema: string;
   readonly maxLines: number;
   readonly maxBytes: number;
-  readonly files: readonly FileContextEntry[];
+  readonly files: readonly Readonly<{
+    path: string;
+    lines: number;
+    bytes: number;
+  }>[];
 }
 
 function read(relativePath: string): string {
@@ -38,26 +38,21 @@ function parseFileContextBaseline(source: string): FileContextBaseline {
   ) {
     throw new Error('invalid file/context baseline');
   }
-  const files = parsed.files.map((entry: unknown) => {
-    if (
-      !isRecord(entry) ||
-      typeof entry.path !== 'string' ||
-      typeof entry.lines !== 'number' ||
-      typeof entry.bytes !== 'number'
-    ) {
-      throw new Error('invalid file/context baseline entry');
-    }
-    return {
-      path: entry.path,
-      lines: entry.lines,
-      bytes: entry.bytes,
-    };
-  });
   return {
     schema: parsed.schema,
     maxLines: parsed.maxLines,
     maxBytes: parsed.maxBytes,
-    files,
+    files: parsed.files.map((entry: unknown) => {
+      if (
+        !isRecord(entry) ||
+        typeof entry.path !== 'string' ||
+        typeof entry.lines !== 'number' ||
+        typeof entry.bytes !== 'number'
+      ) {
+        throw new Error('invalid file/context baseline entry');
+      }
+      return { path: entry.path, lines: entry.lines, bytes: entry.bytes };
+    }),
   };
 }
 
@@ -80,14 +75,9 @@ describe('WF-163 Code Dojo ratchet', () => {
       const content = read(entry.path);
       const lines = content.split(/\r?\n/u).length;
       const bytes = Buffer.byteLength(content, 'utf8');
-      expect({ lines, bytes }, entry.path).toEqual({
-        lines: entry.lines,
-        bytes: entry.bytes,
-      });
-      expect(
-        lines > baseline.maxLines || bytes > baseline.maxBytes,
-        entry.path,
-      ).toBe(true);
+      expect({ lines, bytes }, entry.path).toEqual({ lines: entry.lines, bytes: entry.bytes });
+      expect(lines > baseline.maxLines || bytes > baseline.maxBytes, entry.path)
+        .toBe(true);
     }
   });
 
@@ -140,5 +130,19 @@ describe('WF-163 Code Dojo ratchet', () => {
     expect(design).not.toContain(
       'No new file exceeds `150` lines or `12,000` bytes unless it remains in the',
     );
+  });
+
+  it('preserves family grouping when an extracted label has no ASCII slug', () => {
+    const [first, second] = COMPONENT_STORIES;
+    if (first == null || second == null)
+      throw new Error('storybook regression requires two canonical stories');
+    const family = '状態';
+    const model = createDogfoodStorybookWorkbenchModel([
+      { ...first, id: 'localized-family-a', family },
+      { ...second, id: 'localized-family-b', family },
+    ]);
+
+    expect(model.familyCount).toBe(1);
+    expect(model.families[0]?.stories).toHaveLength(2);
   });
 });
