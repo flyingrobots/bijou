@@ -25,6 +25,8 @@ export const TRANCHE_C_FAMILY_MEMBERS = {
     'examples/notifications/notification-demo-overlay.ts',
     'examples/notifications/notification-demo-mouse.ts',
     'examples/notifications/notification-demo-lifecycle.ts',
+    'examples/notifications/notification-demo-update.ts',
+    'examples/notifications/notification-demo-action-update.ts',
     'examples/notifications/notification-demo-create.ts',
     'examples/notifications/notification-demo-entry.ts',
   ],
