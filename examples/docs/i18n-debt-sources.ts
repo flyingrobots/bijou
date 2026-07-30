@@ -3,39 +3,12 @@ import { posix as posixPath } from 'node:path';
 import ts from 'typescript';
 import type {
   DogfoodI18nDebtSource,
-  DogfoodI18nDebtSourceExclusion,
 } from './i18n-debt-contract.js';
 import { repoUrl } from './i18n-debt-io.js';
+import { DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS } from './i18n-debt-source-exclusions.js';
 const DOGFOOD_I18N_DEBT_ROOT = 'examples/docs';
-const IMPLEMENTATION_REASON =
-  'localization debt scanner implementation, not a DOGFOOD product surface';
-const IMPLEMENTATION_PATHS = [
-  'examples/docs/i18n-debt.ts',
-  'examples/docs/i18n-debt-contract.ts',
-  'examples/docs/i18n-debt-sources.ts',
-  'examples/docs/i18n-debt-ratchet.ts',
-  'examples/docs/i18n-debt-source-scan.ts',
-  'examples/docs/i18n-debt-source-context.ts',
-  'examples/docs/i18n-debt-markdown-discovery.ts',
-  'examples/docs/i18n-debt-markdown-spec.ts',
-  'examples/docs/i18n-debt-markdown-ratchet.ts',
-  'examples/docs/i18n-debt-io.ts',
-] as const;
 
-export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSourceExclusion[] =
-  Object.freeze([
-    ...IMPLEMENTATION_PATHS.map((path) =>
-      Object.freeze({ path, reason: IMPLEMENTATION_REASON }),
-    ),
-    exclusion(
-      'examples/docs/i18n-debt-baseline.ts',
-      'localization debt baseline data, not a DOGFOOD product surface',
-    ),
-    exclusion(
-      'examples/docs/i18n-debt-touched.ts',
-      'localization touched-file ratchet implementation, not a DOGFOOD product surface',
-    ),
-  ]);
+export { DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS } from './i18n-debt-source-exclusions.js';
 
 const SURFACE_NAMES: Readonly<Record<string, string>> = {
   'examples/docs/app.ts': 'docs-app',
@@ -142,8 +115,4 @@ function isInsideNamedFunction(node: ts.Node, name: string): boolean {
     }
   }
   return false;
-}
-
-function exclusion(path: string, reason: string): DogfoodI18nDebtSourceExclusion {
-  return Object.freeze({ path, reason });
 }

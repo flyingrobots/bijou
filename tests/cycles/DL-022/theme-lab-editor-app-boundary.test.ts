@@ -9,11 +9,13 @@ function read(relativePath: string): string {
 }
 
 describe('DL-022 Theme Lab editor app boundary', () => {
-  it('keeps Theme Lab editor key handling outside the legacy docs app shell', () => {
-    const appSource = read('examples/docs/app.ts');
+  it('keeps Theme Lab editor key handling outside the public docs app facade', () => {
+    const facadeSource = read('examples/docs/app.ts');
+    const routeSource = read('examples/docs/app-docs-route-update.ts');
 
-    expect(appSource.includes("from './app-theme-lab-editor-model.js'")).toBe(false);
-    expect(appSource.includes('function updateThemeLabEditorFromKey(')).toBe(false);
-    expect(appSource.includes("from './app-theme-lab-key-handling.js'")).toBe(true);
+    expect(facadeSource.includes('app-theme-lab-editor-model')).toBe(false);
+    expect(facadeSource.includes('app-theme-lab-key-handling')).toBe(false);
+    expect(routeSource.includes('function updateThemeLabEditorFromKey(')).toBe(false);
+    expect(routeSource.includes("from './app-theme-lab-key-handling.js'")).toBe(true);
   });
 });

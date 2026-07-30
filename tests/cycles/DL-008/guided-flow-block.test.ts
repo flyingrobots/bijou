@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { explainability, guidedFlow } from '../../../packages/bijou/src/index.js';
+import { findComponentStory } from '../../../examples/docs/stories.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 
 describe('DL-008 guided-flow block cycle', () => {
@@ -62,11 +63,11 @@ describe('DL-008 guided-flow block cycle', () => {
   });
 
   it('proves the promoted block in DOGFOOD', () => {
-    const stories = readRepoFile('examples/docs/stories.ts');
+    const story = findComponentStory('guided-flow');
 
-    expect(stories).toContain("id: 'guided-flow'");
-    expect(stories).toContain('guidedFlow({');
-    expect(stories).toContain('Prepare the staging rollout');
+    expect(story?.title).toBe('guidedFlow()');
+    expect(story?.variants.some(({ id }) => id === 'staging-rollout')).toBe(true);
+    expect(story?.docs.summary).toContain('multi-step assistance');
   });
 
   it('points to the next design-language closure', () => {

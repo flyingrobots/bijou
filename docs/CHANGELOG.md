@@ -48,6 +48,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **WF-165 Code Dojo goalpost, tranche E** — The TUI runtime, table,
+  framed-app, DOGFOOD application, and DOGFOOD story catalog preserve their
+  public entrypoints as typed facades over focused sub-150-line modules. Exact
+  public-export and family manifests bind the compatibility surface, context
+  limits, and repository runtime-cycle proof. The ordered story catalog remains
+  semantically identical across all `42` definitions, while one typed package
+  identity replaces repeated literals and lowers the story localization lineage
+  from `1,453` to `1,427` raw strings. File/context debt falls from `17` to
+  `12`, code-size debt falls from `5` to `0`, and aggregate debt reaches the
+  WF-165 goalpost at `12`.
 - **WF-165 Code Dojo goalpost, tranche D** — `Surface`, DOGFOOD i18n-debt
   analysis, framed-app overlays, `ui-scene-ir/1`, and the terminal differ now
   preserve their public entrypoints as typed facades over focused

@@ -17,7 +17,7 @@ import { TRANCHE_D_ROOTS } from './tranche-d-contract.js';
 import { TRANCHE_D_FAMILY_MEMBERS } from './tranche-d-families.js';
 
 describe('WF-165 Code Dojo tranche D debt contract', () => {
-  it('removes five double-counted roots and lowers debt to 22', () => {
+  it('keeps tranche-D debt absent as later tranches lower the ceiling', () => {
     const baseline = parseFileContextBaseline(
       read('scripts/code-dojo/baselines/file-context.json'),
     );
@@ -30,16 +30,18 @@ describe('WF-165 Code Dojo tranche D debt contract', () => {
     const measuredDebt = loadCodeDojoDebtSummary(ROOT);
 
     expect(TRANCHE_D_ROOTS).toHaveLength(5);
-    expect(contextPaths).toHaveLength(17);
-    expect(codeSizePaths).toHaveLength(5);
-    expect(measuredDebt).toMatchObject({
-      fileContextViolations: 17,
-      mockBanViolations: 0,
-      codeSizeViolations: 5,
-      eslintViolations: 0,
-      totalViolations: 22,
-    });
-    expect(debtScript()).toBe('tsx scripts/code-dojo-debt.ts --max 22');
+    expect(contextPaths.length).toBeLessThanOrEqual(17);
+    expect(codeSizePaths.length).toBeLessThanOrEqual(5);
+    expect(measuredDebt.fileContextViolations).toBeLessThanOrEqual(17);
+    expect(measuredDebt.codeSizeViolations).toBeLessThanOrEqual(5);
+    expect(measuredDebt.totalViolations).toBeLessThanOrEqual(22);
+    const command = debtScript();
+    expect(command).toMatch(/^tsx scripts\/code-dojo-debt\.ts --max \d+$/u);
+    const ceiling = Number(
+      command?.match(/--max (?<ceiling>\d+)$/u)?.groups?.ceiling,
+    );
+    expect(Number.isSafeInteger(ceiling)).toBe(true);
+    expect(ceiling).toBeLessThanOrEqual(22);
     for (const root of TRANCHE_D_ROOTS) {
       expect(contextPaths, root).not.toContain(root);
       expect(codeSizePaths, root).not.toContain(root);

@@ -151,7 +151,7 @@ Current direction and active tensions. Historical ship data is in
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 22 open
-  and 2 closed milestone items.
+  and 3 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
 - The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
@@ -218,10 +218,14 @@ The Code Dojo ratchet
 counted violations. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to
 `22` file/context and `10` code-size violations with no mock-ban or ESLint
-debt. Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
+debt. Landed tranche D
+[#488](https://github.com/flyingrobots/bijou/pull/488)
 preserves five more public entrypoints as focused families and lowers those
-ledgers to `17` and `5`. The final bounded tranche must remove the five
-remaining double-counted roots and reach aggregate debt of `12` or less.
+ledgers to `17` and `5`. Tranche E
+[#489](https://github.com/flyingrobots/bijou/pull/489) implements the final
+five splits while preserving the public TUI runtime, table, framed-app,
+DOGFOOD application, and DOGFOOD story entrypoints. The ledgers now reach `12`
+and `0`; merged goalpost evidence precedes V8 tracker closeout.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -248,11 +252,14 @@ smallest roots and lowered that ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering, lowering the live ceiling to `32`; `10` double-counted
-roots remain. Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
+roots remain. Landed tranche D
+[#488](https://github.com/flyingrobots/bijou/pull/488)
 preserves `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
 `ui-scene-ir/1`, and the terminal differ behind stable facades, lowering the
-live ceiling to `22`; five double-counted roots remain. V8 tracker closeout
-and release preparation follow the completed `62 -> 12` goalpost.
+live ceiling to `22`. Tranche E
+[#489](https://github.com/flyingrobots/bijou/pull/489) preserves the final five
+public entrypoints as bounded families and reaches `12 + 0 = 12`. V8 tracker
+closeout and release preparation follow merged `62 -> 12` goalpost evidence.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope for scroll measurements until revision- or digest-based
@@ -286,8 +293,7 @@ Recommended pull order:
    replay facts, and visual scene facts are implemented.
 3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
    and adapts into a synchronized terminal `Surface`.
-4. Pull #480 through bounded WF-165 tranches until Code Dojo debt reaches `12`
-   or less.
+4. Merge #489 after exact-head review to close #480 at Code Dojo debt `12`.
 5. Close #302 and #457 only after merged goalpost evidence and V8 contract
    closeout agree.
 6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof

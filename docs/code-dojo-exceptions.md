@@ -24,20 +24,27 @@ Current count:
 
 | Source                |   Count | Meaning                                                           |
 | :-------------------- | ------: | :---------------------------------------------------------------- |
-| File/context baseline |      17 | Files over the Code Dojo context threshold.                       |
+| File/context baseline |      12 | Files over the Code Dojo context threshold.                       |
 | Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
-| Code-size baseline    |       5 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
+| Code-size baseline    |       0 | Files over 500 lines; none exceed the 1000-line hard limit.       |
 | ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total**             |  **22** | Aggregate Code Dojo standards debt.                               |
+| **Total**             |  **12** | Aggregate Code Dojo standards debt.                               |
 
-WF-165 tranches A through D split twenty double-counted roots into focused
+WF-165 tranches A through E split twenty-five double-counted roots into focused
 modules behind their existing public entrypoints. Tranche A lowers file/context
 debt from `37` to `32`, code-size debt from `25` to `20`, and aggregate debt
 from `62` to `52`. Tranche B lowers those counts to `27`, `15`, and `42`.
 Tranche C lowers them again to `22`, `10`, and `32`. Tranche D lowers them to
-`17`, `5`, and `22`. The in-flight WF-165 goalpost remains anchored at its
-original `62` count and must reach `12` or lower; an intermediate tranche does
-not reset the required reduction.
+`17`, `5`, and `22`. Tranche E reaches `12`, `0`, and `12`, completing the
+goalpost's required reduction from its original `62` count without weakening a
+threshold.
+
+Tranche E preserves the TUI runtime, table, framed-app, DOGFOOD application,
+and DOGFOOD story public entrypoints as focused module families. The story
+catalog retains all `42` ordered story definitions, while its split
+localization lineage falls from `1,453` to `1,427` raw strings and the complete
+DOGFOOD baseline falls from `2,343` to `2,317`. Missing Markdown localizations
+hold at `78`.
 
 WF-164 tranche B splits `24` more production and repository-tooling
 entrypoints into focused modules while keeping their public import paths stable.
@@ -164,8 +171,8 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The encoded intermediate ceiling is `22`. The active WF-165 goalpost began at
-`62` and must lower the ceiling to `12` or lower.
+The encoded ceiling is `12`. WF-165 began at `62` and reaches its required
+`12`-or-lower goalpost without resetting the denominator between tranches.
 
 ## Updating The Ceiling
 

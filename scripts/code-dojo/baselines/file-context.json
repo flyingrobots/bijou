@@ -4,31 +4,6 @@
   "maxBytes": 12000,
   "files": [
     {
-      "path": "examples/docs/stories.ts",
-      "lines": 4559,
-      "bytes": 169954
-    },
-    {
-      "path": "examples/docs/app.ts",
-      "lines": 3307,
-      "bytes": 114774
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame.ts",
-      "lines": 2848,
-      "bytes": 109042
-    },
-    {
-      "path": "packages/bijou/src/core/components/table.ts",
-      "lines": 991,
-      "bytes": 32973
-    },
-    {
-      "path": "packages/bijou-tui/src/runtime-engine.ts",
-      "lines": 976,
-      "bytes": 25353
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062
