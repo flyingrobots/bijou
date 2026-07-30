@@ -8,7 +8,44 @@ interface TestMsg {
   readonly value: number;
 }
 
+class ObservedPromise extends Promise<undefined> {
+  thenCalls = 0;
+
+  override then<TResult1 = undefined, TResult2 = never>(
+    onfulfilled?: (
+      (value: undefined) => TResult1 | PromiseLike<TResult1>
+    ) | null,
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+  ): Promise<TResult1 | TResult2> {
+    this.thenCalls += 1;
+    return super.then(onfulfilled, onrejected);
+  }
+}
+
 describe('event-bus subscriber isolation', () => {
+  it('consumes asynchronous error-reporter failures', async () => {
+    let rejectReport: ((reason: unknown) => void) | undefined;
+    const rejectedReport = new ObservedPromise((_resolve, reject) => {
+      rejectReport = reject;
+    });
+    const options = {};
+    Object.defineProperty(options, 'onError', {
+      value: () => rejectedReport,
+    });
+    const bus = createEventBus<TestMsg>(options);
+    bus.on(() => {
+      throw new Error('subscriber failed');
+    });
+
+    bus.emit({ type: 'custom', value: 42 });
+    await Promise.resolve();
+    expect(rejectedReport.thenCalls).toBe(1);
+
+    rejectReport?.(new Error('reporter failed'));
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
   it('reports one subscriber failure and continues fan-out', () => {
     const onError = vi.fn();
     const bus = createEventBus<TestMsg>({ onError });

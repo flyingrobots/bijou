@@ -6,7 +6,9 @@ export function safeReport<M>(
   error: unknown,
 ): void {
   try {
-    state.options?.onError?.(message, error);
+    void Promise.resolve(
+      state.options?.onError?.(message, error),
+    ).catch(() => undefined);
   } catch {
     // Error reporting must not recreate an unhandled rejection.
   }

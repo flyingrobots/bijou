@@ -52,9 +52,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   example smoke runner, i18n runtime, and timeline now keep their public
   entrypoints as typed facades over focused sub-150-line modules. Exact export
   witnesses and repository-wide runtime-cycle analysis preserve their
-  contracts. File/context debt falls from `37` to `32`, code-size debt falls
-  from `25` to `20`, and aggregate debt falls from `62` to `52`; the active
-  goalpost remains `12` or lower.
+  contracts. Event-bus subscriber failures remain isolated across every
+  fan-out path, and synchronous throws or asynchronous rejections from the
+  optional error reporter cannot escape the reporting boundary. File/context
+  debt falls from `37` to `32`, code-size debt falls from `25` to `20`, and
+  aggregate debt falls from `62` to `52`; the active goalpost remains `12` or
+  lower.
 - **DX-050 Code Dojo prerequisite, tranche B** — `24` additional production
   and repository-tooling entrypoints are now stable compatibility facades over
   focused sub-150-line modules. File/context debt falls from `61` to `37`,
