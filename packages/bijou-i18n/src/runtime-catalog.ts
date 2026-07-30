@@ -12,7 +12,7 @@ export class RuntimeCatalogStore {
   readonly #fallback = new Map<string, I18nCatalog>();
   readonly #manual = new Map<string, I18nCatalog>();
   readonly #loader = new Map<string, I18nCatalog>();
-  readonly #cache = new Map<string, Promise<readonly I18nCatalog[]>>();
+  readonly #cache = new Map<string, readonly I18nCatalog[]>();
   readonly #load: I18nCatalogLoader | undefined;
 
   constructor(options: I18nRuntimeOptions) {
@@ -39,24 +39,14 @@ export class RuntimeCatalogStore {
   }
 
   async preloadLocale(locale: string): Promise<void> {
-    if (this.#load === undefined) return;
-    let pending = this.#cache.get(locale);
-    if (pending === undefined) {
-      pending = this.#load(locale);
-      this.#cache.set(locale, pending);
-    }
-    try {
-      await pending;
-    } catch (error: unknown) {
-      if (this.#cache.get(locale) === pending) this.#cache.delete(locale);
-      throw error;
-    }
+    if (this.#load === undefined || this.#cache.has(locale)) return;
+    this.#cache.set(locale, await this.#load(locale));
   }
 
   async loadLocale(locale: string): Promise<boolean> {
     if (this.#load === undefined) return false;
     await this.preloadLocale(locale);
-    this.#activateLoaderCatalogs(await (this.#cache.get(locale) ?? []));
+    this.#activateLoaderCatalogs(this.#cache.get(locale) ?? []);
     return true;
   }
 
