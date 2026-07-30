@@ -2,7 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { testRuntime } from './driver.js';
 import type { App } from './types.js';
 import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { plainStyle } from '@flyingrobots/bijou/adapters/test';
+import {
+  createTestContext,
+  mockClock,
+  plainStyle,
+} from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
 
@@ -62,5 +66,25 @@ describe('runScript', () => {
       expect(disposeCalls).toBe(1);
       expect(harness.commands[0]?.cleanedUp).toBe(true);
       expect(harness.running).toBe(false);
+    });
+
+  it('includes application initialization in elapsed time', async () => {
+      const clock = mockClock();
+      const ctx = createTestContext({ clock });
+      const app: App<string> = {
+        init: () => {
+          clock.advanceBy(25);
+          return ['ready', []];
+        },
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      const harness = await testRuntime(app, {
+        ctx,
+        pulseFps: false,
+      });
+
+      expect(harness.elapsed).toBe(25);
     });
 });

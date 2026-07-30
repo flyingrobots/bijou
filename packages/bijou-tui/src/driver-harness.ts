@@ -36,6 +36,7 @@ export async function testRuntime<Model, M>(
   options?: TestRuntimeOptions,
 ): Promise<TestHarness<Model, M>> {
   const clock = resolveClock(options?.ctx);
+  const start = clock.now();
   const bus = createEventBus<M>({ clock });
   const frames: Surface[] = [];
   const snapshots: TestRuntimeSnapshot<Model, M>[] = [];
@@ -64,7 +65,7 @@ export async function testRuntime<Model, M>(
     options,
     bus,
     clock,
-    start: clock.now(),
+    start,
     runtime: createDriverRuntimeState(),
     frames,
     snapshots,
