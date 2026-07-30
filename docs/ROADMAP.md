@@ -334,7 +334,10 @@ terminal `Surface` through
 The active prerequisite is the third Code Dojo goalpost
 [#480](https://github.com/flyingrobots/bijou/issues/480): remove all `25`
 double-counted code-size roots and lower aggregate debt from `62` to `12` or
-less through bounded review tranches. Its design is
+less through bounded review tranches. Tranche A
+[#484](https://github.com/flyingrobots/bijou/pull/484) removes five roots from
+both ledgers and lowers the enforced intermediate ceiling to `52`; `20`
+double-counted roots remain. Its design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -384,8 +387,9 @@ These are planning recommendations from the open tracker state as of
   and [#459](https://github.com/flyingrobots/bijou/issues/459) have landed the
   V8 source-side artifact and packed-cell contracts. Pull
   [#480](https://github.com/flyingrobots/bijou/issues/480) through bounded
-  [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches, lowering
-  Code Dojo debt from `62` to `12` or less before V8 tracker closeout.
+  [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Tranche A
+  lowers Code Dojo debt from `62` to `52`; the remaining tranches must reach
+  `12` or less before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

@@ -234,10 +234,11 @@ The active prerequisite is
 [#480](https://github.com/flyingrobots/bijou/issues/480): remove the `25`
 double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
 `12` or less through bounded
-[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. The first
-tranche starts with five smaller double-counted roots and targets `52`
-aggregate violations. V8 tracker closeout and release preparation follow the
-completed `62 -> 12` goalpost.
+[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Tranche A
+[#484](https://github.com/flyingrobots/bijou/pull/484) removes five smaller
+double-counted roots and lowers the enforced intermediate ceiling to `52`.
+Twenty double-counted roots remain. V8 tracker closeout and release preparation
+follow the completed `62 -> 12` goalpost.
 
 ```text
 VISOR v8 tracker (#457)

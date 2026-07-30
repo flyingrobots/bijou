@@ -43,12 +43,14 @@ Ledger edits are evidence after extraction. They are not the implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `62`
-- File/context baseline: `37`
+- Aggregate Code Dojo debt: `52`
+- File/context baseline: `32`
 - Mock-ban baseline: `0`
-- Code-size baseline: `25`, including `3` hard-limit files
+- Code-size baseline: `20`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required goalpost: `12` aggregate violations or lower
+- Tranche A result: `10` counted violations removed from `5` roots
+- Remaining double-counted roots: `20`
 - Tracker issue:
   [#480](https://github.com/flyingrobots/bijou/issues/480)
 - Previous goalpost:
@@ -195,4 +197,11 @@ without reconstructing the goalpost from commit history.
 
 ## Retrospective And Closeout
 
-Open. Tranche A is the first bounded pull in the `62 -> 12` goalpost.
+Open. Tranche A is implemented in
+[#484](https://github.com/flyingrobots/bijou/pull/484). Five compatibility
+facades now delegate to focused contract, state, execution, and adapter modules;
+all facade exports remain stable, every family file is within the strict
+context threshold, focused behavior suites pass, and repository runtime-cycle
+analysis reports no cycle touching a changed family. The live ledgers move from
+`37 + 25 = 62` to `32 + 20 = 52`. Twenty double-counted roots remain before the
+overall `62 -> 12` goalpost can close.

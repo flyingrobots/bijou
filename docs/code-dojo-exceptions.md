@@ -24,11 +24,19 @@ Current count:
 
 | Source                |   Count | Meaning                                                           |
 | :-------------------- | ------: | :---------------------------------------------------------------- |
-| File/context baseline |      37 | Files over the Code Dojo context threshold.                       |
+| File/context baseline |      32 | Files over the Code Dojo context threshold.                       |
 | Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
-| Code-size baseline    |      25 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
+| Code-size baseline    |      20 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
 | ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total**             |  **62** | Aggregate Code Dojo standards debt.                               |
+| **Total**             |  **52** | Aggregate Code Dojo standards debt.                               |
+
+WF-165 tranche A splits the event bus, frame actions, example smoke runner,
+i18n runtime, and timeline into focused modules behind their existing public
+entrypoints. The five roots leave both measured ledgers, lowering file/context
+debt from `37` to `32`, code-size debt from `25` to `20`, and aggregate debt
+from `62` to `52`. The in-flight WF-165 goalpost remains anchored at its
+original `62` count and must reach `12` or lower; an intermediate tranche does
+not reset the required reduction.
 
 WF-164 tranche B splits `24` more production and repository-tooling
 entrypoints into focused modules while keeping their public import paths stable.
@@ -155,17 +163,18 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The encoded ceiling is `62`. The next met goalpost must lower the ceiling to
-`12` or lower.
+The encoded intermediate ceiling is `52`. The active WF-165 goalpost began at
+`62` and must lower the ceiling to `12` or lower.
 
 ## Updating The Ceiling
 
-At a goalpost boundary:
+At a goalpost or bounded-tranche boundary:
 
 1. Remove or formally justify standards debt.
 2. Run `npm run code-dojo:debt`.
-3. Lower the `--max` value in the `code-dojo:debt` package script by at least
-   50, or to zero if fewer than 50 violations remain.
+3. Lower the `--max` value in the `code-dojo:debt` package script to the
+   measured result. A bounded tranche does not reset the active goalpost's
+   required 50-violation reduction.
 4. Update this ledger's current count and next target.
 5. Run `npm run code-dojo:verify`.
 
