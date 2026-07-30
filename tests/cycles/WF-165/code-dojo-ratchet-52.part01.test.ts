@@ -3,6 +3,10 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CODE_SIZE_BASELINE } from '../../../scripts/code-size-gate.js';
 import { splitModuleFamily } from '../DX-050/split-module-family.js';
+import {
+  extractBashCommandBlocks,
+  expectClaims,
+} from '../WF-130/roadmap-goalpost-policy.test-support.js';
 import { TRANCHE_A_ROOTS } from './tranche-a-contract.js';
 
 const ROOT = resolve(import.meta.dirname, '../../..');
@@ -83,5 +87,22 @@ describe('WF-165 Code Dojo tranche A debt contract', () => {
         ).toBe(true);
       }
     }
+  });
+
+  it('replays every cycle suite changed by tranche A', () => {
+    const commands = extractBashCommandBlocks(
+      read('docs/design/WF-165-respecting-dojo-ratchet-12.md'),
+    );
+    const cycleCommand = commands.find((command) =>
+      command.includes('tests/cycles/WF-165'),
+    );
+    expectClaims(cycleCommand ?? '', [
+      'tests/cycles/DX-050',
+      'tests/cycles/RE-036',
+      'tests/cycles/WF-130',
+      'tests/cycles/WF-163',
+      'tests/cycles/WF-164',
+      'tests/cycles/WF-165',
+    ]);
   });
 });

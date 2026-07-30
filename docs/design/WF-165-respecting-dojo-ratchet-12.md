@@ -134,7 +134,13 @@ The overall WF-165 goalpost remains open after tranche A.
 ## Validation Plan
 
 ```bash
-npx vitest run --config vitest.config.ts tests/cycles/WF-165
+npx vitest run --config vitest.config.ts \
+  tests/cycles/DX-050 \
+  tests/cycles/RE-036 \
+  tests/cycles/WF-130 \
+  tests/cycles/WF-163 \
+  tests/cycles/WF-164 \
+  tests/cycles/WF-165
 npm run code-dojo:verify
 npm run typecheck
 npm run lint
