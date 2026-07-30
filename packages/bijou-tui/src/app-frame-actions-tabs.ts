@@ -9,6 +9,8 @@ import { EASINGS } from './spring.js';
 import { timeline } from './timeline.js';
 import { syncPageFrameState } from './app-frame-actions-pane.js';
 
+const PAGE_TRANSITION_DURATION_MS = 300;
+
 export function switchTab<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
@@ -35,7 +37,7 @@ export function switchTab<PageModel, Msg>(
         type: 'tween',
         from: 0,
         to: 1,
-        duration: options.transitionDuration ?? 300,
+        duration: options.transitionDuration ?? PAGE_TRANSITION_DURATION_MS,
         ease: EASINGS.easeInOutCubic,
       })
       .build())
@@ -43,7 +45,7 @@ export function switchTab<PageModel, Msg>(
   const durationMs =
     transitionTimeline?.estimatedDurationMs
     ?? options.transitionDuration
-    ?? 300;
+    ?? PAGE_TRANSITION_DURATION_MS;
   const nextModel = syncPageFrameState({
     ...model,
     activePageId: nextId,
