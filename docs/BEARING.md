@@ -146,12 +146,12 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 2 open milestone items
-  and 2 closed milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is the active feature horizon: 1 open milestone item
+  and 4 closed milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 22 open
-  and 3 closed milestone items.
+  and 5 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
 - The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
@@ -177,6 +177,11 @@ Current direction and active tensions. Historical ship data is in
   Graph visualization proof after the first V8 contract lands.
 - `v8.2.0` should make Code Dojo, Method, tracker sync, and fixture-backed test
   gates easier to inspect and harder to drift.
+- Fresh `v8.2.0` Bad Code follow-through includes
+  [#490](https://github.com/flyingrobots/bijou/issues/490) for canonical
+  DOGFOOD i18n debt aggregation and
+  [#491](https://github.com/flyingrobots/bijou/issues/491) for semantic public
+  TypeScript signature-drift detection.
 - `v9.0.0` should organize the Product Workbench and operator surfaces:
   BlockLab, DOGFOOD drawer/focus language, Theme Lab and Theme Inspector
   provenance, localization operations, artifact matrices, and product-review
@@ -210,22 +215,19 @@ Current direction and active tensions. Historical ship data is in
 
 ## Next Target
 
-The Code Dojo ratchet
-[#477](https://github.com/flyingrobots/bijou/issues/477) has met its
-`112 -> 62` contract. Landed tranche A
-[#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
-[#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
-counted violations. Landed tranche C
-[#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to
-`22` file/context and `10` code-size violations with no mock-ban or ESLint
-debt. Landed tranche D
-[#488](https://github.com/flyingrobots/bijou/pull/488)
-preserves five more public entrypoints as focused families and lowers those
-ledgers to `17` and `5`. Tranche E
-[#489](https://github.com/flyingrobots/bijou/pull/489) implements the final
-five splits while preserving the public TUI runtime, table, framed-app,
-DOGFOOD application, and DOGFOOD story entrypoints. The ledgers now reach `12`
-and `0`; merged goalpost evidence precedes V8 tracker closeout.
+The Code Dojo ratchets
+[#477](https://github.com/flyingrobots/bijou/issues/477) and
+[#480](https://github.com/flyingrobots/bijou/issues/480) are closed. Their
+landed tranches
+[#475](https://github.com/flyingrobots/bijou/pull/475),
+[#478](https://github.com/flyingrobots/bijou/pull/478),
+[#484](https://github.com/flyingrobots/bijou/pull/484),
+[#486](https://github.com/flyingrobots/bijou/pull/486),
+[#487](https://github.com/flyingrobots/bijou/pull/487),
+[#488](https://github.com/flyingrobots/bijou/pull/488), and
+[#489](https://github.com/flyingrobots/bijou/pull/489) lowered aggregate debt
+from `112` to `12`; file/context debt is `12`, and code-size, mock-ban, and
+ESLint debt are `0`.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -239,27 +241,18 @@ have landed as the two bounded V8 implementation proofs. Their cycle designs
 remain [DX-049](./design/DX-049-visor-artifact-bundle-proof.md) and
 [RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md).
 
-The active prerequisite is
-[#480](https://github.com/flyingrobots/bijou/issues/480): remove the `25`
-double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
-`12` or less through bounded
-[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
-tranche A [#484](https://github.com/flyingrobots/bijou/pull/484) removed five
-smaller double-counted roots and lowered the enforced intermediate ceiling to
-`52`. Landed tranche B
-[#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five
-smallest roots and lowered that ceiling to `42`. Landed tranche C
-[#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
-example app, Notifications, Image Viewer, the PR review-status tool, and
-framed-app rendering, lowering the live ceiling to `32`; `10` double-counted
-roots remain. Landed tranche D
-[#488](https://github.com/flyingrobots/bijou/pull/488)
-preserves `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
-`ui-scene-ir/1`, and the terminal differ behind stable facades, lowering the
-live ceiling to `22`. Tranche E
-[#489](https://github.com/flyingrobots/bijou/pull/489) preserves the final five
-public entrypoints as bounded families and reaches `12 + 0 = 12`. V8 tracker
-closeout and release preparation follow merged `62 -> 12` goalpost evidence.
+The V8 source-side contract umbrella issues
+[#302](https://github.com/flyingrobots/bijou/issues/302) and
+[#457](https://github.com/flyingrobots/bijou/issues/457) are closed. The active
+release prerequisite is dependency-security issue
+[#482](https://github.com/flyingrobots/bijou/issues/482), carried by
+[WF-166](./design/WF-166-v8-dependency-security-closeout.md). Live `npm audit`
+reports seven advisories across the MCP, ESLint, and Vitest dependency paths.
+The replacement graph must reach zero advisories and reproduce through a clean
+install before release preparation. Dependabot pull request
+[#467](https://github.com/flyingrobots/bijou/pull/467) targets
+`brace-expansion@5.0.7`, which remains vulnerable under a newer advisory, so it
+must be superseded rather than merged.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope for scroll measurements until revision- or digest-based
@@ -288,14 +281,14 @@ GraphQL SDL fixture
 
 Recommended pull order:
 
-1. Treat the bounded Profunctor Page inspection proof in #468 as landed.
-2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
-   replay facts, and visual scene facts are implemented.
-3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
-   and adapts into a synchronized terminal `Surface`.
-4. Merge #489 after exact-head review to close #480 at Code Dojo debt `12`.
-5. Close #302 and #457 only after merged goalpost evidence and V8 contract
-   closeout agree.
+1. Treat the V8 source-side contract and its #302 / #457 umbrellas as landed.
+2. Close #482 through WF-166 with a reproducible zero-advisory dependency
+   graph.
+3. Supersede #467 only after the replacement resolves
+   `brace-expansion@5.0.9` or later and all gates pass.
+4. Remove the final `12` Code Dojo exceptions in the last zero-debt goalpost.
+5. Start explicit `v8.0.0` release preparation only after security and Code
+   Dojo prerequisites are green.
 6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
 7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
@@ -305,7 +298,7 @@ Recommended pull order:
 9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
    surface work after the Bijou contracts are proven.
 10. Keep closed dependency PR #326 as superseded lineage, not active release
-   work.
+    work.
 
 Non-goals for the next cycle:
 

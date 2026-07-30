@@ -27,9 +27,9 @@ describe('WF-130 roadmap release state', () => {
       '`v9.0.0`: Product Workbench And Operator Surfaces',
       '`v10.0.0`: Renderer And Host Systems Integration',
       '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
-      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 |',
+      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 1 | 4 |',
       '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 3 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 5 |',
       '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
       '| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |',
@@ -54,8 +54,9 @@ describe('WF-130 roadmap release state', () => {
     ]);
     expect(row('v7.1.0')).not.toContain('issues/302');
     expectClaims(row('v7.2.0'), ['issues/354', 'issues/344', 'issues/353']);
-    expect(row('v8.0.0')).toContain('issues/302');
-    expect(row('v8.2.0')).toContain('pull/467');
+    expectClaims(row('v8.0.0'), ['issues/302', 'issues/482']);
+    expect(row('v8.2.0')).not.toContain('pull/467');
+    expect(roadmap).toContain('pull/467');
     expect(normalized('docs/ROADMAP.md')).toContain(
       'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
     );
