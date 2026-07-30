@@ -48,12 +48,16 @@ export const TRANCHE_C_FAMILY_MEMBERS = {
   'scripts/pr-review-status.ts': [
     'scripts/pr-review-status.ts',
     'scripts/pr-review-status-contract.ts',
+    'scripts/pr-review-status-authors.ts',
     'scripts/pr-review-status-checks.ts',
     'scripts/pr-review-status-reviews.ts',
     'scripts/pr-review-status-coderabbit.ts',
     'scripts/pr-review-status-readiness.ts',
     'scripts/pr-review-status-github.ts',
+    'scripts/pr-review-status-github-contract.ts',
+    'scripts/pr-review-status-queries.ts',
     'scripts/pr-review-status-cli.ts',
+    'scripts/pr-review-status-output.ts',
   ],
   'packages/bijou-tui/src/app-frame-render.ts': [
     'packages/bijou-tui/src/app-frame-render.ts',
