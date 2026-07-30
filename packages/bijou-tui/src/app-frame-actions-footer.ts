@@ -1,4 +1,5 @@
 import type {
+  FrameAction,
   FramedAppMsg,
   InternalFrameModel,
 } from './app-frame-types.js';
@@ -8,6 +9,14 @@ import { animate } from './animate.js';
 import { EASINGS } from './spring.js';
 
 const FOOTER_TOGGLE_DURATION_MS = 200;
+type FooterTransitionAction = Extract<
+  FrameAction,
+  { readonly type: 'footer-transition' }
+>;
+type FooterTransitionCompleteAction = Extract<
+  FrameAction,
+  { readonly type: 'footer-transition-complete' }
+>;
 
 export function toggleFooter<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
@@ -45,4 +54,34 @@ export function toggleFooter<PageModel, Msg>(
       }),
     }),
   ]];
+}
+
+export function applyFooterTransition<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  action: FooterTransitionAction,
+): InternalFrameModel<PageModel, Msg> {
+  if (!isCurrentFooterGeneration(model, action.generation)) return model;
+  return {
+    ...model,
+    footerTranslateY: Math.max(0, Math.min(1, action.translateY)),
+  };
+}
+
+export function applyFooterTransitionComplete<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  action: FooterTransitionCompleteAction,
+): InternalFrameModel<PageModel, Msg> {
+  if (!isCurrentFooterGeneration(model, action.generation)) return model;
+  return {
+    ...model,
+    footerVisible: action.visible,
+    footerTranslateY: action.visible ? 0 : 1,
+  };
+}
+
+function isCurrentFooterGeneration<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  generation: number,
+): boolean {
+  return generation === (model.footerAnimationGeneration ?? 0);
 }

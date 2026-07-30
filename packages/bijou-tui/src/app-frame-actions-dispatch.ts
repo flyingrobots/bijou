@@ -5,7 +5,11 @@ import type {
   InternalFrameModel,
 } from './app-frame-types.js';
 import type { Cmd } from './types.js';
-import { toggleFooter } from './app-frame-actions-footer.js';
+import {
+  applyFooterTransition,
+  applyFooterTransitionComplete,
+  toggleFooter,
+} from './app-frame-actions-footer.js';
 import {
   toggleNotificationCenter,
   toggleSettings,
@@ -76,26 +80,9 @@ export function applyFrameAction<PageModel, Msg>(
     case 'notification-tick':
       return [model, []];
     case 'footer-transition':
-      if (
-        action.generation !== (model.footerAnimationGeneration ?? 0)
-      ) {
-        return [model, []];
-      }
-      return [{
-        ...model,
-        footerTranslateY: Math.max(0, Math.min(1, action.translateY)),
-      }, []];
+      return [applyFooterTransition(model, action), []];
     case 'footer-transition-complete':
-      if (
-        action.generation !== (model.footerAnimationGeneration ?? 0)
-      ) {
-        return [model, []];
-      }
-      return [{
-        ...model,
-        footerVisible: action.visible,
-        footerTranslateY: action.visible ? 0 : 1,
-      }, []];
+      return [applyFooterTransitionComplete(model, action), []];
     case 'transition':
     case 'transition-complete':
       return [model, []];
