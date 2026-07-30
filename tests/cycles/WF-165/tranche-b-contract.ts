@@ -119,6 +119,8 @@ export const TRANCHE_B_FAMILY_MEMBERS = {
     'packages/bijou-tui-app/src/skeleton-layout.ts',
     'packages/bijou-tui-app/src/skeleton-overlays.ts',
     'packages/bijou-tui-app/src/skeleton-page.ts',
+    'packages/bijou-tui-app/src/skeleton-page-contract.ts',
+    'packages/bijou-tui-app/src/skeleton-state-contract.ts',
     'packages/bijou-tui-app/src/skeleton-tab-contract.ts',
     'packages/bijou-tui-app/src/skeleton-theme-contract.ts',
   ],

@@ -3,7 +3,7 @@ import type {
   TokenValue,
 } from '@flyingrobots/bijou';
 import type { KeyMap } from '@flyingrobots/bijou-tui';
-import type { SkeletonMsg } from './skeleton-contract.js';
+import type { SkeletonMsg } from './skeleton-state-contract.js';
 import type {
   SkeletonStatusContext,
   SkeletonTab,

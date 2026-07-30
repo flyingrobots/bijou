@@ -81,4 +81,20 @@ describe('WF-165 Code Dojo tranche B debt contract', () => {
       '`${spec.tab.id}-main`',
     );
   });
+
+  it('keeps skeleton contract leaves pointed away from the aggregator', () => {
+    for (const path of [
+      'packages/bijou-tui-app/src/skeleton-page-contract.ts',
+      'packages/bijou-tui-app/src/skeleton-state-contract.ts',
+      'packages/bijou-tui-app/src/skeleton-tab-contract.ts',
+      'packages/bijou-tui-app/src/skeleton-theme-contract.ts',
+    ]) {
+      expect(read(path), path).not.toContain("from './skeleton-contract.js'");
+    }
+    const aggregator = read(
+      'packages/bijou-tui-app/src/skeleton-contract.ts',
+    );
+    expect(aggregator).not.toContain('import type');
+    expect(aggregator).not.toContain('export interface');
+  });
 });

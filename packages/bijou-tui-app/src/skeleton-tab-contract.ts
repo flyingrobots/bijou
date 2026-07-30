@@ -3,7 +3,7 @@ import type {
   FrameLayoutNode,
   ViewOutput,
 } from '@flyingrobots/bijou-tui';
-import type { SkeletonPageModel } from './skeleton-contract.js';
+import type { SkeletonPageModel } from './skeleton-state-contract.js';
 
 /** Context passed to consumer-provided skeleton page renderers. */
 export interface SkeletonRenderContext {
