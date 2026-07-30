@@ -55,7 +55,7 @@ export async function finalizeRuntime<Model, M>(
   }
 }
 
-async function drainWithin(
+export async function drainWithin(
   bus: { drain(): Promise<void> },
   clock: ClockPort,
   timeout: number,
@@ -74,9 +74,14 @@ async function drainWithin(
       handle = clock.setTimeout(() => {
         finish('timed-out');
       }, timeout);
-      void bus.drain().then(() => {
-        finish('drained');
-      });
+      void bus.drain().then(
+        () => {
+          finish('drained');
+        },
+        () => {
+          finish('drained');
+        },
+      );
     });
   } finally {
     disposeHandle(handle);
