@@ -71,7 +71,7 @@ export function minimumDetourWidth(
       if (
         toLayer == null
         || toColumn == null
-        || fromColumn === toColumn
+        || fromColumn !== toColumn
         || toLayer - fromLayer <= 1
       ) continue;
       required = Math.max(
