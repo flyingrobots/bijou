@@ -13,7 +13,7 @@ requests assigned to each milestone. They are not issue-only totals. Do not
 compare release snapshot item totals to issue-only `gh issue list` output
 without also accounting for milestone pull requests.
 
-Last synced from GitHub milestone items: 2026-07-29.
+Last synced from GitHub milestone items: 2026-07-30.
 
 ## Current Release State
 
@@ -50,7 +50,7 @@ count reaches zero.
 | `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 | Shipped demo-integrity and framework-input stabilization lineage. |
 | `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 | Contract implementation landed; tracker closeout waits on the next Code Dojo goalpost. |
 | `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 | Post-V8 replay, capture, debugger, and render-witness follow-through. |
-| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 21 | 2 | Quality automation, Method hardening, and Code Dojo visibility horizon. |
+| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 2 | Quality automation, Method hardening, and Code Dojo visibility horizon. |
 | `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 | Product Workbench and operator-surface horizon. |
 | `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 | Renderer and host-systems integration horizon. |
 | `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Previous shipped release lineage. Complete; do not reopen for new feature work. |
@@ -215,6 +215,7 @@ Primary tracker:
 - Code Dojo goalposts, structural debt, visibility, and ratchet automation:
   [#480](https://github.com/flyingrobots/bijou/issues/480),
   [#482](https://github.com/flyingrobots/bijou/issues/482),
+  [#467](https://github.com/flyingrobots/bijou/pull/467),
   [#481](https://github.com/flyingrobots/bijou/issues/481),
   [#477](https://github.com/flyingrobots/bijou/issues/477),
   [#476](https://github.com/flyingrobots/bijou/issues/476),
@@ -343,11 +344,15 @@ less through bounded review tranches. Landed tranche A
 both ledgers and lowered the enforced intermediate ceiling to `52`; `20`
 double-counted roots remained. Landed tranche B
 [#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five
-smallest roots and lowered the intermediate ceiling to `42`. Tranche C
+smallest roots and lowered the intermediate ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering. It lowers the live intermediate ceiling to `32`; `10`
-double-counted roots remain. The cycle design is
+double-counted roots remain. Tranche D is the immediate pull: split
+`Surface`, DOGFOOD i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`,
+and the terminal differ behind stable facades, then lower file/context debt
+from `22` to `17`, code-size debt from `10` to `5`, and aggregate debt from
+`32` to `22`. The cycle design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -355,7 +360,7 @@ publication is part of this structural cycle.
 ## Forward Goalposts
 
 These are planning recommendations from the open tracker state as of
-2026-07-29. `v7.1.0` and `v7.2.0` are shipped lineage; `v8.0.0`, `v8.1.0`,
+2026-07-30. `v7.1.0` and `v7.2.0` are shipped lineage; `v8.0.0`, `v8.1.0`,
 `v8.2.0`, `v9.0.0`, and `v10.0.0` are the explicit forward release horizons.
 
 | Target | Goalpost | Tracker | Why It Belongs There | Release Gate |
@@ -399,9 +404,11 @@ These are planning recommendations from the open tracker state as of
   [#480](https://github.com/flyingrobots/bijou/issues/480) through bounded
   [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
   tranche A lowered Code Dojo debt from `62` to `52`, and landed tranche B
-  lowered it to `42`. Tranche C
+  lowered it to `42`. Landed tranche C
   [#487](https://github.com/flyingrobots/bijou/pull/487) lowers it to `32`.
-  The remaining tranches must reach `12` or less before V8 tracker closeout.
+  Tranche D targets `22` by splitting the next five smallest double-counted
+  roots. The final bounded tranche must then reach `12` or less before V8
+  tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

@@ -150,7 +150,7 @@ Current direction and active tensions. Historical ship data is in
   and 2 closed milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 21 open
+- The `v8.2.0` milestone is quality automation and Method hardening: 22 open
   and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
@@ -215,10 +215,10 @@ The Code Dojo ratchet
 `112 -> 62` contract. Landed tranche A
 [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
 [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
-counted violations. Tranche C
+counted violations. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to
 `22` file/context and `10` code-size violations with no mock-ban or ESLint
-debt.
+debt. Tranche D is selected to lower those ledgers to `17` and `5`.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -241,15 +241,18 @@ tranche A [#484](https://github.com/flyingrobots/bijou/pull/484) removed five
 smaller double-counted roots and lowered the enforced intermediate ceiling to
 `52`. Landed tranche B
 [#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five
-smallest roots and lowered that ceiling to `42`. Tranche C
+smallest roots and lowered that ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering, lowering the live ceiling to `32`; `10` double-counted
-roots remain. V8 tracker closeout and release preparation follow the completed
-`62 -> 12` goalpost.
+roots remain. Tranche D now owns `Surface`, DOGFOOD i18n-debt analysis,
+framed-app overlays, `ui-scene-ir/1`, and the terminal differ, targeting an
+aggregate ceiling of `22`. V8 tracker closeout and release preparation follow
+the completed `62 -> 12` goalpost.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
-out of scope until revision- or digest-based invalidation is explicit.
+out of scope for scroll measurements until revision- or digest-based
+invalidation is explicit.
 
 ```text
 VISOR v8 tracker (#457)
