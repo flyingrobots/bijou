@@ -2,13 +2,13 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   expectClaims,
+  expectParagraphClaims,
   normalized,
+  read,
   ROOT,
 } from '../WF-130/roadmap-goalpost-policy.test-support.js';
-
 const DESIGN_PATH =
   'docs/design/RE-036-packed-bijou-cells-surface-adapter.md';
-
 describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
   it('locks the fail-closed receipt and byte-exact adapter contract', () => {
     expect(existsSync(`${ROOT}/${DESIGN_PATH}`)).toBe(true);
@@ -48,10 +48,6 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
     const bearing = normalized('docs/BEARING.md');
 
     expectClaims(roadmap, [
-      'The V8 source-side contract pulls are landed:',
-      '[#483](https://github.com/flyingrobots/bijou/pull/483)',
-      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
-      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 20 | 2 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
@@ -65,5 +61,28 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
     ]);
     expect(bearing).not.toContain('active packed-cell Surface adapter (#459)');
+    const roadmapSource = read('docs/ROADMAP.md');
+    expectParagraphClaims(
+      roadmapSource,
+      'The V8 source-side contract pulls are landed:',
+      [
+        '[#458](https://github.com/flyingrobots/bijou/issues/458)',
+        '[#459](https://github.com/flyingrobots/bijou/issues/459)',
+        '[#483](https://github.com/flyingrobots/bijou/pull/483)',
+      ],
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+    );
+    expectParagraphClaims(
+      roadmapSource,
+      'The active prerequisite is the third Code Dojo goalpost',
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+      ['[#458]', '[#459]', '[#483]'],
+    );
   });
 });

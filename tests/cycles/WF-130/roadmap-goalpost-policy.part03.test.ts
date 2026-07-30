@@ -7,11 +7,11 @@ import {
   expectClaims,
   expectNoClaims,
   expectOrderedClaims,
+  expectParagraphClaims,
   normalized,
   read,
   ROOT,
 } from './roadmap-goalpost-policy.test-support.js';
-
 describe('WF-130 roadmap pull order', () => {
   it('binds the completed Dojo prerequisite and complete downstream order', () => {
     const roadmap = normalized('docs/ROADMAP.md');
@@ -22,10 +22,6 @@ describe('WF-130 roadmap pull order', () => {
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
       'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
       'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
-      'The V8 source-side contract pulls are landed:',
-      '[#483](https://github.com/flyingrobots/bijou/pull/483)',
-      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
-      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
@@ -42,6 +38,29 @@ describe('WF-130 roadmap pull order', () => {
       'Renderer And Host Systems Integration',
       'terminal shader, raster, and native-render foundations',
     ]);
+    const roadmapSource = read('docs/ROADMAP.md');
+    expectParagraphClaims(
+      roadmapSource,
+      'The V8 source-side contract pulls are landed:',
+      [
+        '[#458](https://github.com/flyingrobots/bijou/issues/458)',
+        '[#459](https://github.com/flyingrobots/bijou/issues/459)',
+        '[#483](https://github.com/flyingrobots/bijou/pull/483)',
+      ],
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+    );
+    expectParagraphClaims(
+      roadmapSource,
+      'The active prerequisite is the third Code Dojo goalpost',
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+      ['[#458]', '[#459]', '[#483]'],
+    );
     expectOrderedClaims(bearing, [
       'Recommended pull order:',
       '1. Treat the bounded Profunctor Page inspection proof in #468 as landed.',
@@ -64,7 +83,6 @@ describe('WF-130 roadmap pull order', () => {
       'Workflow, Capture, And CI Determinism',
     ]);
   });
-
   it('keeps v7.2 release evidence replay commands aligned with split WF-130 proof files', () => {
     const command = extractBashCommandBlocks(
       read('docs/releases/7.2.0/README.md'),
@@ -75,7 +93,6 @@ describe('WF-130 roadmap pull order', () => {
       'tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts',
     ]);
   });
-
   it('keeps v7.2 release evidence test paths replayable from the checkout', () => {
     const paths = extractReferencedTestPaths(
       read('docs/releases/7.2.0/README.md'),
