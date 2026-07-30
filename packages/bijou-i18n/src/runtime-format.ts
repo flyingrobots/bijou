@@ -1,8 +1,6 @@
 import type { I18nFormatterPort } from './runtime-contract.js';
 
 const numberFormatters = new Map<string, Intl.NumberFormat>();
-const dateFormatters = new Map<string, Intl.DateTimeFormat>();
-const timeFormatters = new Map<string, Intl.DateTimeFormat>();
 const listFormatters = new Map<string, Intl.ListFormat>();
 
 export const DEFAULT_FORMATTER: I18nFormatterPort = {
@@ -14,17 +12,15 @@ export const DEFAULT_FORMATTER: I18nFormatterPort = {
     ).format(value);
   },
   formatDate(value, locale) {
-    return cachedFormatter(
-      dateFormatters,
+    return new Intl.DateTimeFormat(
       locale,
-      () => new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }),
+      { dateStyle: 'medium' },
     ).format(value);
   },
   formatTime(value, locale) {
-    return cachedFormatter(
-      timeFormatters,
+    return new Intl.DateTimeFormat(
       locale,
-      () => new Intl.DateTimeFormat(locale, { timeStyle: 'short' }),
+      { timeStyle: 'short' },
     ).format(value);
   },
   formatList(values, locale) {
