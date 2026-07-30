@@ -53,14 +53,15 @@ export class RuntimeCatalogStore {
     }
   }
 
-  async loadLocale(locale: string): Promise<boolean> {
-    if (this.#load === undefined) return false;
+  async localeCatalogs(
+    locale: string,
+  ): Promise<readonly I18nCatalog[] | undefined> {
+    if (this.#load === undefined) return undefined;
     await this.preloadLocale(locale);
-    this.#activateLoaderCatalogs(await (this.#cache.get(locale) ?? []));
-    return true;
+    return this.#cache.get(locale) ?? [];
   }
 
-  #activateLoaderCatalogs(catalogs: readonly I18nCatalog[]): void {
+  activateLoaderCatalogs(catalogs: readonly I18nCatalog[]): void {
     const staged = new Map<string, I18nCatalog>();
     this.#rememberAll(staged, catalogs);
     const nextEntries = this.#buildEntries(staged);

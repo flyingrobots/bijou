@@ -27,6 +27,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     locale: options.locale,
     direction: options.direction,
   };
+  let localeRequestGeneration = 0;
   const context: ResolutionContext = {
     entries: catalogs.entries,
     state,
@@ -52,12 +53,17 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       return catalogs.preloadLocale(locale);
     },
     async setLocale(locale, direction) {
+      const generation = ++localeRequestGeneration;
       if (options.loader === undefined) {
         state.locale = locale;
         if (direction !== undefined) state.direction = direction;
         return;
       }
-      await catalogs.loadLocale(locale);
+      const loaded = await catalogs.localeCatalogs(locale);
+      if (generation !== localeRequestGeneration || loaded === undefined) {
+        return;
+      }
+      catalogs.activateLoaderCatalogs(loaded);
       state.locale = locale;
       if (direction !== undefined) state.direction = direction;
     },
