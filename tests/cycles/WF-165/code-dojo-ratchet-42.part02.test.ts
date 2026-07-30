@@ -99,4 +99,22 @@ describe('WF-165 Code Dojo tranche B architecture', () => {
       0.5099932155140692,
     ]);
   });
+
+  it('keeps runtime issue dependencies in top-level type imports', () => {
+    const path = 'packages/bijou-tui/src/runtime-contract.ts';
+    const source = ts.createSourceFile(
+      path,
+      readFileSync(resolve(ROOT, path), 'utf8'),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+    const importTypes: ts.ImportTypeNode[] = [];
+    const visit = (node: ts.Node): void => {
+      if (ts.isImportTypeNode(node)) importTypes.push(node);
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+
+    expect(importTypes).toHaveLength(0);
+  });
 });

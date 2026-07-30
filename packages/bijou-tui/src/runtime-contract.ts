@@ -8,6 +8,7 @@ import type { RenderStageTiming } from './pipeline/pipeline.js';
 import type {
   App,
   RunOptions,
+  RuntimeIssue,
 } from './types.js';
 
 export interface RuntimeRenderSummary<Model> {
@@ -60,9 +61,7 @@ export interface InteractiveRuntimeInput<Model, M> {
   readonly bus: EventBus<M>;
   readonly session: RuntimeSession<Model>;
   readonly runtimeViewport: () => { columns: number; rows: number };
-  readonly routeRuntimeIssue: (
-    issue: import('./types.js').RuntimeIssue,
-  ) => void;
+  readonly routeRuntimeIssue: (issue: RuntimeIssue) => void;
   readonly crash: (
     phase: 'update' | 'render' | 'resize',
     error: unknown,
