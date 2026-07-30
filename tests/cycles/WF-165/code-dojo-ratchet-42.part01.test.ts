@@ -75,4 +75,10 @@ describe('WF-165 Code Dojo tranche B debt contract', () => {
       }
     }
   });
+
+  it('derives every skeleton main-pane identity through one helper', () => {
+    expect(read('packages/bijou-tui-app/src/skeleton-layout.ts')).not.toContain(
+      '`${spec.tab.id}-main`',
+    );
+  });
 });

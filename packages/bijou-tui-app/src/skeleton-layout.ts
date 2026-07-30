@@ -28,7 +28,7 @@ export function layoutFor(
     const render = spec.tab.render;
     return {
       kind: 'pane',
-      paneId: `${spec.tab.id}-main`,
+      paneId: drawerPaneId(spec.tab.id),
       render: (width, height) => render(width, height, {
         ctx,
         tab: spec.tab,
@@ -73,7 +73,7 @@ export function layoutFor(
   }
   return {
     kind: 'pane',
-    paneId: `${spec.tab.id}-main`,
+    paneId: drawerPaneId(spec.tab.id),
     render: () => createSurface(0, 0),
   };
 }
