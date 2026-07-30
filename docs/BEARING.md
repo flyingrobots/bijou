@@ -221,9 +221,11 @@ counted violations. Landed tranche C
 debt. Landed tranche D
 [#488](https://github.com/flyingrobots/bijou/pull/488)
 preserves five more public entrypoints as focused families and lowers those
-ledgers to `17` and `5`. Tranche E must split `runtime-engine.ts`, `table.ts`,
-`app-frame.ts`, `examples/docs/app.ts`, and `examples/docs/stories.ts`,
-lowering the ledgers to `12` and `0`.
+ledgers to `17` and `5`. Tranche E
+[#489](https://github.com/flyingrobots/bijou/pull/489) implements the final
+five splits while preserving the public TUI runtime, table, framed-app,
+DOGFOOD application, and DOGFOOD story entrypoints. The ledgers now reach `12`
+and `0`; merged goalpost evidence precedes V8 tracker closeout.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -254,10 +256,10 @@ roots remain. Landed tranche D
 [#488](https://github.com/flyingrobots/bijou/pull/488)
 preserves `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
 `ui-scene-ir/1`, and the terminal differ behind stable facades, lowering the
-live ceiling to `22`; five double-counted roots remain. Tranche E owns
-`runtime-engine.ts`, `table.ts`, `app-frame.ts`, `examples/docs/app.ts`, and
-`examples/docs/stories.ts`, targeting `12 + 0 = 12`. V8 tracker closeout and
-release preparation follow the completed `62 -> 12` goalpost.
+live ceiling to `22`. Tranche E
+[#489](https://github.com/flyingrobots/bijou/pull/489) preserves the final five
+public entrypoints as bounded families and reaches `12 + 0 = 12`. V8 tracker
+closeout and release preparation follow merged `62 -> 12` goalpost evidence.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope for scroll measurements until revision- or digest-based
@@ -291,8 +293,7 @@ Recommended pull order:
    replay facts, and visual scene facts are implemented.
 3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
    and adapts into a synchronized terminal `Surface`.
-4. Pull #480 through bounded WF-165 tranches until Code Dojo debt reaches `12`
-   or less.
+4. Merge #489 after exact-head review to close #480 at Code Dojo debt `12`.
 5. Close #302 and #457 only after merged goalpost evidence and V8 contract
    closeout agree.
 6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof

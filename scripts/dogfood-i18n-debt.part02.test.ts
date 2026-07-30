@@ -78,10 +78,13 @@ describe('DOGFOOD i18n debt inventory', () => {
   it('groups the current DOGFOOD debt by source surface and stays within the explicit baseline', () => {
       const inventory = collectDogfoodI18nDebt();
       const result = evaluateDogfoodI18nDebtRatchet(inventory);
+      const surfaces = inventory.bySurface.map((surface) => surface.surface);
 
-      expect(inventory.total).toBeGreaterThan(0);
-      expect(inventory.bySurface.map((surface) => surface.surface)).toContain('docs-app');
-      expect(inventory.bySurface.map((surface) => surface.surface)).toContain('component-stories');
+      expect(inventory.total).toBe(2317);
+      expect(surfaces).toContain('app-root-view');
+      expect(surfaces).toContain('stories-story-guided-flow');
+      expect(surfaces).not.toContain('docs-app');
+      expect(surfaces).not.toContain('component-stories');
       expect(inventory.bySurface).toContainEqual({
         surface: 'release-title',
         count: 32,

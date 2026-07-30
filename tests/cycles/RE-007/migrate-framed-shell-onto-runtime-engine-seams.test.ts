@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 
+const readFrameModule = (name: string) =>
+  readRepoFile(`packages/bijou-tui/src/${name}`);
+
 describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
   it('promotes RE-007 into the active runtime-engine cycle', () => {
     const legend = readRepoFile('docs/legends/RE-runtime-engine.md');
@@ -40,13 +43,17 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
       'part03',
       'part04',
     ]
-      .map((part) =>
-        readRepoFile(`packages/bijou-tui/src/app-frame-layers.${part}.ts`),
-      )
+      .map((part) => readFrameModule(`app-frame-layers.${part}.ts`))
       .join('\n');
-    const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
-    const index = readRepoFile('packages/bijou-tui/src/index.ts');
-    const indexPart = readRepoFile('packages/bijou-tui/src/index.part04.ts');
+    const appFrame = readFrameModule('app-frame.ts');
+    const routingImplementation = [
+      'app-frame-key-route.ts',
+      'app-frame-mouse-layout.ts',
+    ]
+      .map(readFrameModule)
+      .join('\n');
+    const index = readFrameModule('index.ts');
+    const indexPart = readFrameModule('index.part04.ts');
     const cycle = readRepoFile(
       'docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md',
     );
@@ -59,8 +66,8 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     );
     expect(appFrame).toContain('FrameRuntimeViewStack');
     expect(appFrame).toContain('describeFrameRuntimeViewStack');
-    expect(appFrame).toContain('routeRuntimeInput');
-    expect(appFrame).toContain('retainRuntimeLayout');
+    expect(routingImplementation).toContain('routeRuntimeInput');
+    expect(routingImplementation).toContain('retainRuntimeLayout');
     expect(index).toContain("export * from './index.part04.js'");
     expect(indexPart).toContain('FrameRuntimeViewStack');
     expect(indexPart).toContain('describeFrameRuntimeViewStack');
@@ -69,27 +76,29 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
   });
 
   it('migrates workspace and settings sub-layer routing onto retained layouts', () => {
-    const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
+    const workspaceTree = readFrameModule('app-frame-workspace-tree.ts');
+    const mouseLayout = readFrameModule('app-frame-mouse-layout.ts');
+    const mouseWorkspace = readFrameModule('app-frame-mouse-workspace.ts');
     const cycle = readRepoFile(
       'docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md',
     );
 
     // Workspace layout tree with tab and pane children
-    expect(appFrame).toContain('buildWorkspaceLayoutTree');
-    expect(appFrame).toContain("'header-bar'");
-    expect(appFrame).toContain("'workspace-body'");
-    expect(appFrame).toContain('`tab:${');
-    expect(appFrame).toContain('`pane:${');
+    expect(workspaceTree).toContain('buildWorkspaceLayoutTreeFromPaneRects');
+    expect(workspaceTree).toContain("'header-bar'");
+    expect(workspaceTree).toContain("'workspace-body'");
+    expect(workspaceTree).toContain('`tab:${');
+    expect(workspaceTree).toContain('`pane:${');
 
     // Settings row children in the retained layout
-    expect(appFrame).toContain('buildSettingsRowChildren');
-    expect(appFrame).toContain('`settings-row:${');
+    expect(mouseLayout).toContain('settingsRowChildren');
+    expect(mouseLayout).toContain('`settings-row:${');
 
     // Pane geometry extraction
-    expect(appFrame).toContain('resolveWorkspacePaneRects');
+    expect(mouseWorkspace).toContain('workspace.paneRects(model)');
 
     // Workspace retained layout registration
-    expect(appFrame).toContain("viewId: 'workspace'");
+    expect(mouseLayout).toContain("viewId: 'workspace'");
 
     // Cycle doc records the slice
     expect(cycle).toContain('workspace retained layout');
@@ -97,13 +106,9 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
   });
 
   it('routes shell command/effect dispatch through runtime buffers', () => {
-    const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
-    const actionTypes = readRepoFile(
-      'packages/bijou-tui/src/app-frame-action-types.ts',
-    );
-    const compatibilityTypes = readRepoFile(
-      'packages/bijou-tui/src/app-frame-types.ts',
-    );
+    const shellCommand = readFrameModule('app-frame-shell-command.ts');
+    const actionTypes = readFrameModule('app-frame-action-types.ts');
+    const compatibilityTypes = readFrameModule('app-frame-types.ts');
     const cycle = readRepoFile(
       'docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md',
     );
@@ -118,19 +123,19 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
       "export type * from './app-frame-action-types.js'",
     );
 
-    // Command dispatcher interprets shell commands inside createFramedApp
-    expect(appFrame).toContain('applyShellCommand');
-    expect(appFrame).toContain('drainShellCommandBuffer');
+    // Command dispatcher interprets shell commands for createFramedApp
+    expect(shellCommand).toContain('applyShellCommand');
+    expect(shellCommand).toContain('drainShellCommandBuffer');
 
     // Buffer infrastructure wired
-    expect(appFrame).toContain('bufferRuntimeRouteResult');
-    expect(appFrame).toContain('applyRuntimeCommandBuffer');
-    expect(appFrame).toContain('createRuntimeBuffers');
+    expect(shellCommand).toContain('bufferRuntimeRouteResult');
+    expect(shellCommand).toContain('applyRuntimeCommandBuffer');
+    expect(shellCommand).toContain('createRuntimeBuffers');
 
     // Old ad-hoc dispatch removed
-    expect(appFrame).not.toContain('withObservedKey');
-    expect(appFrame).not.toContain('handleFrameMouse');
-    expect(appFrame).not.toContain('applyQuitRequest');
+    expect(shellCommand).not.toContain('withObservedKey');
+    expect(shellCommand).not.toContain('handleFrameMouse');
+    expect(shellCommand).not.toContain('applyQuitRequest');
 
     // Cycle doc records the buffer migration
     expect(cycle).toContain('FrameShellCommand');

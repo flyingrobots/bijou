@@ -66,7 +66,7 @@ describe('WF-130 roadmap pull order', () => {
       '1. Treat the bounded Profunctor Page inspection proof in #468 as landed.',
       '2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle, replay facts, and visual scene facts are implemented.',
       '3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates and adapts into a synchronized terminal `Surface`.',
-      '4. Pull #480 through bounded WF-165 tranches until Code Dojo debt reaches `12` or less.',
+      '4. Merge #489 after exact-head review to close #480 at Code Dojo debt `12`.',
       '5. Close #302 and #457 only after merged goalpost evidence and V8 contract closeout agree.',
       '6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
       '7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality automation.',

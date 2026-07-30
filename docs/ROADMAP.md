@@ -352,13 +352,14 @@ double-counted roots remain. Landed tranche D
 [#488](https://github.com/flyingrobots/bijou/pull/488) splits `Surface`,
 DOGFOOD i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`, and the
 terminal differ behind stable facades. Their families stay within the strict
-context threshold, and the enforced ledgers now measure `17 + 5 = 22`.
-Tranche E must split `runtime-engine.ts`, `table.ts`, `app-frame.ts`,
-`examples/docs/app.ts`, and `examples/docs/stories.ts`, removing the final five
+context threshold, and the enforced ledgers measure `17 + 5 = 22`. Tranche E
+is implemented in [#489](https://github.com/flyingrobots/bijou/pull/489): the
+TUI runtime, table, framed-app, DOGFOOD application, and DOGFOOD story catalog
+remain stable facades over bounded families, removing the final five
 double-counted roots and reaching `12 + 0 = 12`. The cycle design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
-and release preparation follow merged `62 -> 12` evidence; no tag or
-publication is part of this structural cycle.
+and release preparation follow merged goalpost evidence; no tag or publication
+is part of this structural cycle.
 
 ## Forward Goalposts
 
@@ -410,9 +411,10 @@ These are planning recommendations from the open tracker state as of
   lowered it to `42`. Landed tranche C
   [#487](https://github.com/flyingrobots/bijou/pull/487) lowers it to `32`.
   Landed tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
-  lowers it to `22`. Tranche E must split `runtime-engine.ts`, `table.ts`,
-  `app-frame.ts`, `examples/docs/app.ts`, and `examples/docs/stories.ts`,
-  lowering the ledgers to `12` and `0` before V8 tracker closeout.
+  lowers it to `22`. Tranche E
+  [#489](https://github.com/flyingrobots/bijou/pull/489) implements the final
+  five splits and lowers the ledgers to `12` and `0`; merged goalpost evidence
+  precedes V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.
