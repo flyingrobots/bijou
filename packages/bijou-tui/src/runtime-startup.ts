@@ -46,6 +46,7 @@ export function synchronizeInitialViewport<Model, M>(
     [session.model, commands] = app.update(resize, session.model);
   } catch (error) {
     crash('resize', error, session.model);
+    return commands;
   }
   const postResize = viewport();
   buffers.reset(postResize.columns, postResize.rows);
