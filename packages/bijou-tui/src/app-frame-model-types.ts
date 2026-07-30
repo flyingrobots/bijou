@@ -6,6 +6,7 @@ import type {
 import type { FrameAction } from './app-frame-action-types.js';
 import type { PanelDockState } from './panel-dock.js';
 import type { PanelVisibilityState } from './panel-state.js';
+import type { PageTransition } from './app-frame-transition-contract.js';
 
 export type PaletteKind = 'command' | 'search';
 
@@ -47,7 +48,7 @@ export interface FrameModel<PageModel> {
   readonly previousPageId?: string;
   readonly transitionProgress: number;
   readonly transitionGeneration: number;
-  readonly activeTransition?: import('./app-frame.js').PageTransition;
+  readonly activeTransition?: PageTransition;
   readonly transitionStartMs?: number;
   readonly transitionTimeline?: import('./timeline.js').Timeline;
   readonly transitionTimelineState?: import('./timeline.js').TimelineState;
