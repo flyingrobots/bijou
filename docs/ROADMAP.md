@@ -343,11 +343,11 @@ less through bounded review tranches. Landed tranche A
 both ledgers and lowered the enforced intermediate ceiling to `52`; `20`
 double-counted roots remained. Landed tranche B
 [#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five
-smallest roots and lowered the intermediate ceiling to `42`; `15`
-double-counted roots remain. Tranche C now selects the next five smallest roots:
-the canonical example app, Notifications, Image Viewer, the PR review-status
-tool, and framed-app rendering. Its target is `32` aggregate violations with
-`10` double-counted roots remaining. The cycle design is
+smallest roots and lowered the intermediate ceiling to `42`. Tranche C
+[#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
+example app, Notifications, Image Viewer, the PR review-status tool, and
+framed-app rendering. It lowers the live intermediate ceiling to `32`; `10`
+double-counted roots remain. The cycle design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -399,9 +399,9 @@ These are planning recommendations from the open tracker state as of
   [#480](https://github.com/flyingrobots/bijou/issues/480) through bounded
   [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
   tranche A lowered Code Dojo debt from `62` to `52`, and landed tranche B
-  lowered it to `42`. Tranche C removes the next five double-counted roots and
-  targets `32`. The remaining tranches must reach `12` or less before V8
-  tracker closeout.
+  lowered it to `42`. Tranche C
+  [#487](https://github.com/flyingrobots/bijou/pull/487) lowers it to `32`.
+  The remaining tranches must reach `12` or less before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

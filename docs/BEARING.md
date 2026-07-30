@@ -215,8 +215,10 @@ The Code Dojo ratchet
 `112 -> 62` contract. Landed tranche A
 [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
 [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
-counted violations. Current debt comprises `27` file/context and `15`
-code-size violations with no mock-ban or ESLint debt.
+counted violations. Tranche C
+[#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to
+`22` file/context and `10` code-size violations with no mock-ban or ESLint
+debt.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -239,12 +241,12 @@ tranche A [#484](https://github.com/flyingrobots/bijou/pull/484) removed five
 smaller double-counted roots and lowered the enforced intermediate ceiling to
 `52`. Landed tranche B
 [#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five
-smallest roots and lowered that ceiling to `42`; `15` double-counted roots
-remain. Tranche C selects the canonical example app, Notifications, Image
-Viewer, the PR review-status tool, and framed-app rendering as the next five
-smallest roots. It targets `32` aggregate violations and `10` remaining
-double-counted roots. V8 tracker closeout and release preparation follow the
-completed `62 -> 12` goalpost.
+smallest roots and lowered that ceiling to `42`. Tranche C
+[#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
+example app, Notifications, Image Viewer, the PR review-status tool, and
+framed-app rendering, lowering the live ceiling to `32`; `10` double-counted
+roots remain. V8 tracker closeout and release preparation follow the completed
+`62 -> 12` goalpost.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope until revision- or digest-based invalidation is explicit.

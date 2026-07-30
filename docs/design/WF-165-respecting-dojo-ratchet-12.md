@@ -43,14 +43,14 @@ Ledger edits are evidence after extraction. They are not the implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `42`
-- File/context baseline: `27`
+- Aggregate Code Dojo debt: `32`
+- File/context baseline: `22`
 - Mock-ban baseline: `0`
-- Code-size baseline: `15`, including `3` hard-limit files
+- Code-size baseline: `10`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required goalpost: `12` aggregate violations or lower
-- Tranches A and B: `20` counted violations removed from `10` roots
-- Remaining double-counted roots: `15`
+- Tranches A through C: `30` counted violations removed from `15` roots
+- Remaining double-counted roots: `10`
 - Tracker issue:
   [#480](https://github.com/flyingrobots/bijou/issues/480)
 - Previous goalpost:
@@ -286,7 +286,10 @@ permutation, empty DAG badges, and initialization-inclusive harness time. The
 live ledgers move again to `27 + 15 = 42`. Fifteen double-counted roots remain
 before the overall `62 -> 12` goalpost can close.
 
-Tranche C selects the canonical example app, Notifications, Image Viewer, the
-PR review-status tool, and framed-app rendering as the next five mechanically
-smallest double-counted roots. It targets `22 + 10 = 32` while preserving each
-original entrypoint and keeping the overall goalpost open.
+Tranche C is implemented in
+[#487](https://github.com/flyingrobots/bijou/pull/487). The canonical example
+app, Notifications, Image Viewer, PR review-status tool, and framed-app renderer
+remain stable facades over focused implementation families. Exact public-export
+and family manifests bind the compatibility surface, strict context thresholds,
+and runtime-cycle proof. The live ledgers move to `22 + 10 = 32`; ten
+double-counted roots remain before the overall `62 -> 12` goalpost can close.
