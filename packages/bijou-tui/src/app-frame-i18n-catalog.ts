@@ -43,6 +43,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('key.scrollRight', 'Scroll right'),
     message('key.settings', 'Settings'),
     message('key.notifications', 'Notifications'),
+    message('header.title', 'App'),
     message('palette.title', 'Command Palette'),
     message('palette.hint', 'Enter select • Esc close'),
     message('search.title', 'Search'),

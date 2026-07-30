@@ -9,7 +9,7 @@ import {
 } from './app-frame-render-surface.js';
 import type { InternalFrameModel } from './app-frame-types.js';
 import { fitLine, resolveFramePageText } from './app-frame-utils.js';
-import { frameModeLabel } from './app-frame-i18n.js';
+import { frameMessage, frameModeLabel } from './app-frame-i18n.js';
 import type { FrameLayerDescriptor } from './app-frame-layers.js';
 import { paintStyledTextSurfaceWithBCSS } from './css/text-style.js';
 import { helpShort } from './help.js';
@@ -40,7 +40,8 @@ export function resolveHeaderLine<PageModel, Msg>(
     activePage,
     pageModel: activeModel,
   });
-  const title = options.title ?? 'App';
+  const title =
+    options.title ?? frameMessage(options.i18n, 'header.title', 'App');
   let cursor = visibleLength(title) + 2;
   const tabTargets: FrameHeaderRenderResult['tabTargets'][number][] = [];
   const tabs = model.pageOrder
