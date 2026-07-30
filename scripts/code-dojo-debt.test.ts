@@ -58,7 +58,10 @@ describe('code-dojo debt summary', () => {
     });
 
     expect(formatCodeDojoDebt(summary)).toContain('every met goalpost must remove at least 50 violations until zero');
-    expect(formatCodeDojoDebt(summary)).toContain('Next goalpost target from this count: <= 0 violations.');
+    expect(formatCodeDojoDebt(summary)).toContain(
+      'Derived target for a new goalpost starting at this count:'
+        + ' <= 0 violations.',
+    );
     expect(formatCodeDojoDebt(summary)).toContain('- ESLint baseline: 47');
   });
 });

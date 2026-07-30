@@ -79,7 +79,8 @@ export function formatCodeDojoDebt(summary: CodeDojoDebtSummary): string {
     `- code-size baseline: ${codeSizeViolations} (${codeSizeHardLimitViolations} over hard limit)`,
     `- ESLint baseline: ${eslintViolations}`,
     `Goalpost policy: every met goalpost must remove at least ${goalpostReduction} violations until zero.`,
-    `Next goalpost target from this count: <= ${nextGoalpostTarget} violations.`,
+    'Derived target for a new goalpost starting at this count:'
+      + ` <= ${nextGoalpostTarget} violations.`,
     '',
   ].join('\n');
 }
