@@ -1,5 +1,6 @@
 import type { Cell, Surface } from '../../ports/surface.js';
 import type { StylePort, WritePort } from '../../ports/index.js';
+import { cursorPosition } from '../ansi.js';
 import { hasVisibleStyle } from './differ-cell.js';
 import {
   cellAtOrEmpty,
@@ -33,7 +34,7 @@ export function renderDiffCells(
         continue;
       }
       if (x !== cursorX || y !== cursorY) {
-        output += moveCursor(x, y);
+        output += cursorPosition(x, y);
       }
       let batchX = x;
       let batchText = '';
@@ -57,10 +58,6 @@ export function renderDiffCells(
     }
   }
   if (output.length > 0) io.write(output);
-}
-
-function moveCursor(x: number, y: number): string {
-  return `\x1b[${String(y + 1)};${String(x + 1)}H`;
 }
 
 function sameRenderedCell(a: Cell, b: Cell): boolean {

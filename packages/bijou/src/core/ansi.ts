@@ -28,3 +28,8 @@ export const CLEAR_LINE = `${ESC}[K`;
 export function cursorUp(lines: number): string {
   return `${ESC}[${String(lines)}A`;
 }
+
+/** ANSI escape: move the cursor to the zero-based column and row. */
+export function cursorPosition(x: number, y: number): string {
+  return `${ESC}[${String(y + 1)};${String(x + 1)}H`;
+}
