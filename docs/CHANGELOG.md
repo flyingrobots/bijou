@@ -55,10 +55,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   compatibility surface, context limits, and repository runtime-cycle proof.
   Focused suites preserve example construction, notification input, image
   navigation and rendering, merge-readiness classification, and frame-render
-  behavior. Historical tranche witnesses now prove their debt stays absent as
-  later tranches lower the aggregate ceiling. File/context debt falls from
-  `27` to `22`, code-size debt falls from `15` to `10`, and aggregate debt
-  falls from `42` to `32`; the active goalpost remains `12` or lower.
+  behavior. Review hardening unifies notification rendering and hit-test
+  spacing, preserves RGB-only active-tab backgrounds, localizes the default
+  frame title, preserves divider grapheme contracts, and removes the orphan
+  image-viewer mode message. Bounded caches now reuse derived active-tab tokens
+  and rendered image previews while invalidating previews when the source file
+  changes. Historical tranche witnesses assert the measured debt totals and
+  prove their debt stays absent as later tranches lower the aggregate ceiling.
+  File/context debt falls from `27` to `22`, code-size debt falls from `15` to
+  `10`, and aggregate debt falls from `42` to `32`; the active goalpost remains
+  `12` or lower.
 - **WF-165 Code Dojo goalpost, tranche B** — The TUI runtime, performance
   gradient, scripted driver, DAG renderer, and TUI-app skeleton now preserve
   their public entrypoints as typed facades over focused sub-150-line modules.

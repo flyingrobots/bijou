@@ -162,7 +162,10 @@ the code-size baseline, and every one is also present in the file/context
 baseline. Each original path remains a stable facade. Example process entry,
 public exports, deterministic merge-readiness classification, notification
 input behavior, image navigation and rendering, and framed-app output remain
-unchanged. The overall WF-165 goalpost remains open after tranche C.
+unchanged. Review evidence additionally binds shared notification geometry,
+RGB-only active-tab backgrounds, localized default frame titles, grapheme-safe
+dividers, source-invalidated image-preview caching, and bounded active-tab token
+caching. The overall WF-165 goalpost remains open after tranche C.
 
 ## Implementation Outline
 
@@ -291,5 +294,12 @@ Tranche C is implemented in
 app, Notifications, Image Viewer, PR review-status tool, and framed-app renderer
 remain stable facades over focused implementation families. Exact public-export
 and family manifests bind the compatibility surface, strict context thresholds,
-and runtime-cycle proof. The live ledgers move to `22 + 10 = 32`; ten
-double-counted roots remain before the overall `62 -> 12` goalpost can close.
+and runtime-cycle proof. Review hardening shares compact notification geometry
+between rendering and hit testing, preserves RGB-only active-tab backgrounds,
+localizes the default frame title, keeps divider graphemes intact, removes an
+orphan image-viewer mode message, and adds bounded caches for derived active-tab
+tokens and rendered image previews. The preview cache binds its entries to the
+source path, modification time, byte size, viewport, mode, and tuning so a
+source-file rewrite invalidates stale output. The live ledgers move to
+`22 + 10 = 32`; ten double-counted roots remain before the overall `62 -> 12`
+goalpost can close.
