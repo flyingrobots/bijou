@@ -75,9 +75,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       '`8.0.0` is the next feature horizon',
       'New feature work should shape toward `8.0.0`',
     ]);
-    expectNoClaims(releaseRunbook, [
-      'No next public release version is selected',
-    ]);
+    expectNoClaims(releaseRunbook, ['No next public release version is selected']);
     expectClaims(dx046Design, [
       'User story: [#329](https://github.com/flyingrobots/bijou/issues/329)',
       'Parent tracker: [#302](https://github.com/flyingrobots/bijou/issues/302)',
