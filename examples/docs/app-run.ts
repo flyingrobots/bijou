@@ -14,12 +14,12 @@ import type {
 import { createDocsApp } from './app-root.js';
 
 export async function runDocsApp(
-  context: BijouContext,
+  ctx: BijouContext,
   options: DocsAppOptions = {},
   runOptions: RunOptions<RootMsg> = {},
 ): Promise<void> {
-  const app = createDocsApp(context, options);
-  const runtimeContext = runOptions.ctx ?? context;
+  const app = createDocsApp(ctx, options);
+  const runtimeContext = runOptions.ctx ?? ctx;
   const frameBudgetMs = resolveRootFrameBudgetMs(runtimeContext);
   let pendingSnapshot: FrameTimingSnapshot | undefined;
   let needsHydrationRender = true;

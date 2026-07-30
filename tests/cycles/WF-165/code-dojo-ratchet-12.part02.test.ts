@@ -8,6 +8,7 @@ import {
   findRuntimeCyclesTouching,
   listProjectTypeScriptFiles,
 } from '../DX-050/runtime-import-cycles.js';
+import { readRepoFile } from '../repo.js';
 import { publicExportNames } from './public-export-contract.js';
 import {
   TRANCHE_E_PUBLIC_EXPORTS,
@@ -33,6 +34,14 @@ describe('WF-165 Code Dojo tranche E architecture', () => {
     expectTypeOf(COMPONENT_STORIES).toEqualTypeOf<
       readonly DogfoodComponentStory[]
     >();
+  });
+
+  it('preserves the public DOGFOOD function signatures', () => {
+    const appRoot = readRepoFile('examples/docs/app-root.ts');
+    const appRun = readRepoFile('examples/docs/app-run.ts');
+
+    expect(appRoot).toContain('export function createDocsApp(\n  ctx:');
+    expect(appRun).toContain('export async function runDocsApp(\n  ctx:');
   });
 
   it('keeps every split family out of repository runtime cycles', () => {

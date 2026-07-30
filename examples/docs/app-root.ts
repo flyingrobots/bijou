@@ -32,12 +32,12 @@ import { VERSION_TEXT } from './app-ids.js';
 import { resolveDogfoodInitialLocale } from './locale.js';
 
 export function createDocsApp(
-  context: BijouContext,
+  ctx: BijouContext,
   options: DocsAppOptions = {},
 ): App<RootModel, RootMsg> {
-  let currentContext = context;
+  let currentContext = ctx;
   const syncShellThemeContext = (themeId: string | undefined) => {
-    currentContext = applyDocsShellThemeToContext(context, themeId);
+    currentContext = applyDocsShellThemeToContext(ctx, themeId);
   };
   const initialLocale = resolveDogfoodInitialLocale(options);
   const i18n = createDocsI18nRuntime(options);
@@ -96,7 +96,7 @@ export function createDocsApp(
       );
       return [
         createInitialRootModel(
-          context,
+          ctx,
           options,
           synced,
         ),
@@ -105,7 +105,7 @@ export function createDocsApp(
     },
     update: (message, model) =>
       updateRootApp(message, model, {
-        baseContext: context,
+        baseContext: ctx,
         localization,
         syncShellThemeContext,
         updateExplorer,
