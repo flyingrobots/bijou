@@ -11,6 +11,9 @@ import {
 } from '@flyingrobots/bijou';
 import type { FrameHeaderTabTarget } from './app-frame-render-contract.js';
 
+const ACTIVE_HEADER_TOKEN_CACHE_LIMIT = 64;
+const activeHeaderTokenCache = new Map<string, TokenValue>();
+
 function relativeLuminance(hex: string): number {
   const [red, green, blue] = hexToRgb(hex);
   return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
@@ -35,7 +38,7 @@ function colorDistance(left: string, right: string): number {
   return Math.sqrt((lr - rr) ** 2 + (lg - rg) ** 2 + (lb - rb) ** 2);
 }
 
-function deriveActiveHeaderTabToken(
+export function deriveActiveHeaderTabToken(
   ctx: BijouContext,
   backgroundHex: string,
   baseHex: string,
@@ -45,6 +48,20 @@ function deriveActiveHeaderTabToken(
   const info = ctx.semantic('info');
   const primary = ctx.semantic('primary');
   const warning = ctx.semantic('warning');
+  const cacheKey = [
+    backgroundHex,
+    baseHex,
+    accent.hex,
+    info.hex,
+    primary.hex,
+    warning.hex,
+  ].join('\0');
+  const cached = activeHeaderTokenCache.get(cacheKey);
+  if (cached != null) {
+    activeHeaderTokenCache.delete(cacheKey);
+    activeHeaderTokenCache.set(cacheKey, cached);
+    return cached;
+  }
   const seeds = [
     accent,
     info,
@@ -79,7 +96,13 @@ function deriveActiveHeaderTabToken(
       best = candidate;
     }
   }
-  return { hex: best.hex, modifiers: ['bold'] };
+  const token: TokenValue = { hex: best.hex, modifiers: ['bold'] };
+  if (activeHeaderTokenCache.size >= ACTIVE_HEADER_TOKEN_CACHE_LIMIT) {
+    const oldest = activeHeaderTokenCache.keys().next().value;
+    if (oldest != null) activeHeaderTokenCache.delete(oldest);
+  }
+  activeHeaderTokenCache.set(cacheKey, token);
+  return token;
 }
 
 export function paintActiveHeaderTab(
