@@ -17,9 +17,4 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] =
     { path: 'examples/image-viewer/main.ts', lines: 740 },
     { path: 'examples/notifications/main.ts', lines: 725 },
     { path: 'examples/_shared/canonical-app.ts', lines: 724 },
-    { path: 'packages/bijou-tui-app/src/index.ts', lines: 692 },
-    { path: 'packages/bijou/src/core/components/dag-render.ts', lines: 692 },
-    { path: 'packages/bijou-tui/src/driver.ts', lines: 679 },
-    { path: 'examples/perf-gradient/main.ts', lines: 676 },
-    { path: 'packages/bijou-tui/src/runtime.ts', lines: 669 },
   ]);

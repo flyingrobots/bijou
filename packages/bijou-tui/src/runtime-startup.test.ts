@@ -1,4 +1,7 @@
 import {
+  createSurface,
+} from '@flyingrobots/bijou';
+import {
   createTestContext,
   describe,
   expect,
@@ -7,6 +10,12 @@ import {
   counterApp,
   _resetDefaultContextForTesting,
 } from './runtime.test-support.js';
+import { RuntimeFramebuffers } from './runtime-buffers.js';
+import {
+  createRuntimeSession,
+  synchronizeInitialViewport,
+} from './runtime-startup.js';
+import type { App } from './types.js';
 
 describe('run', () => {
   it('throws an actionable startup error when no ctx or ambient default is available', async () => {
@@ -38,5 +47,30 @@ describe('run', () => {
       await run(counterApp(), { ctx });
       expect(ctx.io.written).toEqual(['count: 0']);
     });
+  });
+
+  it('preserves the crash surface when initial resize handling fails', () => {
+    const app: App<{ count: number }> = {
+      init: () => [{ count: 0 }, []],
+      update: () => {
+        throw new Error('resize failed');
+      },
+      view: () => createSurface(10, 4),
+    };
+    const session = createRuntimeSession({ count: 0 });
+    const buffers = new RuntimeFramebuffers(10, 4);
+    const crashSurface = createSurface(10, 4);
+
+    synchronizeInitialViewport(
+      app,
+      session,
+      () => ({ columns: 10, rows: 4 }),
+      buffers,
+      () => {
+        buffers.replaceFront(crashSurface);
+      },
+    );
+
+    expect(buffers.current).toBe(crashSurface);
   });
 });

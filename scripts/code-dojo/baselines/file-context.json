@@ -79,31 +79,6 @@
       "bytes": 24359
     },
     {
-      "path": "packages/bijou/src/core/components/dag-render.ts",
-      "lines": 693,
-      "bytes": 25039
-    },
-    {
-      "path": "packages/bijou-tui-app/src/index.ts",
-      "lines": 693,
-      "bytes": 22737
-    },
-    {
-      "path": "packages/bijou-tui/src/driver.ts",
-      "lines": 680,
-      "bytes": 20563
-    },
-    {
-      "path": "examples/perf-gradient/main.ts",
-      "lines": 677,
-      "bytes": 23436
-    },
-    {
-      "path": "packages/bijou-tui/src/runtime.ts",
-      "lines": 668,
-      "bytes": 19486
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062

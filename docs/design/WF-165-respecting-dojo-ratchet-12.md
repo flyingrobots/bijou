@@ -43,14 +43,14 @@ Ledger edits are evidence after extraction. They are not the implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `52`
-- File/context baseline: `32`
+- Aggregate Code Dojo debt: `42`
+- File/context baseline: `27`
 - Mock-ban baseline: `0`
-- Code-size baseline: `20`, including `3` hard-limit files
+- Code-size baseline: `15`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required goalpost: `12` aggregate violations or lower
-- Tranche A result: `10` counted violations removed from `5` roots
-- Remaining double-counted roots: `20`
+- Tranches A and B: `20` counted violations removed from `10` roots
+- Remaining double-counted roots: `15`
 - Tracker issue:
   [#480](https://github.com/flyingrobots/bijou/issues/480)
 - Previous goalpost:
@@ -107,16 +107,47 @@ The expected tranche result is:
 
 The overall WF-165 goalpost remains open after tranche A.
 
+## Tranche B Contract
+
+Tranche B removes the five smallest remaining roots from both counted ledgers:
+
+| Root | Existing responsibility boundary |
+| :--- | :--- |
+| `packages/bijou-tui/src/runtime.ts` | Lifecycle contracts, the interactive render loop, shutdown draining, output buffers, and error emission. |
+| `examples/perf-gradient/main.ts` | Telemetry charts, paint modes, frame assembly, interactive state, and process entry. |
+| `packages/bijou-tui/src/driver.ts` | Script contracts, mouse-step builders, harness state, command observations, and script execution. |
+| `packages/bijou/src/core/components/dag-render.ts` | DAG metrics, node glyphs, graph placement, edge highlighting, serialization, and fallback formats. |
+| `packages/bijou-tui-app/src/index.ts` | Skeleton contracts, shell construction, chrome and overlays, page state and layout, and key-map helpers. |
+
+The expected tranche-B result is:
+
+- File/context baseline: `32 -> 27`
+- Code-size baseline: `20 -> 15`
+- Aggregate debt: `52 -> 42`
+- Mock-ban baseline: `0`
+- ESLint baseline: `0`
+
+The selection is mechanical: these are the five smallest remaining entries in
+the code-size baseline, and every one is also present in the file/context
+baseline. The tranche does not redesign public behavior, change public exports,
+add an exception, or introduce cache invalidation. Review hardening corrects
+bounded runtime scheduling, shutdown, crash, modal, footer, and performance
+chart defects exposed by the extraction. It also restores pre-split DAG detour
+width, empty-badge, render-target adoption, deterministic noise, and harness
+elapsed-time semantics. The overall WF-165 goalpost remains open after tranche
+B.
+
 ## Implementation Outline
 
-1. Add RED evidence for the exact tranche-A roots and target ledgers.
+1. Add RED evidence for the exact active-tranche roots and target ledgers.
 2. Extract cohesive declarations and behavior into focused adjacent modules.
 3. Keep each original root as a stable compatibility facade.
 4. Preserve behavior through existing focused suites and new export/size
    witnesses.
 5. Prove that changed split families remain outside runtime import cycles.
 6. Remove only the five proven roots from the file/context baseline.
-7. Record measured `52` debt in the exception ledger and package ceiling.
+7. Record each tranche's measured debt in the exception ledger and package
+   ceiling.
 8. Run documentation upkeep and the complete repository gate before review.
 9. Repeat bounded tranches until all `25` double-counted roots are gone.
 
@@ -130,6 +161,7 @@ The overall WF-165 goalpost remains open after tranche A.
   import cycles.
 - Preserve focused behavioral tests for each touched public entrypoint.
 - Assert that aggregate debt is exactly `52` after tranche A.
+- Assert that aggregate debt is exactly `42` after tranche B.
 
 ## Validation Plan
 
@@ -203,11 +235,20 @@ without reconstructing the goalpost from commit history.
 
 ## Retrospective And Closeout
 
-Open. Tranche A is implemented in
+Open. Tranche A landed in
 [#484](https://github.com/flyingrobots/bijou/pull/484). Five compatibility
 facades now delegate to focused contract, state, execution, and adapter modules;
 all facade exports remain stable, every family file is within the strict
 context threshold, focused behavior suites pass, and repository runtime-cycle
 analysis reports no cycle touching a changed family. The live ledgers move from
-`37 + 25 = 62` to `32 + 20 = 52`. Twenty double-counted roots remain before the
-overall `62 -> 12` goalpost can close.
+`37 + 25 = 62` to `32 + 20 = 52`.
+
+Tranche B now applies the same bounded extraction to the TUI runtime, performance
+gradient, scripted driver, DAG renderer, and TUI-app skeleton. Their public
+facades preserve the original exports while explicit family manifests bind the
+focused implementation modules used for size and runtime-cycle evidence. The
+review witness also binds behavior that the extraction initially drifted:
+same-column DAG detours, middleware-replaced render targets, the original noise
+permutation, empty DAG badges, and initialization-inclusive harness time. The
+live ledgers move again to `27 + 15 = 42`. Fifteen double-counted roots remain
+before the overall `62 -> 12` goalpost can close.
