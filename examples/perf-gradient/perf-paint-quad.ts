@@ -5,15 +5,16 @@ import {
   fillHorizon,
   fillNoise,
 } from './perf-paint-ansi.js';
+import type { PerfSurface } from './perf-surface.js';
 
-let surfaces: ReturnType<typeof createSurface>[] | undefined;
+let surfaces: PerfSurface[] | undefined;
 let width = 0;
 let height = 0;
 
 function quadrants(
   columns: number,
   rows: number,
-): ReturnType<typeof createSurface>[] {
+): PerfSurface[] {
   if (surfaces == null || width !== columns || height !== rows) {
     const halfColumns = Math.floor(columns / 2);
     const halfRows = Math.floor(rows / 2);
@@ -30,7 +31,7 @@ function quadrants(
 }
 
 export function fillQuad(
-  target: ReturnType<typeof createSurface>,
+  target: PerfSurface,
   model: Model,
 ): void {
   const halfColumns = Math.floor(model.cols / 2);

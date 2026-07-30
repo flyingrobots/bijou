@@ -128,4 +128,18 @@ describe('WF-165 Code Dojo tranche B architecture', () => {
       expect(source, path).not.toContain('Ñ@#W$9876543210');
     }
   });
+
+  it('uses the shared performance surface type', () => {
+    for (const path of [
+      'examples/perf-gradient/perf-chart.ts',
+      'examples/perf-gradient/perf-paint-ansi.ts',
+      'examples/perf-gradient/perf-paint-quad.ts',
+      'examples/perf-gradient/perf-paint-rgb.ts',
+      'examples/perf-gradient/perf-stats.ts',
+    ]) {
+      const source = readFileSync(resolve(ROOT, path), 'utf8');
+      expect(source, path).not.toContain('ReturnType<typeof createSurface>');
+      expect(source, path).not.toContain('PackedSurface');
+    }
+  });
 });

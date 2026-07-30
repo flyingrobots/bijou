@@ -1,4 +1,3 @@
-import { createSurface } from '@flyingrobots/bijou';
 import {
   clamp,
   rgbHex,
@@ -8,12 +7,13 @@ import {
   PERF_DENSITY,
   PERF_NOISE,
 } from './perf-noise.js';
+import type { PerfSurface } from './perf-surface.js';
 
 const cell = { char: '█', fg: '', bg: '' };
 const { cos, PI } = Math;
 
 export function fillGradient(
-  surface: ReturnType<typeof createSurface>,
+  surface: PerfSurface,
   model: Model,
 ): void {
   const frame = model.frame * 0.05 * (model.mouseDown ? -1 : 1);
@@ -36,7 +36,7 @@ export function fillGradient(
 }
 
 export function fillHorizon(
-  surface: ReturnType<typeof createSurface>,
+  surface: PerfSurface,
   model: Model,
 ): void {
   const halfY = model.rows / 2;
@@ -71,7 +71,7 @@ export function fillHorizon(
 }
 
 export function fillNoise(
-  surface: ReturnType<typeof createSurface>,
+  surface: PerfSurface,
   model: Model,
 ): void {
   const time = model.elapsed * 0.0007 * (model.mouseDown ? -1 : 1);

@@ -1,4 +1,3 @@
-import { createSurface } from '@flyingrobots/bijou';
 import {
   GRAPH_SAMPLES,
   phaseTiming,
@@ -9,13 +8,16 @@ import {
   renderBrailleLineChart,
   viewTimeCount,
 } from './perf-chart.js';
-import { stampText } from './perf-surface.js';
+import {
+  stampText,
+  type PerfSurface,
+} from './perf-surface.js';
 
 const BG = '#000000';
 const FG = '#cccccc';
 
 export function renderStats(
-  surface: ReturnType<typeof createSurface>,
+  surface: PerfSurface,
   model: Model,
 ): void {
   const stats = statLines(model);

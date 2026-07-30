@@ -1,5 +1,5 @@
-import { createSurface } from '@flyingrobots/bijou';
 import { GRAPH_SAMPLES } from './perf-model.js';
+import type { PerfSurface } from './perf-surface.js';
 
 const samples = new Float64Array(GRAPH_SAMPLES);
 let sampleHead = 0;
@@ -25,7 +25,7 @@ export function readViewTime(index: number): number {
 }
 
 export function renderBrailleLineChart(
-  surface: ReturnType<typeof createSurface>,
+  surface: PerfSurface,
   x: number,
   y: number,
   width: number,

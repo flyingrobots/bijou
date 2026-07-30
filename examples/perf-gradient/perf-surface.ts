@@ -1,13 +1,19 @@
-import { createSurface } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  type PackedSurface,
+} from '@flyingrobots/bijou';
 
-let surface: ReturnType<typeof createSurface> | undefined;
+/** Canonical mutable surface used by the performance demo. */
+export type PerfSurface = PackedSurface;
+
+let surface: PerfSurface | undefined;
 let width = 0;
 let height = 0;
 
 export function getSurface(
   nextWidth: number,
   nextHeight: number,
-): ReturnType<typeof createSurface> {
+): PerfSurface {
   if (surface == null || width !== nextWidth || height !== nextHeight) {
     surface = createSurface(nextWidth, nextHeight);
     width = nextWidth;
@@ -17,7 +23,7 @@ export function getSurface(
 }
 
 export function stampText(
-  target: ReturnType<typeof createSurface>,
+  target: PerfSurface,
   x: number,
   y: number,
   text: string,
