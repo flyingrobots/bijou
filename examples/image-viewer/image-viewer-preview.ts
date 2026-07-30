@@ -3,7 +3,10 @@ import type { BijouContext } from '@flyingrobots/bijou';
 import { boxSurface, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import type { ScopedNodeIO } from '@flyingrobots/bijou-node';
 import { placeSurface, vstackSurface } from '@flyingrobots/bijou-tui';
-import type { ImageViewerModel } from './image-viewer-contract.js';
+import type {
+  ImageViewerModel,
+  LoadedImage,
+} from './image-viewer-contract.js';
 import { loadImagePreview } from './image-viewer-load.js';
 import {
   MAX_CONTRAST_PERCENT,
@@ -19,7 +22,7 @@ import {
 
 function loadedStatus(
   model: ImageViewerModel,
-  loaded: Exclude<ReturnType<typeof loadImagePreview>, Error>,
+  loaded: LoadedImage,
 ): string {
   const threshold = formatPercentSlider(
     model.tuning.thresholdPercent,
