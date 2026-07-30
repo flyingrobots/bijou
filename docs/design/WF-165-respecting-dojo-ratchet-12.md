@@ -203,7 +203,7 @@ without reconstructing the goalpost from commit history.
 
 ## Retrospective And Closeout
 
-Open. Tranche A is implemented in
+Open. Tranche A landed in
 [#484](https://github.com/flyingrobots/bijou/pull/484). Five compatibility
 facades now delegate to focused contract, state, execution, and adapter modules;
 all facade exports remain stable, every family file is within the strict

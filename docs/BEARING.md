@@ -150,7 +150,7 @@ Current direction and active tensions. Historical ship data is in
   and 2 closed milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 20 open
+- The `v8.2.0` milestone is quality automation and Method hardening: 21 open
   and 2 closed milestone items.
 - The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
   and 0 closed milestone items.
@@ -234,11 +234,14 @@ The active prerequisite is
 [#480](https://github.com/flyingrobots/bijou/issues/480): remove the `25`
 double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
 `12` or less through bounded
-[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Tranche A
-[#484](https://github.com/flyingrobots/bijou/pull/484) removes five smaller
-double-counted roots and lowers the enforced intermediate ceiling to `52`.
-Twenty double-counted roots remain. V8 tracker closeout and release preparation
-follow the completed `62 -> 12` goalpost.
+[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
+tranche A [#484](https://github.com/flyingrobots/bijou/pull/484) removed five
+smaller double-counted roots and lowered the enforced intermediate ceiling to
+`52`. Twenty double-counted roots remain; tranche B is the next bounded pull.
+V8 tracker closeout and release preparation follow the completed `62 -> 12`
+goalpost. Rendering-cache authority debt is tracked separately in
+[#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
+out of scope until revision- or digest-based invalidation is explicit.
 
 ```text
 VISOR v8 tracker (#457)
