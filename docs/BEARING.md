@@ -246,7 +246,7 @@ VISOR v8 tracker (#457)
     -> bijou-block/1 artifact contract
       -> ui-scene-ir/1 lowering contract
         -> receipts, source maps, lower modes, and debug facts
-          -> active packed-cell Surface adapter (#459)
+          -> landed packed-cell Surface adapter (#459)
 ```
 
 The proof chain that V7 shipped must become a product contract before Bijou

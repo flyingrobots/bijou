@@ -59,9 +59,11 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
     expectClaims(bearing, [
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
       'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
+      'landed packed-cell Surface adapter (#459)',
       '[#480](https://github.com/flyingrobots/bijou/issues/480)',
       '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
     ]);
+    expect(bearing).not.toContain('active packed-cell Surface adapter (#459)');
   });
 });
