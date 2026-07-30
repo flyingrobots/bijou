@@ -30,7 +30,7 @@ export function createNoise2D(seed: number): (x: number, y: number) => number {
   };
   for (let index = 0; index < 256; index++) source[index] = index;
   let state = (seed * 1664525 + 1013904223) | 0;
-  for (let index = 0; index < 3; index++) {
+  for (let index = 0; index < 2; index++) {
     state = (state * 1664525 + 1013904223) | 0;
   }
   for (let index = 255; index >= 0; index--) {
