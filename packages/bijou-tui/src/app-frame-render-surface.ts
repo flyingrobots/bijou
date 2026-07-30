@@ -7,6 +7,7 @@ import {
 } from '@flyingrobots/bijou';
 import type { LayoutRect } from './layout-rect.js';
 import { fitBlock } from './layout-utils.js';
+import { resolveDividerChar } from './split-pane.part03.js';
 import {
   normalizeViewOutput,
   normalizeViewOutputInto,
@@ -120,10 +121,7 @@ export function paintDivider(
   direction: 'row' | 'column',
 ): void {
   const fallback = direction === 'row' ? '│' : '─';
-  const unit =
-    dividerChar == null || dividerChar.length === 0
-      ? fallback
-      : (dividerChar[0] ?? fallback);
+  const unit = resolveDividerChar(dividerChar, fallback);
   for (let y = 0; y < rect.height; y++) {
     for (let x = 0; x < rect.width; x++) {
       const col = rect.col + x;
