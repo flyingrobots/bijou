@@ -1,6 +1,5 @@
 import type { FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type { InternalFrameModel } from './app-frame-types.js';
-import { hasNotificationCenter } from './app-frame-actions-footer.js';
 
 export function toggleSettings<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
@@ -61,4 +60,22 @@ export function toggleNotificationCenter<PageModel, Msg>(
     commandPaletteKind: undefined,
     quitConfirmOpen: false,
   };
+}
+
+function hasNotificationCenter<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): boolean {
+  if (options.runtimeNotifications !== false) return true;
+  const activePage = pagesById.get(model.activePageId);
+  if (activePage == null) return false;
+  const pageModel = model.pageModels[model.activePageId];
+  if (pageModel === undefined) return false;
+  return options.notificationCenter?.({
+    model,
+    activePage,
+    pageModel,
+    runtimeNotifications: model.runtimeNotifications,
+  }) != null;
 }

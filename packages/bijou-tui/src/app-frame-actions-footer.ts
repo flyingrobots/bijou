@@ -1,4 +1,3 @@
-import type { FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type {
   FramedAppMsg,
   InternalFrameModel,
@@ -46,22 +45,4 @@ export function toggleFooter<PageModel, Msg>(
       }),
     }),
   ]];
-}
-
-export function hasNotificationCenter<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): boolean {
-  const activePage = pagesById.get(model.activePageId);
-  if (activePage == null) return options.runtimeNotifications !== false;
-  const pageModel = model.pageModels[model.activePageId];
-  if (pageModel === undefined) return options.runtimeNotifications !== false;
-  const provided = options.notificationCenter?.({
-    model,
-    activePage,
-    pageModel,
-    runtimeNotifications: model.runtimeNotifications,
-  });
-  return provided != null || options.runtimeNotifications !== false;
 }
