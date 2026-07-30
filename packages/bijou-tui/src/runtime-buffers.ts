@@ -23,7 +23,9 @@ export class RuntimeFramebuffers {
       ? invalidatedSurface(columns, rows)
       : createSurface(columns, rows);
     this.next = createSurface(columns, rows);
-    this.output = allocateOutput(columns, rows);
+    if (this.output.byteLength < outputCapacity(columns, rows)) {
+      this.output = allocateOutput(columns, rows);
+    }
   }
 
   ensure(columns: number, rows: number): void {
@@ -50,7 +52,11 @@ export class RuntimeFramebuffers {
 }
 
 function allocateOutput(columns: number, rows: number): Uint8Array {
-  return new Uint8Array(columns * rows * BYTES_PER_CELL + OUTPUT_SLACK);
+  return new Uint8Array(outputCapacity(columns, rows));
+}
+
+function outputCapacity(columns: number, rows: number): number {
+  return columns * rows * BYTES_PER_CELL + OUTPUT_SLACK;
 }
 
 function invalidatedSurface(columns: number, rows: number): Surface {
