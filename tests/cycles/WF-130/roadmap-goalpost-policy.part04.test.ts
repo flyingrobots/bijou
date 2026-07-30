@@ -46,12 +46,14 @@ describe('WF-130 roadmap supporting contracts', () => {
       'The next feature horizon remains `v8.0.0`',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met its `112 -> 62` contract.',
       'Landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
-      'Current debt comprises `27` file/context and `15` code-size violations with no mock-ban or ESLint debt.',
+      'Tranche C [#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to `22` file/context and `10` code-size violations with no mock-ban or ESLint debt.',
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
       'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
       '[#480](https://github.com/flyingrobots/bijou/issues/480)',
       '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
-      'Tranche B removes the next five smallest roots and lowers that ceiling to `42`',
+      'Landed tranche B [#486](https://github.com/flyingrobots/bijou/pull/486) removed the next five smallest roots and lowered that ceiling to `42`',
+      'Tranche C [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical example app, Notifications, Image Viewer, the PR review-status tool, and framed-app rendering',
+      'lowering the live ceiling to `32`; `10` double-counted roots remain.',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
@@ -95,7 +97,6 @@ describe('WF-130 roadmap supporting contracts', () => {
       'VISOR coordination surface: https://github.com/flyingrobots/visor',
     ]);
   });
-
   it('disables Markdown line-length linting for project docs', () => {
     const config = requireRecord(JSON.parse(read('.markdownlint.json')));
     expect(config.MD013).toBe(false);
@@ -112,7 +113,7 @@ describe('WF-130 roadmap supporting contracts', () => {
     }
     expectClaims(read('docs/releases/README.md'), [
       '[Release Evidence (v7.2.0)](./7.2.0/README.md)',
-      '[What\'s New (v7.2.0)](./7.2.0/whats-new.md)',
+      "[What's New (v7.2.0)](./7.2.0/whats-new.md)",
       '[Migration Guide (v7.2.0)](./7.2.0/migration-guide.md)',
     ]);
   });
@@ -138,11 +139,11 @@ describe('WF-130 roadmap supporting contracts', () => {
       'visual scene facts',
       'Tests To Write First',
     ]);
-    expect(sectionBetween(source, '## Non-Goals', '## Bundle Contract'))
-      .toContain('implement #459 packed-cell-to-`Surface` validation');
+    expect(
+      sectionBetween(source, '## Non-Goals', '## Bundle Contract'),
+    ).toContain('implement #459 packed-cell-to-`Surface` validation');
   });
 });
-
 function normalizeSource(source: string): string {
   return source.replace(/\s+/g, ' ').trim();
 }

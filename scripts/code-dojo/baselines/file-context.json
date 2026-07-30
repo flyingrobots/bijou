@@ -54,31 +54,6 @@
       "bytes": 27988
     },
     {
-      "path": "packages/bijou-tui/src/app-frame-render.ts",
-      "lines": 764,
-      "bytes": 27077
-    },
-    {
-      "path": "scripts/pr-review-status.ts",
-      "lines": 755,
-      "bytes": 22351
-    },
-    {
-      "path": "examples/image-viewer/main.ts",
-      "lines": 741,
-      "bytes": 21819
-    },
-    {
-      "path": "examples/notifications/main.ts",
-      "lines": 726,
-      "bytes": 23751
-    },
-    {
-      "path": "examples/_shared/canonical-app.ts",
-      "lines": 725,
-      "bytes": 24359
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062

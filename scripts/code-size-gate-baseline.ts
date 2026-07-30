@@ -12,9 +12,4 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] =
     { path: 'packages/bijou-tui/src/app-frame-overlays.ts', lines: 877 },
     { path: 'examples/docs/i18n-debt.ts', lines: 831 },
     { path: 'packages/bijou/src/ports/surface.ts', lines: 823 },
-    { path: 'packages/bijou-tui/src/app-frame-render.ts', lines: 763 },
-    { path: 'scripts/pr-review-status.ts', lines: 754 },
-    { path: 'examples/image-viewer/main.ts', lines: 740 },
-    { path: 'examples/notifications/main.ts', lines: 725 },
-    { path: 'examples/_shared/canonical-app.ts', lines: 724 },
   ]);

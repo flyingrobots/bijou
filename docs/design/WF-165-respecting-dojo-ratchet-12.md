@@ -43,14 +43,14 @@ Ledger edits are evidence after extraction. They are not the implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `42`
-- File/context baseline: `27`
+- Aggregate Code Dojo debt: `32`
+- File/context baseline: `22`
 - Mock-ban baseline: `0`
-- Code-size baseline: `15`, including `3` hard-limit files
+- Code-size baseline: `10`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required goalpost: `12` aggregate violations or lower
-- Tranches A and B: `20` counted violations removed from `10` roots
-- Remaining double-counted roots: `15`
+- Tranches A through C: `30` counted violations removed from `15` roots
+- Remaining double-counted roots: `10`
 - Tracker issue:
   [#480](https://github.com/flyingrobots/bijou/issues/480)
 - Previous goalpost:
@@ -137,6 +137,36 @@ width, empty-badge, render-target adoption, deterministic noise, and harness
 elapsed-time semantics. The overall WF-165 goalpost remains open after tranche
 B.
 
+## Tranche C Contract
+
+Tranche C removes the five smallest remaining roots from both counted ledgers:
+
+| Root | Existing responsibility boundary |
+| :--- | :--- |
+| `examples/_shared/canonical-app.ts` | Canonical workbench fixtures, page model and messages, pane renderers, page composition, and framed-app construction. |
+| `examples/notifications/main.ts` | Notification demo contracts, state transitions, overlay geometry, mouse routing, notification lifecycle, and process entry. |
+| `examples/image-viewer/main.ts` | Image-viewer contracts, file navigation, model updates, preview loading, raster controls, rendering, and process entry. |
+| `scripts/pr-review-status.ts` | Pull-request and review contracts, check and review summaries, CodeRabbit status, merge readiness, GitHub retrieval, CLI parsing, and process entry. |
+| `packages/bijou-tui/src/app-frame-render.ts` | Frame-render contracts, recursive layout rendering, pane geometry, header/help lines, transitions, surface normalization, and scratch ownership. |
+
+The expected tranche-C result is:
+
+- File/context baseline: `27 -> 22`
+- Code-size baseline: `15 -> 10`
+- Aggregate debt: `42 -> 32`
+- Mock-ban baseline: `0`
+- ESLint baseline: `0`
+
+The selection is mechanical: these are the five smallest remaining entries in
+the code-size baseline, and every one is also present in the file/context
+baseline. Each original path remains a stable facade. Example process entry,
+public exports, deterministic merge-readiness classification, notification
+input behavior, image navigation and rendering, and framed-app output remain
+unchanged. Review evidence additionally binds shared notification geometry,
+RGB-only active-tab backgrounds, localized default frame titles, grapheme-safe
+dividers, source-invalidated image-preview caching, and bounded active-tab token
+caching. The overall WF-165 goalpost remains open after tranche C.
+
 ## Implementation Outline
 
 1. Add RED evidence for the exact active-tranche roots and target ledgers.
@@ -162,6 +192,10 @@ B.
 - Preserve focused behavioral tests for each touched public entrypoint.
 - Assert that aggregate debt is exactly `52` after tranche A.
 - Assert that aggregate debt is exactly `42` after tranche B.
+- Assert that the exact five tranche-C roots leave both measured ledgers.
+- Assert that every tranche-C facade and implementation module is at most
+  `150` lines and `12,000` bytes.
+- Assert that aggregate debt is exactly `32` after tranche C.
 
 ## Validation Plan
 
@@ -243,8 +277,10 @@ context threshold, focused behavior suites pass, and repository runtime-cycle
 analysis reports no cycle touching a changed family. The live ledgers move from
 `37 + 25 = 62` to `32 + 20 = 52`.
 
-Tranche B now applies the same bounded extraction to the TUI runtime, performance
-gradient, scripted driver, DAG renderer, and TUI-app skeleton. Their public
+Tranche B landed through
+[#486](https://github.com/flyingrobots/bijou/pull/486). It applies the same
+bounded extraction to the TUI runtime, performance gradient, scripted driver,
+DAG renderer, and TUI-app skeleton. Their public
 facades preserve the original exports while explicit family manifests bind the
 focused implementation modules used for size and runtime-cycle evidence. The
 review witness also binds behavior that the extraction initially drifted:
@@ -252,3 +288,18 @@ same-column DAG detours, middleware-replaced render targets, the original noise
 permutation, empty DAG badges, and initialization-inclusive harness time. The
 live ledgers move again to `27 + 15 = 42`. Fifteen double-counted roots remain
 before the overall `62 -> 12` goalpost can close.
+
+Tranche C is implemented in
+[#487](https://github.com/flyingrobots/bijou/pull/487). The canonical example
+app, Notifications, Image Viewer, PR review-status tool, and framed-app renderer
+remain stable facades over focused implementation families. Exact public-export
+and family manifests bind the compatibility surface, strict context thresholds,
+and runtime-cycle proof. Review hardening shares compact notification geometry
+between rendering and hit testing, preserves RGB-only active-tab backgrounds,
+localizes the default frame title, keeps divider graphemes intact, removes an
+orphan image-viewer mode message, and adds bounded caches for derived active-tab
+tokens and rendered image previews. The preview cache binds its entries to the
+source path, modification time, byte size, viewport, mode, and tuning so a
+source-file rewrite invalidates stale output. The live ledgers move to
+`22 + 10 = 32`; ten double-counted roots remain before the overall `62 -> 12`
+goalpost can close.

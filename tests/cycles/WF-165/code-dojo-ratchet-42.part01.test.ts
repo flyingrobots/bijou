@@ -6,51 +6,36 @@ import {
   parseFileContextBaseline,
   validateLiveFileContextBaseline,
 } from './file-context-baseline-contract.js';
+import { debtScript, read, ROOT } from './ratchet-contract-support.js';
 import {
   TRANCHE_B_FAMILY_MEMBERS,
   TRANCHE_B_ROOTS,
 } from './tranche-b-contract.js';
 
-const ROOT = resolve(import.meta.dirname, '../../..');
 const MAX_LINES = 150;
 const MAX_BYTES = 12_000;
 
-function read(relativePath: string): string {
-  return readFileSync(resolve(ROOT, relativePath), 'utf8');
-}
-
-function debtScript(): string | undefined {
-  const parsed: unknown = JSON.parse(read('package.json'));
-  if (
-    parsed == null
-    || typeof parsed !== 'object'
-    || !('scripts' in parsed)
-    || parsed.scripts == null
-    || typeof parsed.scripts !== 'object'
-  ) {
-    throw new Error('package.json scripts must be an object');
-  }
-  if (!('code-dojo:debt' in parsed.scripts)) return undefined;
-  const command = parsed.scripts['code-dojo:debt'];
-  return typeof command === 'string' ? command : undefined;
-}
-
 describe('WF-165 Code Dojo tranche B debt contract', () => {
-  it('removes five double-counted roots and lowers debt to 42', () => {
+  it('keeps tranche-B debt absent as later tranches lower the ceiling', () => {
     const baseline = parseFileContextBaseline(
       read('scripts/code-dojo/baselines/file-context.json'),
     );
-    validateLiveFileContextBaseline(
-      baseline,
-      (path) => existsSync(resolve(ROOT, path)) ? read(path) : undefined,
+    validateLiveFileContextBaseline(baseline, (path) =>
+      existsSync(resolve(ROOT, path)) ? read(path) : undefined,
     );
     const contextPaths = baseline.files.map((entry) => entry.path);
     const codeSizePaths = CODE_SIZE_BASELINE.map((entry) => entry.path);
 
     expect(TRANCHE_B_ROOTS).toHaveLength(5);
-    expect(contextPaths).toHaveLength(27);
-    expect(codeSizePaths).toHaveLength(15);
-    expect(debtScript()).toBe('tsx scripts/code-dojo-debt.ts --max 42');
+    expect(contextPaths.length).toBeLessThanOrEqual(27);
+    expect(codeSizePaths.length).toBeLessThanOrEqual(15);
+    const command = debtScript();
+    expect(command).toMatch(/^tsx scripts\/code-dojo-debt\.ts --max \d+$/u);
+    const ceiling = Number(
+      command?.match(/--max (?<ceiling>\d+)$/u)?.groups?.ceiling,
+    );
+    expect(Number.isSafeInteger(ceiling)).toBe(true);
+    expect(ceiling).toBeLessThanOrEqual(42);
     for (const root of TRANCHE_B_ROOTS) {
       expect(contextPaths, root).not.toContain(root);
       expect(codeSizePaths, root).not.toContain(root);
@@ -91,9 +76,7 @@ describe('WF-165 Code Dojo tranche B debt contract', () => {
     ]) {
       expect(read(path), path).not.toContain("from './skeleton-contract.js'");
     }
-    const aggregator = read(
-      'packages/bijou-tui-app/src/skeleton-contract.ts',
-    );
+    const aggregator = read('packages/bijou-tui-app/src/skeleton-contract.ts');
     expect(aggregator).not.toContain('import type');
     expect(aggregator).not.toContain('export interface');
   });
