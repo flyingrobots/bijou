@@ -24,12 +24,12 @@ export function enterRuntimeCrashMode<Model, M>(
   viewport: () => { columns: number; rows: number },
   shutdown: (error?: unknown) => void,
 ): void {
+  if (session.crashMode) return;
   if (session.fatalError === null) session.fatalError = error;
   writeErrorLine(
     ctx.io,
     `[Runtime Error] ${formatRuntimeDetail(error)}\n`,
   );
-  if (session.crashMode) return;
   session.crashMode = true;
   session.renderQueued = false;
   session.renderHandle?.dispose();
