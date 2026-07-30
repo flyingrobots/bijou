@@ -341,7 +341,8 @@ double-counted code-size roots and lower aggregate debt from `62` to `12` or
 less through bounded review tranches. Landed tranche A
 [#484](https://github.com/flyingrobots/bijou/pull/484) removed five roots from
 both ledgers and lowered the enforced intermediate ceiling to `52`; `20`
-double-counted roots remain. Tranche B is the next bounded pull. Its design is
+double-counted roots remain. Tranche B selects the five smallest remaining
+roots and targets the next intermediate ceiling of `42`. Its design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -392,8 +393,9 @@ These are planning recommendations from the open tracker state as of
   V8 source-side artifact and packed-cell contracts. Pull
   [#480](https://github.com/flyingrobots/bijou/issues/480) through bounded
   [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
-  tranche A lowered Code Dojo debt from `62` to `52`; tranche B is next, and
-  the remaining tranches must reach `12` or less before V8 tracker closeout.
+  tranche A lowered Code Dojo debt from `62` to `52`; tranche B selects the
+  five smallest remaining double-counted roots and targets `42`. The remaining
+  tranches must reach `12` or less before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

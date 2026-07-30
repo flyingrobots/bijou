@@ -51,6 +51,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
       '[#480](https://github.com/flyingrobots/bijou/issues/480)',
       '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      'Tranche B selects the five smallest remaining double-counted roots and targets `42`.',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',

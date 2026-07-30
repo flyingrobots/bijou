@@ -237,9 +237,10 @@ double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Landed
 tranche A [#484](https://github.com/flyingrobots/bijou/pull/484) removed five
 smaller double-counted roots and lowered the enforced intermediate ceiling to
-`52`. Twenty double-counted roots remain; tranche B is the next bounded pull.
-V8 tracker closeout and release preparation follow the completed `62 -> 12`
-goalpost. Rendering-cache authority debt is tracked separately in
+`52`. Twenty double-counted roots remain. Tranche B selects the five smallest
+remaining double-counted roots and targets `42`. V8 tracker closeout and
+release preparation follow the completed `62 -> 12` goalpost.
+Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope until revision- or digest-based invalidation is explicit.
 

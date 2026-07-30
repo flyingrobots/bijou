@@ -107,9 +107,35 @@ The expected tranche result is:
 
 The overall WF-165 goalpost remains open after tranche A.
 
+## Tranche B Contract
+
+Tranche B removes the five smallest remaining roots from both counted ledgers:
+
+| Root | Existing responsibility boundary |
+| :--- | :--- |
+| `packages/bijou-tui/src/runtime.ts` | Lifecycle contracts, the interactive render loop, shutdown draining, output buffers, and error emission. |
+| `examples/perf-gradient/main.ts` | Telemetry charts, paint modes, frame assembly, interactive state, and process entry. |
+| `packages/bijou-tui/src/driver.ts` | Script contracts, mouse-step builders, harness state, command observations, and script execution. |
+| `packages/bijou/src/core/components/dag-render.ts` | DAG metrics, node glyphs, graph placement, edge highlighting, serialization, and fallback formats. |
+| `packages/bijou-tui-app/src/index.ts` | Skeleton contracts, shell construction, chrome and overlays, page state and layout, and key-map helpers. |
+
+The expected tranche-B result is:
+
+- File/context baseline: `32 -> 27`
+- Code-size baseline: `20 -> 15`
+- Aggregate debt: `52 -> 42`
+- Mock-ban baseline: `0`
+- ESLint baseline: `0`
+
+The selection is mechanical: these are the five smallest remaining entries in
+the code-size baseline, and every one is also present in the file/context
+baseline. The tranche does not introduce a behavior change, public export
+change, new exception, or cache optimization. The overall WF-165 goalpost
+remains open after tranche B.
+
 ## Implementation Outline
 
-1. Add RED evidence for the exact tranche-A roots and target ledgers.
+1. Add RED evidence for the exact active-tranche roots and target ledgers.
 2. Extract cohesive declarations and behavior into focused adjacent modules.
 3. Keep each original root as a stable compatibility facade.
 4. Preserve behavior through existing focused suites and new export/size
@@ -130,6 +156,7 @@ The overall WF-165 goalpost remains open after tranche A.
   import cycles.
 - Preserve focused behavioral tests for each touched public entrypoint.
 - Assert that aggregate debt is exactly `52` after tranche A.
+- Assert that aggregate debt is exactly `42` after tranche B.
 
 ## Validation Plan
 
