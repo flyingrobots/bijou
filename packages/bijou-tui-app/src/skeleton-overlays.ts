@@ -12,6 +12,11 @@ import {
 import type { SkeletonOverlayOptions } from './skeleton-contract.js';
 import { maybeRenderDrawerOverlay } from './skeleton-drawer.js';
 
+/** Resolve the quit modal width without crossing the terminal's lower bound. */
+export function resolveQuitModalWidth(width: number): number {
+  return Math.max(0, Math.min(56, width - 2, Math.max(20, width - 4)));
+}
+
 /** Assemble the shell overlay stack in terminal z-order. */
 export function buildSkeletonOverlays(
   options: SkeletonOverlayOptions,
@@ -69,7 +74,7 @@ export function buildSkeletonOverlays(
       title: 'Quit App?',
       body: 'Exit this TUI session now?',
       hint: 'Y / Enter confirm  •  N / Esc cancel',
-      width: Math.min(56, width - 2, Math.max(20, width - 4)),
+      width: resolveQuitModalWidth(width),
       screenWidth: width,
       screenHeight: height,
       borderToken:
