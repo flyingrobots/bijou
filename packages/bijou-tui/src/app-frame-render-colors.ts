@@ -105,12 +105,13 @@ export function paintActiveHeaderTab(
     tokenOverride ?? deriveActiveHeaderTabToken(ctx, background, foreground);
   for (let x = target.startCol; x <= target.endCol; x++) {
     const cell = surface.get(x, 0);
+    const hasTokenBackground = token.bg != null || token.bgRGB != null;
     const next: Cell = {
       ...cell,
       fg: token.hex,
-      bg: token.bg ?? cell.bg,
+      bg: hasTokenBackground ? token.bg : cell.bg,
       fgRGB: token.fgRGB,
-      bgRGB: token.bgRGB,
+      bgRGB: hasTokenBackground ? token.bgRGB : cell.bgRGB,
       modifiers:
         token.modifiers == null
           ? cell.modifiers
