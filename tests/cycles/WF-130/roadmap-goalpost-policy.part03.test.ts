@@ -15,7 +15,6 @@ import {
 describe('WF-130 roadmap pull order', () => {
   it('binds the completed V8 contract and release prerequisite order', () => {
     const roadmap = normalized('docs/ROADMAP.md');
-    const bearing = normalized('docs/BEARING.md');
     expectClaims(roadmap, [
       'Next Pull',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
@@ -63,7 +62,7 @@ describe('WF-130 roadmap pull order', () => {
       ],
       ['[#480]', '[WF-165]'],
     );
-    expectOrderedClaims(bearing, [
+    expectOrderedClaims(normalized('docs/BEARING.md'), [
       'Recommended pull order:',
       '1. Treat the V8 source-side contract and its #302 / #457 umbrellas as landed.',
       '2. Close #482 through WF-166 with a reproducible zero-advisory dependency graph.',
