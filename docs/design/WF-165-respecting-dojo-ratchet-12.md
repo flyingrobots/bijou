@@ -129,9 +129,11 @@ The expected tranche-B result is:
 
 The selection is mechanical: these are the five smallest remaining entries in
 the code-size baseline, and every one is also present in the file/context
-baseline. The tranche does not introduce a behavior change, public export
-change, new exception, or cache optimization. The overall WF-165 goalpost
-remains open after tranche B.
+baseline. The tranche does not redesign public behavior, change public exports,
+add an exception, or introduce cache invalidation. Review hardening corrects
+bounded runtime scheduling, shutdown, crash, modal, footer, and performance
+chart defects exposed by the extraction. The overall WF-165 goalpost remains
+open after tranche B.
 
 ## Implementation Outline
 

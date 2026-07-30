@@ -54,9 +54,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   Exact family manifests bind export, size, and repository runtime-cycle
   evidence without sweeping unrelated prefix matches into a split family.
   Focused behavioral suites preserve interactive runtime, driver, DAG, and
-  skeleton behavior. File/context debt falls from `32` to `27`, code-size debt
-  falls from `20` to `15`, and aggregate debt falls from `52` to `42`; the
-  active goalpost remains `12` or lower.
+  skeleton behavior. Review hardening makes synchronous render clocks safe,
+  consumes rejected shutdown drains, preserves the first crash surface and
+  error, reuses differ output capacity, clamps narrow quit modals, renders the
+  intended footer separator, and preserves performance-chart reference colors
+  while right-aligning warm-up samples. File/context debt falls from `32` to
+  `27`, code-size debt falls from `20` to `15`, and aggregate debt falls from
+  `52` to `42`; the active goalpost remains `12` or lower.
 - **WF-165 Code Dojo goalpost, tranche A** — The event bus, frame actions,
   example smoke runner, i18n runtime, and timeline now keep their public
   entrypoints as typed facades over focused sub-150-line modules. Exact export
