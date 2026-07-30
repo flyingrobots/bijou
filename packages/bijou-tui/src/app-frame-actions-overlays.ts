@@ -15,7 +15,8 @@ export function toggleSettings<PageModel, Msg>(
   const hasStockSettings = shellThemes.length > 1
     || shellThemes.some((theme) => (theme.modes?.length ?? 0) > 1);
   if (
-    !hasStockSettings
+    !model.settingsOpen
+    && !hasStockSettings
     && (
       settings == null
       || settings.sections.every((section) => section.rows.length === 0)
