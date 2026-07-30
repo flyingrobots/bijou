@@ -99,7 +99,6 @@ describe('WF-130 roadmap pull order', () => {
     );
     expect(paths.filter((path) => !existsSync(resolve(ROOT, path)))).toEqual([]);
   });
-
   it('keeps the v7.2 release packet aligned with release-prep and registry gates', () => {
     const packet = read('docs/releases/7.2.0/README.md');
     const packages = [
