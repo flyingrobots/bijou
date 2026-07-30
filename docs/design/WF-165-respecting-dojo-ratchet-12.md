@@ -194,6 +194,35 @@ byte layouts, validation diagnostics, hashes, rendering behavior, localization
 counts, terminal output, and performance-sensitive packed paths remain
 unchanged. The overall WF-165 goalpost remains open after tranche D.
 
+## Tranche E Contract
+
+Tranche E removes the final five roots from the code-size ledger and from their
+double-counted positions in the file/context ledger:
+
+| Root | Existing responsibility boundary |
+| :--- | :--- |
+| `packages/bijou-tui/src/runtime-engine.ts` | Runtime contracts, subscriptions, scheduling, input dispatch, rendering, effects, cleanup, and engine lifecycle. |
+| `packages/bijou/src/core/components/table.ts` | Table contracts, sizing, alignment, overflow, borders, pagination, selection, scrolling, and rendering. |
+| `packages/bijou-tui/src/app-frame.ts` | Framed-app contracts, state, input, lifecycle, layout, rendering, overlays, notifications, shell themes, and public assembly. |
+| `examples/docs/app.ts` | DOGFOOD application contracts, configuration, state, runtime wiring, input routing, rendering, and process lifecycle. |
+| `examples/docs/stories.ts` | DOGFOOD story contracts, metadata, navigation, examples, panels, demonstrations, and story registry assembly. |
+
+The expected tranche-E result is:
+
+- File/context baseline: `17 -> 12`
+- Code-size baseline: `5 -> 0`
+- Aggregate debt: `22 -> 12`
+- Mock-ban baseline: `0`
+- ESLint baseline: `0`
+
+The selection is exhaustive: these are the only remaining code-size entries,
+and every one is also present in the file/context baseline. Each original path
+remains a stable facade. Public types, exports, runtime lifecycle, table
+semantics, framed-app behavior, DOGFOOD process behavior, story identity, and
+rendered output remain unchanged. Tranche E closes the WF-165 `62 -> 12`
+goalpost only after the live ledgers, family bounds, runtime-cycle proof,
+documentation, and full repository gates agree.
+
 ## Implementation Outline
 
 1. Add RED evidence for the exact active-tranche roots and target ledgers.
@@ -206,7 +235,7 @@ unchanged. The overall WF-165 goalpost remains open after tranche D.
 7. Record each tranche's measured debt in the exception ledger and package
    ceiling.
 8. Run documentation upkeep and the complete repository gate before review.
-9. Repeat bounded tranches until all `25` double-counted roots are gone.
+9. Close the goalpost only when all `25` double-counted roots are gone.
 
 ## Tests To Write First
 
@@ -227,6 +256,10 @@ unchanged. The overall WF-165 goalpost remains open after tranche D.
 - Assert that every tranche-D facade and implementation module is at most
   `150` lines and `12,000` bytes.
 - Assert that aggregate debt is exactly `22` after tranche D.
+- Assert that the exact five tranche-E roots leave both measured ledgers.
+- Assert that every tranche-E facade and implementation module is at most
+  `150` lines and `12,000` bytes.
+- Assert that aggregate debt is exactly `12` after tranche E.
 
 ## Validation Plan
 
@@ -346,4 +379,4 @@ RGB writes and covers negative source-origin clipping. The DOGFOOD scanner
 retains `2,347` raw strings and `78` missing Markdown localizations while
 excluding its own implementation family. The live ledgers now measure
 `17 + 5 = 22`; no public API or rendering redesign entered scope. Five
-double-counted roots remain for the final bounded tranche.
+double-counted roots remain for tranche E.

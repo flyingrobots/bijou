@@ -50,7 +50,7 @@ count reaches zero.
 | `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 | Shipped demo-integrity and framework-input stabilization lineage. |
 | `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 | Contract implementation landed; tracker closeout waits on the next Code Dojo goalpost. |
 | `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 | Post-V8 replay, capture, debugger, and render-witness follow-through. |
-| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 2 | Quality automation, Method hardening, and Code Dojo visibility horizon. |
+| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 3 | Quality automation, Method hardening, and Code Dojo visibility horizon. |
 | `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 | Product Workbench and operator-surface horizon. |
 | `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 | Renderer and host-systems integration horizon. |
 | `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 | Previous shipped release lineage. Complete; do not reopen for new feature work. |
@@ -348,13 +348,14 @@ smallest roots and lowered the intermediate ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering. It lowers the live intermediate ceiling to `32`; `10`
-double-counted roots remain. Tranche D
+double-counted roots remain. Landed tranche D
 [#488](https://github.com/flyingrobots/bijou/pull/488) splits `Surface`,
 DOGFOOD i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`, and the
 terminal differ behind stable facades. Their families stay within the strict
 context threshold, and the enforced ledgers now measure `17 + 5 = 22`.
-The final bounded tranche must split the five remaining double-counted roots
-and reach `12` or less. The cycle design is
+Tranche E must split `runtime-engine.ts`, `table.ts`, `app-frame.ts`,
+`examples/docs/app.ts`, and `examples/docs/stories.ts`, removing the final five
+double-counted roots and reaching `12 + 0 = 12`. The cycle design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -408,9 +409,10 @@ These are planning recommendations from the open tracker state as of
   tranche A lowered Code Dojo debt from `62` to `52`, and landed tranche B
   lowered it to `42`. Landed tranche C
   [#487](https://github.com/flyingrobots/bijou/pull/487) lowers it to `32`.
-  Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488) lowers it
-  to `22`. The final bounded tranche must split the five remaining
-  double-counted roots and reach `12` or less before V8 tracker closeout.
+  Landed tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
+  lowers it to `22`. Tranche E must split `runtime-engine.ts`, `table.ts`,
+  `app-frame.ts`, `examples/docs/app.ts`, and `examples/docs/stories.ts`,
+  lowering the ledgers to `12` and `0` before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.
