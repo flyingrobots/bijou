@@ -10,6 +10,7 @@ import type {
   CommandQueueDiagnostics,
   CreateEventBusOptions,
 } from './eventbus-options.js';
+import { safeReport } from './eventbus-report.js';
 
 const DEFAULT_COMMAND_BACKPRESSURE_THRESHOLD = 1000;
 
@@ -53,18 +54,6 @@ export function createEventBusState<M>(
   };
 }
 
-export function safeReport<M>(
-  state: EventBusState<M>,
-  message: string,
-  error: unknown,
-): void {
-  try {
-    state.options?.onError?.(message, error);
-  } catch {
-    // Error reporting must not recreate an unhandled rejection.
-  }
-}
-
 export function emitMessage<M>(
   state: EventBusState<M>,
   msg: BusMsg<M>,
@@ -74,7 +63,13 @@ export function emitMessage<M>(
   const dispatch = (current: BusMsg<M>): void => {
     const middleware = state.middlewares[index];
     if (middleware == null) {
-      for (const handler of state.subscribers) handler(current);
+      for (const handler of state.subscribers) {
+        try {
+          handler(current);
+        } catch (error: unknown) {
+          safeReport(state, '[EventBus] Subscriber threw:', error);
+        }
+      }
       return;
     }
     index += 1;

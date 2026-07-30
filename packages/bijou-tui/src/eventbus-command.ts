@@ -12,8 +12,8 @@ import {
   emitMessage,
   reportBackpressureIfNeeded,
   resolveIdleIfNeeded,
-  safeReport,
 } from './eventbus-state.js';
+import { safeReport } from './eventbus-report.js';
 
 export function runCommand<M>(
   state: EventBusState<M>,
