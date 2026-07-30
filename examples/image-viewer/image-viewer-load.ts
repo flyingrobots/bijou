@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { extname } from 'node:path';
 import type { ScopedNodeIO } from '@flyingrobots/bijou-node';
 import { rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
@@ -11,6 +11,9 @@ import type {
   LoadedImage,
 } from './image-viewer-contract.js';
 
+const IMAGE_PREVIEW_CACHE_LIMIT = 16;
+const imagePreviewCache = new Map<string, LoadedImage>();
+
 export function loadImagePreview(
   selectedPath: string,
   columns: number,
@@ -22,6 +25,28 @@ export function loadImagePreview(
 ): LoadedImage | Error {
   try {
     const resolvedPath = io.resolvePath(selectedPath);
+    const stats = statSync(resolvedPath, { bigint: true });
+    const cacheKey = [
+      resolvedPath,
+      stats.mtimeNs.toString(),
+      stats.size.toString(),
+      String(columns),
+      String(rows),
+      mode,
+      String(viewport.zoomPercent),
+      String(viewport.panX),
+      String(viewport.panY),
+      tuning.colorMode,
+      String(tuning.thresholdPercent),
+      String(tuning.contrastPercent),
+      tuning.dither,
+    ].join('\0');
+    const cached = imagePreviewCache.get(cacheKey);
+    if (cached != null) {
+      imagePreviewCache.delete(cacheKey);
+      imagePreviewCache.set(cacheKey, cached);
+      return cached;
+    }
     const ext = extname(resolvedPath).toLowerCase();
     const decoded =
       ext === '.svg'
@@ -34,7 +59,7 @@ export function loadImagePreview(
           }
         : decodeImageRgba(readFileSync(resolvedPath), resolvedPath);
 
-    return {
+    const loaded: LoadedImage = {
       format: decoded.format,
       width: decoded.frame.width,
       height: decoded.frame.height,
@@ -59,9 +84,15 @@ export function loadImagePreview(
                 kind: 'charset',
                 chars: ' .:-=+*#%@',
                 order: 'light-to-dark',
-              },
+        },
       }),
     };
+    if (imagePreviewCache.size >= IMAGE_PREVIEW_CACHE_LIMIT) {
+      const oldest = imagePreviewCache.keys().next().value;
+      if (oldest != null) imagePreviewCache.delete(oldest);
+    }
+    imagePreviewCache.set(cacheKey, loaded);
+    return loaded;
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error));
   }
