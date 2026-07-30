@@ -19,6 +19,7 @@ import {
   focusAreaScrollToBottom,
   focusAreaScrollToTop,
   focusAreaScrollToX,
+  type FocusAreaState,
 } from './focus-area.js';
 import { renderFrameNode } from './app-frame-render.js';
 import {
@@ -110,9 +111,9 @@ export function scrollFocusedPane<PageModel, Msg>(
 }
 
 function applyScrollAction(
-  state: ReturnType<typeof createFocusAreaStateForSurface>,
+  state: FocusAreaState,
   action: ScrollAction,
-): ReturnType<typeof createFocusAreaStateForSurface> {
+): FocusAreaState {
   switch (action.type) {
     case 'scroll-up':
       return focusAreaScrollBy(state, -1);
