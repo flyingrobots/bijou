@@ -1,0 +1,65 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+interface PatchedFloor {
+  readonly packageName: string;
+  readonly minimum: string;
+}
+
+const PATCHED_FLOORS: readonly PatchedFloor[] = [
+  { packageName: '@hono/node-server', minimum: '2.0.5' },
+  { packageName: '@modelcontextprotocol/sdk', minimum: '1.30.0' },
+  { packageName: 'body-parser', minimum: '2.3.0' },
+  { packageName: 'brace-expansion', minimum: '5.0.9' },
+  { packageName: 'fast-uri', minimum: '3.1.4' },
+  { packageName: 'hono', minimum: '4.12.27' },
+  { packageName: 'postcss', minimum: '8.5.18' },
+];
+
+describe('WF-166 dependency security closeout', () => {
+  it('keeps advisory-bearing packages at or above their patched floors', () => {
+    const packages = readLockedPackages();
+    const violations = PATCHED_FLOORS.flatMap(({ packageName, minimum }) => {
+      const entry = packages[`node_modules/${packageName}`];
+      if (!isRecord(entry) || typeof entry.version !== 'string') {
+        return [`${packageName}: missing resolved version`];
+      }
+      return isAtLeast(entry.version, minimum)
+        ? []
+        : [`${packageName}: ${entry.version} is below ${minimum}`];
+    });
+
+    expect(violations).toEqual([]);
+  });
+});
+
+function readLockedPackages(): Record<string, unknown> {
+  const lockfilePath = resolve(process.cwd(), 'package-lock.json');
+  const parsed: unknown = JSON.parse(readFileSync(lockfilePath, 'utf8'));
+  if (!isRecord(parsed) || !isRecord(parsed.packages)) {
+    throw new Error('package-lock.json must contain a packages object');
+  }
+  return parsed.packages;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isAtLeast(actualRaw: string, minimumRaw: string): boolean {
+  const actual = parseTriplet(actualRaw);
+  const minimum = parseTriplet(minimumRaw);
+  if (actual[0] !== minimum[0]) return actual[0] > minimum[0];
+  if (actual[1] !== minimum[1]) return actual[1] > minimum[1];
+  return actual[2] >= minimum[2];
+}
+
+function parseTriplet(raw: string): readonly [number, number, number] {
+  const match = /^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$/u.exec(raw);
+  const { major, minor, patch } = match?.groups ?? {};
+  if (major === undefined || minor === undefined || patch === undefined) {
+    throw new Error(`Expected a stable semantic version, received ${raw}`);
+  }
+  return [Number(major), Number(minor), Number(patch)];
+}
