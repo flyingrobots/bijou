@@ -4,10 +4,11 @@ import {
   rgbHex,
   type Model,
 } from './perf-model.js';
-import { createNoise2D } from './perf-noise.js';
+import {
+  PERF_DENSITY,
+  PERF_NOISE,
+} from './perf-noise.js';
 
-const noise = createNoise2D(42);
-const density = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';
 const cell = { char: '█', fg: '', bg: '' };
 const { cos, PI } = Math;
 
@@ -77,14 +78,14 @@ export function fillNoise(
   for (let row = 0; row < model.rows; row++) {
     for (let column = 0; column < model.cols; column++) {
       const value =
-        noise(column * 0.03, row * 0.03 / 0.5 + time * 1.3) * 0.5 + 0.5;
+        PERF_NOISE(column * 0.03, row * 0.03 / 0.5 + time * 1.3) * 0.5 + 0.5;
       const index = clamp(
-        Math.floor(value * density.length),
+        Math.floor(value * PERF_DENSITY.length),
         0,
-        density.length - 1,
+        PERF_DENSITY.length - 1,
       );
       surface.set(column, row, {
-        char: density[index] ?? ' ',
+        char: PERF_DENSITY[index] ?? ' ',
         fg: rgbHex(
           255 * value * 0.3 + 246 * (1 - value),
           89 * value * 0.3 + 246 * (1 - value),

@@ -82,3 +82,6 @@ export function createNoise2D(seed: number): (x: number, y: number) => number {
     return value * norm;
   };
 }
+
+export const PERF_NOISE = createNoise2D(42);
+export const PERF_DENSITY = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';

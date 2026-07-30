@@ -117,4 +117,15 @@ describe('WF-165 Code Dojo tranche B architecture', () => {
 
     expect(importTypes).toHaveLength(0);
   });
+
+  it('shares one performance noise field and density ramp', () => {
+    for (const path of [
+      'examples/perf-gradient/perf-paint-ansi.ts',
+      'examples/perf-gradient/perf-paint-rgb.ts',
+    ]) {
+      const source = readFileSync(resolve(ROOT, path), 'utf8');
+      expect(source, path).not.toContain('createNoise2D');
+      expect(source, path).not.toContain('Ñ@#W$9876543210');
+    }
+  });
 });
