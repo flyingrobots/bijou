@@ -18,7 +18,10 @@ export function stepTimelineTrack(
   dt: number,
 ): TrackState {
   if (elapsedMs < track.startMs || previous.done) return previous;
-  if (!previous.started) return startTrack(track, dt);
+  if (!previous.started) {
+    const activeMs = Math.min(elapsedMs - track.startMs, dt * 1000);
+    return startTrack(track, activeMs / 1000);
+  }
   return continueTrack(track, previous, dt);
 }
 
