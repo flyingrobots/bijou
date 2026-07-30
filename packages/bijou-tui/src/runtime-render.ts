@@ -28,11 +28,18 @@ export function createRuntimeRenderer<Model, M>(
     input.runtimeViewport,
   );
   const routedWarnings = new Set<string>();
+  let renderScheduled = false;
   const schedule = (): void => {
-    if (session.renderHandle != null || session.renderInFlight) return;
-    const handle: TimerHandle = clock.setTimeout(() => {
-      if (session.renderHandle === handle) session.renderHandle = null;
-      handle.dispose();
+    if (renderScheduled || session.renderInFlight) return;
+    renderScheduled = true;
+    const ordering = { fired: false };
+    let handle: TimerHandle | null = null;
+    const scheduledHandle = clock.setTimeout(() => {
+      ordering.fired = true;
+      renderScheduled = false;
+      session.renderHandle = null;
+      handle?.dispose();
+      handle = null;
       if (!session.renderQueued) return;
       session.renderInFlight = true;
       session.renderQueued = false;
@@ -90,7 +97,13 @@ export function createRuntimeRenderer<Model, M>(
         scheduleQueuedRender(session, schedule);
       }
     }, 0);
-    session.renderHandle = handle;
+    handle = scheduledHandle;
+    if (ordering.fired) {
+      scheduledHandle.dispose();
+      handle = null;
+    } else {
+      session.renderHandle = scheduledHandle;
+    }
   };
   const render = (): void => {
     if (!session.running) return;
@@ -100,8 +113,9 @@ export function createRuntimeRenderer<Model, M>(
   return {
     render,
     hasPendingRender: () =>
-      session.renderHandle != null || session.renderInFlight,
+      renderScheduled || session.renderInFlight,
     dispose() {
+      renderScheduled = false;
       session.renderHandle?.dispose();
       session.renderHandle = null;
     },
