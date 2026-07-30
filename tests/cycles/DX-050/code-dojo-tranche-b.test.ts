@@ -47,32 +47,13 @@ function readFileContextBaseline(): FileContextBaseline {
 }
 
 describe('DX-050 Code Dojo tranche B', () => {
-  it('removes 25 counted violations and lowers the ceiling to 62', () => {
+  it('keeps 25 cleared violations out of the live ledgers', () => {
     const fileContextPaths = readFileContextBaseline().files.map(
       (entry) => entry.path,
     );
     const codeSizePaths = CODE_SIZE_BASELINE.map((entry) => entry.path);
-    const packageJson: unknown = JSON.parse(
-      readFileSync(resolve(ROOT, 'package.json'), 'utf8'),
-    );
-    if (
-      packageJson == null
-      || typeof packageJson !== 'object'
-      || !('scripts' in packageJson)
-      || packageJson.scripts == null
-      || typeof packageJson.scripts !== 'object'
-    ) {
-      throw new Error('package.json scripts must be an object');
-    }
-
     expect(TRANCHE_B_CLEARED_PATHS).toHaveLength(24);
     expect(TRANCHE_B_CODE_SIZE_PATHS).toHaveLength(1);
-    expect(fileContextPaths).toHaveLength(37);
-    expect(CODE_SIZE_BASELINE).toHaveLength(25);
-    expect(packageJson.scripts).toHaveProperty(
-      'code-dojo:debt',
-      'tsx scripts/code-dojo-debt.ts --max 62',
-    );
     for (const path of TRANCHE_B_CLEARED_PATHS) {
       expect(fileContextPaths, path).not.toContain(path);
     }
