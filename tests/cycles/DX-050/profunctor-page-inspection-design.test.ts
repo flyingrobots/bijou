@@ -66,7 +66,7 @@ describe('DX-050 Profunctor Page inspection design', () => {
       '`v8.0.0` milestone is the active feature horizon: 2 open milestone items and 2 closed milestone items',
       '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
-      'Current debt comprises `32` file/context and `20` code-size violations',
+      'Current debt comprises `27` file/context and `15` code-size violations',
     ]);
   });
 });

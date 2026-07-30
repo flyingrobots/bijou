@@ -43,14 +43,14 @@ Ledger edits are evidence after extraction. They are not the implementation.
 
 ## Current Truth
 
-- Aggregate Code Dojo debt: `52`
-- File/context baseline: `32`
+- Aggregate Code Dojo debt: `42`
+- File/context baseline: `27`
 - Mock-ban baseline: `0`
-- Code-size baseline: `20`, including `3` hard-limit files
+- Code-size baseline: `15`, including `3` hard-limit files
 - ESLint baseline: `0`
 - Required goalpost: `12` aggregate violations or lower
-- Tranche A result: `10` counted violations removed from `5` roots
-- Remaining double-counted roots: `20`
+- Tranches A and B: `20` counted violations removed from `10` roots
+- Remaining double-counted roots: `15`
 - Tracker issue:
   [#480](https://github.com/flyingrobots/bijou/issues/480)
 - Previous goalpost:
@@ -142,7 +142,8 @@ remains open after tranche B.
    witnesses.
 5. Prove that changed split families remain outside runtime import cycles.
 6. Remove only the five proven roots from the file/context baseline.
-7. Record measured `52` debt in the exception ledger and package ceiling.
+7. Record each tranche's measured debt in the exception ledger and package
+   ceiling.
 8. Run documentation upkeep and the complete repository gate before review.
 9. Repeat bounded tranches until all `25` double-counted roots are gone.
 
@@ -236,5 +237,11 @@ facades now delegate to focused contract, state, execution, and adapter modules;
 all facade exports remain stable, every family file is within the strict
 context threshold, focused behavior suites pass, and repository runtime-cycle
 analysis reports no cycle touching a changed family. The live ledgers move from
-`37 + 25 = 62` to `32 + 20 = 52`. Twenty double-counted roots remain before the
-overall `62 -> 12` goalpost can close.
+`37 + 25 = 62` to `32 + 20 = 52`.
+
+Tranche B now applies the same bounded extraction to the TUI runtime, performance
+gradient, scripted driver, DAG renderer, and TUI-app skeleton. Their public
+facades preserve the original exports while explicit family manifests bind the
+focused implementation modules used for size and runtime-cycle evidence. The
+live ledgers move again to `27 + 15 = 42`. Fifteen double-counted roots remain
+before the overall `62 -> 12` goalpost can close.

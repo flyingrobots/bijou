@@ -48,6 +48,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **WF-165 Code Dojo goalpost, tranche B** — The TUI runtime, performance
+  gradient, scripted driver, DAG renderer, and TUI-app skeleton now preserve
+  their public entrypoints as typed facades over focused sub-150-line modules.
+  Exact family manifests bind export, size, and repository runtime-cycle
+  evidence without sweeping unrelated prefix matches into a split family.
+  Focused behavioral suites preserve interactive runtime, driver, DAG, and
+  skeleton behavior. File/context debt falls from `32` to `27`, code-size debt
+  falls from `20` to `15`, and aggregate debt falls from `52` to `42`; the
+  active goalpost remains `12` or lower.
 - **WF-165 Code Dojo goalpost, tranche A** — The event bus, frame actions,
   example smoke runner, i18n runtime, and timeline now keep their public
   entrypoints as typed facades over focused sub-150-line modules. Exact export

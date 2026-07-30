@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { createNoise2D } from '../../../examples/perf-gradient/perf-noise.js';
 import {
   findRuntimeCyclesTouching,
   listProjectTypeScriptFiles,
@@ -82,5 +83,20 @@ describe('WF-165 Code Dojo tranche B architecture', () => {
       TRANCHE_B_FAMILY_MEMBERS[entrypoint].map((path) => resolve(ROOT, path)),
     );
     expect(findRuntimeCyclesTouching(projectFiles, trancheFiles)).toEqual([]);
+  });
+
+  it('preserves the performance-gradient noise field', () => {
+    const noise = createNoise2D(42);
+    expect([
+      noise(0, 0),
+      noise(0.03, 0.06),
+      noise(1.25, -0.75),
+      noise(17.3, 4.2),
+    ]).toEqual([
+      -7.734549096291505e-66,
+      0.010222392083613068,
+      -0.467642263695954,
+      0.5099932155140692,
+    ]);
   });
 });
