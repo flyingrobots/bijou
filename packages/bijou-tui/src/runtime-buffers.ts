@@ -39,10 +39,13 @@ export class RuntimeFramebuffers {
     }
   }
 
-  swap(): void {
-    const previous = this.current;
-    this.current = this.next;
-    this.next = previous;
+  adoptTarget(surface: Surface): void {
+    const previousFront = this.current;
+    const previousBack = this.next;
+    this.current = surface;
+    this.next = surface === previousFront
+      ? previousBack
+      : previousFront;
   }
 
   replaceFront(surface: Surface): void {

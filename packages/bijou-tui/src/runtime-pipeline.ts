@@ -52,8 +52,8 @@ export function createRuntimePipeline<Model, M>(
     );
     next();
   });
-  pipeline.use('Output', (_state, next) => {
-    buffers.swap();
+  pipeline.use('Output', (state, next) => {
+    buffers.adoptTarget(state.targetSurface);
     next();
   });
   options?.configurePipeline?.(pipeline);
