@@ -49,15 +49,15 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
 
     expectClaims(roadmap, [
       '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 3 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 5 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
     ]);
     expectClaims(bearing, [
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
       'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
       'landed packed-cell Surface adapter (#459)',
-      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
-      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      '[#482](https://github.com/flyingrobots/bijou/issues/482)',
+      '[WF-166](./design/WF-166-v8-dependency-security-closeout.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
     ]);
     expect(bearing).not.toContain('active packed-cell Surface adapter (#459)');
@@ -77,12 +77,12 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
     );
     expectParagraphClaims(
       roadmapSource,
-      'The active prerequisite is the third Code Dojo goalpost',
+      'The active release prerequisite is dependency-security issue',
       [
-        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
-        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+        '[#482](https://github.com/flyingrobots/bijou/issues/482)',
+        '[WF-166](./design/WF-166-v8-dependency-security-closeout.md)',
       ],
-      ['[#458]', '[#459]', '[#483]'],
+      ['[#480]', '[WF-165]'],
     );
   });
 });
