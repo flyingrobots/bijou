@@ -1,52 +1,19 @@
 import type { DogfoodI18nDebtInventory } from './i18n-debt.js';
+import {
+  DOGFOOD_I18N_DEBT_SPLIT_LINEAGES,
+  type DogfoodTouchedI18nDebtLineage,
+} from './i18n-debt-lineages.js';
+
+export {
+  DOGFOOD_I18N_DEBT_SPLIT_LINEAGES,
+  type DogfoodTouchedI18nDebtLineage,
+} from './i18n-debt-lineages.js';
 
 export interface DogfoodTouchedI18nDebtResult {
   readonly ok: boolean;
   readonly touchedPaths: readonly string[];
   readonly violations: readonly string[];
 }
-
-export interface DogfoodTouchedI18nDebtLineage {
-  readonly rootPath: string;
-  readonly childPaths: readonly string[];
-}
-
-export const DOGFOOD_I18N_DEBT_SPLIT_LINEAGES: readonly DogfoodTouchedI18nDebtLineage[] = Object.freeze([
-  {
-    rootPath: 'examples/docs/dogfood-blocks.ts',
-    childPaths: Object.freeze([
-      'examples/docs/dogfood-block-command-palette.ts',
-      'examples/docs/dogfood-block-common.ts',
-      'examples/docs/dogfood-block-docs-surface-data.ts',
-      'examples/docs/dogfood-block-docs-surface-parser.ts',
-      'examples/docs/dogfood-block-docs-surface-render.ts',
-      'examples/docs/dogfood-block-docs-surface-schema.ts',
-      'examples/docs/dogfood-block-docs-surface.ts',
-      'examples/docs/dogfood-block-documentation-article.ts',
-      'examples/docs/dogfood-block-footer-hint.ts',
-      'examples/docs/dogfood-block-guide-inspector-render.ts',
-      'examples/docs/dogfood-block-guide-inspector.ts',
-      'examples/docs/dogfood-block-help-overlay.ts',
-      'examples/docs/dogfood-block-navigation-list-render.ts',
-      'examples/docs/dogfood-block-navigation-list.ts',
-      'examples/docs/dogfood-block-notification-center.ts',
-      'examples/docs/dogfood-block-perf-hud.ts',
-      'examples/docs/dogfood-block-preview.ts',
-      'examples/docs/dogfood-block-registry-entries.ts',
-      'examples/docs/dogfood-block-registry-entry.ts',
-      'examples/docs/dogfood-block-registry.ts',
-      'examples/docs/dogfood-block-schema-utils.ts',
-      'examples/docs/dogfood-block-search-panel-render.ts',
-      'examples/docs/dogfood-block-search-panel.ts',
-      'examples/docs/dogfood-block-settings-menu-render.ts',
-      'examples/docs/dogfood-block-settings-menu.ts',
-      'examples/docs/dogfood-block-text.ts',
-      'examples/docs/dogfood-block-title-screen.ts',
-      'examples/docs/dogfood-block-workbench-render.ts',
-      'examples/docs/dogfood-block-workbench.ts',
-    ]),
-  },
-]);
 
 export function evaluateDogfoodTouchedI18nDebt(
   inventory: DogfoodI18nDebtInventory,

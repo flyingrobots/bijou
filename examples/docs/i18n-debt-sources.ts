@@ -12,6 +12,7 @@ const IMPLEMENTATION_REASON =
 const IMPLEMENTATION_PATHS = [
   'examples/docs/i18n-debt.ts',
   'examples/docs/i18n-debt-contract.ts',
+  'examples/docs/i18n-debt-lineages.ts',
   'examples/docs/i18n-debt-sources.ts',
   'examples/docs/i18n-debt-ratchet.ts',
   'examples/docs/i18n-debt-source-scan.ts',
