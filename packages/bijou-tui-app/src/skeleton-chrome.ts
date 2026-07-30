@@ -55,7 +55,7 @@ export function renderSeparatorRow(
   ctx: BijouContext,
 ): string {
   const token = tokens?.separatorToken ?? ctx.theme.theme.border.muted;
-  return style('\\'.repeat(width), token, ctx);
+  return style('─'.repeat(width), token, ctx);
 }
 
 export function renderFooterStatusRow(

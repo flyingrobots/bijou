@@ -33,7 +33,9 @@ describe('createTuiAppSkeleton', () => {
 
       if (model.rows >= 4) {
         const slashRow = lines[model.rows - 3] ?? '';
-        expect(stripAnsi(slashRow)).toHaveLength(model.columns);
+        const separator = stripAnsi(slashRow);
+        expect(separator).toHaveLength(model.columns);
+        expect(separator).toBe('─'.repeat(model.columns));
       }
     });
 
