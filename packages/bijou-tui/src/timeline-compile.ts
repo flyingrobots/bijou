@@ -18,6 +18,7 @@ import { createTimelineRuntime } from './timeline-runtime.js';
 
 export function compileTimeline(entries: readonly BuilderEntry[]): Timeline {
   const tracks: ResolvedTrack[] = [];
+  const trackNames = new Set<string>();
   const callbacks: ResolvedCallback[] = [];
   const labels = new Map<string, number>();
   let prevStartMs = 0;
@@ -37,10 +38,11 @@ export function compileTimeline(entries: readonly BuilderEntry[]): Timeline {
       continue;
     }
     const startMs = resolveTimelinePosition(entry.position, cursor);
-    const resolved = resolveTrack(entry.name, entry.def, startMs);
-    if (tracks.some((track) => track.name === entry.name)) {
+    if (trackNames.has(entry.name)) {
       throw new Error(`Timeline: duplicate track name "${entry.name}"`);
     }
+    const resolved = resolveTrack(entry.name, entry.def, startMs);
+    trackNames.add(entry.name);
     tracks.push(resolved);
     prevStartMs = startMs;
     prevEndMs = startMs + resolved.estimatedDurationMs;
