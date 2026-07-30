@@ -55,6 +55,7 @@ describe('WF-130 roadmap release state', () => {
     expect(row('v7.1.0')).not.toContain('issues/302');
     expectClaims(row('v7.2.0'), ['issues/354', 'issues/344', 'issues/353']);
     expect(row('v8.0.0')).toContain('issues/302');
+    expect(row('v8.2.0')).toContain('pull/467');
     expect(normalized('docs/ROADMAP.md')).toContain(
       'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
     );
