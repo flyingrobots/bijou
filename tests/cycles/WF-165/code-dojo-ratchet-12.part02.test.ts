@@ -1,5 +1,9 @@
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import {
+  COMPONENT_STORIES,
+  type DogfoodComponentStory,
+} from '../../../examples/docs/stories.js';
 import {
   findRuntimeCyclesTouching,
   listProjectTypeScriptFiles,
@@ -23,6 +27,12 @@ describe('WF-165 Code Dojo tranche E architecture', () => {
         [...TRANCHE_E_PUBLIC_EXPORTS[root]].sort(),
       );
     }
+  });
+
+  it('preserves the public component-story collection type', () => {
+    expectTypeOf(COMPONENT_STORIES).toEqualTypeOf<
+      readonly DogfoodComponentStory[]
+    >();
   });
 
   it('keeps every split family out of repository runtime cycles', () => {

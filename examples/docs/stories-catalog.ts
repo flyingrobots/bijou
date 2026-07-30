@@ -1,4 +1,5 @@
 import type { ComponentStory } from './stories-runtime.js';
+import type { DogfoodComponentStory } from './stories-contract.js';
 import { STORY_ALERT } from './stories-story-alert.js';
 import { STORY_BADGE } from './stories-story-badge.js';
 import { STORY_MODAL } from './stories-story-modal.js';
@@ -42,7 +43,7 @@ import { STORY_BRAILLE_CHART } from './stories-story-braille-chart.js';
 import { STORY_STATS_PANEL } from './stories-story-stats-panel.js';
 import { STORY_PERF_OVERLAY } from './stories-story-perf-overlay.js';
 
-export const COMPONENT_STORIES = [
+export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   STORY_ALERT,
   STORY_BADGE,
   STORY_MODAL,
@@ -85,7 +86,7 @@ export const COMPONENT_STORIES = [
   STORY_BRAILLE_CHART,
   STORY_STATS_PANEL,
   STORY_PERF_OVERLAY,
-] as const;
+];
 
 export function findComponentStory(id: string): ComponentStory | undefined {
   return COMPONENT_STORIES.find((story) => story.id === id);
