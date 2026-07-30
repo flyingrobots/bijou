@@ -10,7 +10,7 @@ import type {
   CommandQueueDiagnostics,
   CreateEventBusOptions,
 } from './eventbus-options.js';
-import { safeReport } from './eventbus-report.js';
+import { invokeSubscribers, safeReport } from './eventbus-report.js';
 
 const DEFAULT_COMMAND_BACKPRESSURE_THRESHOLD = 1000;
 
@@ -63,13 +63,14 @@ export function emitMessage<M>(
   const dispatch = (current: BusMsg<M>): void => {
     const middleware = state.middlewares[index];
     if (middleware == null) {
-      for (const handler of state.subscribers) {
-        try {
+      invokeSubscribers(
+        state,
+        state.subscribers,
+        '[EventBus] Subscriber threw:',
+        (handler) => {
           handler(current);
-        } catch (error: unknown) {
-          safeReport(state, '[EventBus] Subscriber threw:', error);
-        }
-      }
+        },
+      );
       return;
     }
     index += 1;

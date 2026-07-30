@@ -1,6 +1,7 @@
 import type { EventBusDisposable } from './eventbus-contract.js';
 import type { EventBusState } from './eventbus-state.js';
 import { emitMessage } from './eventbus-state.js';
+import { invokeSubscribers } from './eventbus-report.js';
 
 export function startEventBusPulse<M>(
   state: EventBusState<M>,
@@ -17,7 +18,14 @@ export function startEventBusPulse<M>(
     const nowMs = state.clock.now();
     const dt = Math.max(0, (nowMs - lastMs) / 1000);
     lastMs = nowMs;
-    for (const handler of state.pulseHandlers) handler(dt);
+    invokeSubscribers(
+      state,
+      state.pulseHandlers,
+      '[EventBus] Pulse subscriber threw:',
+      (handler) => {
+        handler(dt);
+      },
+    );
     emitMessage(state, { type: 'pulse', dt });
   }, intervalMs);
 }

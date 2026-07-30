@@ -13,7 +13,7 @@ import {
   reportBackpressureIfNeeded,
   resolveIdleIfNeeded,
 } from './eventbus-state.js';
-import { safeReport } from './eventbus-report.js';
+import { invokeSubscribers, safeReport } from './eventbus-report.js';
 
 export function runCommand<M>(
   state: EventBusState<M>,
@@ -75,7 +75,14 @@ function resolveCommandResult<M>(
   }
   if (state.disposed) return;
   if (result === QUIT) {
-    for (const handler of state.quitHandlers) handler();
+    invokeSubscribers(
+      state,
+      state.quitHandlers,
+      '[EventBus] Quit subscriber threw:',
+      (handler) => {
+        handler();
+      },
+    );
   } else if (result !== undefined) {
     emitMessage(state, result);
   }

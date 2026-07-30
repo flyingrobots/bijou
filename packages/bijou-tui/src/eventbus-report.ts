@@ -11,3 +11,18 @@ export function safeReport<M>(
     // Error reporting must not recreate an unhandled rejection.
   }
 }
+
+export function invokeSubscribers<M, Handler>(
+  state: EventBusState<M>,
+  handlers: Iterable<Handler>,
+  failureMessage: string,
+  invoke: (handler: Handler) => void,
+): void {
+  for (const handler of handlers) {
+    try {
+      invoke(handler);
+    } catch (error: unknown) {
+      safeReport(state, failureMessage, error);
+    }
+  }
+}
