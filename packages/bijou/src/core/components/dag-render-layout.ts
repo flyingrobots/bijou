@@ -59,12 +59,12 @@ export function createDagRenderLayout(
       automaticNodeWidthFloor(nodeStyle),
       ...nodes.map((node) =>
         visibleLength(
-          nodeStyle === 'compact' && node.badge != null
+          nodeStyle === 'compact' && node.badge
             ? `${node.label} ${node.badge}`
             : node.label,
         ) + (nodeStyle === 'compact'
           ? compactChrome
-          : node.badge == null ? 4 : visibleLength(node.badge) + 4),
+          : node.badge ? visibleLength(node.badge) + 4 : 4),
       ),
     ),
     minimumNodeWidth(nodeStyle),

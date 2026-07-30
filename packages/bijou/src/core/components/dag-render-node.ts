@@ -19,7 +19,7 @@ function centeredLabelAndBadge(
   badge: string | undefined,
   width: number,
 ): { content: string; types: DagCharType[] } {
-  if (badge == null) return centeredRun(label, width, 'label');
+  if (!badge) return centeredRun(label, width, 'label');
   const truncated = truncateLabel(
     label,
     Math.max(1, width - visibleLength(badge) - 1),

@@ -7,7 +7,7 @@ export function renderPipe(nodes: DagNode[]): string {
   const lines: string[] = [];
   for (const node of nodes) {
     const edges = node.edges ?? [];
-    const badge = node.badge == null ? '' : ` (${node.badge})`;
+    const badge = node.badge ? ` (${node.badge})` : '';
     if (edges.length === 0) {
       lines.push(`${node.label}${badge}`);
     } else {
@@ -40,7 +40,7 @@ export function renderAccessible(
     for (const id of layer) {
       const node = nodeMap.get(id);
       if (node == null) continue;
-      const badge = node.badge == null ? '' : ` (${node.badge})`;
+      const badge = node.badge ? ` (${node.badge})` : '';
       const edges = (node.edges ?? []).filter((edge) => nodeMap.has(edge));
       if (edges.length === 0) {
         lines.push(`  ${node.label}${badge} (end)`);
