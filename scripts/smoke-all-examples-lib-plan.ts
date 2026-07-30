@@ -27,7 +27,7 @@ export function createScenarioPlan(
     };
   }
   if (scenario.mode === 'static-tty') {
-    const command = `${execPath} --import tsx ${quote(absolutePath)}`;
+    const command = `${quote(execPath)} --import tsx ${quote(absolutePath)}`;
     const args = platform === 'darwin'
       ? ['-q', '/dev/null', 'zsh', '-lc', command]
       : ['-q', '-e', '-c', command, '/dev/null'];

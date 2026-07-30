@@ -18,12 +18,12 @@ describe('createScenarioPlan', () => {
   it('uses platform-specific static TTY launchers', () => {
     const darwinPlan = createScenarioPlan('/repo', { path: 'examples/v3-demo/main.ts', mode: 'static-tty' }, {
       platform: 'darwin',
-      execPath: '/custom/node',
+      execPath: '/custom node/bin/node',
       env: {},
     });
     const linuxPlan = createScenarioPlan('/repo', { path: 'examples/v3-demo/main.ts', mode: 'static-tty' }, {
       platform: 'linux',
-      execPath: '/custom/node',
+      execPath: '/custom node/bin/node',
       env: {},
     });
 
@@ -33,13 +33,13 @@ describe('createScenarioPlan', () => {
       '/dev/null',
       'zsh',
       '-lc',
-      "/custom/node --import tsx '/repo/examples/v3-demo/main.ts'",
+      "'/custom node/bin/node' --import tsx '/repo/examples/v3-demo/main.ts'",
     ]);
     expect(linuxPlan.args).toEqual([
       '-q',
       '-e',
       '-c',
-      "/custom/node --import tsx '/repo/examples/v3-demo/main.ts'",
+      "'/custom node/bin/node' --import tsx '/repo/examples/v3-demo/main.ts'",
       '/dev/null',
     ]);
   });
