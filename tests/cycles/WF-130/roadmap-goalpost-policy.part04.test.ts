@@ -144,7 +144,6 @@ describe('WF-130 roadmap supporting contracts', () => {
     ).toContain('implement #459 packed-cell-to-`Surface` validation');
   });
 });
-
 function normalizeSource(source: string): string {
   return source.replace(/\s+/g, ' ').trim();
 }
