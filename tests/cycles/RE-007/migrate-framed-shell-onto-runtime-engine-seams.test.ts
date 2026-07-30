@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+import { readAppFrameProductionFamily } from './app-frame-production-family.js';
 
 const readFrameModule = (name: string) =>
   readRepoFile(`packages/bijou-tui/src/${name}`);
@@ -107,6 +108,7 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
 
   it('routes shell command/effect dispatch through runtime buffers', () => {
     const shellCommand = readFrameModule('app-frame-shell-command.ts');
+    const appFrameFamily = readAppFrameProductionFamily();
     const actionTypes = readFrameModule('app-frame-action-types.ts');
     const compatibilityTypes = readFrameModule('app-frame-types.ts');
     const cycle = readRepoFile(
@@ -133,9 +135,9 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(shellCommand).toContain('createRuntimeBuffers');
 
     // Old ad-hoc dispatch removed
-    expect(shellCommand).not.toContain('withObservedKey');
-    expect(shellCommand).not.toContain('handleFrameMouse');
-    expect(shellCommand).not.toContain('applyQuitRequest');
+    expect(appFrameFamily).not.toContain('withObservedKey');
+    expect(appFrameFamily).not.toContain('handleFrameMouse');
+    expect(appFrameFamily).not.toContain('applyQuitRequest');
 
     // Cycle doc records the buffer migration
     expect(cycle).toContain('FrameShellCommand');
