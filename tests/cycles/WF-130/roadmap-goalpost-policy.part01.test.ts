@@ -34,7 +34,7 @@ describe('WF-130 roadmap goalpost policy', () => {
   });
 
   it('retains every split workflow-policy proof case', () => {
-    const proofSource = [1, 2, 3, 4]
+    const proofSource = [1, 2, 3, 4, 5]
       .map((part) =>
         read(
           `tests/cycles/WF-130/roadmap-goalpost-policy.part0${String(part)}.test.ts`,

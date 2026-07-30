@@ -167,6 +167,33 @@ RGB-only active-tab backgrounds, localized default frame titles, grapheme-safe
 dividers, source-invalidated image-preview caching, and bounded active-tab token
 caching. The overall WF-165 goalpost remains open after tranche C.
 
+## Tranche D Contract
+
+Tranche D removes the five smallest remaining roots from both counted ledgers:
+
+| Root | Existing responsibility boundary |
+| :--- | :--- |
+| `packages/bijou/src/ports/surface.ts` | Cell and layout contracts, packed-cell encoding, masks, transforms, and mutable packed-surface construction. |
+| `examples/docs/i18n-debt.ts` | Debt contracts and baselines, TypeScript source discovery, raw-string classification, Markdown localization inventory, and ratchet evaluation. |
+| `packages/bijou-tui/src/app-frame-overlays.ts` | Help, settings, shell-theme, notification-center, focus, scroll, layout, and drawer-rendering behavior. |
+| `packages/bijou/src/core/ui-scene-ir.ts` | Scene and receipt contracts, canonical hashing, validation, semantic lowering, cell source maps, and terminal proof. |
+| `packages/bijou/src/core/render/differ.ts` | ANSI parsing and serialization, layout painting, cell equality, string and packed diffing, byte encoding, and batching. |
+
+The expected tranche-D result is:
+
+- File/context baseline: `22 -> 17`
+- Code-size baseline: `10 -> 5`
+- Aggregate debt: `32 -> 22`
+- Mock-ban baseline: `0`
+- ESLint baseline: `0`
+
+The selection is mechanical: these are the five smallest remaining entries in
+the code-size baseline, and every one is also present in the file/context
+baseline. Each original path remains a stable facade. Public types, exports,
+byte layouts, validation diagnostics, hashes, rendering behavior, localization
+counts, terminal output, and performance-sensitive packed paths remain
+unchanged. The overall WF-165 goalpost remains open after tranche D.
+
 ## Implementation Outline
 
 1. Add RED evidence for the exact active-tranche roots and target ledgers.
@@ -196,6 +223,10 @@ caching. The overall WF-165 goalpost remains open after tranche C.
 - Assert that every tranche-C facade and implementation module is at most
   `150` lines and `12,000` bytes.
 - Assert that aggregate debt is exactly `32` after tranche C.
+- Assert that the exact five tranche-D roots leave both measured ledgers.
+- Assert that every tranche-D facade and implementation module is at most
+  `150` lines and `12,000` bytes.
+- Assert that aggregate debt is exactly `22` after tranche D.
 
 ## Validation Plan
 
@@ -303,3 +334,16 @@ source path, modification time, byte size, viewport, mode, and tuning so a
 source-file rewrite invalidates stale output. The live ledgers move to
 `22 + 10 = 32`; ten double-counted roots remain before the overall `62 -> 12`
 goalpost can close.
+
+Tranche D is implemented in
+[#488](https://github.com/flyingrobots/bijou/pull/488). `Surface`, DOGFOOD
+i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`, and the terminal
+differ remain stable public facades over the exact family manifests locked by
+the tranche contract. Every family member stays within `150` lines and
+`12,000` bytes, and repository runtime-cycle analysis finds no cycle touching
+the changed families. The `Surface` witness preserves allocation-free numeric
+RGB writes and covers negative source-origin clipping. The DOGFOOD scanner
+retains `2,347` raw strings and `78` missing Markdown localizations while
+excluding its own implementation family. The live ledgers now measure
+`17 + 5 = 22`; no public API or rendering redesign entered scope. Five
+double-counted roots remain for the final bounded tranche.

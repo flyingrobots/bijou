@@ -13,11 +13,11 @@ import {
   read,
   ROOT,
 } from './ratchet-contract-support.js';
-import { TRANCHE_C_ROOTS } from './tranche-c-contract.js';
-import { TRANCHE_C_FAMILY_MEMBERS } from './tranche-c-families.js';
+import { TRANCHE_D_ROOTS } from './tranche-d-contract.js';
+import { TRANCHE_D_FAMILY_MEMBERS } from './tranche-d-families.js';
 
-describe('WF-165 Code Dojo tranche C debt contract', () => {
-  it('keeps tranche-C debt absent as later tranches lower the ceiling', () => {
+describe('WF-165 Code Dojo tranche D debt contract', () => {
+  it('removes five double-counted roots and lowers debt to 22', () => {
     const baseline = parseFileContextBaseline(
       read('scripts/code-dojo/baselines/file-context.json'),
     );
@@ -29,29 +29,27 @@ describe('WF-165 Code Dojo tranche C debt contract', () => {
     const codeSizePaths = CODE_SIZE_BASELINE.map((entry) => entry.path);
     const measuredDebt = loadCodeDojoDebtSummary(ROOT);
 
-    expect(TRANCHE_C_ROOTS).toHaveLength(5);
-    expect(contextPaths.length).toBeLessThanOrEqual(22);
-    expect(codeSizePaths.length).toBeLessThanOrEqual(10);
-    expect(measuredDebt.fileContextViolations).toBeLessThanOrEqual(22);
-    expect(measuredDebt.codeSizeViolations).toBeLessThanOrEqual(10);
-    expect(measuredDebt.totalViolations).toBeLessThanOrEqual(32);
-    const command = debtScript();
-    expect(command).toMatch(/^tsx scripts\/code-dojo-debt\.ts --max \d+$/u);
-    const ceiling = Number(
-      command?.match(/--max (?<ceiling>\d+)$/u)?.groups?.ceiling,
-    );
-    expect(Number.isSafeInteger(ceiling)).toBe(true);
-    expect(ceiling).toBeLessThanOrEqual(32);
-    for (const root of TRANCHE_C_ROOTS) {
+    expect(TRANCHE_D_ROOTS).toHaveLength(5);
+    expect(contextPaths).toHaveLength(17);
+    expect(codeSizePaths).toHaveLength(5);
+    expect(measuredDebt).toMatchObject({
+      fileContextViolations: 17,
+      mockBanViolations: 0,
+      codeSizeViolations: 5,
+      eslintViolations: 0,
+      totalViolations: 22,
+    });
+    expect(debtScript()).toBe('tsx scripts/code-dojo-debt.ts --max 22');
+    for (const root of TRANCHE_D_ROOTS) {
       expect(contextPaths, root).not.toContain(root);
       expect(codeSizePaths, root).not.toContain(root);
     }
   });
 
-  it('keeps every tranche-C family file within the strict context gate', () => {
+  it('keeps every tranche-D family file within the strict context gate', () => {
     expectFamilyFilesWithinBounds(
-      TRANCHE_C_ROOTS,
-      TRANCHE_C_FAMILY_MEMBERS,
+      TRANCHE_D_ROOTS,
+      TRANCHE_D_FAMILY_MEMBERS,
     );
   });
 });

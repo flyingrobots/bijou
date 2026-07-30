@@ -12,8 +12,8 @@ describe('WF-130 roadmap release state', () => {
 
     expectClaims(roadmap, [
       'This roadmap is the forward-looking release horizon for Bijou.',
-      'Last synced from GitHub milestone items: 2026-07-29.',
-      'These are planning recommendations from the open tracker state as of 2026-07-29.',
+      'Last synced from GitHub milestone items: 2026-07-30.',
+      'These are planning recommendations from the open tracker state as of 2026-07-30.',
       'The latest shipped public release is',
       '`v7.1.0` is complete post-V7 minor release lineage',
       '`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.',
@@ -29,7 +29,7 @@ describe('WF-130 roadmap release state', () => {
       '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
       '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 |',
       '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 21 | 2 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 2 |',
       '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
       '| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |',
@@ -55,6 +55,7 @@ describe('WF-130 roadmap release state', () => {
     expect(row('v7.1.0')).not.toContain('issues/302');
     expectClaims(row('v7.2.0'), ['issues/354', 'issues/344', 'issues/353']);
     expect(row('v8.0.0')).toContain('issues/302');
+    expect(row('v8.2.0')).toContain('pull/467');
     expect(normalized('docs/ROADMAP.md')).toContain(
       'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
     );

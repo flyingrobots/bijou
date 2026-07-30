@@ -7,9 +7,4 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] =
     { path: 'packages/bijou-tui/src/app-frame.ts', lines: 2847 },
     { path: 'packages/bijou/src/core/components/table.ts', lines: 990 },
     { path: 'packages/bijou-tui/src/runtime-engine.ts', lines: 975 },
-    { path: 'packages/bijou/src/core/render/differ.ts', lines: 901 },
-    { path: 'packages/bijou/src/core/ui-scene-ir.ts', lines: 889 },
-    { path: 'packages/bijou-tui/src/app-frame-overlays.ts', lines: 877 },
-    { path: 'examples/docs/i18n-debt.ts', lines: 831 },
-    { path: 'packages/bijou/src/ports/surface.ts', lines: 823 },
   ]);

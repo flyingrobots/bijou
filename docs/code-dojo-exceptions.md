@@ -24,19 +24,20 @@ Current count:
 
 | Source                |   Count | Meaning                                                           |
 | :-------------------- | ------: | :---------------------------------------------------------------- |
-| File/context baseline |      22 | Files over the Code Dojo context threshold.                       |
+| File/context baseline |      17 | Files over the Code Dojo context threshold.                       |
 | Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
-| Code-size baseline    |      10 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
+| Code-size baseline    |       5 | Files over 500 lines; 3 exceed the 1000-line hard limit.          |
 | ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total**             |  **32** | Aggregate Code Dojo standards debt.                               |
+| **Total**             |  **22** | Aggregate Code Dojo standards debt.                               |
 
-WF-165 tranches A through C split fifteen double-counted roots into focused
+WF-165 tranches A through D split twenty double-counted roots into focused
 modules behind their existing public entrypoints. Tranche A lowers file/context
 debt from `37` to `32`, code-size debt from `25` to `20`, and aggregate debt
 from `62` to `52`. Tranche B lowers those counts to `27`, `15`, and `42`.
-Tranche C lowers them again to `22`, `10`, and `32`. The in-flight WF-165
-goalpost remains anchored at its original `62` count and must reach `12` or
-lower; an intermediate tranche does not reset the required reduction.
+Tranche C lowers them again to `22`, `10`, and `32`. Tranche D lowers them to
+`17`, `5`, and `22`. The in-flight WF-165 goalpost remains anchored at its
+original `62` count and must reach `12` or lower; an intermediate tranche does
+not reset the required reduction.
 
 WF-164 tranche B splits `24` more production and repository-tooling
 entrypoints into focused modules while keeping their public import paths stable.
@@ -163,7 +164,7 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The encoded intermediate ceiling is `32`. The active WF-165 goalpost began at
+The encoded intermediate ceiling is `22`. The active WF-165 goalpost began at
 `62` and must lower the ceiling to `12` or lower.
 
 ## Updating The Ceiling

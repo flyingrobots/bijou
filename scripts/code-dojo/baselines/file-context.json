@@ -29,31 +29,6 @@
       "bytes": 25353
     },
     {
-      "path": "packages/bijou/src/core/render/differ.ts",
-      "lines": 901,
-      "bytes": 30600
-    },
-    {
-      "path": "packages/bijou/src/core/ui-scene-ir.ts",
-      "lines": 740,
-      "bytes": 21659
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-overlays.ts",
-      "lines": 878,
-      "bytes": 28476
-    },
-    {
-      "path": "examples/docs/i18n-debt.ts",
-      "lines": 804,
-      "bytes": 28956
-    },
-    {
-      "path": "packages/bijou/src/ports/surface.ts",
-      "lines": 824,
-      "bytes": 27988
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062
