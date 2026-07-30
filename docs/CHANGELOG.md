@@ -131,6 +131,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- **WF-165 runtime and harness review repairs** — Concurrent locale loads now
+  coalesce per locale, rejected loads remain retryable, and the newest
+  `setLocale()` request remains authoritative when loaders settle out of
+  order. Event-bus event, quit, and pulse subscribers now report failures
+  independently without aborting sibling fan-out. Empty dynamic settings can
+  still close, timeline tracks receive only their active fraction of an
+  activation frame, notification-center availability avoids redundant custom
+  provider calls, and static-TTY smoke commands quote executable paths.
 - **DOGFOOD Theme Inspector token proof** — The Theme Inspector drawer now
   themes its own border, surface, summary copy, palette labels, and scroll
   chrome from the active DOGFOOD docs theme, and shows a live DOGFOOD usage
@@ -145,14 +153,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   the DOGFOOD i18n policy gates instead of only `docs/DOGFOOD.md` doing so.
 - **Theme rule inspection** — `minContrastWith()` candidates below the contrast
   floor now report `contrast-too-low` inspection reasons instead of looking
-	  eligible, and rule dependencies now include `mix` transform references used
-	  by target or `against` colors. Path candidates that resolve to invalid colors
-	  are now inspected as invalid candidates instead of looking eligible, while
-	  circular candidate references remain deterministic graph errors. Rule target
-	  and `against` colors now fail deterministically when they resolve to
-	  non-colors instead of scoring candidates against an undefined ratio. Exact
-	  token paths ending in `.bg` now take precedence over virtual background-slot
-	  fallback references.
+  eligible, and rule dependencies now include `mix` transform references used
+  by target or `against` colors. Path candidates that resolve to invalid colors
+  are now inspected as invalid candidates instead of looking eligible, while
+  circular candidate references remain deterministic graph errors. Rule target
+  and `against` colors now fail deterministically when they resolve to
+  non-colors instead of scoring candidates against an undefined ratio. Exact
+  token paths ending in `.bg` now take precedence over virtual background-slot
+  fallback references.
 - **Focused Code Dojo ratchet** — WF-162 splits the remaining oversized
   deterministic test/support files from the WF-161 tranche and extracts
   declaration-boundary core, TUI, and standard-block modules behind stable
