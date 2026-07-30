@@ -51,7 +51,6 @@ export interface ImageViewerAppMsg {
     | 'enter'
     | 'back'
     | 'refresh'
-    | 'toggle-mode'
     | 'quit';
 }
 

@@ -19,7 +19,6 @@ import {
   enterParentDirectory,
   refreshModel,
 } from './image-viewer-picker.js';
-import { nextMode } from './image-viewer-tuning.js';
 import { updateTuningKey } from './image-viewer-tuning-update.js';
 
 function updateAppMessage(
@@ -52,15 +51,6 @@ function updateAppMessage(
       return [enterParentDirectory(model, io), []];
     case 'refresh':
       return [refreshModel(model, io), []];
-    case 'toggle-mode':
-      return [
-        {
-          ...model,
-          mode: nextMode(model.mode),
-          lastError: undefined,
-        },
-        [],
-      ];
     case 'quit':
       return [model, [quit()]];
   }
