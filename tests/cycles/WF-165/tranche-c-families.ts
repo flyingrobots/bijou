@@ -11,6 +11,8 @@ export const TRANCHE_C_FAMILY_MEMBERS = {
     'examples/_shared/canonical-app-board.ts',
     'examples/_shared/canonical-app-graph.ts',
     'examples/_shared/canonical-app-page.ts',
+    'examples/_shared/canonical-app-layouts.ts',
+    'examples/_shared/canonical-app-overlays.ts',
     'examples/_shared/canonical-app-create.ts',
   ],
   'examples/notifications/main.ts': [
@@ -59,7 +61,6 @@ export const TRANCHE_C_FAMILY_MEMBERS = {
     'packages/bijou-tui/src/app-frame-render-surface.ts',
     'packages/bijou-tui/src/app-frame-render-scratch.ts',
   ],
-} as const satisfies Readonly<Record<
-  (typeof TRANCHE_C_ROOTS)[number],
-  readonly string[]
->>;
+} as const satisfies Readonly<
+  Record<(typeof TRANCHE_C_ROOTS)[number], readonly string[]>
+>;
