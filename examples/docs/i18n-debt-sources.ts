@@ -6,7 +6,6 @@ import type {
   DogfoodI18nDebtSourceExclusion,
 } from './i18n-debt-contract.js';
 import { repoUrl } from './i18n-debt-io.js';
-
 const DOGFOOD_I18N_DEBT_ROOT = 'examples/docs';
 const IMPLEMENTATION_REASON =
   'localization debt scanner implementation, not a DOGFOOD product surface';

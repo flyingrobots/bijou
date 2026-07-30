@@ -348,11 +348,13 @@ smallest roots and lowered the intermediate ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering. It lowers the live intermediate ceiling to `32`; `10`
-double-counted roots remain. Tranche D is the immediate pull: split
-`Surface`, DOGFOOD i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`,
-and the terminal differ behind stable facades, then lower file/context debt
-from `22` to `17`, code-size debt from `10` to `5`, and aggregate debt from
-`32` to `22`. The cycle design is
+double-counted roots remain. Tranche D
+[#488](https://github.com/flyingrobots/bijou/pull/488) splits `Surface`,
+DOGFOOD i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`, and the
+terminal differ behind stable facades. Their families stay within the strict
+context threshold, and the enforced ledgers now measure `17 + 5 = 22`.
+The final bounded tranche must split the five remaining double-counted roots
+and reach `12` or less. The cycle design is
 [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
 and release preparation follow merged `62 -> 12` evidence; no tag or
 publication is part of this structural cycle.
@@ -406,9 +408,9 @@ These are planning recommendations from the open tracker state as of
   tranche A lowered Code Dojo debt from `62` to `52`, and landed tranche B
   lowered it to `42`. Landed tranche C
   [#487](https://github.com/flyingrobots/bijou/pull/487) lowers it to `32`.
-  Tranche D targets `22` by splitting the next five smallest double-counted
-  roots. The final bounded tranche must then reach `12` or less before V8
-  tracker closeout.
+  Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488) lowers it
+  to `22`. The final bounded tranche must split the five remaining
+  double-counted roots and reach `12` or less before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.

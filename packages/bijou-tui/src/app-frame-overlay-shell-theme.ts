@@ -2,9 +2,7 @@ import {
   createResolved,
   type BijouContext,
 } from '@flyingrobots/bijou';
-import type {
-  FrameShellThemeSpec,
-} from './app-frame.js';
+import type { FrameShellThemeSpec } from './app-frame.js';
 import type { ResolvedFrameShellTheme } from './app-frame-overlay-contract.js';
 
 export function frameShellThemeChoiceId(

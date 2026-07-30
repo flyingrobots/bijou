@@ -335,7 +335,15 @@ source-file rewrite invalidates stale output. The live ledgers move to
 `22 + 10 = 32`; ten double-counted roots remain before the overall `62 -> 12`
 goalpost can close.
 
-Tranche D is selected from the five smallest remaining entries in the live
-code-size ledger: `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
-`ui-scene-ir/1`, and the terminal differ. The bounded target is
-`17 + 5 = 22`; no public API or rendering redesign is in scope.
+Tranche D is implemented in
+[#488](https://github.com/flyingrobots/bijou/pull/488). `Surface`, DOGFOOD
+i18n-debt analysis, framed-app overlays, `ui-scene-ir/1`, and the terminal
+differ remain stable public facades over the exact family manifests locked by
+the tranche contract. Every family member stays within `150` lines and
+`12,000` bytes, and repository runtime-cycle analysis finds no cycle touching
+the changed families. The `Surface` witness preserves allocation-free numeric
+RGB writes and covers negative source-origin clipping. The DOGFOOD scanner
+retains `2,347` raw strings and `78` missing Markdown localizations while
+excluding its own implementation family. The live ledgers now measure
+`17 + 5 = 22`; no public API or rendering redesign entered scope. Five
+double-counted roots remain for the final bounded tranche.

@@ -57,7 +57,6 @@ export function resolveFrameNotificationCenter<PageModel, Msg>(
         activeFilter: model.runtimeNotificationHistoryFilter,
       };
 }
-
 export function resolveNotificationCenterLayout<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,

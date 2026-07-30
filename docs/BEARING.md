@@ -218,7 +218,10 @@ The Code Dojo ratchet
 counted violations. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to
 `22` file/context and `10` code-size violations with no mock-ban or ESLint
-debt. Tranche D is selected to lower those ledgers to `17` and `5`.
+debt. Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
+preserves five more public entrypoints as focused families and lowers those
+ledgers to `17` and `5`. The final bounded tranche must remove the five
+remaining double-counted roots and reach aggregate debt of `12` or less.
 
 The bounded target
 [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
@@ -245,10 +248,11 @@ smallest roots and lowered that ceiling to `42`. Landed tranche C
 [#487](https://github.com/flyingrobots/bijou/pull/487) splits the canonical
 example app, Notifications, Image Viewer, the PR review-status tool, and
 framed-app rendering, lowering the live ceiling to `32`; `10` double-counted
-roots remain. Tranche D now owns `Surface`, DOGFOOD i18n-debt analysis,
-framed-app overlays, `ui-scene-ir/1`, and the terminal differ, targeting an
-aggregate ceiling of `22`. V8 tracker closeout and release preparation follow
-the completed `62 -> 12` goalpost.
+roots remain. Tranche D [#488](https://github.com/flyingrobots/bijou/pull/488)
+preserves `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
+`ui-scene-ir/1`, and the terminal differ behind stable facades, lowering the
+live ceiling to `22`; five double-counted roots remain. V8 tracker closeout
+and release preparation follow the completed `62 -> 12` goalpost.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope for scroll measurements until revision- or digest-based

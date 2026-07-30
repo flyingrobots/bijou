@@ -48,6 +48,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **WF-165 Code Dojo goalpost, tranche D** — `Surface`, DOGFOOD i18n-debt
+  analysis, framed-app overlays, `ui-scene-ir/1`, and the terminal differ now
+  preserve their public entrypoints as typed facades over focused
+  sub-150-line modules. Exact public-export and family manifests bind the
+  compatibility surface, context limits, and repository runtime-cycle proof.
+  The `Surface` extraction preserves allocation-free numeric RGB writes and
+  adds deterministic coverage for clipped blits whose source rectangle begins
+  outside the source surface. The DOGFOOD scanner excludes its extracted
+  implementation family, preserves `.partNN` surface aggregation, and retains
+  exactly `2,347` raw strings and `78` missing Markdown localizations.
+  File/context debt falls from `22` to `17`, code-size debt falls from `10` to
+  `5`, and aggregate debt falls from `32` to `22`; the active goalpost remains
+  `12` or lower.
 - **WF-165 Code Dojo goalpost, tranche C** — The canonical workbench,
   Notifications, Image Viewer, PR review-status tool, and framed-app renderer
   now preserve their original entrypoints as typed facades over focused
