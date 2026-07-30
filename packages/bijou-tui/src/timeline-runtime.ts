@@ -32,7 +32,9 @@ export function createTimelineRuntime(
       return timelineValues(trackNames, state);
     },
     done(state) {
-      return trackNames.every((name) => must(state.tracks[name]).done);
+      return trackNames.every(
+        (name) => must(state.tracks[name], `track "${name}" state`).done,
+      );
     },
     firedCallbacks(previous, next) {
       return firedTimelineCallbacks(callbacks, previous, next);
@@ -70,7 +72,7 @@ function stepTimelineState(
   for (const track of tracks) {
     states[track.name] = stepTimelineTrack(
       track,
-      must(state.tracks[track.name]),
+      must(state.tracks[track.name], `track "${track.name}" state`),
       elapsedMs,
       dt,
     );
@@ -84,7 +86,10 @@ function timelineValues(
 ): Record<string, number> {
   const values: Record<string, number> = {};
   for (const name of trackNames) {
-    values[name] = must(state.tracks[name]).currentValue;
+    values[name] = must(
+      state.tracks[name],
+      `track "${name}" state`,
+    ).currentValue;
   }
   return values;
 }

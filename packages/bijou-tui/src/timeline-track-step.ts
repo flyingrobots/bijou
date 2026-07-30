@@ -30,7 +30,7 @@ function startTrack(track: ResolvedTrack, dt: number): TrackState {
     const stepped = springStep(
       createSpringState(track.from),
       track.to,
-      must(track.springConfig),
+      must(track.springConfig, `spring config for track "${track.name}"`),
       dt,
     );
     return {
@@ -62,9 +62,9 @@ function continueTrack(
 ): TrackState {
   if (track.trackType === 'spring') {
     const stepped = springStep(
-      must(previous.spring),
+      must(previous.spring, `spring state for track "${track.name}"`),
       track.to,
-      must(track.springConfig),
+      must(track.springConfig, `spring config for track "${track.name}"`),
       dt,
     );
     return {
@@ -75,7 +75,7 @@ function continueTrack(
     };
   }
   const stepped = tweenStep(
-    must(previous.tween),
+    must(previous.tween, `tween state for track "${track.name}"`),
     tweenConfig(track),
     dt * 1000,
   );
@@ -91,7 +91,10 @@ function tweenConfig(track: ResolvedTrack) {
   return resolveTweenConfig({
     from: track.from,
     to: track.to,
-    duration: must(track.tweenDuration),
+    duration: must(
+      track.tweenDuration,
+      `tween duration for track "${track.name}"`,
+    ),
     ease: track.tweenEase,
   });
 }

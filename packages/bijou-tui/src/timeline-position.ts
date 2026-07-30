@@ -38,27 +38,31 @@ export function resolveTimelinePosition(
 
   const fromPreviousStart = /^<\+=(\d+(?:\.\d+)?)$/.exec(position);
   if (fromPreviousStart !== null) {
-    return cursor.prevStartMs + parseFloat(must(fromPreviousStart[1]));
+    return cursor.prevStartMs
+      + parseFloat(must(fromPreviousStart[1], 'position offset'));
   }
   const afterPreviousEnd = /^\+=(\d+(?:\.\d+)?)$/.exec(position);
   if (afterPreviousEnd !== null) {
-    return cursor.prevEndMs + parseFloat(must(afterPreviousEnd[1]));
+    return cursor.prevEndMs
+      + parseFloat(must(afterPreviousEnd[1], 'position offset'));
   }
   const beforePreviousEnd = /^-=(\d+(?:\.\d+)?)$/.exec(position);
   if (beforePreviousEnd !== null) {
     return Math.max(
       0,
-      cursor.prevEndMs - parseFloat(must(beforePreviousEnd[1])),
+      cursor.prevEndMs
+        - parseFloat(must(beforePreviousEnd[1], 'position offset')),
     );
   }
   const fromPreviousEnd = /^>=?(\d+(?:\.\d+)?)$/.exec(position);
   if (fromPreviousEnd !== null) {
-    return cursor.prevEndMs + parseFloat(must(fromPreviousEnd[1]));
+    return cursor.prevEndMs
+      + parseFloat(must(fromPreviousEnd[1], 'position offset'));
   }
   const fromLabel =
     /^([a-zA-Z_]\w*)(?:\+=(\d+(?:\.\d+)?))?$/.exec(position);
   if (fromLabel !== null) {
-    const label = must(fromLabel[1]);
+    const label = must(fromLabel[1], 'label name');
     const offset = fromLabel[2] === undefined
       ? 0
       : parseFloat(fromLabel[2]);
