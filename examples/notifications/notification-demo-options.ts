@@ -56,3 +56,13 @@ export function demoOverlayMargin(width: number, height: number): number {
     ? COMPACT_OVERLAY_MARGIN
     : DEFAULT_OVERLAY_MARGIN;
 }
+
+export function demoNotificationStackSpacing(
+  width: number,
+  height: number,
+): { readonly margin: number; readonly gap: number } {
+  return {
+    margin: demoOverlayMargin(width, height),
+    gap: DEMO_NOTIFICATION_GAP,
+  };
+}

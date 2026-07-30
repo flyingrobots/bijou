@@ -13,7 +13,10 @@ import type {
   NotificationDemoUpdate,
 } from './notification-demo-contract.js';
 import { applyNotificationState } from './notification-demo-overlay.js';
-import { ctx } from './notification-demo-options.js';
+import {
+  ctx,
+  demoNotificationStackSpacing,
+} from './notification-demo-options.js';
 import { appendLog, mouseText, numberText } from './notification-demo-state.js';
 
 function notificationRegion(notificationCtx: BijouContext) {
@@ -30,12 +33,15 @@ function resolveMouseTarget(
   msg: MouseMsg,
   notificationCtx: BijouContext,
 ) {
+  const region = notificationRegion(notificationCtx);
   const overlays = renderNotificationStack(model.notifications, {
     screenWidth: notificationCtx.runtime.columns,
     screenHeight: notificationCtx.runtime.rows,
-    region: notificationRegion(notificationCtx),
-    margin: 2,
-    gap: 1,
+    region,
+    ...demoNotificationStackSpacing(
+      notificationCtx.runtime.columns,
+      region.height,
+    ),
     ctx: notificationCtx,
   });
 

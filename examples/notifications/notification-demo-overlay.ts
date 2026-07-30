@@ -22,10 +22,9 @@ import {
   toneCopy,
 } from './notification-demo-copy.js';
 import {
-  DEMO_NOTIFICATION_GAP,
   NOTIFICATION_TICK_MS,
   ctx,
-  demoOverlayMargin,
+  demoNotificationStackSpacing,
 } from './notification-demo-options.js';
 import {
   appendLog,
@@ -51,8 +50,10 @@ export function applyNotificationState(
     {
       screenWidth: notificationCtx.runtime.columns,
       screenHeight: height,
-      margin: demoOverlayMargin(notificationCtx.runtime.columns, height),
-      gap: DEMO_NOTIFICATION_GAP,
+      ...demoNotificationStackSpacing(
+        notificationCtx.runtime.columns,
+        height,
+      ),
       ctx: notificationCtx,
     },
     clock.now(),

@@ -19,7 +19,11 @@ import {
 } from './notification-demo-controls.js';
 import { seedDemoNotifications } from './notification-demo-lifecycle.js';
 import { applyNotificationState } from './notification-demo-overlay.js';
-import { HISTORY_FILTERS, ctx } from './notification-demo-options.js';
+import {
+  HISTORY_FILTERS,
+  ctx,
+  demoNotificationStackSpacing,
+} from './notification-demo-options.js';
 import {
   createInitialPageModel,
   currentHistoryFilter,
@@ -107,8 +111,7 @@ function notificationOverlays(
     screenWidth: frame.screenRect.width,
     screenHeight: frame.screenRect.height,
     region,
-    margin: 2,
-    gap: 1,
+    ...demoNotificationStackSpacing(frame.screenRect.width, region.height),
     ctx: notificationCtx,
   });
 }
