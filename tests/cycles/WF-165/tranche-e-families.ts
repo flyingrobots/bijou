@@ -1,5 +1,6 @@
 import { TRANCHE_E_ROOTS } from "./tranche-e-contract.js";
 import { TRANCHE_E_APP_FAMILY } from "./tranche-e-app-family.js";
+import { TRANCHE_E_STORY_FAMILY } from "./tranche-e-story-family.js";
 
 export const TRANCHE_E_FAMILY_MEMBERS = {
   "packages/bijou-tui/src/runtime-engine.ts": [
@@ -93,7 +94,7 @@ export const TRANCHE_E_FAMILY_MEMBERS = {
     "packages/bijou-tui/src/app-frame-workspace-tree.ts",
   ],
   "examples/docs/app.ts": TRANCHE_E_APP_FAMILY,
-  "examples/docs/stories.ts": ["examples/docs/stories.ts"],
+  "examples/docs/stories.ts": TRANCHE_E_STORY_FAMILY,
 } as const satisfies Readonly<
   Record<(typeof TRANCHE_E_ROOTS)[number], readonly string[]>
 >;

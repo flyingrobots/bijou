@@ -1,7 +1,7 @@
-export interface DogfoodTouchedI18nDebtLineage {
-  readonly rootPath: string;
-  readonly childPaths: readonly string[];
-}
+import type { DogfoodTouchedI18nDebtLineage } from './i18n-debt-lineage-contract.js';
+import { DOGFOOD_STORIES_I18N_DEBT_LINEAGE } from './i18n-debt-lineage-stories.js';
+
+export type { DogfoodTouchedI18nDebtLineage } from './i18n-debt-lineage-contract.js';
 
 export const DOGFOOD_I18N_DEBT_SPLIT_LINEAGES: readonly DogfoodTouchedI18nDebtLineage[] =
   Object.freeze([
@@ -69,4 +69,5 @@ export const DOGFOOD_I18N_DEBT_SPLIT_LINEAGES: readonly DogfoodTouchedI18nDebtLi
         'examples/docs/app-variants-pane.ts',
       ]),
     },
+    DOGFOOD_STORIES_I18N_DEBT_LINEAGE,
   ]);
