@@ -58,9 +58,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   consumes rejected shutdown drains, preserves the first crash surface and
   error, reuses differ output capacity, clamps narrow quit modals, renders the
   intended footer separator, and preserves performance-chart reference colors
-  while right-aligning warm-up samples. File/context debt falls from `32` to
-  `27`, code-size debt falls from `20` to `15`, and aggregate debt falls from
-  `52` to `42`; the active goalpost remains `12` or lower.
+  while right-aligning warm-up samples. The review witness also preserves
+  same-column DAG detours, middleware-replaced render targets, the original
+  deterministic noise field, empty-badge omission in every DAG lower mode, and
+  harness initialization timing. File/context debt falls from `32` to `27`,
+  code-size debt falls from `20` to `15`, and aggregate debt falls from `52`
+  to `42`; the active goalpost remains `12` or lower.
 - **WF-165 Code Dojo goalpost, tranche A** — The event bus, frame actions,
   example smoke runner, i18n runtime, and timeline now keep their public
   entrypoints as typed facades over focused sub-150-line modules. Exact export

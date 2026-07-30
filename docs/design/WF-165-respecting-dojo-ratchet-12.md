@@ -132,8 +132,10 @@ the code-size baseline, and every one is also present in the file/context
 baseline. The tranche does not redesign public behavior, change public exports,
 add an exception, or introduce cache invalidation. Review hardening corrects
 bounded runtime scheduling, shutdown, crash, modal, footer, and performance
-chart defects exposed by the extraction. The overall WF-165 goalpost remains
-open after tranche B.
+chart defects exposed by the extraction. It also restores pre-split DAG detour
+width, empty-badge, render-target adoption, deterministic noise, and harness
+elapsed-time semantics. The overall WF-165 goalpost remains open after tranche
+B.
 
 ## Implementation Outline
 
@@ -245,5 +247,8 @@ Tranche B now applies the same bounded extraction to the TUI runtime, performanc
 gradient, scripted driver, DAG renderer, and TUI-app skeleton. Their public
 facades preserve the original exports while explicit family manifests bind the
 focused implementation modules used for size and runtime-cycle evidence. The
+review witness also binds behavior that the extraction initially drifted:
+same-column DAG detours, middleware-replaced render targets, the original noise
+permutation, empty DAG badges, and initialization-inclusive harness time. The
 live ledgers move again to `27 + 15 = 42`. Fifteen double-counted roots remain
 before the overall `62 -> 12` goalpost can close.
