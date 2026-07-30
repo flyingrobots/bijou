@@ -39,25 +39,24 @@ export function renderBrailleLineChart(
   const dotHeight = height * 4;
   const dotWidth = width * 2;
   const grid = new Uint8Array(width * height);
+  const reference = new Uint8Array(width * height);
   if (referenceValue != null && referenceValue <= maxValue) {
     const dotY = dotHeight - 1
       - Math.round((referenceValue / maxValue) * (dotHeight - 1));
     const row = Math.floor(dotY / 4);
     const dotRow = dotY % 4;
+    const bits =
+      (DOT_LEFT[dotRow] ?? 0) | (DOT_RIGHT[dotRow] ?? 0);
     for (let column = 0; column < width; column++) {
-      grid[row * width + column] |=
-        (DOT_LEFT[dotRow] ?? 0) | (DOT_RIGHT[dotRow] ?? 0);
-      const code = BRAILLE_BASE | (grid[row * width + column] ?? 0);
-      surface.set(x + column, y + row, {
-        char: String.fromCharCode(code),
-        fg: referenceForeground,
-        bg: background,
-      });
+      reference[row * width + column] = bits;
     }
   }
-  for (let dotX = 0; dotX < dotWidth && dotX < sampleCount; dotX++) {
-    const sampleIndex = sampleCount - dotWidth + dotX;
-    if (sampleIndex < 0) continue;
+  const visibleSamples = Math.min(dotWidth, sampleCount);
+  const firstDot = dotWidth - visibleSamples;
+  const firstSample = sampleCount - visibleSamples;
+  for (let offset = 0; offset < visibleSamples; offset++) {
+    const dotX = firstDot + offset;
+    const sampleIndex = firstSample + offset;
     const value = readViewTime(sampleIndex);
     const dotY = dotHeight - 1
       - Math.round((Math.min(value, maxValue) / maxValue) * (dotHeight - 1));
@@ -70,11 +69,14 @@ export function renderBrailleLineChart(
   }
   for (let row = 0; row < height; row++) {
     for (let column = 0; column < width; column++) {
-      const code = grid[row * width + column] ?? 0;
+      const index = row * width + column;
+      const sampleBits = grid[index] ?? 0;
+      const referenceBits = reference[index] ?? 0;
+      const code = sampleBits | referenceBits;
       if (code !== 0) {
         surface.set(x + column, y + row, {
           char: String.fromCharCode(BRAILLE_BASE | code),
-          fg: foreground,
+          fg: sampleBits === 0 ? referenceForeground : foreground,
           bg: background,
         });
       }
