@@ -1,28 +1,56 @@
 import type { I18nFormatterPort } from './runtime-contract.js';
 
+const numberFormatters = new Map<string, Intl.NumberFormat>();
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+const timeFormatters = new Map<string, Intl.DateTimeFormat>();
+const listFormatters = new Map<string, Intl.ListFormat>();
+
 export const DEFAULT_FORMATTER: I18nFormatterPort = {
   formatNumber(value, locale) {
-    return new Intl.NumberFormat(locale).format(value);
+    return cachedFormatter(
+      numberFormatters,
+      locale,
+      () => new Intl.NumberFormat(locale),
+    ).format(value);
   },
   formatDate(value, locale) {
-    return new Intl.DateTimeFormat(
+    return cachedFormatter(
+      dateFormatters,
       locale,
-      { dateStyle: 'medium' },
+      () => new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }),
     ).format(value);
   },
   formatTime(value, locale) {
-    return new Intl.DateTimeFormat(
+    return cachedFormatter(
+      timeFormatters,
       locale,
-      { timeStyle: 'short' },
+      () => new Intl.DateTimeFormat(locale, { timeStyle: 'short' }),
     ).format(value);
   },
   formatList(values, locale) {
-    return new Intl.ListFormat(
+    return cachedFormatter(
+      listFormatters,
       locale,
-      { style: 'long', type: 'conjunction' },
+      () => new Intl.ListFormat(
+        locale,
+        { style: 'long', type: 'conjunction' },
+      ),
     ).format(values);
   },
 };
+
+function cachedFormatter<T>(
+  cache: Map<string, T>,
+  locale: string,
+  create: () => T,
+): T {
+  let formatter = cache.get(locale);
+  if (formatter === undefined) {
+    formatter = create();
+    cache.set(locale, formatter);
+  }
+  return formatter;
+}
 
 export function interpolate(
   template: string,
