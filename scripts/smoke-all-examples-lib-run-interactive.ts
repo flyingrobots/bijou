@@ -37,13 +37,7 @@ export async function runInteractiveScriptedScenario(
   const timeoutMs = deps.interactiveTimeoutMs ?? 5000;
   let timer: NodeJS.Timeout | undefined;
   try {
-    const runMain = scenario.path === 'demo.ts'
-      ? Promise.resolve(module.main(
-        ctx,
-        (_themeName: string, currentCtx: typeof ctx) => currentCtx,
-        writeLine,
-      ))
-      : Promise.resolve(module.main(ctx, writeLine));
+    const runMain = Promise.resolve(module.main(ctx, writeLine));
     await Promise.race([
       runMain,
       new Promise<never>((_resolve, reject) => {
