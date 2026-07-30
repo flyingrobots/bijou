@@ -22,9 +22,4 @@ export const CODE_SIZE_BASELINE: readonly CodeSizeBaselineEntry[] =
     { path: 'packages/bijou-tui/src/driver.ts', lines: 679 },
     { path: 'examples/perf-gradient/main.ts', lines: 676 },
     { path: 'packages/bijou-tui/src/runtime.ts', lines: 669 },
-    { path: 'packages/bijou-tui/src/timeline.ts', lines: 632 },
-    { path: 'packages/bijou-i18n/src/runtime.ts', lines: 565 },
-    { path: 'scripts/smoke-all-examples-lib.ts', lines: 558 },
-    { path: 'packages/bijou-tui/src/app-frame-actions.ts', lines: 557 },
-    { path: 'packages/bijou-tui/src/eventbus.ts', lines: 534 },
   ]);

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { runScenarioWithTimeout, ROOT } from './smoke-all-examples-lib.js';
 
@@ -6,6 +7,15 @@ function call(value: unknown, line?: string): void {
 }
 
 describe('runScenarioWithTimeout', () => {
+  it('keeps the scripted runner independent of example paths', () => {
+    const source = readFileSync(
+      new URL('./smoke-all-examples-lib-run-interactive.ts', import.meta.url),
+      'utf8',
+    );
+
+    expect(source).not.toContain('scenario.path ===');
+  });
+
   it('runs scripted interactive examples through an injected fixture module', async () => {
     const result = await runScenarioWithTimeout(ROOT, {
       path: 'examples/select/main.ts',

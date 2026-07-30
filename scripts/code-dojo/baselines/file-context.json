@@ -104,31 +104,6 @@
       "bytes": 19486
     },
     {
-      "path": "packages/bijou-tui/src/timeline.ts",
-      "lines": 633,
-      "bytes": 19545
-    },
-    {
-      "path": "packages/bijou-i18n/src/runtime.ts",
-      "lines": 566,
-      "bytes": 17521
-    },
-    {
-      "path": "scripts/smoke-all-examples-lib.ts",
-      "lines": 559,
-      "bytes": 15737
-    },
-    {
-      "path": "packages/bijou-tui/src/app-frame-actions.ts",
-      "lines": 558,
-      "bytes": 18633
-    },
-    {
-      "path": "packages/bijou-tui/src/eventbus.ts",
-      "lines": 522,
-      "bytes": 15909
-    },
-    {
       "path": "packages/bijou/src/core/active-binding-collection.ts",
       "lines": 426,
       "bytes": 13062

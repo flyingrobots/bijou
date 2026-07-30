@@ -46,13 +46,15 @@ describe('WF-130 roadmap supporting contracts', () => {
       'The next feature horizon remains `v8.0.0`',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met its `112 -> 62` contract.',
       'Landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
-      'Current debt comprises `37` file/context and `25` code-size violations with no mock-ban or ESLint debt.',
+      'Current debt comprises `32` file/context and `20` code-size violations with no mock-ban or ESLint debt.',
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
-      'The active v8 product pull is #459: validate `packed-bijou-cells/1` and adapt it to `Surface`.',
+      'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
+      '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+      '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
-      '`v8.0.0` milestone is the active feature horizon: 3 open milestone items and 1 closed milestone item',
+      '`v8.0.0` milestone is the active feature horizon: 2 open milestone items and 2 closed milestone items',
       '`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through',
       '`v8.2.0` milestone is quality automation and Method hardening: 20 open and 2 closed milestone items',
       'No open issue is currently unmilestoned',
@@ -122,7 +124,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       '`visor-artifact-bundle/1` proof',
     ]);
     expectClaims(normalized('docs/BEARING.md'), [
-      'Its cycle design remains [DX-049](./design/DX-049-visor-artifact-bundle-proof.md)',
+      'Their cycle designs remain [DX-049](./design/DX-049-visor-artifact-bundle-proof.md)',
     ]);
     expectClaims(normalizeSource(source), [
       'User story: [#458](https://github.com/flyingrobots/bijou/issues/458)',

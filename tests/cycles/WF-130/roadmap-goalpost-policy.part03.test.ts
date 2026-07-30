@@ -7,11 +7,11 @@ import {
   expectClaims,
   expectNoClaims,
   expectOrderedClaims,
+  expectParagraphClaims,
   normalized,
   read,
   ROOT,
 } from './roadmap-goalpost-policy.test-support.js';
-
 describe('WF-130 roadmap pull order', () => {
   it('binds the completed Dojo prerequisite and complete downstream order', () => {
     const roadmap = normalized('docs/ROADMAP.md');
@@ -22,8 +22,7 @@ describe('WF-130 roadmap pull order', () => {
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
       'Its landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
       'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
-      'The active V8 product pull is [#459](https://github.com/flyingrobots/bijou/issues/459)',
-      '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
+      '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
       'Runtime Graph And Scene IR Product Contract',
       'VISOR',
@@ -39,17 +38,41 @@ describe('WF-130 roadmap pull order', () => {
       'Renderer And Host Systems Integration',
       'terminal shader, raster, and native-render foundations',
     ]);
+    const roadmapSource = read('docs/ROADMAP.md');
+    expectParagraphClaims(
+      roadmapSource,
+      'The V8 source-side contract pulls are landed:',
+      [
+        '[#458](https://github.com/flyingrobots/bijou/issues/458)',
+        '[#459](https://github.com/flyingrobots/bijou/issues/459)',
+        '[#483](https://github.com/flyingrobots/bijou/pull/483)',
+      ],
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+    );
+    expectParagraphClaims(
+      roadmapSource,
+      'The active prerequisite is the third Code Dojo goalpost',
+      [
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
+      ],
+      ['[#458]', '[#459]', '[#483]'],
+    );
     expectOrderedClaims(bearing, [
       'Recommended pull order:',
       '1. Treat the bounded Profunctor Page inspection proof in #468 as landed.',
       '2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle, replay facts, and visual scene facts are implemented.',
-      '3. Pull #459 as the next v8 implementation proof: validate `packed-bijou-cells/1` and adapt it to `Surface`.',
-      '4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and active #459 prove the smallest stable contract.',
-      '5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
-      '6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality automation.',
-      '7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes the source/artifact/IR contract.',
-      '8. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native surface work after the Bijou contracts are proven.',
-      '9. Keep closed dependency PR #326 as superseded lineage, not active release work.',
+      '3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates and adapts into a synchronized terminal `Surface`.',
+      '4. Pull #480 through bounded WF-165 tranches until Code Dojo debt reaches `12` or less.',
+      '5. Close #302 and #457 only after merged goalpost evidence and V8 contract closeout agree.',
+      '6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
+      '7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality automation.',
+      '8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes the source/artifact/IR contract.',
+      '9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native surface work after the Bijou contracts are proven.',
+      '10. Keep closed dependency PR #326 as superseded lineage, not active release work.',
     ]);
     expectNoClaims(roadmap, [
       'No next public release version is selected.',
@@ -60,7 +83,6 @@ describe('WF-130 roadmap pull order', () => {
       'Workflow, Capture, And CI Determinism',
     ]);
   });
-
   it('keeps v7.2 release evidence replay commands aligned with split WF-130 proof files', () => {
     const command = extractBashCommandBlocks(
       read('docs/releases/7.2.0/README.md'),
@@ -71,14 +93,12 @@ describe('WF-130 roadmap pull order', () => {
       'tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts',
     ]);
   });
-
   it('keeps v7.2 release evidence test paths replayable from the checkout', () => {
     const paths = extractReferencedTestPaths(
       read('docs/releases/7.2.0/README.md'),
     );
     expect(paths.filter((path) => !existsSync(resolve(ROOT, path)))).toEqual([]);
   });
-
   it('keeps the v7.2 release packet aligned with release-prep and registry gates', () => {
     const packet = read('docs/releases/7.2.0/README.md');
     const packages = [

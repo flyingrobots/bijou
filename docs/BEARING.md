@@ -146,8 +146,8 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 3 open milestone items
-  and 1 closed milestone item as of the latest roadmap sync.
+- The `v8.0.0` milestone is the active feature horizon: 2 open milestone items
+  and 2 closed milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 20 open
@@ -215,7 +215,7 @@ The Code Dojo ratchet
 `112 -> 62` contract. Landed tranche A
 [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
 [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
-counted violations. Current debt comprises `37` file/context and `25`
+counted violations. Current debt comprises `32` file/context and `20`
 code-size violations with no mock-ban or ESLint debt.
 
 The bounded target
@@ -225,12 +225,20 @@ canonical website specimen through Bijou-owned `ui-scene-ir/1`, layout,
 `Surface`, source-map, and receipt boundaries. Its completed cycle design is
 [DX-050](./design/DX-050-profunctor-page-inspection.md).
 
-The #458 GraphQL block artifact bundle has landed as the first v8
-implementation proof. Its cycle design remains
-[DX-049](./design/DX-049-visor-artifact-bundle-proof.md). The active v8
-product pull is #459: validate `packed-bijou-cells/1` and adapt it to
-`Surface`. Its accepted cycle design is
+The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter
+have landed as the two bounded V8 implementation proofs. Their cycle designs
+remain [DX-049](./design/DX-049-visor-artifact-bundle-proof.md) and
 [RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md).
+
+The active prerequisite is
+[#480](https://github.com/flyingrobots/bijou/issues/480): remove the `25`
+double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
+`12` or less through bounded
+[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Tranche A
+[#484](https://github.com/flyingrobots/bijou/pull/484) removes five smaller
+double-counted roots and lowers the enforced intermediate ceiling to `52`.
+Twenty double-counted roots remain. V8 tracker closeout and release preparation
+follow the completed `62 -> 12` goalpost.
 
 ```text
 VISOR v8 tracker (#457)
@@ -238,7 +246,7 @@ VISOR v8 tracker (#457)
     -> bijou-block/1 artifact contract
       -> ui-scene-ir/1 lowering contract
         -> receipts, source maps, lower modes, and debug facts
-          -> active packed-cell Surface adapter (#459)
+          -> landed packed-cell Surface adapter (#459)
 ```
 
 The proof chain that V7 shipped must become a product contract before Bijou
@@ -258,19 +266,21 @@ Recommended pull order:
 1. Treat the bounded Profunctor Page inspection proof in #468 as landed.
 2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle,
    replay facts, and visual scene facts are implemented.
-3. Pull #459 as the next v8 implementation proof: validate
-   `packed-bijou-cells/1` and adapt it to `Surface`.
-4. Keep #302 in `v8.0.0` as the broad source tracker while landed #458 and
-   active #459 prove the smallest stable contract.
-5. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
+   and adapts into a synchronized terminal `Surface`.
+4. Pull #480 through bounded WF-165 tranches until Code Dojo debt reaches `12`
+   or less.
+5. Close #302 and #457 only after merged goalpost evidence and V8 contract
+   closeout agree.
+6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
-6. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
+7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
    automation.
-7. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
+8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
    stabilizes the source/artifact/IR contract.
-8. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
+9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
    surface work after the Bijou contracts are proven.
-9. Keep closed dependency PR #326 as superseded lineage, not active release
+10. Keep closed dependency PR #326 as superseded lineage, not active release
    work.
 
 Non-goals for the next cycle:

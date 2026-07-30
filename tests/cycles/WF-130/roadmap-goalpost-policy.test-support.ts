@@ -16,6 +16,25 @@ export function normalized(relativePath: string): string {
   return read(relativePath).replace(/\s+/g, ' ').trim();
 }
 
+export function paragraphContaining(source: string, claim: string): string {
+  const paragraph = source
+    .split(/\n\s*\n/u)
+    .find((candidate) => candidate.includes(claim));
+  if (paragraph == null) throw new Error(`Missing paragraph containing ${claim}`);
+  return paragraph.replace(/\s+/g, ' ').trim();
+}
+
+export function expectParagraphClaims(
+  source: string,
+  marker: string,
+  claims: readonly string[],
+  exclusions: readonly string[],
+): void {
+  const paragraph = paragraphContaining(source, marker);
+  expectClaims(paragraph, claims);
+  expectNoClaims(paragraph, exclusions);
+}
+
 export function sectionBetween(
   source: string,
   startHeading: string,

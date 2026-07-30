@@ -12,16 +12,9 @@ function read(relativePath: string): string {
 }
 
 describe('WF-163 Code Dojo ratchet', () => {
-  it('records the historical goalpost and the current bounded target', () => {
-    const exceptions = read('docs/code-dojo-exceptions.md');
+  it('records its historical goalpost and next bounded target', () => {
     const design = read('docs/design/WF-163-respecting-dojo-ratchet-112.md');
 
-    expect(exceptions).toMatch(/\| File\/context baseline\s+\|\s+37\s+\|/u);
-    expect(exceptions).toMatch(/\| \*\*Total\*\*\s+\|\s+\*\*62\*\*\s+\|/u);
-    expect(exceptions).toContain(
-      'The next met goalpost must lower the ceiling to',
-    );
-    expect(exceptions).toMatch(/`12` or lower\./u);
     expect(design).toContain(
       '- Removed debt: `50` of the required `50` violations',
     );

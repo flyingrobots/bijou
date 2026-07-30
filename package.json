@@ -35,7 +35,7 @@
     "generate:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts",
     "check:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts --check",
     "code:size": "tsx scripts/code-size-gate.ts",
-    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 62",
+    "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 52",
     "code-dojo:eslint:offenders": "node scripts/code-dojo/eslint-offenders.mjs",
     "code-dojo:fast": "node scripts/code-dojo/fast.mjs",
     "code-dojo:changed": "node scripts/code-dojo/changed.mjs",

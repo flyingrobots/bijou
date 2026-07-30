@@ -7,7 +7,7 @@ import { TRANCHE_A_CLEARED_PATHS } from './tranche-a-paths.js';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
 describe('DX-050 Code Dojo tranche A', () => {
-  it('removes 25 production paths from the file/context ledger', () => {
+  it('keeps 25 cleared production paths out of the live ledger', () => {
     const source = readFileSync(
       resolve(ROOT, 'scripts/code-dojo/baselines/file-context.json'),
       'utf8',
@@ -34,7 +34,6 @@ describe('DX-050 Code Dojo tranche A', () => {
     });
 
     expect(TRANCHE_A_CLEARED_PATHS).toHaveLength(25);
-    expect(paths).toHaveLength(37);
     for (const path of TRANCHE_A_CLEARED_PATHS) {
       expect(paths, path).not.toContain(path);
     }

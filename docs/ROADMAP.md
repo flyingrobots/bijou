@@ -48,7 +48,7 @@ count reaches zero.
 | Horizon | Milestone | Open Items | Closed Items | Current Posture |
 | :--- | :--- | ---: | ---: | :--- |
 | `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 | Shipped demo-integrity and framework-input stabilization lineage. |
-| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 1 | Active VISOR and Runtime Graph / Scene IR contract horizon. |
+| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 | Contract implementation landed; tracker closeout waits on the next Code Dojo goalpost. |
 | `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 | Post-V8 replay, capture, debugger, and render-witness follow-through. |
 | `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 20 | 2 | Quality automation, Method hardening, and Code Dojo visibility horizon. |
 | `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 | Product Workbench and operator-surface horizon. |
@@ -152,7 +152,9 @@ Primary staged milestone trackers:
   [`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md) as the first
   `visor-artifact-bundle/1` proof
 - [#459](https://github.com/flyingrobots/bijou/issues/459) VISOR: validate
-  packed-bijou-cells/1 and adapt to Surface
+  packed-bijou-cells/1 and adapt to Surface, landed through
+  [#483](https://github.com/flyingrobots/bijou/pull/483) and
+  [`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)
 - [#302](https://github.com/flyingrobots/bijou/issues/302) as the broad
   GraphQL-authored UI scenes into Bijou Blocks source tracker
 
@@ -322,13 +324,23 @@ Bijou-owned `ui-scene-ir/1`, layout, `Surface`, source-map, and receipt path
 from the canonical website specimen. Its completed cycle design is
 [DX-050](./design/DX-050-profunctor-page-inspection.md).
 
-The active V8 product pull is
-[#459](https://github.com/flyingrobots/bijou/issues/459): validate the
-`packed-bijou-cells/1` receipt and adapt it byte-for-byte into a terminal
-`Surface`. The accepted cycle design is
-[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md). It follows
-the landed #458 artifact bundle proof and restores the planned V8 sequence
-after the bounded target proof.
+The V8 source-side contract pulls are landed:
+[#458](https://github.com/flyingrobots/bijou/issues/458) emits the deterministic
+VISOR artifact bundle and [#459](https://github.com/flyingrobots/bijou/issues/459)
+validates `packed-bijou-cells/1` receipts and adapts them byte-for-byte into a
+terminal `Surface` through
+[#483](https://github.com/flyingrobots/bijou/pull/483).
+
+The active prerequisite is the third Code Dojo goalpost
+[#480](https://github.com/flyingrobots/bijou/issues/480): remove all `25`
+double-counted code-size roots and lower aggregate debt from `62` to `12` or
+less through bounded review tranches. Tranche A
+[#484](https://github.com/flyingrobots/bijou/pull/484) removes five roots from
+both ledgers and lowers the enforced intermediate ceiling to `52`; `20`
+double-counted roots remain. Its design is
+[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md). V8 tracker closeout
+and release preparation follow merged `62 -> 12` evidence; no tag or
+publication is part of this structural cycle.
 
 ## Forward Goalposts
 
@@ -371,13 +383,13 @@ These are planning recommendations from the open tracker state as of
   prove the V8 contract; they should not reopen source/artifact semantics.
 - **V8.2 boundary**: quality automation and Method hardening should improve the
   enforcement system without swallowing product-workbench scope.
-- **Immediate target**: the `62` aggregate Code Dojo prerequisite
-  [#477](https://github.com/flyingrobots/bijou/issues/477) is met and the
-  bounded Profunctor Page inspection story
-  [#468](https://github.com/flyingrobots/bijou/issues/468) landed through
-  [#474](https://github.com/flyingrobots/bijou/pull/474). Pull
-  [#459](https://github.com/flyingrobots/bijou/issues/459) through
-  [RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md).
+- **Immediate target**: [#458](https://github.com/flyingrobots/bijou/issues/458)
+  and [#459](https://github.com/flyingrobots/bijou/issues/459) have landed the
+  V8 source-side artifact and packed-cell contracts. Pull
+  [#480](https://github.com/flyingrobots/bijou/issues/480) through bounded
+  [WF-165](./design/WF-165-respecting-dojo-ratchet-12.md) tranches. Tranche A
+  lowers Code Dojo debt from `62` to `52`; the remaining tranches must reach
+  `12` or less before V8 tracker closeout.
 - **V9 boundary**: Product Workbench And Operator Surfaces should wait until V8
   makes the source/artifact/IR contract stable enough to inspect and author
   against.
