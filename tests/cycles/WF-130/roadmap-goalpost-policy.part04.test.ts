@@ -46,7 +46,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       'The next feature horizon remains `v8.0.0`',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met its `112 -> 62` contract.',
       'Landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
-      'Current debt comprises `37` file/context and `25` code-size violations with no mock-ban or ESLint debt.',
+      'Current debt comprises `32` file/context and `20` code-size violations with no mock-ban or ESLint debt.',
       'The bounded target [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
       'The #458 GraphQL block artifact bundle and #459 packed-cell `Surface` adapter have landed',
       '[#480](https://github.com/flyingrobots/bijou/issues/480)',

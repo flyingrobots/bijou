@@ -215,7 +215,7 @@ The Code Dojo ratchet
 `112 -> 62` contract. Landed tranche A
 [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B
 [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25`
-counted violations. Current debt comprises `37` file/context and `25`
+counted violations. Current debt comprises `32` file/context and `20`
 code-size violations with no mock-ban or ESLint debt.
 
 The bounded target
