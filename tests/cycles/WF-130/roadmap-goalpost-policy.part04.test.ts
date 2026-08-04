@@ -55,7 +55,7 @@ describe('WF-130 roadmap supporting contracts', () => {
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
-      '`v8.0.0` milestone is the active feature horizon: 2 open milestone items and 2 closed milestone items',
+      '`v8.0.0` milestone is the active feature horizon: 17 open milestone items and 4 closed milestone items',
       '`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through',
       '`v8.2.0` milestone is quality automation and Method hardening: 22 open and 3 closed milestone items',
       '[#485](https://github.com/flyingrobots/bijou/issues/485)',

@@ -146,16 +146,21 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 2 open milestone items
-  and 2 closed milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is the active feature horizon: 17 open milestone items
+  and 4 closed milestone items as of the latest roadmap sync. The VISOR Runtime
+  Graph and Scene IR contract is complete; the milestone is deliberately held
+  open for dependency security
+  [#482](https://github.com/flyingrobots/bijou/issues/482), the perceptual
+  colour and Design Book conformance campaign
+  [#501](https://github.com/flyingrobots/bijou/issues/501), and the DOGFOOD
+  title screen for the release.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 22 open
   and 3 closed milestone items.
-- The `v9.0.0` milestone is Product Workbench and operator surfaces: 29 open
-  and 0 closed milestone items. The perceptual colour and Design Book
-  conformance campaign now runs under tracker
-  [#501](https://github.com/flyingrobots/bijou/issues/501).
+- The `v9.0.0` milestone is Product Workbench and operator surfaces: 13 open
+  and 0 closed milestone items. The colour campaign moved out of this lane into
+  `v8.0.0`.
 - The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
   1 closed milestone item.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
