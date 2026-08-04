@@ -43,7 +43,7 @@ export function guideFooterHint(
         return dogfoodText(
           localization,
           'docs.footer.themeLabEditor',
-          '{paneSwitch} • [/] color • r/g/b channel • -/+ nudge • 0 reset',
+          '{paneSwitch} • n/p color • 1/2/3 channel • -/+ nudge • 0 reset',
           { paneSwitch },
         );
       }
