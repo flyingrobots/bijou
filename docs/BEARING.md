@@ -152,8 +152,10 @@ Current direction and active tensions. Historical ship data is in
   follow-through: 13 open and 0 closed milestone items.
 - The `v8.2.0` milestone is quality automation and Method hardening: 22 open
   and 3 closed milestone items.
-- The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
-  and 0 closed milestone items.
+- The `v9.0.0` milestone is Product Workbench and operator surfaces: 29 open
+  and 0 closed milestone items. The perceptual colour and Design Book
+  conformance campaign now runs under tracker
+  [#501](https://github.com/flyingrobots/bijou/issues/501).
 - The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
   1 closed milestone item.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
