@@ -2,7 +2,7 @@ import {
   BIJOU_DARK,
   BIJOU_LIGHT,
   defineThemeSafePairs,
-  type Theme,
+  renameRuleAuthoredTheme,
 } from '../../packages/bijou/src/index.js';
 import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
 import { dogfoodLocalizedText } from './localization.js';
@@ -11,15 +11,11 @@ function dogfoodText(id: string, fallback: string): string {
   return dogfoodLocalizedText(undefined, id, fallback);
 }
 
-function cloneThemeWithName(theme: Theme, name: string): Theme {
-  return {
-    ...structuredClone(theme),
-    name,
-  };
-}
-
-export const DOGFOOD_DARK_THEME = cloneThemeWithName(BIJOU_DARK, 'dogfood-dark');
-export const DOGFOOD_LIGHT_THEME = cloneThemeWithName(BIJOU_LIGHT, 'dogfood-light');
+// Renamed through the provenance-preserving helper rather than a bare
+// structuredClone: the Theme Lab inspects the theme it is editing, and a plain
+// clone would leave it unable to explain any of its own values.
+export const DOGFOOD_DARK_THEME = renameRuleAuthoredTheme(BIJOU_DARK, 'dogfood-dark');
+export const DOGFOOD_LIGHT_THEME = renameRuleAuthoredTheme(BIJOU_LIGHT, 'dogfood-light');
 
 const DOGFOOD_READABLE_FOREGROUNDS = [
   'semantic.primary',
