@@ -10,6 +10,8 @@ import { dogfoodLocalizedText } from './localization.js';
 interface ThemeLabCopyOptions {
   readonly activeLabel: string;
   readonly draftTheme: Theme;
+  /** The shell theme the draft was cloned from, named as the rest of the app names it. */
+  readonly baseTheme: Theme;
   readonly activeShellLine: string;
   readonly localization?: LocalizationPort;
 }
@@ -28,13 +30,33 @@ function dogfoodText(
   return dogfoodLocalizedText(localization, id, fallback, values);
 }
 
+/**
+ * The theme name to show a reader, with an edited marker when the draft has
+ * diverged from the shell theme it was cloned from.
+ */
+export function themeLabDisplayName(
+  baseTheme: Theme,
+  draftTheme: Theme,
+  localization: LocalizationPort | undefined,
+): string {
+  const edited = draftTheme.semantic.accent.hex !== baseTheme.semantic.accent.hex
+    || draftTheme.semantic.primary.hex !== baseTheme.semantic.primary.hex
+    || draftTheme.surface.primary.bg !== baseTheme.surface.primary.bg;
+  return edited
+    ? dogfoodText(localization, 'themeLab.editedName', '{name} (edited)', { name: baseTheme.name })
+    : baseTheme.name;
+}
+
 export function themeLabCopy(options: ThemeLabCopyOptions): ThemeLabCopy {
-  const { activeLabel, draftTheme, activeShellLine, localization } = options;
+  const { activeLabel, draftTheme, baseTheme, activeShellLine, localization } = options;
   const activeLine = dogfoodText(localization, 'themeInspector.active', 'Active: {label}', {
     label: activeLabel,
   });
+  // Report the shell theme's own name rather than the editor's internal draft
+  // clone. `dogfood-dark-draft` exists nowhere else in the app and reads like
+  // a different theme; an explicit edited marker says what actually happened.
   const themeLine = dogfoodText(localization, 'themeInspector.theme', 'Theme: {name}', {
-    name: draftTheme.name,
+    name: themeLabDisplayName(baseTheme, draftTheme, localization),
   });
   const defaultDarkLine = dogfoodText(
     localization,
