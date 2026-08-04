@@ -6,7 +6,7 @@ import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { column, proseSurface, spacer } from '../_shared/example-surfaces.js';
 import type { DocsShellThemeChoice } from './app-docs-shell-theme.js';
 import type { LandingThemeTokens } from './app-landing.js';
-import { themeLabCopy } from './app-theme-lab-copy.js';
+import { themeLabCopy, themeLabDisplayName } from './app-theme-lab-copy.js';
 import { renderThemeLabGraphSurface } from './app-theme-lab-editor-graph-view.js';
 import { renderThemeLabEditorSurface } from './app-theme-lab-editor-view.js';
 import {
@@ -15,6 +15,9 @@ import {
   type ThemeLabEditorState,
 } from './app-theme-lab-editor-model.js';
 import { themeLabMode } from './app-theme-lab-mode.js';
+import { themeLabColumnWidth, themeLabColumns, themeLabRightColumnWidth } from './app-theme-lab-columns.js';
+import { renderThemeLabPickerSurface } from './app-theme-lab-picker.js';
+import { renderThemeLabPreviewSurface } from './app-theme-lab-preview.js';
 import { themeLabPalette } from './app-theme-lab-palette.js';
 import { renderThemeLabProvenanceSurface } from './app-theme-lab-provenance-view.js';
 import {
@@ -55,22 +58,27 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
     body: draftTheme.surface.primary,
     muted: draftTheme.surface.muted,
   };
-  const shellGallery = shellThemes
-    .map((shellTheme, index) => {
-      const marker = shellTheme.id === activeTheme.id ? '* ' : '  ';
-      return `${marker}${String(index + 1)}. ${shellTheme.label} -> ${shellTheme.theme.name}`;
-    })
-    .join('\n');
   const activeShellIndex = shellThemes.findIndex((shellTheme) => shellTheme.id === activeTheme.id);
+  const displayName = themeLabDisplayName(activeTheme.theme, draftTheme, localization);
   const activeShellLine = activeShellIndex >= 0
-    ? `* ${String(activeShellIndex + 1)}. ${activeTheme.label} -> ${draftTheme.name}`
-    : `* ${activeTheme.label} -> ${draftTheme.name}`;
+    ? `* ${String(activeShellIndex + 1)}. ${activeTheme.label} -> ${displayName}`
+    : `* ${activeTheme.label} -> ${displayName}`;
   const copy = themeLabCopy({
     activeLabel: activeTheme.label,
     draftTheme,
+    baseTheme: activeTheme.theme,
     activeShellLine,
     localization,
   });
+
+  const leftWidth = themeLabColumnWidth(bodyWidth);
+  const rightWidth = themeLabRightColumnWidth(bodyWidth);
+  const leftBody = Math.max(20, leftWidth - 2);
+  const rightBody = Math.max(18, rightWidth - 2);
+  const leftBox = (surface: Surface, title: string): Surface =>
+    themeLabBox(surface, title, leftWidth, ctx, landingTheme);
+  const rightBox = (surface: Surface, title: string): Surface =>
+    themeLabBox(surface, title, rightWidth, ctx, landingTheme);
 
   return themeLabInsetPaneSurface(column([
     themeLabSeparatorSurface(
@@ -80,62 +88,60 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
       landingTheme,
     ),
     spacer(1, 1),
-    themeLabBox(
-      renderThemeLabEditorSurface(activeTheme.theme, editor, bodyWidth, localization, renderTokens, {
-        contextLines: copy.editorContext,
-      }),
-      dogfoodText(localization, 'themeLab.editorTitle', 'Theme editor'),
-      paneWidth,
-      ctx,
-      landingTheme,
-    ),
-    spacer(1, 1),
-    themeLabBox(
-      renderThemeLabProvenanceSurface(
-        activeTheme.theme,
-        themeLabEditorSelectedPath(editor),
-        bodyWidth,
-        renderTokens,
-        themeLabMode(ctx),
-        localization,
+    themeLabColumns(
+      leftBox(
+        renderThemeLabPickerSurface(shellThemes, activeTheme.id, leftBody, renderTokens, localization),
+        dogfoodText(localization, 'themeLab.pickerTitle', 'Themes'),
       ),
-      dogfoodText(localization, 'themeLab.provenanceTitle', 'Why this value'),
-      paneWidth,
-      ctx,
-      landingTheme,
-    ),
-    spacer(1, 1),
-    themeLabBox(
-      renderThemeLabGraphSurface(
-        activeTheme.theme,
-        draftTheme,
-        bodyWidth,
-        localization,
-        renderTokens,
-        themeLabMode(ctx),
+      rightBox(
+        renderThemeLabPreviewSurface(draftTheme, ctx, rightBody, localization),
+        dogfoodText(localization, 'themeLab.previewTitle', 'Live preview'),
       ),
-      dogfoodText(localization, 'themeLab.graphTitle', 'Live token graph'),
-      paneWidth,
-      ctx,
-      landingTheme,
+      bodyWidth,
     ),
     spacer(1, 1),
-    themeLabPalette(draftTheme, activeTheme.label, paneWidth, bodyWidth, ctx, landingTheme, localization),
-    spacer(1, 1),
-    themeLabBox(
-      proseSurface(copy.defaultSummary, bodyWidth),
-      dogfoodText(localization, 'themeLab.postureTitle', 'theme posture'),
-      paneWidth,
-      ctx,
-      landingTheme,
+    themeLabColumns(
+      column([
+        leftBox(
+          renderThemeLabEditorSurface(activeTheme.theme, editor, leftBody, localization, renderTokens, {
+            contextLines: copy.editorContext,
+          }),
+          dogfoodText(localization, 'themeLab.editorTitle', 'Theme editor'),
+        ),
+        spacer(1, 1),
+        leftBox(
+          renderThemeLabProvenanceSurface(
+            activeTheme.theme,
+            themeLabEditorSelectedPath(editor),
+            leftBody,
+            renderTokens,
+            themeLabMode(ctx),
+            localization,
+          ),
+          dogfoodText(localization, 'themeLab.provenanceTitle', 'Why this value'),
+        ),
+      ]),
+      rightBox(
+        renderThemeLabGraphSurface(
+          activeTheme.theme,
+          draftTheme,
+          rightBody,
+          localization,
+          renderTokens,
+          themeLabMode(ctx),
+        ),
+        dogfoodText(localization, 'themeLab.graphTitle', 'Live token graph'),
+      ),
+      bodyWidth,
     ),
     spacer(1, 1),
-    themeLabBox(
-      proseSurface(shellGallery, bodyWidth),
-      dogfoodText(localization, 'themeLab.galleryTitle', 'shell gallery'),
-      paneWidth,
-      ctx,
-      landingTheme,
+    themeLabColumns(
+      themeLabPalette(draftTheme, activeTheme.label, leftWidth, leftBody, ctx, landingTheme, localization),
+      rightBox(
+        proseSurface(copy.defaultSummary, rightBody),
+        dogfoodText(localization, 'themeLab.postureTitle', 'theme posture'),
+      ),
+      bodyWidth,
     ),
   ]), width);
 }
