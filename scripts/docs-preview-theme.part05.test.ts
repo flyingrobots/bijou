@@ -25,10 +25,12 @@ describe('docs preview app', () => {
       initialPageId: 'themes',
     });
 
+    // n/1/2/3 rather than ]/r/g/b: the frame owns [, ] and g, so the old
+    // editor bindings were shadowing tab navigation and scroll-to-top.
     const result = await runScript(app, [
       { key: KEY_TAB },
-      { key: ']' },
-      { key: 'b' },
+      { key: 'n' },
+      { key: '3' },
       { key: '+' },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
