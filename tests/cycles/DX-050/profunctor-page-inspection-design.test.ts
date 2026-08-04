@@ -63,7 +63,7 @@ describe('DX-050 Profunctor Page inspection design', () => {
     ]);
     expectClaims(bearing, [
       '`v8.2.0` milestone is quality automation and Method hardening: 22 open and 3 closed milestone items',
-      '`v8.0.0` milestone is the active feature horizon: 17 open milestone items and 4 closed milestone items',
+      '`v8.0.0` milestone is the active feature horizon: 23 open milestone items and 4 closed milestone items',
       '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       'lowers current debt to `22` file/context and `10` code-size violations',

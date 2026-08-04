@@ -146,7 +146,7 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 17 open milestone items
+- The `v8.0.0` milestone is the active feature horizon: 23 open milestone items
   and 4 closed milestone items as of the latest roadmap sync. The VISOR Runtime
   Graph and Scene IR contract is complete; the milestone is deliberately held
   open for dependency security
