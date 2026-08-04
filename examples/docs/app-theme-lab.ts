@@ -1,7 +1,6 @@
 import {
   type BijouContext,
   type Surface,
-  type Theme,
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { column, proseSurface, spacer } from '../_shared/example-surfaces.js';
@@ -11,16 +10,19 @@ import { themeLabCopy } from './app-theme-lab-copy.js';
 import { renderThemeLabGraphSurface } from './app-theme-lab-editor-graph-view.js';
 import { renderThemeLabEditorSurface } from './app-theme-lab-editor-view.js';
 import {
+  themeLabEditorSelectedPath,
   themeLabEditorStateFor,
   type ThemeLabEditorState,
 } from './app-theme-lab-editor-model.js';
+import { themeLabMode } from './app-theme-lab-mode.js';
+import { themeLabPalette } from './app-theme-lab-palette.js';
+import { renderThemeLabProvenanceSurface } from './app-theme-lab-provenance-view.js';
 import {
   themeLabBox,
   themeLabInsetPaneSurface,
   themeLabPaneInnerWidth,
   themeLabSeparatorSurface,
 } from './app-theme-lab-layout.js';
-import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 import { dogfoodLocalizedText } from './localization.js';
 
 interface ThemeLabPaneOptions {
@@ -89,7 +91,29 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
     ),
     spacer(1, 1),
     themeLabBox(
-      renderThemeLabGraphSurface(activeTheme.theme, draftTheme, bodyWidth, localization, renderTokens),
+      renderThemeLabProvenanceSurface(
+        activeTheme.theme,
+        themeLabEditorSelectedPath(editor),
+        bodyWidth,
+        renderTokens,
+        themeLabMode(ctx),
+        localization,
+      ),
+      dogfoodText(localization, 'themeLab.provenanceTitle', 'Why this value'),
+      paneWidth,
+      ctx,
+      landingTheme,
+    ),
+    spacer(1, 1),
+    themeLabBox(
+      renderThemeLabGraphSurface(
+        activeTheme.theme,
+        draftTheme,
+        bodyWidth,
+        localization,
+        renderTokens,
+        themeLabMode(ctx),
+      ),
       dogfoodText(localization, 'themeLab.graphTitle', 'Live token graph'),
       paneWidth,
       ctx,
@@ -114,19 +138,4 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
       landingTheme,
     ),
   ]), width);
-}
-
-function themeLabPalette(
-  theme: Theme,
-  title: string,
-  paneWidth: number,
-  bodyWidth: number,
-  ctx: BijouContext,
-  landingTheme: LandingThemeTokens,
-  localization: LocalizationPort | undefined,
-): Surface {
-  return themeLabBox(renderThemeTokenPalette(theme, bodyWidth, localization, {
-    maxRows: 28,
-    chromeTheme: ctx.theme.theme,
-  }), title, paneWidth, ctx, landingTheme);
 }

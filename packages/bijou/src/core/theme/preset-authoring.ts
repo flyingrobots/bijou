@@ -73,8 +73,35 @@ export function compileRuleAuthoredPreset(options: RuleAuthoredPresetOptions): T
   return theme;
 }
 
+/**
+ * Recover the authoring-time definitions behind a rule-authored preset.
+ *
+ * Returns `undefined` for themes that were written as flat token values, or
+ * for copies that lost their identity — the registry is keyed on the theme
+ * object itself. Use {@link renameRuleAuthoredTheme} to copy a theme without
+ * dropping its provenance.
+ */
 export function ruleAuthoredDefinitions(theme: Theme): TokenDefinitions | undefined {
   return RULE_AUTHORED_DEFINITIONS.get(theme);
+}
+
+/**
+ * Copy a rule-authored theme under a new name, keeping its provenance.
+ *
+ * A plain `structuredClone` produces a theme that renders identically but can
+ * no longer explain itself: the definitions registry is keyed on object
+ * identity, so the copy resolves to `undefined` and every rule, candidate set,
+ * and dependency edge behind it becomes unreachable. Hosts that re-label a
+ * first-party preset should use this instead.
+ *
+ * Themes that were never rule-authored are copied and renamed as usual; there
+ * is simply no provenance to carry across.
+ */
+export function renameRuleAuthoredTheme(theme: Theme, name: string): Theme {
+  const renamed: Theme = { ...structuredClone(theme), name };
+  const definitions = RULE_AUTHORED_DEFINITIONS.get(theme);
+  if (definitions !== undefined) RULE_AUTHORED_DEFINITIONS.set(renamed, definitions);
+  return renamed;
 }
 
 function readToken(graph: TokenGraph, mode: ThemeMode, path: string): TokenValue {
