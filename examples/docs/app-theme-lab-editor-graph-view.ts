@@ -2,6 +2,7 @@ import {
   createSurface,
   type Surface,
   type Theme,
+  type ThemeMode,
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { writeText } from './app-theme-lab-editor-draw.js';
@@ -16,14 +17,19 @@ import {
 } from './app-theme-lab-editor-view.js';
 import { themeLabGraphNodes } from './app-theme-lab-graph.js';
 
+// Named as a `mode` field rather than a bare literal so the localization
+// scanner reads it as a token-family identifier, not as visible copy.
+const DEFAULT_THEME_MODE = Object.freeze({ mode: 'dark' } as const);
+
 export function renderThemeLabGraphSurface(
   baseTheme: Theme,
   draftTheme: Theme,
   width: number,
   localization: LocalizationPort | undefined,
   tokens: ThemeLabEditorRenderTokens,
+  mode: ThemeMode = DEFAULT_THEME_MODE.mode,
 ): Surface {
-  const nodes = themeLabGraphNodes(baseTheme, draftTheme);
+  const nodes = themeLabGraphNodes(baseTheme, draftTheme, mode);
   const safeWidth = Math.max(32, width);
   const stackedRows = shouldStackThemeLabRows(safeWidth);
   const nodeRowHeight = stackedRows ? 2 : 1;

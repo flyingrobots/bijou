@@ -46,6 +46,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `adaptPackedBijouCellsToSurface()` then copies validated bytes and side-table
   entries without re-encoding cells.
 
+### Security
+
+- **Dependency advisory closeout** — The eight open advisories reported by
+  `npm audit` (`4` high, `3` moderate, `1` low) are resolved with no source
+  changes. Transitive resolutions move to `@hono/node-server@2.1.0`,
+  `body-parser@2.3.0`, `brace-expansion@5.0.9`, `fast-uri@3.1.5`,
+  `hono@4.13.0`, `ip-address@10.4.0`, and `postcss@8.5.25`. The stale exact
+  `hono` override left behind by an earlier Dependabot bump is widened from
+  `4.12.25` to `^4.13.0` so a clean install cannot silently reintroduce the
+  four Hono advisories. `npm audit` reports `0` vulnerabilities and the full
+  suite holds at `928` files / `4,099` tests.
+
 ### Changed
 
 - **WF-165 Code Dojo goalpost, tranche E** — The TUI runtime, table,

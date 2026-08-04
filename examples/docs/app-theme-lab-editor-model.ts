@@ -6,13 +6,12 @@ import {
 } from '../../packages/bijou/src/index.js';
 import { cloneThemeForThemeLabEditor } from './app-theme-lab-editor-theme.js';
 import {
-  THEME_LAB_CHANNEL_BLUE,
-  THEME_LAB_CHANNEL_GREEN,
   THEME_LAB_CHANNEL_RED,
   THEME_LAB_EDITABLE_PATHS,
   type ThemeLabEditorChannel,
   type ThemeLabEditableTokenPath,
 } from './app-theme-lab-editor-types.js';
+import { themeLabEditorActionForKey } from './app-theme-lab-editor-keys.js';
 import { writeThemeLabEditableHex } from './app-theme-lab-editor-write.js';
 export {
   THEME_LAB_CHANNEL_BLUE,
@@ -133,17 +132,12 @@ export function themeLabEditorUpdateForKey(
   activeTheme: Theme,
   key: string,
 ): ThemeLabEditorState | undefined {
-  if (key.length !== 1) return undefined;
-  switch (key.charCodeAt(0)) {
-    case 93: return themeLabEditorSelectNext(editor, 1);
-    case 91: return themeLabEditorSelectNext(editor, -1);
-    case 114: return themeLabEditorSelectChannel(editor, THEME_LAB_CHANNEL_RED);
-    case 103: return themeLabEditorSelectChannel(editor, THEME_LAB_CHANNEL_GREEN);
-    case 98: return themeLabEditorSelectChannel(editor, THEME_LAB_CHANNEL_BLUE);
-    case 43:
-    case 61: return themeLabEditorNudge(editor, 8);
-    case 45: return themeLabEditorNudge(editor, -8);
-    case 48: return themeLabEditorReset(editor, activeTheme);
-    default: return undefined;
+  const action = themeLabEditorActionForKey(key);
+  if (action === undefined) return undefined;
+  switch (action.type) {
+    case 'select': return themeLabEditorSelectNext(editor, action.delta);
+    case 'channel': return themeLabEditorSelectChannel(editor, action.channel);
+    case 'nudge': return themeLabEditorNudge(editor, action.delta);
+    case 'reset': return themeLabEditorReset(editor, activeTheme);
   }
 }
