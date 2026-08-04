@@ -18,6 +18,7 @@
     "hello": "node --import tsx examples/hello/hello.ts",
     "counter": "node --import tsx examples/counter/main.ts",
     "app-frame": "node --import tsx examples/app-frame/main.ts",
+    "theme-lab": "node --import tsx examples/theme-lab/main.ts",
     "test:frames": "vitest run --config vitest.config.ts scripts/frame-assertions.test.ts scripts/frame-regressions.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
