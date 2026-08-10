@@ -20,7 +20,7 @@ describe('WF-130 roadmap supporting contracts', () => {
     expectClaims(roadmap, [
       'Open Unmilestoned Triage',
       'No open issue currently lives in `Beyond`',
-      'No open issue is currently unmilestoned.',
+      'No open issue or pull request is currently unmilestoned.',
       'Dependency Security Lineage',
       '[#357]',
       '[#358]',
@@ -37,7 +37,7 @@ describe('WF-130 roadmap supporting contracts', () => {
     ]);
     expectClaims(bearing, [
       'The latest shipped public release is `v7.2.0`',
-      'The next feature horizon remains `v8.0.0`',
+      'The next major feature horizon is `v9.0.0`',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met its `112 -> 62` contract.',
       'Landed tranche A [#475](https://github.com/flyingrobots/bijou/pull/475) and landed tranche B [#478](https://github.com/flyingrobots/bijou/pull/478) each removed `25` counted violations.',
       'Landed tranche C [#487](https://github.com/flyingrobots/bijou/pull/487) lowers current debt to `22` file/context and `10` code-size violations with no mock-ban or ESLint debt.',
@@ -55,11 +55,11 @@ describe('WF-130 roadmap supporting contracts', () => {
       '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '`v7.2.0` completed as a narrow stabilization and demo-integrity release',
       '`v7.2.0` milestone is complete release lineage: 0 open and 19 closed milestone items',
-      '`v8.0.0` milestone is the active feature horizon: 2 open milestone items and 2 closed milestone items',
+      '`v8.0.0` milestone is Runtime Graph release closeout: 3 open milestone items and 4 closed milestone items',
       '`v8.1.0` milestone is replay, capture, debugger, and render-witness follow-through',
-      '`v8.2.0` milestone is quality automation and Method hardening: 22 open and 3 closed milestone items',
+      '`v8.2.0` milestone is quality automation and reliability: 26 open and 5 closed milestone items',
       '[#485](https://github.com/flyingrobots/bijou/issues/485)',
-      'No open issue is currently unmilestoned',
+      'No open issue or pull request is currently unmilestoned',
       'The selected `v7.2.0` DOGFOOD product pull #335 has landed',
       'Keep Future Releases Explicit',
     ]);

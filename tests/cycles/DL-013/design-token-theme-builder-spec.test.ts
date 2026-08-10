@@ -46,7 +46,7 @@ describe('DL-013 design token and theme builder spec', () => {
     expect(roadmap).toContain(
       '| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) |',
     );
-    expect(roadmap).toContain('Product Workbench And Operator Surfaces');
+    expect(roadmap).toContain('Product Workbench And Sapphire Design Language');
     expect(roadmap).toContain('Theme Lab and Theme Inspector provenance surfaces backed by token facts');
     expect(roadmap).toContain('[#311](https://github.com/flyingrobots/bijou/issues/311)');
     expect(roadmap).toContain('[#315](https://github.com/flyingrobots/bijou/issues/315)');

@@ -78,16 +78,19 @@ Current direction and active tensions. Historical ship data is in
 
 ## Active Gravity
 
-### 0. Advance Runtime Graph And Scene IR From Proof To Product Fixture
+### 0. Close V8 Without Reopening Its Landed Product Contract
 
 - `DX-043`, `DX-044`, `DX-045`, and `DX-046` landed the portable
   `ui-scene-ir/1` seed,
   the first GraphQL-authored `bijou-block/1` proof, grouped block authoring,
   deterministic debug facts, and the first real GraphQL-authored DOGFOOD
   NavigationListBlock fixture for #302.
-- The broad #302 tracker now lives in `v8.0.0` with the VISOR Runtime Graph
-  and Scene IR contract work. The v7.1 feature proof and release-prep
-  guardrails are complete release lineage, not the full Runtime Graph product.
+- The broad #302 tracker and the #457 VISOR goalpost are closed `v8.0.0`
+  lineage. The #458 artifact bundle and #459 packed-cell adapter have landed;
+  the Runtime Graph and Scene IR contract is no longer the active design gap.
+- Dependency-security issue #482 is the remaining V8 blocker. Pull requests
+  #492 and #509 overlap on its remediation; select one reproducible path before
+  merge instead of treating both as independent release work.
 - The proof path that v7.1 now carries is:
 
   ```text
@@ -125,9 +128,9 @@ Current direction and active tensions. Historical ship data is in
   surfaces now stay inside DOGFOOD's main reader flow so What's New, the real
   GraphQL proof chain, and changelog history are visible without wide-only side
   metadata.
-- The next feature horizon remains `v8.0.0`: the Runtime Graph and Scene IR
-  product contract built from the proof chain that v7.1.0 shipped and the
-  release surface that v7.2.0 stabilized.
+- The next release remains `v8.0.0`, now in Runtime Graph release closeout.
+  The next major feature horizon is `v9.0.0`: Product Workbench, Sapphire
+  Design Language, compositional interaction state, and State Atlas proof.
 - The detailed release-horizon index lives in [ROADMAP.md](./ROADMAP.md), and
   the release process lives in [release.md](./release.md).
 
@@ -146,21 +149,21 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is the active feature horizon: 2 open milestone items
-  and 2 closed milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is Runtime Graph release closeout: 3 open milestone
+  items and 4 closed milestone items as of the latest roadmap sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and Method hardening: 22 open
-  and 3 closed milestone items.
-- The `v9.0.0` milestone is Product Workbench and operator surfaces: 20 open
-  and 0 closed milestone items.
-- The `v10.0.0` milestone is renderer and host-systems integration: 9 open and
-  1 closed milestone item.
+- The `v8.2.0` milestone is quality automation and reliability: 26 open and 5
+  closed milestone items.
+- The `v9.0.0` milestone is Product Workbench and Sapphire Design Language: 36
+  open and 0 closed milestone items.
+- The `v10.0.0` milestone is renderer and host-systems integration: 11 open
+  and 1 closed milestone item.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
   and 6 closed milestone items as of the latest roadmap sync.
-- No open issue is currently unmilestoned; keep open unmilestoned searches
-  empty unless a maintainer is deliberately shaping work before release
-  assignment.
+- No open issue or pull request is currently unmilestoned; keep both open
+  unmilestoned searches empty unless a maintainer is deliberately shaping work
+  before release assignment.
 - Stale completed work-in-progress issues
   [#450](https://github.com/flyingrobots/bijou/issues/450) and
   [#383](https://github.com/flyingrobots/bijou/issues/383) were verified
@@ -170,20 +173,20 @@ Current direction and active tensions. Historical ship data is in
   `v7.2.0`, commented, and closed as completed.
 - `v7.2.0` must stay closed to the framework input and DOGFOOD demo-integrity
   issues selected in #354, plus narrow security repairs such as #357.
-- `v8.0.0` should organize Runtime Graph And Scene IR into a product contract:
-  versioned `bijou-block/1`, `ui-scene-ir/1`, receipts, source maps, lower
-  modes, debug facts, DOGFOOD round-trip fixtures, and capture evidence.
+- `v8.0.0` should preserve the landed Runtime Graph and Scene IR contracts,
+  resolve dependency security through one selected implementation, and produce
+  release evidence without absorbing unfinished V9 scope.
 - `v8.1.0` should harden replay, capture, debugger, render-witness, and Runtime
   Graph visualization proof after the first V8 contract lands.
-- `v8.2.0` should make Code Dojo, Method, tracker sync, and fixture-backed test
-  gates easier to inspect and harder to drift.
-- `v9.0.0` should organize the Product Workbench and operator surfaces:
-  BlockLab, DOGFOOD drawer/focus language, Theme Lab and Theme Inspector
-  provenance, localization operations, artifact matrices, and product-review
-  docs.
+- `v8.2.0` should make Code Dojo, Method, tracker sync, startup diagnostics,
+  and fixture-backed test gates easier to inspect and harder to drift.
+- `v9.0.0` should organize the Product Workbench and Sapphire Design Language:
+  BlockLab, perceptual colour, DOGFOOD interaction grammar, Theme Lab and Theme
+  Inspector provenance, State Atlas proof, localization operations, artifact
+  matrices, and product-review docs.
 - `v10.0.0` should hold Geordi/Wesley follow-through, renderer and host
-  systems, terminal shader/raster work, native-surface foundations, and
-  advanced host input controls.
+  systems, the Geordi native GPU cell host, terminal shader/raster work,
+  native-surface foundations, and advanced host input controls.
 
 ## Tensions
 
@@ -204,7 +207,8 @@ Current direction and active tensions. Historical ship data is in
 - **DOGFOOD Truth Debt**: DF-030 converted the docs app into a named Block
   contract. New DOGFOOD truth work should be shaped as a post-v7 candidate
   goalpost or a Beyond issue rather than reopening the closed V7 queue.
-- **Unmilestoned Regression Risk**: Open unmilestoned work is currently empty.
+- **Unmilestoned Regression Risk**: Open unmilestoned issues and pull requests
+  are currently empty.
   Work with `work-in-progress`, `roadmap`, or `needs-design` labels but no
   milestone must be made explicit before agents treat it as a release target.
 
@@ -239,7 +243,7 @@ have landed as the two bounded V8 implementation proofs. Their cycle designs
 remain [DX-049](./design/DX-049-visor-artifact-bundle-proof.md) and
 [RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md).
 
-The active prerequisite is
+The prior structural prerequisite was
 [#480](https://github.com/flyingrobots/bijou/issues/480): remove the `25`
 double-counted code-size roots and lower aggregate Code Dojo debt from `62` to
 `12` or less through bounded
@@ -258,8 +262,9 @@ preserves `Surface`, DOGFOOD i18n-debt analysis, framed-app overlays,
 `ui-scene-ir/1`, and the terminal differ behind stable facades, lowering the
 live ceiling to `22`. Tranche E
 [#489](https://github.com/flyingrobots/bijou/pull/489) preserves the final five
-public entrypoints as bounded families and reaches `12 + 0 = 12`. V8 tracker
-closeout and release preparation follow merged `62 -> 12` goalpost evidence.
+public entrypoints as bounded families and reaches `12 + 0 = 12`. Its remaining
+tracker closeout belongs to V8.2 quality lineage and does not block V8 release
+preparation.
 Rendering-cache authority debt is tracked separately in
 [#485](https://github.com/flyingrobots/bijou/issues/485); cache reuse remains
 out of scope for scroll measurements until revision- or digest-based
@@ -274,8 +279,9 @@ VISOR v8 tracker (#457)
           -> landed packed-cell Surface adapter (#459)
 ```
 
-The proof chain that V7 shipped must become a product contract before Bijou
-pulls in broad Geordi, Wesley, browser, or native-render work:
+The proof chain that V7 shipped is now a landed product contract. Broad Geordi,
+Wesley, browser, or native-render work should consume it rather than redefine
+it:
 
 ```text
 GraphQL SDL fixture
@@ -293,19 +299,20 @@ Recommended pull order:
    replay facts, and visual scene facts are implemented.
 3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
    and adapts into a synchronized terminal `Surface`.
-4. Merge #489 after exact-head review to close #480 at Code Dojo debt `12`.
-5. Close #302 and #457 only after merged goalpost evidence and V8 contract
-   closeout agree.
-6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
+4. Compare #492 and #509 as competing implementations of #482; select one
+   reproducible dependency-security path.
+5. Close #482 only when the selected exact head proves zero actionable
+   advisories through the documented audit commands.
+6. Prepare the V8 release packet without pulling unfinished V9 design-language
+   work into the release gate.
+7. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
    follow-through after V8 lands.
-7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality
-   automation.
-8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8
-   stabilizes the source/artifact/IR contract.
-9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native
-   surface work after the Bijou contracts are proven.
-10. Keep closed dependency PR #326 as superseded lineage, not active release
-   work.
+8. Use `v8.2.0` for Code Dojo, Method, tracker sync, startup diagnostics, and
+   fixture-backed quality automation.
+9. Use `v9.0.0` for Product Workbench, Sapphire Design Language, interaction
+   recipes, and State Atlas proof over the landed V8 contract.
+10. Use `v10.0.0` for Geordi/Wesley, renderer, host, native GPU, shader,
+    raster, and advanced input work after the Bijou contracts are proven.
 
 Non-goals for the next cycle:
 

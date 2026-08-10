@@ -86,8 +86,9 @@ Two additional open pull requests were unmilestoned:
   [#511](https://github.com/flyingrobots/bijou/pull/511).
 
 The audit cohort therefore contained `83` open issues and `4` open pull
-requests. Opening governance issue #514 increases the live issue total to `84`
-and the `v8.2.0` milestone by one item during the cycle.
+requests. Opening governance issue #514 increases the live issue total to `84`;
+opening governance PR #515 increases the open pull request total to `5`. Both
+live in the `v8.2.0` milestone during the cycle.
 
 ### V8 Scope Drift
 
@@ -204,10 +205,11 @@ Add issue #507 because startup key-conflict reporting is quality enforcement,
 not Runtime Graph release scope. Governance issue #514 also lives here because
 tracker synchronization is an explicit V8.2 outcome.
 
-Expected open items after triage: `25`:
+Expected open items after triage: `26`:
 
 - `24` open issues, including #507 and #514;
-- Dependabot PR #467.
+- Dependabot PR #467;
+- governance PR #515.
 
 ### `v9.0.0`: Product Workbench And Sapphire Design Language
 
@@ -251,14 +253,21 @@ Rename these open issues without changing their substantive titles:
 - #202 through #219 where the current title begins `[Beyond]`:
   #202, #203, #204, #205, #206, #207, #208, #209, #210, #211, #212, #213,
   #214, #215, #216, #217, #218, and #219.
+- #311: remove the same stale prefix from the Theme Inspector drawer.
+- #502: replace its stale `v8 release` suffix with `V9 release` after the
+  milestone migration.
 
 Each already has an explicit versioned milestone. The prefix now contradicts
 the milestone and makes search results look parked when they are not.
 
 ### Normalize Lanes And Priority
 
-- #204: remove `lane:inbox`; retain `lane:cool-ideas`.
+- #204: remove `lane:inbox` and `priority:medium`; retain `lane:cool-ideas` and
+  `priority:low`.
+- #205: remove `lane:up-next`; retain `lane:cool-ideas`.
 - #214, #217, #218: remove `lane:up-next`; retain `lane:cool-ideas`.
+- #215: remove `lane:up-next` and `priority:medium`; retain
+  `lane:cool-ideas` and `priority:low`.
 - #219: replace `lane:inbox` with `lane:cool-ideas`.
 - #348: replace `lane:asap` with `lane:cool-ideas`; V10 is a future host and
   renderer horizon, not the imminent V8 pull.
@@ -391,16 +400,16 @@ depend on network availability.
 
 ## Acceptance Criteria
 
-- All `83` pre-cycle issues, issue #514, and all four open pull requests have a
-  recorded disposition.
+- All `83` pre-cycle issues, issue #514, the four pre-cycle pull requests, and
+  governance PR #515 have a recorded disposition.
 - V8 contains one issue and two competing security implementation PRs.
 - V9 contains the full twenty-one-issue Sapphire/design-language cohort.
 - V8.2 contains #507 and #514.
 - V10 contains PR #511.
 - No open issue or pull request is unmilestoned.
 - No versioned issue retains `[Beyond]` in its title.
-- #204, #214, #217, #218, #219, #348, and #249 have one coherent lane or
-  priority posture as specified.
+- #204, #205, #214, #215, #217, #218, #219, #348, and #249 have one coherent
+  lane or priority posture as specified.
 - Every issue moved across a release horizon has a migration comment.
 - Milestone descriptions, roadmap, bearing, changelog, and tests match the
   verified post-migration snapshot.
