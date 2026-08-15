@@ -88,9 +88,10 @@ Current direction and active tensions. Historical ship data is in
 - The broad #302 tracker and the #457 VISOR goalpost are closed `v8.0.0`
   lineage. The #458 artifact bundle and #459 packed-cell adapter have landed;
   the Runtime Graph and Scene IR contract is no longer the active design gap.
-- Dependency-security issue #482 is the remaining V8 blocker. Pull requests
-  #492 and #509 overlap on its remediation; select one reproducible path before
-  merge instead of treating both as independent release work.
+- Dependency-security issue #482 is closed through merged pull request #492,
+  whose exact head proved zero actionable advisories. The overlapping security
+  work in #509 was preserved as V9 pull request #516 and then closed; V8 no
+  longer has an implementation blocker.
 - The proof path that v7.1 now carries is:
 
   ```text
@@ -149,14 +150,16 @@ Current direction and active tensions. Historical ship data is in
 
 - The `v7.2.0` milestone is complete release lineage: 0 open and 19 closed
   milestone items as of the latest roadmap sync.
-- The `v8.0.0` milestone is Runtime Graph release closeout: 3 open milestone
-  items and 4 closed milestone items as of the latest roadmap sync.
+- The `v8.0.0` milestone is complete Runtime Graph release-closeout lineage: 0
+  open milestone items and 7 closed milestone items as of the latest roadmap
+  sync.
 - The `v8.1.0` milestone is replay, capture, debugger, and render-witness
   follow-through: 13 open and 0 closed milestone items.
-- The `v8.2.0` milestone is quality automation and reliability: 26 open and 5
+- The `v8.2.0` milestone is quality automation and reliability: 23 open and 8
   closed milestone items.
-- The `v9.0.0` milestone is Product Workbench and Sapphire Design Language: 36
-  open and 0 closed milestone items.
+- The `v9.0.0` milestone is Product Workbench and Sapphire Design Language: 37
+  open and 0 closed milestone items, including active successor pull request
+  #516.
 - The `v10.0.0` milestone is renderer and host-systems integration: 11 open
   and 1 closed milestone item.
 - The `Beyond` milestone is now a parking lane, not the active queue: 0 open
@@ -299,10 +302,10 @@ Recommended pull order:
    replay facts, and visual scene facts are implemented.
 3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates
    and adapts into a synchronized terminal `Surface`.
-4. Compare #492 and #509 as competing implementations of #482; select one
-   reproducible dependency-security path.
-5. Close #482 only when the selected exact head proves zero actionable
-   advisories through the documented audit commands.
+4. Treat merged #492 as the selected dependency-security path for closed #482;
+   its exact head proved zero actionable advisories.
+5. Treat closed #509 as superseded mixed lineage whose V9 product work is
+   preserved in active successor #516.
 6. Prepare the V8 release packet without pulling unfinished V9 design-language
    work into the release gate.
 7. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof
