@@ -1,7 +1,7 @@
 import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
 
 const COLUMN_GAP = 1;
-const MIN_TWO_COLUMN_WIDTH = 53;
+const MIN_TWO_COLUMN_WIDTH = 75;
 
 // The left column carries the editor and its context prose, which is the
 // wordiest content on the page; the right carries dependency lists, which are

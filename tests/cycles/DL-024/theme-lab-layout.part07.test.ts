@@ -7,7 +7,7 @@ import {
 } from '../../../examples/docs/app-theme-lab-columns.js';
 
 describe('Theme Lab responsive columns', () => {
-  it.each([30, 35, 52])('stacks both complete panels at %i columns', (bodyWidth) => {
+  it.each([30, 35, 52, 53, 74])('stacks both complete panels at %i columns', (bodyWidth) => {
     const leftWidth = themeLabColumnWidth(bodyWidth);
     const rightWidth = themeLabRightColumnWidth(bodyWidth);
     const left = createSurface(leftWidth, 2);
@@ -26,7 +26,7 @@ describe('Theme Lab responsive columns', () => {
   });
 
   it('keeps the wide layout side by side at the minimum fitting width', () => {
-    const bodyWidth = 53;
+    const bodyWidth = 75;
     const leftWidth = themeLabColumnWidth(bodyWidth);
     const rightWidth = themeLabRightColumnWidth(bodyWidth);
     const composed = themeLabColumns(

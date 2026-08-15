@@ -7,6 +7,7 @@ import type {
 } from './graph-types.js';
 import type { StoredDefinition } from './graph-guards.js';
 import { isTokenDefinition } from './graph-guards.js';
+import { hasThemeRulePath } from './theme-rule-paths.js';
 import { isThemeColorRuleDefinition } from './theme-rules.js';
 
 type GraphMode = 'light' | 'dark';
@@ -25,7 +26,7 @@ export function collectGraphDefinitionDependencies(
   } else {
     collectColorDependencies(def, mode, deps);
   }
-  return [...deps];
+  return [...deps].filter((path) => hasThemeRulePath(definitions, path));
 }
 
 function collectRuleDependencies(

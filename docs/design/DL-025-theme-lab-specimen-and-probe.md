@@ -93,12 +93,15 @@ This cannot ship before the perceptual floor. An advisor built on
 `max(r,g,b) - min(r,g,b)` would be confidently wrong, which is worse than
 silent.
 
-### C. Recommended-colour generation (blocked on DL-023 phases 1 and 3)
+### C. Recommended-colour proposals (blocked on DL-023 phases 1 and 3)
 
 Propose colours that pass the checks in B rather than only flagging failures:
 a cusp-aware ramp for the hue, adaptive shades, and harmony-aware suggestions
-that avoid perceptually muddy regions. This is the substance of
-[#318](https://github.com/flyingrobots/bijou/issues/318).
+that avoid perceptually muddy regions. Issue
+[#318](https://github.com/flyingrobots/bijou/issues/318) owns the deterministic
+palette and ramp-generation machinery. Issue
+[#495](https://github.com/flyingrobots/bijou/issues/495) owns the selected-token
+advisor that uses that machinery to judge an edit and propose passing values.
 
 ### D. Element provenance (partly specified already)
 

@@ -1,6 +1,6 @@
 import { createTokenGraph, type ThemeMode } from './graph.js';
 import type { TokenDefinitions } from './graph-types.js';
-import { isNestedDefinitions, isTokenValue } from './graph-guards.js';
+import { isNestedDefinitions, isTokenDefinition, isTokenValue } from './graph-guards.js';
 
 /**
  * Every addressable token path in a definition tree, in declaration order.
@@ -9,13 +9,28 @@ import { isNestedDefinitions, isTokenValue } from './graph-guards.js';
  * token graph itself uses.
  */
 export function tokenDefinitionPaths(definitions: TokenDefinitions, basePath = ''): readonly string[] {
+  return collectTokenDefinitionPaths(definitions, basePath, false);
+}
+
+function tokenDefinitionAddressablePaths(definitions: TokenDefinitions): readonly string[] {
+  return collectTokenDefinitionPaths(definitions, '', true);
+}
+
+function collectTokenDefinitionPaths(
+  definitions: TokenDefinitions,
+  basePath: string,
+  includeBackgrounds: boolean,
+): readonly string[] {
   const paths: string[] = [];
   for (const [key, value] of Object.entries(definitions)) {
     const fullPath = basePath === '' ? key : `${basePath}.${key}`;
     if (!isTokenValue(value) && isNestedDefinitions(value)) {
-      paths.push(...tokenDefinitionPaths(value, fullPath));
-    } else {
-      paths.push(fullPath);
+      paths.push(...collectTokenDefinitionPaths(value, fullPath, includeBackgrounds));
+      continue;
+    }
+    paths.push(fullPath);
+    if (includeBackgrounds && isTokenDefinition(value) && value.bg !== undefined) {
+      paths.push(`${fullPath}.bg`);
     }
   }
   return paths;
@@ -39,10 +54,12 @@ export function collectTokenDependents(
 ): ReadonlyMap<string, readonly string[]> {
   const graph = createTokenGraph(definitions);
   const dependents = new Map<string, string[]>();
+  const addressablePaths = new Set(tokenDefinitionAddressablePaths(definitions));
 
   try {
     for (const path of tokenDefinitionPaths(definitions)) {
       for (const dependency of graph.dependencies(path, mode)) {
+        if (!addressablePaths.has(dependency)) continue;
         const bucket = dependents.get(dependency) ?? [];
         if (!bucket.includes(path)) bucket.push(path);
         dependents.set(dependency, bucket);

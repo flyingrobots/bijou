@@ -89,9 +89,9 @@ Current direction and active tensions. Historical ship data is in
   lineage. The #458 artifact bundle and #459 packed-cell adapter have landed;
   the Runtime Graph and Scene IR contract is no longer the active design gap.
 - Dependency-security issue #482 is closed through merged pull request #492,
-  whose exact head proved zero actionable advisories. The overlapping security
-  work in #509 was preserved as V9 pull request #516 and then closed; V8 no
-  longer has an implementation blocker.
+  whose exact head proved zero actionable advisories. Pull request #509 was
+  closed as superseded; its V9 product work is preserved in active pull request
+  #516. V8 no longer has an implementation blocker.
 - The proof path that v7.1 now carries is:
 
   ```text

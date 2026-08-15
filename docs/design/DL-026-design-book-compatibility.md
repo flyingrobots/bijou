@@ -77,8 +77,9 @@ The vocabulary is almost complete. The maths under it is not.
 | Perceptual distance (delta-E) | yes | **no** | [#352](https://github.com/flyingrobots/bijou/issues/352) |
 | HSL conversion exposed | n/a | **partial** `rgbToHsl` exists but is not re-exported through `color.ts` | [#352](https://github.com/flyingrobots/bijou/issues/352) |
 
-**This row is the campaign.** Every *partial* above resolves to the same
-missing floor.
+**The decision-function and colour-space rows are the perceptual campaign.**
+Their colour-math gaps resolve to issue #352. The token-graph partials are
+separate capability gaps and do not depend on that perceptual floor.
 
 ### 4. Output
 
@@ -124,8 +125,9 @@ per-product brand variant becomes real.
    above resolve to it.
 2. **[#496](https://github.com/flyingrobots/bijou/issues/496) — repoint the rules.**
    Vividness by chroma, nearness by delta-E. Vocabulary unchanged.
-3. **[#318](https://github.com/flyingrobots/bijou/issues/318) — ramps and shades.**
-   Cusp-aware `ramp()`, adaptive `shade()`, `relativeTo()`.
+3. **[#318](https://github.com/flyingrobots/bijou/issues/318) — generation machinery.**
+   Deterministic palette and ramp controls, including cusp-aware `ramp()`,
+   adaptive `shade()`, and `relativeTo()` primitives.
 4. **[#497](https://github.com/flyingrobots/bijou/issues/497) — rebuild the presets.**
    One hue anchor, derived rather than typed, role collisions resolved.
 5. **[#499](https://github.com/flyingrobots/bijou/issues/499) — fix the downsample.**
@@ -134,8 +136,9 @@ per-product brand variant becomes real.
 6. **[#500](https://github.com/flyingrobots/bijou/issues/500) — CVD checking.**
    Contrast is necessary and not sufficient; `success`/`error` is the canonical
    failure and nothing checks it.
-7. **[#495](https://github.com/flyingrobots/bijou/issues/495) — advice and generation.**
-   The payoff: tell an author a colour is a bad idea, and propose better ones.
+7. **[#495](https://github.com/flyingrobots/bijou/issues/495) — advice and proposals.**
+   The selected-token payoff: tell an author why a colour is a bad idea and
+   propose better values by reusing #318's generation machinery.
 
 Surfaces ([#494](https://github.com/flyingrobots/bijou/issues/494),
 [#317](https://github.com/flyingrobots/bijou/issues/317),

@@ -60,6 +60,18 @@ describe('token dependents', () => {
     }
   });
 
+  it('omits unresolved references but preserves virtual background paths', () => {
+    const definitions = {
+      surface: { primary: { fg: '#ffffff', bg: '#000000' } },
+      consumer: { ref: 'surface.primary.bg' },
+      broken: { ref: 'missing' },
+    } as const;
+    const dependents = collectTokenDependents(definitions);
+
+    expect(dependents.get('surface.primary.bg')).toEqual(['consumer']);
+    expect(dependents.get('missing')).toBeUndefined();
+  });
+
   it('traces the collision DL-023 recorded, as a real edge', () => {
     const dependents = collectTokenDependents(darkDefinitions(), 'dark');
     // brand.accent feeds both the accent decision and the warning role, which
@@ -72,20 +84,18 @@ describe('token dependents', () => {
 
   it('reads only the adaptive branch selected for the requested mode', () => {
     const definitions = {
-      ink: {
-        light: '#101010',
-        dark: '#f0f0f0',
-      },
+      inkLight: '#101010',
+      inkDark: '#f0f0f0',
       adaptive: {
-        light: { ref: 'ink.light' },
-        dark: { ref: 'ink.dark' },
+        light: { ref: 'inkLight' },
+        dark: { ref: 'inkDark' },
       },
     } as const;
 
-    expect(collectTokenDependents(definitions, 'light').get('ink.light')).toEqual(['adaptive']);
-    expect(collectTokenDependents(definitions, 'light').get('ink.dark')).toBeUndefined();
-    expect(collectTokenDependents(definitions, 'dark').get('ink.dark')).toEqual(['adaptive']);
-    expect(collectTokenDependents(definitions, 'dark').get('ink.light')).toBeUndefined();
+    expect(collectTokenDependents(definitions, 'light').get('inkLight')).toEqual(['adaptive']);
+    expect(collectTokenDependents(definitions, 'light').get('inkDark')).toBeUndefined();
+    expect(collectTokenDependents(definitions, 'dark').get('inkDark')).toEqual(['adaptive']);
+    expect(collectTokenDependents(definitions, 'dark').get('inkLight')).toBeUndefined();
   });
 
   it('collects cyclic reference edges without resolving the cycle', () => {

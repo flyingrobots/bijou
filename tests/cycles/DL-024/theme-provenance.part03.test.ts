@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BIJOU_DARK, PRESETS } from '@flyingrobots/bijou';
 import { themeLabProvenanceLines } from '../../../examples/docs/app-theme-lab-provenance.js';
+import { renderThemeLabProvenanceSurface } from '../../../examples/docs/app-theme-lab-provenance-view.js';
 import { DOGFOOD_DARK_THEME } from '../../../examples/docs/dogfood-shell-themes.js';
 
 function textOf(theme = BIJOU_DARK, path = 'semantic.accent'): string {
@@ -75,5 +76,20 @@ describe('theme lab provenance', () => {
     const nord = PRESETS['nord'];
     if (nord === undefined) throw new Error('nord preset is missing.');
     expect(textOf(nord)).toContain('flat token values');
+  });
+
+  it('preserves a narrow requested surface width', () => {
+    const surface = renderThemeLabProvenanceSurface(
+      BIJOU_DARK,
+      'semantic.accent',
+      20,
+      {
+        accent: BIJOU_DARK.semantic.accent,
+        body: BIJOU_DARK.surface.primary,
+        muted: BIJOU_DARK.surface.muted,
+      },
+    );
+
+    expect(surface.width).toBe(20);
   });
 });

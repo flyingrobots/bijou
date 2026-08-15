@@ -53,7 +53,7 @@ export function renderThemeLabProvenanceSurface(
   options: ThemeLabProvenanceOptions = {},
 ): Surface {
   const lines = themeLabProvenanceLines(theme, selectedPath, mode, localization, options);
-  const safeWidth = Math.max(32, width);
+  const safeWidth = Math.max(1, width);
   const surface = createSurface(safeWidth, Math.max(1, lines.length));
 
   lines.forEach((entry, y) => {
