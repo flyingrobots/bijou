@@ -12,9 +12,11 @@ const PATCHED_FLOORS: readonly PatchedFloor[] = [
   { packageName: '@modelcontextprotocol/sdk', minimum: '1.30.0' },
   { packageName: 'body-parser', minimum: '2.3.0' },
   { packageName: 'brace-expansion', minimum: '5.0.9' },
-  { packageName: 'fast-uri', minimum: '3.1.4' },
-  { packageName: 'hono', minimum: '4.12.27' },
-  { packageName: 'postcss', minimum: '8.5.18' },
+  { packageName: 'fast-uri', minimum: '3.1.5' },
+  { packageName: 'hono', minimum: '4.12.34' },
+  { packageName: 'ip-address', minimum: '10.3.1' },
+  { packageName: 'nanoid', minimum: '3.3.18' },
+  { packageName: 'postcss', minimum: '8.5.23' },
 ];
 
 describe('WF-166 dependency security closeout', () => {
@@ -32,15 +34,32 @@ describe('WF-166 dependency security closeout', () => {
 
     expect(violations).toEqual([]);
   });
+
+  it('keeps clean installs on the patched Hono line', () => {
+    const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
+    expect(readStringProperty(manifest.overrides, 'hono')).toBe('^4.13.0');
+  });
 });
 
 function readLockedPackages(): Record<string, unknown> {
   const lockfilePath = resolve(process.cwd(), 'package-lock.json');
-  const parsed: unknown = JSON.parse(readFileSync(lockfilePath, 'utf8'));
+  const parsed = readJsonObject(lockfilePath);
   if (!isRecord(parsed) || !isRecord(parsed.packages)) {
     throw new Error('package-lock.json must contain a packages object');
   }
   return parsed.packages;
+}
+
+function readJsonObject(path: string): Record<string, unknown> {
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));
+  if (!isRecord(parsed)) throw new Error(`${path} must contain a JSON object`);
+  return parsed;
+}
+
+function readStringProperty(value: unknown, property: string): string | undefined {
+  if (!isRecord(value)) return undefined;
+  const result = value[property];
+  return typeof result === 'string' ? result : undefined;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

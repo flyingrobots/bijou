@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress for issue
+Implementation proof in progress for issue
 [#482](https://github.com/flyingrobots/bijou/issues/482).
 
 ## Linked Legend
@@ -33,37 +33,39 @@ complete Node 20 and Node 22 verification matrix, and produces a zero-advisory
 
 ## Current Truth
 
-`main` at `4412ec6dbce947887ed6ea2740ecbad0a66d122e` reports seven npm
-advisories:
+The shaping snapshot on `main` at
+`4412ec6dbce947887ed6ea2740ecbad0a66d122e` reported seven npm advisories.
+By the implementation pass on 2026-08-15, `origin/main` at
+`49671510249fc79ed25b4e8f5796b47d2ad2e11d` exposed 18 open Dependabot
+alerts. The carried lockfile attempt also produced four live `npm audit`
+package findings: `fast-uri`, `hono`, `ip-address`, and newly disclosed
+`nanoid`.
 
-| Severity | Count |
-| :--- | ---: |
-| High | 3 |
-| Moderate | 3 |
-| Low | 1 |
-
-The affected dependency paths are:
+The refreshed candidate dependency paths and resolved versions are:
 
 ```text
 @flyingrobots/bijou-mcp
-  -> @modelcontextprotocol/sdk@1.29.0
-    -> @hono/node-server@1.19.13 -> hono@4.12.22
-    -> ajv@8.18.0 -> fast-uri@3.1.2
-    -> express@5.2.1 -> body-parser@2.2.2
-    -> hono@4.12.22
-eslint@10.5.0 -> minimatch@10.2.5 -> brace-expansion@5.0.6
-vitest@4.1.8 -> vite@8.0.16 -> postcss@8.5.15
+  -> @modelcontextprotocol/sdk@1.30.0
+    -> @hono/node-server@2.0.12 -> hono@4.13.2
+    -> ajv@8.18.0 -> fast-uri@3.1.5
+    -> express-rate-limit@8.5.2 -> ip-address@10.5.0
+    -> express@5.2.1 -> body-parser@2.3.0
+    -> hono@4.13.2
+eslint@10.5.0 -> minimatch@10.2.5 -> brace-expansion@5.0.9
+vitest@4.1.8 -> vite@8.0.16 -> postcss@8.5.25 -> nanoid@3.3.18
 ```
 
-The current advisories affect:
+The executable regression binds the current patched floors:
 
-- `@hono/node-server` before `2.0.5`;
-- `@modelcontextprotocol/sdk` from `1.25.0` through `1.29.0`;
-- `body-parser` from `2.0.0` through `2.2.2`;
-- `brace-expansion` through `5.0.7`;
-- `fast-uri` from `3.0.0` through `3.1.3`;
-- `hono` before `4.12.27` in the resolved range;
-- `postcss` through `8.5.17`.
+- `@hono/node-server@2.0.5` or later;
+- `@modelcontextprotocol/sdk@1.30.0` or later;
+- `body-parser@2.3.0` or later;
+- `brace-expansion@5.0.9` or later;
+- `fast-uri@3.1.5` or later;
+- `hono@4.12.34` or later;
+- `ip-address@10.3.1` or later;
+- `nanoid@3.3.18` or later;
+- `postcss@8.5.23` or later.
 
 Dependabot pull request #467 resolves `brace-expansion@5.0.7`. The newer
 `GHSA-mh99-v99m-4gvg` advisory includes that version, so the pull request no
@@ -74,6 +76,8 @@ longer satisfies its security purpose.
 - Update the deterministic package lock through the package manager.
 - Resolve `@modelcontextprotocol/sdk` to `1.30.0` or later within the existing
   declared range.
+- Replace the vulnerable exact Hono override with a compatible patched range
+  so a clean install cannot reintroduce the advisory-bearing line.
 - Resolve every affected transitive dependency to a patched version.
 - Preserve the supported Node 20 and Node 22 runtime and test matrix.
 - Preserve all public package and command behavior.
@@ -97,8 +101,7 @@ longer satisfies its security purpose.
 The change is acceptable only when:
 
 - `package-lock.json` is reproducible from the declared workspace manifests;
-- the resolved graph contains no version covered by the seven current
-  advisories;
+- the resolved graph contains no version covered by the current advisories;
 - the existing `@modelcontextprotocol/sdk` public usage compiles and its MCP
   tests pass;
 - Node 20 and Node 22 repository tests remain green;
@@ -120,16 +123,34 @@ The external advisory proof is:
 npm audit --audit-level=low
 ```
 
-The compatibility proof includes:
+The local compatibility and product proof includes:
 
 ```bash
+npx vitest run --config vitest.config.ts \
+  tests/cycles/WF-166/dependency-security-closeout.test.ts
+npm run build
+npm run typecheck:test
+npm run lint
+npm run lint:eslint
+npm run code:size
 npm run code-dojo:ci
+npm run smoke:dogfood
+npm run docs:inventory
+npm run docs:design-system:preflight
+npm run verify:interactive-examples
 npm ci
+npm audit --audit-level=low
 npm run code-dojo:ci
+npm run smoke:dogfood
+npm run docs:inventory
+npm run docs:design-system:preflight
+npm run verify:interactive-examples
 ```
 
 The second full run proves that a clean install from the committed lockfile
-preserves the repository's supported execution surface.
+preserves the repository's supported execution surface. Hosted CI repeats the
+full repository lane as the `test (20)` and `test (22)` jobs and runs the two
+DOGFOOD smoke jobs independently.
 
 ## Implementation Plan
 
@@ -166,7 +187,8 @@ preserves the repository's supported execution surface.
 - Does the MCP package behave identically after its transitive Hono server
   update?
 - Does the live audit report zero at the exact reviewed head?
-- Is every lockfile change explained by one of the seven advisory paths?
+- Is every lockfile change explained by an advisory path or deterministic
+  pruning of an orphaned lock entry?
 
 ## Retrospective
 
