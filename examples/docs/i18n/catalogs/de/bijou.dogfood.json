@@ -1798,7 +1798,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "{paneSwitch} • [/] Farbe • r/g/b Kanal • -/+ ändern • 0 zurücksetzen"
+        "de": "{paneSwitch} • n/p Farbe • 1/2/3 Kanal • -/+ ändern • 0 zurücksetzen"
       }
     },
     {
@@ -4033,7 +4033,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Steuerung: [/] Farbe | r/g/b Kanal | -/+ ändern | 0 zurücksetzen"
+        "de": "Steuerung: n/p Farbe | 1/2/3 Kanal | -/+ ändern | 0 zurücksetzen"
       }
     },
     {

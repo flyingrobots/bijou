@@ -12,8 +12,8 @@ describe('WF-130 roadmap release state', () => {
 
     expectClaims(roadmap, [
       'This roadmap is the forward-looking release horizon for Bijou.',
-      'Last synced from GitHub milestone items: 2026-08-09.',
-      'These are planning recommendations from the open tracker state as of 2026-08-09.',
+      'Last synced from GitHub milestone items: 2026-08-15.',
+      'These are planning recommendations from the open tracker state as of 2026-08-15.',
       'The latest shipped public release is',
       '`v7.1.0` is complete post-V7 minor release lineage',
       '`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.',
@@ -27,10 +27,10 @@ describe('WF-130 roadmap release state', () => {
       '`v9.0.0`: Product Workbench And Sapphire Design Language',
       '`v10.0.0`: Renderer And Host Systems Integration',
       '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
-      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 4 |',
+      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 0 | 7 |',
       '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 26 | 5 |',
-      '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 36 | 0 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 23 | 8 |',
+      '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 37 | 0 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 11 | 1 |',
       '| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |',
       '`Beyond`',
@@ -57,7 +57,7 @@ describe('WF-130 roadmap release state', () => {
     expect(row('v8.0.0')).toContain('issues/302');
     expect(row('v8.2.0')).toContain('pull/467');
     expectClaims(normalized('docs/ROADMAP.md'), [
-      '`v8.0.0` is in Runtime Graph release closeout',
+      '`v8.0.0` has complete Runtime Graph and dependency-security closeout lineage',
       'Landed contract lineage',
       '[#482](https://github.com/flyingrobots/bijou/issues/482)',
     ]);

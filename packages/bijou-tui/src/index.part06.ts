@@ -9,6 +9,14 @@ export {
   formatKeyCombo,
 } from './keybindings.js';
 
+export {
+  describeKeyBindingConflict,
+  findKeyBindingConflicts,
+  type KeyBindingClaim,
+  type KeyBindingConflict,
+  type KeyBindingSource,
+} from './keybindings-conflicts.js';
+
 // Input feature events and semantic action maps
 export {
   type InputActionBinding,

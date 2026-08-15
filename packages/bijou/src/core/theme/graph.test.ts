@@ -112,4 +112,15 @@ describe('TokenGraph', () => {
     expect(graph.get('surface.primary.bg').hex).toBe('#abcdef');
     expect(graph.get('semantic.exact').hex).toBe('#abcdef');
   });
+
+  it('reports only addressable dependency paths', () => {
+    const graph = createTokenGraph({
+      surface: { primary: { fg: '#111111', bg: '#222222' } },
+      valid: { ref: 'surface.primary.bg' },
+      broken: { ref: 'missing' },
+    });
+
+    expect(graph.dependencies('valid')).toEqual(['surface.primary.bg']);
+    expect(graph.dependencies('broken')).toEqual([]);
+  });
 });

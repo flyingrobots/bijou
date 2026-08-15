@@ -38,6 +38,8 @@ export type {
 
 export { BIJOU_DARK, BIJOU_LIGHT, CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
 
+export { renameRuleAuthoredTheme, ruleAuthoredDefinitions } from './preset-authoring.js';
+
 export * from './styled.js';
 
 export { extendTheme } from './extend.js';
@@ -80,6 +82,7 @@ export { createThemeAccessors, type ThemeAccessors } from './accessors.js';
 
 export { createTokenGraph } from './graph.js';
 export type { TokenGraph, ThemeMode } from './graph.js';
+export { collectTokenDependents, collectTransitiveTokenDependents, tokenDefinitionPaths } from './graph-dependents.js';
 export {
   bestContrastWith,
   closestColor,

@@ -16,15 +16,15 @@ describe('WF-167 roadmap milestone authority', () => {
   it('binds the verified GitHub milestone-item snapshot', () => {
     const roadmap = normalized('docs/ROADMAP.md');
     const rows = [
-      ['v8.0.0', '6', '3', '4'],
+      ['v8.0.0', '6', '0', '7'],
       ['v8.1.0', '7', '13', '0'],
-      ['v8.2.0', '8', '26', '5'],
-      ['v9.0.0', '9', '36', '0'],
+      ['v8.2.0', '8', '23', '8'],
+      ['v9.0.0', '9', '37', '0'],
       ['v10.0.0', '10', '11', '1'],
     ] as const;
 
     expect(roadmap).toContain(
-      'Last synced from GitHub milestone items: 2026-08-09.',
+      'Last synced from GitHub milestone items: 2026-08-15.',
     );
     for (const [name, number, open, closed] of rows) {
       expect(roadmap).toContain(
@@ -37,7 +37,8 @@ describe('WF-167 roadmap milestone authority', () => {
     const roadmap = normalized('docs/ROADMAP.md');
 
     expect(roadmap).toContain('`v8.0.0`: Runtime Graph Release Closeout');
-    expect(roadmap).toContain('competing remediation PRs [#492]');
+    expect(roadmap).toContain('merged remediation [#492]');
+    expect(roadmap).toContain('active successor [#516]');
     expect(roadmap).toContain('`v8.2.0`: Quality Automation And Reliability');
     expect(roadmap).toContain('Governance [#514]');
     expect(roadmap).toContain(
