@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BIJOU_DARK,
   collectTokenDependents,
+  collectTransitiveTokenDependents,
   ruleAuthoredDefinitions,
   tokenDefinitionPaths,
 } from '@flyingrobots/bijou';
@@ -67,5 +68,34 @@ describe('token dependents', () => {
     const consumers = dependents.get('brand.accent') ?? [];
     expect(consumers).toContain('status.warning');
     expect(BIJOU_DARK.semantic.accent.hex).toBe(BIJOU_DARK.status.warning.hex);
+  });
+
+  it('reads only the adaptive branch selected for the requested mode', () => {
+    const definitions = {
+      ink: {
+        light: '#101010',
+        dark: '#f0f0f0',
+      },
+      adaptive: {
+        light: { ref: 'ink.light' },
+        dark: { ref: 'ink.dark' },
+      },
+    } as const;
+
+    expect(collectTokenDependents(definitions, 'light').get('ink.light')).toEqual(['adaptive']);
+    expect(collectTokenDependents(definitions, 'light').get('ink.dark')).toBeUndefined();
+    expect(collectTokenDependents(definitions, 'dark').get('ink.dark')).toEqual(['adaptive']);
+    expect(collectTokenDependents(definitions, 'dark').get('ink.light')).toBeUndefined();
+  });
+
+  it('collects cyclic reference edges without resolving the cycle', () => {
+    const definitions = {
+      alpha: { ref: 'beta' },
+      beta: { ref: 'alpha' },
+    } as const;
+
+    expect(collectTokenDependents(definitions).get('alpha')).toEqual(['beta']);
+    expect(collectTokenDependents(definitions).get('beta')).toEqual(['alpha']);
+    expect(collectTransitiveTokenDependents(definitions).get('alpha')).toEqual(['beta']);
   });
 });

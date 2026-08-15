@@ -45,7 +45,7 @@ Legend: **yes** shipped · **partial** shipped but unsound · **no** absent.
 | Reactive graph, dependents recompute | yes | **yes** `createTokenGraph()` | — |
 | References between tokens | `ref()` | **yes** `{ ref }` | — |
 | Introspection of a value's origin | `inspect()` | **yes** `inspect()` | — |
-| Dependency graph exposed | `getDependencyGraph()` | **yes** `collectTokenDependents()` | — |
+| Dependency graph exposed | `getDependencyGraph()` | **partial** `collectTokenDependents()` returns a reverse map of dependencies to direct consumers and omits tokens with no consumers | no complete forward graph |
 | Cycle detection | yes | **partial** resolution guards visited paths; no explicit report | worth an issue if it bites |
 | Scope inheritance (`extends`) | yes | **partial** `{ light, dark }` per token; no scope-level inheritance | see *Scope inheritance* |
 | Batch update / flush | yes | **no** | low value in a TUI; not planned |
@@ -144,6 +144,6 @@ make the work visible but do not depend on it.
 
 ## The One-Line Summary
 
-Bijou already has Design Book's *model*. What it lacks is Design Book's
-*mathematics* — and every interesting thing on this page is downstream of
-adding it.
+Bijou already has much of Design Book's *model*. Its compatibility gaps are
+mostly downstream of the missing perceptual *mathematics*; the operator
+surfaces above can continue independently while that foundation lands.

@@ -42,7 +42,7 @@ export function collectTokenDependents(
 
   try {
     for (const path of tokenDefinitionPaths(definitions)) {
-      for (const dependency of graph.inspect(path, mode).dependencies) {
+      for (const dependency of graph.dependencies(path, mode)) {
         const bucket = dependents.get(dependency) ?? [];
         if (!bucket.includes(path)) bucket.push(path);
         dependents.set(dependency, bucket);

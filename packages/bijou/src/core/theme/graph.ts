@@ -17,6 +17,7 @@ export type ThemeMode = 'light' | 'dark';
 export interface TokenGraph {
   get(path: string, mode?: ThemeMode): TokenValue;
   getColor(def: ColorDefinition, mode?: ThemeMode): string;
+  dependencies(path: string, mode?: ThemeMode): readonly string[];
   inspect(path: string, mode?: ThemeMode): TokenGraphInspection;
   set(path: string, definition: TokenInput): void;
   on(handler: (path: string) => void): { dispose(): void };
@@ -58,16 +59,27 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
       return resolver.resolveColor(def, mode, new Set());
     },
 
+    dependencies(path, mode = 'dark') {
+      const def = definitions.get(path);
+      if (!def) throw new Error(`Token not found: ${path}`);
+      return collectGraphDefinitionDependencies(def, mode, definitions);
+    },
+
     inspect(path, mode = 'dark') {
       const def = definitions.get(path);
       if (!def) throw new Error(`Token not found: ${path}`);
-      if (isThemeColorRuleDefinition(def)) return resolver.inspectRule(def, path, mode);
+      if (isThemeColorRuleDefinition(def)) {
+        return {
+          ...resolver.inspectRule(def, path, mode),
+          dependencies: graph.dependencies(path, mode),
+        };
+      }
       return {
         kind: isTokenDefinition(def) ? 'token' : 'color',
         path,
         mode,
         hex: graph.get(path, mode).hex,
-        dependencies: collectGraphDefinitionDependencies(def),
+        dependencies: graph.dependencies(path, mode),
       };
     },
 

@@ -59,11 +59,12 @@ propagation `switch`. Two hand-written copies of something the token graph
 already knew.
 
 **So the graph drifted.** Read back from the real definitions, the table was
-wrong in six of its eight rows. It claimed `semantic.primary` fed
+wrong in five of its eight rows. It claimed `semantic.primary` fed
 `surface.primary` and `ui.tableHeader` (they depend on `decision.primaryText`),
 that `border.primary` fed `ui.scrollThumb` (it references `brand.primary`), and
 that `ui.cursor` fed a token called `focus.current` — which does not exist
-anywhere in `Theme`. It also missed a real and load-bearing edge:
+anywhere in `Theme`. It also invented a dependent for `surface.secondary.bg`
+and missed a real and load-bearing edge:
 `surface.primary.bg` feeds `semantic.accent`, because the accent rule gates its
 candidates on contrast against the background. Change the surface and the
 accent can re-decide. The drawn graph never said so.
@@ -75,11 +76,12 @@ public alongside `ruleAuthoredDefinitions(theme)`. DOGFOOD's shell themes use
 it, so the lab can now inspect the theme it is editing.
 
 **Edges read back out of the graph.** `collectTokenDependents()` and
-`collectTransitiveTokenDependents()` invert what `inspect()` already reports.
-The frozen table is gone. Edges are transitive, because the editor's question
-is "what moves if I change this" — editing `status.success` changes
-`semantic.success`, which changes `border.success`, and all three belong on
-screen.
+`collectTransitiveTokenDependents()` invert dependency-only inspection. That
+inspection selects the requested adaptive branch and never resolves token
+values, so it remains useful even when definitions contain a cycle. The frozen
+table is gone. Edges are transitive, because the editor's question is "what
+moves if I change this" — editing `status.success` changes `semantic.success`,
+which changes `border.success`, and all three belong on screen.
 
 **A provenance panel: "Why this value".** For the selected token it reports the
 rule that chose it, every candidate that rule weighed, each candidate's score
@@ -101,10 +103,10 @@ hides the metric cannot be used to fix the metric.
 
 - No OKLCH editing yet. The channel nudger stays on RGB until DL-023 phase 1
   lands a perceptual floor; editing L/C/H over sRGB maths would be theatre.
-- No replacement of the hand-written propagation `switch` in
-  `app-theme-lab-editor-write.ts`. Reading edges from the graph is done;
-  driving *writes* through the graph is a larger change and belongs with the
-  phase 4 preset rebuild.
+- No replacement of the bounded propagation `switch` in
+  `app-theme-lab-editor-write.ts`. It may apply only effects present in the
+  authoring graph; driving every write through rule recomputation is a larger
+  change and belongs with the phase 4 preset rebuild.
 - No `design-book` dependency, at runtime or otherwise, in this cycle.
 
 ## Tests To Write First
@@ -121,10 +123,15 @@ hides the metric cannot be used to fix the metric.
 8. Transitive closure reaches `border.success` from `status.success`.
 9. The panel distinguishes rule, reference, and literal.
 10. The panel explains rather than throws for a token field with no rule.
+11. Adaptive dependencies select only the requested mode, and cyclic
+    references can be inspected without resolving them.
+12. Draft propagation never mutates a dependent absent from the authoring
+    graph.
 
 ## Follow-Up
 
 - Localization keys `themeLab.provenance.*` ship with English fallbacks only;
   catalogue translations are outstanding.
-- `app-theme-lab-editor-write.ts` still encodes propagation by hand. It should
-  be driven by the same graph, tracked with the DL-023 phase 4 rebuild.
+- `app-theme-lab-editor-write.ts` still encodes a bounded subset of propagation
+  by hand. Full rule-driven recomputation remains part of the DL-023 phase 4
+  rebuild.
