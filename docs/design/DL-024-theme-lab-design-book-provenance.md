@@ -135,3 +135,18 @@ hides the metric cannot be used to fix the metric.
 - `app-theme-lab-editor-write.ts` still encodes a bounded subset of propagation
   by hand. Full rule-driven recomputation remains part of the DL-023 phase 4
   rebuild.
+
+## Successor Validation
+
+The clean V9 successor was replayed from merged `origin/main`, excluding the
+mixed source branch's obsolete security, add-then-remove comparator, and stale
+roadmap-count commits. Its integrated gate passes `939` test files / `4,164`
+tests, Code Dojo at the existing `12`-violation ratchet, both DOGFOOD smokes,
+documentation inventory and design-system preflight, generated-catalog checks,
+the unchanged `2,317` raw-string / `78` Markdown-localization debt baselines,
+four scripted interactive examples, and a zero-vulnerability npm audit.
+
+Graft's structural review reports additive package exports. It mechanically
+labels defaulted parameter additions on internal DOGFOOD helpers and the
+non-package-exported dependency collector as signature breaks; existing call
+forms remain valid, and the public package additions are additive.

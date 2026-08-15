@@ -8,6 +8,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Inspectable theme provenance and key-binding conflicts** — rule-authored
+  presets retain their definitions when renamed, token graphs expose
+  mode-aware direct and transitive reverse dependents without resolving cyclic
+  values, and Theme Lab can explain a token's rule, winner, rejected
+  candidates, score, contrast, and direct draft override. `@flyingrobots/bijou`
+  adds `renameRuleAuthoredTheme()`, `ruleAuthoredDefinitions()`,
+  `collectTokenDependents()`, `collectTransitiveTokenDependents()`, and
+  `tokenDefinitionPaths()`; `@flyingrobots/bijou-tui` adds
+  `findKeyBindingConflicts()` and `describeKeyBindingConflict()` with
+  runtime-accurate enabled/disabled claim reporting.
 - **Profunctor Page terminal inspection target** —
   `lowerProfunctorPageArtifacts()` validates the canonical Keep
   `profunctor-page/0` family and emits deterministic
@@ -48,6 +58,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **Sapphire Theme Lab interaction pass** — DOGFOOD now opens Theme Lab with
+  its full shell-theme picker and a live component specimen above the fold,
+  applies draft colours to the preview, marks edits across every editable
+  path, keeps provenance honest about direct overrides, and stacks complete
+  panels below the two-column width floor. Editor controls are declared as a
+  real key map, use `n`/`p` and `1`/`2`/`3` without stealing frame keys, and
+  publish matching localized editor and footer guidance. The integrated gate
+  passes `939` test files / `4,164` tests with zero audit findings and unchanged
+  Code Dojo and DOGFOOD localization-debt baselines.
 - **V8 dependency-security closeout** — WF-166 replaces the vulnerable exact
   Hono override with the patched `^4.13.0` line and regenerates the workspace
   lock through npm. The resolved graph now carries
