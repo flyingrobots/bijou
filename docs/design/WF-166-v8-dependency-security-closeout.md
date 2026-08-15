@@ -167,12 +167,12 @@ DOGFOOD smoke jobs independently.
 
 ## Acceptance Criteria
 
-- [ ] Every affected direct and transitive dependency path is documented.
-- [ ] The deterministic lockfile regression fails on the merge-base graph.
-- [ ] `npm audit --audit-level=low` reports zero vulnerabilities.
-- [ ] `package-lock.json` resolves patched versions without unrelated package
+- [x] Every affected direct and transitive dependency path is documented.
+- [x] The deterministic lockfile regression fails on the merge-base graph.
+- [x] `npm audit --audit-level=low` reports zero vulnerabilities.
+- [x] `package-lock.json` resolves patched versions without unrelated package
   churn.
-- [ ] A clean `npm ci` reproduces the verified graph.
+- [x] A clean `npm ci` reproduces the verified graph.
 - [ ] Full Node 20 and Node 22 tests, typecheck, Code Dojo, DOGFOOD smoke, and
   documentation gates pass.
 - [ ] PR #467 is explicitly superseded rather than merged at a still-vulnerable
@@ -192,4 +192,17 @@ DOGFOOD smoke jobs independently.
 
 ## Retrospective
 
-To be completed after the exact reviewed head lands.
+The security pass had to be refreshed against live advisory truth rather than
+the original shaping snapshot. The first carried lock attempt still admitted
+newer `fast-uri`, Hono, and `ip-address` advisories and predated the `nanoid`
+advisory. Its regression could therefore false-green. Raising the executable
+floors and binding the root Hono override made the clean-install promise real.
+
+`npm audit fix --package-lock-only` also demonstrated why audit success is not
+the complete proof: it temporarily pruned the manifest-required SheetJS entry
+and reported zero vulnerabilities, while `npm ci` correctly rejected the
+inconsistent lock. Regenerating through `npm install --package-lock-only`
+restored that entry; the repeated clean install, audit, full `930` file / `4,104`
+test suite, DOGFOOD smoke, documentation preflight, and interactive examples
+then passed. Hosted Node 20/22 evidence, #467 disposition, and the final #482
+closeout remain merge-bound acceptance steps.
