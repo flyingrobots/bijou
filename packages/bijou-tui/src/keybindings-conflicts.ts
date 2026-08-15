@@ -20,7 +20,7 @@ export interface KeyBindingClaim {
 export interface KeyBindingConflict {
   /** Human-readable combo, e.g. `]` or `ctrl+p`. */
   readonly combo: string;
-  /** Every binding claiming it, in registration order. The first one wins. */
+  /** Every binding claiming it, in registration order. The first enabled one wins. */
   readonly claims: readonly KeyBindingClaim[];
 }
 
@@ -78,17 +78,27 @@ export function findKeyBindingConflicts(
 /**
  * Render a conflict as a single warning line.
  *
- * Names the winner explicitly, because "these two collide" leaves a reader to
- * work out which one they actually get. The winner is the first claim in the
- * order the sources were passed in, which is the caller's dispatch order —
- * pass layers in the order they are consulted and the line is accurate.
+ * Names the runtime winner explicitly, because "these two collide" leaves a
+ * reader to work out which one they actually get. Dispatch skips disabled
+ * bindings, so the winner is the first enabled claim in caller order. Disabled
+ * claims remain visible because later state changes can activate them.
  */
 export function describeKeyBindingConflict(conflict: KeyBindingConflict): string {
-  const [winner, ...shadowed] = conflict.claims;
+  const winnerIndex = conflict.claims.findIndex((claim) => claim.enabled);
+  if (winnerIndex < 0) {
+    const claims = conflict.claims.map(describeClaim).join(', ');
+    return `Key ${conflict.combo} is bound more than once, but all claims are disabled: ${claims}.`;
+  }
+  const winner = conflict.claims[winnerIndex];
   if (winner === undefined) return '';
-  const losers = shadowed
-    .map((claim) => `"${claim.description}" (${claim.source})`)
+  const losers = conflict.claims
+    .filter((_claim, index) => index !== winnerIndex)
+    .map((claim) => `${describeClaim(claim)} ${claim.enabled ? 'never fires' : 'is disabled'}`)
     .join(', ');
   return `Key ${conflict.combo} is bound more than once: `
-    + `"${winner.description}" (${winner.source}) is checked first; ${losers} never fires.`;
+    + `${describeClaim(winner)} is checked first; ${losers}.`;
+}
+
+function describeClaim(claim: KeyBindingClaim): string {
+  return `"${claim.description}" (${claim.source})`;
 }

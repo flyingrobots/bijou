@@ -74,6 +74,37 @@ describe('describeKeyBindingConflict', () => {
     expect(line).toContain('"Top" (frame) is checked first');
     expect(line).toContain('"Green channel" (theme-lab) never fires');
   });
+
+  it('names the first enabled claim when an earlier claim is disabled', () => {
+    const map = createKeyMap<string>()
+      .bind('x', 'Disabled first', 'disabled')
+      .bind('x', 'Enabled second', 'enabled');
+    map.disable('Disabled first');
+    const [conflict] = findKeyBindingConflicts([
+      { source: 'page', bindings: map.bindings() },
+    ]);
+
+    expect(conflict).toBeDefined();
+    if (conflict === undefined) return;
+    const line = describeKeyBindingConflict(conflict);
+    expect(line).toContain('"Enabled second" (page) is checked first');
+    expect(line).toContain('"Disabled first" (page) is disabled');
+  });
+
+  it('reports when every duplicate claim is disabled', () => {
+    const map = createKeyMap<string>()
+      .bind('x', 'First', 'first')
+      .bind('x', 'Second', 'second');
+    map.disable('First');
+    map.disable('Second');
+    const [conflict] = findKeyBindingConflicts([
+      { source: 'page', bindings: map.bindings() },
+    ]);
+
+    expect(conflict).toBeDefined();
+    if (conflict === undefined) return;
+    expect(describeKeyBindingConflict(conflict)).toContain('all claims are disabled');
+  });
 });
 
 describe('the default frame keymap', () => {
