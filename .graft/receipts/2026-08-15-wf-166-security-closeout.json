@@ -1,0 +1,28 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "8ed35d49-7be5-43f7-ad1f-86b1dc41501a",
+  "agent": "codex",
+  "task": "Refresh WF-166 dependency floors and produce a reproducible zero-advisory V8 lockfile",
+  "bytesConsumed": 90788,
+  "filesRead": [
+    "docs/typescript-code-standards.editors-edition.md",
+    "docs/design/WF-166-v8-dependency-security-closeout.md",
+    "package.json",
+    "package-lock.json",
+    "packages/bijou-i18n-tools-xlsx/package.json",
+    "scripts/code-dojo/check-commit-message.mjs",
+    "scripts/code-dojo/check-graft-receipts.mjs",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "filesModified": [
+    ".graft/receipts/2026-08-15-wf-166-security-closeout.json",
+    "docs/design/WF-166-v8-dependency-security-closeout.md",
+    "package.json",
+    "package-lock.json",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "tripwires": [
+    "Graft inferred a rebase although Git had no rebase control directory; Git state was treated as authoritative and no rebase operation was used",
+    "npm audit fix pruned required xlsx lock data; npm ci exposed the inconsistency and npm install --package-lock-only restored the manifest-required entry"
+  ]
+}

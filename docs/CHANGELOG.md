@@ -48,6 +48,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **V8 dependency-security closeout** — WF-166 replaces the vulnerable exact
+  Hono override with the patched `^4.13.0` line and regenerates the workspace
+  lock through npm. The resolved graph now carries
+  `@modelcontextprotocol/sdk@1.30.0`, `@hono/node-server@2.0.12`,
+  `body-parser@2.3.0`, `brace-expansion@5.0.9`, `fast-uri@3.1.5`,
+  `hono@4.13.2`, `ip-address@10.5.0`, `nanoid@3.3.18`, and
+  `postcss@8.5.25`. A deterministic regression binds their patched floors and
+  the manifest override; a clean `npm ci` reproduces a zero-vulnerability
+  audit. The integrated local gate passes `930` test files / `4,104` tests,
+  DOGFOOD smoke, documentation preflight, and four scripted interactive
+  examples.
 - **WF-167 roadmap milestone authority** — GitHub and the durable roadmap now
   share one release model: V8 is the landed Runtime Graph contract plus
   dependency-security closeout; V8.1 owns replay and render evidence; V8.2 owns

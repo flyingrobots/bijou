@@ -1,0 +1,21 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "8ed35d49-7be5-43f7-ad1f-86b1dc41501a",
+  "agent": "codex",
+  "task": "Integrate WF-167 authority and record exact-head WF-166 validation evidence",
+  "bytesConsumed": 109767,
+  "filesRead": [
+    "docs/CHANGELOG.md",
+    "docs/design/WF-166-v8-dependency-security-closeout.md",
+    "tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts"
+  ],
+  "filesModified": [
+    ".graft/receipts/2026-08-15-wf-166-integrated-validation.json",
+    "docs/CHANGELOG.md",
+    "docs/design/WF-166-v8-dependency-security-closeout.md"
+  ],
+  "tripwires": [
+    "Resolved seven roadmap-authority merge conflicts to origin/main because WF-167 supersedes the branch snapshots",
+    "Deferred hosted Node 20/22 checklist completion until exact-head GitHub Actions succeeds"
+  ]
+}
