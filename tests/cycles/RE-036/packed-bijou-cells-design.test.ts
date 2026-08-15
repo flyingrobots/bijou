@@ -49,7 +49,7 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
 
     expectClaims(roadmap, [
       '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 26 | 5 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 23 | 8 |',
       '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 11 | 1 |',
     ]);
     expectClaims(bearing, [
