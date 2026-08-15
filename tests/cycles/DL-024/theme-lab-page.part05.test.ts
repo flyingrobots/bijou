@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { BIJOU_DARK, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { renderThemeLabPane } from '../../../examples/docs/app-theme-lab.js';
+import {
+  createThemeLabEditorState,
+  themeLabEditorNudge,
+  themeLabEditorSelectNext,
+  type ThemeLabEditorState,
+} from '../../../examples/docs/app-theme-lab-editor-model.js';
 import { DOCS_SHELL_THEME_CHOICES } from '../../../examples/docs/app-shell-theme-state.js';
 import { LANDING_THEMES } from '../../../examples/docs/app-landing-themes.js';
 import { docsVisualThemeFromShellThemeChoice } from '../../../examples/docs/app-landing-themes.js';
@@ -12,7 +18,7 @@ const ctx = createTestContext({
   runtime: { columns: 100, rows: 40 },
 });
 
-function paneLines(): readonly string[] {
+function paneLines(editorState?: ThemeLabEditorState): readonly string[] {
   const activeTheme = DOCS_SHELL_THEME_CHOICES[0];
   if (activeTheme === undefined) throw new Error('No shell theme choices.');
   const landingTheme = LANDING_THEMES[0]
@@ -24,6 +30,7 @@ function paneLines(): readonly string[] {
     landingTheme,
     activeTheme,
     shellThemes: DOCS_SHELL_THEME_CHOICES,
+    editorState,
   });
   return surfaceToString(surface, ctx.style).split('\n');
 }
@@ -75,5 +82,18 @@ describe('theme lab page order', () => {
     const text = lines.join('\n');
     expect(text).toContain('Theme: dogfood-dark');
     expect(text).not.toContain('dogfood-dark-draft');
+  });
+
+  it('does not label a propagated dependent as a direct override', () => {
+    const activeTheme = DOCS_SHELL_THEME_CHOICES[0];
+    if (activeTheme === undefined) throw new Error('No shell theme choices.');
+    let editor = createThemeLabEditorState(activeTheme.id, activeTheme.theme);
+    editor = themeLabEditorSelectNext(editor, 1);
+    editor = themeLabEditorNudge(editor, 1);
+    editor = themeLabEditorSelectNext(editor, 4);
+
+    const text = paneLines(editor).join('\n');
+    expect(editor.directlyEditedPaths).toEqual(['semantic.accent']);
+    expect(text).not.toContain('ui.cursor is a direct override');
   });
 });

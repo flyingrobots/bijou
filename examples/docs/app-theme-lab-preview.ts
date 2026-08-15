@@ -21,16 +21,39 @@ import { dogfoodText } from './app-theme-lab-provenance-contract.js';
 const PREVIEW_PROGRESS_PERCENT = 61;
 const PREVIEW_SEPARATOR_MAX = 44;
 
-function badgeRow(ctx: BijouContext, localization: LocalizationPort | undefined): Surface {
+function badgeRows(
+  ctx: BijouContext,
+  localization: LocalizationPort | undefined,
+  width: number,
+): Surface {
   // Variants passed as `variant:` fields rather than positionally, so the
   // localization scanner reads them as the role identifiers they are.
-  return row([
-    badge(dogfoodText(localization, 'themeLab.preview.success', 'SUCCESS'), { variant: 'success', ctx }), ' ',
-    badge(dogfoodText(localization, 'themeLab.preview.warning', 'WARNING'), { variant: 'warning', ctx }), ' ',
-    badge(dogfoodText(localization, 'themeLab.preview.error', 'ERROR'), { variant: 'error', ctx }), ' ',
-    badge(dogfoodText(localization, 'themeLab.preview.info', 'INFO'), { variant: 'info', ctx }), ' ',
+  const badges = [
+    badge(dogfoodText(localization, 'themeLab.preview.success', 'SUCCESS'), { variant: 'success', ctx }),
+    badge(dogfoodText(localization, 'themeLab.preview.warning', 'WARNING'), { variant: 'warning', ctx }),
+    badge(dogfoodText(localization, 'themeLab.preview.error', 'ERROR'), { variant: 'error', ctx }),
+    badge(dogfoodText(localization, 'themeLab.preview.info', 'INFO'), { variant: 'info', ctx }),
     badge(dogfoodText(localization, 'themeLab.preview.accent', 'ACCENT'), { variant: 'accent', ctx }),
-  ]);
+  ];
+  const rows: Surface[] = [];
+  let current: Surface[] = [];
+  let currentWidth = 0;
+  for (const item of badges) {
+    const gap = current.length === 0 ? 0 : 1;
+    if (current.length > 0 && currentWidth + gap + item.width > width) {
+      rows.push(spacedBadgeRow(current));
+      current = [];
+      currentWidth = 0;
+    }
+    current.push(item);
+    currentWidth += (current.length === 1 ? 0 : 1) + item.width;
+  }
+  if (current.length > 0) rows.push(spacedBadgeRow(current));
+  return column(rows);
+}
+
+function spacedBadgeRow(badges: readonly Surface[]): Surface {
+  return row(badges.flatMap((item, index) => index === 0 ? [item] : [' ', item]));
 }
 
 /**
@@ -60,7 +83,7 @@ export function renderThemeLabPreviewSurface(
   // Deliberately compact. Every row spent here is a row the editor and the
   // token graph lose, and this pane has to share one screen with both.
   const body = column([
-    badgeRow(themed, localization),
+    badgeRows(themed, localization, Math.max(1, width)),
     spacer(1, 1),
     contentSurface(alert(
       dogfoodText(localization, 'themeLab.preview.alertWarning', 'Two advisories remain open.'),

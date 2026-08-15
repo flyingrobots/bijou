@@ -108,4 +108,17 @@ describe('token dependents', () => {
     expect(collectTokenDependents(definitions).get('beta')).toEqual(['alpha']);
     expect(collectTransitiveTokenDependents(definitions).get('alpha')).toEqual(['beta']);
   });
+
+  it('follows virtual background edges through transitive closure', () => {
+    const definitions = {
+      base: '#111111',
+      surface: { primary: { fg: '#ffffff', bg: { ref: 'base' } } },
+      accent: { ref: 'surface.primary.bg' },
+    } as const;
+
+    expect(collectTransitiveTokenDependents(definitions).get('base')).toEqual([
+      'surface.primary',
+      'accent',
+    ]);
+  });
 });

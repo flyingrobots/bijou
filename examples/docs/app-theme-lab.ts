@@ -111,6 +111,7 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
             themeLabMode(ctx),
             localization,
             selectedDraftHex === selectedBaseHex
+              || !editor.directlyEditedPaths.includes(selectedPath)
               ? {}
               : { overrideHex: selectedDraftHex },
           ),

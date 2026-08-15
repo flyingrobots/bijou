@@ -23,6 +23,14 @@ describe('rule-authored provenance', () => {
     expect(ruleAuthoredDefinitions(renamed)).toBe(ruleAuthoredDefinitions(BIJOU_DARK));
   });
 
+  it('exposes a deeply immutable provenance snapshot', () => {
+    const definitions = ruleAuthoredDefinitions(BIJOU_DARK);
+    if (definitions === undefined) throw new Error('BIJOU_DARK lost its definitions.');
+
+    expect(Object.isFrozen(definitions)).toBe(true);
+    expect(Object.isFrozen(definitions['brand'])).toBe(true);
+  });
+
   it('does not alias the source theme', () => {
     const renamed = renameRuleAuthoredTheme(BIJOU_DARK, 'renamed-dark');
     expect(renamed).not.toBe(BIJOU_DARK);

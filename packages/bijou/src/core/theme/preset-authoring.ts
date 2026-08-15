@@ -1,6 +1,7 @@
 import { hexToRgb } from './color.js';
 import { createTokenGraph, type ThemeMode, type TokenGraph } from './graph.js';
 import type { ColorDefinition, TokenDefinitions } from './graph-types.js';
+import { immutableTokenDefinitions } from './preset-authoring-freeze.js';
 import type {
   GradientStop,
   RGB,
@@ -21,7 +22,8 @@ interface RuleAuthoredPresetOptions {
 const RULE_AUTHORED_DEFINITIONS = new WeakMap<Theme, TokenDefinitions>();
 
 export function compileRuleAuthoredPreset(options: RuleAuthoredPresetOptions): Theme {
-  const graph = createTokenGraph(options.definitions);
+  const definitions = immutableTokenDefinitions(options.definitions);
+  const graph = createTokenGraph(definitions);
   const theme: Theme = {
     name: options.name,
     status: {
@@ -69,17 +71,17 @@ export function compileRuleAuthoredPreset(options: RuleAuthoredPresetOptions): T
       muted: readToken(graph, options.mode, 'surface.muted'),
     },
   };
-  RULE_AUTHORED_DEFINITIONS.set(theme, options.definitions);
+  RULE_AUTHORED_DEFINITIONS.set(theme, definitions);
   return theme;
 }
 
 /**
  * Recover the authoring-time definitions behind a rule-authored preset.
  *
- * Returns `undefined` for themes that were written as flat token values, or
- * for copies that lost their identity — the registry is keyed on the theme
- * object itself. Use {@link renameRuleAuthoredTheme} to copy a theme without
- * dropping its provenance.
+ * Returns an immutable snapshot, or `undefined` for themes that were written
+ * as flat token values or for copies that lost their identity — the registry
+ * is keyed on the theme object itself. Use {@link renameRuleAuthoredTheme} to
+ * copy a theme without dropping its provenance.
  */
 export function ruleAuthoredDefinitions(theme: Theme): TokenDefinitions | undefined {
   return RULE_AUTHORED_DEFINITIONS.get(theme);

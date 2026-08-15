@@ -99,6 +99,7 @@ export function collectTransitiveTokenDependents(
       if (next === undefined || next === path || reached.has(next)) continue;
       reached.add(next);
       queue.push(...(direct.get(next) ?? []));
+      if (!next.endsWith('.bg')) queue.push(...(direct.get(`${next}.bg`) ?? []));
     }
     transitive.set(path, [...reached]);
   }

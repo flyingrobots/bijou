@@ -106,6 +106,16 @@ describe('theme lab live preview', () => {
       expect(text).toContain(label);
     }
   });
+
+  it('wraps status badges before a narrow preview clips them', () => {
+    const text = surfaceToString(renderThemeLabPreviewSurface(BIJOU_DARK, ctx, 41), ctx.style);
+    const lines = text.split('\n');
+    const successRow = lines.findIndex((line) => line.includes('SUCCESS'));
+    const accentRow = lines.findIndex((line) => line.includes('ACCENT'));
+
+    expect(successRow).toBeGreaterThanOrEqual(0);
+    expect(accentRow).toBeGreaterThan(successRow);
+  });
 });
 
 describe('theme lab display name', () => {
