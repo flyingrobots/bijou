@@ -12,8 +12,8 @@ describe('WF-130 roadmap release state', () => {
 
     expectClaims(roadmap, [
       'This roadmap is the forward-looking release horizon for Bijou.',
-      'Last synced from GitHub milestone items: 2026-07-30.',
-      'These are planning recommendations from the open tracker state as of 2026-07-30.',
+      'Last synced from GitHub milestone items: 2026-08-09.',
+      'These are planning recommendations from the open tracker state as of 2026-08-09.',
       'The latest shipped public release is',
       '`v7.1.0` is complete post-V7 minor release lineage',
       '`v7.2.0` is complete narrow stabilization and demo-integrity release lineage.',
@@ -21,17 +21,17 @@ describe('WF-130 roadmap release state', () => {
       'Release Train Decision',
       '`v7.1.0`: Previous Shipped Post-V7 Minor',
       '`v7.2.0`: Shipped Stabilization And Demo Integrity',
-      '`v8.0.0`: Runtime Graph And Scene IR Product Contract',
+      '`v8.0.0`: Runtime Graph Release Closeout',
       '`v8.1.0`: Replay, Capture, And Render Witnesses',
-      '`v8.2.0`: Quality Automation And Method Hardening',
-      '`v9.0.0`: Product Workbench And Operator Surfaces',
+      '`v8.2.0`: Quality Automation And Reliability',
+      '`v9.0.0`: Product Workbench And Sapphire Design Language',
       '`v10.0.0`: Renderer And Host Systems Integration',
       '| `v7.2.0` | [v7.2.0](https://github.com/flyingrobots/bijou/milestone/5) | 0 | 19 |',
-      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 2 | 2 |',
+      '| `v8.0.0` | [v8.0.0](https://github.com/flyingrobots/bijou/milestone/6) | 3 | 4 |',
       '| `v8.1.0` | [v8.1.0](https://github.com/flyingrobots/bijou/milestone/7) | 13 | 0 |',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 22 | 3 |',
-      '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 20 | 0 |',
-      '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 9 | 1 |',
+      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 26 | 5 |',
+      '| `v9.0.0` | [v9.0.0](https://github.com/flyingrobots/bijou/milestone/9) | 36 | 0 |',
+      '| `v10.0.0` | [v10.0.0](https://github.com/flyingrobots/bijou/milestone/10) | 11 | 1 |',
       '| `v7.1.0` | [v7.1.0](https://github.com/flyingrobots/bijou/milestone/4) | 0 | 4 |',
       '`Beyond`',
       '0 | 6',
@@ -56,16 +56,18 @@ describe('WF-130 roadmap release state', () => {
     expectClaims(row('v7.2.0'), ['issues/354', 'issues/344', 'issues/353']);
     expect(row('v8.0.0')).toContain('issues/302');
     expect(row('v8.2.0')).toContain('pull/467');
-    expect(normalized('docs/ROADMAP.md')).toContain(
-      'keep parent #302 in the active `v8.0.0` Runtime Graph horizon',
-    );
+    expectClaims(normalized('docs/ROADMAP.md'), [
+      '`v8.0.0` is in Runtime Graph release closeout',
+      'Landed contract lineage',
+      '[#482](https://github.com/flyingrobots/bijou/issues/482)',
+    ]);
   });
 
   it('keeps staged v8 tracker details and sync commands aligned to the milestone', () => {
     const roadmap = read('docs/ROADMAP.md');
     const v8 = sectionBetween(
       roadmap,
-      '### `v8.0.0`: Runtime Graph And Scene IR Product Contract',
+      '### `v8.0.0`: Runtime Graph Release Closeout',
       '### `v8.1.0`: Replay, Capture, And Render Witnesses',
     );
     const maintenance = sectionBetween(
