@@ -5,6 +5,10 @@ import {
 } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { dogfoodSafePairSummary, themeColorReuseSummary } from './app-theme-diagnostics.js';
+import {
+  THEME_LAB_EDITABLE_PATHS,
+  themeLabEditableHex,
+} from './app-theme-lab-editor-model.js';
 import { dogfoodLocalizedText } from './localization.js';
 
 interface ThemeLabCopyOptions {
@@ -39,9 +43,9 @@ export function themeLabDisplayName(
   draftTheme: Theme,
   localization: LocalizationPort | undefined,
 ): string {
-  const edited = draftTheme.semantic.accent.hex !== baseTheme.semantic.accent.hex
-    || draftTheme.semantic.primary.hex !== baseTheme.semantic.primary.hex
-    || draftTheme.surface.primary.bg !== baseTheme.surface.primary.bg;
+  const edited = THEME_LAB_EDITABLE_PATHS.some(
+    (path) => themeLabEditableHex(draftTheme, path) !== themeLabEditableHex(baseTheme, path),
+  );
   return edited
     ? dogfoodText(localization, 'themeLab.editedName', '{name} (edited)', { name: baseTheme.name })
     : baseTheme.name;

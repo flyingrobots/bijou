@@ -6,11 +6,11 @@ import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { column, proseSurface, spacer } from '../_shared/example-surfaces.js';
 import type { DocsShellThemeChoice } from './app-docs-shell-theme.js';
 import type { LandingThemeTokens } from './app-landing.js';
-import { themeLabCopy, themeLabDisplayName } from './app-theme-lab-copy.js';
 import { renderThemeLabGraphSurface } from './app-theme-lab-editor-graph-view.js';
 import { renderThemeLabEditorSurface } from './app-theme-lab-editor-view.js';
 import {
   themeLabEditorSelectedPath,
+  themeLabEditableHex,
   themeLabEditorStateFor,
   type ThemeLabEditorState,
 } from './app-theme-lab-editor-model.js';
@@ -19,6 +19,7 @@ import { themeLabColumnWidth, themeLabColumns, themeLabRightColumnWidth } from '
 import { renderThemeLabPickerSurface } from './app-theme-lab-picker.js';
 import { renderThemeLabPreviewSurface } from './app-theme-lab-preview.js';
 import { themeLabPalette } from './app-theme-lab-palette.js';
+import { themeLabPaneCopy } from './app-theme-lab-state.js';
 import { renderThemeLabProvenanceSurface } from './app-theme-lab-provenance-view.js';
 import {
   themeLabBox,
@@ -58,23 +59,15 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
     body: draftTheme.surface.primary,
     muted: draftTheme.surface.muted,
   };
-  const activeShellIndex = shellThemes.findIndex((shellTheme) => shellTheme.id === activeTheme.id);
-  const displayName = themeLabDisplayName(activeTheme.theme, draftTheme, localization);
-  const activeShellLine = activeShellIndex >= 0
-    ? `* ${String(activeShellIndex + 1)}. ${activeTheme.label} -> ${displayName}`
-    : `* ${activeTheme.label} -> ${displayName}`;
-  const copy = themeLabCopy({
-    activeLabel: activeTheme.label,
-    draftTheme,
-    baseTheme: activeTheme.theme,
-    activeShellLine,
-    localization,
-  });
+  const copy = themeLabPaneCopy(activeTheme, shellThemes, draftTheme, localization);
 
   const leftWidth = themeLabColumnWidth(bodyWidth);
   const rightWidth = themeLabRightColumnWidth(bodyWidth);
   const leftBody = Math.max(20, leftWidth - 2);
   const rightBody = Math.max(18, rightWidth - 2);
+  const selectedPath = themeLabEditorSelectedPath(editor);
+  const selectedDraftHex = themeLabEditableHex(draftTheme, selectedPath);
+  const selectedBaseHex = themeLabEditableHex(activeTheme.theme, selectedPath);
   const leftBox = (surface: Surface, title: string): Surface =>
     themeLabBox(surface, title, leftWidth, ctx, landingTheme);
   const rightBox = (surface: Surface, title: string): Surface =>
@@ -112,11 +105,14 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
         leftBox(
           renderThemeLabProvenanceSurface(
             activeTheme.theme,
-            themeLabEditorSelectedPath(editor),
+            selectedPath,
             leftBody,
             renderTokens,
             themeLabMode(ctx),
             localization,
+            selectedDraftHex === selectedBaseHex
+              ? {}
+              : { overrideHex: selectedDraftHex },
           ),
           dogfoodText(localization, 'themeLab.provenanceTitle', 'Why this value'),
         ),

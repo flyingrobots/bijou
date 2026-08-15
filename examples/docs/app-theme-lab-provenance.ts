@@ -16,6 +16,10 @@ export type {
   ThemeLabProvenanceTone,
 } from './app-theme-lab-provenance-contract.js';
 
+export interface ThemeLabProvenanceOptions {
+  readonly overrideHex?: string;
+}
+
 /**
  * Explain how the selected token got its value.
  *
@@ -31,10 +35,12 @@ export function themeLabProvenanceLines(
   path: string,
   mode: ThemeMode,
   localization?: LocalizationPort,
+  options: ThemeLabProvenanceOptions = {},
 ): readonly ThemeLabProvenanceLine[] {
+  const override = overrideLines(path, options.overrideHex, localization);
   const definitions = ruleAuthoredDefinitions(theme);
   if (definitions === undefined) {
-    return [{
+    return [...override, {
       text: dogfoodText(
         localization,
         'themeLab.provenance.none',
@@ -47,13 +53,14 @@ export function themeLabProvenanceLines(
   const graph = createTokenGraph(definitions);
   try {
     const inspection = graph.inspect(path, mode);
-    return inspection.kind === 'rule'
+    const provenance = inspection.kind === 'rule'
       ? ruleLines(inspection, localization)
       : valueLines(inspection, localization);
+    return [...override, ...provenance];
   } catch {
     // Editable paths such as `surface.primary.bg` address a field of a token
     // rather than a token, so they have no definition of their own to inspect.
-    return [{
+    return [...override, {
       text: dogfoodText(
         localization,
         'themeLab.provenance.field',
@@ -65,4 +72,22 @@ export function themeLabProvenanceLines(
   } finally {
     graph.dispose();
   }
+}
+
+function overrideLines(
+  path: string,
+  overrideHex: string | undefined,
+  localization: LocalizationPort | undefined,
+): readonly ThemeLabProvenanceLine[] {
+  if (overrideHex === undefined) return [];
+  return [{
+    text: dogfoodText(
+      localization,
+      'themeLab.provenance.override',
+      '{path} is a direct override: {hex}; base provenance follows.',
+      { path, hex: overrideHex },
+    ),
+    tone: 'accent',
+    swatch: overrideHex,
+  }];
 }

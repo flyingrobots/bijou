@@ -57,6 +57,20 @@ describe('theme lab provenance', () => {
     expect(textOf(DOGFOOD_DARK_THEME)).toContain('rule most-vivid');
   });
 
+  it('names a direct override before explaining the base rule', () => {
+    const text = themeLabProvenanceLines(
+      BIJOU_DARK,
+      'semantic.accent',
+      'dark',
+      undefined,
+      { overrideHex: '#123456' },
+    ).map((entry) => entry.text).join('\n');
+
+    expect(text).toContain('direct override');
+    expect(text).toContain('#123456');
+    expect(text).toContain('rule most-vivid');
+  });
+
   it('degrades honestly for a preset with no rule provenance', () => {
     const nord = PRESETS['nord'];
     if (nord === undefined) throw new Error('nord preset is missing.');

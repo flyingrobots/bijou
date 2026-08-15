@@ -10,6 +10,7 @@ import { renderSwatch, writeText } from './app-theme-lab-editor-draw.js';
 import type { ThemeLabEditorRenderTokens } from './app-theme-lab-editor-view.js';
 import {
   themeLabProvenanceLines,
+  type ThemeLabProvenanceOptions,
   type ThemeLabProvenanceLine,
 } from './app-theme-lab-provenance.js';
 
@@ -49,8 +50,9 @@ export function renderThemeLabProvenanceSurface(
   tokens: ThemeLabEditorRenderTokens,
   mode: ThemeMode = DEFAULT_THEME_MODE.mode,
   localization?: LocalizationPort,
+  options: ThemeLabProvenanceOptions = {},
 ): Surface {
-  const lines = themeLabProvenanceLines(theme, selectedPath, mode, localization);
+  const lines = themeLabProvenanceLines(theme, selectedPath, mode, localization, options);
   const safeWidth = Math.max(32, width);
   const surface = createSurface(safeWidth, Math.max(1, lines.length));
 

@@ -83,7 +83,8 @@ Mark an edited colour as not recommended, with a reason. Candidate checks, all
 of which need OKLCH:
 
 - contrast against the surfaces the token actually renders on
-- chroma beyond what the sRGB gamut can hold at that lightness, which clips
+- chroma beyond what the sRGB gamut can hold at that OKLCH lightness and hue,
+  which clips; the check must evaluate `L`, `C`, and `h` together
 - lightness too close to a neighbouring role to stay distinguishable
 - collision with a role that must stay tellable apart, which
   [DL-024](./DL-024-theme-lab-design-book-provenance.md) can already detect

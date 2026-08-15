@@ -4,7 +4,12 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { renderThemeLabPickerSurface } from '../../../examples/docs/app-theme-lab-picker.js';
 import { renderThemeLabPreviewSurface } from '../../../examples/docs/app-theme-lab-preview.js';
 import { themeLabDisplayName } from '../../../examples/docs/app-theme-lab-copy.js';
+import {
+  THEME_LAB_EDITABLE_PATHS,
+  themeLabEditableHex,
+} from '../../../examples/docs/app-theme-lab-editor-model.js';
 import { cloneThemeForThemeLabEditor } from '../../../examples/docs/app-theme-lab-editor-theme.js';
+import { writeThemeLabEditableHex } from '../../../examples/docs/app-theme-lab-editor-write.js';
 import { DOCS_SHELL_THEME_CHOICES } from '../../../examples/docs/app-shell-theme-state.js';
 
 const ctx = createTestContext({
@@ -119,5 +124,15 @@ describe('theme lab display name', () => {
       semantic: { ...draft.semantic, accent: { ...draft.semantic.accent, hex: '#123456' } },
     };
     expect(themeLabDisplayName(base, edited, undefined)).toBe(`${base.name} (edited)`);
+  });
+
+  it('marks edits to every path the editor exposes', () => {
+    for (const path of THEME_LAB_EDITABLE_PATHS) {
+      const current = themeLabEditableHex(base, path);
+      const replacement = current.toLowerCase() === '#000000' ? '#ffffff' : '#000000';
+      const edited = writeThemeLabEditableHex(base, path, replacement);
+      expect(themeLabDisplayName(base, edited, undefined), path)
+        .toBe(`${base.name} (edited)`);
+    }
   });
 });
