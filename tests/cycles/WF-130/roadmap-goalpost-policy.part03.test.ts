@@ -13,8 +13,10 @@ import {
   ROOT,
 } from './roadmap-goalpost-policy.test-support.js';
 describe('WF-130 roadmap pull order', () => {
-  it('binds the completed V8 contract and release prerequisite order', () => {
+  it('binds the completed Dojo prerequisite and complete downstream order', () => {
     const roadmap = normalized('docs/ROADMAP.md');
+    const bearing = normalized('docs/BEARING.md');
+
     expectClaims(roadmap, [
       'Next Pull',
       '[#477](https://github.com/flyingrobots/bijou/issues/477) has met the `112 -> 62` goalpost.',
@@ -22,9 +24,7 @@ describe('WF-130 roadmap pull order', () => {
       'The bounded Profunctor Page inspection story [#468](https://github.com/flyingrobots/bijou/issues/468) landed through [#474](https://github.com/flyingrobots/bijou/pull/474)',
       '[`RE-036`](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
       '[`DX-048`](./design/DX-048-v8-runtime-graph-scene-ir-contract.md)',
-      '[WF-166](./design/WF-166-v8-dependency-security-closeout.md)',
-      '[#482](https://github.com/flyingrobots/bijou/issues/482)',
-      'Runtime Graph And Scene IR Product Contract',
+      'Runtime Graph Release Closeout',
       'VISOR',
       '#335 release-story surfaces implemented',
       'versioned artifact semantics',
@@ -32,7 +32,7 @@ describe('WF-130 roadmap pull order', () => {
       'Forward Goalposts',
       'Decision Points',
       'Demo Integrity And Framework Input Stabilization',
-      'Product Workbench And Operator Surfaces',
+      'Product Workbench And Sapphire Design Language',
       'Theme Lab and Theme Inspector provenance',
       'localization workbench proof',
       'Renderer And Host Systems Integration',
@@ -48,32 +48,31 @@ describe('WF-130 roadmap pull order', () => {
         '[#483](https://github.com/flyingrobots/bijou/pull/483)',
       ],
       [
-        '[#482](https://github.com/flyingrobots/bijou/issues/482)',
-        '[WF-166](./design/WF-166-v8-dependency-security-closeout.md)',
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       ],
     );
     expectParagraphClaims(
       roadmapSource,
-      'The active release prerequisite is dependency-security issue',
+      'The V8.2 quality runway also records the third Code Dojo goalpost',
       [
-        '[#482](https://github.com/flyingrobots/bijou/issues/482)',
-        '[WF-166](./design/WF-166-v8-dependency-security-closeout.md)',
-        '[#467](https://github.com/flyingrobots/bijou/pull/467)',
+        '[#480](https://github.com/flyingrobots/bijou/issues/480)',
+        '[WF-165](./design/WF-165-respecting-dojo-ratchet-12.md)',
       ],
-      ['[#480]', '[WF-165]'],
+      ['[#458]', '[#459]', '[#483]'],
     );
-    expectOrderedClaims(normalized('docs/BEARING.md'), [
+    expectOrderedClaims(bearing, [
       'Recommended pull order:',
-      '1. Treat the V8 source-side contract and its #302 / #457 umbrellas as landed.',
-      '2. Close #482 through WF-166 with a reproducible zero-advisory dependency graph.',
-      '3. Supersede #467 only after the replacement resolves `brace-expansion@5.0.9` or later and all gates pass.',
-      '4. Remove the final `12` Code Dojo exceptions in the last zero-debt goalpost.',
-      '5. Start explicit `v8.0.0` release preparation only after security and Code Dojo prerequisites are green.',
-      '6. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
-      '7. Use `v8.2.0` for Code Dojo, Method, tracker-sync, and fixture-backed quality automation.',
-      '8. Keep `v9.0.0` for Product Workbench and operator surfaces after V8 stabilizes the source/artifact/IR contract.',
-      '9. Keep `v10.0.0` for Geordi/Wesley, renderer, host, shader, raster, and native surface work after the Bijou contracts are proven.',
-      '10. Keep closed dependency PR #326 as superseded lineage, not active release work.',
+      '1. Treat the bounded Profunctor Page inspection proof in #468 as landed.',
+      '2. Treat #458 as landed v8 foundation: the GraphQL block artifact bundle, replay facts, and visual scene facts are implemented.',
+      '3. Treat #459 as landed through PR #483: `packed-bijou-cells/1` now validates and adapts into a synchronized terminal `Surface`.',
+      '4. Compare #492 and #509 as competing implementations of #482; select one reproducible dependency-security path.',
+      '5. Close #482 only when the selected exact head proves zero actionable advisories through the documented audit commands.',
+      '6. Prepare the V8 release packet without pulling unfinished V9 design-language work into the release gate.',
+      '7. Use `v8.1.0` for replay, capture, debugger, render-witness, and graph proof follow-through after V8 lands.',
+      '8. Use `v8.2.0` for Code Dojo, Method, tracker sync, startup diagnostics, and fixture-backed quality automation.',
+      '9. Use `v9.0.0` for Product Workbench, Sapphire Design Language, interaction recipes, and State Atlas proof over the landed V8 contract.',
+      '10. Use `v10.0.0` for Geordi/Wesley, renderer, host, native GPU, shader, raster, and advanced input work after the Bijou contracts are proven.',
     ]);
     expectNoClaims(roadmap, [
       'No next public release version is selected.',
@@ -137,6 +136,7 @@ describe('WF-130 roadmap pull order', () => {
       ]);
     }
   });
+
   it('keeps dev-tooling dependency security in the v7.2 audit replay', () => {
     expectClaims(read('docs/releases/7.2.0/README.md'), [
       'Dev-tooling dependency audit',

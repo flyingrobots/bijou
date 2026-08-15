@@ -48,6 +48,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **WF-167 roadmap milestone authority** — GitHub and the durable roadmap now
+  share one release model: V8 is the landed Runtime Graph contract plus
+  dependency-security closeout; V8.1 owns replay and render evidence; V8.2 owns
+  quality, reliability, diagnostics, and tracker synchronization; V9 combines
+  Product Workbench with the Sapphire Design Language, compositional
+  interaction recipes, and State Atlas proof; and V10 owns renderer, Geordi
+  native-GPU host, and systems integration. All open issues and pull requests
+  have explicit milestones, retargeted issues carry migration comments, and
+  stale `[Beyond]` title and contradictory lane/priority residue is removed.
 - **WF-165 Code Dojo goalpost, tranche E** — The TUI runtime, table,
   framed-app, DOGFOOD application, and DOGFOOD story catalog preserve their
   public entrypoints as typed facades over focused sub-150-line modules. Exact
