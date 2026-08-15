@@ -23,13 +23,23 @@ describe('WF-166 dependency security closeout', () => {
   it('keeps advisory-bearing packages at or above their patched floors', () => {
     const packages = readLockedPackages();
     const violations = PATCHED_FLOORS.flatMap(({ packageName, minimum }) => {
-      const entry = packages[`node_modules/${packageName}`];
-      if (!isRecord(entry) || typeof entry.version !== 'string') {
+      const rootPath = `node_modules/${packageName}`;
+      const entries = Object.entries(packages).filter(
+        ([packagePath]) =>
+          packagePath === rootPath ||
+          packagePath.endsWith(`/node_modules/${packageName}`),
+      );
+      if (entries.length === 0) {
         return [`${packageName}: missing resolved version`];
       }
-      return isAtLeast(entry.version, minimum)
-        ? []
-        : [`${packageName}: ${entry.version} is below ${minimum}`];
+      return entries.flatMap(([packagePath, entry]) => {
+        if (!isRecord(entry) || typeof entry.version !== 'string') {
+          return [`${packagePath}: missing resolved version`];
+        }
+        return isAtLeast(entry.version, minimum)
+          ? []
+          : [`${packagePath}: ${entry.version} is below ${minimum}`];
+      });
     });
 
     expect(violations).toEqual([]);

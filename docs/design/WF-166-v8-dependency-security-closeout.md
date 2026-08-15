@@ -123,23 +123,17 @@ The external advisory proof is:
 npm audit --audit-level=low
 ```
 
-The local compatibility and product proof includes:
+The clean-install compatibility and product proof is executed in this order:
 
 ```bash
-npx vitest run --config vitest.config.ts \
-  tests/cycles/WF-166/dependency-security-closeout.test.ts
+npm ci
+npm audit --audit-level=low
 npm run build
 npm run typecheck:test
 npm run lint
 npm run lint:eslint
 npm run code:size
-npm run code-dojo:ci
-npm run smoke:dogfood
-npm run docs:inventory
-npm run docs:design-system:preflight
-npm run verify:interactive-examples
-npm ci
-npm audit --audit-level=low
+npm run test:run
 npm run code-dojo:ci
 npm run smoke:dogfood
 npm run docs:inventory
@@ -147,10 +141,11 @@ npm run docs:design-system:preflight
 npm run verify:interactive-examples
 ```
 
-The second full run proves that a clean install from the committed lockfile
-preserves the repository's supported execution surface. Hosted CI repeats the
-full repository lane as the `test (20)` and `test (22)` jobs and runs the two
-DOGFOOD smoke jobs independently.
+That sequence proves that a clean install from the committed lockfile preserves
+the repository's supported execution surface. Hosted CI repeats `npm ci` and
+the full repository test lane on both supported runtimes as the
+[`test (20)` and `test (22)` matrix jobs](../../.github/workflows/ci.yml), and
+runs the two DOGFOOD smoke jobs independently.
 
 ## Implementation Plan
 
