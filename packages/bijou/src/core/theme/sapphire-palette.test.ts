@@ -44,6 +44,7 @@ describe('Sapphire Noir reference palette', () => {
       const first = createSapphireReferencePalette(mode);
       expect(createSapphireReferencePalette(mode)).toEqual(first);
       for (const group of [first.ink, first.brand, first.surfaceBase, first.borderBase, first.uiBase]) {
+        expect(Object.isFrozen(group)).toBe(true);
         for (const color of values(group)) expect(color).toMatch(/^#[0-9a-f]{6}$/);
       }
     }

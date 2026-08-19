@@ -54,32 +54,32 @@ function darkPalette(seed: SapphirePaletteSeed): SapphireReferencePalette {
   return Object.freeze({
     mode: 'dark',
     seed,
-    ink: {
+    ink: Object.freeze({
       primary: hex(0.93, 0.08, hue),
       secondary: hex(0.82, 0.1, hue),
       elevated: hex(0.97, 0.04, hue),
       muted: hex(0.68, 0.12, hue),
-    },
-    brand: {
+    }),
+    brand: Object.freeze({
       primary: hex(0.72, 0.55, hue),
       accent: hex(0.7, 1, hue),
       success: hex(0.72, 1, status.success),
       warning: hex(0.78, 1, status.warning),
       error: hex(0.68, 1, status.error),
       info: hex(0.74, 0.75, status.info),
-    },
-    surfaceBase: {
+    }),
+    surfaceBase: Object.freeze({
       primary: hex(0.16, 0.12, hue),
       secondary: hex(0.205, 0.15, hue),
       elevated: hex(0.25, 0.18, hue),
       overlay: hex(0.12, 0.1, hue),
       muted: hex(0.145, 0.1, hue),
-    },
-    borderBase: {
+    }),
+    borderBase: Object.freeze({
       muted: hex(0.58, 0.14, hue),
       scrollTrack: hex(0.55, 0.12, hue),
-    },
-    uiBase: { trackEmpty: hex(0.27, 0.14, hue) },
+    }),
+    uiBase: Object.freeze({ trackEmpty: hex(0.27, 0.14, hue) }),
   });
 }
 
@@ -90,32 +90,32 @@ function lightPalette(seed: SapphirePaletteSeed): SapphireReferencePalette {
   return Object.freeze({
     mode: 'light',
     seed,
-    ink: {
+    ink: Object.freeze({
       primary: hex(0.25, 0.12, hue),
       secondary: hex(0.32, 0.1, hue),
       elevated: hex(0.2, 0.08, hue),
       muted: hex(0.45, 0.13, hue),
-    },
-    brand: {
+    }),
+    brand: Object.freeze({
       primary: hex(0.47, 0.75, hue),
       accent: hex(0.43, 0.92, hue),
       success: hex(0.42, 0.68, status.success),
       warning: hex(0.44, 0.68, status.warning),
       error: hex(0.44, 0.7, status.error),
       info: hex(0.46, 0.62, status.info),
-    },
-    surfaceBase: {
+    }),
+    surfaceBase: Object.freeze({
       primary: hex(0.97, 0.1, surfaceHue),
       secondary: hex(0.93, 0.14, surfaceHue),
       elevated: hex(0.99, 0.05, surfaceHue),
       overlay: hex(0.95, 0.12, surfaceHue),
       muted: hex(0.92, 0.1, surfaceHue),
-    },
-    borderBase: {
+    }),
+    borderBase: Object.freeze({
       muted: hex(0.52, 0.12, hue),
       scrollTrack: hex(0.49, 0.16, hue),
-    },
-    uiBase: { trackEmpty: hex(0.87, 0.1, surfaceHue) },
+    }),
+    uiBase: Object.freeze({ trackEmpty: hex(0.87, 0.1, surfaceHue) }),
   });
 }
 

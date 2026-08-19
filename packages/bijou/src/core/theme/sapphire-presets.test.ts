@@ -76,5 +76,9 @@ describe('Sapphire Noir character', () => {
 
   it('does not collapse light informational status onto brand chrome', () => {
     expect(BIJOU_LIGHT.semantic.info.hex).not.toBe(BIJOU_LIGHT.border.primary.hex);
+    const info = hexToRgb(BIJOU_LIGHT.semantic.info.hex);
+    const brand = hexToRgb(BIJOU_LIGHT.border.primary.hex);
+    expect(rgbToAnsi256(...info)).not.toBe(rgbToAnsi256(...brand));
+    expect(rgbToAnsi16(...info)).not.toBe(rgbToAnsi16(...brand));
   });
 });
