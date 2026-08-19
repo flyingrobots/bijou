@@ -108,7 +108,7 @@ produced every visible token.
 - Light surfaces retain a warm porcelain hue near `h = 85`, satisfying the
   existing warm/cool design requirement without turning text yellow.
 - Status hues are deterministic offsets from the brand anchor:
-  success `-110`, warning `-175`, error `+130`, and info `-20` degrees.
+  success `-110`, warning `-175`, error `+130`, and info `+35` degrees.
 - Chroma is expressed relative to the sRGB gamut shell at each lightness and
   hue. A requested `relC` therefore means the same design intensity at a dark,
   middle, or pale stop without silently clipping seven stops of a ramp.
@@ -242,4 +242,25 @@ token roles rather than position or English strings as the colour oracle.
 
 ## Closeout Notes
 
-Pending implementation, visual playback, and validation.
+Implementation is complete on `cycle/sapphire-noir` for
+[PR #517](https://github.com/flyingrobots/bijou/pull/517):
+
+- `BIJOU_DARK` and `BIJOU_LIGHT` now compile through one Sapphire reference
+  generator and the existing rule-authored token graph.
+- Public OKLAB/OKLCH conversion, gamut-shell, gamut-relative chroma, delta-E,
+  and circular hue helpers make the derivation inspectable without adding a
+  runtime dependency.
+- Focus and all four status roles are distinct in truecolor, ANSI-256, and
+  ANSI-16. The lowest measured semantic/surface pair is `5.03:1` in dark mode
+  and `5.86:1` in light mode.
+- A deterministic `150x44` `Surface` render was inspected in both modes. The
+  repository VHS recorder could not connect to `ttyd`
+  (`net::ERR_CONNECTION_REFUSED`), so no tracked recording was regenerated or
+  claimed.
+- The complete local CI-equivalent gate passed: Code Dojo debt/strict/size,
+  build, test typecheck, every workspace lint, ESLint, `934` test files / `4,134`
+  tests, scripted interactive examples, and both DOGFOOD smoke scenarios.
+
+The generic theme generator (#318), CVD simulation (#500), gradient
+interpolation (#504), and quantizer changes (#499) remain separate work.
+This design remains `active` until the pull request lands.

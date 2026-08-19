@@ -267,7 +267,7 @@ strict so components remain readable when a theme changes.
 | `gradient.brand` | A rare brand treatment, title art, or identity moment benefits from multi-stop color. | The user must infer meaning from it. |
 | `gradient.progress` | A meter, progress fill, or continuous range benefits from directional color. | Static decoration, status badges, or body text. |
 
-## Default Dark/Light UX Audit
+## Sapphire Noir First-Party Defaults
 
 The legacy `CYAN_MAGENTA` preset is useful as a vivid terminal-native preset,
 but it is not ideal as the model for dense product surfaces. It uses saturated
@@ -276,7 +276,8 @@ cursor, scrollbar, logo, and primary border; magenta appears as accent,
 secondary border, and focus gutter. That makes the app energetic, but it also
 makes many regions compete at the same visual priority.
 
-Bijou's first-party defaults now use a calmer shell posture:
+Bijou's `BIJOU_DARK` and `BIJOU_LIGHT` defaults are one derived **Sapphire
+Noir** system. They use a calmer shell posture:
 
 - neutral surfaces carry most of the screen
 - one accent family carries local emphasis and shell selection
@@ -284,15 +285,50 @@ Bijou's first-party defaults now use a calmer shell posture:
 - muted text remains contrast-safe instead of merely dim
 - dark and light themes both satisfy readable foreground/background pairs
 
-The `BIJOU_DARK` preset uses dark neutral surfaces, readable cool/warm accents,
-and separate success/warning/error/info colors. The `BIJOU_LIGHT` preset uses
-light neutral surfaces with darker semantic colors instead of pastel
-foregrounds. DOGFOOD consumes those defaults directly as one `DOGFOOD` shell
-theme family with `Dark` and `Light` modes, so the docs app proves the same
-palette family that first-party components should treat as the baseline. Both
-modes target at least 4.5:1
-contrast for surface text and common semantic foregrounds on every shell
-surface.
+The dark preset leads with low-chroma graphite surfaces, ice-neutral text, and
+a luminous sapphire focus color. The light preset keeps the intentional warm
+surface family as porcelain while using darker sapphire for interactive
+chrome. Amber is reserved for warning; green, red, and cool violet retain
+success, error, and information. Focus therefore no longer masquerades as a
+warning, and informational status no longer collapses into brand chrome.
+
+DOGFOOD consumes those defaults directly as one `DOGFOOD` shell theme family
+with `Dark` and `Light` modes, so the docs app proves the same palette family
+that first-party components should treat as the baseline. Both modes target at
+least 4.5:1 contrast for surface text and common semantic foregrounds on every
+shell surface.
+
+### Perceptual derivation
+
+The first-party references are generated from `SAPPHIRE_HUE` (`255` degrees)
+and mode-specific lightness/chroma curves. Chroma is expressed as a fraction
+of the sRGB gamut boundary at the chosen OKLCH lightness and hue. This keeps a
+relative chroma of `1` in gamut and avoids the hue shifts caused by clipping
+RGB channels after conversion.
+
+```ts
+import { createSapphireReferencePalette } from '@flyingrobots/bijou';
+
+const references = createSapphireReferencePalette('dark');
+const customReferences = createSapphireReferencePalette('light', {
+  brandHue: 265,
+});
+```
+
+The public color-math floor uses normalized OKLAB lightness (`0..1`), OKLCH
+chroma (`0` or greater), and hue in degrees. `gamutRelativeOklch()` clamps its
+relative-chroma argument to `0..1`; `gamutMapOklch()` preserves normalized
+lightness and hue while reducing out-of-gamut chroma. `interpolateHue()` takes
+a progress value clamped to `0..1` and an explicit `shorter` or `longer` arc.
+Use `deltaEOk()` for fast ordinary design-distance checks, not high-precision
+colorimetry. Numeric helpers reject non-finite channels rather than emitting an
+invalid color.
+
+The conversion matrices follow Björn Ottosson's
+[OKLAB reference](https://bottosson.github.io/posts/oklab/). The
+boundary-relative chroma model applies the same practical shell concept
+documented by [nutelch](https://github.com/meodai/nutelch), implemented here by
+a small deterministic binary search so Bijou keeps its zero-dependency core.
 
 Compared with large design systems, Bijou is intentionally compact today. The
 runtime vocabulary has about thirty direct color-bearing slots plus two

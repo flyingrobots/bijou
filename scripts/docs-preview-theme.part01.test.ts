@@ -27,7 +27,7 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
-  it('documents every built-in token with usage guidance and dark/light UX posture', () => {
+  it('documents every built-in token with usage guidance and Sapphire Noir posture', () => {
     const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
     const requiredRows = [
       'semantic.primary',
@@ -68,7 +68,7 @@ describe('docs preview app', () => {
     ];
 
     expect(doctrine).toContain('## Per-Token Library Reference');
-    expect(doctrine).toContain('## Default Dark/Light UX Audit');
+    expect(doctrine).toContain('## Sapphire Noir First-Party Defaults');
     expect(doctrine).toContain('## Theme Debugger And Lab');
     expect(doctrine).toContain('Use when');
     expect(doctrine).toContain('Do not use when');

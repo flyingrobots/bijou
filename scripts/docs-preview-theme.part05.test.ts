@@ -29,7 +29,9 @@ describe('docs preview app', () => {
       { key: KEY_TAB },
       { key: ']' },
       { key: 'b' },
-      { key: '+' },
+      // Sapphire Noir reaches the sRGB blue shell, so decrement the channel;
+      // incrementing an already-255 value is correctly a no-op.
+      { key: '-' },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
 

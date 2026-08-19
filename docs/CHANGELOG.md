@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Perceptual color and Sapphire reference APIs** — `@flyingrobots/bijou`
+  now exports dependency-free sRGB/OKLAB/OKLCH conversion, sRGB gamut-shell,
+  gamut-relative chroma, fast OKLAB distance, and circular hue-interpolation
+  helpers. `createSapphireReferencePalette()` exposes the deterministic seed
+  and mode references behind the first-party presets without broadening this
+  slice into the deferred interactive theme generator.
 - **Profunctor Page terminal inspection target** —
   `lowerProfunctorPageArtifacts()` validates the canonical Keep
   `profunctor-page/0` family and emits deterministic
@@ -48,6 +54,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **Sapphire Noir first-party palette** — `BIJOU_DARK` and `BIJOU_LIGHT` now
+  compile from one hue-anchored, gamut-relative reference system. Graphite and
+  ice lead dark mode; warm porcelain and sapphire ink lead light mode; focus,
+  warning, information, success, and error remain contrast-safe and distinct
+  in truecolor, ANSI-256, and ANSI-16 output. Legacy vivid presets are
+  unchanged.
 - **V8 dependency-security closeout** — WF-166 replaces the vulnerable exact
   Hono override with the patched `^4.13.0` line and regenerates the workspace
   lock through npm. The resolved graph now carries
