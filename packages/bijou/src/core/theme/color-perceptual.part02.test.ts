@@ -60,6 +60,11 @@ describe('circular hue interpolation', () => {
     expect(interpolateHue(350, 10, 0.5, 'longer')).toBeCloseTo(180, 8);
   });
 
+  it('takes one full turn when longer-path endpoints normalize to the same hue', () => {
+    expect(interpolateHue(20, 380, 0.25, 'longer')).toBeCloseTo(110, 8);
+    expect(interpolateHue(20, 380, 0.5, 'longer')).toBeCloseTo(200, 8);
+  });
+
   it('clamps interpolation progress', () => {
     expect(interpolateHue(20, 80, -1)).toBe(20);
     expect(interpolateHue(20, 80, 2)).toBe(80);

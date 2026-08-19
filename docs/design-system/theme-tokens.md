@@ -319,10 +319,11 @@ The public color-math floor uses normalized OKLAB lightness (`0..1`), OKLCH
 chroma (`0` or greater), and hue in degrees. `gamutRelativeOklch()` clamps its
 relative-chroma argument to `0..1`; `gamutMapOklch()` preserves normalized
 lightness and hue while reducing out-of-gamut chroma. `interpolateHue()` takes
-a progress value clamped to `0..1` and an explicit `shorter` or `longer` arc.
-Use `deltaEOk()` for fast ordinary design-distance checks, not high-precision
-colorimetry. Numeric helpers reject non-finite channels rather than emitting an
-invalid color.
+a progress value clamped to `0..1` and an explicit `shorter` or `longer` arc;
+when longer-path endpoints normalize to the same hue, it travels one complete
+turn. Use `deltaEOk()` for fast ordinary design-distance checks, not
+high-precision colorimetry. Numeric helpers reject malformed tuples and
+non-finite channels rather than emitting an invalid color.
 
 The conversion matrices follow Björn Ottosson's
 [OKLAB reference](https://bottosson.github.io/posts/oklab/). The

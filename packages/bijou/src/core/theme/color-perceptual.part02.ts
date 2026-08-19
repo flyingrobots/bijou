@@ -75,8 +75,8 @@ export function interpolateHue(
   const end = normalizeHue(to);
   const t = Math.max(0, Math.min(1, progress));
   let delta = ((end - start + 540) % 360) - 180;
-  if (path === 'longer' && Math.abs(delta) > 1e-12) {
-    delta += delta > 0 ? -360 : 360;
+  if (path === 'longer') {
+    delta = Math.abs(delta) <= 1e-12 ? 360 : delta + (delta > 0 ? -360 : 360);
   }
   return normalizeHue(start + delta * t);
 }

@@ -58,6 +58,10 @@ describe('OKLAB conversion', () => {
   it('rejects invalid numeric channels instead of emitting invalid colors', () => {
     expect(() => rgbToOklab([Number.NaN, 0, 0])).toThrow('RGB channels must be finite numbers');
     expect(() => rgbToOklab([256, 0, 0])).toThrow('RGB channels must be between 0 and 255');
+    expect(() => { Reflect.apply(rgbToOklab, undefined, [[0, 0]]); })
+      .toThrow('RGB must contain exactly three channels');
+    expect(() => { Reflect.apply(rgbToOklab, undefined, [new Array<number>(3)]); })
+      .toThrow('RGB channels must be finite numbers');
     expect(() => oklchToOklab({ l: 0.5, c: -0.1, h: 255 }))
       .toThrow('OKLCH chroma must be zero or greater');
   });

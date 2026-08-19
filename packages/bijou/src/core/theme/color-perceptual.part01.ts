@@ -20,9 +20,17 @@ function assertFinite(label: string, channels: readonly number[]): void {
   if (!channels.every(Number.isFinite)) throw new Error(`${label} channels must be finite numbers`);
 }
 
-function assertRgb(rgb: RGB): void {
-  assertFinite('RGB', rgb);
-  if (rgb.some((channel) => channel < 0 || channel > 255)) {
+function assertRgb(rgb: unknown): asserts rgb is RGB {
+  if (!Array.isArray(rgb) || rgb.length !== 3) {
+    throw new Error('RGB must contain exactly three channels');
+  }
+  const channels: unknown[] = [rgb[0], rgb[1], rgb[2]];
+  if (!channels.every((channel): channel is number => (
+    typeof channel === 'number' && Number.isFinite(channel)
+  ))) {
+    throw new Error('RGB channels must be finite numbers');
+  }
+  if (channels.some((channel) => channel < 0 || channel > 255)) {
     throw new Error('RGB channels must be between 0 and 255');
   }
 }
@@ -51,7 +59,8 @@ function encode(channel: number): number {
 }
 
 /** Convert an 8-bit sRGB tuple into perceptual OKLAB coordinates. */
-export function rgbToOklab(rgb: RGB): Oklab {
+export function rgbToOklab(rgb: RGB): Oklab;
+export function rgbToOklab(rgb: unknown): Oklab {
   assertRgb(rgb);
   const r = linearize(rgb[0]);
   const g = linearize(rgb[1]);

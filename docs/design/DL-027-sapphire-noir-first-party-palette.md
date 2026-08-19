@@ -258,7 +258,7 @@ Implementation is complete on `cycle/sapphire-noir` for
   (`net::ERR_CONNECTION_REFUSED`), so no tracked recording was regenerated or
   claimed.
 - The complete local CI-equivalent gate passed: Code Dojo debt/strict/size,
-  build, test typecheck, every workspace lint, ESLint, `934` test files / `4,134`
+  build, test typecheck, every workspace lint, ESLint, `934` test files / `4,136`
   tests, scripted interactive examples, and both DOGFOOD smoke scenarios.
 
 The generic theme generator (#318), CVD simulation (#500), gradient

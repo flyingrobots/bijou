@@ -55,6 +55,11 @@ describe('Sapphire Noir reference palette', () => {
       .toThrow('Sapphire palette hue seeds must be finite numbers');
   });
 
+  it('rejects unsupported runtime modes instead of silently choosing light', () => {
+    expect(() => { Reflect.apply(createSapphireReferencePalette, undefined, ['sepia']); })
+      .toThrow('Unsupported Sapphire palette mode: sepia');
+  });
+
   it('orders surface lightness into a visible depth hierarchy', () => {
     const dark = createSapphireReferencePalette('dark').surfaceBase;
     expect(rgbToOklch(hexToRgb(dark.overlay)).l).toBeLessThan(rgbToOklch(hexToRgb(dark.primary)).l);

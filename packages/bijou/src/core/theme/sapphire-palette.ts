@@ -126,8 +126,15 @@ function lightPalette(seed: SapphirePaletteSeed): SapphireReferencePalette {
  */
 export function createSapphireReferencePalette(
   mode: 'dark' | 'light',
+  seed?: Partial<SapphirePaletteSeed>,
+): SapphireReferencePalette;
+export function createSapphireReferencePalette(
+  mode: unknown,
   seed: Partial<SapphirePaletteSeed> = {},
 ): SapphireReferencePalette {
+  if (mode !== 'dark' && mode !== 'light') {
+    throw new Error(`Unsupported Sapphire palette mode: ${String(mode)}`);
+  }
   const resolved = resolveSeed(seed);
   return mode === 'dark' ? darkPalette(resolved) : lightPalette(resolved);
 }
