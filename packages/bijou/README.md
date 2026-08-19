@@ -78,12 +78,19 @@ fake duplication rather than a real second API.
 
 ### Theme Authoring
 - **`extendTheme()`**: Build a custom theme from a known-good preset.
+- **`createSapphireReferencePalette()`**: Inspect or explore the shared
+  hue-anchored references behind `BIJOU_DARK` and `BIJOU_LIGHT`.
 - **`defineThemeSafePairs()`**: Declare reusable foreground/background
   contrast matrices for `doctorTheme()` and inspector surfaces.
 - **`doctorTheme()`**: Structured checks for invalid colors, weak contrast,
   and suspicious token reuse.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast
   calculation for token-pair tests.
+- **Perceptual color helpers**: Convert sRGB, OKLAB, and OKLCH with
+  `rgbToOklab()`, `rgbToOklch()`, `oklabToRgb()`, and `oklchToRgb()`; use
+  `gamutMapOklch()` or `gamutRelativeOklch()` to stay inside sRGB; compare
+  colors with `deltaEOk()`; and interpolate circular hue with
+  `interpolateHue()`.
 
 ### Mode-Aware Authoring
 - **`renderByMode()`**: Dispatch a component to the current output contract.

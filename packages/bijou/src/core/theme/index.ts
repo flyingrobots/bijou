@@ -37,6 +37,8 @@ export type {
 } from './builder.js';
 
 export { BIJOU_DARK, BIJOU_LIGHT, CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
+export { createSapphireReferencePalette, SAPPHIRE_HUE } from './sapphire-palette.js';
+export type { SapphirePaletteSeed, SapphireReferencePalette } from './sapphire-palette.js';
 
 export * from './styled.js';
 
@@ -126,5 +128,18 @@ export {
   complementary,
   saturate,
   desaturate,
+  deltaEOk,
+  gamutMapOklch,
+  gamutRelativeOklch,
+  interpolateHue,
+  isOklchInSrgb,
+  maxSrgbChroma,
+  normalizeHue,
+  oklabToOklch,
+  oklabToRgb,
+  oklchToOklab,
+  oklchToRgb,
+  rgbToOklab,
+  rgbToOklch,
 } from './color.js';
-export type { ColorRef, ResolvedColor } from './color.js';
+export type { ColorRef, HueInterpolationPath, Oklab, Oklch, ResolvedColor } from './color.js';
