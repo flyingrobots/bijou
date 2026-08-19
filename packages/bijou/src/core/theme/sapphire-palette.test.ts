@@ -55,6 +55,14 @@ describe('Sapphire Noir reference palette', () => {
       .toThrow('Sapphire palette hue seeds must be finite numbers');
   });
 
+  it('rejects invalid runtime seed containers with a controlled error', () => {
+    for (const seed of [null, 7, 'seed', []]) {
+      expect(() => {
+        Reflect.apply(createSapphireReferencePalette, undefined, ['dark', seed]);
+      }).toThrow('Sapphire palette seed must be an object');
+    }
+  });
+
   it('rejects unsupported runtime modes instead of silently choosing light', () => {
     expect(() => { Reflect.apply(createSapphireReferencePalette, undefined, ['sepia']); })
       .toThrow('Unsupported Sapphire palette mode: sepia');

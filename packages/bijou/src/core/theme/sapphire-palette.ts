@@ -24,7 +24,14 @@ const DEFAULT_SEED: SapphirePaletteSeed = Object.freeze({
   lightSurfaceHue: 85,
 });
 
-function resolveSeed(seed: Partial<SapphirePaletteSeed>): SapphirePaletteSeed {
+function isSapphirePaletteSeedInput(value: unknown): value is Partial<SapphirePaletteSeed> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function resolveSeed(seed: unknown): SapphirePaletteSeed {
+  if (!isSapphirePaletteSeedInput(seed)) {
+    throw new Error('Sapphire palette seed must be an object');
+  }
   const resolved = {
     brandHue: seed.brandHue ?? DEFAULT_SEED.brandHue,
     lightSurfaceHue: seed.lightSurfaceHue ?? DEFAULT_SEED.lightSurfaceHue,
@@ -130,7 +137,7 @@ export function createSapphireReferencePalette(
 ): SapphireReferencePalette;
 export function createSapphireReferencePalette(
   mode: unknown,
-  seed: Partial<SapphirePaletteSeed> = {},
+  seed: unknown = {},
 ): SapphireReferencePalette {
   if (mode !== 'dark' && mode !== 'light') {
     throw new Error(`Unsupported Sapphire palette mode: ${String(mode)}`);
