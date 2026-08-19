@@ -264,3 +264,22 @@ Implementation is complete on `cycle/sapphire-noir` for
 The generic theme generator (#318), CVD simulation (#500), gradient
 interpolation (#504), and quantizer changes (#499) remain separate work.
 This design remains `active` until the pull request lands.
+
+## DOGFOOD Home-Tab Mockup Matrix
+
+The follow-up visual exploration lives in
+[`mockups/dl-027-sapphire-noir-home/`](./mockups/dl-027-sapphire-noir-home/README.md).
+It renders three conceptual Home-tab directions against both shipped DOGFOOD
+theme modes, producing one standalone SVG for every direction/mode pair:
+
+- **Command Deck** — an action-first terminal cockpit;
+- **Proof Atlas** — an architecture-first rendering of the source-to-Surface
+  proof chain;
+- **Editorial Index** — a classic navigation-tree and reader-pane entrance.
+
+The six artifacts use the live `BIJOU_DARK` and `BIJOU_LIGHT` token values and
+materialize a literal `150x44` cell grid. The existing `assets/Bijou.svg` is
+lowered through Bijou's raster-to-glyph renderer rather than presented as a web
+logo. They are design mockups, not screenshots or claims that a Home tab has
+been implemented. The matrix is generated deterministically and visually
+inspected at `1500x880` in both modes.
