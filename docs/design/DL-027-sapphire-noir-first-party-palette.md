@@ -250,6 +250,8 @@ Implementation is complete on `cycle/sapphire-noir` for
 - Public OKLAB/OKLCH conversion, gamut-shell, gamut-relative chroma, delta-E,
   and circular hue helpers make the derivation inspectable without adding a
   runtime dependency.
+- Public runtime guards reject unsupported palette modes, malformed RGB tuple
+  shapes, and invalid Sapphire seed containers with controlled errors.
 - Focus and all four status roles are distinct in truecolor, ANSI-256, and
   ANSI-16. The lowest measured semantic/surface pair is `5.03:1` in dark mode
   and `5.86:1` in light mode.
@@ -258,7 +260,7 @@ Implementation is complete on `cycle/sapphire-noir` for
   (`net::ERR_CONNECTION_REFUSED`), so no tracked recording was regenerated or
   claimed.
 - The complete local CI-equivalent gate passed: Code Dojo debt/strict/size,
-  build, test typecheck, every workspace lint, ESLint, `934` test files / `4,136`
+  build, test typecheck, every workspace lint, ESLint, `934` test files / `4,137`
   tests, scripted interactive examples, and both DOGFOOD smoke scenarios.
 
 The generic theme generator (#318), CVD simulation (#500), gradient
