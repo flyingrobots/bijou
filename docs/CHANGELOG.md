@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [8.0.0-rc.1] - 2026-08-21
+
+Release candidate for `8.0.0`. Published so downstream consumers can validate the
+breaking theme and detection changes before the stable tag. The entries below are
+the accumulated `main` work since `7.2.0`; the stable `8.0.0` header will
+consolidate them.
+
 ### Added
 
 - **Profunctor Page terminal inspection target** —
@@ -69,6 +76,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   when the caller had said nothing of the kind. The new target matches the
   sibling `ui()` accessor, which already falls back into `semantic`.
   `status('muted')` itself is unchanged, strikethrough intact.
+- **DOGFOOD resolves release docs by release line, not exact version** — the docs
+  app read `docs/releases/${BIJOU_VERSION}/whats-new.md`, so cutting the first
+  prerelease crashed it on startup with an unhandled `ENOENT` before the first
+  frame: no `docs/releases/8.0.0-rc.1/` directory exists, and none should. A
+  prerelease is a candidate *for* a line and shares its What's New and migration
+  guide, and `release:readiness` keys the evidence-packet path off the target
+  milestone, which is the line too. `releaseLineOf()` in the new
+  `examples/docs/app-release-line.ts` strips `-(alpha|beta|rc).N`, and
+  `tests/cycles/DX-052/dogfood-release-line-docs.test.ts`
+  asserts the derived paths exist on disk without booting the app — the check
+  that would have caught it, since `smoke:dogfood` reported only `exited with
+  code 1`. `defaultMarkdownTemplateValues()` resolves `BIJOU_RELEASE_LINE` as
+  well as `BIJOU_VERSION`, because the i18n scanner turns templated path
+  literals into real files and an unresolvable token makes documents *vanish*
+  from the inventory instead of failing: the first cut of this fix dropped the
+  release What's New and migration guide and moved measured Markdown debt from
+  78 to 72, which reads as a six-point improvement while two documents go
+  unwatched. Both the resolution and the inventory membership are now asserted.
+  Release guide titles and ids in the DOGFOOD Release page also key off the line
+  rather than the exact version: they open the line's docs, and at 120x40
+  `What's New in v8.0.0-rc.1` overflowed the nav column and rendered as
+  `What's New in v8.0.0-rc.`. Document bodies keep the precise version.
 - **`extendTheme()` reaches all six token groups** — `border` and `semantic` join
   `status`, `ui`, `gradient`, and `surface` in the extension parameter. Both are
   overridable rather than extensible, since `Theme` fixes their key sets. This is

@@ -6,6 +6,7 @@ import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { BIJOU_RELEASE_LINE } from '../../../examples/docs/app-release-line.js';
 
 const PACKAGE_JSON = readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8');
 const BIJOU_VERSION = must(/"version":\s*"([^"]+)"/u.exec(PACKAGE_JSON)?.[1], 'bijou package version');
@@ -72,16 +73,21 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(packageText).toContain('Surface primitives without abandoning');
   });
 
+  // Nav titles and guide ids key off the release LINE; document bodies keep the
+  // exact version. Two reasons, both surfaced by cutting the first prerelease
+  // (#523): these guides open `docs/releases/<line>/`, so the line is what they
+  // name; and `What's New in v8.0.0-rc.1` overflowed the nav column at 120x40,
+  // rendering as `What's New in v8.0.0-rc.` and failing this assertion.
   it('publishes the current release story and migration guide in Release', async () => {
-    const versionSlug = BIJOU_VERSION.replaceAll('.', '-');
+    const versionSlug = BIJOU_RELEASE_LINE.replaceAll('.', '-');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const opened = await runScript(app, [], { ctx });
     const releaseText = frameText(must(opened.frames.at(-1)));
 
     expect(opened.model.docsModel.activePageId).toBe('release');
-    expect(releaseText).toContain(`What's New in v${BIJOU_VERSION}`);
-    expect(releaseText).toContain(`Migration Guide v${BIJOU_VERSION}`);
+    expect(releaseText).toContain(`What's New in v${BIJOU_RELEASE_LINE}`);
+    expect(releaseText).toContain(`Migration Guide v${BIJOU_RELEASE_LINE}`);
 
     const whatsNew = await runScript(app, [
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-whats-new-${versionSlug}` } } },

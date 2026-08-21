@@ -337,29 +337,35 @@ npm run blocklab:index
 API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
 script names remain as compatibility aliases during the rename window.
 
-## What's New in v7.2.0
+## What's New in v8.0.0-rc.1
 
-Bijou `v7.2.0` is a focused stabilization release for the V7 demo, TUI mouse
-input, DOGFOOD documentation, and release evidence.
+Bijou `v8.0.0-rc.1` is a release candidate. It is published so downstream
+consumers can validate two breaking changes before the stable `8.0.0` tag; treat
+it as a preview rather than a supported line.
 
-- TUI apps can request `press`, `drag`, or any-event SGR mouse tracking, and
-  the event bus now splits bundled mouse packets before parsing so hover-heavy
-  surfaces do not lose movement events.
-- Framework mouse fallthrough, page-scoped frame helper exports, and scripted
-  mouse driver builders make pointer regressions easier to replay and test.
-- DOGFOOD's release section now surfaces What's New, the real GraphQL Blocks
-  proof chain, and changelog history in the main reader flow instead of hiding
-  release-critical context in side metadata.
-- DOGFOOD demo surfaces are more honest for localization fallback, light-theme
-  readability, first-party theme variants, and Blocks app-binding snippets.
-- Release validation now records the v7.2.0 evidence packet, milestone-aware
-  tracker state for issues and pull requests, dev-inclusive security audit
-  proof, and Code Dojo ratchet progress.
+**Breaking.** `NO_COLOR` no longer changes the detected output mode. It disables
+colour, which is all [no-color.org](https://no-color.org) asks for — previously
+it also forced `'pipe'`, so a terminal with `NO_COLOR=1` in the environment lost
+the whole TUI rather than only its colour. Also, an unknown status key now
+resolves to `semantic.muted` rather than `status.muted`, so a mistyped or
+undefined key no longer renders struck through. See
+[`DX-052`](./docs/design/DX-052-no-color-is-not-a-capability.md).
+
+- `extendTheme()` now reaches all six token groups — `border` and `semantic`
+  join `status`, `ui`, `gradient`, and `surface`.
+- The Profunctor Page terminal inspection target validates the canonical
+  `profunctor-page/0` family and emits deterministic scene IR, surfaces,
+  receipts, and cell source maps across six inspection modes.
+- `createVisorArtifactBundleFromGraphql()` and the `visor-artifact-bundle/1`
+  types land the VISOR artifact bundle proof.
+- `RE-036` adds packed-cell receipt validation and `Surface` adaptation.
+- Dependency-security closeout, roadmap milestone authority, and Code Dojo
+  ratchet progress across tranches A–E.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/7.2.0/whats-new.md), the
-[migration guide](./docs/releases/7.2.0/migration-guide.md), and the
-[release evidence packet](./docs/releases/7.2.0/README.md).
+[What's New guide](./docs/releases/8.0.0/whats-new.md), the
+[migration guide](./docs/releases/8.0.0/migration-guide.md), and the
+[release evidence packet](./docs/releases/8.0.0/README.md).
 
 ## Tests, Soak, and Performance
 

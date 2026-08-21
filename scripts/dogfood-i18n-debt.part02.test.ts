@@ -80,7 +80,12 @@ describe('DOGFOOD i18n debt inventory', () => {
       const result = evaluateDogfoodI18nDebtRatchet(inventory);
       const surfaces = inventory.bySurface.map((surface) => surface.surface);
 
-      expect(inventory.total).toBe(2317);
+      // Ratchet tightened 2317 -> 2316 by DX-052: `app-guides-release`'s release
+      // overview summary interpolated the version mid-sentence, so it counted as
+      // two translatable literals split around an inserted value — an order a
+      // translator cannot rearrange. Moving the value to the end makes it one.
+      // A real reduction, so the baseline shrinks with it.
+      expect(inventory.total).toBe(2316);
       expect(surfaces).toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');

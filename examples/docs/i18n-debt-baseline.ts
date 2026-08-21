@@ -17,7 +17,7 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'app-guides-packages': 11,
     'app-guides-philosophy': 12,
     'app-guides-primary': 2,
-    'app-guides-release': 7,
+    'app-guides-release': 6,
     'app-ids': 14,
     'app-input-maps': 36,
     'app-landing-key-policy': 1,
