@@ -257,6 +257,23 @@ environment at all.
    `latest` would silently upgrade every consumer running a bare
    `npm install @flyingrobots/bijou`. `next` is what the `rc` channel maps to.
 
+## Open `priority:high` Disposition
+
+`REL-GH-PRIORITY-HIGH-ZERO` permits a release with open `priority:high` issues
+only where this packet names the accepted risk and its owner. Four are open at
+tag time, and three of them were opened by this cycle — the release process
+found its own gates wanting.
+
+| Issue | Release-blocking for `v8.0.0-rc.1`? | Owner | Disposition |
+| :--- | :--- | :--- | :--- |
+| [#525](https://github.com/flyingrobots/bijou/issues/525) `release:preflight` was a silent no-op | No — **fixed on this release commit** | maintainer | The defect is repaired and covered by `tests/cycles/DX-052/release-metadata-entrypoint.test.ts`. The issue stays open for the residual suggestion that `Verify release candidate` should fail when it emits no outputs, rather than letting a downstream job discover the emptiness. |
+| [#526](https://github.com/flyingrobots/bijou/issues/526) lock-step versioning ignores `package-lock.json` | No — **the symptom is fixed on this release commit** | maintainer | The lockfile is regenerated and consistent at `8.0.0-rc.1`. The three gates that failed to detect it are unchanged, so the *class* of defect remains and could recur on the next bump. Accepted for a prerelease; should be closed before the stable tag, since a stale lock is exactly the kind of thing a GA must not ship. |
+| [#527](https://github.com/flyingrobots/bijou/issues/527) replay inherited witnesses | **Blocking for `8.0.0`, accepted for the rc** | maintainer | See residual risk 2. The rc's purpose is downstream validation of #518's breaking changes, which does not depend on re-proving three unrelated goalposts. Carries the six unreviewed human-review surfaces too. |
+| [#473](https://github.com/flyingrobots/bijou/issues/473) SVG path parsing is not total | No | maintainer | Milestoned `v8.2.0`, unrelated to this release's surface. Named here rather than left implicit. |
+
+None of these is hidden, and none is a gate reported as passing that did not run —
+which is the failure #525 was.
+
 ## Residual Risk
 
 1. **Nine of eleven release-law human review gates are unreviewed** (see the
