@@ -58,6 +58,49 @@ describe('extendTheme', () => {
     expect(extended.status.success).toEqual(override);
   });
 
+  it('merges border overrides', () => {
+    const extended = extendTheme(CYAN_MAGENTA, {
+      border: { primary: { hex: '#123456' } },
+    });
+    expect(extended.border.primary.hex).toBe('#123456');
+  });
+
+  it('preserves unlisted border keys when overriding one', () => {
+    const extended = extendTheme(CYAN_MAGENTA, {
+      border: { primary: { hex: '#123456' } },
+    });
+    expect(extended.border.secondary).toEqual(CYAN_MAGENTA.border.secondary);
+    expect(extended.border.error).toEqual(CYAN_MAGENTA.border.error);
+  });
+
+  it('merges semantic overrides', () => {
+    const extended = extendTheme(CYAN_MAGENTA, {
+      semantic: { accent: { hex: '#abcdef' } },
+    });
+    expect(extended.semantic.accent.hex).toBe('#abcdef');
+  });
+
+  it('preserves unlisted semantic keys when overriding one', () => {
+    const extended = extendTheme(CYAN_MAGENTA, {
+      semantic: { accent: { hex: '#abcdef' } },
+    });
+    expect(extended.semantic.primary).toEqual(CYAN_MAGENTA.semantic.primary);
+    expect(extended.semantic.muted).toEqual(CYAN_MAGENTA.semantic.muted);
+  });
+
+  it('extending border and semantic leaves the other four groups untouched', () => {
+    // The reason this API gap mattered: an app overriding only `status` silently
+    // kept the base theme's colours in every other group.
+    const extended = extendTheme(CYAN_MAGENTA, {
+      border: { primary: { hex: '#123456' } },
+      semantic: { accent: { hex: '#abcdef' } },
+    });
+    expect(extended.status).toEqual(CYAN_MAGENTA.status);
+    expect(extended.ui).toEqual(CYAN_MAGENTA.ui);
+    expect(extended.gradient).toEqual(CYAN_MAGENTA.gradient);
+    expect(extended.surface).toEqual(CYAN_MAGENTA.surface);
+  });
+
   it('merges surface overrides', () => {
     const extended = extendTheme(CYAN_MAGENTA, {
       surface: { primary: { hex: '#111111', bg: '#222222' } },

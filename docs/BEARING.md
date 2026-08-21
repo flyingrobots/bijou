@@ -192,6 +192,20 @@ Current direction and active tensions. Historical ship data is in
 
 - **Closed Release Gravity**: `v6.0.0`, `v7.0.0`, `v7.1.0`, and `v7.2.0` are
   complete release lineage. Do not use those lanes for new feature work.
+- **Environment Signals Are Not Capability Signals**: `DX-052` removed
+  `NO_COLOR` from `detectOutputMode()` — it disables colour, and colour only.
+  Two first-party consumers (`git-cas`, `muniment`) had each shipped a local
+  detector override before this landed, which is the signal to watch: when a
+  consumer reimplements a detector, the detector is answering a question the
+  caller did not ask. `TERM=dumb` stays a capability signal because it genuinely
+  is one. Resist folding new environment variables into mode detection unless
+  they describe what the terminal *can do*.
+- **Cross-Group Token Aliasing**: the shipped presets use one colour for ten
+  token paths spanning `status`, `semantic`, `ui`, and `border` (#519), and
+  `error`/`success` collapse under protanopia in both. `extendTheme()` can now
+  reach every group (`DX-052`), so an app can escape the alias — but the presets
+  themselves still do not satisfy `doctorTheme`, and `doctorTheme` still cannot
+  see colour-vision-deficiency collapse (#520).
 - **Minor-Release Temptation**: Do not reopen `v7.2.0` as a full feature train.
   Adding a full workbench, theme lab, localization suite, Wesley path, or
   Geordi path turns the work into `v9.0.0` or `v10.0.0` scope.

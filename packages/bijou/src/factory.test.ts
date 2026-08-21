@@ -99,6 +99,16 @@ describe('createBijou()', () => {
     expect(ctx.mode).toBe('interactive');
   });
 
+  // The pair of assertions that matter together. `NO_COLOR` must disable colour
+  // without disabling the TUI: one context, monochrome and still interactive.
+  // Asserting either half alone is what let the two concerns get conflated.
+  it('NO_COLOR suppresses colour without leaving interactive mode', () => {
+    const ctx = createBijou(basePorts({ NO_COLOR: '1' }, true));
+    expect(ctx.mode).toBe('interactive');
+    expect(ctx.theme.noColor).toBe(true);
+    expect(ctx.theme.ink(ctx.status('error'))).toBeUndefined();
+  });
+
   it('detects pipe mode when stdout is not TTY', () => {
     const ctx = createBijou(basePorts({}, false));
     expect(ctx.mode).toBe('pipe');
