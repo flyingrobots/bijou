@@ -99,11 +99,12 @@ describe('createBijou()', () => {
     expect(ctx.mode).toBe('interactive');
   });
 
-  // The pair of assertions that matter together. `NO_COLOR` must disable colour
-  // without disabling the TUI: one context, monochrome and still interactive.
-  // Asserting either half alone is what let the two concerns get conflated.
-  it('NO_COLOR suppresses colour without leaving interactive mode', () => {
-    const ctx = createBijou(basePorts({ NO_COLOR: '1' }, true));
+  // The assertions that matter together: NO_COLOR must disable colour without
+  // disabling the TUI. Checking either half alone is what let the two concerns
+  // get conflated. Both values, because no-color.org specifies the variable as
+  // active "regardless of its value" -- special-casing '1' must not pass.
+  it.each(['1', ''])('NO_COLOR=%j suppresses colour but stays interactive', (value) => {
+    const ctx = createBijou(basePorts({ NO_COLOR: value }, true));
     expect(ctx.mode).toBe('interactive');
     expect(ctx.theme.noColor).toBe(true);
     expect(ctx.theme.ink(ctx.status('error'))).toBeUndefined();

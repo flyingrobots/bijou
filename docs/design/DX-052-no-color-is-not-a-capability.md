@@ -60,9 +60,12 @@ none consulting `mode`:
 | `packages/bijou-node/src/node-context.ts` | 23 | `chalkStyle({ noColor, level: 0 })` |
 | `packages/bijou/src/core/theme/resolve.ts` | 20 | `isNoColor()` |
 
-So removing the line removes the interactivity damage and keeps every escape
-sequence suppressed. The two concerns were never actually coupled in the
-implementation; only in the detector.
+So removing the line removes the interactivity damage while every **colour and
+style** escape stays suppressed. Not every escape: an interactive session by
+definition emits cursor movement, screen updates and possibly alternate-screen
+control sequences, and it should — a monochrome TUI is still a TUI. `NO_COLOR`
+asks for no colour, not for no terminal control. The two concerns were never
+coupled in the implementation; only in the detector.
 
 `git-cas` (`bin/ui/context.js`) already ships a `detectCliTuiMode` override for
 exactly this reason, with a comment saying so. When two first-party consumers
@@ -140,7 +143,8 @@ abandon `extendTheme` and author all six groups by hand.
 1. With `NO_COLOR=1` and a real TTY on both stdio, is `ctx.mode`
    `'interactive'`?
 2. With `NO_COLOR=1`, is `theme.noColor` still `true` and does `styled()` still
-   return unstyled text?
+   return unstyled text? And with `NO_COLOR=""` — the variable is presence-only,
+   so an implementation that special-cases `'1'` must not pass.
 3. Does `TERM=dumb` still yield `'pipe'`? Does a non-TTY stdout? Does `CI`
    still yield `'static'`, and `BIJOU_ACCESSIBLE=1` still win outright?
 4. Does `status('nonexistent')` return a token with no `strikethrough`?
@@ -163,18 +167,44 @@ abandon `extendTheme` and author all six groups by hand.
 1 and 2 change observable behaviour that the current docblocks describe, so this
 lands as part of **8.0.0** rather than a minor.
 
-Two existing tests assert the behaviour being removed:
+**Eight existing tests across five files** assert the behaviour being removed.
+Six of them encode the `NO_COLOR` → `'pipe'` mapping alone:
 
-- `tty.test.ts` — `'returns pipe when NO_COLOR is set'` and `'NO_COLOR takes
-  priority over CI'`.
-- `accessors.test.ts` — `'status() falls back to muted for unknown keys'`.
+| File | Test |
+| :--- | :--- |
+| `detect/tty.test.ts` | `'returns pipe when NO_COLOR is set'` |
+| `detect/tty.test.ts` | `'NO_COLOR takes priority over CI'` |
+| `detect/tty.test.ts` | `'BIJOU_ACCESSIBLE takes priority over NO_COLOR'` |
+| `detect/tty.fuzz.test.ts` | `'NO_COLOR always results in pipe or accessible mode'` |
+| `environment.part01.test.ts` | `'NO_COLOR set -> pipe mode regardless of TTY'` |
+| `environment.part01.test.ts` | `'NO_COLOR + TTY still produces pipe mode'` |
+| `theme/accessors.test.ts` | `'status() falls back to muted for unknown keys'` |
+| `theme/resolve.part02.test.ts` | `'inkStatus() falls back to muted hex for unknown status'` |
+
+Six tests reinforcing a rule usually means the rule was chosen deliberately. It
+was not. Every one is a characterization test restating the truth table, sitting
+in `describe` blocks named "detection logic" and "conflicting env vars", and no
+comment, docblock, or design note in the repository argues *why* `NO_COLOR`
+should imply non-interactive — the only justification is the detector's own
+docblock restating its own order. The tests are thorough about coverage, not
+about defending the choice.
 
 They are not wrong about what the code did; they are the specification of the
-defect. They are rewritten to assert the new contract, and this paragraph exists
-so that the rewrite is a recorded decision rather than a test quietly edited to
-make a build go green. `'BIJOU_ACCESSIBLE takes priority over NO_COLOR'` becomes
-vacuous once `NO_COLOR` no longer affects mode and is replaced by a test that
-`NO_COLOR` leaves an interactive session interactive.
+defect. They are rewritten to assert the new contract, and this section exists so
+that the rewrite is a recorded decision rather than tests quietly edited to make
+a build go green. Two of them change shape rather than expectation:
+
+- `'BIJOU_ACCESSIBLE takes priority over NO_COLOR'` becomes vacuous once
+  `NO_COLOR` no longer affects mode, and is reframed as priority over an
+  interactive TTY.
+- the fuzz property is strengthened rather than adjusted. Instead of asserting
+  which mode results, it now asserts that adding `NO_COLOR` to *any* environment
+  leaves that environment's mode unchanged — the contract stated directly.
+
+`resolve.part02.test.ts` is the one case with no observable behaviour change:
+`inkStatus()` returns a hex, and `status.muted` and `semantic.muted` share a hex
+in every shipped preset. It is updated anyway so the two fallbacks cannot
+disagree in a theme where the hexes differ.
 
 3 is additive and breaks nothing.
 
