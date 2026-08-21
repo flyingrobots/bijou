@@ -2,7 +2,7 @@
 
 A release candidate, published so the breaking changes below can be validated
 against real applications before `8.0.0` is cut. Pin the exact version; the
-dist-tag is `rc`, not `latest`.
+dist-tag is `next`, not `latest`.
 
 ## The headline is a deletion
 

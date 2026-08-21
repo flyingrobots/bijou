@@ -34,7 +34,7 @@ into a GA tag would not be.
 - Version: `8.0.0-rc.1`
 - Previous public tag: `v7.2.0`
 - Release type: **prerelease** (release candidate)
-- Intended npm dist-tag: `rc` — **not** `latest`
+- npm dist-tag: **`next`** — not `latest`. `parseReleaseTag()` maps the `rc` channel to `next` (`scripts/release-metadata.part02.ts`), verified by `npx tsx scripts/release-metadata.ts --tag v8.0.0-rc.1` emitting `npm_dist_tag=next`. An earlier draft of this packet said `rc`, which was an assumption about the name rather than a reading of the mapping; the property that matters — a prerelease must not land on `latest` — holds either way, but the tag to verify after publish is `next`
 - Release-prep branch: `release/v8.0.0-rc.1`
 - Release date: 2026-08-21
 - Publish surface: npm workspace packages only, lock-step at `8.0.0-rc.1`
@@ -253,8 +253,9 @@ environment at all.
 4. Tag `v8.0.0-rc.1` on the exact merged `origin/main` commit.
 5. Verify Tag Guard, tag CI, and the publish workflow.
 6. Verify every package reports `8.0.0-rc.1` on npm.
-7. **Confirm the dist-tag is `rc`, not `latest`.** A prerelease published to
-   `latest` would silently upgrade every consumer on a caret range.
+7. **Confirm the dist-tag is `next`, not `latest`.** A prerelease published to
+   `latest` would silently upgrade every consumer running a bare
+   `npm install @flyingrobots/bijou`. `next` is what the `rc` channel maps to.
 
 ## Residual Risk
 
@@ -264,7 +265,19 @@ environment at all.
 2. **Three product goalposts carry inherited rather than replayed evidence.**
    DX-050, DX-049, and RE-036 landed with their own review and CI, but their
    witnesses were not replayed from this commit, which is what `docs/release.md`
-   requires. Owner: maintainer. Must be closed before GA.
+   requires: *"evidence is complete only when another operator can replay it from
+   the tag commit."*
+
+   Automated review raised this as a release-law objection — the Law says no
+   public tag may be created unless every gate is satisfied. The Law's own
+   provision for this case is that *"any accepted residual risk is named with
+   rationale, owner, and a follow-up issue"*, and that hidden accepted failures
+   are not allowed. So: accepted for the prerelease, owner maintainer, follow-up
+   [#527](https://github.com/flyingrobots/bijou/issues/527), which also carries
+   the six unreviewed human-review surfaces and is written so that closing it
+   means flipping five rows in this packet from Inherited to Verified here.
+
+   **The stable `8.0.0` tag must not be created while any row reads Inherited.**
 3. **The breaking changes are unvalidated against real consumers.** That is the
    point of the rc. `muniment` is the first consumer and will pin this version;
    `git-cas` carries a local `detectCliTuiMode` override that is now redundant
@@ -272,10 +285,25 @@ environment at all.
 4. **The changelog boundary will need consolidating at GA.** Twenty entries now
    sit under an rc header. The stable `8.0.0` header should absorb them rather
    than leave consumers reading release history split across a prerelease.
-5. **Open `priority:high` issue #473** (`BAD CODE: make SVG path parsing total
+5. **The lockfile was stale until review caught it.** `npm run version` rewrote
+   all eleven manifests and left `package-lock.json` byte-identical to `main`,
+   still recording `7.2.0` for every workspace package and internal pin — so a
+   clean `npm ci` would have resolved from metadata a full major behind the
+   manifests. Regenerated here with `npm install --package-lock-only`. Three
+   separate gates failed to notice, filed as
+   [#526](https://github.com/flyingrobots/bijou/issues/526): the version script
+   does not touch the lock, the pre-commit "lockfile consistency" check runs
+   `npm ls --all` which cannot detect the condition, and `release:preflight`
+   validates manifests only. Same family as
+   [#525](https://github.com/flyingrobots/bijou/issues/525) — gates that report
+   success without checking what their names promise.
+6. **DOGFOOD's "Current Release Story" guide still describes the v7.2 path** in
+   its summary, catalogs, and body, while the release page now presents v8.
+   Cosmetic for a prerelease, tracked in #527 for the stable tag.
+7. **Open `priority:high` issue #473** (`BAD CODE: make SVG path parsing total
    and non-stalling`) is milestoned `v8.2.0` and is not release-blocking for
    `8.0.0`. Named here rather than left implicit, per `REL-GH-PRIORITY-HIGH-ZERO`.
-6. **Known palette defects ship unchanged.** [#519](https://github.com/flyingrobots/bijou/issues/519)
+8. **Known palette defects ship unchanged.** [#519](https://github.com/flyingrobots/bijou/issues/519)
    records that both first-party presets alias one colour across the same ten
    token paths and that `error`/`success` collapse to ΔE 0.059 (dark) and 0.064
    (light) under protanopia, with `bijou-light`'s severity ladder inverted in

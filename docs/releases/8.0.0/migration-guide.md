@@ -77,12 +77,12 @@ something else you still want.
 
 ## 2. An unknown status key no longer resolves to a struck-through token
 
-### What changed
+### What changed about the fallback
 
 `ctx.status(key)` and `ResolvedTheme.inkStatus(key)` fall back to
 `semantic.muted` instead of `status.muted` when `key` is not in the theme.
 
-### Why
+### Why the fallback moved
 
 `status.muted` carries `['dim', 'strikethrough']` in every shipped preset. That
 is reasonable for a token meaning "retired" — and wrong as the answer to "I don't
@@ -93,7 +93,7 @@ through it. A reader sees "cancelled"; the application said nothing of the kind.
 The new target matches the sibling `ui()` accessor, which already falls back to
 `semantic.primary`.
 
-### What you may need to do
+### What you may need to do about the fallback
 
 **Probably nothing.** `status.muted` and `semantic.muted` share a hex in every
 shipped preset, so the only visible difference is the absence of the

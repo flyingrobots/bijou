@@ -113,10 +113,6 @@ export const RELEASE_AND_THEME_GUIDES: readonly GuideDoc[] = [
     title: releaseWhatsNewTitle(),
     summary: releaseWhatsNewSummary(),
     body: RELEASE_WHATS_NEW_TEXT,
-    localizedTitle: (localization) =>
-      dogfoodText(localization, 'release.whatsNew.title', releaseWhatsNewTitle()),
-    localizedSummary: (localization) =>
-      dogfoodText(localization, 'release.whatsNew.summary', releaseWhatsNewSummary()),
   },
   ...RELEASE_STORY_GUIDES,
   {
@@ -125,9 +121,5 @@ export const RELEASE_AND_THEME_GUIDES: readonly GuideDoc[] = [
     title: releaseMigrationTitle(),
     summary: releaseMigrationSummary(),
     body: RELEASE_MIGRATION_GUIDE_TEXT,
-    localizedTitle: (localization) =>
-      dogfoodText(localization, 'release.migration.title', releaseMigrationTitle()),
-    localizedSummary: (localization) =>
-      dogfoodText(localization, 'release.migration.summary', releaseMigrationSummary()),
   },
 ];
