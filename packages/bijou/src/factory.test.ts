@@ -99,6 +99,17 @@ describe('createBijou()', () => {
     expect(ctx.mode).toBe('interactive');
   });
 
+  // The assertions that matter together: NO_COLOR must disable colour without
+  // disabling the TUI. Checking either half alone is what let the two concerns
+  // get conflated. Both values, because no-color.org specifies the variable as
+  // active "regardless of its value" -- special-casing '1' must not pass.
+  it.each(['1', ''])('NO_COLOR=%j suppresses colour but stays interactive', (value) => {
+    const ctx = createBijou(basePorts({ NO_COLOR: value }, true));
+    expect(ctx.mode).toBe('interactive');
+    expect(ctx.theme.noColor).toBe(true);
+    expect(ctx.theme.ink(ctx.status('error'))).toBeUndefined();
+  });
+
   it('detects pipe mode when stdout is not TTY', () => {
     const ctx = createBijou(basePorts({}, false));
     expect(ctx.mode).toBe('pipe');

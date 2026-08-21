@@ -48,6 +48,37 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- **BREAKING: `NO_COLOR` no longer changes the detected output mode** —
+  [`DX-052`](design/DX-052-no-color-is-not-a-capability.md) removes the
+  `NO_COLOR` branch from `detectOutputMode()`. The variable is a statement about
+  colour, not about capability ([no-color.org](https://no-color.org): "prevents
+  the addition of ANSI color"), so mapping it to `'pipe'` took a real terminal
+  out of interactive mode entirely — a user who exported `NO_COLOR=1` in a shell
+  profile got no TUI rather than a monochrome one, with every component lowered
+  to its single-frame form and `shouldUseShellQuitConfirm()` returning
+  `'immediate'`. Colour output is unchanged: `NO_COLOR` is read independently by
+  `createBijou`, `createNodeContext`, and `isNoColor()`, none of which consult the
+  mode. `TERM=dumb`, a non-TTY stdout, `CI`, and `BIJOU_ACCESSIBLE=1` keep their
+  previous results. A property test now asserts the stronger contract: adding
+  `NO_COLOR` to any environment leaves the detected mode unchanged.
+- **BREAKING: an unknown status key no longer resolves to a struck-through
+  token** — the `status()` accessor and `inkStatus()` fall back to
+  `semantic.muted` instead of `status.muted`. Both carry the same hex in every
+  shipped preset, but `status.muted` also carries `strikethrough`, so a mistyped
+  or undefined key rendered text with a line through it — reading as "cancelled"
+  when the caller had said nothing of the kind. The new target matches the
+  sibling `ui()` accessor, which already falls back into `semantic`.
+  `status('muted')` itself is unchanged, strikethrough intact.
+- **`extendTheme()` reaches all six token groups** — `border` and `semantic` join
+  `status`, `ui`, `gradient`, and `surface` in the extension parameter. Both are
+  overridable rather than extensible, since `Theme` fixes their key sets. This is
+  additive and breaks nothing. It closes a gap that mattered because the shipped
+  presets alias heavily across groups: `bijou-dark` uses one amber for
+  `status.warning`, `status.active`, `semantic.warning`, `semantic.accent`,
+  `ui.cursor`, `ui.focusGutter`, `ui.sectionHeader`, `ui.logo`,
+  `border.secondary` and `border.warning`, so an app that could only replace
+  `status` silently kept that amber for every heading, cursor and border.
+
 - **V8 dependency-security closeout** — WF-166 replaces the vulnerable exact
   Hono override with the patched `^4.13.0` line and regenerates the workspace
   lock through npm. The resolved graph now carries

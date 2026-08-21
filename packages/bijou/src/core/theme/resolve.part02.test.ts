@@ -136,12 +136,14 @@ describe('createThemeResolver', () => {
       expect(t.inkStatus('success')).toBeUndefined();
     });
 
-    it('inkStatus() falls back to muted hex for unknown status', () => {
+    // Not observable in the shipped presets (both mutes share a hex); moved so
+    // the two fallbacks cannot disagree in a theme where they differ.
+    it('inkStatus() falls back to the semantic.muted hex for unknown status', () => {
       const rt = mockRuntime({});
       const resolver = createThemeResolver({ runtime: rt });
       const t = resolver.getTheme();
       const result = t.inkStatus('NONEXISTENT_STATUS');
-      expect(result).toBe(t.theme.status.muted.hex);
+      expect(result).toBe(t.theme.semantic.muted.hex);
     });
   });
 });

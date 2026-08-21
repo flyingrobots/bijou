@@ -81,9 +81,9 @@ describe('environment integration', () => {
         expect(detectOutputMode(rt)).toBe('pipe');
       });
 
-      it('NO_COLOR set -> pipe mode regardless of TTY', () => {
+      it('NO_COLOR does not decide mode; a TTY stays interactive', () => {
         const rt = mockRuntime({ env: { NO_COLOR: '' }, stdoutIsTTY: true });
-        expect(detectOutputMode(rt)).toBe('pipe');
+        expect(detectOutputMode(rt)).toBe('interactive');
       });
 
       it('BIJOU_ACCESSIBLE=1 takes priority over everything', () => {
@@ -96,9 +96,9 @@ describe('environment integration', () => {
     });
 
   describe('conflicting env vars', () => {
-      it('NO_COLOR + TTY still produces pipe mode', () => {
+      it('NO_COLOR + TTY is a monochrome TUI, not a pipe', () => {
         const rt = mockRuntime({ env: { NO_COLOR: '1' }, stdoutIsTTY: true });
-        expect(detectOutputMode(rt)).toBe('pipe');
+        expect(detectOutputMode(rt)).toBe('interactive');
       });
 
       it('BIJOU_ACCESSIBLE overrides NO_COLOR + TERM=dumb', () => {

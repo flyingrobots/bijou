@@ -56,21 +56,28 @@ describe('detectOutputMode fuzz (property-based)', () => {
     );
   });
 
-  it('NO_COLOR always results in pipe or accessible mode', () => {
+  // The strongest statement of the contract: NO_COLOR is not an input to mode at
+  // all. Rather than assert which mode results, assert that adding NO_COLOR to
+  // any environment changes nothing about the mode that environment produces.
+  it('NO_COLOR never changes the detected mode', () => {
     fc.assert(
       fc.property(
         fc.constantFrom('', '1', 'true'),
         fc.boolean(),
         fc.constantFrom(undefined, 'true', '1'),
-        (noColorVal, isTTY, ciVal) => {
-          const env: Record<string, string> = { NO_COLOR: noColorVal };
-          if (ciVal !== undefined) env['CI'] = ciVal;
-          const rt = mockRuntime({ env, stdoutIsTTY: isTTY });
-          const mode = detectOutputMode(rt);
-          expect(['pipe', 'accessible']).toContain(mode);
+        fc.constantFrom(undefined, 'dumb', 'xterm-256color'),
+        (noColorVal, isTTY, ciVal, termVal) => {
+          const base: Record<string, string> = {};
+          if (ciVal !== undefined) base['CI'] = ciVal;
+          if (termVal !== undefined) base['TERM'] = termVal;
+          const without = detectOutputMode(mockRuntime({ env: base, stdoutIsTTY: isTTY }));
+          const withIt = detectOutputMode(
+            mockRuntime({ env: { ...base, NO_COLOR: noColorVal }, stdoutIsTTY: isTTY }),
+          );
+          expect(withIt).toBe(without);
         },
       ),
-      { numRuns: 100 },
+      { numRuns: 200 },
     );
   });
 });
