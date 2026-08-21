@@ -157,6 +157,29 @@ fixed on the release-prep branch and recorded in
 4. **A prerelease version string overflows the DOGFOOD release nav.** At 120x40,
    `What's New in v8.0.0-rc.1` rendered as `What's New in v8.0.0-rc.`. Release
    guide titles and ids now key off the line, which is also what they describe.
+5. **`release:preflight` was a silent no-op, and this packet initially claimed it
+   passed.** `scripts/release-metadata.ts` is the CLI entry point but was a pure
+   re-export shim; it imported `release-metadata.part04.js` for the side effect of
+   *that* module's main guard, which compares `import.meta.url` against
+   `process.argv[1]` and therefore never fires when the process starts on the
+   shim. The command exited 0 having validated nothing, written no stdout, and
+   written no `GITHUB_OUTPUT`.
+
+   `REL-META-VERSION-LOCKSTEP` is the gate the release process assigns to
+   `release:preflight`, so version-mismatch detection was unenforced:
+   `--version 9.9.9` against an `8.0.0-rc.1` workspace exited 0. The Release Dry
+   Run surfaced it only indirectly — its notes job read the missing output as an
+   empty tag and failed with `gh: Missing tag_name parameter (HTTP 400)`.
+
+   Every unit test of `runReleaseMetadata()` passed throughout, because the
+   function was always correct; nothing called it.
+   `tests/cycles/DX-052/release-metadata-entrypoint.test.ts` now invokes the real
+   entry point as a child process, which is the only way to observe this class of
+   defect.
+
+   **A gate that reports success without running is worse than a missing gate**,
+   and the first version of this row in the matrix above recorded exactly that
+   false pass. It is corrected rather than quietly overwritten.
 
 One ratchet was tightened rather than loosened: `app-guides-release`'s release
 overview summary interpolated the version mid-sentence, counting as two
@@ -171,7 +194,7 @@ match.
 | Gate | Command or source | Expected result | Status |
 | :--- | :--- | :--- | :--- |
 | Workspace lock-step | `npm run version 8.0.0-rc.1` | All ten workspace packages and internal dependency pins report `8.0.0-rc.1`. | Verified here: all ten confirmed. |
-| Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | Verified here: exit 0 on the release-prep branch. |
+| Release metadata preflight | `npm run release:preflight` | Lock-step workspace metadata is valid. | **Initially recorded as passing on exit 0, which was wrong** — the command was a no-op (see below). Fixed on this branch; now prints the eleven-package lock-step summary and exits 1 on a mismatch. |
 | Docs inventory | `npm run docs:inventory` | Documentation manifest remains valid after release docs are added. | Verified here: exit 0. |
 | Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Verified here: `found 0 vulnerabilities`. |
 | Release gauntlet | `npm run release:readiness` | The fourteen-gate local gauntlet passes. | Verified here: `release-readiness: ok`. |

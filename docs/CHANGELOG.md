@@ -76,6 +76,22 @@ consolidate them.
   when the caller had said nothing of the kind. The new target matches the
   sibling `ui()` accessor, which already falls back into `semantic`.
   `status('muted')` itself is unchanged, strikethrough intact.
+- **`release:preflight` actually runs now** — `scripts/release-metadata.ts` is the
+  CLI entry point but was a pure re-export shim that imported
+  `release-metadata.part04.js` for the side effect of that module's main guard.
+  The guard compares `import.meta.url` against `process.argv[1]`, which never
+  match when the process starts on the shim, so `npm run release:preflight`
+  exited 0 having validated nothing and written no `GITHUB_OUTPUT`.
+  `REL-META-VERSION-LOCKSTEP` is the release gate assigned to that command, so
+  version-mismatch detection was unenforced — `--version 9.9.9` against an
+  `8.0.0-rc.1` workspace exited 0. It surfaced only because the Release Dry Run's
+  notes job read the missing output as an empty tag and failed with
+  `gh: Missing tag_name parameter (HTTP 400)`. Every unit test of
+  `runReleaseMetadata()` passed throughout, because the function was correct and
+  nothing called it; the new
+  `tests/cycles/DX-052/release-metadata-entrypoint.test.ts` invokes the real entry
+  point as a child process. `part04`'s own guard also now resolves `argv[1]`, so
+  direct relative invocation works.
 - **DOGFOOD resolves release docs by release line, not exact version** — the docs
   app read `docs/releases/${BIJOU_VERSION}/whats-new.md`, so cutting the first
   prerelease crashed it on startup with an unhandled `ENOENT` before the first
