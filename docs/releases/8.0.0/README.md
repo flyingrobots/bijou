@@ -176,7 +176,7 @@ match.
 | Runtime dependency audit | `npm audit --omit=dev --audit-level=high` | Zero high or critical runtime vulnerabilities. | Verified here: `found 0 vulnerabilities`. |
 | Release gauntlet | `npm run release:readiness` | The fourteen-gate local gauntlet passes. | Verified here: `release-readiness: ok`. |
 | Milestone-aware readiness | `npm run release:readiness -- --milestone v8.0.0` | Target milestone has zero open tracker items and no `work-in-progress` labels. | Verified here: all six report gates PASS. Required first: closing #518 and clearing stale `work-in-progress` labels from the already-closed #482 and #458. |
-| Full test suite | `npm test` | Green. | Verified here on the DX-052 lineage: 930 test files / 4,104 tests. |
+| Full test suite | `npm test` | Green. | Verified here on this release-prep branch via the gauntlet: 933 test files / 4,130 tests, summed across the twenty vitest chunks. |
 | Lint | `npm run lint` | Clean across all workspace packages. | Verified here. |
 | Pre-push verification | `.githooks/pre-push` | Full dojo and repo verification, including scripted interactive example smoke. | Verified here: passed on every push in this lineage. |
 | PR CI | GitHub Actions on [#522](https://github.com/flyingrobots/bijou/pull/522) | All checks green. | Verified here: 10/10 green including both DOGFOOD smokes, TypeScript doctrine, and focused unit tests on ubuntu and windows. CodeRabbit passed. |
