@@ -21,6 +21,23 @@ import {
   RELEASE_STORY_GUIDES,
 } from './app-release-story.js';
 import { dogfoodText } from './app-localization.js';
+import { BIJOU_RELEASE_LINE } from './app-release-line.js';
+
+function releaseWhatsNewTitle(): string {
+  return `What's New in v${BIJOU_RELEASE_LINE}`;
+}
+
+function releaseWhatsNewSummary(): string {
+  return `The long-form release story for the ${BIJOU_VERSION} line.`;
+}
+
+function releaseMigrationTitle(): string {
+  return `Migration Guide v${BIJOU_RELEASE_LINE}`;
+}
+
+function releaseMigrationSummary(): string {
+  return `Migration guidance for the ${BIJOU_VERSION} upgrade.`;
+}
 
 const releaseTitleGuide = (release: DogfoodReleaseTitle): GuideDoc => ({
   id: `release-title-${release.id}`,
@@ -75,26 +92,34 @@ export const RELEASE_AND_THEME_GUIDES: readonly GuideDoc[] = [
     id: 'release-overview',
     pageId: RELEASE_PAGE_ID,
     title: 'Release Overview',
+    // One translatable unit, not two. Interpolating mid-sentence split this into
+    // `...the detailed ` + `` + ` release docs.`, which the debt scanner counts
+    // twice and a translator cannot reorder — word order around an inserted
+    // value differs by language. Moving the value to the end fixes both.
     summary:
-      `How the current release line is shaped and where to read the detailed ${BIJOU_VERSION} release docs.`,
+      `How the current release line is shaped and where to read the detailed release docs for ${BIJOU_VERSION}.`,
     body: RELEASE_OVERVIEW_TEXT,
     localizedBody: localizedReleaseStoryMarkdownBody(
       RELEASE_OVERVIEW_MARKDOWN_PATHS,
     ),
   },
   {
-    id: `release-whats-new-${BIJOU_VERSION.replaceAll('.', '-')}`,
+    // Line, not exact version. These guides open `docs/releases/<line>/`, so the
+    // line is what they describe — and a prerelease string overflows the nav
+    // column: `What's New in v8.0.0-rc.1` rendered as `What's New in v8.0.0-rc.`
+    // at 120x40. See #523.
+    id: `release-whats-new-${BIJOU_RELEASE_LINE.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,
-    title: `What's New in v${BIJOU_VERSION}`,
-    summary: `The long-form release story for the ${BIJOU_VERSION} line.`,
+    title: releaseWhatsNewTitle(),
+    summary: releaseWhatsNewSummary(),
     body: RELEASE_WHATS_NEW_TEXT,
   },
   ...RELEASE_STORY_GUIDES,
   {
-    id: `release-migration-${BIJOU_VERSION.replaceAll('.', '-')}`,
+    id: `release-migration-${BIJOU_RELEASE_LINE.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,
-    title: `Migration Guide v${BIJOU_VERSION}`,
-    summary: `Migration guidance for the ${BIJOU_VERSION} upgrade.`,
+    title: releaseMigrationTitle(),
+    summary: releaseMigrationSummary(),
     body: RELEASE_MIGRATION_GUIDE_TEXT,
   },
 ];

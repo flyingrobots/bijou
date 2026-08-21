@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { releaseLineOf } from './app-release-line.js';
 import type {
   DogfoodI18nDebtInventory,
   DogfoodMarkdownLocalizationInventory,
@@ -30,7 +31,20 @@ export function defaultMarkdownTemplateValues(): Readonly<
     typeof parsed.version === 'string'
       ? parsed.version.trim()
       : '';
-  return Object.freeze({ BIJOU_VERSION: version });
+  // `BIJOU_RELEASE_LINE` must be resolvable here too, or the scanner silently
+  // stops counting the release docs.
+  //
+  // This table is how the static scanner turns a templated path literal into a
+  // real file to check. When `app-content.ts` moved from `${BIJOU_VERSION}` to
+  // `${BIJOU_RELEASE_LINE}` (see #523), the release What's New and migration
+  // guide became unresolvable, dropped out of the inventory, and the measured
+  // Markdown debt fell from 78 to 72 — a six-point "improvement" that was really
+  // two documents going unwatched. An unresolvable token reads exactly like
+  // progress, which is the dangerous part.
+  return Object.freeze({
+    BIJOU_VERSION: version,
+    BIJOU_RELEASE_LINE: releaseLineOf(version),
+  });
 }
 
 export function uniqueStringList(

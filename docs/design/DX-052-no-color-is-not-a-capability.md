@@ -4,7 +4,7 @@ legend: DX
 lane: release
 priority: high
 github_issue: 518
-status: active
+status: landed
 keywords:
   - no-color
   - output-mode
