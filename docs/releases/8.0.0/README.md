@@ -206,7 +206,7 @@ match.
 | Release Dry Run | `.github/workflows/release-dry-run.yml` | Packed files and publish dry-runs stay green. | Required before tagging. |
 | Tag Guard | `.github/workflows/tag-guard.yml` | The pushed tag resolves to the intended release commit. | Runs after tag push. |
 | Publish workflow | `.github/workflows/publish.yml` | Automated npm publishing succeeds for every workspace package. | Runs after tag push. |
-| npm registry verification | `npm view <package> version dist-tags --json` | Every package reports `8.0.0-rc.1`. | Required after publish. |
+| npm registry verification | `npm view <package> dist-tags --json --prefer-online` | Every package carries `8.0.0-rc.1` on `next`, and `latest` is untouched. | Verified after publish for all ten packages — see the registry snapshot below. |
 
 ## Human Review Matrix
 
@@ -224,6 +224,74 @@ match.
 
 Nine surfaces, three reviewed. That ratio is the honest state of this packet and
 is the reason this is an rc.
+
+## Release-Time Registry Snapshot
+
+`v8.0.0-rc.1` was tagged from `437d81bbd035463ba4bbd6901e39467f1e47bf1d`, which
+was exactly `origin/main` with a clean worktree. Recorded because the Release Law
+says never to claim a release succeeded unless the tag, workflows, and registry
+state were directly verified.
+
+| Workflow | Run | Result |
+| :--- | :--- | :--- |
+| Release Dry Run (pre-tag, final tree) | [32529250110](https://github.com/flyingrobots/bijou/actions/runs/32529250110) | success — all jobs, including `npm ci` against the regenerated lockfile |
+| Tag Guard | [32531521083](https://github.com/flyingrobots/bijou/actions/runs/32531521083) | success |
+| Release (publish) | [32531521042](https://github.com/flyingrobots/bijou/actions/runs/32531521042) | success — all ten publish jobs plus both DOGFOOD smokes |
+| Tag CI | [32531521038](https://github.com/flyingrobots/bijou/actions/runs/32531521038) | success |
+| GitHub Release | [v8.0.0-rc.1](https://github.com/flyingrobots/bijou/releases/tag/v8.0.0-rc.1) | published, `prerelease: true` |
+
+Registry verified with `npm view <package> dist-tags --json --prefer-online`.
+All ten packages:
+
+```text
+@flyingrobots/bijou                   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-node              latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-tui               latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-tui-app           latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n              latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools        latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools-node   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools-xlsx   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-mcp               latest=7.2.0  next=8.0.0-rc.1
+create-bijou-tui-app                  latest=7.2.0  next=8.0.0-rc.1
+```
+
+**`latest` remains `7.2.0` on every package**, which is the property that
+mattered: a prerelease on `latest` would have become the default install for a
+bare `npm install`.
+
+One verification note worth keeping, because it is a trap for the next operator.
+An immediate post-publish query reported `next: null` for `bijou-node` and a 404
+on `@flyingrobots/bijou-node@8.0.0-rc.1`, while that package's publish job had
+reported success. The job log resolves it: `+ @flyingrobots/bijou-node@8.0.0-rc.1`
+followed by npm's own `"Your package is being processed and may take a few minutes
+to become available."` It was registry propagation, and a re-query confirmed it.
+Given three genuine "reported success without doing the work" defects in this
+cycle (#525, #526, and the dry-run notes job), treating a 404 as a fourth was the
+natural reading and the wrong one — **read the publish log before concluding a
+publish failed.**
+
+## Downstream Validation
+
+`muniment` is the first consumer on `8.0.0-rc.1` and the reason this candidate
+exists. On upgrade it deleted its local `mode.ts` — a re-derived output-mode
+detector that existed solely because `NO_COLOR` used to force `'pipe'` — and
+repointed its assertions at bijou's own `detectOutputMode`, keeping them as a
+downstream regression test of the contract it depends on.
+
+Its whole check suite passes on the candidate: palette audit, construct check
+across 32 frames, greppable view render, and typecheck.
+
+It also found one real behavioural difference, resolved in bijou's favour.
+`detectOutputMode` consults `stdoutIsTTY` only, so a TTY stdout with a piped
+stdin yields `'interactive'`; muniment's detector had called that `'pipe'`, on the
+grounds that a full-screen app which cannot receive keys is a hang rather than a
+UI. bijou's reading is better: `mode` describes output capability, and stdin is
+enforced separately and loudly by `createNodeContext`, which throws
+`BijouBootstrapError` with *"raw mode unavailable — run in an interactive terminal
+rather than a non-TTY pipeline."* A loud bootstrap failure beats a silently
+lowered mode, so the stricter downstream rule was dropped rather than
+reimplemented.
 
 ## Deterministic Reproducibility
 
