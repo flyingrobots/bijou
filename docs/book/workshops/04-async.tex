@@ -1,0 +1,34 @@
+\chapter*{Workshop 4: Results arrive after the screen changes}\label{workshop-04}
+\addcontentsline{toc}{chapter}{W4: Results arrive after the screen changes}
+
+\section{Create the race deliberately}
+
+Open logs for the compile job, then select the test job before the old response arrives. The adapter deliberately gives compile logs a longer delay. The first response now belongs to an earlier selection. Without an ownership check, it can replace the test job's detail pane with compile output even though the current heading still names the test job.
+
+\subsection{Identity has two dimensions}
+
+A job run carries a run identity. A view-scoped log request carries the job identity and a view epoch. Selection changes increment that epoch and request cancellation of the old log operation. Leaving the log screen also invalidates it. The monitor accepts a log completion only when the log screen is still open, the job is still selected, and the epoch still matches.
+
+Cancellation is useful resource management. The identity check is the correctness boundary. An adapter can race cancellation, a queued message can already be on its way, or a future external transport can refuse to abort. The model still has enough information to reject a stale completion.
+
+\input{diagrams/workshop-late-result}
+
+\subsection{Trace the second interaction}
+
+The first request owns \texttt{compile / epoch 1}. Selecting the test job creates \texttt{test / epoch 2}, clears the displayed log and requests a new load. A late \texttt{compile / epoch 1} completion is ignored. A matching \texttt{test / epoch 2} completion can fill the pane. Closing that pane before the matching completion arrives also prevents it from reopening the screen. Run checkpoint 04 to reproduce the rejection without depending on wall-clock timing.
+
+\section{Separate useful work from its presentation}
+
+\subsection{Global jobs and local details}
+
+Changing the selected job does not cancel every job in the application. A running job belongs to the monitor's work model; its log-detail request belongs to the current view. This difference matters. Treating every screen change as a global cancellation would destroy useful work. Treating every result as globally displayable would let old details overwrite the current screen.
+
+The extra identities and transitions make the model larger. They also require an explicit answer to which owner remains interested in a result. That cost is preferable to making temporal ownership an accidental property of whichever callback ran last.
+
+\subsection{Close the adapter}
+
+The effect driver owns cancellation functions for scheduled work and the current log request. Disposal cancels them and prevents later emissions. The application connects quit and process-interruption messages to that lifecycle. A deterministic scheduler in the tests advances completion and cancellation without sleeping. The recorded pseudo-terminal check separately verifies that quitting and SIGTERM return the terminal's canonical-input and echo flags on the tested host.
+
+\section{Break the epoch check}
+
+Run \texttt{npm run exercise -- stale}. The faulty branch accepts the old log text into the new model. The observable failure is wrong detail for the current selection. Repair the ownership check and rerun with \texttt{--repair}; the detail remains empty until a matching completion arrives. Then run the timer exercise: work disposed by its owner must produce no later progress events. These are different guarantees and need separate observations.

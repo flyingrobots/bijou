@@ -44,13 +44,7 @@ Bijou should treat GraphQL SDL as an authoring surface for portable block semant
 
 The first flow is:
 
-\begin{CodeBlock}
-GraphQL SDL fixture
-  -> bijou-block/1 artifact
-    -> ui-scene-ir/1
-      -> Bijou terminal Surface proof
-        -> ui-scene-receipt/1
-\end{CodeBlock}
+\input{diagrams/flows/flow-018}
 
 The first slice stays inside Bijou. Geordi remains a named endpoint target, but this cycle does not require Geordi repository changes unless the Bijou proof needs a companion endpoint fixture.
 
@@ -255,9 +249,7 @@ Absolute paths are not allowed in emitted artifacts. The caller may provide a \t
 
 The useful debug path should be:
 
-\begin{CodeBlock}
-SDL field -> bijou-block/1 field -> ui-scene-ir/1 node -> Surface cell -> receipt
-\end{CodeBlock}
+\input{diagrams/flows/flow-019}
 
 An agent should not need a screenshot to answer:
 
@@ -285,12 +277,7 @@ Geordi is the likely next endpoint after this Bijou-only proof. The first Geordi
 
 Expected later flow:
 
-\begin{CodeBlock}
-bijou-block/1
-  -> ui-scene-ir/1
-    -> Geordi endpoint profile
-      -> browser/image/packed-cell witness
-\end{CodeBlock}
+\input{diagrams/flows/flow-020}
 
 \section{Implementation Outline}\label{record-140-implementation-outline}
 

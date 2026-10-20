@@ -1,0 +1,123 @@
+{
+  "repository": "https://github.com/flyingrobots/bijou-job-monitor",
+  "tag": "book-v1",
+  "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62",
+  "bijou": "7.2.0",
+  "node": "26.10.0",
+  "npm": "11.19.1",
+  "workshops": [
+    "01-model",
+    "02-modes",
+    "03-interaction",
+    "04-async",
+    "05-constraints",
+    "06-evidence",
+    "07-reproduce"
+  ],
+  "verification": {
+    "edition": "book-v1",
+    "bijou_release": "7.2.0",
+    "bijou_release_commit": "123f4a6150963932118cbf763a8a6ec03487e227",
+    "node": "v26.10.0",
+    "npm": "11.19.1",
+    "host": {
+      "os": "Darwin",
+      "release": "27.0.0",
+      "machine": "arm64"
+    },
+    "checks": {
+      "typecheck": "passed",
+      "vitest": {
+        "files": 2,
+        "tests": 15,
+        "passed": 15
+      },
+      "pty": [
+        {
+          "scenario": "keyboard",
+          "exit": 0,
+          "bytes": 2989,
+          "terminal_flags_restored": true
+        },
+        {
+          "scenario": "sigterm",
+          "exit": 0,
+          "bytes": 950,
+          "terminal_flags_restored": true
+        }
+      ],
+      "exercises": [
+        {
+          "exercise": "modal",
+          "repaired": false,
+          "exit": 1
+        },
+        {
+          "exercise": "modal",
+          "repaired": true,
+          "exit": 0
+        },
+        {
+          "exercise": "stale",
+          "repaired": false,
+          "exit": 1
+        },
+        {
+          "exercise": "stale",
+          "repaired": true,
+          "exit": 0
+        },
+        {
+          "exercise": "color",
+          "repaired": false,
+          "exit": 1
+        },
+        {
+          "exercise": "color",
+          "repaired": true,
+          "exit": 0
+        },
+        {
+          "exercise": "timer",
+          "repaired": false,
+          "exit": 1
+        },
+        {
+          "exercise": "timer",
+          "repaired": true,
+          "exit": 0
+        }
+      ],
+      "checkpoints_verified": [
+        "01",
+        "02",
+        "03 via actual PTY main application",
+        "04",
+        "05"
+      ]
+    },
+    "limits": [
+      "No human screen-reader session performed",
+      "No physical terminal emulator compatibility matrix established",
+      "Only macOS arm64 run locally; GitHub Actions verifies Linux after publication",
+      "Job work is simulated; no operating-system process runner is implemented",
+      "Long-copy fixture is not a localization catalog"
+    ],
+    "lockfile_sha256": "670b2bac1f19cc2542c03fe2b6db9358660f4b4f705e232cf18e9207328877c6"
+  },
+  "snippets": [
+    {
+      "file": "companion-snippets/job.ts.txt",
+      "source": "src/job.ts",
+      "sha256": "568a22885f3c1eaa347b72c9925dab329fabff152fba32f6e85674be0ccc8c6d"
+    }
+  ],
+  "github_actions": {
+    "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62",
+    "conclusion": "success",
+    "runs": [
+      "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39494363807",
+      "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39494364048"
+    ]
+  }
+}

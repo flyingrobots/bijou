@@ -20,13 +20,7 @@ Two breaking changes, both from \href{https://github.com/flyingrobots/bijou/blob
 
 \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})} no longer inspects \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R}. The detection order is now:
 
-\begin{CodeBlock}
-BIJOU_ACCESSIBLE=1  -> 'accessible'
-TERM=dumb           -> 'pipe'
-!stdout.isTTY       -> 'pipe'
-CI                  -> 'static'
-stdout.isTTY        -> 'interactive'
-\end{CodeBlock}
+\input{diagrams/flows/flow-061}
 
 \subsection{Why}\label{record-273-why}
 

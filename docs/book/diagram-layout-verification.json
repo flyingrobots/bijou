@@ -1,0 +1,16 @@
+{
+  "legacy_tikz_wrappers_corrected": 34,
+  "source_records": [
+    "docs/VISION.md",
+    "docs/guides/terminal-scenarios.md",
+    "docs/CLI.md",
+    "docs/MCP.md",
+    "ADVANCED_GUIDE.md",
+    "docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md",
+    "docs/design/DX-031-standard-bijou-blocks.md",
+    "docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md",
+    "docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md",
+    "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md"
+  ],
+  "policy": "Never enlarge native TikZ; cap width at available line width and total height at 85 percent of text area. New flow figures are already laid out at explicit readable sizes."
+}

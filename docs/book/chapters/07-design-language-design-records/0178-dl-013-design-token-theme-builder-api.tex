@@ -256,39 +256,7 @@ If Bijou later adds package-level token catalogs, those catalogs should declare 
 
 \section{Relationship Diagram}\label{record-178-relationship-diagram}
 
-\begin{CodeBlock}
-              +------------------+
-              | Theme            |
-              | id, label        |
-              +--------+---------+
-                       |
-              owns mode maps
-                       |
-          +------------+------------+
-          |                         |
-+---------v---------+     +---------v---------+
-| Mode: dark        |     | Mode: light       |
-| token -> color    |     | token -> color    |
-+---------+---------+     +---------+---------+
-          |                         |
-          +------------+------------+
-                       |
-                 resolves refs
-                       |
-              +--------v---------+
-              | Style            |
-              | fg: tokenRef(...)|
-              | bg: tokenRef(...)|
-              | layout rules     |
-              +--------+---------+
-                       |
-                 render context
-                       |
-              +--------v---------+
-              | Surface cells    |
-              | concrete colors  |
-              +------------------+
-\end{CodeBlock}
+\input{diagrams/flows/flow-052}
 
 \section{Style Builder Surface}\label{record-178-style-builder-surface}
 

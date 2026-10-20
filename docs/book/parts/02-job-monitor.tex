@@ -1,0 +1,22 @@
+\part{Build a job monitor}\label{part-workshops}
+\chapter*{A route through the working example}
+\addcontentsline{toc}{chapter}{Introduction: A route through the working example}
+
+This part gives the collection a practical spine. Seven workshops follow one useful application from job identities and immutable state to four presentations, keyboard ownership, asynchronous results, constrained geometry, behavioral evidence and a reproducible source package. The application is small enough to inspect and large enough for the design principles to encounter real tradeoffs.
+
+\section*{Build, break, test and ship}
+\subsection*{One task, several pressures}
+
+The job monitor carries status, progress, filtering, logs, failure and cancellation. Its work is simulated, so the example can concentrate on the architecture of a terminal application. The same facts must remain understandable in interactive, static/CI, pipe and accessible presentations. Several exercises deliberately violate those requirements before showing the production repair.
+
+\subsection*{Use the checkpoint that belongs to the page}
+
+The separate companion repository is pinned to published Bijou 7.2.0. Its checkpoints, tests, exact edition commit and limitations are recorded near the front of this book and in the companion. The historical source chapters retain their own versions and context. Read a workshop for a runnable teaching path; read the later records for the history and reasoning behind a particular contract.
+
+\input{workshops/01-model}%
+\input{workshops/02-modes}%
+\input{workshops/03-interaction}%
+\input{workshops/04-async}%
+\input{workshops/05-constraints}%
+\input{workshops/06-evidence}%
+\input{workshops/07-reproduce}%

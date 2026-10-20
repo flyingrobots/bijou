@@ -20,32 +20,7 @@
 
 \section{Raw numbers}\label{record-156-raw-numbers}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
-\toprule\noalign{}
-{M\allowbreak{}o\allowbreak{}d\allowbreak{}e}
- & {F\allowbreak{}P\allowbreak{}S} {(\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{})}
- & {F\allowbreak{}P\allowbreak{}S} {(\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{},} {c\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{})}
- & {F\allowbreak{}P\allowbreak{}S} {(\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{},} {w\allowbreak{}a\allowbreak{}r\allowbreak{}m\allowbreak{})}
- & {v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} {m\allowbreak{}s}
- & {f\allowbreak{}t} {m\allowbreak{}s} {(\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{})}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{G\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {4\allowbreak{}9} & {3\allowbreak{}0\allowbreak{}-\allowbreak{}4\allowbreak{}9} & {1\allowbreak{}5\allowbreak{}8} & {2\allowbreak{}.\allowbreak{}5} & {\textasciitilde{}\allowbreak{}2\allowbreak{}0} \\
-{H\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}z\allowbreak{}o\allowbreak{}n} & {6\allowbreak{}0} & {3\allowbreak{}4\allowbreak{}4} & {3\allowbreak{}4\allowbreak{}4} & {1\allowbreak{}.\allowbreak{}4} & {\textasciitilde{}\allowbreak{}3} \\
-{N\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}e} & {4\allowbreak{}9\allowbreak{}-\allowbreak{}6\allowbreak{}0} & {9\allowbreak{}8} & {2\allowbreak{}9\allowbreak{}8} & {1\allowbreak{}.\allowbreak{}4\allowbreak{}-\allowbreak{}1\allowbreak{}.\allowbreak{}5} & {\textasciitilde{}\allowbreak{}3\allowbreak{}-\allowbreak{}1\allowbreak{}0} \\
-{Q\allowbreak{}u\allowbreak{}a\allowbreak{}d} & {6\allowbreak{}0} & {9\allowbreak{}1} & {9\allowbreak{}1} & {1\allowbreak{}.\allowbreak{}3} & {\textasciitilde{}\allowbreak{}1\allowbreak{}1} \\
-\end{longtable}
-}
+\input{tables/table-039}
 
 ``Warm'' means after 60+ seconds of sustained rendering, when V8 has JIT-compiled the hot paths and GC has settled.
 
@@ -53,25 +28,7 @@
 
 At 191×48 with the gradient (worst case), a frame takes \textasciitilde20ms total:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-{P\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}e}
- & {T\allowbreak{}i\allowbreak{}m\allowbreak{}e}
- & {M\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {a\allowbreak{}p\allowbreak{}p\allowbreak{}?}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} & {\textasciitilde{}\allowbreak{}0\allowbreak{}m\allowbreak{}s} & {y\allowbreak{}e\allowbreak{}s} \\
-{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} {(\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} {m\allowbreak{}a\allowbreak{}t\allowbreak{}h} {+} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{})} & {\textasciitilde{}\allowbreak{}2\allowbreak{}.\allowbreak{}5\allowbreak{}m\allowbreak{}s} & {y\allowbreak{}e\allowbreak{}s} \\
-{P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}:} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f} {+} {A\allowbreak{}N\allowbreak{}S\allowbreak{}I} {e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e} {+} {s\allowbreak{}t\allowbreak{}d\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e} & {\textasciitilde{}\allowbreak{}1\allowbreak{}7\allowbreak{}.\allowbreak{}5\allowbreak{}m\allowbreak{}s} & \textbf{{n\allowbreak{}o}} \\
-\end{longtable}
-}
+\input{tables/table-040}
 
 \textbf{92\% of frame time is spent in bijou's render pipeline, not in the app's view function.} The pipeline is not observable from the app side --- there are no hooks to measure diff, paint, or output phases individually.
 
@@ -101,27 +58,7 @@ With surface reuse (the cached surface is not reallocated per frame), the Cell o
 
 \subsection{GC behavior at different modes}\label{record-156-gc-behavior-at-different-modes}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{M\allowbreak{}o\allowbreak{}d\allowbreak{}e}
- & {H\allowbreak{}e\allowbreak{}a\allowbreak{}p} {(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{})}
- & {G\allowbreak{}C} {e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s} {/} {0\allowbreak{}.\allowbreak{}5\allowbreak{}s}
- & {N\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{G\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} {(\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d} {6\allowbreak{}0\allowbreak{}f\allowbreak{}p\allowbreak{}s\allowbreak{})} & {5\allowbreak{}1\allowbreak{}-\allowbreak{}9\allowbreak{}2} {M\allowbreak{}B} & {2\allowbreak{}-\allowbreak{}5} & {Y\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}g\allowbreak{}e\allowbreak{}n} {f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}s} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {h\allowbreak{}e\allowbreak{}x} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} \\
-{G\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} {(\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{})} & {1\allowbreak{}8\allowbreak{}5\allowbreak{}-\allowbreak{}8\allowbreak{}2\allowbreak{}4} {M\allowbreak{}B} & {0\allowbreak{}-\allowbreak{}1} & {H\allowbreak{}e\allowbreak{}a\allowbreak{}p} {g\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s} {u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}l} {m\allowbreak{}a\allowbreak{}j\allowbreak{}o\allowbreak{}r} {G\allowbreak{}C\allowbreak{};} {V\allowbreak{}8} {e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}y} {s\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}s} \\
-{N\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}e} {(\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{})} & {1\allowbreak{}0\allowbreak{}1} {M\allowbreak{}B} & {0\allowbreak{}-\allowbreak{}1} & {F\allowbreak{}e\allowbreak{}w\allowbreak{}e\allowbreak{}r} {u\allowbreak{}n\allowbreak{}i\allowbreak{}q\allowbreak{}u\allowbreak{}e} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{};} {V\allowbreak{}8} {h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}s} {i\allowbreak{}t} \\
-\end{longtable}
-}
+\input{tables/table-041}
 
 \subsection{JIT warmup}\label{record-156-jit-warmup}
 
@@ -162,7 +99,9 @@ A first-class \texttt{d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\
 
 \section{Pipeline observability gap}\label{record-156-pipeline-observability-gap}
 
-The render pipeline (Layout → Paint → PostProcess → Diff → Output) is not observable from the app side. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} can add middleware but only appends after the default stages --- it cannot wrap them for timing. A future improvement would expose per-stage timing hooks so the debug overlay can show the full breakdown.
+The render pipeline (the illustrated sequence below) is not observable from the app side. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} can add middleware but only appends after the default stages --- it cannot wrap them for timing. A future improvement would expose per-stage timing hooks so the debug overlay can show the full breakdown.
+
+\input{diagrams/flows/flow-076}
 
 \section{Reproducing}\label{record-156-reproducing}
 

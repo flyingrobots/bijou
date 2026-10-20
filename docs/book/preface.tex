@@ -10,13 +10,21 @@ This book brings that explanation together. It contains practical guides, archit
 
 \section*{An order for reading}
 
+\subsection*{Foundations and practical work}
+
 \hyperref[part-philosophy]{Part~\ref*{part-philosophy}, Philosophy and architecture}, establishes the ideas behind the system: runtime truth, explicit boundaries, humane interaction, graceful lowering, localization and inspectability. These chapters explain the constraints against which later choices should be judged.
 
+\hyperref[part-workshops]{Part~\ref*{part-workshops}, Build a job monitor}, provides a progressive teaching path through one runnable application: four presentations, input ownership, asynchronous results, constrained terminals, tests and reproducible packaging. Its separate companion repository contains the checkpoints and deliberately broken exercises.
+
 \hyperref[part-using]{Part~\ref*{part-using}, Using Bijou}, turns those ideas towards application work. Begin with the general Guide and the terminal-scenarios chapter, then follow the reference material needed for a particular task. The advanced guide, rendering material, package-development notes and component-family reference support deeper work. DOGFOOD is the documentation application; BlockLab is the standalone component workbench. Their presence throughout the book reflects the project's use of its own tools as a proving ground.
+
+\subsection*{Decisions and their consequences}
 
 \hyperref[part-design]{Part~\ref*{part-design}, Design records}, preserves the reasoning behind individual changes. Its introduction explains the recurring document format before the first record appears. The records are grouped by concern so a reader can follow a line of work across the documentation app, developer experience, runtime, design language, localization and delivery tooling.
 
 \hyperref[part-releases]{Part~\ref*{part-releases}, Releases and migration}, follows changes into release-facing claims and upgrade guidance. \hyperref[part-retrospectives]{Part~\ref*{part-retrospectives}, Retrospectives and historical planning}, records what happened during the work. \hyperref[part-audits]{Part~\ref*{part-audits}, Audits and archive records}, preserves assessments, experiments and discarded directions. Together they let a reader compare an intention, an implementation claim and its later consequences.
+
+\subsection*{Visible output and provenance}
 
 \hyperref[part-atlas]{Part~\ref*{part-atlas}, Rendered components and provenance}, closes the book with actual component specimens and the inventory of original sources. It connects the written contracts to visible terminal surfaces and gives each source record a traceable identity.
 
@@ -26,11 +34,15 @@ A design document is useful when it makes a decision easier to examine. The recu
 
 The resulting documents can look formal. Their value comes from the questions they expose: a named outcome can be challenged, a non-goal limits a promise, an invariant constrains an implementation, and a proposed test gives a reviewer something concrete to inspect. The introduction to the design-record part explains these fields in detail, including the distinction between tests proposed before implementation and evidence recorded after it.
 
+\subsection*{Historical vocabulary}
+
 The collection spans changes in the project's working practices. Terms such as sponsor, hill, playback, cycle, lane and legend belong to that history. They help explain the records in which they appear. They do not impose the retired METHOD process on new work. Current operating agreements and the live issue tracker govern current execution.
 
 \section*{Reading with evidence in mind}
 
-Each source chapter retains its original path and text. Its status fields and future-tense promises describe the record at the time it was written. A design can contain a sound argument without proving that the feature shipped; a release note can state a result without establishing that the result still holds in today's code. Use linked issues, pull requests, commits and recorded checks to follow a claim into implementation. Read current tracker state from the tracker.
+Each source chapter retains its original path and wording, with conceptual arrow notation illustrated as figures and tables rendered through Bijou. The frozen source corpus preserves the original notation. Its status fields and future-tense promises describe the record at the time it was written. A design can contain a sound argument without proving that the feature shipped; a release note can state a result without establishing that the result still holds in today's code. Use linked issues, pull requests, commits and recorded checks to follow a claim into implementation. Read current tracker state from the tracker.
+
+\subsection*{Choosing an evidence trail}
 
 When building an application, use this book to understand the contracts and choices, then verify the exact API against the version being used. When reviewing a change, read its design, closeout evidence and subsequent history together. When looking for a subject such as Theme Lab or BlockLab, follow its named records and the part introductions instead of treating every mention as a complete operating guide.
 

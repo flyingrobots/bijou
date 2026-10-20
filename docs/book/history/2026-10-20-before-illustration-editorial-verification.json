@@ -1,0 +1,36 @@
+{
+  "pages": 1771,
+  "source_documents": 426,
+  "source_chapter_bodies_preserved": 426,
+  "part_introductions": 7,
+  "design_family_introductions": 7,
+  "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
+  "tex_tree_sha256": "fc99e36810d80352c5c2ac7b83ed583c9659c4d8f56e89260e1b60077bf35c2a",
+  "validation": [
+    "426/426 original source chapter files remain byte-identical.",
+    "426/426 source chapter destinations resolve to pages displaying their original source paths.",
+    "Preface and all seven part introductions appear in PDF bookmarks.",
+    "All 32 diagram conversions and 42 component specimens are retained.",
+    "Existing repository links to source chapter pages updated for the new reading order."
+  ],
+  "source_base_commit": "3347f300c9e5ba78899697d9151c124fee4f15df",
+  "updated_link_files": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/CHANGELOG.md",
+    "examples/README.md",
+    "examples/docs/README.md",
+    "fixtures/profunctor-page/project-keep/README.md",
+    "packages/bijou-node/ADVANCED_GUIDE.md",
+    "packages/bijou-node/GUIDE.md",
+    "packages/bijou-tui-app/README.md",
+    "packages/bijou-tui/ADVANCED_GUIDE.md",
+    "packages/bijou-tui/ARCHITECTURE.md",
+    "packages/bijou-tui/README.md",
+    "packages/bijou/ADVANCED_GUIDE.md",
+    "packages/bijou/ARCHITECTURE.md",
+    "packages/bijou/GUIDE.md",
+    "packages/bijou/README.md",
+    "packages/create-bijou-tui-app/README.md"
+  ]
+}

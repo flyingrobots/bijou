@@ -25,13 +25,7 @@ Bijou should distinguish theme identity from theme mode at the app-frame boundar
 
 The existing runtime \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} object is a concrete palette. That stays true for compatibility. The new shape is an adapter around that concrete palette:
 
-\begin{CodeBlock}
-FrameShellThemeFamily
-  id: "dogfood"
-  modes:
-    dark  -> Theme("dogfood-dark")
-    light -> Theme("dogfood-light")
-\end{CodeBlock}
+\input{diagrams/flows/flow-049}
 
 Single-mode shell themes remain valid:
 
@@ -194,9 +188,7 @@ Shell theme  DOGFOOD / Dark
 
 Activating the row cycles the resolved choices:
 
-\begin{CodeBlock}
-DOGFOOD / Dark -> DOGFOOD / Light -> Cabinet of Curiosities -> ...
-\end{CodeBlock}
+\input{diagrams/flows/flow-050}
 
 This is intentionally conservative. A later \#311/\#315 slice can split family and mode into separate controls once the app-frame has enough option metadata to render that well.
 

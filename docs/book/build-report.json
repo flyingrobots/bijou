@@ -1,6 +1,6 @@
 {
-  "edition": "2026-10-20 reader-facing editorial revision",
-  "pages": 1771,
+  "edition": "2026-10-20 illustrated workshop edition",
+  "pages": 1860,
   "source_documents": 426,
   "original_design_documents": 196,
   "additional_documents": 230,
@@ -12,93 +12,273 @@
     },
     {
       "number": 2,
+      "title": "Build a job monitor",
+      "source_chapters": 0,
+      "workshops": 7
+    },
+    {
+      "number": 3,
       "title": "Using Bijou",
       "source_chapters": 24
     },
     {
-      "number": 3,
+      "number": 4,
       "title": "Design records",
       "source_chapters": 196
     },
     {
-      "number": 4,
+      "number": 5,
       "title": "Releases and migration",
       "source_chapters": 26
     },
     {
-      "number": 5,
+      "number": 6,
       "title": "Retrospectives and historical planning",
       "source_chapters": 126
     },
     {
-      "number": 6,
+      "number": 7,
       "title": "Audits and archive records",
       "source_chapters": 17
     },
     {
-      "number": 7,
+      "number": 8,
       "title": "Rendered components and provenance",
       "component_specimens": 42
     }
   ],
   "general_preface": true,
-  "part_introductions": 7,
+  "part_introductions": 8,
   "design_family_introductions": 7,
-  "source_chapter_bodies_preserved": 426,
+  "authored_workshops": 7,
+  "copyright_page": 2,
+  "version_page": 3,
+  "preface_page": 5,
+  "full_apache_license_paragraphs_verified": 32,
+  "source_corpus_bytes_preserved": true,
+  "typeset_source_records_with_presentation_edits": 93,
   "mermaid_sources_converted_to_tikz": 32,
+  "source_arrow_figures": 83,
+  "authored_interaction_traces": 2,
+  "component_tables": 123,
+  "table_panels": 159,
   "component_specimens": 42,
-  "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
-  "tex_sha256": "b98a5b16a6d669f917c655cf1b193cf173bcc686e0ecaa194d059e10004dd165",
-  "tex_tree_sha256": "fc99e36810d80352c5c2ac7b83ed583c9659c4d8f56e89260e1b60077bf35c2a",
+  "job_monitor_specimens": 4,
+  "renderer_demo_specimens": 2,
+  "executable_arrow_code_blocks_preserved": 35,
+  "pdf_sha256": "fb779af06ccfb046c51988f4583ee12e461130b5a0947f11872136e706b7febe",
+  "pdf_bytes": 22554539,
+  "tex_sha256": "57bdaa903095d8bcbb44f43e5ec4ac6b19825b8dacd5d70c8a56c3fc8b5f67e0",
+  "tex_tree_sha256": "3544efe0cd5403368dfb6e3b029677e9733b73cd876177e1225d629ca57bfbc7",
   "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "compiler": "LuaHBTeX 1.15.0 / TeX Live 2022",
-  "build": "Three clean LuaLaTeX passes from the modular source tree into bounded temporary storage.",
+  "build": "Three converged LuaLaTeX passes in the reused bounded worker, after native PDF-font reuse and page-bounded legacy diagram sizing.",
   "missing_glyphs": 0,
   "undefined_references": 0,
-  "maximum_text_overflow_pt": 7.87482,
+  "vertical_overflows": 0,
+  "maximum_text_overflow_pt": 0.69456,
   "latex_structure": {
-    "entrypoint_lines": 13,
-    "reader_facing_parts": 7,
+    "entrypoint_lines": 15,
+    "reader_facing_parts": 8,
     "source_chapters": 426,
+    "workshop_files": 7,
     "specimen_files": 42,
-    "tex_files": 502
+    "tex_files": 722
   },
   "validation": [
-    "426/426 original source chapter files remain byte-identical.",
-    "426/426 source chapter destinations resolve to pages displaying their original source paths.",
-    "Preface and all seven part introductions appear in PDF bookmarks.",
-    "All 32 diagram conversions and 42 component specimens are retained.",
-    "Existing repository links to source chapter pages updated for the new reading order.",
-    "Focused documentation/corpus/entrypoint checks: 3 files, 12 tests passed; documentation inventory passed."
+    "426 original source hashes verified against byte-identical frozen corpus.",
+    "426 chapter destinations resolve to pages displaying their original source paths.",
+    "83 source arrow figures retain their original notation and graph topology in a manifest.",
+    "35 arrow-bearing executable source samples retained.",
+    "123 component tables / 159 panels; repeated headers, row ranges and explicit column groups recorded.",
+    "Full Apache license text verified in PDF and distributed source.",
+    "Jacquard headings including h3, IBM Plex Mono prose, VT323 source listings and Recursive Mono specimens verified.",
+    "Focused documentation contracts: 3 files, 12 tests passed; extra wrapper-filter run: 48 files, 153 tests passed.",
+    "Documentation inventory passed.",
+    "Companion typecheck and 15 tests passed; four broken/repair exercises verified; keyboard/resize/SIGTERM PTY checks passed.",
+    "Companion public GitHub Actions passed at the pinned commit.",
+    "Retained table-capture tool reproduced all 159 Surface panels exactly.",
+    "Reader receipt verified with intact attachment digest."
   ],
   "visual_inspection": [
-    "preface opening",
-    "philosophy introduction",
-    "two-page design-record introduction"
+    "copyright and version pages",
+    "h1/h2/h3 and source-font specimen",
+    "both architecture pipelines",
+    "four-mode comparison",
+    "late-result sequence",
+    "page-bounded legacy diagrams",
+    "component tables and source inventory",
+    "raymarching and metaballs"
+  ],
+  "companion": {
+    "repository": "https://github.com/flyingrobots/bijou-job-monitor",
+    "tag": "book-v1",
+    "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62",
+    "bijou": "7.2.0",
+    "node": "26.10.0",
+    "npm": "11.19.1",
+    "workshops": [
+      "01-model",
+      "02-modes",
+      "03-interaction",
+      "04-async",
+      "05-constraints",
+      "06-evidence",
+      "07-reproduce"
+    ],
+    "verification": {
+      "edition": "book-v1",
+      "bijou_release": "7.2.0",
+      "bijou_release_commit": "123f4a6150963932118cbf763a8a6ec03487e227",
+      "node": "v26.10.0",
+      "npm": "11.19.1",
+      "host": {
+        "os": "Darwin",
+        "release": "27.0.0",
+        "machine": "arm64"
+      },
+      "checks": {
+        "typecheck": "passed",
+        "vitest": {
+          "files": 2,
+          "tests": 15,
+          "passed": 15
+        },
+        "pty": [
+          {
+            "scenario": "keyboard",
+            "exit": 0,
+            "bytes": 2989,
+            "terminal_flags_restored": true
+          },
+          {
+            "scenario": "sigterm",
+            "exit": 0,
+            "bytes": 950,
+            "terminal_flags_restored": true
+          }
+        ],
+        "exercises": [
+          {
+            "exercise": "modal",
+            "repaired": false,
+            "exit": 1
+          },
+          {
+            "exercise": "modal",
+            "repaired": true,
+            "exit": 0
+          },
+          {
+            "exercise": "stale",
+            "repaired": false,
+            "exit": 1
+          },
+          {
+            "exercise": "stale",
+            "repaired": true,
+            "exit": 0
+          },
+          {
+            "exercise": "color",
+            "repaired": false,
+            "exit": 1
+          },
+          {
+            "exercise": "color",
+            "repaired": true,
+            "exit": 0
+          },
+          {
+            "exercise": "timer",
+            "repaired": false,
+            "exit": 1
+          },
+          {
+            "exercise": "timer",
+            "repaired": true,
+            "exit": 0
+          }
+        ],
+        "checkpoints_verified": [
+          "01",
+          "02",
+          "03 via actual PTY main application",
+          "04",
+          "05"
+        ]
+      },
+      "limits": [
+        "No human screen-reader session performed",
+        "No physical terminal emulator compatibility matrix established",
+        "Only macOS arm64 run locally; GitHub Actions verifies Linux after publication",
+        "Job work is simulated; no operating-system process runner is implemented",
+        "Long-copy fixture is not a localization catalog"
+      ],
+      "lockfile_sha256": "670b2bac1f19cc2542c03fe2b6db9358660f4b4f705e232cf18e9207328877c6"
+    },
+    "snippets": [
+      {
+        "file": "companion-snippets/job.ts.txt",
+        "source": "src/job.ts",
+        "sha256": "568a22885f3c1eaa347b72c9925dab329fabff152fba32f6e85674be0ccc8c6d"
+      }
+    ],
+    "github_actions": {
+      "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62",
+      "conclusion": "success",
+      "runs": [
+        "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39494363807",
+        "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39494364048"
+      ]
+    }
+  },
+  "updated_link_files": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/CHANGELOG.md",
+    "examples/README.md",
+    "examples/docs/README.md",
+    "fixtures/profunctor-page/project-keep/README.md",
+    "packages/bijou-node/ADVANCED_GUIDE.md",
+    "packages/bijou-node/GUIDE.md",
+    "packages/bijou-tui-app/README.md",
+    "packages/bijou-tui/ADVANCED_GUIDE.md",
+    "packages/bijou-tui/ARCHITECTURE.md",
+    "packages/bijou-tui/README.md",
+    "packages/bijou/ADVANCED_GUIDE.md",
+    "packages/bijou/ARCHITECTURE.md",
+    "packages/bijou/GUIDE.md",
+    "packages/bijou/README.md",
+    "packages/create-bijou-tui-app/README.md"
   ],
   "resource_usage": {
-    "temporary_build_kib": 670924,
-    "host_free_bytes": 646106288128,
+    "temporary_build_kib": 857108,
+    "host_free_bytes": 654049337344,
     "worker": "bijou-design-book-worker",
     "scratch_limit_bytes": 1610612736,
     "worker_memory_bytes": 4294967296,
     "worker_cpus": 2
   },
   "reader_previous_edition": {
-    "id": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d",
-    "status": "awaiting_filing",
-    "integrity": "intact",
-    "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b"
-  },
-  "limitations": [
-    "Historical source claims retain their recorded scope and status; new introductions distinguish plans from evidence.",
-    "Minor existing TeX box and font-shape substitution warnings remain; no missing glyphs."
-  ],
-  "reader_delivery": {
     "id": "499c188f-2133-4469-9c7f-216d63386bdb",
     "status": "awaiting_filing",
     "integrity": "intact",
     "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
     "supersedes": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d"
+  },
+  "limitations": [
+    "Historical assertions retain their original status; the frozen corpus preserves their exact original words.",
+    "Current TeX chapter bodies are presentation edits; prior byte-equivalence proofs remain historical snapshots.",
+    "PDF font text and outlined SVG antialiasing can differ; cell positions, colors and source glyph outlines are shared.",
+    "One source heading has a sub-point horizontal overflow; no vertical clipping or missing glyphs.",
+    "No human screen-reader session or broad physical terminal-emulator matrix was performed."
+  ],
+  "reader_delivery": {
+    "id": "bdf1d8e9-27fc-40bd-8417-7ebba2543691",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "pdf_sha256": "fb779af06ccfb046c51988f4583ee12e461130b5a0947f11872136e706b7febe",
+    "supersedes": "499c188f-2133-4469-9c7f-216d63386bdb"
   }
 }

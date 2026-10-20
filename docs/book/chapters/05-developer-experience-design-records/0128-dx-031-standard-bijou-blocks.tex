@@ -340,7 +340,7 @@ The eventual metadata can align with \texttt{d\allowbreak{}e\allowbreak{}f\allow
 The entity relationship is:
 
 \begin{center}
-\resizebox{.9\linewidth}{!}{%
+\BookDiagram[.9\linewidth]{%
 \begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
 \node[classbox] (BlockPackageManifest) at (0,0) {\textbf{BlockPackageManifest}\\[-2pt]\rule{\linewidth}{.3pt}\\packageName\\version\\bijouPeerRange};
 \node[classbox] (BlockDefinition) at (4.7,0) {\textbf{BlockDefinition}\\[-2pt]\rule{\linewidth}{.3pt}\\metadata\\render};
@@ -357,7 +357,7 @@ The entity relationship is:
 
 \clearpage
 \begin{center}
-\resizebox{.9\linewidth}{!}{%
+\BookDiagram[.9\linewidth]{%
 \begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
 \node[classbox] (BlockMetadata) at (0,-7.5) {\textbf{BlockMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
 \node[classbox] (BlockSlot) at (7,0) {\textbf{BlockSlot}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\required\\description};
@@ -381,7 +381,7 @@ The entity relationship is:
 
 \clearpage
 \begin{center}
-\resizebox{.9\linewidth}{!}{%
+\BookDiagram[.9\linewidth]{%
 \begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
 \node[classbox] (BlockVariantMetadata) at (0,0) {\textbf{BlockVariantMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
 \node[classbox] (BlockSlot) at (-3,-3.5) {\textbf{BlockSlot}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\required\\description};
@@ -820,15 +820,7 @@ Rules:
 
 The schema-bound API opens a larger tooling path:
 
-\begin{CodeBlock}
-GraphQL schema / operations
-  -> semantic model
-  -> TypeScript types
-  -> Zod or schema adapter
-  -> block metadata
-  -> schema-bound block package
-  -> stories, captures, docs, and tests
-\end{CodeBlock}
+\input{diagrams/flows/flow-017}
 
 This is not first-slice block runtime work, but it is a coherent future lane. \texttt{\textasciitilde{}\allowbreak{}/\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}/\allowbreak{}w\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}e\allowbreak{}y} already points in this direction: it has GraphQL schema lowering, operation catalogs, TypeScript emission, and dialect seams that mention future SQLite and other SQL targets. Bijou should be able to consume that kind of semantic output and generate useful block packages.
 

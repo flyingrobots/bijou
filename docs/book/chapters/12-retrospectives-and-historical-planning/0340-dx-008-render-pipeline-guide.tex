@@ -19,7 +19,9 @@ Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e
 
 \section{Problem}\label{record-340-problem}
 
-The render pipeline (Layout → Paint → PostProcess → Diff → Output) is a powerful extension point but has zero documentation beyond type definitions. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} appears in RunOptions but there is no guide showing how to write middleware, what RenderState fields are available, or how stages interact.
+The render pipeline (the illustrated sequence below) is a powerful extension point but has zero documentation beyond type definitions. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} appears in RunOptions but there is no guide showing how to write middleware, what RenderState fields are available, or how stages interact.
+
+\input{diagrams/flows/flow-079}
 
 The perf-gradient demo proved this gap --- we could not instrument the pipeline from outside to measure per-stage timing.
 

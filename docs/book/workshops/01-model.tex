@@ -1,0 +1,34 @@
+\chapter*{Workshop 1: A job worth monitoring}\label{workshop-01}
+\addcontentsline{toc}{chapter}{W1: A job worth monitoring}
+
+\section{Start with the user's question}
+
+A person starts a build and wants to know whether it is making progress, whether it failed, and whether it is safe to leave. The job monitor in these workshops gives those questions a concrete home. It has three jobs: compile the application, run the tests, and publish the package. These are simulated jobs driven by scheduled events. The example never invokes a build tool or publishes anything. That boundary keeps the lesson about terminal application design while leaving room for a real process adapter later.
+
+\subsection{Facts before decoration}
+
+A job has a stable identity, a title, a textual status, a percentage and a run identity. Failure can also carry an explanation. The run identity distinguishes two attempts at the same job; a percentage alone cannot do that. Selection belongs to the monitor, rather than being inferred from where a highlight happened to be painted.
+
+The \texttt{Job} class checks its invariants when a value is created. A successful job must be complete. Progress must be a finite number between zero and one hundred. A run identity is a non-negative integer. An immutable job can be handed to a renderer or retained in a test without a later update silently changing the value under examination.
+
+\VerbatimInput[formatcom=\sourcecodefont,fontsize=\fontsize{12}{13}\selectfont,breaklines,breakanywhere]{companion-snippets/job.ts.txt}
+
+\subsection{What immutability costs}
+
+Each transition constructs a new job or monitor snapshot. That adds allocation and some copying. For three small jobs, the cost is easy to understand and measure. For a monitor with hundreds of thousands of entries, the collection strategy would need another decision. Immutability establishes an ownership boundary; it does not exempt a program from measuring its workload.
+
+\section{Keep meaning out of the presentation}
+
+A failed job remains failed when the terminal loses color. A running job remains running when a narrow viewport requires a different layout. The domain model therefore stores statuses such as \texttt{running} and \texttt{failed}, not color names, terminal escape sequences or coordinates.
+
+\subsection{A tempting shortcut}
+
+It is tempting to store preformatted rows as the application's state. That works until filtering needs the job identity, cancellation needs its run, or a pipe consumer needs a numeric percentage. Parsing those facts back out of painted text reverses the dependency. Here, presentation consumes the facts. Commands and tests use those same facts directly.
+
+\subsection{Run the first checkpoint}
+
+From the companion repository, run \texttt{npm ci}, then \texttt{npm run checkpoint -- 01}. The output contains three queued jobs. Read the rows with color disabled and answer: which job is selected, what state is each job in, and how much work is complete? The initial checkpoint introduces \path{src/job.ts}, the initial monitor snapshot, and the static presentation. The next workshop reuses that snapshot rather than inventing a separate model for each environment.
+
+\section{Try a real extension}
+
+Add a job whose title contains a wide character and a combining accent. Give it an identity that remains stable if its title changes. Success means the same identity reaches every presentation and every transition. A title is a label for people; changing its spelling must not redirect an asynchronous result to another job.

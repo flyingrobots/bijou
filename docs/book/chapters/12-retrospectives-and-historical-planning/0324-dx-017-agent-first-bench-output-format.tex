@@ -18,7 +18,9 @@ Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e
 
 \section{Idea}\label{record-324-idea}
 
-The bench v2 report JSON is structured for humans: nested arrays, scenario → samples → stats. It's readable but inefficient for agents to consume programmatically, especially when comparing many runs over time (e.g., ``how did p99 trend across the last 20 RE-017 commits?'').
+The bench v2 report JSON is structured for humans: nested arrays, the illustrated sequence below It's readable but inefficient for agents to consume programmatically, especially when comparing many runs over time (e.g., ``how did p99 trend across the last 20 RE-017 commits?'').
+
+\input{diagrams/flows/flow-078}
 
 Add a flat, agent-friendly output format alongside the existing one. Structure:
 

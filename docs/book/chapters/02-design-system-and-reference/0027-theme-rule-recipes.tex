@@ -6,13 +6,7 @@ Theme rules let Bijou themes describe how semantic colors are selected instead o
 
 The runtime contract is unchanged:
 
-\begin{CodeBlock}
-primitive colors
-  -> selector rules
-    -> TokenGraph
-      -> ThemeAccessors
-        -> terminal rendering
-\end{CodeBlock}
+\input{diagrams/flows/flow-035}
 
 Rules live in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. They do not depend on external design token packages and they compile to the same \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} objects the renderer already consumes.
 

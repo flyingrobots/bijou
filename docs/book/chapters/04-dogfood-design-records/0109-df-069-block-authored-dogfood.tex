@@ -46,24 +46,11 @@ It should not wrap every \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\all
 
 The target composition is:
 
-\begin{CodeBlock}
-DOGFOOD app
-  -> AppFrame / AppShell composition
-    -> page and region Blocks
-      -> components
-        -> surfaces
-\end{CodeBlock}
+\input{diagrams/flows/flow-042}
 
 The existing unidirectional data-binding rule still applies:
 
-\begin{CodeBlock}
-business logic / providers
-  -> immutable snapshots
-  -> binding frames
-  -> blocks and views render
-  -> command intents
-  -> business logic owns the next state
-\end{CodeBlock}
+\input{diagrams/flows/flow-043}
 
 Block-authored DOGFOOD must not introduce hidden provider registries, callback backchannels, render-time refresh hooks, mutable view stores, or direct provider reads from rendering code.
 

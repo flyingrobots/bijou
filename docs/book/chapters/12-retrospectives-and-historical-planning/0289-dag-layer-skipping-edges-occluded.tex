@@ -30,7 +30,9 @@ Multiple edges terminating at the same destination cell also collide: \texttt{a\
 
 \section{Evidence}\label{record-289-evidence}
 
-Minimal repro (three nodes, edges \texttt{A\allowbreak{}→\allowbreak{}B}, \texttt{A\allowbreak{}→\allowbreak{}C}, \texttt{B\allowbreak{}→\allowbreak{}C}):
+Minimal three-node reproduction:
+
+\input{diagrams/flows/flow-081}
 
 \begin{CodeBlock}
 bijou_dag({ nodes: [
@@ -80,10 +82,14 @@ Option 1 is the most correct. Option 2 is probably the simplest and resolves the
 \item
   Three-node repro above, asserting \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} shows \texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{},\allowbreak{} \allowbreak{}C} and \texttt{B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C} (source of truth) and that the rendered output contains two arrowheads entering C's row range.
 \item
-  Four-node diamond (\texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{},\allowbreak{} \allowbreak{}A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C\allowbreak{},\allowbreak{} \allowbreak{}B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D\allowbreak{},\allowbreak{} \allowbreak{}C\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D}) --- asserting both inbound edges to D are visible.
+  Four-node diamond (the illustrated sequence below) --- asserting both inbound edges to D are visible.
 \item
-  A layer-skipping chain (\texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C}, plus \texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D} with D at layer 2) asserting A→D does not overlap B's column.
+  A layer-skipping chain (the illustrated sequence below, plus \texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D} with D at layer 2) asserting A→D does not overlap B's column.
 \end{itemize}
+
+\input{diagrams/flows/flow-067}
+
+\input{diagrams/flows/flow-068}
 
 \section{Impact}\label{record-289-impact}
 

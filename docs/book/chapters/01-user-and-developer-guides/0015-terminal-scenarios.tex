@@ -35,7 +35,7 @@ npm run blocklab
 Bijou is intentionally layered. Core rendering and contracts are portable; interactive runtime behavior lives in the TUI package; host I/O lives behind Node adapters.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (App) at (0.0,0.0) {Your app code};
 \node[box] (Core) at (-5.0,-2.6) {@flyingrobots/bijou / components, surfaces, forms, blocks, themes};
 \node[box] (Tui) at (0.0,-2.6) {@flyingrobots/bijou-tui / TEA runtime, input, layout, canvas};
@@ -55,7 +55,7 @@ Bijou is intentionally layered. Core rendering and contracts are portable; inter
 \end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (BijouContext) at (-5.0,0) {\textbf{Bijou\allowbreak{}Context}\\\rule{\linewidth}{.3pt}\\+runtime\\+io\\+style\\+theme\\+semantic(name)\\+status(name)\\+border(name)};
 \node[box] (Surface) at (0.0,0) {\textbf{Surface}\\\rule{\linewidth}{.3pt}\\+width\\+height\\+get(x, y)\\+set(x, y, cell)};
 \node[box] (App) at (5.0,0) {\textbf{App}\\\rule{\linewidth}{.3pt}\\+init()\\+update(msg, model)\\+view(model)};
@@ -72,7 +72,7 @@ Bijou is intentionally layered. Core rendering and contracts are portable; inter
 \section{Choose A Scenario}\label{record-015-choose-a-scenario}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Start) at (0.0,0.0) {What are you building?};
 \node[box] (Colors) at (-7.5,-2.6) {One-shot colored CLI output};
 \node[box] (Form) at (-2.5,-2.6) {Prompt or form flow};
@@ -91,33 +91,14 @@ Bijou is intentionally layered. Core rendering and contracts are portable; inter
 \end{tikzpicture}}
 \end{center}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} {p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s}
- & {M\allowbreak{}a\allowbreak{}i\allowbreak{}n} {o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{P\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}t} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s} & \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}{,} \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} & {S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {h\allowbreak{}o\allowbreak{}s\allowbreak{}t} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g} \\
-{I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {f\allowbreak{}o\allowbreak{}r\allowbreak{}m} & \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}{,} \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} & {P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}t} {r\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}s} \\
-{B\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}c} {T\allowbreak{}U\allowbreak{}I} {a\allowbreak{}p\allowbreak{}p} & \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}{,} \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} & \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s} \\
-{B\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} {r\allowbreak{}a\allowbreak{}y} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r} & \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}{,} \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} & {S\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d} \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} \\
-\end{longtable}
-}
+\input{tables/table-005}
 
 \section{Scenario 1: Print Some Colors}\label{record-015-scenario-1-print-some-colors}
 
 Use core components and a Node context when the program writes a result and exits. This is the right lane for CLIs, scripts, release notes, status output, and other non-full-screen tools.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
 \node[actor] (Script) at (0.0,0) {Script};
 \draw[dashed,BookMuted] (Script.south) -- (0.0,-7.3999999999999995);
 \node[actor] (Node) at (4.5,0) {Node adapter};
@@ -133,7 +114,7 @@ Use core components and a Node context when the program writes a result and exit
 \end{tikzpicture}}\end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (SCRIPT) at (0.0,0.0) {SCRIPT};
 \node[box] (BIJOU_CONTEXT) at (0.0,-2.6) {BIJOU\_CONTEXT};
 \node[box] (STYLE_PORT) at (-2.5,-5.2) {STYLE\_PORT};
@@ -179,7 +160,7 @@ console.log(box('Use core components for one-shot terminal output.', { ctx }));
 Use string-returning components for command output. Do not start the TUI runtime unless you need retained state, input routing, animation, or full-screen redraw.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Need) at (0.0,0.0) {Need terminal output};
 \node[box] (Input) at (0.0,-2.6) {Need ongoing input?};
 \node[box] (Core) at (-2.5,-5.2) {Use core components and Node context};
@@ -199,7 +180,7 @@ Use string-returning components for command output. Do not start the TUI runtime
 Use forms when the program should ask a bounded sequence of questions and then return to normal terminal output. Forms write through the context I/O port and return structured values.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
 \node[actor] (User) at (0.0,0) {User};
 \draw[dashed,BookMuted] (User.south) -- (0.0,-12.5);
 \node[actor] (Form) at (4.5,0) {Form};
@@ -218,7 +199,7 @@ Use forms when the program should ask a bounded sequence of questions and then r
 \end{tikzpicture}}\end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (GroupResult) at (-5.0,0) {\textbf{Group\allowbreak{}Result}\\\rule{\linewidth}{.3pt}\\+cancelled\\+values};
 \node[box] (Field) at (0.0,0) {\textbf{Field}\\\rule{\linewidth}{.3pt}\\+title\\+placeholder\\+required\\+ctx};
 \node[box] (FormHelpers) at (5.0,0) {\textbf{Form\allowbreak{}Helpers}\\\rule{\linewidth}{.3pt}\\+input(options)\\+select(options)\\+multiselect(options)\\+confirm(options)\\+group(fields)};
@@ -283,7 +264,7 @@ if (result.cancelled) {
 \subsection{Data Shape}\label{record-015-data-shape}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (FORM_FLOW) at (0.0,0) {FORM\_FLOW};
 \node[box] (FIELD) at (-2.5,-4) {\textbf{FIELD}\\\rule{\linewidth}{.3pt}\\string name\\string title\\string kind};
 \node[box] (FIELD_RESULT) at (-2.5,-8) {FIELD\_RESULT};
@@ -318,7 +299,7 @@ The loop is:
 \end{enumerate}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Init) at (0.0,0.0) {init};
 \node[box] (Model) at (-2.5,-2.6) {Model};
 \node[box] (Cmds) at (2.5,-2.6) {Commands};
@@ -347,7 +328,7 @@ The loop is:
 \end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
 \node[actor] (Terminal) at (0.0,0) {Terminal};
 \draw[dashed,BookMuted] (Terminal.south) -- (0.0,-19.3);
 \node[actor] (Runtime) at (4.5,0) {Runtime};
@@ -418,7 +399,7 @@ await startApp(app);
 \subsection{Ownership Boundaries}\label{record-015-ownership-boundaries}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Model) at (-5.0,0) {\textbf{Model}\\\rule{\linewidth}{.3pt}\\+count};
 \node[box] (Msg) at (0.0,0) {\textbf{Msg}\\\rule{\linewidth}{.3pt}\\+key\\+type};
 \node[box] (Update) at (5.0,0) {\textbf{Update}\\\rule{\linewidth}{.3pt}\\+update(msg, model)};
@@ -439,7 +420,7 @@ Do not mutate the model from inside \texttt{v\allowbreak{}i\allowbreak{}e\allowb
 Use the TUI \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} renderer when you want procedural character graphics. The Braille resolution samples each terminal cell as a 2 by 4 sub-pixel grid, so a small terminal surface can carry more visual detail than one character per cell.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Model) at (0.0,0.0) {Model: time and camera};
 \node[box] (View) at (0.0,-2.6) {View};
 \node[box] (Canvas) at (0.0,-5.2) {canvas(cols, rows, shader, resolution=braille)};
@@ -459,7 +440,7 @@ Use the TUI \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\al
 \end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
 \node[actor] (Runtime) at (0.0,0) {Runtime};
 \draw[dashed,BookMuted] (Runtime.south) -- (0.0,-14.2);
 \node[actor] (App) at (4.5,0) {App};
@@ -481,7 +462,7 @@ Use the TUI \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\al
 \end{tikzpicture}}\end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (ShaderParams) at (-5.0,0) {\textbf{Shader\allowbreak{}Params}\\\rule{\linewidth}{.3pt}\\+u\\+v\\+time\\+uniforms};
 \node[box] (ShaderCell) at (0.0,0) {\textbf{Shader\allowbreak{}Cell}\\\rule{\linewidth}{.3pt}\\+char\\+fg\allowbreak{}RGB\\+bg\allowbreak{}RGB};
 \node[box] (ShaderFn) at (5.0,0) {\textbf{Shader\allowbreak{}Fn}\\\rule{\linewidth}{.3pt}\\+call(params)};
@@ -572,7 +553,7 @@ await startApp(app);
 \subsection{Renderer Data Flow}\label{record-015-renderer-data-flow}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (MODEL) at (-2.5,0.0) {MODEL};
 \node[box] (VIEW) at (-2.5,-2.6) {VIEW};
 \node[box] (CANVAS_CALL) at (0.0,-5.2) {CANVAS\_CALL};
@@ -610,7 +591,7 @@ await startApp(app);
 Bijou components should degrade intentionally when output is not an interactive terminal.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Component) at (0.0,0.0) {Component or Block};
 \node[box] (Interactive) at (-7.5,-2.6) {interactive: rich terminal UI};
 \node[box] (Static) at (-2.5,-2.6) {static: fixed visual output};
@@ -647,7 +628,7 @@ Use this rule:
 For reusable application surfaces, use Blocks. Blocks declare metadata, variants, slots, data requirements, command intents, and mode-lowering posture. They do not pull mutable state directly.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Provider) at (0.0,0.0) {Provider publishes immutable snapshot};
 \node[box] (Snapshot) at (0.0,-2.6) {Binding\allowbreak{}Snapshot};
 \node[box] (Frame) at (0.0,-5.2) {Binding\allowbreak{}Frame};
@@ -666,7 +647,7 @@ For reusable application surfaces, use Blocks. Blocks declare metadata, variants
 \end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (DataRequirement) at (-5.0,0) {\textbf{Data\allowbreak{}Requirement}\\\rule{\linewidth}{.3pt}\\+id\\+resource};
 \node[box] (BindingSnapshot) at (0.0,0) {\textbf{Binding\allowbreak{}Snapshot}\\\rule{\linewidth}{.3pt}\\+provider\allowbreak{}Id\\+requirement\allowbreak{}Id\\+version\\+status\\+data};
 \node[box] (BindingFrame) at (5.0,0) {\textbf{Binding\allowbreak{}Frame}\\\rule{\linewidth}{.3pt}\\+require(id)\\+get(id)\\+status(id)\\+issues(id)};
@@ -681,19 +662,12 @@ For reusable application surfaces, use Blocks. Blocks declare metadata, variants
 
 That loop is unidirectional:
 
-\begin{CodeBlock}
-business logic/providers
-  -> immutable snapshots
-  -> render frame
-  -> views/blocks render
-  -> command intents leave as user intent
-  -> business logic owns change
-\end{CodeBlock}
+\input{diagrams/flows/flow-058}
 
 \section{Common Mistakes}\label{record-015-common-mistakes}
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
 \node[box] (Bad1) at (-10.0,0.0) {Render reads files or process.env};
 \node[box] (Fix1) at (-10.0,-2.6) {Move host access behind adapter};
 \node[box] (Bad2) at (-5.0,0.0) {View mutates model};
@@ -712,25 +686,7 @@ business logic/providers
 \end{tikzpicture}}
 \end{center}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule\noalign{}
-{M\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}k\allowbreak{}e}
- & {B\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} {p\allowbreak{}a\allowbreak{}t\allowbreak{}h}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{P\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g} \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}i\allowbreak{}n} {i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} {a} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {L\allowbreak{}e\allowbreak{}t} {h\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {p\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}e} {m\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} {o\allowbreak{}r} {f\allowbreak{}o\allowbreak{}r\allowbreak{}m} {a\allowbreak{}n\allowbreak{}s\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.} \\
-{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g} {p\allowbreak{}r\allowbreak{}o\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r} {r\allowbreak{}e\allowbreak{}f\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}h} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {E\allowbreak{}m\allowbreak{}i\allowbreak{}t} {a} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{};} {b\allowbreak{}u\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} {l\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}c} {o\allowbreak{}w\allowbreak{}n\allowbreak{}s} {c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}.} \\
-{D\allowbreak{}u\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {E\allowbreak{}n\allowbreak{}g\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h} {f\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} {i\allowbreak{}n} {t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d} {c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}s} & {L\allowbreak{}o\allowbreak{}a\allowbreak{}d} {E\allowbreak{}n\allowbreak{}g\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h} {f\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k} {s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}l\allowbreak{}y\allowbreak{}.} \\
-{U\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g} {a} {f\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} {T\allowbreak{}U\allowbreak{}I} {f\allowbreak{}o\allowbreak{}r} {s\allowbreak{}i\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e} {o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} & {U\allowbreak{}s\allowbreak{}e} {c\allowbreak{}o\allowbreak{}r\allowbreak{}e} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s} {a\allowbreak{}n\allowbreak{}d} {a} {N\allowbreak{}o\allowbreak{}d\allowbreak{}e} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} \\
-{T\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} {g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}i\allowbreak{}c\allowbreak{}s} {a\allowbreak{}s} {r\allowbreak{}a\allowbreak{}w} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} {e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y\allowbreak{}w\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e} & {P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}e} {t\allowbreak{}h\allowbreak{}e\allowbreak{}m} {t\allowbreak{}o} \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n} {l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} {a\allowbreak{}n\allowbreak{}d} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}g} {m\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}.} \\
-\end{longtable}
-}
+\input{tables/table-006}
 
 \section{Validation Checklist}\label{record-015-validation-checklist}
 

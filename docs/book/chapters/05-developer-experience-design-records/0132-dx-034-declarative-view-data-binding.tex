@@ -83,17 +83,7 @@ Views do not mutate business state, provider state, caches, stores, channels, or
 
 Views communicate user intent by emitting Commands. Business logic handles those Commands, updates state or provider inputs, and produces the next immutable snapshot. That is the loop.
 
-\begin{CodeBlock}
-business state / adapters
-  -> providers
-  -> immutable binding snapshots
-  -> active view hierarchy
-  -> render
-  -> user input
-  -> Commands expressing intent
-  -> business logic
-  -> next state / provider inputs
-\end{CodeBlock}
+\input{diagrams/flows/flow-002}
 
 There is no reverse data mutation path from view to provider.
 
@@ -628,12 +618,7 @@ Provider updates do not mutate rendered views or existing frames.
 
 The lifecycle flow is:
 
-\begin{CodeBlock}
-provider publishes snapshot
-  -> runtime records binding invalidation
-  -> runtime assembles next BindingFrame
-  -> active view renders the next frame
-\end{CodeBlock}
+\input{diagrams/flows/flow-003}
 
 Invalidation belongs to runtime binding ownership, not to rendered cells. Static, pipe, and accessible modes must be able to observe lifecycle facts such as active, suspended, disposed, loading, stale, empty, error, and invalidated without parsing terminal output.
 
@@ -697,24 +682,13 @@ The public vocabulary stays deliberately small:
 
 Allowed transitions are:
 
-\begin{CodeBlock}
-active -> suspended
-active -> disposed
-suspended -> active
-suspended -> disposed
-active -> active by invalidation only
-suspended -> suspended by invalidation only
-\end{CodeBlock}
+\input{diagrams/flows/flow-004}
 
 Disposed bindings cannot be activated, suspended, or invalidated. A disposed binding means ownership was released; later activation requires a new lifecycle record and a new ownership event.
 
 Provider updates create invalidation records. They do not mutate existing frames, fetch data, call providers, or dispatch Commands:
 
-\begin{CodeBlock}
-provider publishes snapshot
-  -> runtime creates BindingInvalidation
-  -> runtime later assembles next BindingFrame
-\end{CodeBlock}
+\input{diagrams/flows/flow-005}
 
 Lifecycle records are immutable facts, not managers. They expose no provider handles, subscription handles, refresh methods, command dispatch callbacks, mutable stores, or render hooks.
 
@@ -819,12 +793,7 @@ DX-034H proves the provider-update half of the loop without implementing a provi
 
 It resolves the collection's requirements against the scope, assembles the next immutable \texttt{B\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e}, and records provider updates as lifecycle invalidations. It never mutates the previous frame or lifecycle records. Snapshots whose provider id and version already appear in a lifecycle record's provider-update invalidations do not create duplicate invalidations or lifecycle churn. Explicit provider assignments carried by active binding entries are authoritative: a scope-resolved provider that conflicts with an explicit assignment becomes a deterministic \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h} issue rather than data in the frame.
 
-\begin{CodeBlock}
-provider publishes snapshot
-  -> binding lifecycle records receive invalidation facts
-  -> runtime assembles next immutable BindingFrame
-  -> views later render the new frame
-\end{CodeBlock}
+\input{diagrams/flows/flow-006}
 
 DX-034H does not fetch data, subscribe, refresh providers, retain caches, walk the active hierarchy, render AppShell, or dispatch Commands.
 
@@ -834,12 +803,7 @@ DX-034I proves the command half of the loop without putting business logic in vi
 
 Views emit branded \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n} values from declared \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} metadata. Runtime code maps those emissions through explicit \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e} values into the existing \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}. Business logic still handles the resulting command later through the normal command-buffer path. Emissions copy and deeply freeze inert payload data before routing so caller mutation cannot change the command that eventually reaches business logic.
 
-\begin{CodeBlock}
-view emits command intent
-  -> runtime maps intent to a command
-  -> command buffer records the command
-  -> business logic applies the command later
-\end{CodeBlock}
+\input{diagrams/flows/flow-007}
 
 Command intents and emissions expose no provider handles, subscription handles, refresh methods, dispatch callbacks, mutable stores, or render hooks.
 
@@ -974,12 +938,7 @@ Schemas validate the shape of data. Providers answer where data comes from, when
 
 The two should compose:
 
-\begin{CodeBlock}
-provider snapshot
-  -> schema adapter validates data
-  -> immutable binding frame
-  -> block render
-\end{CodeBlock}
+\input{diagrams/flows/flow-008}
 
 \section{Accessibility / Assistive Posture}\label{record-132-accessibility-assistive-posture}
 

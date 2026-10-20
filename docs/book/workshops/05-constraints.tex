@@ -1,0 +1,32 @@
+\chapter*{Workshop 5: When the terminal fights back}\label{workshop-05}
+\addcontentsline{toc}{chapter}{W5: When the terminal fights back}
+
+\section{Reduce the available space}
+
+Resize the interactive monitor to twenty-four columns and eight rows. Below forty-two columns, its presentation changes from a table to compact job records. The renderer wraps the content into cells, keeps a small heading region, and provides a scrollable body with a footer. Moving selection brings the selected job into the visible body; \texttt{j} and \texttt{k} let the reader inspect more content. The model still owns job identities and selection while the geometry changes.
+
+\subsection{Do not confuse clipping with usability}
+
+A Surface bounded to its allocated rectangle can be geometrically correct while hiding the only cancellation instruction. The companion tests dimensions down to one cell to catch allocation and width errors. Its practical small-viewport target is twenty-four by eight. The one-cell checks establish bounds, not a claim that the complete task is usable in that space. A product should declare its minimum useful geometry and provide an understandable recovery path below it.
+
+\subsection{Terminal cells are a constraint}
+
+String length is not cell width. A wide character can occupy two cells, a combining accent can share a cell, and an emoji can contain several code points. The companion's cell-wrapping helper walks grapheme clusters and uses Bijou's width calculation. Its tests include these cases at controlled dimensions. A cluster too wide for a one-cell allocation receives a visible placeholder. That is a deliberate loss of shape at an extreme bound, not a silent claim that every character fits.
+
+The cost is another layout pass and a dependency on the terminal's width conventions. Actual emulators and fonts can disagree about edge cases. Controlled cell tests establish the renderer's chosen contract; they do not replace checking the terminals supported by the product.
+
+\section{Remove presentation assumptions}
+
+\subsection{Long copy and no color}
+
+Run checkpoint 05. Its long-copy fixture exposes assumptions hidden by short English labels. The fixture is not a localization catalog: it changes the title to exercise expansion while the rest of the application remains English. A real localization exercise would move complete messages, counts and direction into an explicit catalog and test their effect on focus and geometry. Translating a few words is not the same acceptance claim.
+
+Run the static mode with \texttt{NO\_COLOR=1}. A failed job must still have a word identifying its state and an explanation. Redirect output and inspect the TSV. A consumer should not have to strip interactive cursor control codes before reading the data. Force interactive mode without a TTY and observe the explicit error rather than an application pretending that raw keyboard input is available.
+
+\subsection{Interrupt at an inconvenient time}
+
+Start a job and close the application before it completes. Scheduled callbacks belong to an owner that must dispose of them. The timer exercise makes a missing disposal observable; the separate pseudo-terminal script tests terminal restoration after SIGTERM. For a real process runner, interruption also needs a policy for child processes, partial output and a meaningful exit status. The current simulated adapter does not establish those guarantees.
+
+\section{Choose an honest intermediate result}
+
+The small-layout implementation retains statuses, numeric progress, errors, selection and controls through compact text and scrolling. It gives up simultaneous visibility of every column. That tradeoff should be judged against the task. If an operator must compare hundreds of jobs at once, a different interaction or a larger minimum viewport may be appropriate. A framework's ability to paint a small rectangle does not make every workflow fit inside it.

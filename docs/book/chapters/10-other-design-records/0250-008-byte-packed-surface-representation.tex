@@ -113,31 +113,7 @@ Surface rendering in Bijou goes from ``every cell is a heap-allocated object wit
 
 \subsection{Benchmark Results}\label{record-250-benchmark-results}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {M\allowbreak{}a\allowbreak{}i\allowbreak{}n} {b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
- & {R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8}
- & {D\allowbreak{}e\allowbreak{}l\allowbreak{}t\allowbreak{}a}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{L\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}0} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}5} {m\allowbreak{}s} & \textbf{{-\allowbreak{}3\allowbreak{}\%}} \\
-{L\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}+\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}.\allowbreak{}8\allowbreak{}6} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}7\allowbreak{}4} {m\allowbreak{}s} & \textbf{{-\allowbreak{}7\allowbreak{}\%}} \\
-{L\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {2\allowbreak{}7\allowbreak{}1\allowbreak{}×\allowbreak{}7\allowbreak{}1} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}3} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}1} {m\allowbreak{}s} & \textbf{{-\allowbreak{}3\allowbreak{}\%}} \\
-{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}9\allowbreak{}5} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}9} {m\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}5\allowbreak{}\%} \\
-{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} {n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}6} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}4} {m\allowbreak{}s} & {+\allowbreak{}1\allowbreak{}1\allowbreak{}3\allowbreak{}\%} \\
-{S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}2} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}3} {m\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}6\allowbreak{}\%} \\
-{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {n\allowbreak{}o\allowbreak{}o\allowbreak{}p} {p\allowbreak{}u\allowbreak{}l\allowbreak{}s\allowbreak{}e\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}2} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}2} {m\allowbreak{}s} & \textbf{{-\allowbreak{}9\allowbreak{}\%}} \\
-\end{longtable}
-}
+\input{tables/table-064}
 
 Real-world DOGFOOD rendering is faster. Synthetic stress tests still show overhead from the \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} hex-parsing path --- these will improve as more rendering paths move to direct byte manipulation.
 

@@ -1,0 +1,18 @@
+\chapter*{Version and reproducibility}\label{book-reproducibility}
+\addcontentsline{toc}{chapter}{Version and reproducibility}
+
+\section*{The code this edition teaches}
+
+The job-monitor workshops use a published release and a separate companion repository. Check out the exact commit below, run \texttt{npm ci}, then follow each workshop's checkpoint command. The frozen historical documents elsewhere in this book describe their original versions; they do not change the teaching application's pinned API.
+
+\input{tables/edition-versions}
+
+\subsection*{The tested boundary}
+
+The companion passes typechecking and fifteen deterministic tests. A separate local pseudo-terminal check exercised keyboard quit, resize and SIGTERM shutdown and verified restoration of canonical-input and echo flags. The recorded host was macOS arm64. Human screen-reader usability and a broad terminal-emulator matrix were not tested. Linux CI status belongs to the companion's recorded GitHub Actions run. Full local details are in the companion's \path{VERIFICATION.json}.
+
+\subsection*{Checkpoints and corrections}
+
+Workshop commands 01 through 05 cover the domain snapshot, four modes, interactive application, stale-result rejection and constrained-copy fixture. Workshop 6 runs the test suite and broken/repair exercises. Workshop 7 inspects the distributable source package. The edition tag is \texttt{book-v1}; the immutable commit is the definitive reference.
+
+Companion and errata: \url{https://github.com/flyingrobots/bijou-job-monitor}. Report corrections at \url{https://github.com/flyingrobots/bijou-job-monitor/issues}, including the workshop, commit, command and environment. The table and specimen fonts are publication choices; they do not imply that a reader's terminal has those fonts installed.

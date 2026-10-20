@@ -96,11 +96,11 @@ const success = ctx.status('success');
 ```
 
 For the canonical meaning of each token family and the first-party usage rules,
-read [Theme Token Vocabulary](../../docs/book/bijou-designs.pdf#page=332).
+read [Theme Token Vocabulary](../../docs/book/bijou-designs.pdf#page=359).
 
 For a copy-paste starter theme, DTCG JSON shape, and the practical loading
 path for custom themes, read
-[Theme Authoring Guide](../../docs/book/bijou-designs.pdf#page=322).
+[Theme Authoring Guide](../../docs/book/bijou-designs.pdf#page=348).
 
 ## Custom Components
 

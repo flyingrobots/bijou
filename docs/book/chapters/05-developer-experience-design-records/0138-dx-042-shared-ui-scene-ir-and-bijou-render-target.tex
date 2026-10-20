@@ -39,18 +39,7 @@ Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbre
 
 The shared IR should sit above Bijou and Geordi:
 
-\begin{CodeBlock}
-GraphQL SDL / authored source
-  -> Wesley semantic graph and domain law
-    -> ui-scene-ir/1
-      -> bijou-layout/1
-        -> Bijou Surface
-          -> terminal cells
-
-      -> geordi-ir/1
-        -> Geordi renderer
-          -> pixels and render receipts
-\end{CodeBlock}
+\input{diagrams/flows/flow-009}
 
 This keeps the final renderer substrates honest. Geordi owns pixel-oriented render proof. Bijou owns terminal cell rendering, input, focus, runtime interaction, and agent-legible surfaces. The shared IR owns portable scene structure, semantic identity, bindings, localization references, theme token references, actions, and source maps.
 
@@ -289,7 +278,7 @@ Bijou does not claim:
 \section{Relationship Diagram}\label{record-138-relationship-diagram}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\BookDiagram{%
 \begin{tikzpicture}[booknode/.style={draw=BookHeading,line width=.6pt,fill=BookPanel,rounded corners=1.5pt,align=center,text width=29mm,minimum height=10mm,inner sep=5pt,font=\small},bookedge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.65pt},every edge quotes/.style={font=\scriptsize,fill=white,inner sep=2pt,text=BookMuted}]
 \node[booknode] (SDL) at (0,0) {Graph\allowbreak{}QL SDL or authored source};
 \node[booknode] (W) at (0,-1.6) {Wesley semantic compiler};
@@ -453,12 +442,7 @@ type BijouLayoutIr = {
 
 The final render target remains \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
 
-\begin{CodeBlock}
-ui-scene-ir/1
-  -> bijou-layout/1
-    -> Surface
-      -> terminal
-\end{CodeBlock}
+\input{diagrams/flows/flow-010}
 
 The \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} can then be inspected, hashed, diffed, serialized for MCP, or recorded in a renderer playback artifact.
 
@@ -466,13 +450,7 @@ The \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak
 
 Geordi lowering turns portable intent into a pixel-oriented render contract:
 
-\begin{CodeBlock}
-ui-scene-ir/1
-  -> geordi-ir/1
-    -> browser/native renderer
-      -> pixel buffer
-      -> receipt
-\end{CodeBlock}
+\input{diagrams/flows/flow-011}
 
 Geordi can preserve the same node IDs, token references, localization references, and source maps while resolving geometry and render-profile facts for pixel output.
 

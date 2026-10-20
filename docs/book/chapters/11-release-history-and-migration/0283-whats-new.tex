@@ -46,9 +46,7 @@ Maintainers should treat the release evidence packet as the authoritative 7.2 re
 
 Bijou 7.2.0 intentionally stops short of the next Runtime Graph product. The forward path remains:
 
-\begin{CodeBlock}
-GraphQL Blocks -> Bijou Blocks IR -> Geordi render targets -> TUI | Browser | Native UI
-\end{CodeBlock}
+\input{diagrams/flows/flow-060}
 
 That work belongs to V8 and later. V7.2 makes the current release surface clean enough to move on without carrying avoidable release debt forward.
 

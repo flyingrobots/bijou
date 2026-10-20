@@ -21,13 +21,7 @@ DL-019 added Bijou-native theme selector rules and inspection facts. This cycle 
 
 The public runtime contract remains unchanged:
 
-\begin{CodeBlock}
-rule-authored preset definitions
-  -> TokenGraph
-    -> concrete Theme
-      -> ResolvedTheme
-        -> terminal rendering, DTCG interop, and inspectors
-\end{CodeBlock}
+\input{diagrams/flows/flow-045}
 
 No external design-token dependency is introduced. The work is a narrow dogfood pass over Bijou-owned themes only.
 

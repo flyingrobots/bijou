@@ -21,13 +21,7 @@ DL-019 and DL-020 made theme rule provenance inspectable, and DL-021 made the DO
 
 The runtime truth for this slice is:
 
-\begin{CodeBlock}
-active DOGFOOD shell theme
-  -> editable DOGFOOD-local draft
-    -> selected editable color slot
-      -> derived theme token rows
-        -> live token relationship graph
-\end{CodeBlock}
+\input{diagrams/flows/flow-046}
 
 No external design-token package or design-book dependency is added. The useful idea is the relationship graph and immediate feedback loop, implemented through Bijou's existing theme and terminal surface contracts.
 
@@ -167,15 +161,7 @@ The graph is textual and terminal-native. It should show:
   dependency-style edges for major families, such as:
 \end{itemize}
 
-\begin{CodeBlock}
-semantic.accent #7aa7e8 *
-  -> border.secondary
-  -> ui.cursor
-  -> ui.focusGutter
-surface.primary.bg #171827
-  -> surface.primary
-  -> ui.focusGutter.bg
-\end{CodeBlock}
+\input{diagrams/flows/flow-047}
 
 \texttt{A\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}B} means the preview treats \texttt{B} as a consumer or dependent of editable source \texttt{A}. It does not mean runtime derivation has been committed to \texttt{C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h}.
 

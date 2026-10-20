@@ -186,28 +186,11 @@ Views and block previews should receive the port or localized objects. They shou
 
 \section{Expected Flow}\label{record-195-expected-flow}
 
-\begin{CodeBlock}
-CSV source string table
-  -> generated per-locale JSON catalogs
-  -> selected-locale catalog loader adapter
-  -> I18nRuntime
-  -> LocalizationPort
-  -> LocalizedObject
-  -> DOGFOOD / Blocks / shell surfaces
-\end{CodeBlock}
+\input{diagrams/flows/flow-056}
 
 The fallback posture remains:
 
-\begin{CodeBlock}
-production:
-  selected locale value
-  -> English fallback catalog
-
-non-production:
-  selected locale value
-  -> loud missing-localization object
-  -> English fallback only when missing markers are disabled
-\end{CodeBlock}
+\input{diagrams/flows/flow-057}
 
 \section{DOGFOOD Implications}\label{record-195-dogfood-implications}
 

@@ -29,30 +29,7 @@
 
 After RE-008 merged (byte-packed surface representation, PR \#62, merge commit \texttt{0\allowbreak{}d\allowbreak{}f\allowbreak{}3\allowbreak{}e\allowbreak{}9\allowbreak{}7}), an audit of the existing renderer benchmark suite revealed a broad performance regression across every scenario:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8} {→} {P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}0} {→} {2\allowbreak{}.\allowbreak{}3\allowbreak{}2} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}3\allowbreak{}1\allowbreak{}\%\allowbreak{})} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}8\allowbreak{}6} {→} {2\allowbreak{}.\allowbreak{}7\allowbreak{}1} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}3\allowbreak{}1\allowbreak{}\%\allowbreak{})} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}3} {→} {1\allowbreak{}.\allowbreak{}0\allowbreak{}9} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}5\allowbreak{}1\allowbreak{}\%\allowbreak{})} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}8} {→} {1\allowbreak{}.\allowbreak{}5\allowbreak{}5} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}5\allowbreak{}0\allowbreak{}\%\allowbreak{})} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {2\allowbreak{}.\allowbreak{}6\allowbreak{}1} {→} {2\allowbreak{}.\allowbreak{}9\allowbreak{}9} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}\%\allowbreak{})} \\
-{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}2\allowbreak{}2} {→} {0\allowbreak{}.\allowbreak{}4\allowbreak{}1} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}4\allowbreak{}5\allowbreak{}\%\allowbreak{})} \\
-{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}6} {→} {0\allowbreak{}.\allowbreak{}3\allowbreak{}4} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}5\allowbreak{}3\allowbreak{}\%\allowbreak{})} \\
-{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}2} {→} {0\allowbreak{}.\allowbreak{}7\allowbreak{}0} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}4\allowbreak{}0\allowbreak{}\%\allowbreak{})} \\
-{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}9\allowbreak{}5} {→} {1\allowbreak{}.\allowbreak{}2\allowbreak{}1} {m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {(\allowbreak{}-\allowbreak{}2\allowbreak{}2\allowbreak{}\%\allowbreak{})} \\
-{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} \\
-\end{longtable}
-}
+\input{tables/table-092}
 
 The most dramatic finding: \textbf{\texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} transient heap allocation grew from 1.4 MiB to 62 MiB per scenario run (44× increase)}. This is the signature of the current \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} path: \texttt{s\allowbreak{}g\allowbreak{}r\allowbreak{}C\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e} Map growth, \texttt{S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}d\allowbreak{}e} key allocation per cell, \texttt{b\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{} \allowbreak{}+\allowbreak{}=\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.} string concatenation, and side-table grapheme string churn.
 
@@ -82,64 +59,13 @@ An earlier claim of ``-5.5\% DOGFOOD'' from the RE-008 handoff does not reconcil
 
 The \texttt{D\allowbreak{}E\allowbreak{}F\allowbreak{}A\allowbreak{}U\allowbreak{}L\allowbreak{}T\allowbreak{}\_\allowbreak{}R\allowbreak{}E\allowbreak{}N\allowbreak{}D\allowbreak{}E\allowbreak{}R\allowbreak{}E\allowbreak{}R\allowbreak{}\_\allowbreak{}B\allowbreak{}E\allowbreak{}N\allowbreak{}C\allowbreak{}H\allowbreak{}\_\allowbreak{}S\allowbreak{}C\allowbreak{}E\allowbreak{}N\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}O\allowbreak{}S} array in \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}s} defines 10 scenarios across 7 \texttt{k\allowbreak{}i\allowbreak{}n\allowbreak{}d}s. Each scenario has fixed \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s}, \texttt{r\allowbreak{}o\allowbreak{}w\allowbreak{}s}, \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s}, and \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}m\allowbreak{}u\allowbreak{}p\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s}. Warmup frames run before timing starts so JIT optimization has stabilized.
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {K\allowbreak{}i\allowbreak{}n\allowbreak{}d}
- & {S\allowbreak{}i\allowbreak{}z\allowbreak{}e}
- & {F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s}
- & {W\allowbreak{}h\allowbreak{}a\allowbreak{}t} {i\allowbreak{}t} {m\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {2\allowbreak{}4\allowbreak{}0} & {D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} {l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}:} \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})} {+} \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} {p\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.} {N\allowbreak{}o} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.} \\
-\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}8\allowbreak{}0} & {S\allowbreak{}a\allowbreak{}m\allowbreak{}e} {a\allowbreak{}s} {a\allowbreak{}b\allowbreak{}o\allowbreak{}v\allowbreak{}e} {+} \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}(\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{},\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{})} {t\allowbreak{}o} {a} {c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {s\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}.} \\
-\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {2\allowbreak{}7\allowbreak{}1\allowbreak{}×\allowbreak{}7\allowbreak{}1} & {1\allowbreak{}8\allowbreak{}0} & {L\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}r} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{},} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {o\allowbreak{}n\allowbreak{}l\allowbreak{}y\allowbreak{}.} \\
-\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f} & {2\allowbreak{}7\allowbreak{}1\allowbreak{}×\allowbreak{}7\allowbreak{}1} & {1\allowbreak{}2\allowbreak{}0} & {L\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}r} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{},} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {+} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.} \\
-\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}8\allowbreak{}0} & {D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} {d\allowbreak{}o\allowbreak{}c\allowbreak{}s} {e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}r} {p\allowbreak{}a\allowbreak{}g\allowbreak{}e} {(\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}a\allowbreak{}r} {+} {d\allowbreak{}o\allowbreak{}c} {b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{})\allowbreak{}.} \\
-\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {2\allowbreak{}4\allowbreak{}0} & {P\allowbreak{}u\allowbreak{}r\allowbreak{}e} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} {p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:} \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}.\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})\allowbreak{};\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}.\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{};\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}.\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{}s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} {t\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}e} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}s} {p\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {+} {o\allowbreak{}n\allowbreak{}e} \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}w}{.} {N\allowbreak{}o} {a\allowbreak{}p\allowbreak{}p\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.} \\
-\texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {2\allowbreak{}4\allowbreak{}0} & \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}(\allowbreak{}s\allowbreak{}y\allowbreak{}n\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}s\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h\allowbreak{})} {p\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {—} {t\allowbreak{}h\allowbreak{}e} {l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} {n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e} {i\allowbreak{}n} {i\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.} \\
-\texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}8\allowbreak{}0} & {S\allowbreak{}y\allowbreak{}n\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}t\allowbreak{}i\allowbreak{}c} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}:} {t\allowbreak{}w\allowbreak{}o} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s} {b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}t} {b\allowbreak{}y} \texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r} {(\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} {3\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}5\allowbreak{}t\allowbreak{}h\allowbreak{}/\allowbreak{}7\allowbreak{}t\allowbreak{}h} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {r\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} {+} {o\allowbreak{}c\allowbreak{}c\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l} {m\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{})\allowbreak{},} \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f} {c\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}d} {i\allowbreak{}n} {a} {t\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} {l\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.} {E\allowbreak{}x\allowbreak{}e\allowbreak{}r\allowbreak{}c\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}s} {t\allowbreak{}h\allowbreak{}e} {p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}’\allowbreak{}s} {S\allowbreak{}G\allowbreak{}R} {c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e} {+} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {c\allowbreak{}o\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}.} \\
-\texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}8\allowbreak{}0} & \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}C\allowbreak{}t\allowbreak{}x\allowbreak{})} {—} {t\allowbreak{}h\allowbreak{}e} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e} {(\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e} {t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{})\allowbreak{}.} \\
-\texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} & {2\allowbreak{}2\allowbreak{}0\allowbreak{}×\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}8\allowbreak{}0} & {F\allowbreak{}u\allowbreak{}l\allowbreak{}l} {r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {l\allowbreak{}o\allowbreak{}o\allowbreak{}p} {(}\texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{} \allowbreak{}\}\allowbreak{})}{)} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {a} {t\allowbreak{}r\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}a\allowbreak{}l} {v\allowbreak{}i\allowbreak{}e\allowbreak{}w} {f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {—} {m\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s} {t\allowbreak{}h\allowbreak{}e} {c\allowbreak{}o\allowbreak{}s\allowbreak{}t} {o\allowbreak{}f} {t\allowbreak{}h\allowbreak{}e} {e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t} {l\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{},} {p\allowbreak{}u\allowbreak{}l\allowbreak{}s\allowbreak{}e} {t\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}d} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}u\allowbreak{}t} {r\allowbreak{}e\allowbreak{}a\allowbreak{}l} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}.} \\
-\end{longtable}
-}
+\input{tables/table-093}
 
 \subsection{Metrics (current)}\label{record-422-metrics-current}
 
 Per sample, as defined in \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}S\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e} at \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}2\allowbreak{}8}:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-{F\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d}
- & {M\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
- & {H\allowbreak{}o\allowbreak{}w} {i\allowbreak{}t\allowbreak{}’\allowbreak{}s} {m\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}d}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{e\allowbreak{}l\allowbreak{}a\allowbreak{}p\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}M\allowbreak{}s} & {T\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}l} {w\allowbreak{}a\allowbreak{}l\allowbreak{}l} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {f\allowbreak{}o\allowbreak{}r} \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s} {i\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} {(\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}l\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} {w\allowbreak{}a\allowbreak{}r\allowbreak{}m\allowbreak{}u\allowbreak{}p\allowbreak{})} & \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}(\allowbreak{})} {d\allowbreak{}e\allowbreak{}l\allowbreak{}t\allowbreak{}a\allowbreak{}s} \\
-\texttt{a\allowbreak{}v\allowbreak{}g\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s} & \texttt{e\allowbreak{}l\allowbreak{}a\allowbreak{}p\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}M\allowbreak{}s\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s} & {D\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}d} \\
-\texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}x\allowbreak{}F\allowbreak{}p\allowbreak{}s} & \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{}0\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}a\allowbreak{}v\allowbreak{}g\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s} & {D\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}d} \\
-\texttt{w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s} & {C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t} {o\allowbreak{}f} \texttt{i\allowbreak{}o\allowbreak{}.\allowbreak{}w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} {c\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}s} {o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d} {b\allowbreak{}y} {t\allowbreak{}h\allowbreak{}e} {s\allowbreak{}i\allowbreak{}n\allowbreak{}k} {(\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}s} {o\allowbreak{}n\allowbreak{}l\allowbreak{}y\allowbreak{})} & {S\allowbreak{}i\allowbreak{}n\allowbreak{}k} {c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
-\texttt{b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}W\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}n} & {S\allowbreak{}u\allowbreak{}m} {o\allowbreak{}f} \texttt{.\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h} {o\allowbreak{}f} {a\allowbreak{}l\allowbreak{}l} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} {p\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}d} {t\allowbreak{}o} \texttt{w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} & {S\allowbreak{}i\allowbreak{}n\allowbreak{}k} {c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
-\texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}D\allowbreak{}e\allowbreak{}l\allowbreak{}t\allowbreak{}a} & \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}U\allowbreak{}s\allowbreak{}e\allowbreak{}d} {a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {r\allowbreak{}u\allowbreak{}n} {m\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}s} {b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{},} \textbf{{w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}u\allowbreak{}t}} {f\allowbreak{}o\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}d} {G\allowbreak{}C} {b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e} {t\allowbreak{}a\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}h\allowbreak{}e} ``{a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r}'' {r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} {M\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s} {p\allowbreak{}e\allowbreak{}a\allowbreak{}k} {a\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {d\allowbreak{}u\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}h\allowbreak{}e} {r\allowbreak{}u\allowbreak{}n\allowbreak{}.} & \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}U\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} {(\allowbreak{}r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}s} \texttt{-\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}c}{)} \\
-\texttt{r\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}D\allowbreak{}e\allowbreak{}l\allowbreak{}t\allowbreak{}a} & \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}U\allowbreak{}s\allowbreak{}e\allowbreak{}d} {a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {r\allowbreak{}u\allowbreak{}n} {m\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}s} {b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{},} \textbf{{w\allowbreak{}i\allowbreak{}t\allowbreak{}h}} {f\allowbreak{}o\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}d} {G\allowbreak{}C} {b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e} {b\allowbreak{}o\allowbreak{}t\allowbreak{}h} {r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.} {M\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s} {l\allowbreak{}o\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}d} {a\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.} & \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}U\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} {a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} \texttt{g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l\allowbreak{}.\allowbreak{}g\allowbreak{}c\allowbreak{}(\allowbreak{})} {(\allowbreak{}r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}s} \texttt{-\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}c}{)} \\
-\end{longtable}
-}
+\input{tables/table-094}
 
 Per scenario (aggregated across samples), only \textbf{median} is currently computed. This is a known gap --- see \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design}{RE-017 task I-2} for the expansion to mean / stddev / min / max / p50 / p90 / p99.
 
@@ -236,8 +162,10 @@ Completed task I-0 (bench infrastructure audit). Key findings:
 \item
   Created new audit tasks: I-0c (methodology docs), I-0d (pipeline instrumentation), I-0e (investigate broad slowdown).
 \item
-  Hypothesis to test in I-0e: per-cell hex string parsing in the \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} path is the bulk of the regression. Trace: \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}5\allowbreak{}3\allowbreak{}2} → \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}B\allowbreak{}u\allowbreak{}f} (line 300) → \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}R\allowbreak{}G\allowbreak{}B} (line 288) + \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r} + \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}. Pre-RE-008, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} was an object assignment. Post-RE-008, every \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} call does 6 \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}t}s, 6 \texttt{h\allowbreak{}e\allowbreak{}x\allowbreak{}D} lookups, modifier array iteration, and two byte writes per color. For a paint-heavy scenario that calls \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} per cell, this adds \textasciitilde20-30 operations per cell on a path that used to be a single object assignment. No compensating savings on \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} because it never enters the diff path where the byte-packed representation pays off.
+  Hypothesis to test in I-0e: per-cell hex string parsing in the \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} path is the bulk of the regression. The illustrated call path below identifies the source locations. Pre-RE-008, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} was an object assignment. Post-RE-008, every \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} call does 6 \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}t}s, 6 \texttt{h\allowbreak{}e\allowbreak{}x\allowbreak{}D} lookups, modifier array iteration, and two byte writes per color. For a paint-heavy scenario that calls \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} per cell, this adds \textasciitilde20-30 operations per cell on a path that used to be a single object assignment. No compensating savings on \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} because it never enters the diff path where the byte-packed representation pays off.
 \end{enumerate}
+
+\input{diagrams/flows/flow-082}
 
 If the hypothesis holds, a cheap early win is possible: cache theme-token hex parses so repeated calls to \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{}f\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}\}\allowbreak{})} reuse pre-parsed bytes instead of re-parsing on every call. This would be independent of the byte-pipeline rewrite.
 
@@ -261,137 +189,19 @@ The 10-process × 10-samples-each run completed in \textasciitilde5 minutes. All
 
 \textbf{Frame time (ms) --- full stats across 100 samples}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {M\allowbreak{}e\allowbreak{}a\allowbreak{}n}
- & {S\allowbreak{}t\allowbreak{}d\allowbreak{}D\allowbreak{}e\allowbreak{}v}
- & {M\allowbreak{}i\allowbreak{}n}
- & {P\allowbreak{}5\allowbreak{}0}
- & {P\allowbreak{}9\allowbreak{}0}
- & {P\allowbreak{}9\allowbreak{}9}
- & {M\allowbreak{}a\allowbreak{}x}
- & {C\allowbreak{}o\allowbreak{}V}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {2\allowbreak{}.\allowbreak{}4\allowbreak{}0} & {0\allowbreak{}.\allowbreak{}6\allowbreak{}0\allowbreak{}8} & {2\allowbreak{}.\allowbreak{}2\allowbreak{}9} & {2\allowbreak{}.\allowbreak{}3\allowbreak{}3} & {2\allowbreak{}.\allowbreak{}3\allowbreak{}5} & {3\allowbreak{}.\allowbreak{}7\allowbreak{}9} & {8\allowbreak{}.\allowbreak{}2\allowbreak{}5} & {2\allowbreak{}5\allowbreak{}.\allowbreak{}3\allowbreak{}\%} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {2\allowbreak{}.\allowbreak{}7\allowbreak{}1} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}4\allowbreak{}3} & {2\allowbreak{}.\allowbreak{}6\allowbreak{}7} & {2\allowbreak{}.\allowbreak{}7\allowbreak{}1} & {2\allowbreak{}.\allowbreak{}7\allowbreak{}5} & {2\allowbreak{}.\allowbreak{}7\allowbreak{}9} & {3\allowbreak{}.\allowbreak{}0\allowbreak{}6} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}\%} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}0} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}1\allowbreak{}6} & {1\allowbreak{}.\allowbreak{}0\allowbreak{}7} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}0} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}1} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}5} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}0} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}\%} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}5} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}2\allowbreak{}1} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}2} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}5} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}8} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}2} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}3} & {1\allowbreak{}.\allowbreak{}3\allowbreak{}\%} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {3\allowbreak{}.\allowbreak{}0\allowbreak{}7} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}3\allowbreak{}3} & {2\allowbreak{}.\allowbreak{}8\allowbreak{}9} & {3\allowbreak{}.\allowbreak{}0\allowbreak{}7} & {3\allowbreak{}.\allowbreak{}1\allowbreak{}8} & {3\allowbreak{}.\allowbreak{}7\allowbreak{}0} & {3\allowbreak{}.\allowbreak{}8\allowbreak{}9} & {4\allowbreak{}.\allowbreak{}3\allowbreak{}\%} \\
-{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}0\allowbreak{}7} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}1\allowbreak{}0} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}9\allowbreak{}5} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}0\allowbreak{}6} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}1\allowbreak{}1} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}2\allowbreak{}6} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}0\allowbreak{}1} & {2\allowbreak{}.\allowbreak{}6\allowbreak{}\%} \\
-{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}4\allowbreak{}5} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}7\allowbreak{}4} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}3\allowbreak{}5} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}4\allowbreak{}3} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}4\allowbreak{}8} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}8\allowbreak{}2} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}9\allowbreak{}8} & {2\allowbreak{}.\allowbreak{}2\allowbreak{}\%} \\
-{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}3\allowbreak{}0} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}1\allowbreak{}6} & {0\allowbreak{}.\allowbreak{}6\allowbreak{}9\allowbreak{}4} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}0\allowbreak{}8} & {0\allowbreak{}.\allowbreak{}8\allowbreak{}0\allowbreak{}8} & {0\allowbreak{}.\allowbreak{}8\allowbreak{}4\allowbreak{}1} & {1\allowbreak{}.\allowbreak{}8\allowbreak{}3} & {1\allowbreak{}5\allowbreak{}.\allowbreak{}8\allowbreak{}\%} \\
-{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}4} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}3\allowbreak{}9} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}9} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}4} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}8} & {1\allowbreak{}.\allowbreak{}3\allowbreak{}3} & {1\allowbreak{}.\allowbreak{}4\allowbreak{}9} & {3\allowbreak{}.\allowbreak{}2\allowbreak{}\%} \\
-{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}5} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}0\allowbreak{}3} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}2} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}4} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}0} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}2} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}3} & {2\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}\%} \\
-\end{longtable}
-}
+\input{tables/table-095}
 
 \textbf{Transient heap per scenario run (mean across 100 samples)}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {M\allowbreak{}e\allowbreak{}a\allowbreak{}n}
- & {S\allowbreak{}t\allowbreak{}d\allowbreak{}D\allowbreak{}e\allowbreak{}v}
- & {M\allowbreak{}i\allowbreak{}n}
- & {P\allowbreak{}5\allowbreak{}0}
- & {P\allowbreak{}9\allowbreak{}0}
- & {M\allowbreak{}a\allowbreak{}x}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {3\allowbreak{}3\allowbreak{}.\allowbreak{}8\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}6\allowbreak{}.\allowbreak{}1\allowbreak{}1} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}2} {M\allowbreak{}i\allowbreak{}B} & {4\allowbreak{}5\allowbreak{}.\allowbreak{}3\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {4\allowbreak{}5\allowbreak{}.\allowbreak{}5\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {4\allowbreak{}5\allowbreak{}.\allowbreak{}6\allowbreak{}7} {M\allowbreak{}i\allowbreak{}B} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {4\allowbreak{}9\allowbreak{}.\allowbreak{}1\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}7\allowbreak{}.\allowbreak{}8\allowbreak{}1} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}4\allowbreak{}.\allowbreak{}2\allowbreak{}2} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}1\allowbreak{}.\allowbreak{}7\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}1\allowbreak{}.\allowbreak{}8\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}2\allowbreak{}.\allowbreak{}1\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {2\allowbreak{}5\allowbreak{}.\allowbreak{}1\allowbreak{}7} {M\allowbreak{}i\allowbreak{}B} & {4\allowbreak{}.\allowbreak{}0\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}0\allowbreak{}.\allowbreak{}3\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}6\allowbreak{}.\allowbreak{}2\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}6\allowbreak{}.\allowbreak{}3\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}6\allowbreak{}.\allowbreak{}4\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {2\allowbreak{}8\allowbreak{}.\allowbreak{}8\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {3\allowbreak{}.\allowbreak{}4\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}3\allowbreak{}.\allowbreak{}8\allowbreak{}2} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}9\allowbreak{}.\allowbreak{}6\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}9\allowbreak{}.\allowbreak{}7\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}9\allowbreak{}.\allowbreak{}7\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {5\allowbreak{}3\allowbreak{}.\allowbreak{}2\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}6\allowbreak{}.\allowbreak{}8\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}0\allowbreak{}.\allowbreak{}7\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {5\allowbreak{}8\allowbreak{}.\allowbreak{}1\allowbreak{}1} {M\allowbreak{}i\allowbreak{}B} & {9\allowbreak{}2\allowbreak{}.\allowbreak{}6\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {9\allowbreak{}8\allowbreak{}.\allowbreak{}4\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} \\
-{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}0} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}1} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}0} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} \\
-{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}6} {M\allowbreak{}i\allowbreak{}B} \\
-{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {5\allowbreak{}1\allowbreak{}.\allowbreak{}7\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {3\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}0\allowbreak{}.\allowbreak{}9\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}0} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} \\
-{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {6\allowbreak{}1\allowbreak{}.\allowbreak{}1\allowbreak{}0} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}8\allowbreak{}.\allowbreak{}6\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}1} {M\allowbreak{}i\allowbreak{}B} & {5\allowbreak{}2\allowbreak{}.\allowbreak{}0\allowbreak{}2} {M\allowbreak{}i\allowbreak{}B} & {9\allowbreak{}2\allowbreak{}.\allowbreak{}1\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}0\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} \\
-{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}8} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}3} {M\allowbreak{}i\allowbreak{}B} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} \\
-\end{longtable}
-}
+\input{tables/table-096}
 
 \textbf{Regression vs pre-RE-008 baseline (median comparison --- most fair)}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {B\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}n}
- & {P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8} {P\allowbreak{}5\allowbreak{}0}
- & {Δ} {\%}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}6\allowbreak{}0} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}3\allowbreak{}3} {m\allowbreak{}s} & \textbf{{+\allowbreak{}4\allowbreak{}5\allowbreak{}.\allowbreak{}6\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}8\allowbreak{}6} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}7\allowbreak{}1} {m\allowbreak{}s} & \textbf{{+\allowbreak{}4\allowbreak{}5\allowbreak{}.\allowbreak{}7\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}5\allowbreak{}3\allowbreak{}4} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}0} {m\allowbreak{}s} & \textbf{{+\allowbreak{}1\allowbreak{}0\allowbreak{}6\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}8\allowbreak{}1} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}5} {m\allowbreak{}s} & \textbf{{+\allowbreak{}9\allowbreak{}8\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {2\allowbreak{}.\allowbreak{}6\allowbreak{}1} {m\allowbreak{}s} & {3\allowbreak{}.\allowbreak{}0\allowbreak{}7} {m\allowbreak{}s} & {+\allowbreak{}1\allowbreak{}7\allowbreak{}.\allowbreak{}5\allowbreak{}\%} \\
-{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}2\allowbreak{}2\allowbreak{}4} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}0\allowbreak{}6} {m\allowbreak{}s} & \textbf{{+\allowbreak{}8\allowbreak{}1\allowbreak{}\%}} \\
-{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}1\allowbreak{}6\allowbreak{}1} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}3\allowbreak{}4\allowbreak{}3} {m\allowbreak{}s} & \textbf{{+\allowbreak{}1\allowbreak{}1\allowbreak{}3\allowbreak{}\%}} \\
-{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}4\allowbreak{}2\allowbreak{}1} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}7\allowbreak{}0\allowbreak{}8} {m\allowbreak{}s} & \textbf{{+\allowbreak{}6\allowbreak{}8\allowbreak{}\%}} \\
-{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}9\allowbreak{}5\allowbreak{}1} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}2\allowbreak{}4} {m\allowbreak{}s} & {+\allowbreak{}3\allowbreak{}0\allowbreak{}\%} \\
-{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}9} {m\allowbreak{}s} & {0\allowbreak{}.\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}4} {m\allowbreak{}s} & {-\allowbreak{}1\allowbreak{}7\allowbreak{}\%} {(\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{};} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{})} \\
-\end{longtable}
-}
+\input{tables/table-097}
 
 \textbf{Heap regression vs baseline}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {B\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}n}
- & {P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8} {P\allowbreak{}5\allowbreak{}0}
- & {M\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}l\allowbreak{}e}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {1\allowbreak{}.\allowbreak{}3\allowbreak{}4} {M\allowbreak{}i\allowbreak{}B} & {6\allowbreak{}0\allowbreak{}.\allowbreak{}9\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & \textbf{{\textasciitilde{}\allowbreak{}4\allowbreak{}6\allowbreak{}×}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e} & {1\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}9} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}6\allowbreak{}.\allowbreak{}2\allowbreak{}5} {M\allowbreak{}i\allowbreak{}B} & {2\allowbreak{}.\allowbreak{}6\allowbreak{}×} \\
-{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {6\allowbreak{}4} {K\allowbreak{}i\allowbreak{}B} & {9\allowbreak{}4} {K\allowbreak{}i\allowbreak{}B} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}×} \\
-{a\allowbreak{}l\allowbreak{}l} {o\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}s} & {-} & {-} & {\textasciitilde{}\allowbreak{}1\allowbreak{}×} {(\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}y\allowbreak{},} {n\allowbreak{}o} {c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r} {t\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{})} \\
-\end{longtable}
-}
+\input{tables/table-098}
 
 \textbf{Key observations}
 
@@ -555,34 +365,7 @@ After the expanded 10×10 audit revealed that the \texttt{P\allowbreak{}e\allowb
 
 \textbf{First trustworthy baseline at HEAD (\texttt{9\allowbreak{}4\allowbreak{}1\allowbreak{}f\allowbreak{}6\allowbreak{}2\allowbreak{}c}, Apple M1 Pro, Node v25.8.1):}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}5\allowbreak{}0}
- & {P\allowbreak{}9\allowbreak{}0}
- & {P\allowbreak{}9\allowbreak{}9}
- & {M\allowbreak{}i\allowbreak{}n}
- & {M\allowbreak{}a\allowbreak{}x}
- & {C\allowbreak{}o\allowbreak{}V}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}6\allowbreak{}.\allowbreak{}6\allowbreak{}9} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}9\allowbreak{}.\allowbreak{}3\allowbreak{}2} {µ\allowbreak{}s} & {2\allowbreak{}2\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}1} {µ\allowbreak{}s} & {2\allowbreak{}4\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}4} {µ\allowbreak{}s} & \textbf{{1\allowbreak{}.\allowbreak{}1\allowbreak{}\%}} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}3\allowbreak{}.\allowbreak{}9\allowbreak{}2} {µ\allowbreak{}s} & {6\allowbreak{}4\allowbreak{}4\allowbreak{}.\allowbreak{}2\allowbreak{}9} {µ\allowbreak{}s} & {7\allowbreak{}2\allowbreak{}9\allowbreak{}.\allowbreak{}6\allowbreak{}3} {µ\allowbreak{}s} & {6\allowbreak{}2\allowbreak{}4\allowbreak{}.\allowbreak{}3\allowbreak{}8} {µ\allowbreak{}s} & {7\allowbreak{}6\allowbreak{}1\allowbreak{}.\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & \textbf{{3\allowbreak{}.\allowbreak{}8\allowbreak{}\%}} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}4\allowbreak{}6\allowbreak{}.\allowbreak{}2\allowbreak{}9} {µ\allowbreak{}s} & {9\allowbreak{}5\allowbreak{}1\allowbreak{}.\allowbreak{}7\allowbreak{}5} {µ\allowbreak{}s} & {9\allowbreak{}5\allowbreak{}4\allowbreak{}.\allowbreak{}9\allowbreak{}2} {µ\allowbreak{}s} & {8\allowbreak{}7\allowbreak{}8\allowbreak{}.\allowbreak{}7\allowbreak{}8} {µ\allowbreak{}s} & {9\allowbreak{}5\allowbreak{}5\allowbreak{}.\allowbreak{}1\allowbreak{}4} {µ\allowbreak{}s} & \textbf{{2\allowbreak{}.\allowbreak{}6\allowbreak{}\%}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}3} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}6} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}9} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}4} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}2\allowbreak{}0} {m\allowbreak{}s} & \textbf{{2\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} \\
-\end{longtable}
-}
+\input{tables/table-099}
 
 30 samples per scenario. \textbf{All CoVs under 4\%.} These are trustworthy numbers for the first time in this cycle. The bench is reproducible and the new sample runs take \textasciitilde45 seconds total, which makes iterative optimization measurement practical.
 
@@ -712,27 +495,9 @@ Added \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbre
 
 30 samples each, CoV \textless{} 5\%:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}5\allowbreak{}0}
- & {n\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l}
- & {P\allowbreak{}a\allowbreak{}t\allowbreak{}h}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}3} {µ\allowbreak{}s} & \textbf{{1\allowbreak{}1\allowbreak{}.\allowbreak{}2} {n\allowbreak{}s}} & \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} {→} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l} {d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t} {(\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s} {i\allowbreak{}n\allowbreak{},} {b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s} {o\allowbreak{}u\allowbreak{}t\allowbreak{})} \\
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}1} {µ\allowbreak{}s} & \textbf{{1\allowbreak{}8\allowbreak{}.\allowbreak{}1} {n\allowbreak{}s}} & \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}\}\allowbreak{})} {→} \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}B\allowbreak{}u\allowbreak{}f} {(\allowbreak{}n\allowbreak{}o} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{},} {b\allowbreak{}u\allowbreak{}t} {a\allowbreak{}l\allowbreak{}l} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}s} {s\allowbreak{}t\allowbreak{}i\allowbreak{}l\allowbreak{}l} {e\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{})} \\
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}2\allowbreak{}5} {µ\allowbreak{}s} & \textbf{{4\allowbreak{}9\allowbreak{}.\allowbreak{}0} {n\allowbreak{}s}} & \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{},\allowbreak{} \allowbreak{}f\allowbreak{}g\allowbreak{},\allowbreak{} \allowbreak{}b\allowbreak{}g\allowbreak{}\}\allowbreak{})} {→} \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}B\allowbreak{}u\allowbreak{}f} {→} {2\allowbreak{}×} \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}R\allowbreak{}G\allowbreak{}B} \\
-\end{longtable}
-}
+\input{tables/table-100}
+
+\input{diagrams/flows/flow-083}
 
 \textbf{The deltas tell the story:}
 
@@ -821,29 +586,7 @@ Prototyped RE-019 cool idea (pre-parse theme token colors into bytes). Scope of 
 
 \textbf{Bench measurement} --- added a \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} scenario that mirrors \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} but pre-parses the palette once in \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})} and passes \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} / \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} on each \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} call. 30 samples each, same machine, commit \texttt{0\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}4\allowbreak{}8}:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}5\allowbreak{}0}
- & {n\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l}
- & {C\allowbreak{}o\allowbreak{}V}
- & {N\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {1\allowbreak{}1\allowbreak{}.\allowbreak{}4} & {3\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} {f\allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}r} {(\allowbreak{}n\allowbreak{}o} {p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{})} \\
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & \textbf{{3\allowbreak{}2\allowbreak{}8} {µ\allowbreak{}s}} & \textbf{{2\allowbreak{}5\allowbreak{}.\allowbreak{}7}} & \textbf{{1\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} & {s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {p\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d} {f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}/\allowbreak{}b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} {—} \textbf{{N\allowbreak{}E\allowbreak{}W}} \\
-\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}2\allowbreak{}4} {µ\allowbreak{}s} & {4\allowbreak{}8\allowbreak{}.\allowbreak{}9} & {3\allowbreak{}.\allowbreak{}1\allowbreak{}\%} & {s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {h\allowbreak{}e\allowbreak{}x} {p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d} {e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} {c\allowbreak{}a\allowbreak{}l\allowbreak{}l} \\
-\end{longtable}
-}
+\input{tables/table-101}
 
 \textbf{Result: \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} → \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} = 624 µs → 328 µs, a 1.9× speedup.} That's a \textbf{47\% reduction in frame time} on the theme-driven paint path with a \textasciitilde30-line change.
 
@@ -956,35 +699,7 @@ Saved as \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allow
 
 30 samples each, Apple M1 Pro, Node v25.8.1, commit \texttt{f\allowbreak{}9\allowbreak{}6\allowbreak{}6\allowbreak{}c\allowbreak{}7\allowbreak{}2}:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}5\allowbreak{}0}
- & {n\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l}
- & {C\allowbreak{}o\allowbreak{}V}
- & {N\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}1} {µ\allowbreak{}s} & {1\allowbreak{}8\allowbreak{}.\allowbreak{}1} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}\}\allowbreak{})} {f\allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}r} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {1\allowbreak{}1\allowbreak{}.\allowbreak{}4} & {7\allowbreak{}.\allowbreak{}4\allowbreak{}\%} & \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} {f\allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}r} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}5} {µ\allowbreak{}s} & {4\allowbreak{}9\allowbreak{}.\allowbreak{}7} & {1\allowbreak{}.\allowbreak{}1\allowbreak{}\%} & {h\allowbreak{}e\allowbreak{}x} {p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} {e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} \\
-\textbf{{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e}} & \textbf{{3\allowbreak{}2\allowbreak{}8} {µ\allowbreak{}s}} & \textbf{{2\allowbreak{}5\allowbreak{}.\allowbreak{}7}} & \textbf{{0\allowbreak{}.\allowbreak{}7\allowbreak{}\%}} & \textbf{{p\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d} {R\allowbreak{}G\allowbreak{}B} {(\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} {c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{})}} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}5\allowbreak{}0} {µ\allowbreak{}s} & {7\allowbreak{}4\allowbreak{}.\allowbreak{}4} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}\%} & {d\allowbreak{}o\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d} {b\allowbreak{}y} {M\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}s} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}8} {m\allowbreak{}s} & {—} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}\%} & {p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t} {+} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{},} {s\allowbreak{}g\allowbreak{}r\allowbreak{}C\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e} {s\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}} & \textbf{{3\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s}} & \textbf{{2\allowbreak{}7\allowbreak{}.\allowbreak{}3}} & \textbf{{3\allowbreak{}.\allowbreak{}3\allowbreak{}\%}} & \textbf{{\textasciitilde{}\allowbreak{}1\allowbreak{}0\allowbreak{}\%} {d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} {—} {N\allowbreak{}E\allowbreak{}W}} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}} & \textbf{{2\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s}} & \textbf{{1\allowbreak{}7\allowbreak{}.\allowbreak{}8}} & \textbf{{4\allowbreak{}.\allowbreak{}9\allowbreak{}\%}} & \textbf{{z\allowbreak{}e\allowbreak{}r\allowbreak{}o} {c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}s} {—} {N\allowbreak{}E\allowbreak{}W}} \\
-\textbf{{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c}} & \textbf{{4\allowbreak{}6\allowbreak{}9} {µ\allowbreak{}s}} & \textbf{{3\allowbreak{}6\allowbreak{}.\allowbreak{}7}} & \textbf{{1\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} & \textbf{{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n} {—} {N\allowbreak{}E\allowbreak{}W}} \\
-\end{longtable}
-}
+\input{tables/table-102}
 
 All CoVs under 8\% (paint-rgb-fixed's 7.4\% is the absolute-floor effect; 145 µs is tight enough that OS jitter dominates). All others under 5\%. Numbers are trustworthy.
 
@@ -1075,33 +790,7 @@ Apple M1 Pro, Node v25.8.1, commit \texttt{4\allowbreak{}2\allowbreak{}1\allowbr
 
 Comparison vs Phase A baseline:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}e} {A} {P\allowbreak{}5\allowbreak{}0}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}1} {P\allowbreak{}5\allowbreak{}0}
- & {Δ}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}} & \textbf{{2\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s}} & \textbf{{7\allowbreak{}.\allowbreak{}5\allowbreak{}8} {µ\allowbreak{}s}} & \textbf{{−\allowbreak{}9\allowbreak{}7\allowbreak{}\%} {(\allowbreak{}3\allowbreak{}0\allowbreak{}×} {f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{})}} {[\allowbreak{}l\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}]} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}} & \textbf{{3\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s}} & \textbf{{1\allowbreak{}8\allowbreak{}5} {µ\allowbreak{}s}} & \textbf{{−\allowbreak{}4\allowbreak{}7\allowbreak{}\%} {(\allowbreak{}1\allowbreak{}.\allowbreak{}9\allowbreak{}×} {f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{})}} {[\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}]} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}6\allowbreak{}9} {µ\allowbreak{}s} & {4\allowbreak{}6\allowbreak{}5} {µ\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} {(\allowbreak{}f\allowbreak{}u\allowbreak{}l\allowbreak{}l} {r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{},} {e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{})} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}8} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}7} {m\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} {(\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{})} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}1} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}9} {µ\allowbreak{}s} & {+\allowbreak{}3\allowbreak{}\%} {(\allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}i\allowbreak{}n} {n\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{})} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {1\allowbreak{}4\allowbreak{}6} {µ\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}5} {µ\allowbreak{}s} & {6\allowbreak{}4\allowbreak{}0} {µ\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {3\allowbreak{}2\allowbreak{}8} {µ\allowbreak{}s} & {3\allowbreak{}3\allowbreak{}3} {µ\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}5\allowbreak{}0} {µ\allowbreak{}s} & {9\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} \\
-\end{longtable}
-}
+\input{tables/table-103}
 
 Paint scenarios are neutral as expected --- they don't go through the diff path. \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} and \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} are neutral because every cell is dirty (full repaint). \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} (\textasciitilde10\% dirty) and \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} (0\% dirty) are exactly the cases II-1 was designed to optimize, and they show the predicted wins.
 
@@ -1167,27 +856,7 @@ II-3 and II-4 are bigger and probably need to split across sessions. Stopping he
 
 The first attempt replaced every \texttt{o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{} \allowbreak{}+\allowbreak{}=\allowbreak{} \allowbreak{}X} site in the differ with a \texttt{w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}(\allowbreak{}X\allowbreak{})} helper that called \texttt{T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o} per chunk. Predicted neutral; measured \textbf{regression}:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}1}
- & {F\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t} {I\allowbreak{}I\allowbreak{}-\allowbreak{}3} {a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}t}
- & {Δ}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}7} {m\allowbreak{}s} & {4\allowbreak{}.\allowbreak{}5\allowbreak{}5} {m\allowbreak{}s} & \textbf{{+\allowbreak{}1\allowbreak{}2\allowbreak{}0\allowbreak{}\%}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {1\allowbreak{}8\allowbreak{}5} {µ\allowbreak{}s} & {4\allowbreak{}5\allowbreak{}2} {µ\allowbreak{}s} & \textbf{{+\allowbreak{}1\allowbreak{}4\allowbreak{}4\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}6\allowbreak{}5} {µ\allowbreak{}s} & {5\allowbreak{}8\allowbreak{}8} {µ\allowbreak{}s} & \textbf{{+\allowbreak{}2\allowbreak{}6\allowbreak{}\%}} \\
-\end{longtable}
-}
+\input{tables/table-104}
 
 Per-call \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o} setup overhead dominates when the source strings are short (cursor moves, SGR codes, single graphemes). The V8 string-concat ropes that the legacy path relied on are free by comparison.
 
@@ -1199,35 +868,7 @@ Reverted to the single-encodeInto-at-end design and re-measured --- neutral as e
 
 Apple M1 Pro, Node v25.8.1, 30 samples each.
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {B\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}3}
- & {Δ}
- & {S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}6\allowbreak{}.\allowbreak{}4\allowbreak{}0} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}5\allowbreak{}.\allowbreak{}5\allowbreak{}0} {µ\allowbreak{}s} & {-\allowbreak{}0\allowbreak{}.\allowbreak{}4\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}4\allowbreak{}.\allowbreak{}6\allowbreak{}1} {µ\allowbreak{}s} & {1\allowbreak{}4\allowbreak{}4\allowbreak{}.\allowbreak{}9\allowbreak{}1} {µ\allowbreak{}s} & {+\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}5\allowbreak{}.\allowbreak{}2\allowbreak{}6} {µ\allowbreak{}s} & {6\allowbreak{}3\allowbreak{}1\allowbreak{}.\allowbreak{}3\allowbreak{}2} {µ\allowbreak{}s} & {-\allowbreak{}0\allowbreak{}.\allowbreak{}6\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {3\allowbreak{}2\allowbreak{}9\allowbreak{}.\allowbreak{}8\allowbreak{}3} {µ\allowbreak{}s} & {3\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}7\allowbreak{}5} {µ\allowbreak{}s} & {-\allowbreak{}0\allowbreak{}.\allowbreak{}3\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}4\allowbreak{}3\allowbreak{}.\allowbreak{}8\allowbreak{}2} {µ\allowbreak{}s} & {9\allowbreak{}3\allowbreak{}9\allowbreak{}.\allowbreak{}4\allowbreak{}3} {µ\allowbreak{}s} & {-\allowbreak{}0\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}5} {m\allowbreak{}s} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}2} {m\allowbreak{}s} & {-\allowbreak{}1\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {1\allowbreak{}7\allowbreak{}9\allowbreak{}.\allowbreak{}6\allowbreak{}8} {µ\allowbreak{}s} & {1\allowbreak{}8\allowbreak{}4\allowbreak{}.\allowbreak{}6\allowbreak{}8} {µ\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}.\allowbreak{}8\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {9\allowbreak{}.\allowbreak{}5\allowbreak{}8} {µ\allowbreak{}s} & {7\allowbreak{}.\allowbreak{}8\allowbreak{}2} {µ\allowbreak{}s} & {-\allowbreak{}1\allowbreak{}8\allowbreak{}.\allowbreak{}3\allowbreak{}\%} & {G\allowbreak{}O\allowbreak{}O\allowbreak{}D} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}6\allowbreak{}1\allowbreak{}.\allowbreak{}5\allowbreak{}9} {µ\allowbreak{}s} & {4\allowbreak{}6\allowbreak{}8\allowbreak{}.\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {+\allowbreak{}1\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-\end{longtable}
-}
+\input{tables/table-105}
 
 The diff-static ``improvement'' is mostly the floor-noise effect (7.82 µs is well inside the 13.6\% CoV bin); the remaining scenarios are within ±3\% of baseline. Plumbing achieved without regression.
 
@@ -1316,27 +957,7 @@ First cut used pre-allocated \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t
 
 Root cause: \texttt{T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t} has per-call setup cost that dominates when the source is tiny (4--7 bytes). The hot path was calling \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t} \textasciitilde15× per cell × 9168 cells per frame. Inlining the sequences as individual \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}[\allowbreak{}o\allowbreak{}f\allowbreak{}f\allowbreak{}]\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}…} writes:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {W\allowbreak{}i\allowbreak{}t\allowbreak{}h} \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t}
- & {W\allowbreak{}i\allowbreak{}t\allowbreak{}h} {i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d} {w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s}
- & {Δ}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}6} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}6} {m\allowbreak{}s} & \textbf{{−\allowbreak{}2\allowbreak{}8\allowbreak{}\%}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {1\allowbreak{}9\allowbreak{}9} {µ\allowbreak{}s} & {1\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}3\allowbreak{}3\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}2\allowbreak{}6} {µ\allowbreak{}s} & {4\allowbreak{}1\allowbreak{}8} {µ\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}9\allowbreak{}\%} \\
-\end{longtable}
-}
+\input{tables/table-106}
 
 Inline byte writes beat \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y} constants + \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} on every scenario, massively on diff-gradient. Kept the inlined form and deleted the unused \texttt{B\allowbreak{}Y\allowbreak{}T\allowbreak{}E\allowbreak{}S\allowbreak{}\_\allowbreak{}*} constants.
 
@@ -1344,35 +965,7 @@ Inline byte writes beat \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allo
 
 Apple M1 Pro, Node v25.8.1, 30 samples each.
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}3}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}4}
- & {Δ}
- & {S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}9\allowbreak{}0} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}9\allowbreak{}.\allowbreak{}8\allowbreak{}9} {µ\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}.\allowbreak{}1\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}3} {µ\allowbreak{}s} & {1\allowbreak{}4\allowbreak{}8\allowbreak{}.\allowbreak{}1\allowbreak{}4} {µ\allowbreak{}s} & {+\allowbreak{}3\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}0\allowbreak{}.\allowbreak{}7\allowbreak{}9} {µ\allowbreak{}s} & {6\allowbreak{}4\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}1} {µ\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}.\allowbreak{}6\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {3\allowbreak{}2\allowbreak{}9\allowbreak{}.\allowbreak{}3\allowbreak{}7} {µ\allowbreak{}s} & {3\allowbreak{}3\allowbreak{}8\allowbreak{}.\allowbreak{}7\allowbreak{}0} {µ\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}.\allowbreak{}8\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}3\allowbreak{}6\allowbreak{}.\allowbreak{}1\allowbreak{}3} {µ\allowbreak{}s} & {9\allowbreak{}5\allowbreak{}8\allowbreak{}.\allowbreak{}8\allowbreak{}9} {µ\allowbreak{}s} & {+\allowbreak{}2\allowbreak{}.\allowbreak{}4\allowbreak{}\%} & {o\allowbreak{}k} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}} & \textbf{{2\allowbreak{}.\allowbreak{}0\allowbreak{}2} {m\allowbreak{}s}} & \textbf{{1\allowbreak{}.\allowbreak{}5\allowbreak{}6} {m\allowbreak{}s}} & \textbf{{−\allowbreak{}2\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}} & \textbf{{1\allowbreak{}8\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}3} {µ\allowbreak{}s}} & \textbf{{1\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}0} {µ\allowbreak{}s}} & \textbf{{−\allowbreak{}2\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}3} {µ\allowbreak{}s} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}8} {µ\allowbreak{}s} & {+\allowbreak{}0\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-\textbf{{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c}} & \textbf{{4\allowbreak{}6\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}6} {µ\allowbreak{}s}} & \textbf{{4\allowbreak{}1\allowbreak{}8\allowbreak{}.\allowbreak{}1\allowbreak{}4} {µ\allowbreak{}s}} & \textbf{{−\allowbreak{}1\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-\end{longtable}
-}
+\input{tables/table-107}
 
 Paint scenarios drift +2--3\% --- within CoV noise on most and probably attributable to a small JIT reshuffle from the new byte-writer symbol set. The wins are on the differ hot path, which is what Part II was designed to move.
 
@@ -1420,27 +1013,7 @@ First attempt was the handoff-planned II-7 optimization: a precomputed \texttt{U
 
 Bench said otherwise. 40-sample run:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}4}
- & {W\allowbreak{}i\allowbreak{}t\allowbreak{}h} {u\allowbreak{}8} {t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}
- & {Δ}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}6} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}5\allowbreak{}4} {m\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}3\allowbreak{}\%} {(\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{})} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {1\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & {1\allowbreak{}3\allowbreak{}8} {µ\allowbreak{}s} & {+\allowbreak{}3\allowbreak{}.\allowbreak{}0\allowbreak{}\%} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}1\allowbreak{}8} {µ\allowbreak{}s} & {4\allowbreak{}2\allowbreak{}2} {µ\allowbreak{}s} & {+\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}\%} \\
-\end{longtable}
-}
+\input{tables/table-108}
 
 V8 is already generating near-optimal code for the 2/3-digit arithmetic path --- the \texttt{|\allowbreak{} \allowbreak{}0} integer-cast divisions lower to simple imuls, and the per-call cost is already dominated by the function-call and the byte writes themselves, not the arithmetic. Reverted the table; the arithmetic path stays.
 
@@ -1469,35 +1042,7 @@ while (batchX < width) {
 
 Apple M1 Pro, Node v25.8.1, 30 samples each.
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}4}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}5}
- & {Δ}
- & {S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}9\allowbreak{}.\allowbreak{}8\allowbreak{}9} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}3\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}2\allowbreak{}.\allowbreak{}3\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}8\allowbreak{}.\allowbreak{}1\allowbreak{}4} {µ\allowbreak{}s} & {1\allowbreak{}4\allowbreak{}4\allowbreak{}.\allowbreak{}6\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}2\allowbreak{}.\allowbreak{}4\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}4\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}1} {µ\allowbreak{}s} & {6\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}5\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}2\allowbreak{}.\allowbreak{}9\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {3\allowbreak{}3\allowbreak{}8\allowbreak{}.\allowbreak{}7\allowbreak{}0} {µ\allowbreak{}s} & {3\allowbreak{}2\allowbreak{}9\allowbreak{}.\allowbreak{}6\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}2\allowbreak{}.\allowbreak{}7\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}5\allowbreak{}8\allowbreak{}.\allowbreak{}8\allowbreak{}9} {µ\allowbreak{}s} & {9\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s} & {−\allowbreak{}2\allowbreak{}.\allowbreak{}5\allowbreak{}\%} & {o\allowbreak{}k} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}} & \textbf{{1\allowbreak{}.\allowbreak{}5\allowbreak{}6} {m\allowbreak{}s}} & \textbf{{1\allowbreak{}.\allowbreak{}4\allowbreak{}5} {m\allowbreak{}s}} & \textbf{{−\allowbreak{}6\allowbreak{}.\allowbreak{}6\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-\textbf{{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}} & \textbf{{1\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}0} {µ\allowbreak{}s}} & \textbf{{1\allowbreak{}2\allowbreak{}5\allowbreak{}.\allowbreak{}1\allowbreak{}9} {µ\allowbreak{}s}} & \textbf{{−\allowbreak{}6\allowbreak{}.\allowbreak{}9\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}8} {µ\allowbreak{}s} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}2} {µ\allowbreak{}s} & {−\allowbreak{}0\allowbreak{}.\allowbreak{}6\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}1\allowbreak{}8\allowbreak{}.\allowbreak{}1\allowbreak{}4} {µ\allowbreak{}s} & {4\allowbreak{}1\allowbreak{}0\allowbreak{}.\allowbreak{}5\allowbreak{}3} {µ\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}8\allowbreak{}\%} & {o\allowbreak{}k} \\
-\end{longtable}
-}
+\input{tables/table-109}
 
 \textbf{diff-gradient is officially under the 1.5 ms target.} 1.45 ms p50, 1.42 ms p-min. The paint scenarios drift −2 to −3\% in the same direction but within CoV; they don't touch the inner loop at all, so the paint shift is most likely JIT reshuffling from the smaller hot-path symbol footprint.
 
@@ -1505,30 +1050,7 @@ Apple M1 Pro, Node v25.8.1, 30 samples each.
 
 Comparison against \texttt{H\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}-\allowbreak{}9\allowbreak{}4\allowbreak{}1\allowbreak{}f\allowbreak{}6\allowbreak{}2\allowbreak{}c\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}0\allowbreak{}1\allowbreak{}7} (the cycle start, before the hex-parse regression was even understood):
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}0\allowbreak{}1\allowbreak{}7}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}5}
- & {Δ}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}3} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}4\allowbreak{}5} {m\allowbreak{}s} & \textbf{{−\allowbreak{}3\allowbreak{}2\allowbreak{}\%}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {3\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s} & {1\allowbreak{}2\allowbreak{}5} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}6\allowbreak{}4\allowbreak{}\%}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {2\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}2} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}9\allowbreak{}6\allowbreak{}\%}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}6\allowbreak{}9} {µ\allowbreak{}s} & {4\allowbreak{}1\allowbreak{}0} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}1\allowbreak{}3\allowbreak{}\%}} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}3} {µ\allowbreak{}s} & {6\allowbreak{}2\allowbreak{}8} {µ\allowbreak{}s} & {−\allowbreak{}0\allowbreak{}.\allowbreak{}8\allowbreak{}\%} {(\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{})} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & {0\allowbreak{}\%} {(\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{})} \\
-\end{longtable}
-}
+\input{tables/table-110}
 
 The hex-parse paint-side regression (RE-008's theme-heavy paint path) is now paid back to neutral via the theme token color cache (phase A), and the diff path is 32--96 \% faster than it was before RE-008 ever landed. The cycle's primary goal --- recovering from the \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} regression without losing anything else --- is comfortably met.
 
@@ -1560,62 +1082,11 @@ Part II is now effectively done --- diff-gradient hits its target, every represe
 
 Formal gate run comparing \texttt{H\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}-\allowbreak{}6\allowbreak{}0\allowbreak{}b\allowbreak{}1\allowbreak{}e\allowbreak{}0\allowbreak{}b\allowbreak{}-\allowbreak{}a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}I\allowbreak{}I\allowbreak{}-\allowbreak{}5} against the pre-RE017 baseline (\texttt{H\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}-\allowbreak{}9\allowbreak{}4\allowbreak{}1\allowbreak{}f\allowbreak{}6\allowbreak{}2\allowbreak{}c}):
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}R\allowbreak{}E\allowbreak{}0\allowbreak{}1\allowbreak{}7}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}5}
- & {Δ}
- & {G\allowbreak{}a\allowbreak{}t\allowbreak{}e}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}3\allowbreak{}5} {µ\allowbreak{}s} & {+\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}3\allowbreak{}.\allowbreak{}9\allowbreak{}2} {µ\allowbreak{}s} & {6\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}5\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}0\allowbreak{}.\allowbreak{}8\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}4\allowbreak{}6\allowbreak{}.\allowbreak{}2\allowbreak{}9} {µ\allowbreak{}s} & {9\allowbreak{}3\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}2\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}1\allowbreak{}3} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}4\allowbreak{}5} {m\allowbreak{}s} & \textbf{{−\allowbreak{}3\allowbreak{}1\allowbreak{}.\allowbreak{}7\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-\end{longtable}
-}
+\input{tables/table-111}
 
 Only 4 scenarios existed in the pre-RE017 baseline. Full trajectory comparison against Phase A (\texttt{H\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}-\allowbreak{}f\allowbreak{}9\allowbreak{}6\allowbreak{}6\allowbreak{}c\allowbreak{}7\allowbreak{}2}) shows all 9 bench v2 scenarios:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o}
- & {P\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}e} {A}
- & {A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r} {I\allowbreak{}I\allowbreak{}-\allowbreak{}5}
- & {Δ}
- & {G\allowbreak{}a\allowbreak{}t\allowbreak{}e}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i} & {2\allowbreak{}3\allowbreak{}1} {µ\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & {+\allowbreak{}1\allowbreak{}.\allowbreak{}3\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} & {1\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {1\allowbreak{}4\allowbreak{}5} {µ\allowbreak{}s} & {−\allowbreak{}0\allowbreak{}.\allowbreak{}3\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {6\allowbreak{}3\allowbreak{}5} {µ\allowbreak{}s} & {6\allowbreak{}2\allowbreak{}9} {µ\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} & {3\allowbreak{}2\allowbreak{}8} {µ\allowbreak{}s} & {3\allowbreak{}3\allowbreak{}0} {µ\allowbreak{}s} & {+\allowbreak{}0\allowbreak{}.\allowbreak{}6\allowbreak{}\%} & {o\allowbreak{}k} \\
-{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}g\allowbreak{}b} & {9\allowbreak{}5\allowbreak{}0} {µ\allowbreak{}s} & {9\allowbreak{}3\allowbreak{}4} {µ\allowbreak{}s} & {−\allowbreak{}1\allowbreak{}.\allowbreak{}6\allowbreak{}\%} & {o\allowbreak{}k} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {2\allowbreak{}.\allowbreak{}0\allowbreak{}8} {m\allowbreak{}s} & {1\allowbreak{}.\allowbreak{}4\allowbreak{}5} {m\allowbreak{}s} & \textbf{{−\allowbreak{}3\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e} & {3\allowbreak{}4\allowbreak{}9} {µ\allowbreak{}s} & {1\allowbreak{}2\allowbreak{}5} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}6\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {2\allowbreak{}2\allowbreak{}7} {µ\allowbreak{}s} & {9\allowbreak{}.\allowbreak{}4\allowbreak{}2} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}9\allowbreak{}5\allowbreak{}.\allowbreak{}9\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} & {4\allowbreak{}6\allowbreak{}9} {µ\allowbreak{}s} & {4\allowbreak{}1\allowbreak{}1} {µ\allowbreak{}s} & \textbf{{−\allowbreak{}1\allowbreak{}2\allowbreak{}.\allowbreak{}5\allowbreak{}\%}} & \textbf{{G\allowbreak{}O\allowbreak{}O\allowbreak{}D}} \\
-\end{longtable}
-}
+\input{tables/table-112}
 
 Zero regressions. All paint scenarios recovered to neutral. All diff scenarios faster than any prior baseline by double-digit margins.
 

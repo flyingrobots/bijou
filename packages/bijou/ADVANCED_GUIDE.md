@@ -26,8 +26,8 @@ Rule of thumb:
 
 For the deeper rendering posture, also read:
 
-- [Root Advanced Guide](../../docs/book/bijou-designs.pdf#page=199)
-- [Byte-Pipeline Recovery](../../docs/book/bijou-designs.pdf#page=1677)
+- [Root Advanced Guide](../../docs/book/bijou-designs.pdf#page=223)
+- [Byte-Pipeline Recovery](../../docs/book/bijou-designs.pdf#page=1742)
 
 ## Terminal Text Sanitization Boundary
 
@@ -64,7 +64,7 @@ If you are touching the render bedrock, read:
 
 - [README](./README.md)
 - [surface primitives tests](./src/core/components/surface-primitives.test.ts)
-- [Byte-Pipeline Recovery](../../docs/book/bijou-designs.pdf#page=1677)
+- [Byte-Pipeline Recovery](../../docs/book/bijou-designs.pdf#page=1742)
 
 ## Theme Engine And Token Graph
 
@@ -79,8 +79,8 @@ The beginner guide covers presets and basic extension. The advanced lane is:
 Read:
 
 - [GUIDE theme section](./GUIDE.md#themes)
-- [Theme Token Vocabulary](../../docs/book/bijou-designs.pdf#page=332)
-- [Theme Authoring Guide](../../docs/book/bijou-designs.pdf#page=322)
+- [Theme Token Vocabulary](../../docs/book/bijou-designs.pdf#page=359)
+- [Theme Authoring Guide](../../docs/book/bijou-designs.pdf#page=348)
 - [token graph spec](../../docs/specs/token-graph.spec.json)
 - [theme graph implementation](./src/core/theme/graph.ts)
 - [theme graph types](./src/core/theme/graph-types.ts)
@@ -173,9 +173,9 @@ That usually means:
 Good companion docs:
 
 - [GUIDE custom components](./GUIDE.md#custom-components)
-- [Design System Overview](../../docs/book/bijou-designs.pdf#page=232)
-- [Content Guide](../../docs/book/bijou-designs.pdf#page=71)
-- [Accessibility and Assistive Modes](../../docs/book/bijou-designs.pdf#page=52)
+- [Design System Overview](../../docs/book/bijou-designs.pdf#page=257)
+- [Content Guide](../../docs/book/bijou-designs.pdf#page=78)
+- [Accessibility and Assistive Modes](../../docs/book/bijou-designs.pdf#page=59)
 
 ### Mode-Lowering Linter
 
@@ -334,9 +334,9 @@ core territory and deserve deliberate use:
 
 For design intent rather than just signatures, read:
 
-- [Component Families](../../docs/book/bijou-designs.pdf#page=241)
-- [Patterns](../../docs/book/bijou-designs.pdf#page=294)
-- [Data Visualization Policy](../../docs/book/bijou-designs.pdf#page=278)
+- [Component Families](../../docs/book/bijou-designs.pdf#page=266)
+- [Patterns](../../docs/book/bijou-designs.pdf#page=320)
+- [Data Visualization Policy](../../docs/book/bijou-designs.pdf#page=303)
 
 ## Testing Contracts
 

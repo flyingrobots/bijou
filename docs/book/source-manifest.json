@@ -449,13 +449,13 @@
     {
       "chapter": 38,
       "path": "GUIDE.md",
-      "title": "Guide \u2014 Bijou",
+      "title": "Guide — Bijou",
       "bytes": 3146,
       "sha256": "4872895cc8f093f43ce3f52708f8b72cdf7ae8834536d1a6ec66656d32a2eadc",
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0008-guide.tex",
       "record_label": "record-008",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -467,7 +467,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0015-terminal-scenarios.tex",
       "record_label": "record-015",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -479,7 +479,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0006-dogfood.tex",
       "record_label": "record-006",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -491,7 +491,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0011-package-development.tex",
       "record_label": "record-011",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -503,7 +503,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0004-cli.tex",
       "record_label": "record-004",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -515,19 +515,19 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0009-mcp.tex",
       "record_label": "record-009",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
       "chapter": 44,
       "path": "ADVANCED_GUIDE.md",
-      "title": "Advanced Guide \u2014 Bijou",
+      "title": "Advanced Guide — Bijou",
       "bytes": 8772,
       "sha256": "14ac9eab0a673e520c39371b14b89721ab252c6a0eabfaf5b8e860e7f07f90fb",
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0001-advanced-guide.tex",
       "record_label": "record-001",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -539,7 +539,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0005-documentation-standards.tex",
       "record_label": "record-005",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -551,7 +551,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0007-examples.tex",
       "record_label": "record-007",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -563,7 +563,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0010-migrating-to-v4.tex",
       "record_label": "record-010",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -575,7 +575,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0012-readme.tex",
       "record_label": "record-012",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -587,7 +587,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0014-render-pipeline.tex",
       "record_label": "record-014",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -599,7 +599,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0017-readme.tex",
       "record_label": "record-017",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -611,7 +611,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0018-blocks.tex",
       "record_label": "record-018",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -623,7 +623,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0019-component-families.tex",
       "record_label": "record-019",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -635,7 +635,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0020-data-visualization.tex",
       "record_label": "record-020",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -647,7 +647,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0021-foundations.tex",
       "record_label": "record-021",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -659,7 +659,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0022-packed-bijou-cells.tex",
       "record_label": "record-022",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -671,7 +671,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0023-patterns.tex",
       "record_label": "record-023",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -683,7 +683,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0024-pointer.tex",
       "record_label": "record-024",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -695,7 +695,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0025-profunctor-page-inspection.tex",
       "record_label": "record-025",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -707,7 +707,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0026-theme-authoring.tex",
       "record_label": "record-026",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -719,7 +719,7 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0027-theme-rule-recipes.tex",
       "record_label": "record-027",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
@@ -731,307 +731,307 @@
       "group": "FOUNDATIONS",
       "latex_path": "chapters/02-design-system-and-reference/0028-theme-tokens.tex",
       "record_label": "record-028",
-      "book_part": 2,
+      "book_part": 3,
       "book_part_title": "Using Bijou"
     },
     {
       "chapter": 62,
       "path": "docs/design/DF-001-show-dogfood-coverage-progress.md",
-      "title": "DF-001 \u2014 Show DOGFOOD Coverage Progress",
+      "title": "DF-001 — Show DOGFOOD Coverage Progress",
       "bytes": 5068,
       "sha256": "61cd9659a916704c7890910b5ecb36ac1d954418ba7f018d8c94388cba49acc8",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0064-df-001-show-dogfood-coverage-progress.tex",
       "record_label": "record-064",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 63,
       "path": "docs/design/DF-003-enforce-dogfood-coverage-floor.md",
-      "title": "DF-003 \u2014 Enforce DOGFOOD Coverage Floor",
+      "title": "DF-003 — Enforce DOGFOOD Coverage Floor",
       "bytes": 5163,
       "sha256": "1517aa52da330ddc93c109654fcaa13f32184ae8f30e696591ea4b7a317e2d01",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0065-df-003-enforce-dogfood-coverage-floor.tex",
       "record_label": "record-065",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 64,
       "path": "docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md",
-      "title": "DF-004 \u2014 Raise DOGFOOD Coverage Floor to the Next 5-Point Target",
+      "title": "DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target",
       "bytes": 5384,
       "sha256": "eb3614ee5e51f39ecaf1fd65e2c4636eeb3d91c6cc24903db940ab8246f45386",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0066-df-004-raise-dogfood-coverage-floor-to-next-target.tex",
       "record_label": "record-066",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 65,
       "path": "docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md",
-      "title": "DF-005 \u2014 Raise DOGFOOD Coverage Floor to 19%",
+      "title": "DF-005 — Raise DOGFOOD Coverage Floor to 19%",
       "bytes": 6530,
       "sha256": "eee2b24e0d469c086c4eb04fce1777d717dc03324ac7ad8ccd29f5b2b1bb449c",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0067-df-005-raise-dogfood-coverage-floor-to-19-percent.tex",
       "record_label": "record-067",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 66,
       "path": "docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md",
-      "title": "DF-006 \u2014 Raise DOGFOOD Coverage Floor to 24%",
+      "title": "DF-006 — Raise DOGFOOD Coverage Floor to 24%",
       "bytes": 6538,
       "sha256": "57eda4cdd7d86aafbbe00110d3c6a1c59c7d566737b5e8c050079cf78c34a327",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0068-df-006-raise-dogfood-coverage-floor-to-24-percent.tex",
       "record_label": "record-068",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 67,
       "path": "docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md",
-      "title": "DF-007 \u2014 Raise DOGFOOD Coverage Floor to 29%",
+      "title": "DF-007 — Raise DOGFOOD Coverage Floor to 29%",
       "bytes": 6511,
       "sha256": "52cb97b55c8d8ae0e43b20ae4d687ba1c65408cabb06bb3011f0b7d50f34f779",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0069-df-007-raise-dogfood-coverage-floor-to-29-percent.tex",
       "record_label": "record-069",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 68,
       "path": "docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md",
-      "title": "DF-008 \u2014 Raise DOGFOOD Coverage Floor to 34%",
+      "title": "DF-008 — Raise DOGFOOD Coverage Floor to 34%",
       "bytes": 6663,
       "sha256": "81bc86d24eb70a5505718a163d7c9c6cb374e4ff133e878c2bc80add26161ed9",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0070-df-008-raise-dogfood-coverage-floor-to-34-percent.tex",
       "record_label": "record-070",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 69,
       "path": "docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md",
-      "title": "DF-009 \u2014 Raise DOGFOOD Coverage Floor to 39%",
+      "title": "DF-009 — Raise DOGFOOD Coverage Floor to 39%",
       "bytes": 6607,
       "sha256": "4c399cf99a96acc37f9bda86962a8c9d72e98c6f642656db24e3c3fe8d19b8c5",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0071-df-009-raise-dogfood-coverage-floor-to-39-percent.tex",
       "record_label": "record-071",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 70,
       "path": "docs/design/DF-010-raise-dogfood-coverage-floor-to-44-percent.md",
-      "title": "DF-010 \u2014 Raise DOGFOOD Coverage Floor to 44%",
+      "title": "DF-010 — Raise DOGFOOD Coverage Floor to 44%",
       "bytes": 6703,
       "sha256": "0613b574e4c0aa62f21bb81086bb149bb7dc1d7c9c71d9e8278e0e99eec35f0b",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0072-df-010-raise-dogfood-coverage-floor-to-44-percent.tex",
       "record_label": "record-072",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 71,
       "path": "docs/design/DF-011-raise-dogfood-coverage-floor-to-49-percent.md",
-      "title": "DF-011 \u2014 Raise DOGFOOD Coverage Floor to 49%",
+      "title": "DF-011 — Raise DOGFOOD Coverage Floor to 49%",
       "bytes": 6895,
       "sha256": "5102f4689df11201c552cb3afa3abe483dde387c30d246050552fd2fc75f4404",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0073-df-011-raise-dogfood-coverage-floor-to-49-percent.tex",
       "record_label": "record-073",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 72,
       "path": "docs/design/DF-012-raise-dogfood-coverage-floor-to-54-percent.md",
-      "title": "DF-012 \u2014 Raise DOGFOOD Coverage Floor to 54%",
+      "title": "DF-012 — Raise DOGFOOD Coverage Floor to 54%",
       "bytes": 7189,
       "sha256": "6bb126dd8c28f14638ca1b2605e74a18ac8cb3e21f0e04a2eed1c23eac7ca979",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0074-df-012-raise-dogfood-coverage-floor-to-54-percent.tex",
       "record_label": "record-074",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 73,
       "path": "docs/design/DF-013-raise-dogfood-coverage-floor-to-59-percent.md",
-      "title": "DF-013 \u2014 Raise DOGFOOD Coverage Floor to 59%",
+      "title": "DF-013 — Raise DOGFOOD Coverage Floor to 59%",
       "bytes": 7073,
       "sha256": "04729d0116771eba77daae6a8c507ec92426bc8f300b698815ff1c7077d83234",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0075-df-013-raise-dogfood-coverage-floor-to-59-percent.tex",
       "record_label": "record-075",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 74,
       "path": "docs/design/DF-014-raise-dogfood-coverage-floor-to-64-percent.md",
-      "title": "DF-014 \u2014 Raise DOGFOOD Coverage Floor to 64%",
+      "title": "DF-014 — Raise DOGFOOD Coverage Floor to 64%",
       "bytes": 3537,
       "sha256": "844d11af787f87542f910104236fd09621e6252f01f0904dd855b82a9a5d7370",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0076-df-014-raise-dogfood-coverage-floor-to-64-percent.tex",
       "record_label": "record-076",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 75,
       "path": "docs/design/DF-015-raise-dogfood-coverage-floor-to-69-percent.md",
-      "title": "DF-015 \u2014 Raise DOGFOOD Coverage Floor to 69%",
+      "title": "DF-015 — Raise DOGFOOD Coverage Floor to 69%",
       "bytes": 2772,
       "sha256": "01d99e1b1b73929ac5f81c53f8f59bfda87e923acc9e2451038ab98871db62fe",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0077-df-015-raise-dogfood-coverage-floor-to-69-percent.tex",
       "record_label": "record-077",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 76,
       "path": "docs/design/DF-016-raise-dogfood-coverage-floor-to-74-percent.md",
-      "title": "DF-016 \u2014 Raise DOGFOOD Coverage Floor to 74%",
+      "title": "DF-016 — Raise DOGFOOD Coverage Floor to 74%",
       "bytes": 2672,
       "sha256": "86612f99ca41ce3151a3d441fa6bfe6392d749e1a43c42818f8520843ef88834",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0078-df-016-raise-dogfood-coverage-floor-to-74-percent.tex",
       "record_label": "record-078",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 77,
       "path": "docs/design/DF-017-raise-dogfood-coverage-floor-to-79-percent.md",
-      "title": "DF-017 \u2014 Raise DOGFOOD Coverage Floor to 79%",
+      "title": "DF-017 — Raise DOGFOOD Coverage Floor to 79%",
       "bytes": 2580,
       "sha256": "6fdc177257c82b9fc5f50667c127c2f41ba1b5a3b71ef05b9daf35edaa55fe59",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0079-df-017-raise-dogfood-coverage-floor-to-79-percent.tex",
       "record_label": "record-079",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 78,
       "path": "docs/design/DF-018-raise-dogfood-coverage-floor-to-84-percent.md",
-      "title": "DF-018 \u2014 Raise DOGFOOD Coverage Floor to 84%",
+      "title": "DF-018 — Raise DOGFOOD Coverage Floor to 84%",
       "bytes": 2693,
       "sha256": "853731a0a187f95e1908d2dd5ee0d67823676fabad1ce63e6e51f30bcfa70215",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0080-df-018-raise-dogfood-coverage-floor-to-84-percent.tex",
       "record_label": "record-080",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 79,
       "path": "docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md",
-      "title": "DF-019 \u2014 Raise DOGFOOD Coverage Floor to 100%",
+      "title": "DF-019 — Raise DOGFOOD Coverage Floor to 100%",
       "bytes": 3839,
       "sha256": "f38208c59ef961c8777c89a15dd7e34f9fd92f0d18be796d8bf59be556b0f53c",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0081-df-019-raise-dogfood-coverage-floor-to-100-percent.tex",
       "record_label": "record-081",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 80,
       "path": "docs/design/DF-021-shape-dogfood-as-terminal-docs-system.md",
-      "title": "DF-021 \u2014 Shape DOGFOOD As Terminal Docs System",
+      "title": "DF-021 — Shape DOGFOOD As Terminal Docs System",
       "bytes": 9059,
       "sha256": "83e93b082ba567c3288faa52db83e6bc9372f33fc96c96b58c5375fd63694bbd",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0082-df-021-shape-dogfood-as-terminal-docs-system.tex",
       "record_label": "record-082",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 81,
       "path": "docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md",
-      "title": "DF-022 \u2014 Build Prose Docs Reader And Top-Level DOGFOOD Nav",
+      "title": "DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav",
       "bytes": 4683,
       "sha256": "f825c554f9635e2ca8d957630118733246d08071f23d5cca45f6eb36b4cde968",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0083-df-022-build-prose-docs-reader-and-top-level-dogfood-nav.tex",
       "record_label": "record-083",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 82,
       "path": "docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md",
-      "title": "DF-023 \u2014 Publish Repo, Package, And Release Guides In DOGFOOD",
+      "title": "DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD",
       "bytes": 4862,
       "sha256": "8b7a4f0fff951298583272beda95577e7dc063f4eb535fcabcda87991358ad4e",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0084-df-023-publish-repo-package-and-release-guides-in-dogfood.tex",
       "record_label": "record-084",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 83,
       "path": "docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md",
-      "title": "DF-024 \u2014 Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD",
+      "title": "DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD",
       "bytes": 4275,
       "sha256": "d52d212a23e3a9c1b8061dfc5706c9fff4be24373148b32cd16903040a93b8fd",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0085-df-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.tex",
       "record_label": "record-085",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 84,
       "path": "docs/design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md",
-      "title": "DF-025 \u2014 Make DOGFOOD The Only Human-Facing Docs Surface",
+      "title": "DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface",
       "bytes": 7608,
       "sha256": "d31799de49ad53c2128a2ad2a144809dac74ef68e03a14141dd99a17f989f9a4",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0086-df-025-make-dogfood-the-only-human-facing-docs-surface.tex",
       "record_label": "record-086",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 85,
       "path": "docs/design/DF-026-demote-examples-to-secondary-reference-status.md",
-      "title": "DF-026 \u2014 Demote Examples To Secondary Reference Status",
+      "title": "DF-026 — Demote Examples To Secondary Reference Status",
       "bytes": 3482,
       "sha256": "ed94bee69358ffba730a435da447f69a71eb54013e8a0b754704d44bf618c9e8",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0087-df-026-demote-examples-to-secondary-reference-status.tex",
       "record_label": "record-087",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 86,
       "path": "docs/design/DF-027-storybook-style-tool-for-bijou.md",
-      "title": "DF-027 \u2014 Storybook-Style Tool for Bijou",
+      "title": "DF-027 — Storybook-Style Tool for Bijou",
       "bytes": 5677,
       "sha256": "edd4c3ee2ed1b611e2d8adbabdfa560b4f4b93bbcd97f0038bb5f37464efc32d",
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0088-df-027-storybook-style-tool-for-bijou.tex",
       "record_label": "record-088",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1043,7 +1043,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0089-df-028-story-capture-matrix.tex",
       "record_label": "record-089",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1055,7 +1055,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0090-df-029-fixture-to-docs-promotion-path.tex",
       "record_label": "record-090",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1067,7 +1067,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0091-df-030-dogfood-docs-surface-block.tex",
       "record_label": "record-091",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1079,7 +1079,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0092-df-031-status-feedback-standard-blocks.tex",
       "record_label": "record-092",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1091,7 +1091,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0093-df-036-audit-loading-placeholders-family-across-real-surfaces.tex",
       "record_label": "record-093",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1103,7 +1103,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0094-df-039-component-family-standard-blocks.tex",
       "record_label": "record-094",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1115,7 +1115,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0095-df-041-audit-inspector-panels-family-across-real-surfaces.tex",
       "record_label": "record-095",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1127,7 +1127,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0096-df-046-choice-navigation-standard-blocks.tex",
       "record_label": "record-096",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1139,7 +1139,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0097-df-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.tex",
       "record_label": "record-097",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1151,7 +1151,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0098-df-053-audit-motion-and-shader-effects-family-across-real-surfaces.tex",
       "record_label": "record-098",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1163,7 +1163,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0099-df-054-late-family-standard-blocks.tex",
       "record_label": "record-099",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1175,7 +1175,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0100-df-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.tex",
       "record_label": "record-100",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1187,7 +1187,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0101-df-060-v7-dogfood-release-title-screen.tex",
       "record_label": "record-101",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1199,7 +1199,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0102-df-061-audit-overlay-primitives-family-across-real-surfaces.tex",
       "record_label": "record-102",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1211,7 +1211,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0103-df-062-audit-notification-system-family-across-real-surfaces.tex",
       "record_label": "record-103",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1223,7 +1223,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0104-df-063-audit-app-shell-family-across-real-surfaces.tex",
       "record_label": "record-104",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1235,7 +1235,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0105-df-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.tex",
       "record_label": "record-105",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1247,7 +1247,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0106-df-065-audit-workspace-layout-family-across-real-surfaces.tex",
       "record_label": "record-106",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1259,7 +1259,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0107-df-066-audit-data-visualization-family-across-real-surfaces.tex",
       "record_label": "record-107",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1271,7 +1271,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0108-df-067-prove-responsive-dogfood-layout-variants.tex",
       "record_label": "record-108",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1283,7 +1283,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0109-df-069-block-authored-dogfood.tex",
       "record_label": "record-109",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1295,7 +1295,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0110-df-070-dogfood-block-product-polish.tex",
       "record_label": "record-110",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1307,7 +1307,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0111-df-071-dogfood-block-authored-surfaces.tex",
       "record_label": "record-111",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1319,7 +1319,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0112-df-072-dogfood-release-title-artifact-gallery.tex",
       "record_label": "record-112",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1331,7 +1331,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0113-df-073-raster-to-glyph-title-art.tex",
       "record_label": "record-113",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1343,7 +1343,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
       "record_label": "record-114",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1355,7 +1355,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0115-df-075-dogfood-post-release-polish.tex",
       "record_label": "record-115",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1367,7 +1367,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0116-df-076-blocklab-demo-readiness.tex",
       "record_label": "record-116",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1379,7 +1379,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0117-df-077-dogfood-app-landing-extraction.tex",
       "record_label": "record-117",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1391,7 +1391,7 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0118-df-078-dogfood-release-story-surfaces.tex",
       "record_label": "record-118",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1403,31 +1403,31 @@
       "group": "DF",
       "latex_path": "chapters/04-dogfood-design-records/0119-df-150-dogfood-terminal-guardrails.tex",
       "record_label": "record-119",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 118,
       "path": "docs/design/DX-001-type-framed-app-messages-and-updates-end-to-end.md",
-      "title": "DX-001 \u2014 Type Framed App Messages and Updates End-to-End",
+      "title": "DX-001 — Type Framed App Messages and Updates End-to-End",
       "bytes": 2266,
       "sha256": "d2790f3d62d8996ca444ae18dc2c37cf2666c3a4bf82c77e76a9222b5e8783f9",
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0120-dx-001-type-framed-app-messages-and-updates-end-to-end.tex",
       "record_label": "record-120",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 119,
       "path": "docs/design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md",
-      "title": "DX-002 \u2014 Reconcile Cmd Typing With Cleanup and Effect Patterns",
+      "title": "DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns",
       "bytes": 2241,
       "sha256": "3d5c54faa47d99a9b8e0ee65de503e9e938a2a976145437f7e8fde8d1382800e",
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0121-dx-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.tex",
       "record_label": "record-121",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1439,7 +1439,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0122-dx-022-layout-inspector-overlay.tex",
       "record_label": "record-122",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1451,7 +1451,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0123-dx-023-input-routing-inspector.tex",
       "record_label": "record-123",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1463,7 +1463,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0124-dx-024-surface-diff-viewer.tex",
       "record_label": "record-124",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1475,7 +1475,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0125-dx-025-component-metadata-contract.tex",
       "record_label": "record-125",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1487,7 +1487,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0126-dx-026-mode-lowering-linter.tex",
       "record_label": "record-126",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1499,7 +1499,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0127-dx-030-add-boundary-aware-pointer-selection-and-copy.tex",
       "record_label": "record-127",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1511,7 +1511,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0128-dx-031-standard-bijou-blocks.tex",
       "record_label": "record-128",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1523,7 +1523,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0129-dx-031f-block-tree-rendering.tex",
       "record_label": "record-129",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1535,7 +1535,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0130-dx-032-create-tui-app-skeleton-renders-consumer-pages.tex",
       "record_label": "record-130",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1547,7 +1547,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0131-dx-033-remove-showcase-layout-sludge.tex",
       "record_label": "record-131",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1559,7 +1559,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
       "record_label": "record-132",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1571,7 +1571,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0133-dx-036-responsive-table-layout-and-variants.tex",
       "record_label": "record-133",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1583,7 +1583,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0134-dx-038-blocklab-rename-and-migration.tex",
       "record_label": "record-134",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1595,7 +1595,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0135-dx-039-blocklab-product-parity.tex",
       "record_label": "record-135",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1607,7 +1607,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0136-dx-040-v7-review-regression-fixes.tex",
       "record_label": "record-136",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1619,7 +1619,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0137-dx-041-image-to-glyph-side-app.tex",
       "record_label": "record-137",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1631,7 +1631,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0138-dx-042-shared-ui-scene-ir-and-bijou-render-target.tex",
       "record_label": "record-138",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1643,7 +1643,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
       "record_label": "record-139",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1655,7 +1655,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0140-dx-044-graphql-authored-bijou-block-ir-proof.tex",
       "record_label": "record-140",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1667,7 +1667,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0141-dx-045-graphql-block-groups-and-debug-facts.tex",
       "record_label": "record-141",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1679,7 +1679,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0142-dx-046-graphql-authored-dogfood-block-fixture.tex",
       "record_label": "record-142",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1691,7 +1691,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0143-dx-047-blocks-app-binding-snippets.tex",
       "record_label": "record-143",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1703,7 +1703,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0144-dx-048-v8-runtime-graph-scene-ir-contract.tex",
       "record_label": "record-144",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1715,7 +1715,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0145-dx-049-visor-artifact-bundle-proof.tex",
       "record_label": "record-145",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1727,7 +1727,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0146-dx-050-profunctor-page-inspection.tex",
       "record_label": "record-146",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1739,7 +1739,7 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0147-dx-052-no-color-is-not-a-capability.tex",
       "record_label": "record-147",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1751,103 +1751,103 @@
       "group": "DX",
       "latex_path": "chapters/05-developer-experience-design-records/0148-dx-125-day-zero-onboarding-bridge.tex",
       "record_label": "record-148",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 147,
       "path": "docs/design/RE-001-define-runtime-engine-architecture.md",
-      "title": "RE-001 \u2014 Define Runtime Engine Architecture",
+      "title": "RE-001 — Define Runtime Engine Architecture",
       "bytes": 8048,
       "sha256": "adf8c9badd844de475b2892c96616be8e248e1bf0fb79135c7d9ef507ae4228c",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0149-re-001-define-runtime-engine-architecture.tex",
       "record_label": "record-149",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 148,
       "path": "docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md",
-      "title": "RE-002 \u2014 Promote First-Class State Machine and View Stack",
+      "title": "RE-002 — Promote First-Class State Machine and View Stack",
       "bytes": 6666,
       "sha256": "28ad8ed0d1f0bfa3c8cb9b37ddbb939b75d0928f770770efb1c3bd1b784fa6ef",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0150-re-002-promote-first-class-state-machine-and-view-stack.tex",
       "record_label": "record-150",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 149,
       "path": "docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md",
-      "title": "RE-003 \u2014 Retain Layout Trees and Layout Invalidation",
+      "title": "RE-003 — Retain Layout Trees and Layout Invalidation",
       "bytes": 7115,
       "sha256": "7fe01c3a240a1a9a7e32b41d5acd8be91567a1ee4ed886fbe054850187d7ba6f",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0151-re-003-retain-layout-trees-and-layout-invalidation.tex",
       "record_label": "record-151",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 150,
       "path": "docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md",
-      "title": "RE-004 \u2014 Route Input Through Layouts and Layer Bubbling",
+      "title": "RE-004 — Route Input Through Layouts and Layer Bubbling",
       "bytes": 6866,
       "sha256": "7cb8caeb7ae6a6561880e475d5cd41e739c07e688595616f6fd2152bc5ae3801",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0152-re-004-route-input-through-layouts-and-layer-bubbling.tex",
       "record_label": "record-152",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 151,
       "path": "docs/design/RE-005-buffer-commands-and-effects-separately.md",
-      "title": "RE-005 \u2014 Buffer Commands and Effects Separately",
+      "title": "RE-005 — Buffer Commands and Effects Separately",
       "bytes": 7371,
       "sha256": "a1b6c52004e9a2c6fb9f9f680d26c0507fbf04e12a6a18957bd920af029d55fd",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0153-re-005-buffer-commands-and-effects-separately.tex",
       "record_label": "record-153",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 152,
       "path": "docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md",
-      "title": "RE-006 \u2014 Formalize Component Layout and Interaction Contracts",
+      "title": "RE-006 — Formalize Component Layout and Interaction Contracts",
       "bytes": 7433,
       "sha256": "1089aac53d706bf949ba9dd3012b923447468093375f9696cba9cc2489ecdc34",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0154-re-006-formalize-component-layout-and-interaction-contracts.tex",
       "record_label": "record-154",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 153,
       "path": "docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md",
-      "title": "RE-007 \u2014 Migrate Framed Shell Onto Runtime Engine Seams",
+      "title": "RE-007 — Migrate Framed Shell Onto Runtime Engine Seams",
       "bytes": 14982,
       "sha256": "5620ab061d0fa7fb30316e169a6532d2bf27f66d05bdbf3e7b1f1aedcf20cb93",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0155-re-007-migrate-framed-shell-onto-runtime-engine-seams.tex",
       "record_label": "record-155",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 154,
       "path": "docs/design/RE-008-perf-findings.md",
-      "title": "RE-008 \u2014 Rendering Performance Findings",
+      "title": "RE-008 — Rendering Performance Findings",
       "bytes": 5437,
       "sha256": "a0d148cb2eeeab89f40fd41ce8398aefef3e645de8bf2bee86c1541024867d2d",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0156-re-008-perf-findings.tex",
       "record_label": "record-156",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1859,43 +1859,43 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0157-re-024-surface-budget-warnings.tex",
       "record_label": "record-157",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 156,
       "path": "docs/design/RE-030-average-high-resolution-canvas-colors.md",
-      "title": "RE-030 \u2014 Average High-Resolution Canvas Colors",
+      "title": "RE-030 — Average High-Resolution Canvas Colors",
       "bytes": 6789,
       "sha256": "e1da38f52150253dec377a5e9836f08f9916d85e29e1c0d3fad456dddc374157",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0158-re-030-average-high-resolution-canvas-colors.tex",
       "record_label": "record-158",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 157,
       "path": "docs/design/RE-031-raytrace-shader-kernel.md",
-      "title": "RE-031 \u2014 Raytrace Shader Kernel",
+      "title": "RE-031 — Raytrace Shader Kernel",
       "bytes": 5497,
       "sha256": "c93782df0cd3be182875cea2b119e59ddd2b1bd0bb9079834435ae1341049848",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0159-re-031-raytrace-shader-kernel.tex",
       "record_label": "record-159",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 158,
       "path": "docs/design/RE-032-fit-cell-glyphs-from-coverage.md",
-      "title": "RE-032 \u2014 Fit Cell Glyphs From Coverage",
+      "title": "RE-032 — Fit Cell Glyphs From Coverage",
       "bytes": 5337,
       "sha256": "2832fba24091cf839e468eaf1b27393d177f00dea0c6c8f7b9a2f03f1f3c7f74",
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0160-re-032-fit-cell-glyphs-from-coverage.tex",
       "record_label": "record-160",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1907,7 +1907,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0161-re-033-stable-spring-pulse-integration.tex",
       "record_label": "record-161",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1919,7 +1919,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0162-re-034-glyph-fit-canvas-resolution.tex",
       "record_label": "record-162",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1931,7 +1931,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0163-re-035-mandatory-layout-envelope-and-constraint-negotiation.tex",
       "record_label": "record-163",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1943,7 +1943,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0164-re-036-packed-bijou-cells-surface-adapter.tex",
       "record_label": "record-164",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1955,7 +1955,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0165-re-041-v72-framework-input-stabilization.tex",
       "record_label": "record-165",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1967,7 +1967,7 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0166-re-127-command-and-render-runtime-guardrails.tex",
       "record_label": "record-166",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -1979,103 +1979,103 @@
       "group": "RE",
       "latex_path": "chapters/06-runtime-engine-design-records/0167-re-142-node-bootstrap-failure-contract.tex",
       "record_label": "record-167",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 166,
       "path": "docs/design/DL-001-capture-design-language-doctrine.md",
-      "title": "DL-001 \u2014 Capture Design Language Doctrine",
+      "title": "DL-001 — Capture Design Language Doctrine",
       "bytes": 5446,
       "sha256": "e7bece8c6aa43683a3c7bcc8655d3d4cc5475628e628c92149f03f9f33c8d70c",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0168-dl-001-capture-design-language-doctrine.tex",
       "record_label": "record-168",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 167,
       "path": "docs/design/DL-002-canonicalize-patterns-and-blocks.md",
-      "title": "DL-002 \u2014 Canonicalize Patterns and Blocks",
+      "title": "DL-002 — Canonicalize Patterns and Blocks",
       "bytes": 5961,
       "sha256": "198e757525068a24a39d9f12301728bc2223390ec5b9209bb20856a6df6e1dba",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0169-dl-002-canonicalize-patterns-and-blocks.tex",
       "record_label": "record-169",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 168,
       "path": "docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md",
-      "title": "DL-003 \u2014 Prove Canonical Patterns in Shared Surfaces",
+      "title": "DL-003 — Prove Canonical Patterns in Shared Surfaces",
       "bytes": 5583,
       "sha256": "df6b469eb1f405f9dc8af6da1d3f05b1982c3deae382c34b2265b3c64cd0e259",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0170-dl-003-prove-canonical-patterns-in-shared-surfaces.tex",
       "record_label": "record-170",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 169,
       "path": "docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md",
-      "title": "DL-004 \u2014 Prove Drawer Rhythm and Notice Rows",
+      "title": "DL-004 — Prove Drawer Rhythm and Notice Rows",
       "bytes": 5251,
       "sha256": "f1b58cd0ea62db84ecac484095bf122cf25bf36f4b73ddc4fff03641530bb52a",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0171-dl-004-prove-drawer-rhythm-and-notice-rows.tex",
       "record_label": "record-171",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 170,
       "path": "docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md",
-      "title": "DL-005 \u2014 Prove Inspector and Guided Flow Rhythm",
+      "title": "DL-005 — Prove Inspector and Guided Flow Rhythm",
       "bytes": 5835,
       "sha256": "505ea91e4a40a57d4bdbb43adfe749af6e41658357684d3c53e76dcf88d94ffd",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0172-dl-005-prove-inspector-and-guided-flow-rhythm.tex",
       "record_label": "record-172",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 171,
       "path": "docs/design/DL-006-prove-inspector-panel-rhythm.md",
-      "title": "DL-006 \u2014 Prove Inspector Panel Rhythm",
+      "title": "DL-006 — Prove Inspector Panel Rhythm",
       "bytes": 6002,
       "sha256": "0631935205e82843aa3f7da3ce85d3e91635f42b752a18635af1ea61bd4fcb0a",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0173-dl-006-prove-inspector-panel-rhythm.tex",
       "record_label": "record-173",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 172,
       "path": "docs/design/DL-007-promote-inspector-panel-block.md",
-      "title": "DL-007 \u2014 Promote Inspector Panel Block",
+      "title": "DL-007 — Promote Inspector Panel Block",
       "bytes": 6474,
       "sha256": "5b510a26dd32989c2969a5cd3525fa8e686f661d056acabaec914d4de7e3c930",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0174-dl-007-promote-inspector-panel-block.tex",
       "record_label": "record-174",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 173,
       "path": "docs/design/DL-008-promote-guided-flow-block.md",
-      "title": "DL-008 \u2014 Promote Guided Flow Block",
+      "title": "DL-008 — Promote Guided Flow Block",
       "bytes": 6275,
       "sha256": "bb27eb6e16289357b2f17b904ae17bbbabb4f3ac37704b531599ecd42b96a6d2",
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0175-dl-008-promote-guided-flow-block.tex",
       "record_label": "record-175",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2087,7 +2087,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0176-dl-011-theme-contrast-doctor.tex",
       "record_label": "record-176",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2099,7 +2099,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0177-dl-012-separate-focus-gutter-from-scrollbar-ui-tokens.tex",
       "record_label": "record-177",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2111,7 +2111,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0178-dl-013-design-token-theme-builder-api.tex",
       "record_label": "record-178",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2123,7 +2123,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0179-dl-014-theme-inspector-and-lab.tex",
       "record_label": "record-179",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2135,7 +2135,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0180-dl-015-theme-safe-pairs-and-contrast-matrices.tex",
       "record_label": "record-180",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2147,7 +2147,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0181-dl-016-mode-aware-runtime-theme-adapter.tex",
       "record_label": "record-181",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2159,7 +2159,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0182-dl-017-dogfood-light-theme-readiness.tex",
       "record_label": "record-182",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2171,7 +2171,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0183-dl-018-first-party-theme-variant-coverage.tex",
       "record_label": "record-183",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2183,7 +2183,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0184-dl-019-theme-rule-selection-and-inspection.tex",
       "record_label": "record-184",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2195,7 +2195,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0185-dl-020-dogfood-rule-authored-first-party-themes.tex",
       "record_label": "record-185",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2207,7 +2207,7 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0186-dl-021-dogfood-theme-token-usage-proof.tex",
       "record_label": "record-186",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2219,103 +2219,103 @@
       "group": "DL",
       "latex_path": "chapters/07-design-language-design-records/0187-dl-022-theme-lab-editor-graph-ux.tex",
       "record_label": "record-187",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 186,
       "path": "docs/design/LX-001-bijou-i18n-runtime-package.md",
-      "title": "LX-001 \u2014 bijou-i18n Runtime Package",
+      "title": "LX-001 — bijou-i18n Runtime Package",
       "bytes": 6415,
       "sha256": "ef67d636b79340830657b9426975a73e8c72b972517432505b17cc73f422ece8",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0188-lx-001-bijou-i18n-runtime-package.tex",
       "record_label": "record-188",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 187,
       "path": "docs/design/LX-002-bijou-i18n-tools-package.md",
-      "title": "LX-002 \u2014 bijou-i18n Tools Package",
+      "title": "LX-002 — bijou-i18n Tools Package",
       "bytes": 6667,
       "sha256": "bc3ac6f92027a62229620bfda4ce1dc5e10b823764e7193ec595d563036a56e2",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0189-lx-002-bijou-i18n-tools-package.tex",
       "record_label": "record-189",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 188,
       "path": "docs/design/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md",
-      "title": "LX-003 \u2014 Spreadsheet Adapters and Catalog Exchange Workflows",
+      "title": "LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows",
       "bytes": 7000,
       "sha256": "b5f3643e06470e72a2240131d4b4a176e909377abc3ced4a22b23698a913a780",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0190-lx-003-spreadsheet-adapters-and-catalog-exchange-workflows.tex",
       "record_label": "record-190",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 189,
       "path": "docs/design/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md",
-      "title": "LX-004 \u2014 Provider Adapters for Workbook and Bundle Exchange",
+      "title": "LX-004 — Provider Adapters for Workbook and Bundle Exchange",
       "bytes": 6227,
       "sha256": "46f10f7556650408ff2f3e7db2afee9fe808fca2cd54049edf1c9695251a8a97",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0191-lx-004-provider-adapters-for-workbook-and-bundle-exchange.tex",
       "record_label": "record-191",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 190,
       "path": "docs/design/LX-005-rich-spreadsheet-and-filesystem-adapters.md",
-      "title": "LX-005 \u2014 Rich Spreadsheet and Filesystem Adapters",
+      "title": "LX-005 — Rich Spreadsheet and Filesystem Adapters",
       "bytes": 6383,
       "sha256": "77dcfdfe7f24a4bbde47df99ac2de9076b95cc0fdd1191d98667f1e815bafd62",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0192-lx-005-rich-spreadsheet-and-filesystem-adapters.tex",
       "record_label": "record-192",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 191,
       "path": "docs/design/LX-006-xlsx-localization-adapters.md",
-      "title": "LX-006 \u2014 XLSX Localization Adapters",
+      "title": "LX-006 — XLSX Localization Adapters",
       "bytes": 6013,
       "sha256": "bc98e5ea25f5980dfd4dc497ff42be1111cefc7d964781bb6e2e7236a00a98a5",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0193-lx-006-xlsx-localization-adapters.tex",
       "record_label": "record-193",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 192,
       "path": "docs/design/LX-008-localize-shell-chrome-and-dogfood.md",
-      "title": "LX-008 \u2014 Localize Shell Chrome and DOGFOOD",
+      "title": "LX-008 — Localize Shell Chrome and DOGFOOD",
       "bytes": 7493,
       "sha256": "f9cd542a83629c283b7925d383bebe398ecd75b06a8ff486bec1064182fca790",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0194-lx-008-localize-shell-chrome-and-dogfood.tex",
       "record_label": "record-194",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 193,
       "path": "docs/design/LX-019-localization-port-contract.md",
-      "title": "LX-019 \u2014 Localization Port Contract",
+      "title": "LX-019 — Localization Port Contract",
       "bytes": 7189,
       "sha256": "960e096c4b583676ba7724472cc0bf3fa84220194669b2f65bd9093022ce8c58",
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0195-lx-019-localization-port-contract.tex",
       "record_label": "record-195",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2327,7 +2327,7 @@
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0196-lx-020-dogfood-locale-demo-readiness.tex",
       "record_label": "record-196",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2339,7 +2339,7 @@
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0197-lx-021-dogfood-string-debt-ratchet.tex",
       "record_label": "record-197",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2351,7 +2351,7 @@
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0198-lx-022-dogfood-app-main-ratchet.tex",
       "record_label": "record-198",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2363,67 +2363,67 @@
       "group": "LX",
       "latex_path": "chapters/08-localization-design-records/0199-lx-023-dogfood-blocks-capture-ratchet.tex",
       "record_label": "record-199",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 198,
       "path": "docs/design/WF-001-adopt-cycle-workflow.md",
-      "title": "WF-001 \u2014 Adopt the Legends/Cycles Workflow",
+      "title": "WF-001 — Adopt the Legends/Cycles Workflow",
       "bytes": 4642,
       "sha256": "598f92584bd87ec46af7d059b47a15a7805a62b98be96b57f2131e3fffe1a658",
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0200-wf-001-adopt-cycle-workflow.tex",
       "record_label": "record-200",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 199,
       "path": "docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md",
-      "title": "WF-003 \u2014 Replace smoke:examples:* With smoke:dogfood",
+      "title": "WF-003 — Replace smoke:examples:* With smoke:dogfood",
       "bytes": 6351,
       "sha256": "e0d2a8aa647cc514025d18871eb854c2a6e38547178249635f0c6e005e6c3683",
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0201-wf-003-replace-smoke-examples-with-smoke-dogfood.tex",
       "record_label": "record-201",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 200,
       "path": "docs/design/WF-004-shape-the-next-release.md",
-      "title": "WF-004 \u2014 Shape The Next Release",
+      "title": "WF-004 — Shape The Next Release",
       "bytes": 9545,
       "sha256": "23fcc1df5ed36dc47e123d7fcab8297ca74d270f1c3862567a9a61968da375f3",
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0202-wf-004-shape-the-next-release.tex",
       "record_label": "record-202",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 201,
       "path": "docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md",
-      "title": "WF-005 \u2014 Close 4.1.0 i18n Publish-Surface Gap",
+      "title": "WF-005 — Close 4.1.0 i18n Publish-Surface Gap",
       "bytes": 6531,
       "sha256": "bc035e080cb5138fae5cecfc718e22c1187a453cca6cadc24bd2b0ac96c150c2",
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0203-wf-005-close-4-1-0-i18n-publish-surface-gap.tex",
       "record_label": "record-203",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 202,
       "path": "docs/design/WF-006-cut-clean-4-1-0-release-boundary.md",
-      "title": "WF-006 \u2014 Cut Clean 4.1.0 Release Boundary",
+      "title": "WF-006 — Cut Clean 4.1.0 Release Boundary",
       "bytes": 5988,
       "sha256": "cadb1e5ca3526270a255257f5142cc0df1d2edf4b0f54c93e12ab4f74137e113",
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0204-wf-006-cut-clean-4-1-0-release-boundary.tex",
       "record_label": "record-204",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2435,7 +2435,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0205-wf-009-keep-release-prs-under-automated-review-file-limits.tex",
       "record_label": "record-205",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2447,7 +2447,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0206-wf-122-cross-platform-contributor-path.tex",
       "record_label": "record-206",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2459,7 +2459,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0207-wf-123-issues-first-method-intake.tex",
       "record_label": "record-207",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2471,7 +2471,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0208-wf-125-draft-first-cycle-start-workflow.tex",
       "record_label": "record-208",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2483,7 +2483,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0209-wf-127-v7-issue-complete-tracker-sync.tex",
       "record_label": "record-209",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2495,7 +2495,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0210-wf-128-safe-gh-comments-and-milestone-items.tex",
       "record_label": "record-210",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2507,7 +2507,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0211-wf-129-path-gate-dogfood-ci.tex",
       "record_label": "record-211",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2519,7 +2519,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0212-wf-130-roadmap-goalpost-policy.tex",
       "record_label": "record-212",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2531,7 +2531,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0213-wf-131-roadmap-current-reality-refresh.tex",
       "record_label": "record-213",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2543,7 +2543,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0214-wf-132-release-readiness-and-dogfood-i18n-gates.tex",
       "record_label": "record-214",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2555,7 +2555,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0215-wf-133-esbuild-security-patch.tex",
       "record_label": "record-215",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2567,7 +2567,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0216-wf-134-code-dojo-eslint-ratchet-1.tex",
       "record_label": "record-216",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2579,7 +2579,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0217-wf-135-respecting-dojo-1000.tex",
       "record_label": "record-217",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2591,7 +2591,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0218-wf-136-respecting-dojo-ratchet-2018.tex",
       "record_label": "record-218",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2603,7 +2603,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0219-wf-137-respecting-dojo-ratchet-1965.tex",
       "record_label": "record-219",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2615,7 +2615,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0220-wf-138-respecting-dojo-ratchet-1857.tex",
       "record_label": "record-220",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2627,7 +2627,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0221-wf-139-respecting-dojo-ratchet-1796.tex",
       "record_label": "record-221",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2639,7 +2639,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0222-wf-140-respecting-dojo-ratchet-1729.tex",
       "record_label": "record-222",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2651,7 +2651,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0223-wf-141-respecting-dojo-ratchet-1679.tex",
       "record_label": "record-223",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2663,7 +2663,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0224-wf-142-respecting-dojo-ratchet-1621.tex",
       "record_label": "record-224",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2675,7 +2675,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0225-wf-143-respecting-dojo-ratchet-1567.tex",
       "record_label": "record-225",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2687,7 +2687,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0226-wf-144-respecting-dojo-ratchet-1514.tex",
       "record_label": "record-226",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2699,7 +2699,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0227-wf-145-respecting-dojo-ratchet-1461.tex",
       "record_label": "record-227",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2711,7 +2711,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0228-wf-146-respecting-dojo-ratchet-1393.tex",
       "record_label": "record-228",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2723,7 +2723,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0229-wf-147-respecting-dojo-ratchet-1319.tex",
       "record_label": "record-229",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2735,7 +2735,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0230-wf-148-respecting-dojo-ratchet-1268.tex",
       "record_label": "record-230",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2747,7 +2747,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0231-wf-149-respecting-dojo-ratchet-1216.tex",
       "record_label": "record-231",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2759,7 +2759,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0232-wf-150-respecting-dojo-ratchet-1165.tex",
       "record_label": "record-232",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2771,7 +2771,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0233-wf-151-respecting-dojo-ratchet-1110.tex",
       "record_label": "record-233",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2783,7 +2783,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0234-wf-152-respecting-dojo-ratchet-1055.tex",
       "record_label": "record-234",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2795,7 +2795,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0235-wf-153-respecting-dojo-ratchet-1004.tex",
       "record_label": "record-235",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2807,7 +2807,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0236-wf-154-respecting-dojo-ratchet-953.tex",
       "record_label": "record-236",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2819,7 +2819,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0237-wf-155-respecting-dojo-ratchet-624.tex",
       "record_label": "record-237",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2831,7 +2831,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0238-wf-156-respecting-dojo-ratchet-573.tex",
       "record_label": "record-238",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2843,7 +2843,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0239-wf-157-respecting-dojo-ratchet-520.tex",
       "record_label": "record-239",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2855,7 +2855,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0240-wf-158-respecting-dojo-ratchet-468.tex",
       "record_label": "record-240",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2867,7 +2867,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0241-wf-159-respecting-dojo-ratchet-415.tex",
       "record_label": "record-241",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2879,7 +2879,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0242-wf-160-respecting-dojo-ratchet-364.tex",
       "record_label": "record-242",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2891,7 +2891,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0243-wf-161-respecting-dojo-ratchet-262.tex",
       "record_label": "record-243",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2903,7 +2903,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0244-wf-162-respecting-dojo-ratchet-162.tex",
       "record_label": "record-244",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2915,7 +2915,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0245-wf-163-respecting-dojo-ratchet-112.tex",
       "record_label": "record-245",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2927,7 +2927,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0246-wf-164-respecting-dojo-ratchet-62.tex",
       "record_label": "record-246",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2939,7 +2939,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0247-wf-165-respecting-dojo-ratchet-12.tex",
       "record_label": "record-247",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2951,7 +2951,7 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0248-wf-166-v8-dependency-security-closeout.tex",
       "record_label": "record-248",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -2963,43 +2963,43 @@
       "group": "WF",
       "latex_path": "chapters/09-workflow-design-records/0249-wf-167-roadmap-milestone-authority.tex",
       "record_label": "record-249",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 248,
       "path": "docs/design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md",
-      "title": "RE-008 \u2014 Byte-Packed Surface Representation",
+      "title": "RE-008 — Byte-Packed Surface Representation",
       "bytes": 4619,
       "sha256": "d267cd75283d57488e59d4ba9ac94b4d6b89cb1c793a2d47ab645ea91905f271",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0250-008-byte-packed-surface-representation.tex",
       "record_label": "record-250",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 249,
       "path": "docs/design/ASAP-001-fix-mcp-dag-type-error.md",
-      "title": "ASAP-001 \u2014 Fix MCP DAG Type Error",
+      "title": "ASAP-001 — Fix MCP DAG Type Error",
       "bytes": 2744,
       "sha256": "4e2616458260cb8b1894348d35d654486fb1cfd0acd70029ea9ae53b45745a9b",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0251-asap-001-fix-mcp-dag-type-error.tex",
       "record_label": "record-251",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 250,
       "path": "docs/design/AUDIT-001-showcase-audit.md",
-      "title": "AUDIT-001 \u2014 Mentor Audit of examples/showcase",
+      "title": "AUDIT-001 — Mentor Audit of examples/showcase",
       "bytes": 2743,
       "sha256": "768c32b25b65782723412fbcb4c46eec1699dd0d5515d562c08b2e377fd2c285",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0252-audit-001-showcase-audit.tex",
       "record_label": "record-252",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -3011,43 +3011,43 @@
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0253-be-001-dogfood-blocks-breakout.tex",
       "record_label": "record-253",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 252,
       "path": "docs/design/HT-002-layered-focus-and-interaction.md",
-      "title": "HT-002 \u2014 Layered Focus and Interaction",
+      "title": "HT-002 — Layered Focus and Interaction",
       "bytes": 7862,
       "sha256": "aa29b1cd2fe771eb17c53a1d0e154d347dc90da7ac7d374648f781f431e18388",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0254-ht-002-layered-focus-and-interaction.tex",
       "record_label": "record-254",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 253,
       "path": "docs/design/HT-003-implement-layer-stack-and-input-map-routing.md",
-      "title": "HT-003 \u2014 Implement Layer Stack and Input Map Routing",
+      "title": "HT-003 — Implement Layer Stack and Input Map Routing",
       "bytes": 5597,
       "sha256": "ee8522ae911693ae0a16612fbc30853aea1d0e3e2f9753e4aa2785a1dd4bbd05",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0255-ht-003-implement-layer-stack-and-input-map-routing.tex",
       "record_label": "record-255",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 254,
       "path": "docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md",
-      "title": "HT-004 \u2014 Promote Explicit Layer Objects and Richer Shell Introspection",
+      "title": "HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection",
       "bytes": 6096,
       "sha256": "1493a7d5551c23d2fff0f63682b4bac43dd700833f7ab3af516e59b4d29b0831",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0256-ht-004-promote-explicit-layer-objects-and-richer-shell-introspection.tex",
       "record_label": "record-256",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -3059,19 +3059,19 @@
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0257-ht-007-focus-map-surface.tex",
       "record_label": "record-257",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
       "chapter": 256,
       "path": "docs/design/HT_HT-008-surface-native-text-bypasses-the-terminal-sanitization-boundary.md",
-      "title": "HT-008 \u2014 Surface-native text bypasses the terminal sanitization boundary",
+      "title": "HT-008 — Surface-native text bypasses the terminal sanitization boundary",
       "bytes": 2773,
       "sha256": "f1a4cc8d25ea83d101ca277a420ed69892d150f135e28de802392d4d1cae8774",
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0258-ht-ht-008-surface-native-text-bypasses-the-terminal-sanitization-boundary.tex",
       "record_label": "record-258",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -3083,7 +3083,7 @@
       "group": "OTHER",
       "latex_path": "chapters/10-other-design-records/0259-readme.tex",
       "record_label": "record-259",
-      "book_part": 3,
+      "book_part": 4,
       "book_part_title": "Design records"
     },
     {
@@ -3095,7 +3095,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0013-workflow.tex",
       "record_label": "record-013",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3107,7 +3107,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0260-readme.tex",
       "record_label": "record-260",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3119,7 +3119,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0261-readme.tex",
       "record_label": "record-261",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3131,7 +3131,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0262-readme.tex",
       "record_label": "record-262",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3143,7 +3143,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0263-readme.tex",
       "record_label": "record-263",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3155,7 +3155,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0264-migration-guide.tex",
       "record_label": "record-264",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3167,7 +3167,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0265-migration-guide.tex",
       "record_label": "record-265",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3179,7 +3179,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0266-migration-guide.tex",
       "record_label": "record-266",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3191,7 +3191,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0267-migration-guide.tex",
       "record_label": "record-267",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3203,7 +3203,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0268-migration-guide.tex",
       "record_label": "record-268",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3215,7 +3215,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0269-migration-guide.tex",
       "record_label": "record-269",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3227,7 +3227,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0270-migration-guide.tex",
       "record_label": "record-270",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3239,7 +3239,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0271-migration-guide.tex",
       "record_label": "record-271",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3251,7 +3251,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0272-migration-guide.tex",
       "record_label": "record-272",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3263,7 +3263,7 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0273-migration-guide.tex",
       "record_label": "record-273",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
@@ -3275,235 +3275,235 @@
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0274-release.tex",
       "record_label": "record-274",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 274,
       "path": "docs/releases/4.1.0/whats-new.md",
-      "title": "What\u2019s New In Bijou v4.1.0",
+      "title": "What’s New In Bijou v4.1.0",
       "bytes": 9623,
       "sha256": "f6fe4b7c6ec2f939eed1578ce2067d7c2e66eadb94fe7b216ebf02dc776f53b8",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0275-whats-new.tex",
       "record_label": "record-275",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 275,
       "path": "docs/releases/4.2.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 4.2.0",
+      "title": "What’s New in Bijou 4.2.0",
       "bytes": 3276,
       "sha256": "4772f6859fff0dcc33be3f4d4cc446e19e803400c92260f85f9f35e0e9751890",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0276-whats-new.tex",
       "record_label": "record-276",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 276,
       "path": "docs/releases/4.3.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 4.3.0",
+      "title": "What’s New in Bijou 4.3.0",
       "bytes": 3042,
       "sha256": "44893d31e13e06dbed48815b670fc019e2c81066fbf6f5f8d3eebc1072e6ef95",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0277-whats-new.tex",
       "record_label": "record-277",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 277,
       "path": "docs/releases/4.4.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 4.4.0",
+      "title": "What’s New in Bijou 4.4.0",
       "bytes": 3084,
       "sha256": "f8863047ac88cba5a84bbc96484d92e0a9d4c309f2e8696e5d605bb15201e6bc",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0278-whats-new.tex",
       "record_label": "record-278",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 278,
       "path": "docs/releases/4.4.1/whats-new.md",
-      "title": "What\u2019s New in Bijou 4.4.1",
+      "title": "What’s New in Bijou 4.4.1",
       "bytes": 3541,
       "sha256": "5d82ea6e77baacd16fdf8b68382123bc2e2cef722f186c5759672c7b35a569c6",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0279-whats-new.tex",
       "record_label": "record-279",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 279,
       "path": "docs/releases/5.0.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 5.0.0",
+      "title": "What’s New in Bijou 5.0.0",
       "bytes": 3874,
       "sha256": "5cd3c456a808582660f30bf502b6372c42008cfd3361f80437010625f31c1769",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0280-whats-new.tex",
       "record_label": "record-280",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 280,
       "path": "docs/releases/7.0.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 7.0.0",
+      "title": "What’s New in Bijou 7.0.0",
       "bytes": 4724,
       "sha256": "757d004bc0e6b55c485bd98e4d0bc03feec298173879ec52992b8a21f0a35316",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0281-whats-new.tex",
       "record_label": "record-281",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 281,
       "path": "docs/releases/7.1.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 7.1.0",
+      "title": "What’s New in Bijou 7.1.0",
       "bytes": 4148,
       "sha256": "03591582ae3ece3d890b47ad6226624180ce4385feb5cf7b088e628f5f2bc243",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0282-whats-new.tex",
       "record_label": "record-282",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 282,
       "path": "docs/releases/7.2.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 7.2.0",
+      "title": "What’s New in Bijou 7.2.0",
       "bytes": 3056,
       "sha256": "7255d83c64bba9459e2d16cc505cb6975e9e7f561d0815ad756b8de2c59ed4ee",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0283-whats-new.tex",
       "record_label": "record-283",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 283,
       "path": "docs/releases/8.0.0/whats-new.md",
-      "title": "What\u2019s New in Bijou 8.0.0-rc.1",
+      "title": "What’s New in Bijou 8.0.0-rc.1",
       "bytes": 5510,
       "sha256": "3f34b0622f828528cb2806fa33b34337185046ae2f642758f63051b2e83d079e",
       "group": "RELEASES",
       "latex_path": "chapters/11-release-history-and-migration/0284-whats-new.tex",
       "record_label": "record-284",
-      "book_part": 4,
+      "book_part": 5,
       "book_part_title": "Releases and migration"
     },
     {
       "chapter": 284,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/CI-001-mermaid-surface-component.md",
-      "title": "CI-001 \u2014 mermaidSurface() Component",
+      "title": "CI-001 — mermaidSurface() Component",
       "bytes": 915,
       "sha256": "f857fd606d23f2b3a73ea5abf8aab7029265e6997323c435f88ac5ba68a9fe03",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0285-ci-001-mermaid-surface-component.tex",
       "record_label": "record-285",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 285,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/CI-002-deterministic-time-travel-debugger.md",
-      "title": "CI-002 \u2014 Deterministic Time-Travel Debugger",
+      "title": "CI-002 — Deterministic Time-Travel Debugger",
       "bytes": 1094,
       "sha256": "91c073bfc82b2bb7f087d1a146fec53155fc001a0cb64831335b0ab9c92045b1",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0286-ci-002-deterministic-time-travel-debugger.tex",
       "record_label": "record-286",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 286,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/CI-003-surface-shaders.md",
-      "title": "CI-003 \u2014 Surface Shaders (CRT / Scanlines)",
+      "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
       "bytes": 1081,
       "sha256": "1321d46098709710ef3aacf481edd381234fc50261dc338fbe5c34d638752032",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0287-ci-003-surface-shaders.tex",
       "record_label": "record-287",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 287,
       "path": "docs/method/retro/CI-003-surface-shaders.md",
-      "title": "CI-003 \u2014 Surface Shaders (CRT / Scanlines)",
+      "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
       "bytes": 1742,
       "sha256": "2c16885a7cdab74ebaa1390f5709b9cc138bedc86c97b50bcb8e4ea3b7717391",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0288-ci-003-surface-shaders.tex",
       "record_label": "record-288",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 288,
       "path": "docs/method/retro/DAG-layer-skipping-edges-occluded.md",
-      "title": "DAG \u2014 Layer-Skipping Edges Silently Occluded By Intermediate Nodes",
+      "title": "DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes",
       "bytes": 5431,
       "sha256": "1b99c2293c794fada62a707423bbf90280883ffa08abeab649e166cad8b43be6",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0289-dag-layer-skipping-edges-occluded.tex",
       "record_label": "record-289",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 289,
       "path": "docs/method/graveyard/legacy-backlog/DF-002-expand-dogfood-component-family-coverage.md",
-      "title": "DF-002 \u2014 Expand DOGFOOD Component Family Coverage",
+      "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
       "bytes": 906,
       "sha256": "ba7388d201140bcdda63b4ef9162941aa0460ecb99dd98ad600e3e7be614724c",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0290-df-002-expand-dogfood-component-family-coverage.tex",
       "record_label": "record-290",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 290,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/DF-020-deepen-dogfood-story-depth-and-variant-quality.md",
-      "title": "DF-020 \u2014 Deepen DOGFOOD Story Depth and Variant Quality",
+      "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
       "bytes": 742,
       "sha256": "d9be719af08029f273601becd33d162034615da34da0c9b56a1aa1dea6b3797c",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0291-df-020-deepen-dogfood-story-depth-and-variant-quality.tex",
       "record_label": "record-291",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 291,
       "path": "docs/method/retro/DF-020-deepen-dogfood-story-depth-and-variant-quality.md",
-      "title": "DF-020 \u2014 Deepen DOGFOOD Story Depth and Variant Quality",
+      "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
       "bytes": 1411,
       "sha256": "9b70a4778a3833ed30cbc5aace18aeddbbdcbfc187dded73c2d2cc104bdfdd3f",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0292-df-020-deepen-dogfood-story-depth-and-variant-quality.tex",
       "record_label": "record-292",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 292,
       "path": "docs/method/retro/DF_002-expand-dogfood-component-family-coverage.md",
-      "title": "DF-002 \u2014 Expand DOGFOOD Component Family Coverage",
+      "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
       "bytes": 1424,
       "sha256": "6759d6857a635941a6b93b90156e47ab6e742ce788fd751fa437a34138495b63",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0293-df-002-expand-dogfood-component-family-coverage.tex",
       "record_label": "record-293",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -3515,703 +3515,703 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0294-df-mcp-interactive-documentation-for-all-bijou-components.tex",
       "record_label": "record-294",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 294,
       "path": "docs/method/graveyard/legacy-backlog/DL-008-promote-guided-flow-block.md",
-      "title": "DL-008 \u2014 Promote Guided Flow Block",
+      "title": "DL-008 — Promote Guided Flow Block",
       "bytes": 858,
       "sha256": "48ec1f9ac21a79906bc3ef8cbacd3e6642ffd0cf7ca97bfc07cba61bfd458793",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0295-dl-008-promote-guided-flow-block.tex",
       "record_label": "record-295",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 295,
       "path": "docs/method/graveyard/legacy-backlog/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md",
-      "title": "DL-009 \u2014 Formalize Layout and Viewport Rules",
+      "title": "DL-009 — Formalize Layout and Viewport Rules",
       "bytes": 1373,
       "sha256": "4cb4e6dd100a36bf60485dedf4fbfa19673289cf126497e91cd0411f9bc5d06b",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0296-dl-009-formalize-layout-and-viewport-rules.tex",
       "record_label": "record-296",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 296,
       "path": "docs/method/retro/DL-009-formalize-layout-and-viewport-rules.md",
-      "title": "DL-009 \u2014 Formalize Layout and Viewport Rules",
+      "title": "DL-009 — Formalize Layout and Viewport Rules",
       "bytes": 1319,
       "sha256": "3688536d2584ec76828a5f73c93968c215e9b73d04dea359fcbeab7d984943b1",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0297-dl-009-formalize-layout-and-viewport-rules.tex",
       "record_label": "record-297",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 297,
       "path": "docs/method/graveyard/DL-009-strictly-typed-app-examples.md",
-      "title": "DL-009 \u2014 Strictly Typed App Interface Examples",
+      "title": "DL-009 — Strictly Typed App Interface Examples",
       "bytes": 1486,
       "sha256": "2e02b3adbe6a54b1e9d55e613e75331deb23553afe7fb81c8f7f24f37d70f2a4",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0298-dl-009-strictly-typed-app-examples.tex",
       "record_label": "record-298",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 298,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DL-009-strictly-typed-app-examples.md",
-      "title": "DL-009 \u2014 Strictly Typed App Interface Examples",
+      "title": "DL-009 — Strictly Typed App Interface Examples",
       "bytes": 907,
       "sha256": "d24b1ccf643935e120a8736bfe0968a0d663f998c5d9eef8024da755af795b06",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0299-dl-009-strictly-typed-app-examples.tex",
       "record_label": "record-299",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 299,
       "path": "docs/method/retro/DL-010-strictly-typed-app-examples.md",
-      "title": "DL-010 \u2014 Strictly Typed App Interface Examples",
+      "title": "DL-010 — Strictly Typed App Interface Examples",
       "bytes": 1094,
       "sha256": "981b9a2e3ce2feb7dc630cf342f4d1e8b0cef7d66b1bc6f7c955603a12a4688c",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0300-dl-010-strictly-typed-app-examples.tex",
       "record_label": "record-300",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 300,
       "path": "docs/method/retro/DL_008-promote-guided-flow-block.md",
-      "title": "DL-008 \u2014 Promote Guided Flow Block",
+      "title": "DL-008 — Promote Guided Flow Block",
       "bytes": 1365,
       "sha256": "597461f39323ea182944a7030aa10b7483e9557016a23f355cd3492343768388",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0301-dl-008-promote-guided-flow-block.tex",
       "record_label": "record-301",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 301,
       "path": "docs/method/graveyard/legacy-backlog/DX-003-rationalize-table-apis-and-public-table-types.md",
-      "title": "DX-003 \u2014 Rationalize Table APIs and Public Table Types",
+      "title": "DX-003 — Rationalize Table APIs and Public Table Types",
       "bytes": 1310,
       "sha256": "84566f4988502265aae92ff211bb6a264ac8832e2f44ef53feed1d741572d18f",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0302-dx-003-rationalize-table-apis-and-public-table-types.tex",
       "record_label": "record-302",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 302,
       "path": "docs/method/graveyard/legacy-backlog/DX-004-smooth-surface-and-string-composition-seams.md",
-      "title": "DX-004 \u2014 Smooth Surface and String Composition Seams",
+      "title": "DX-004 — Smooth Surface and String Composition Seams",
       "bytes": 1269,
       "sha256": "be238ede52fe9c5d6507f29950f40c70ca669443ba4132cd04300954151509f8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0303-dx-004-smooth-surface-and-string-composition-seams.tex",
       "record_label": "record-303",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 303,
       "path": "docs/method/graveyard/legacy-backlog/DX-005-polish-small-component-and-import-ergonomics.md",
-      "title": "DX-005 \u2014 Polish Small Component and Import Ergonomics",
+      "title": "DX-005 — Polish Small Component and Import Ergonomics",
       "bytes": 1121,
       "sha256": "cbed6d1d9dd7e3861066ea3191bade434110a4d6b983b56e7039feccf3378ec5",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0304-dx-005-polish-small-component-and-import-ergonomics.tex",
       "record_label": "record-304",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 304,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-006-debug-performance-overlay-component.md",
-      "title": "DX-006 \u2014 Debug Performance Overlay Component",
+      "title": "DX-006 — Debug Performance Overlay Component",
       "bytes": 1852,
       "sha256": "3ce6dcfb2322866ecc4c2b76c57facd26fd008da0cbb7a979bbbe5e0cbb9f1f5",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0305-dx-006-debug-performance-overlay-component.tex",
       "record_label": "record-305",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 305,
       "path": "docs/method/graveyard/legacy-backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md",
-      "title": "DX-007 \u2014 Decompose app-frame.ts Mega-Closure",
+      "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
       "bytes": 1501,
       "sha256": "6faf74176e08150b87c483766bb6ba7b55f268fa9821629ab3959113b153d976",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0306-dx-007-decompose-app-frame-mega-closure.tex",
       "record_label": "record-306",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 306,
       "path": "docs/method/retro/DX-007-decompose-app-frame-mega-closure.md",
-      "title": "DX-007 \u2014 Decompose app-frame.ts Mega-Closure",
+      "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
       "bytes": 2535,
       "sha256": "fbb7e8bbb983b41fe0b3ec02536808a2f255305625536dc495ed3e972eccc768",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0307-dx-007-decompose-app-frame-mega-closure.tex",
       "record_label": "record-307",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 307,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/DX-007-project-wide-numeric-input-sanitization.md",
-      "title": "DX-007 \u2014 Project-Wide Numeric Input Sanitization",
+      "title": "DX-007 — Project-Wide Numeric Input Sanitization",
       "bytes": 1024,
       "sha256": "346162db95138bfae118c3f0307965cb6ef549c2a7b315781dc86727e733a3f1",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0308-dx-007-project-wide-numeric-input-sanitization.tex",
       "record_label": "record-308",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 308,
       "path": "docs/method/retro/DX-007-project-wide-numeric-input-sanitization.md",
-      "title": "DX-007 \u2014 Project-Wide Numeric Input Sanitization",
+      "title": "DX-007 — Project-Wide Numeric Input Sanitization",
       "bytes": 1571,
       "sha256": "27d739cc09bf48803feba84e62b49cbb06b35fa88cdcacc052e589cb0be3bb7a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0309-dx-007-project-wide-numeric-input-sanitization.tex",
       "record_label": "record-309",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 309,
       "path": "docs/method/retro/DX-008-performance-observer-gc-unreliable.md",
-      "title": "DX-008 \u2014 PerformanceObserver('gc') Is Unreliable For Our Measurement Needs",
+      "title": "DX-008 — PerformanceObserver('gc') Is Unreliable For Our Measurement Needs",
       "bytes": 3754,
       "sha256": "0ef356a3978ae696d9aea90227d413b660d925c2a6c23c8dfc52518842f51fbb",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0310-dx-008-performance-observer-gc-unreliable.tex",
       "record_label": "record-310",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 310,
       "path": "docs/method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md",
-      "title": "DX-008 \u2014 Render Pipeline Documentation Guide",
+      "title": "DX-008 — Render Pipeline Documentation Guide",
       "bytes": 1074,
       "sha256": "854dfa6f9a194ac4f3b3df5a2602c37494d6264f31afc918dcabbbf73f284f89",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0311-dx-008-render-pipeline-guide.tex",
       "record_label": "record-311",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 311,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/DX-008-sanitize-wrapper-for-user-facing-numerics.md",
-      "title": "DX-008 \u2014 Sanitize Wrapper for User-Facing Numeric Inputs",
+      "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
       "bytes": 1108,
       "sha256": "755d658fd5af97054622199e506c56f6459c4487b42883ec5c5089ef17c52524",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0312-dx-008-sanitize-wrapper-for-user-facing-numerics.tex",
       "record_label": "record-312",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 312,
       "path": "docs/method/retro/DX-008-sanitize-wrapper-for-user-facing-numerics.md",
-      "title": "DX-008 \u2014 Sanitize Wrapper for User-Facing Numeric Inputs",
+      "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
       "bytes": 1628,
       "sha256": "205d00d16330066a6a15c83d6b0973f368fead941c6f06e2a87f19f6b67265df",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0313-dx-008-sanitize-wrapper-for-user-facing-numerics.tex",
       "record_label": "record-313",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 313,
       "path": "docs/method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md",
-      "title": "DX-009 \u2014 Auto-Init Context and Actionable Error Messages",
+      "title": "DX-009 — Auto-Init Context and Actionable Error Messages",
       "bytes": 931,
       "sha256": "b3ee81de4baf94ac7d7a0dbb99047242238651c87b8048a6599c38d696add5ca",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0314-dx-009-context-auto-init-and-error-messages.tex",
       "record_label": "record-314",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 314,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-010-typed-subapp-adapter.md",
-      "title": "DX-010 \u2014 Typed Sub-App Adapter Factory",
+      "title": "DX-010 — Typed Sub-App Adapter Factory",
       "bytes": 995,
       "sha256": "6a690677fc4421589b57b93db6b3ae787f16a4db7a1163b183374f2069773906",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0315-dx-010-typed-subapp-adapter.tex",
       "record_label": "record-315",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 315,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-011-key-collision-warnings.md",
-      "title": "DX-011 \u2014 Key Collision Warnings at Registration Time",
+      "title": "DX-011 — Key Collision Warnings at Registration Time",
       "bytes": 951,
       "sha256": "90c4f2bfbdf766f21f2aaea7945dee4d6dcef5cebe407b0bda29a32fd6407d6a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0316-dx-011-key-collision-warnings.tex",
       "record_label": "record-316",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 316,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-012-render-path-naming-convention.md",
-      "title": "DX-012 \u2014 Document Render-Path Naming Convention",
+      "title": "DX-012 — Document Render-Path Naming Convention",
       "bytes": 1042,
       "sha256": "2c3b29dba803d1f2893473c1ca4bb34d4ec12f8c813379f43cec71ebd0bed464",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0317-dx-012-render-path-naming-convention.tex",
       "record_label": "record-317",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 317,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-013-motion-key-warning.md",
-      "title": "DX-013 \u2014 Motion Key Lifecycle Warning",
+      "title": "DX-013 — Motion Key Lifecycle Warning",
       "bytes": 932,
       "sha256": "31e97816fb03873134f9044c3439a07ca07aebf400b66621c4933ad2d9e20006",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0318-dx-013-motion-key-warning.tex",
       "record_label": "record-318",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 318,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-014-readme-interactive-example-fix.md",
-      "title": "DX-014 \u2014 Fix Root README Interactive Example",
+      "title": "DX-014 — Fix Root README Interactive Example",
       "bytes": 778,
       "sha256": "81fc101f2882f533b5650eb4971b033312ddf8e75c92ba63e4280b7044ec57ca",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0319-dx-014-readme-interactive-example-fix.tex",
       "record_label": "record-319",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 319,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-015-perf-gradient-as-ci-benchmark.md",
-      "title": "DX-015 \u2014 Perf Gradient as CI Benchmark",
+      "title": "DX-015 — Perf Gradient as CI Benchmark",
       "bytes": 1409,
       "sha256": "febc54961901cfaf4adac056d53317dd59b7938ac28cc337383fb536cba8f2c5",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0320-dx-015-perf-gradient-as-ci-benchmark.tex",
       "record_label": "record-320",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 320,
       "path": "docs/method/graveyard/DX-016-error-surface-post-mortem.md",
-      "title": "DX-016 \u2014 Error Surface for Crash Post-Mortems",
+      "title": "DX-016 — Error Surface for Crash Post-Mortems",
       "bytes": 1707,
       "sha256": "cc87f04db2c9d461dedf477cdf2749413e129bb3d226e5815e60c2783435d1b6",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0321-dx-016-error-surface-post-mortem.tex",
       "record_label": "record-321",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 321,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-016-error-surface-post-mortem.md",
-      "title": "DX-016 \u2014 Error Surface for Crash Post-Mortems",
+      "title": "DX-016 — Error Surface for Crash Post-Mortems",
       "bytes": 1146,
       "sha256": "8b15a26331f6ea2e42f35c3aa6b2c43f788b7c1612fa83ae22b937cb05c8016b",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0322-dx-016-error-surface-post-mortem.tex",
       "record_label": "record-322",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 322,
       "path": "docs/method/retro/DX-016-scenario-provenance-tags.md",
-      "title": "DX-016 \u2014 Scenario Provenance Tags For Intelligent Bench Filtering",
+      "title": "DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering",
       "bytes": 3409,
       "sha256": "ef5b7c4f6ce3739ef631bd737ac9ce973a8c8d65343658a3719a4910ae964f27",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0323-dx-016-scenario-provenance-tags.tex",
       "record_label": "record-323",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 323,
       "path": "docs/method/retro/DX-017-agent-first-bench-output-format.md",
-      "title": "DX-017 \u2014 Agent-First Bench Output Format",
+      "title": "DX-017 — Agent-First Bench Output Format",
       "bytes": 3966,
       "sha256": "ef26de2586db318c55bcd3e211031180b09e2a815e415225f1cd13dbeb6d2653",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0324-dx-017-agent-first-bench-output-format.tex",
       "record_label": "record-324",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 324,
       "path": "docs/method/graveyard/legacy-backlog/up-next/DX-017-one-call-node-host-entry-point.md",
-      "title": "DX-017 \u2014 One-Call Node Host Entry Point",
+      "title": "DX-017 — One-Call Node Host Entry Point",
       "bytes": 962,
       "sha256": "5868ad3daee504c12c148403e279ca280e839961412c964df47feee70133efaf",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0325-dx-017-one-call-node-host-entry-point.tex",
       "record_label": "record-325",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 325,
       "path": "docs/method/retro/DX-017-one-call-node-host-entry-point.md",
-      "title": "DX-017 \u2014 One-Call Node Host Entry Point",
+      "title": "DX-017 — One-Call Node Host Entry Point",
       "bytes": 1536,
       "sha256": "23693ba4e93f9cb203a62a1e4b2822ee8d7be2fc3099b34d204994a51c900da4",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0326-dx-017-one-call-node-host-entry-point.tex",
       "record_label": "record-326",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 326,
       "path": "docs/method/graveyard/legacy-backlog/up-next/DX-018-runtime-test-harness.md",
-      "title": "DX-018 \u2014 Runtime Test Harness for TEA Apps",
+      "title": "DX-018 — Runtime Test Harness for TEA Apps",
       "bytes": 959,
       "sha256": "5a38b98051ccefa34484c04541119853d9d372298da1eb1cf84a8678d2f3b72f",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0327-dx-018-runtime-test-harness.tex",
       "record_label": "record-327",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 327,
       "path": "docs/method/retro/DX-018-runtime-test-harness.md",
-      "title": "DX-018 \u2014 Runtime Test Harness for TEA Apps",
+      "title": "DX-018 — Runtime Test Harness for TEA Apps",
       "bytes": 1520,
       "sha256": "def0c37183a8dfa25bded9f07953eab725faf92c4f539ccf4233a6a657e437e5",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0328-dx-018-runtime-test-harness.tex",
       "record_label": "record-328",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 328,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/DX-019-third-party-theme-reactivity-hook.md",
-      "title": "DX-019 \u2014 Third-Party Theme Reactivity Hook",
+      "title": "DX-019 — Third-Party Theme Reactivity Hook",
       "bytes": 949,
       "sha256": "a6d7d2857ec0c15419351128d8a113d90ef00edda0a532261280a4b9b0f30306",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0329-dx-019-third-party-theme-reactivity-hook.tex",
       "record_label": "record-329",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 329,
       "path": "docs/method/retro/DX-019-third-party-theme-reactivity-hook.md",
-      "title": "DX-019 \u2014 Third-Party Theme Reactivity Hook",
+      "title": "DX-019 — Third-Party Theme Reactivity Hook",
       "bytes": 1602,
       "sha256": "066a45ed622f1c54e58310f837bed4af6850fcc45b3a5c4fa2155d9562757e04",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0330-dx-019-third-party-theme-reactivity-hook.tex",
       "record_label": "record-330",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 330,
       "path": "docs/method/graveyard/legacy-backlog/up-next/DX-020-layout-localization-pipeline-guide.md",
-      "title": "DX-020 \u2014 Layout Localization Pipeline Guide",
+      "title": "DX-020 — Layout Localization Pipeline Guide",
       "bytes": 953,
       "sha256": "f5f2c5a0c0c6fe0ebc8cb49d11bf311084f98876282ac7b969059917b3c73576",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0331-dx-020-layout-localization-pipeline-guide.tex",
       "record_label": "record-331",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 331,
       "path": "docs/method/retro/DX-020-layout-localization-pipeline-guide.md",
-      "title": "DX-020 \u2014 Layout Localization Pipeline Guide",
+      "title": "DX-020 — Layout Localization Pipeline Guide",
       "bytes": 1556,
       "sha256": "cbaba769bf70d0b6664eff778a87b668915f62133b0314614aa3f852b9e4975a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0332-dx-020-layout-localization-pipeline-guide.tex",
       "record_label": "record-332",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 332,
       "path": "docs/method/retro/DX-021-error-surface-post-mortem.md",
-      "title": "DX-021 \u2014 Error Surface for Crash Post-Mortems",
+      "title": "DX-021 — Error Surface for Crash Post-Mortems",
       "bytes": 1291,
       "sha256": "cb517b2349b27858c98e1807e7bc0d6cfc427607b4e0c927148e0129e9087c81",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0333-dx-021-error-surface-post-mortem.tex",
       "record_label": "record-333",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 333,
       "path": "docs/method/retro/DX-028-align-front-door-docs-with-repo-truth.md",
-      "title": "DX-028 \u2014 Align front-door docs with repo truth",
+      "title": "DX-028 — Align front-door docs with repo truth",
       "bytes": 1954,
       "sha256": "4f39aaeac2834f58ab899cd4f596dfb6944b0f4855ab254281a8daa5a4148050",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0334-dx-028-align-front-door-docs-with-repo-truth.tex",
       "record_label": "record-334",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 334,
       "path": "docs/method/retro/DX_003-rationalize-table-apis-and-public-table-types.md",
-      "title": "DX-003 \u2014 Rationalize Table APIs and Public Table Types",
+      "title": "DX-003 — Rationalize Table APIs and Public Table Types",
       "bytes": 1956,
       "sha256": "901aa17922615bf37b2953eb49b815addb6f0248898f5f2569d3ac710f48592f",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0335-dx-003-rationalize-table-apis-and-public-table-types.tex",
       "record_label": "record-335",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 335,
       "path": "docs/method/retro/DX_004-smooth-surface-and-string-composition-seams.md",
-      "title": "DX-004 \u2014 Smooth Surface and String Composition Seams",
+      "title": "DX-004 — Smooth Surface and String Composition Seams",
       "bytes": 1912,
       "sha256": "223398aa890b7c6dc322967217721d0e84aaa2a28bb9ee1f649658d42228cb44",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0336-dx-004-smooth-surface-and-string-composition-seams.tex",
       "record_label": "record-336",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 336,
       "path": "docs/method/retro/DX_005-polish-small-component-and-import-ergonomics.md",
-      "title": "DX-005 \u2014 Polish Small Component and Import Ergonomics",
+      "title": "DX-005 — Polish Small Component and Import Ergonomics",
       "bytes": 1848,
       "sha256": "7b489fcd99efa1c023a1d6aed127417711c7d20f12ba2a8c5766c91ddf91d4dd",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0337-dx-005-polish-small-component-and-import-ergonomics.tex",
       "record_label": "record-337",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 337,
       "path": "docs/method/retro/DX_006-debug-performance-overlay-component.md",
-      "title": "DX-006 \u2014 Debug Performance Overlay Component",
+      "title": "DX-006 — Debug Performance Overlay Component",
       "bytes": 3233,
       "sha256": "7365bd84ee5a35bd5e48cac6a21078bb6e0d1e75d522eaafdac929013edf9c14",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0338-dx-006-debug-performance-overlay-component.tex",
       "record_label": "record-338",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 338,
       "path": "docs/method/graveyard/legacy-backlog/v5.0.0/DX_007-decompose-app-frame-mega-closure.md",
-      "title": "DX-007 \u2014 Decompose app-frame.ts Mega-Closure",
+      "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
       "bytes": 1501,
       "sha256": "6faf74176e08150b87c483766bb6ba7b55f268fa9821629ab3959113b153d976",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0339-dx-007-decompose-app-frame-mega-closure.tex",
       "record_label": "record-339",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 339,
       "path": "docs/method/retro/DX_008-render-pipeline-guide.md",
-      "title": "DX-008 \u2014 Render Pipeline Documentation Guide",
+      "title": "DX-008 — Render Pipeline Documentation Guide",
       "bytes": 1652,
       "sha256": "0f07463e37ff6f057ebd506e5f2be5bba6d3a0260b4301bcc9ad7f2b5182ef0f",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0340-dx-008-render-pipeline-guide.tex",
       "record_label": "record-340",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 340,
       "path": "docs/method/retro/DX_009-context-auto-init-and-error-messages.md",
-      "title": "DX-009 \u2014 Auto-Init Context and Actionable Error Messages",
+      "title": "DX-009 — Auto-Init Context and Actionable Error Messages",
       "bytes": 1608,
       "sha256": "fe38aa992d5801bc203b09f16d55a333152bc796568b754b66a950cc34fa7b0a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0341-dx-009-context-auto-init-and-error-messages.tex",
       "record_label": "record-341",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 341,
       "path": "docs/method/retro/DX_010-typed-subapp-adapter.md",
-      "title": "DX-010 \u2014 Typed Sub-App Adapter Factory",
+      "title": "DX-010 — Typed Sub-App Adapter Factory",
       "bytes": 1594,
       "sha256": "30275a83f0cae15eef31cfaccd33d57fa2d9b0e82789ce9a270339d4696dfe1d",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0342-dx-010-typed-subapp-adapter.tex",
       "record_label": "record-342",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 342,
       "path": "docs/method/retro/DX_011-key-collision-warnings.md",
-      "title": "DX-011 \u2014 Key Collision Warnings at Registration Time",
+      "title": "DX-011 — Key Collision Warnings at Registration Time",
       "bytes": 1499,
       "sha256": "706dddec3d29bc7777ba2994448f997ba862b5bcd542b83b3cc4459ea435dfbb",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0343-dx-011-key-collision-warnings.tex",
       "record_label": "record-343",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 343,
       "path": "docs/method/retro/DX_012-render-path-naming-convention.md",
-      "title": "DX-012 \u2014 Document Render-Path Naming Convention",
+      "title": "DX-012 — Document Render-Path Naming Convention",
       "bytes": 1670,
       "sha256": "028c243ff5efe5a982b02ca351daa49c942b8b8d8aeb0b15ba22fb1fe3d46352",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0344-dx-012-render-path-naming-convention.tex",
       "record_label": "record-344",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 344,
       "path": "docs/method/retro/DX_013-motion-key-warning.md",
-      "title": "DX-013 \u2014 Motion Key Lifecycle Warning",
+      "title": "DX-013 — Motion Key Lifecycle Warning",
       "bytes": 1363,
       "sha256": "86989f9516b406205791c667a595316769edb69d0566dd6edfd472289d4ee67b",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0345-dx-013-motion-key-warning.tex",
       "record_label": "record-345",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 345,
       "path": "docs/method/retro/DX_014-readme-interactive-example-fix.md",
-      "title": "DX-014 \u2014 Fix Root README Interactive Example",
+      "title": "DX-014 — Fix Root README Interactive Example",
       "bytes": 1231,
       "sha256": "da873637fbb41d31653204dfb72ae069b5cf21ef1bf625a73678e922d641b0e8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0346-dx-014-readme-interactive-example-fix.tex",
       "record_label": "record-346",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 346,
       "path": "docs/method/retro/DX_015-perf-gradient-as-ci-benchmark.md",
-      "title": "DX-015 \u2014 Perf Gradient as CI Benchmark",
+      "title": "DX-015 — Perf Gradient as CI Benchmark",
       "bytes": 2070,
       "sha256": "234bfb383425d0cbd0f8268f8c454a1434f625a3c6e3f4d96b559e550cd2a993",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0347-dx-015-perf-gradient-as-ci-benchmark.tex",
       "record_label": "record-347",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 347,
       "path": "docs/method/graveyard/legacy-backlog/HT-001-notification-center-polish-and-discoverability.md",
-      "title": "HT-001 \u2014 Notification Center Polish and Discoverability",
+      "title": "HT-001 — Notification Center Polish and Discoverability",
       "bytes": 656,
       "sha256": "c49311192c1101edea0a5ae461cd89927b72cdc437338b766d3ef0c3a6a40d92",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0348-ht-001-notification-center-polish-and-discoverability.tex",
       "record_label": "record-348",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 348,
       "path": "docs/method/graveyard/legacy-backlog/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md",
-      "title": "HT-005 \u2014 Promote Page-Provided Layer Registry and Shell Control Projection",
+      "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
       "bytes": 911,
       "sha256": "868e9cb2bdccd05a029486a2f58c4dbb80b44f02ea8ef58efd9822f00c27cdee",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0349-ht-005-promote-page-provided-layer-registry-and-shell-control-projection.tex",
       "record_label": "record-349",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 349,
       "path": "docs/method/retro/HT-006-page-level-notification-push.md",
-      "title": "HT-006 \u2014 Allow pages to push notifications in createFramedApp",
+      "title": "HT-006 — Allow pages to push notifications in createFramedApp",
       "bytes": 1741,
       "sha256": "4b86008a9644f7f6c21fe52e6827630bcc09bdb557e7e52720eb66cd67ed63c4",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0350-ht-006-page-level-notification-push.tex",
       "record_label": "record-350",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 350,
       "path": "docs/method/retro/HT_001-notification-center-polish-and-discoverability.md",
-      "title": "HT-001 \u2014 Notification Center Polish and Discoverability",
+      "title": "HT-001 — Notification Center Polish and Discoverability",
       "bytes": 1389,
       "sha256": "867e5fd05a31042e85fe0c9dff3d5dbffb07eded3335a2b169d8b50b80c3f190",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0351-ht-001-notification-center-polish-and-discoverability.tex",
       "record_label": "record-351",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 351,
       "path": "docs/method/retro/HT_005-promote-page-provided-layer-registry-and-shell-control-projection.md",
-      "title": "HT-005 \u2014 Promote Page-Provided Layer Registry and Shell Control Projection",
+      "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
       "bytes": 1676,
       "sha256": "1ffaa0b078c71e63e96dfd9172d7e7562ad4e87db49a44fd41630a2c11810861",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0352-ht-005-promote-page-provided-layer-registry-and-shell-control-projection.tex",
       "record_label": "record-352",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4223,7 +4223,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0353-ht-upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.tex",
       "record_label": "record-353",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4235,367 +4235,367 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0354-ht-upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.tex",
       "record_label": "record-354",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 354,
       "path": "docs/method/graveyard/legacy-backlog/LX-007-service-oriented-localization-adapters.md",
-      "title": "LX-007 \u2014 Service-Oriented Localization Adapters",
+      "title": "LX-007 — Service-Oriented Localization Adapters",
       "bytes": 686,
       "sha256": "be9f87d7f5e1cf183b0f4097efc808dc0e8b1f1bcfc3810ce3fdc5030cfba512",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0355-lx-007-service-oriented-localization-adapters.tex",
       "record_label": "record-355",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 355,
       "path": "docs/method/graveyard/legacy-backlog/LX-009-localize-shell-help-notification-and-directional-surfaces.md",
-      "title": "LX-009 \u2014 Localize Shell Help, Notification, and Directional Surfaces",
+      "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
       "bytes": 1006,
       "sha256": "7807b9ce86937627f0b881a584bf44b93438f1a6ea0e30c13b2f4313c2c935c1",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0356-lx-009-localize-shell-help-notification-and-directional-surfaces.tex",
       "record_label": "record-356",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 356,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/LX-010-built-in-i18n-catalog-loader.md",
-      "title": "LX-010 \u2014 Built-in i18n Catalog Loader",
+      "title": "LX-010 — Built-in i18n Catalog Loader",
       "bytes": 2259,
       "sha256": "027d0980353eb27fb8080269d94bcfd7d7146a4fe03a557ea1535052d675a551",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0357-lx-010-built-in-i18n-catalog-loader.tex",
       "record_label": "record-357",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 357,
       "path": "docs/method/retro/LX-010-built-in-i18n-catalog-loader.md",
-      "title": "LX-010 \u2014 Built-in i18n Catalog Loader",
+      "title": "LX-010 — Built-in i18n Catalog Loader",
       "bytes": 2087,
       "sha256": "85464ec77d4b3a8189aa47bab6f719d3b837a024c11b898b18c9adbd4d797a2e",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0358-lx-010-built-in-i18n-catalog-loader.tex",
       "record_label": "record-358",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 358,
       "path": "docs/method/retro/LX-012-dogfood-i18n-debt-inventory.md",
-      "title": "LX-012 \u2014 DOGFOOD i18n Debt Inventory",
+      "title": "LX-012 — DOGFOOD i18n Debt Inventory",
       "bytes": 2209,
       "sha256": "3d41802e3e728a55c22ac6560437980ec02898e642595f9e4c3e587354f41c7d",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0359-lx-012-dogfood-i18n-debt-inventory.tex",
       "record_label": "record-359",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 359,
       "path": "docs/method/retro/LX_007-service-oriented-localization-adapters.md",
-      "title": "LX-007 \u2014 Service-Oriented Localization Adapters",
+      "title": "LX-007 — Service-Oriented Localization Adapters",
       "bytes": 1397,
       "sha256": "b8c596ff8833272a93037b153e43d1f503936aa88d7ec62f56c9ee7182963aff",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0360-lx-007-service-oriented-localization-adapters.tex",
       "record_label": "record-360",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 360,
       "path": "docs/method/retro/LX_009-localize-shell-help-notification-and-directional-surfaces.md",
-      "title": "LX-009 \u2014 Localize Shell Help, Notification, and Directional Surfaces",
+      "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
       "bytes": 1850,
       "sha256": "6eeb5b3cd6e37ca881b6a13c3ea6edeb0cc2db941c76d7b53f6620f2cd7043ae",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0361-lx-009-localize-shell-help-notification-and-directional-surfaces.tex",
       "record_label": "record-361",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 361,
       "path": "docs/method/graveyard/legacy-backlog/inbox/RE-011-pipeline-per-frame-allocation.md",
-      "title": "RE-011 \u2014 Eliminate Per-Frame Allocation in Render Pipeline",
+      "title": "RE-011 — Eliminate Per-Frame Allocation in Render Pipeline",
       "bytes": 607,
       "sha256": "bf28e0a2f396024f8f57294c1b3f83c9e7567b3751377133cff177f780d30486",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0362-re-011-pipeline-per-frame-allocation.tex",
       "record_label": "record-362",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 362,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/RE-012-pipeline-observability-hooks.md",
-      "title": "RE-012 \u2014 Pipeline Observability Hooks",
+      "title": "RE-012 — Pipeline Observability Hooks",
       "bytes": 1253,
       "sha256": "f7b84deac941d9a3bfb01227cf6a346fa723dc746cc73fcb9a8107b06491d6f4",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0363-re-012-pipeline-observability-hooks.tex",
       "record_label": "record-363",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 363,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/RE-013-memoize-workspace-layout-tree.md",
-      "title": "RE-013 \u2014 Memoize Workspace Layout Tree",
+      "title": "RE-013 — Memoize Workspace Layout Tree",
       "bytes": 958,
       "sha256": "423f23f7694929f7984c29b5baf27cf8985ec2d575027251ba1c651ad40ca9a4",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0364-re-013-memoize-workspace-layout-tree.tex",
       "record_label": "record-364",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 364,
       "path": "docs/method/graveyard/legacy-backlog/cool-ideas/RE-014-buffer-holds-facts-doctrine.md",
-      "title": "RE-014 \u2014  Design Doctrine",
+      "title": "RE-014 —  Design Doctrine",
       "bytes": 1476,
       "sha256": "4af8eebc16d0890fc34ca2ada42b5cec406a64af6bdc3ec3aced605c9e38cade",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0365-re-014-buffer-holds-facts-doctrine.tex",
       "record_label": "record-365",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 365,
       "path": "docs/method/retro/RE-017-frame-does-not-fill-surface-background.md",
-      "title": "RE-017 \u2014 Frame does not fill terminal background with surface.primary.bg",
+      "title": "RE-017 — Frame does not fill terminal background with surface.primary.bg",
       "bytes": 2453,
       "sha256": "a3553e7dab3ce33655155da0502883054eb17fc39423aebc9fc64b568abebed8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0366-re-017-frame-does-not-fill-surface-background.tex",
       "record_label": "record-366",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 366,
       "path": "docs/method/graveyard/RE-018-hex-color-string-as-canonical-fg-bg.md",
-      "title": "RE-018 \u2014 Hex Color Strings As The Canonical fg/bg Representation",
+      "title": "RE-018 — Hex Color Strings As The Canonical fg/bg Representation",
       "bytes": 5310,
       "sha256": "d28fa274e42163fa523b260a4c15d15ce7d701c3df8cf2d74bce7d553c421b20",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0367-re-018-hex-color-string-as-canonical-fg-bg.tex",
       "record_label": "record-367",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 367,
       "path": "docs/method/retro/RE-019-dirtyWords-serves-lazy-cache-not-render-dirty.md",
-      "title": "RE-019 \u2014 Surface dirtyWords Bitmap Serves The Wrong Master",
+      "title": "RE-019 — Surface dirtyWords Bitmap Serves The Wrong Master",
       "bytes": 4320,
       "sha256": "3446e6a60bb0319635affa9dee8bada157c8c19026e78cc3909d4c91d70bb594",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0368-re-019-dirtywords-serves-lazy-cache-not-render-dirty.tex",
       "record_label": "record-368",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 368,
       "path": "docs/method/retro/RE-019-theme-token-color-cache.md",
-      "title": "RE-019 \u2014 Pre-Parse Theme Token Colors Into Bytes",
+      "title": "RE-019 — Pre-Parse Theme Token Colors Into Bytes",
       "bytes": 4030,
       "sha256": "126f87bbb5461f9dfbd5625689c839b6110e32bce2253c9eb3667737ec4c9a23",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0369-re-019-theme-token-color-cache.tex",
       "record_label": "record-369",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 369,
       "path": "docs/method/graveyard/legacy-backlog/v5.0.0/RE-020-typed-color-representation.md",
-      "title": "RE-020 \u2014 Typed Color Representation (ColorRef Branded Type)",
+      "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
       "bytes": 3601,
       "sha256": "a3c00c26ea1c3ed1b0183ff80072cbd67ec41ede541b29a2f8a8d773c5fd0a04",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0370-re-020-typed-color-representation.tex",
       "record_label": "record-370",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 370,
       "path": "docs/method/retro/RE-020-typed-color-representation.md",
-      "title": "RE-020 \u2014 Typed Color Representation (ColorRef Branded Type)",
+      "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
       "bytes": 2830,
       "sha256": "b122d93a73ecf9b43177c277731a20ca22fc8008ad25f78ec0b26852d0c25ebb",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0371-re-020-typed-color-representation.tex",
       "record_label": "record-371",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 371,
       "path": "docs/method/graveyard/legacy-backlog/v5.0.0/RE-021-frame-owns-the-pump.md",
-      "title": "RE-021 \u2014 Frame Owns the Pump",
+      "title": "RE-021 — Frame Owns the Pump",
       "bytes": 3467,
       "sha256": "e582095ba551d708c1a49b672db773c1bdff5c1590ca5a105cfcc601be69c2bc",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0372-re-021-frame-owns-the-pump.tex",
       "record_label": "record-372",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 372,
       "path": "docs/method/retro/RE-021-frame-owns-the-pump.md",
-      "title": "RE-021 \u2014 Frame Owns the Pump",
+      "title": "RE-021 — Frame Owns the Pump",
       "bytes": 4682,
       "sha256": "54815d17a6455304cf511db68035a712d0999d7eb4fc994d53049b31e68e56e0",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0373-re-021-frame-owns-the-pump.tex",
       "record_label": "record-373",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 373,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/RE-022-public-packed-surface-type-guard.md",
-      "title": "RE-022 \u2014 Public PackedSurface Type Guard",
+      "title": "RE-022 — Public PackedSurface Type Guard",
       "bytes": 875,
       "sha256": "21f0438e15aa91c218423b521cb82a170347b8d1c6339b36393931df78dbc2dd",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0374-re-022-public-packed-surface-type-guard.tex",
       "record_label": "record-374",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 374,
       "path": "docs/method/retro/RE-022-public-packed-surface-type-guard.md",
-      "title": "RE-022 \u2014 Public PackedSurface Type Guard",
+      "title": "RE-022 — Public PackedSurface Type Guard",
       "bytes": 1367,
       "sha256": "e2c2a8894b624cee9312ad280149949fac83cfaaee1a944609aea3f6141f44e7",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0375-re-022-public-packed-surface-type-guard.tex",
       "record_label": "record-375",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 375,
       "path": "docs/method/graveyard/legacy-backlog/bad-code/RE-022-unified-layout-calculation-engine.md",
-      "title": "RE-022 \u2014 Unified Layout Calculation Engine",
+      "title": "RE-022 — Unified Layout Calculation Engine",
       "bytes": 1355,
       "sha256": "0b57d32e211919db1a2a0f82deac8b39bd719091e71f5de971dfd18636e03416",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0376-re-022-unified-layout-calculation-engine.tex",
       "record_label": "record-376",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 376,
       "path": "docs/method/retro/RE-022-unified-layout-calculation-engine.md",
-      "title": "RE-022 \u2014 Unified Layout Calculation Engine",
+      "title": "RE-022 — Unified Layout Calculation Engine",
       "bytes": 2060,
       "sha256": "c94c93f7d85080f5a9e21b4609532c5f79aa05b4a02b777f1ba125199ad876f5",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0377-re-022-unified-layout-calculation-engine.tex",
       "record_label": "record-377",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 377,
       "path": "docs/method/graveyard/legacy-backlog/bad-code/RE-023-stabilize-render-scheduling.md",
-      "title": "RE-023 \u2014 Stabilize Render Scheduling in runtime.ts",
+      "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
       "bytes": 1111,
       "sha256": "d5c455464930532068534dad73d623884261761149df242ecc5d0e4e7985b7c8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0378-re-023-stabilize-render-scheduling.tex",
       "record_label": "record-378",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 378,
       "path": "docs/method/retro/RE-023-stabilize-render-scheduling.md",
-      "title": "RE-023 \u2014 Stabilize Render Scheduling in runtime.ts",
+      "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
       "bytes": 1751,
       "sha256": "3c4426f82173680b84b806e2e68251d1ae2a499d5c34a3c9bad0890c61c34bf1",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0379-re-023-stabilize-render-scheduling.tex",
       "record_label": "record-379",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 379,
       "path": "docs/method/graveyard/legacy-backlog/asap/RE-024-terminal-content-sanitization-boundary.md",
-      "title": "RE-024 \u2014 Terminal Content Sanitization Boundary",
+      "title": "RE-024 — Terminal Content Sanitization Boundary",
       "bytes": 1032,
       "sha256": "187cf87443bb61894283eeed3e56cb27ee30efc651d72a1958a8392adf77e380",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0380-re-024-terminal-content-sanitization-boundary.tex",
       "record_label": "record-380",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 380,
       "path": "docs/method/retro/RE-024-terminal-content-sanitization-boundary.md",
-      "title": "RE-024 \u2014 Terminal Content Sanitization Boundary",
+      "title": "RE-024 — Terminal Content Sanitization Boundary",
       "bytes": 1701,
       "sha256": "e86b46310276b067e4b1ad3164c40b63dde437fb0f626f10f7ff6308614e40a0",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0381-re-024-terminal-content-sanitization-boundary.tex",
       "record_label": "record-381",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 381,
       "path": "docs/method/graveyard/legacy-backlog/asap/RE-025-scoped-node-io-adapter.md",
-      "title": "RE-025 \u2014 Scoped Node IO Adapter",
+      "title": "RE-025 — Scoped Node IO Adapter",
       "bytes": 870,
       "sha256": "f88a1a96594e031b24335b17b7fc4b20bad6770ba5b2dab89713dc04ebc02342",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0382-re-025-scoped-node-io-adapter.tex",
       "record_label": "record-382",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 382,
       "path": "docs/method/retro/RE-025-scoped-node-io-adapter.md",
-      "title": "RE-025 \u2014 Scoped Node IO Adapter",
+      "title": "RE-025 — Scoped Node IO Adapter",
       "bytes": 1414,
       "sha256": "efed58673b0542268916ee83f93fbad67a9113341f317f3796e404ed0a5c38fa",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0383-re-025-scoped-node-io-adapter.tex",
       "record_label": "record-383",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 383,
       "path": "docs/method/retro/RE-026-drain-runtime-commands-before-shutdown.md",
-      "title": "RE-026 \u2014 Drain runtime commands before shutdown",
+      "title": "RE-026 — Drain runtime commands before shutdown",
       "bytes": 1771,
       "sha256": "cef0c0b87e770afa828b000abe840a4e3117c15a46471fa040ad80f762c64c21",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0384-re-026-drain-runtime-commands-before-shutdown.tex",
       "record_label": "record-384",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4607,7 +4607,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0385-readme.tex",
       "record_label": "record-385",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4619,7 +4619,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0386-readme.tex",
       "record_label": "record-386",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4631,7 +4631,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0387-readme.tex",
       "record_label": "record-387",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4643,7 +4643,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0388-readme.tex",
       "record_label": "record-388",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4655,7 +4655,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0389-readme.tex",
       "record_label": "record-389",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4667,7 +4667,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0390-readme.tex",
       "record_label": "record-390",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4679,31 +4679,31 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0391-readme.tex",
       "record_label": "record-391",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 391,
       "path": "docs/method/graveyard/legacy-backlog/v4.5.0/README.md",
-      "title": "v4.5.0 \u2014 Legacy Release Lane Snapshot",
+      "title": "v4.5.0 — Legacy Release Lane Snapshot",
       "bytes": 351,
       "sha256": "89d7490f131a9f8332d09c2bf15cfefc000a944d959ada6a4db56bc972d64b81",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0392-readme.tex",
       "record_label": "record-392",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 392,
       "path": "docs/method/graveyard/legacy-backlog/v5.0.0/README.md",
-      "title": "v5.0.0 \u2014 Legacy Release Lane Snapshot",
+      "title": "v5.0.0 — Legacy Release Lane Snapshot",
       "bytes": 262,
       "sha256": "183255f21c0bf96848c7377a799d8f40b3312138d9e935ba51aac9a075ff40c8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0393-readme.tex",
       "record_label": "record-393",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4715,7 +4715,7 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0394-readme.tex",
       "record_label": "record-394",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4727,67 +4727,67 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0395-readme.tex",
       "record_label": "record-395",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 395,
       "path": "docs/method/retro/RE_007-migrate-framed-shell-onto-runtime-engine-seams.md",
-      "title": "RE-007 \u2014 Migrate Framed Shell Onto Runtime Engine Seams",
+      "title": "RE-007 — Migrate Framed Shell Onto Runtime Engine Seams",
       "bytes": 1523,
       "sha256": "0fa3aba163d5051d515dfc893f82deea3c30b577b5cb307468aedd0f808bab69",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0396-re-007-migrate-framed-shell-onto-runtime-engine-seams.tex",
       "record_label": "record-396",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 396,
       "path": "docs/method/retro/RE_011-pipeline-per-frame-allocation.md",
-      "title": "RE-011 \u2014 Eliminate Per-Frame Allocation in Render Pipeline",
+      "title": "RE-011 — Eliminate Per-Frame Allocation in Render Pipeline",
       "bytes": 1126,
       "sha256": "fab02b760fdd4d256f5b5ccd150dd9571bdd84ec0568db80cdf9c636bbd5dc23",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0397-re-011-pipeline-per-frame-allocation.tex",
       "record_label": "record-397",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 397,
       "path": "docs/method/retro/RE_012-pipeline-observability-hooks.md",
-      "title": "RE-012 \u2014 Pipeline Observability Hooks",
+      "title": "RE-012 — Pipeline Observability Hooks",
       "bytes": 1916,
       "sha256": "3e9954bbc314f534d8200a1de83a45559925f6c06fa929e541e02a33b1e6fc04",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0398-re-012-pipeline-observability-hooks.tex",
       "record_label": "record-398",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 398,
       "path": "docs/method/retro/RE_013-memoize-workspace-layout-tree.md",
-      "title": "RE-013 \u2014 Memoize Workspace Layout Tree",
+      "title": "RE-013 — Memoize Workspace Layout Tree",
       "bytes": 1631,
       "sha256": "cf2b72b086c6bbbba0dd3a82fcba6a6bdeaf7f1c2be9f083ade40fb636b856ea",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0399-re-013-memoize-workspace-layout-tree.tex",
       "record_label": "record-399",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 399,
       "path": "docs/method/retro/RE_014-buffer-holds-facts-doctrine.md",
-      "title": "RE-014 \u2014  Design Doctrine",
+      "title": "RE-014 —  Design Doctrine",
       "bytes": 1230,
       "sha256": "8b4ce6638ac561b563f1fa0c52dc798c12cbaadb33ef5f97c4e89d18f2d4b590",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0400-re-014-buffer-holds-facts-doctrine.tex",
       "record_label": "record-400",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4799,19 +4799,19 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0401-re-016-dag-cycle-graceful-handling.tex",
       "record_label": "record-401",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 401,
       "path": "docs/method/retro/RE_016-grapheme-width-miscounts-emoji-like-icons.md",
-      "title": "RE-016 \u2014 graphemeWidth Miscounts Emoji-Like Icon Characters",
+      "title": "RE-016 — graphemeWidth Miscounts Emoji-Like Icon Characters",
       "bytes": 2418,
       "sha256": "e089ced10b0cadea2a70f6ad09f074ba03090a83df6cab839a8dea7274cf68c8",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0402-re-016-grapheme-width-miscounts-emoji-like-icons.tex",
       "record_label": "record-402",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4823,43 +4823,43 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0403-re-writeport-byte-level-api-for-zero-alloc-ansi-output.tex",
       "record_label": "record-403",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 403,
       "path": "docs/method/graveyard/legacy-backlog/WF-002-migrate-legacy-planning-artifacts.md",
-      "title": "WF-002 \u2014 Migrate Legacy Planning Artifacts",
+      "title": "WF-002 — Migrate Legacy Planning Artifacts",
       "bytes": 651,
       "sha256": "92e48b2299193296569eead1016e06b780d6d442ab727f8ac77b5bc2a317cb4b",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0404-wf-002-migrate-legacy-planning-artifacts.tex",
       "record_label": "record-404",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 404,
       "path": "docs/method/graveyard/legacy-backlog/bad-code/WF-007-align-local-validation-with-ci-typecheck-test-gate.md",
-      "title": "WF-007 \u2014 Align Local Validation With CI typecheck:test Gate",
+      "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
       "bytes": 1422,
       "sha256": "41469470f6e5293a39a04da8236eacffdbf004e8749f33788ebfbad2d6a4be12",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0405-wf-007-align-local-validation-with-ci-typecheck-test-gate.tex",
       "record_label": "record-405",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 405,
       "path": "docs/method/graveyard/WF-008-method-backlog-helper-generates-malformed-note-filenames.md",
-      "title": "WF-008 \u2014 METHOD backlog helper generates malformed note filenames",
+      "title": "WF-008 — METHOD backlog helper generates malformed note filenames",
       "bytes": 1503,
       "sha256": "dd245056884f2e5669cf87cf9fbfb982d37c694e219550ba3bed13a22317bb87",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0406-wf-008-method-backlog-helper-generates-malformed-note-filenames.tex",
       "record_label": "record-406",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4871,31 +4871,31 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0407-wf-122-day-zero-audit-fixes.tex",
       "record_label": "record-407",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 407,
       "path": "docs/method/retro/WF_002-migrate-legacy-planning-artifacts.md",
-      "title": "WF-002 \u2014 Migrate Legacy Planning Artifacts",
+      "title": "WF-002 — Migrate Legacy Planning Artifacts",
       "bytes": 1230,
       "sha256": "4315997840a4771f85ec6b0aac724a028afc7a667ed250f32e05a9bfbe86b64a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0408-wf-002-migrate-legacy-planning-artifacts.tex",
       "record_label": "record-408",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 408,
       "path": "docs/method/retro/WF_007-align-local-validation-with-ci-typecheck-test-gate.md",
-      "title": "WF-007 \u2014 Align Local Validation With CI typecheck:test Gate",
+      "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
       "bytes": 1982,
       "sha256": "ab01d95760ea7c38b14817743f3204c5ec14a8d07e6f031460e3c035b36f5d0a",
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0409-wf-007-align-local-validation-with-ci-typecheck-test-gate.tex",
       "record_label": "record-409",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
@@ -4907,31 +4907,31 @@
       "group": "RETROS",
       "latex_path": "chapters/12-retrospectives-and-historical-planning/0410-think-bg-fill-regression-v4-4-0.tex",
       "record_label": "record-410",
-      "book_part": 5,
+      "book_part": 6,
       "book_part_title": "Retrospectives and historical planning"
     },
     {
       "chapter": 410,
       "path": "docs/audits/2026-04-05-codebase-health-assessment.md",
-      "title": "Codebase Health Assessment \u2014 2026-04-05",
+      "title": "Codebase Health Assessment — 2026-04-05",
       "bytes": 13636,
       "sha256": "3126f1618df06003f6221fceb4d3b73c2a48cefbcfc066bd1b5bfe2a58d6d008",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0411-2026-04-05-codebase-health-assessment.tex",
       "record_label": "record-411",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
       "chapter": 411,
       "path": "docs/audits/2026-04-05-documentation-audit.md",
-      "title": "Documentation & README Audit \u2014 2026-04-05",
+      "title": "Documentation & README Audit — 2026-04-05",
       "bytes": 6209,
       "sha256": "01dbca558cc4ec33a64894c09d5278163ca819a55e6e6e79a0ae24a41f8e43be",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0412-2026-04-05-documentation-audit.tex",
       "record_label": "record-412",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -4943,7 +4943,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0413-2026-04-11-code-quality.tex",
       "record_label": "record-413",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -4955,7 +4955,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0414-2026-04-11-documentation-quality.tex",
       "record_label": "record-414",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -4967,7 +4967,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0415-2026-04-11-ship-readiness.tex",
       "record_label": "record-415",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -4979,7 +4979,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0416-2026-04-14-code-quality.tex",
       "record_label": "record-416",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -4991,7 +4991,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0417-2026-04-14-documentation-quality.tex",
       "record_label": "record-417",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5003,7 +5003,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0418-2026-04-14-ship-readiness.tex",
       "record_label": "record-418",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5015,43 +5015,43 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0419-graveyard.tex",
       "record_label": "record-419",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
       "chapter": 419,
       "path": "docs/graveyard/I-0d-render-pipeline-instrumentation.md",
-      "title": "I-0d \u2014 Per-stage render pipeline instrumentation (buried 2026-04-09)",
+      "title": "I-0d — Per-stage render pipeline instrumentation (buried 2026-04-09)",
       "bytes": 2183,
       "sha256": "85d044e04f62815e57441925292cc7d40829ce97f45f45a3347a2e84b9a635de",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0420-i-0d-render-pipeline-instrumentation.tex",
       "record_label": "record-420",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
       "chapter": 420,
       "path": "docs/graveyard/I-3-custom-baseline-format.md",
-      "title": "I-3 \u2014 Custom baseline JSON format + compare tool (buried 2026-04-09)",
+      "title": "I-3 — Custom baseline JSON format + compare tool (buried 2026-04-09)",
       "bytes": 1380,
       "sha256": "9375b6f41dc3d4a964617ec6e61a9661fb311c5f0530dfb9193d78e6bedb1235",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0421-i-3-custom-baseline-format.tex",
       "record_label": "record-421",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
       "chapter": 421,
       "path": "docs/perf/RE-017-byte-pipeline.md",
-      "title": "RE-017 \u2014 Byte-Pipeline Recovery",
+      "title": "RE-017 — Byte-Pipeline Recovery",
       "bytes": 70057,
       "sha256": "deb789a076eeca44ab048a44053ddd06479f69d8090874b6239107308dc7ba9c",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0422-re-017-byte-pipeline.tex",
       "record_label": "record-422",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5063,7 +5063,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0423-readme.tex",
       "record_label": "record-423",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5075,7 +5075,7 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0424-readme.tex",
       "record_label": "record-424",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5087,19 +5087,19 @@
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0425-component-system-audit.tex",
       "record_label": "record-425",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
       "chapter": 425,
       "path": "docs/archive/dag-exploration.md",
-      "title": "dag() \u2014 ASCII DAG Renderer for Bijou",
+      "title": "dag() — ASCII DAG Renderer for Bijou",
       "bytes": 21415,
       "sha256": "b6121c7dbfcec04fa394e04b41ea9554ddb607edf3b8d6f6c2df7582182eaba1",
       "group": "ARCHIVES",
       "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
       "record_label": "record-426",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     },
     {
@@ -5111,7 +5111,7 @@
       "group": "MANUAL",
       "latex_path": "chapters/01-user-and-developer-guides/0016-xyph-title.tex",
       "record_label": "record-016",
-      "book_part": 6,
+      "book_part": 7,
       "book_part_title": "Audits and archive records"
     }
   ],
@@ -5322,33 +5322,47 @@
     },
     {
       "number": 2,
+      "title": "Build a job monitor",
+      "source_chapters": 0,
+      "workshops": 7
+    },
+    {
+      "number": 3,
       "title": "Using Bijou",
       "source_chapters": 24
     },
     {
-      "number": 3,
+      "number": 4,
       "title": "Design records",
       "source_chapters": 196
     },
     {
-      "number": 4,
+      "number": 5,
       "title": "Releases and migration",
       "source_chapters": 26
     },
     {
-      "number": 5,
+      "number": 6,
       "title": "Retrospectives and historical planning",
       "source_chapters": 126
     },
     {
-      "number": 6,
+      "number": 7,
       "title": "Audits and archive records",
       "source_chapters": 17
     },
     {
-      "number": 7,
+      "number": 8,
       "title": "Rendered components and provenance",
       "component_specimens": 42
     }
-  ]
+  ],
+  "companion_part": {
+    "number": 2,
+    "title": "Build a job monitor",
+    "latex_path": "parts/02-job-monitor.tex",
+    "workshops": 7,
+    "source_chapters": 0,
+    "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62"
+  }
 }

@@ -1,0 +1,10 @@
+% Presentation of original arrow notation. See flow-manifest.json.
+\begin{center}
+\begin{tikzpicture}[book flow node/.style={draw=BookHeading,line width=.65pt,fill=BookPanel,rounded corners=1.5pt,align=center,inner sep=5pt,minimum height=10mm,font=\fontsize{9}{11}\selectfont,execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},book flow edge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.7pt}]
+\node[book flow node,text width=58mm] (n0) at (0,0.0) {Frame\allowbreak{}Shell\allowbreak{}Theme\allowbreak{}Family, id: "dogfood"};
+\node[book flow node,text width=58mm] (n1) at (4,0.0) {dark: Theme("dogfood-dark")};
+\node[book flow node,text width=58mm] (n2) at (4,-1.8) {light: Theme("dogfood-light")};
+\draw[book flow edge] (n0) -- (n1);
+\draw[book flow edge] (n0) -- (n2);
+\end{tikzpicture}
+\end{center}

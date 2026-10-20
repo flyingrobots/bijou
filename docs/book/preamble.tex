@@ -8,6 +8,7 @@
 \setmainfont{IBMPlexMono-Regular.ttf}[Path=fonts/,BoldFont=IBMPlexMono-Bold.ttf,ItalicFont=IBMPlexMono-Italic.ttf,BoldItalicFont=IBMPlexMono-BoldItalic.ttf,RawFeature={fallback=bookfallback}]
 \setmonofont{IBMPlexMono-Regular.ttf}[Path=fonts/,BoldFont=IBMPlexMono-Bold.ttf,ItalicFont=IBMPlexMono-Italic.ttf,BoldItalicFont=IBMPlexMono-BoldItalic.ttf,RawFeature={fallback=bookfallback}]
 \newfontfamily\headingfont{Jacquard24-Regular.ttf}[Path=fonts/,RawFeature={fallback=bookfallback}]
+\newfontfamily\sourcecodefont{VT323-Regular.ttf}[Path=fonts/,RawFeature={fallback=bookfallback}]
 \usepackage{xcolor,graphicx,tikz}
 \usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
 \definecolor{BookCoral}{HTML}{F7685F}
@@ -15,11 +16,20 @@
 \definecolor{BookHeading}{HTML}{83312C}
 \definecolor{BookMuted}{HTML}{645452}
 \definecolor{BookPanel}{HTML}{FFEDEB}
+\newsavebox{\BookDiagramBox}
+\newcommand{\BookDiagram}[2][\linewidth]{%
+  \sbox{\BookDiagramBox}{#2}%
+  \ifdim\wd\BookDiagramBox>#1\relax
+    \sbox{\BookDiagramBox}{\resizebox{#1}{!}{\usebox{\BookDiagramBox}}}%
+  \fi
+  \ifdim\dimexpr\ht\BookDiagramBox+\dp\BookDiagramBox\relax>.85\textheight
+    \resizebox*{!}{.85\textheight}{\usebox{\BookDiagramBox}}%
+  \else\usebox{\BookDiagramBox}\fi}
 \usepackage{etoolbox}
 \AtBeginEnvironment{longtable}{\footnotesize}
 \usepackage{amsmath,amssymb,longtable,booktabs,array,calc}
 \usepackage{fvextra,enumitem,titlesec,fancyhdr,xurl,hyperref,bookmark}
-\hypersetup{colorlinks=true,linkcolor=BookHeading,urlcolor=BookHeading,citecolor=BookHeading,pdftitle={Bijou Documentation Book},pdfauthor={Bijou contributors},pdfsubject={Complete design corpus with actual DOGFOOD Surface specimens}}
+\hypersetup{colorlinks=true,linkcolor=BookHeading,urlcolor=BookHeading,citecolor=BookHeading,pdftitle={Bijou Documentation Book},pdfauthor={James Ross},pdfsubject={Complete design corpus with actual DOGFOOD Surface specimens}}
 \urlstyle{tt}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt plus 1pt}
@@ -33,6 +43,12 @@
 \setlist[itemize]{label=\textbullet}
 \setcounter{secnumdepth}{0}
 \setcounter{tocdepth}{0}
+\makeatletter
+\renewcommand{\@pnumwidth}{3em}
+\renewcommand{\@tocrmarg}{4em}
+\patchcmd{\l@chapter}{1.5em}{2.8em}{}{\PackageError{bijou-book}{Cannot widen contents chapter numbers}{Check the book class contents definition.}}
+\patchcmd{\l@chapter}{\rightskip \@pnumwidth}{\rightskip \@pnumwidth plus 1fil}{}{\PackageError{bijou-book}{Cannot set ragged contents entries}{Check the book class contents definition.}}
+\makeatother
 \titleformat{\part}[display]{\headingfont\Huge\color{BookHeading}}{\fontsize{64}{70}\selectfont\thepart}{12pt}{}
 \titleformat{\chapter}[display]{\headingfont\Huge\color{BookHeading}}{\fontsize{48}{52}\selectfont\thechapter}{10pt}{}
 \titlespacing*{\chapter}{0pt}{0pt}{22pt}
@@ -42,7 +58,8 @@
 \titlespacing*{\section}{0pt}{18pt}{7pt}
 \titlespacing*{\subsection}{0pt}{14pt}{5pt}
 \titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
-\DefineVerbatimEnvironment{CodeBlock}{Verbatim}{breaklines,breakanywhere,fontsize=\footnotesize,baselinestretch=1,frame=leftline,rulecolor=\color{BookCoral},framesep=5pt,xleftmargin=7pt}
+\DefineVerbatimEnvironment{CodeBlock}{Verbatim}{breaklines,breakanywhere,formatcom=\sourcecodefont,fontsize=\fontsize{12}{13}\selectfont,baselinestretch=1,frame=leftline,rulecolor=\color{BookCoral},framesep=5pt,xleftmargin=7pt}
+\DefineVerbatimEnvironment{LicenseText}{Verbatim}{breaklines,breakanywhere=false,fontsize=\footnotesize,baselinestretch=1,fontfamily=tt}
 \DefineVerbatimEnvironment{RecordMeta}{Verbatim}{breaklines,breakanywhere,fontsize=\scriptsize,baselinestretch=1,formatcom=\color{BookMuted}}
 \providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{1pt}}
 \providecommand{\passthrough}[1]{#1}

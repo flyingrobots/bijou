@@ -38,12 +38,7 @@ Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e
 
 DX-044 proved the smallest boring path:
 
-\begin{CodeBlock}
-GraphQL SDL
-  -> bijou-block/1
-    -> ui-scene-ir/1
-      -> terminal Surface proof
-\end{CodeBlock}
+\input{diagrams/flows/flow-014}
 
 DX-045 turns that proof into a more credible authoring pipeline by adding explicit group nodes and deterministic debug facts. It should still stay inside Bijou; Geordi remains the next endpoint after the semantic artifact is strong enough to hand across a repository boundary.
 
@@ -53,14 +48,7 @@ GraphQL-authored Bijou blocks need a hierarchy before Dogfood or BlockLab can us
 
 The next flow is:
 
-\begin{CodeBlock}
-GraphQL SDL fixture
-  -> bijou-block/1 artifact with groups[]
-    -> ui-scene-ir/1 group/text node tree
-      -> terminal Surface proof
-        -> debug summary facts
-          -> ui-scene-receipt/1
-\end{CodeBlock}
+\input{diagrams/flows/flow-015}
 
 The debug summary is deliberately fact-shaped. It is not a renderer and not a test snapshot. It gives maintainers and agents one deterministic object that answers what source, artifact, scene, nodes, tokens, i18n keys, actions, bindings, and lower-mode witnesses exist.
 
@@ -252,14 +240,7 @@ The compiler continues to require fallback text for renderable i18n text nodes. 
 
 The useful debug path should become:
 
-\begin{CodeBlock}
-SDL type directive / field directive
-  -> bijou-block/1 group / field
-    -> ui-scene-ir/1 group / text node
-      -> terminal cell source map
-        -> debug summary
-          -> receipt
-\end{CodeBlock}
+\input{diagrams/flows/flow-016}
 
 An agent should be able to answer, from committed facts:
 

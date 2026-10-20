@@ -1,0 +1,34 @@
+\chapter*{Workshop 3: Follow one keypress}\label{workshop-03}
+\addcontentsline{toc}{chapter}{W3: Follow one keypress}
+
+\section{Run the application}
+
+Run \texttt{npm run checkpoint -- 03} in a terminal. Up and Down select jobs. Enter starts the selected job. The \texttt{c} key opens cancellation confirmation; Enter confirms and Escape leaves the job running. The \texttt{l} key opens logs, \texttt{f} filters failures, and \texttt{j}/\texttt{k} scroll the viewport. Quitting is an explicitly global command: \texttt{q} or Ctrl+C closes the application even while a dialog is open.
+
+\subsection{Name the intermediate representations}
+
+A terminal input sequence is decoded by Bijou into a \texttt{KeyMsg}. The application's routing function translates it into a monitor intention. The immutable monitor transition produces a new model and explicit effects. An effect adapter schedules work and emits later messages. The view reads the current model and returns a \texttt{Surface}. Bijou's runtime owns layout handling, painting, diffing and terminal output. These are the App, Cmd and Surface contracts verified against the published 7.2.0 release.
+
+\input{diagrams/workshop-keypress}
+
+\subsection{Trace Enter on the compile job}
+
+The input message identifies Enter. The application turns it into \texttt{\{type: 'start'\}}. The monitor constructs a running job with a new run identity and zero progress. Its effect identifies the job and that exact run. The current model can now render ``running, 0 percent'' before the simulated work completes. Later progress messages contain the same job identity and run. A completion updates that run's state; it cannot safely identify its target by row number after filtering or selection changes.
+
+The companion's \path{src/app.ts} is the adapter between framework messages and monitor intentions. \path{src/monitor.ts} owns business transitions. \path{src/effects.ts} owns scheduled work. That division lets a model test ask what changed without starting a terminal, while a routing test can still verify that a real framework key reaches the intended transition.
+
+\section{Give input an owner}
+
+\subsection{A modal is an input boundary}
+
+The confirmation dialog blocks selection, filtering, starting work and opening logs behind it. Progress messages can still update jobs. Escape dismisses the dialog; it does not send a cancellation effect. Confirming cancellation changes the job state, invalidates its old run identity and asks the adapter to stop scheduled work. If the job finished while the dialog was open, confirmation cannot turn that successful completion into a cancelled job.
+
+A tempting implementation handles every shortcut globally, then draws a modal on top. It looks correct in a screenshot while the keys still affect the page underneath. Explicit routing adds a branch and a policy that must be maintained. The cost is real, but so is the failure it prevents.
+
+\subsection{Reproduce the leak}
+
+Run \texttt{npm run exercise -- modal}. The faulty route clears the dialog boundary before applying movement, so the selected job behind it changes. The success criterion is a state observation: selection remains unchanged while the modal owns movement. Run the repair and inspect the corresponding production transition. A painted overlay alone cannot establish that guarantee.
+
+\section{Know what a frame proves}
+
+The returned Surface gives a test controlled cells and dimensions to inspect. It does not prove that Escape is routed correctly or that a cancelled operation stopped. Those claims need the transition and lifecycle evidence introduced in the next workshops. Keep those claims separate even when the same feature has a convincing screenshot.

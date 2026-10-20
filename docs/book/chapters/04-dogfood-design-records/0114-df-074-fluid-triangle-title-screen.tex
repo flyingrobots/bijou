@@ -48,18 +48,7 @@ Bijou should design a future DOGFOOD title screen around a live fluid field movi
 
 The intended long-term flow is:
 
-\begin{CodeBlock}
-Fluid Title Scene Spec
-  -> deterministic field state
-    -> Bijou CPU glyph renderer
-      -> Bijou Surface
-        -> terminal
-
-Fluid Title Scene Spec
-  -> Geordi fluid/shader endpoint
-    -> PackedBijouCells or image witness
-      -> Bijou Surface or browser/image output
-\end{CodeBlock}
+\input{diagrams/flows/flow-037}
 
 The goal is not to copy a browser demo into DOGFOOD. The goal is to turn the idea into a Bijou-native release-title system with deterministic witnesses and a future GPU render endpoint.
 
@@ -181,24 +170,13 @@ Acceptable first algorithms:
 
 The CPU renderer should emit:
 
-\begin{CodeBlock}
-FluidTitleSceneSpec + frame index
-  -> FluidTitleFrame
-    -> Surface
-    -> FluidTitleReceipt
-\end{CodeBlock}
+\input{diagrams/flows/flow-038}
 
 \subsection{Geordi GPU Renderer}\label{record-114-geordi-gpu-renderer}
 
 The intended high-end path is Geordi-rendered:
 
-\begin{CodeBlock}
-FluidTitleSceneSpec
-  -> Geordi fluid/shader endpoint
-    -> rgba image target
-    -> PackedBijouCells target
-    -> frame witness
-\end{CodeBlock}
+\input{diagrams/flows/flow-039}
 
 The Geordi endpoint should be allowed to compute richer fluid motion, higher resolution fields, better collider interaction, and image/video witnesses. Bijou should consume its output through a declared target profile rather than special-case a browser canvas.
 
@@ -206,37 +184,13 @@ The Geordi endpoint should be allowed to compute richer fluid motion, higher res
 
 Low mode must remain useful without GPU support.
 
-\begin{CodeBlock}
-seeded density wave
-  -> glyph ramp
-    -> token colors
-      -> Surface
-\end{CodeBlock}
+\input{diagrams/flows/flow-040}
 
 Low mode should be cheap enough for CI snapshots and slow terminals.
 
 \section{Quality Modes}\label{record-114-quality-modes}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-{M\allowbreak{}o\allowbreak{}d\allowbreak{}e}
- & {R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r}
- & {P\allowbreak{}u\allowbreak{}r\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{l\allowbreak{}o\allowbreak{}w} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {C\allowbreak{}P\allowbreak{}U} {d\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}y} {w\allowbreak{}a\allowbreak{}v\allowbreak{}e} & {C\allowbreak{}I\allowbreak{},} {S\allowbreak{}S\allowbreak{}H\allowbreak{},} {c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}s} \\
-\texttt{m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {C\allowbreak{}P\allowbreak{}U} {p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}l\allowbreak{}e} {o\allowbreak{}r} {s\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}a\allowbreak{}r} {f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} & {d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} \\
-\texttt{h\allowbreak{}i\allowbreak{}g\allowbreak{}h} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {G\allowbreak{}P\allowbreak{}U} {e\allowbreak{}n\allowbreak{}d\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n} {a\allowbreak{}v\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} & {r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} {c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{},} {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e} {w\allowbreak{}i\allowbreak{}t\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} \\
-\texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o} & {r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {c\allowbreak{}h\allowbreak{}o\allowbreak{}i\allowbreak{}c\allowbreak{}e} & {b\allowbreak{}e\allowbreak{}s\allowbreak{}t} {a\allowbreak{}v\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e} {u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {b\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t} \\
-\end{longtable}
-}
+\input{tables/table-031}
 
 \texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o} must degrade deterministically by recorded facts:
 
@@ -269,10 +223,7 @@ title.prompt.enter.fg
 
 The glyph ramp and color ramp should be separate:
 
-\begin{CodeBlock}
-density -> glyph
-density -> token/color
-\end{CodeBlock}
+\input{diagrams/flows/flow-041}
 
 This avoids the prior title-screen failure mode where a visual layer appeared to set the wrong background because glyph, foreground, and background channels were not explicit enough.
 
@@ -465,31 +416,7 @@ For Geordi output, the receipt should add endpoint facts:
 
 \section{Slice Plan}\label{record-114-slice-plan}
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedleft\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedleft
-{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e}
-\end{minipage} & {O\allowbreak{}u\allowbreak{}t\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}e}
- & {P\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-{1} & {D\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n} {d\allowbreak{}o\allowbreak{}c} {a\allowbreak{}n\allowbreak{}d} {i\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} & {d\allowbreak{}o\allowbreak{}c\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} \\
-{2} & {S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {s\allowbreak{}p\allowbreak{}e\allowbreak{}c} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} {t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s} & {t\allowbreak{}y\allowbreak{}p\allowbreak{}e} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{3} & {D\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} {l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r} & {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} {h\allowbreak{}a\allowbreak{}s\allowbreak{}h} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{4} & {D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} {t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{5} & {I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t} {p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {k\allowbreak{}e\allowbreak{}y} {r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{6} & {T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} {r\allowbreak{}a\allowbreak{}m\allowbreak{}p} & {t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{7} & {L\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}z\allowbreak{}e\allowbreak{}n} {p\allowbreak{}a\allowbreak{}t\allowbreak{}h} & {d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
-{8} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {e\allowbreak{}n\allowbreak{}d\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t} {d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n} {h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}o\allowbreak{}f\allowbreak{}f} & {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}o\allowbreak{}n} {i\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c} \\
-\end{longtable}
-}
+\input{tables/table-032}
 
 \section{Closeout Notes}\label{record-114-closeout-notes}
 

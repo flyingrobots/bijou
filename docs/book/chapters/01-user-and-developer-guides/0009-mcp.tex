@@ -5,7 +5,7 @@
 This signpost covers Bijou's current MCP surface.
 
 \begin{center}
-\resizebox{\linewidth}{!}{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
 \node[actor] (Client) at (0.0,0) {Client};
 \draw[dashed,BookMuted] (Client.south) -- (0.0,-7.3999999999999995);
 \node[actor] (MCPServer) at (4.5,0) {MCPServer};

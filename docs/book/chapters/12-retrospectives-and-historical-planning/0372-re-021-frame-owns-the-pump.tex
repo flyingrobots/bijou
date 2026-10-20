@@ -12,26 +12,13 @@ Raw \texttt{A\allowbreak{}p\allowbreak{}p} + \texttt{r\allowbreak{}u\allowbreak{
 
 \section{Current architecture}\label{record-372-current-architecture}
 
-\begin{CodeBlock}
-runtime (owns loop, surfaces, differ, IO)
-  → App.update(msg, model)    ← frame returns [model, cmds]
-  → App.view(model)           ← frame returns Surface
-  → renderDiff(current, target, io, style)
-\end{CodeBlock}
+\input{diagrams/flows/flow-031}
 
 The runtime owns timing and the differ. The frame is a plain \texttt{A\allowbreak{}p\allowbreak{}p} that maps model → Surface. It has no visibility into render timing, frame budget, or memory pressure.
 
 \section{Proposed architecture}\label{record-372-proposed-architecture}
 
-\begin{CodeBlock}
-FramedApp (owns loop, timing, perf stats, frame budget)
-  → acquires input from IO
-  → page.update(msg, model)
-  → measures view() wall time
-  → renderDiff with timing
-  → perf overlay reads its own bookkeeping
-  → frame budget: skip non-essential overlays if overrunning
-\end{CodeBlock}
+\input{diagrams/flows/flow-032}
 
 \section{Why}\label{record-372-why}
 

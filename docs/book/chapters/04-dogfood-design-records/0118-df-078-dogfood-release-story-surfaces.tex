@@ -43,13 +43,7 @@ This document shapes \#335 into a bounded v7.2 demo-integrity pull. It does not 
 
 DOGFOOD already publishes release notes and migration docs in the Release section, but the app does not yet explain the post-v7.1 proof chain as a first-class product story. A presenter still has to narrate the important relationship manually:
 
-\begin{CodeBlock}
-GraphQL SDL fixture
-  -> bijou-block/1 artifact
-    -> ui-scene-ir/1 scene
-      -> terminal Surface proof
-        -> graphql-bijou-block-debug/1 facts
-\end{CodeBlock}
+\input{diagrams/flows/flow-036}
 
 The v7.2 repair is to add release-story surfaces that make that chain visible inside DOGFOOD:
 
@@ -168,12 +162,14 @@ The first slice may reuse the existing Markdown reader. A custom changelog index
 \item
   Can the presenter open a GraphQL proof walkthrough and point to the real \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} SDL fixture?
 \item
-  Can a viewer see the sequence \texttt{G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}Q\allowbreak{}L\allowbreak{} \allowbreak{}S\allowbreak{}D\allowbreak{}L\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{} \allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{} \allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s} inside DOGFOOD?
+  Can a viewer see the sequence the illustrated sequence below inside DOGFOOD?
 \item
   Can a viewer open the changelog and move between version boundaries without losing headings?
 \item
   Can tests prove these routes from model state and rendered text rather than screenshots?
 \end{enumerate}
+
+\input{diagrams/flows/flow-065}
 
 \section{Accessibility And Assistive Posture}\label{record-118-accessibility-and-assistive-posture}
 

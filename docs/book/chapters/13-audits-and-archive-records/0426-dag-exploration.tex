@@ -104,13 +104,11 @@ export interface SlicedDagSource extends DagSource {
 }
 \end{CodeBlock}
 
-\textbf{The flow: Source → Slice → Render}
+\textbf{the illustrated sequence below}
 
-\begin{CodeBlock}
-DagSource          dagSlice()              dag()
-(your graph,  →  (BFS bounded walk,  →  (Sugiyama on the
- unbounded)       ghost boundaries)       bounded result)
-\end{CodeBlock}
+\input{diagrams/flows/flow-071}
+
+\input{diagrams/flows/flow-053}
 
 \begin{CodeBlock}
 // External graph (never fully loaded)
@@ -354,39 +352,13 @@ Full Unicode box-drawing, ANSI colors via \texttt{c\allowbreak{}t\allowbreak{}x\
 
 Indented adjacency list --- machine-parseable, no ANSI, no box drawing:
 
-\begin{CodeBlock}
-Theme bridge -> Static renderers, TEA app shell
-Static renderers -> RoadmapView, LineageView
-TEA app shell -> RoadmapView, LineageView, Input system, graph.watch()
-RoadmapView -> Cleanup
-LineageView -> Cleanup
-Input system -> Cleanup
-graph.watch() -> Cleanup
-\end{CodeBlock}
+\input{diagrams/flows/flow-054}
 
 \subsection{Accessible Mode}\label{record-426-accessible-mode}
 
 Structured text with depth labels for screen readers:
 
-\begin{CodeBlock}
-Graph: 8 nodes, 10 edges
-
-Layer 1:
-  Theme bridge (2h) -> Static renderers, TEA app shell
-
-Layer 2:
-  Static renderers -> RoadmapView, LineageView
-  TEA app shell -> RoadmapView, LineageView, Input system, graph.watch()
-
-Layer 3:
-  RoadmapView -> Cleanup
-  LineageView -> Cleanup
-  Input system -> Cleanup
-  graph.watch() -> Cleanup
-
-Layer 4:
-  Cleanup (end)
-\end{CodeBlock}
+\input{diagrams/flows/flow-055}
 
 \subsection{ASCII Fallback}\label{record-426-ascii-fallback}
 
@@ -538,10 +510,12 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 \item
   Junction character lookup (15-entry table)
 \item
-  Elbow routing (vertical exit → horizontal turn → vertical entry)
+  Elbow routing (see the illustrated routing stages below)
 \item
   Arrowhead placement
 \end{itemize}
+
+\input{diagrams/flows/flow-072}
 
 \subsection{Phase 3: Renderer --- Shader-based cellAt (\textasciitilde460 LoC)}\label{record-426-phase-3-renderer-shader-based-cellat-460-loc}
 
@@ -582,10 +556,12 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 \item
   Auto-sizing from label lengths
 \item
-  Terminal width overflow → label truncation → gap reduction → vertical fallback
+  the illustrated sequence below
 \item
   \texttt{v\allowbreak{}i\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})} for ANSI-safe width math
 \end{itemize}
+
+\input{diagrams/flows/flow-073}
 
 \subsection{Total: \textasciitilde1014 LoC + tests}\label{record-426-total-1014-loc-tests}
 

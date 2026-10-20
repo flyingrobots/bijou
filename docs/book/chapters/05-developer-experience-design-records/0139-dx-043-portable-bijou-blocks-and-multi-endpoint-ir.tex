@@ -45,27 +45,11 @@ Bijou should grow toward a portable block and component semantics layer. Termina
 
 The intended flow is:
 
-\begin{CodeBlock}
-Bijou Blocks + Components GraphQL
-  -> Wesley validation and generated DTOs
-    -> ui-scene-ir/1
-      -> Bijou terminal endpoint
-      -> Geordi browser/WebGL/WebGPU endpoint
-      -> Geordi image or video witness endpoint
-      -> Geordi packed Bijou cell endpoint
-      -> future engine endpoints such as GeordiUnityGameEngine
-\end{CodeBlock}
+\input{diagrams/flows/flow-022}
 
 The reverse direction should also be possible for visual surfaces:
 
-\begin{CodeBlock}
-Figma or other external design source
-  -> Geordi IR or compatible scene IR
-    -> BijouPackedCellRenderer
-      -> PackedBijouCells
-        -> Bijou Surface
-          -> terminal cells
-\end{CodeBlock}
+\input{diagrams/flows/flow-023}
 
 The important shift is this:
 
@@ -114,7 +98,7 @@ No endpoint owns the semantic truth of a Bijou component. An endpoint may render
 \section{Relationship Diagram}\label{record-139-relationship-diagram}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\BookDiagram{%
 \begin{tikzpicture}[booknode/.style={draw=BookHeading,line width=.6pt,fill=BookPanel,rounded corners=1.5pt,align=center,text width=29mm,minimum height=10mm,inner sep=5pt,font=\small},bookedge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.65pt},every edge quotes/.style={font=\scriptsize,fill=white,inner sep=2pt,text=BookMuted}]
 \node[booknode] (Source) at (0,0) {Bijou Blocks And Components Graph\allowbreak{}QL};
 \node[booknode] (Wesley) at (0,-1.6) {Wesley Validation And DTO Generation};
@@ -189,12 +173,7 @@ The expected debug artifact should be inspectable by agents:
 
 Bijou-authored UI should be able to leave the terminal:
 
-\begin{CodeBlock}
-Bijou Blocks -> IR -> GeordiWebGL
-Bijou Blocks -> IR -> GeordiWebGPU
-Bijou Blocks -> IR -> GeordiImage
-Bijou Blocks -> IR -> GeordiUnityGameEngine
-\end{CodeBlock}
+\input{diagrams/flows/flow-024}
 
 This does not mean every endpoint has identical pixels. It means every endpoint renders the same semantic contract under a declared target profile.
 
@@ -202,9 +181,7 @@ This does not mean every endpoint has identical pixels. It means every endpoint 
 
 Bijou can also become the terminal endpoint for non-Bijou UI sources:
 
-\begin{CodeBlock}
-Figma -> Geordi IR -> BijouPackedCellRenderer -> terminal
-\end{CodeBlock}
+\input{diagrams/flows/flow-025}
 
 The first claim here is visual portability: can the source be approximated as terminal cells? Interactive portability requires additional semantics: focus, actions, state, localization, accessibility, and key routing.
 
@@ -326,28 +303,7 @@ Portability should be explicit. Some Bijou surfaces may remain terminal-native b
 
 The first target profile vocabulary should include:
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-{P\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e}
- & {O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}
- & {P\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r}
- \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} & \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} \\
-\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r} & {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r} {c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}e\allowbreak{}b\allowbreak{}G\allowbreak{}L\allowbreak{}/\allowbreak{}W\allowbreak{}e\allowbreak{}b\allowbreak{}G\allowbreak{}P\allowbreak{}U} {o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} \\
-\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e} & {R\allowbreak{}G\allowbreak{}B\allowbreak{}A} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{},} {P\allowbreak{}N\allowbreak{}G\allowbreak{},} {v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}o} {w\allowbreak{}i\allowbreak{}t\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} \\
-\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} & \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {p\allowbreak{}l\allowbreak{}u\allowbreak{}s} {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t} \\
-\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y} & {U\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {o\allowbreak{}r} {U\allowbreak{}I} {g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
-\texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t} & {v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {F\allowbreak{}i\allowbreak{}g\allowbreak{}m\allowbreak{}a} {o\allowbreak{}r} {s\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}r} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
-\end{longtable}
-}
+\input{tables/table-036}
 
 Every target profile should name supported features. Unsupported features must fail before drawing.
 
@@ -355,12 +311,7 @@ Every target profile should name supported features. Unsupported features must f
 
 The Bijou terminal endpoint lowers semantic UI IR into terminal runtime facts:
 
-\begin{CodeBlock}
-ui-scene-ir/1
-  -> bijou-layout/1
-    -> Surface
-      -> terminal cells
-\end{CodeBlock}
+\input{diagrams/flows/flow-026}
 
 \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1} should carry:
 
@@ -392,13 +343,7 @@ The final \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allo
 
 The packed cell endpoint lets Geordi render directly into a Bijou-compatible terminal cell target:
 
-\begin{CodeBlock}
-ui-scene-ir/1 or geordi endpoint IR
-  -> Geordi packed-cell renderer
-    -> PackedBijouCells
-      -> Bijou Surface adapter
-        -> terminal cells
-\end{CodeBlock}
+\input{diagrams/flows/flow-027}
 
 This is useful when a renderer, CPU backend, or GPU backend can produce the terminal-native output directly instead of rendering a large image and then sampling it on the CPU.
 
@@ -468,13 +413,7 @@ Dogfood is the best flagship proof because it contains:
 
 The intended proof path is:
 
-\begin{CodeBlock}
-Dogfood source
-  -> Dogfood IR
-    -> Dogfood in the terminal
-    -> Dogfood in the browser
-    -> structural receipts proving semantic parity
-\end{CodeBlock}
+\input{diagrams/flows/flow-028}
 
 The first slice should not rewrite all of Dogfood. It should make one page or one pane undeniable.
 
@@ -744,14 +683,7 @@ Mitigation: distinguish visual portability from interactive portability in the t
 
 Create the smallest possible Dogfood proof:
 
-\begin{CodeBlock}
-one Dogfood nav or content pane
-  -> portable source fixture
-    -> ui-scene-ir/1
-      -> Bijou Surface
-      -> browser/Geordi endpoint receipt
-      -> structural parity receipt
-\end{CodeBlock}
+\input{diagrams/flows/flow-029}
 
 That proves the architecture without rewriting Dogfood or overbuilding the compiler.
 
