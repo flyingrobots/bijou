@@ -17,7 +17,7 @@ covers the workflow, expectations, and resources for contributors.
 Use GitHub issues and milestones for roadmap and release scope. Linear is the
 chosen execution tracker; the connection and workspace/team migration are still
 pending. Existing GitHub issues remain live until verified Linear links exist.
-See [the workflow](docs/WORKFLOW.md) for the current process.
+See [the workflow](docs/book/bijou-designs.pdf#page=68) for the current process.
 
 - Name one observable outcome, its scope, acceptance checks, and prerequisites.
 - Use a descriptive branch and one coherent PR per outcome.
@@ -78,9 +78,10 @@ roadmap files. During the Linear migration, preserve source issue links and
 verify imported scope, acceptance criteria, status, and dependencies before
 changing ownership. Do not close source issues just because they were exported.
 
-Existing `docs/method/` files preserve historical evidence. Do not add new
-planning cards there. Use `docs/design/` for technical decisions and
-`docs/releases/` for release proof.
+The [documentation book](docs/book/bijou-designs.pdf) preserves historical
+design, METHOD, and release evidence. Record new technical decisions and release
+proof in the linked issue or pull request; do not recreate repository planning
+cards. The book corpus remains available to DOGFOOD and historical checks.
 
 ## Code Style
 

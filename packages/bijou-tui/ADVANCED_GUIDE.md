@@ -20,7 +20,7 @@ Bijou caches layout trees and rect calculations to optimize input routing and re
 import { createRuntimeRetainedLayouts, retainRuntimeLayout, invalidateRuntimeLayouts } from '@flyingrobots/bijou-tui';
 ```
 
-Read [docs/strategy/layout-localization-pipeline.md](../../docs/strategy/layout-localization-pipeline.md)
+Read [docs/strategy/layout-localization-pipeline.md](../../docs/book/bijou-designs.pdf#page=289)
 alongside this section so retained-layout work does not get confused with the
 runtime's separate localization handoff from author coordinates into a local
 paint root.
@@ -41,7 +41,7 @@ The render path is composed of five stages:
 5. **Output**: Write the diff buffer to the terminal.
 
 For the specific `LayoutNode` handoff between localization and paint, use the
-dedicated [layout localization pipeline note](../../docs/strategy/layout-localization-pipeline.md).
+dedicated [layout localization pipeline note](../../docs/book/bijou-designs.pdf#page=289).
 
 ### Custom Middleware
 Extend the pipeline via `options.configurePipeline` in `run()`:
@@ -69,7 +69,7 @@ run(app, {
 ```
 
 For the exact stage order, default runtime wiring, and `RenderState` contract,
-use the dedicated [render pipeline guide](../../docs/guides/render-pipeline.md).
+use the dedicated [render pipeline guide](../../docs/book/bijou-designs.pdf#page=70).
 
 ## Transition Shaders
 

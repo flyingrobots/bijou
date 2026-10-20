@@ -1,11 +1,27 @@
-# Bijou Design Book
+# Bijou Documentation Book
 
 [Read the PDF](./bijou-designs.pdf) or inspect the [LaTeX source](./bijou-designs.tex).
 
-This edition includes all 196 tracked Markdown documents under `docs/design/`,
-all eight Mermaid diagrams converted to native TikZ, and an atlas of 42 actual
-DOGFOOD component stories. Historical proposals retain their original status;
-GitHub issues and milestones own current release scope.
+The 1,760-page edition of 2026-10-20 consolidates 426 source documents: the original 196
+`docs/design/` records plus 230 guides, references, strategy notes, invariants,
+release documents, audits and historical records. All 32 Mermaid diagrams are
+converted to native TikZ. The atlas retains 42 actual DOGFOOD component stories.
+
+The individual compiled Markdown sources have been removed after verified PDF
+delivery to Reader. `source-corpus.json` preserves their exact UTF-8 text and
+SHA-256 values for DOGFOOD, localization scans and historical contract checks.
+`scripts/documentation-corpus.ts` validates these hashes before serving archived
+text, prefers live files, and limits archive fallback to known original
+repository paths.
+Use the bounded excerpt command in `docs/README.md` to read original chapters.
+
+Retained outside the compilation: the live documentation index, changelog,
+TypeScript standards, Code Dojo debt ledger, this book's operating notes, and
+the framed app tutorial, which remains a separate working document. Package and example
+READMEs remain beside their distributable code.
+
+Historical proposals retain their original status; GitHub issues and milestones
+own current release scope. `compiled-source-retirement.json` lists all removals.
 
 ## Typography and palette
 

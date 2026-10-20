@@ -62,27 +62,22 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 
 ## Documentation & Planning Map
 
-Do not audit the repository by recursively walking the filesystem. Follow the authoritative manifests:
+- **`README.md`**: public front door and package quick start.
+- **`docs/README.md`**: live documentation map and bounded chapter-reading command.
+- **`docs/book/bijou-designs.pdf`** and **`docs/book/bijou-designs.tex`**:
+  compiled guides, architecture, strategy, design records and release history.
+- **`docs/book/source-manifest.json`**: original paths, chapter numbers and hashes.
+- **`docs/book/source-corpus.json`**: exact archived text used by DOGFOOD and checks;
+  individual compiled Markdown files have been removed.
+- **`docs/typescript-code-standards.editors-edition.md`** and
+  **`docs/code-dojo-exceptions.md`**: retained live engineering policy.
+- **`docs/CHANGELOG.md`**: ongoing merged-behavior history.
 
-### 1. The Entrance
-- **`README.md`**: Public front door, package roles, and quick start.
-- **`GUIDE.md`**: Orientation, the fast path, and monorepo orchestration.
-- **`docs/README.md`**: Documentation entrypoint and intent-based map.
-
-### 2. The Bedrock
-- **`ARCHITECTURE.md`**: The authoritative structural reference (Ports, Adapters, Package Stack).
-- **`docs/VISION.md`**: Core tenets and project identity.
-- **`docs/DOCUMENTATION_STANDARDS.md`**: Reader-task documentation policy,
-  corpus ownership, examples, accessibility, and upkeep gates.
-- **`docs/typescript-code-standards.editors-edition.md`**: Verbatim TypeScript Code Standards doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture.
-- **`docs/code-dojo-exceptions.md`**: Human exception ledger and 50-violation-per-goalpost burndown policy.
-
-### 3. The Direction
-- **`docs/design/`**: Active and landed cycle design documents.
-
-### 4. The Proof
-- **`docs/DOGFOOD.md`**: Canonical documentation app and proving ground.
-- **`docs/CHANGELOG.md`**: Historical truth of merged behavior.
+Read an archived source in bounded excerpts with
+`node --import tsx scripts/read-documentation.ts ORIGINAL_PATH START_LINE LIMIT`.
+The limit is at most 250 lines. Inspect the manifest for chapter identity before
+reading; do not dump the entire corpus or LaTeX file into agent context.
+Roadmap and release scope remain in GitHub issues and milestones.
 
 ## Context Recovery Protocol
 

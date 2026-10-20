@@ -1,36 +1,58 @@
 {
-  "edition": "2026-10-19",
-  "pages": 1020,
-  "source_documents": 196,
-  "mermaid_sources_converted_to_tikz": 8,
+  "edition": "2026-10-20",
+  "pages": 1760,
+  "source_documents": 426,
+  "original_design_documents": 196,
+  "additional_documents": 230,
+  "mermaid_sources_converted_to_tikz": 32,
   "component_specimens": 42,
-  "source_hash_checks": "196/196 matched",
-  "svg_hash_and_xml_checks": "42/42 passed",
-  "pdf_sha256": "a156a864236dd9059238e70205a3069c5ebd4a5fa15ed3bb7a0d41da64aa7029",
-  "tex_sha256": "4b94a544f303d6299d2166cdd67978ce30dcfd19d8206311d787db63bdcc1c77",
+  "source_hash_checks": "426/426 matched original bytes before retirement and preserved corpus after retirement",
+  "retired_source_checks": "426/426 individual source files removed",
+  "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b",
+  "tex_sha256": "8814a3615d215b82bdbf25d06b21940865180b95570139d7061bbb6d94ceb940",
+  "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "compiler": "LuaHBTeX 1.15.0 / TeX Live 2022",
-  "clean_build": "two passes from retained repository source and assets into temporary storage",
+  "build": "two converged LuaLaTeX passes in bounded temporary storage",
   "missing_glyphs": 0,
   "undefined_references": 0,
-  "maximum_text_overflow_pt": 3.84578,
+  "maximum_text_overflow_pt": 7.87482,
+  "reader_delivery": {
+    "id": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b"
+  },
   "visual_inspection": [
-    "cover",
-    "ownership schema",
-    "metadata schema",
-    "variant schema",
-    "layout envelope",
-    "component atlas box specimen"
+    "coral cover",
+    "terminal scenarios flow and class diagrams",
+    "vision diagram",
+    "performance tables",
+    "retained component atlas"
   ],
-  "limitations": [
-    "Historical design records describe proposals and landed work; current tracker status remains authoritative.",
-    "Minor TeX box warnings remain, at most 3.84578 points."
+  "retained_operating_sources": [
+    "docs/README.md",
+    "docs/CHANGELOG.md",
+    "docs/code-dojo-exceptions.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "docs/guides/framed-app-tutorial.md"
   ],
   "resource_usage": {
-    "temporary_build_kib": 627012,
-    "host_free_bytes": 684619661312,
+    "temporary_build_kib": 650940,
+    "host_free_bytes": 676729622528,
     "worker": "bijou-design-book-worker",
     "scratch_limit_bytes": 1610612736,
     "worker_memory_bytes": 4294967296,
     "worker_cpus": 2
-  }
+  },
+  "limitations": [
+    "Historical proposals retain their original status; current tracker scope remains authoritative.",
+    "Minor TeX box and font-shape substitution warnings remain; no glyphs are missing."
+  ],
+  "validation": [
+    "215 files / 680 tests: 678 passed initially; two entrypoint wording assertions updated and all nine tests in those files passed on rerun.",
+    "Source-retirement regression reproduced three ENOENT failures before corpus adapter migration; the same doctrine checks passed afterward.",
+    "Documentation inventory and design-system preflight passed.",
+    "DOGFOOD coverage gate: 100% = 36/36 families.",
+    "Localization debt gate: 2316 raw strings and 78 untranslated Markdown documents, matching existing baselines."
+  ]
 }

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { documentationFileExists as existsSync, readDocumentationFile as readFileSync } from './documentation-corpus.js';
 import { resolve } from 'node:path';
 import { readMilestoneTrackerItems } from './release-readiness-tracker.js';
 import {

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
@@ -46,8 +46,8 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
 
     expect(result.model.docsModel.activePageId).toBe('guides');
     expect(text).toContain('Documentation Map');
-    expect(text).toContain('Current Truth');
-    expect(text).toContain('repo documentation map');
+    expect(text).toContain('complete book');
+    expect(text).toContain('426 guides');
   });
 
   it('publishes package explainer pages in the Packages section', async () => {

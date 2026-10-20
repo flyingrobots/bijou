@@ -23,7 +23,7 @@ visible ProjectPage block definitions recorded in the fixture and emits:
 - `generated/page.bijou.txt`
 
 See the
-[Profunctor Page Inspection reference](../../../docs/reference/profunctor-page-inspection.md)
+[Profunctor Page Inspection reference](../../../docs/book/bijou-designs.pdf#page=186)
 for the public API, modes, output contracts, and diagnostics.
 
 Regenerate the Bijou-owned output:

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { documentationFileExists as existsSync } from '../../../scripts/documentation-corpus.js';
 import { describe, expect, it } from 'vitest';
 import { expectClaims, normalized, ROOT } from '../WF-130/roadmap-goalpost-policy.test-support.js';
 const DESIGN_PATH =

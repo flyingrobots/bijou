@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { documentationFileExists as existsSync } from '../../../scripts/documentation-corpus.js';
 import { describe, expect, it } from 'vitest';
 import {
   expectClaims,

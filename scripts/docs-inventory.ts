@@ -11,42 +11,26 @@ interface InventorySection {
 
 const SECTIONS: readonly InventorySection[] = [
   {
-    title: 'Current Truth',
+    title: 'Current operating documents',
     entries: [
       'README.md',
+      'AGENTS.md',
       'docs/README.md',
-      'docs/VISION.md',
       'docs/typescript-code-standards.editors-edition.md',
       'docs/code-dojo-exceptions.md',
-      'docs/DOCUMENTATION_STANDARDS.md',
-      'docs/system-style-javascript.md',
-      'docs/DOGFOOD.md',
-      'docs/design/README.md',
-      'docs/book/README.md',
-      'docs/invariants/README.md',
-      'docs/design-system/README.md',
       'docs/CHANGELOG.md',
+      'docs/guides/framed-app-tutorial.md',
     ],
   },
   {
-    title: 'Reference Docs',
+    title: 'Compiled documentation book',
     entries: [
-      'docs/ARCHITECTURE.md',
-      'docs/MIGRATING_TO_V4.md',
-      'docs/EXAMPLES.md',
-      'docs/reference/packed-bijou-cells.md',
-      'docs/reference/profunctor-page-inspection.md',
-      'docs/release.md',
-      'docs/releases/README.md',
-      'docs/WORKFLOW.md',
-    ],
-  },
-  {
-    title: 'Historical And Legacy',
-    entries: [
-      'docs/GRAVEYARD.md',
-      'docs/specs/README.md',
-      'docs/archive/README.md',
+      'docs/book/README.md',
+      'docs/book/bijou-designs.pdf',
+      'docs/book/bijou-designs.tex',
+      'docs/book/source-manifest.json',
+      'docs/book/source-corpus.json',
+      'docs/book/compiled-source-retirement.json',
     ],
   },
 ];

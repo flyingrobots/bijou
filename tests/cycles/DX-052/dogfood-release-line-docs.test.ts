@@ -1,5 +1,6 @@
+import { documentationFileExists as existsSync } from '../../../scripts/documentation-corpus.js';
 import { describe, it, expect } from 'vitest';
-import { existsSync } from 'node:fs';
+
 import { resolve } from 'node:path';
 import { BIJOU_VERSION } from '../../../examples/docs/app-ids.js';
 import { BIJOU_RELEASE_LINE, releaseLineOf } from '../../../examples/docs/app-release-line.js';

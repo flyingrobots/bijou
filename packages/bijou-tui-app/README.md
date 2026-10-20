@@ -90,7 +90,7 @@ await run(
 - Frame keys: `[` / `]` tab switch, `tab` pane next, `shift+tab` pane prev, `ctrl+p` command palette, `?` help
 - Skeleton keys: `o` drawer toggle, `q`/`ctrl+c` quit confirm, `y`/`enter` confirm quit, `n`/`escape` cancel quit
 
-For upgrading an existing shell-based app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
+For upgrading an existing shell-based app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/book/bijou-designs.pdf#page=55).
 
 ## Documentation
 

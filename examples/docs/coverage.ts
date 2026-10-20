@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-
+import { readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
 interface CoverageStoryLike {
   readonly coverageFamilyIds?: readonly string[];
 }
