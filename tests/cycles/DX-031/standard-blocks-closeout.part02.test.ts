@@ -1,4 +1,4 @@
-import { describe, expect, it, readRepoFile, sectionBetween } from './standard-blocks-closeout.test-support.js';
+import { describe, expect, it, readRepoFile } from './standard-blocks-closeout.test-support.js';
 
 describe('DX-031 standard blocks closeout', () => {
   it('marks DX-031 landed in Method evidence after closing issue 181', () => {
@@ -44,16 +44,7 @@ describe('DX-031 standard blocks closeout', () => {
 
 describe('DX-031 standard blocks closeout', () => {
   it('keeps compressed v6 lineage pointing to issue 181 evidence', () => {
-    const bearing = readRepoFile('docs/BEARING.md');
-    const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
-
-    expect(bearing).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181) — `DX-031`');
-
-    expect(roadmapClosedLineage).toContain('`v6.0.0`');
-    expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
-    expect(roadmap).not.toContain('[#181](https://github.com/flyingrobots/bijou/issues/181)');
 
     expect(backlog).toContain('## Landed Standard Blocks Anchor');
     expect(backlog).toContain('issue #181');

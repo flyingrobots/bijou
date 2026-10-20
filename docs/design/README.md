@@ -1,37 +1,14 @@
-# Design Cycles
+# Design Records
 
-This directory holds active and landed cycle docs.
+This directory preserves technical decisions and implementation evidence.
+Current scope and release order live in GitHub issues and milestones; Linear
+is the chosen execution tracker, pending connection and workspace/team selection.
 
-## Lifecycle
+Write a design record when a change needs a durable technical decision. Name the
+problem, scope, non-goals, observable contract, acceptance checks, prerequisites,
+and validation plan. Link the work item and PR. Update the record with actual
+results when the change lands.
 
-- work starts in a GitHub Issue with Method labels
-- when a cycle begins, create or link the design file here
-- enrich it into a real cycle doc with hills, playbacks, and tests
-- keep the design doc as the historical record once the work lands
-
-## Bijou Convention
-
-Bijou keeps flat cycle docs named like:
-
-- `RE-006-formalize-component-layout-and-interaction-contracts.md`
-- `WF-001-adopt-cycle-workflow.md`
-
-Historical docs may be lighter than the current METHOD standard. Do not
-pretend otherwise; make new work better instead.
-
-## Required Sections
-
-Modern cycle docs should include:
-
-- linked legend
-- sponsor human
-- sponsor agent
-- hill
-- playback questions
-- accessibility / assistive posture
-- localization / directionality posture
-- agent inspectability / explainability posture
-- linked invariants
-- implementation outline
-- tests to write first
-- retrospective or clear closeout notes
+Existing cycle identifiers and templates preserve historical provenance. New
+work does not require METHOD ceremonies, sponsor fields, a cycle branch name,
+or an advance shaping commit. Keep existing filenames stable for linked evidence.

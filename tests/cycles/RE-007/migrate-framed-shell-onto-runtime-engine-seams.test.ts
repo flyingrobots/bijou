@@ -8,7 +8,6 @@ const readFrameModule = (name: string) =>
 describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
   it('promotes RE-007 into the active runtime-engine cycle', () => {
     const legend = readRepoFile('docs/legends/RE-runtime-engine.md');
-    const bearing = readRepoFile('docs/BEARING.md');
     const cycle = readRepoFile(
       'docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md',
     );
@@ -20,9 +19,6 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     ).toBe(true);
     expect(legend).toContain(
       'RE-007 — Migrate Framed Shell Onto Runtime Engine Seams',
-    );
-    expect(bearing).toContain(
-      '[RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)',
     );
 
     expect(cycle).toContain('## Human playback');

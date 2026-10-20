@@ -241,8 +241,9 @@ Most production apps eventually move to tier 2 or tier 3.
 | [`docs/typescript-code-standards.editors-edition.md`](./docs/typescript-code-standards.editors-edition.md) | Verbatim Code Dojo doctrine for TypeScript, tests, adapters, scripts, and architecture changes. |
 | [`docs/code-dojo-exceptions.md`](./docs/code-dojo-exceptions.md) | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
 | [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
-| [`docs/BEARING.md`](./docs/BEARING.md) | Current execution direction and active tensions. |
-| [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Broad strategic direction and active themes. |
+| [GitHub issues](https://github.com/flyingrobots/bijou/issues) | Roadmap and work scope. |
+| [GitHub milestones](https://github.com/flyingrobots/bijou/milestones) | Planned releases. |
+| [Workflow](./docs/WORKFLOW.md) | Execution process and Linear migration status. |
 | [`docs/design-system/README.md`](./docs/design-system/README.md) | Design language, components, and UI foundations. |
 | [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | Historical truth of merged behavior. |
 
@@ -390,7 +391,7 @@ npm run bench
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for workflow and PR expectations.
 
-- For backlog-first contributions, start with `docs/method/backlog/inbox/`.
+- For contributions, start with the GitHub issue tracker and `docs/WORKFLOW.md`.
 - If you want beginner-friendly tickets, start from [`GOOD_FIRST_ISSUES.md`](./GOOD_FIRST_ISSUES.md).
 
 ## Future Direction

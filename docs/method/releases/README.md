@@ -1,3 +1,6 @@
+> Historical METHOD material. This process is retired. Do not create new work
+> here; use GitHub issues/milestones and the execution workflow in `docs/WORKFLOW.md`.
+
 # Release Packets
 
 Release packets are Bijou's roadmap planning surface. GitHub milestones and

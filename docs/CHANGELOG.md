@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- Retired repository direction/roadmap mirrors and METHOD doctrine. GitHub
+  issues and milestones own roadmap and release scope; Linear execution
+  migration is pending connection and workspace/team selection. Release
+  readiness uses milestone items and release evidence without planning files.
+
 ## [8.0.0-rc.1] - 2026-08-21
 
 Release candidate for `8.0.0`. Published so downstream consumers can validate the

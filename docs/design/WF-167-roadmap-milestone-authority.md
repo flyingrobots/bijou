@@ -15,7 +15,7 @@ Codex.
 ## Decision Summary
 
 Restore one explainable release model across GitHub milestones,
-[`ROADMAP.md`](../ROADMAP.md), and [`BEARING.md`](../BEARING.md).
+[`ROADMAP.md`](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/ROADMAP.md), and [`BEARING.md`](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md).
 
 Milestones own release horizons. Labels own work posture. Goalpost issues own
 dependency ordering inside a horizon. Documentation mirrors those authorities;
@@ -467,11 +467,11 @@ No agent must infer release scope from issue-number ranges, historical
 
 ## Linked Invariants
 
-- [Work Doctrine](../METHOD.md)
+- [Work Doctrine](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/METHOD.md)
 - [Documentation Standards](../DOCUMENTATION_STANDARDS.md)
 - [TypeScript Code Standards](../typescript-code-standards.editors-edition.md)
-- [Roadmap](../ROADMAP.md)
-- [Bearing](../BEARING.md)
+- [Roadmap](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/ROADMAP.md)
+- [Bearing](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md)
 - [Release Policy](../method/releases/README.md)
 - Tracker synchronization idea:
   [#268](https://github.com/flyingrobots/bijou/issues/268)

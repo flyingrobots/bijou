@@ -10,7 +10,7 @@ workflow, and contributor documentation in Bijou.
 strength.
 
 This standard adapts reader-task documentation discipline to Bijou's existing
-contract, Method, and DOGFOOD practices. It does not require a mass rewrite of
+contract and DOGFOOD practices. It does not require a mass rewrite of
 existing pages. Apply it when creating documentation, changing behavior, or
 touching a page enough that leaving it below this bar would create new debt.
 
@@ -49,18 +49,15 @@ Bijou keeps durable truth in a small set of known places.
 | `docs/ARCHITECTURE.md`                                                   | Current structural explanation for packages, ports, adapters, and major runtime relationships.                            |
 | `docs/design/`                                                           | Cycle design records. Active records define proposed contracts; landed records preserve why a change was made.            |
 | `tests/cycles/`                                                          | Executable cycle evidence. Tests are the specification when prose and executable behavior disagree.                       |
-| `docs/METHOD.md`                                                         | Living repository work doctrine.                                                                                          |
 | `docs/WORKFLOW.md`                                                       | Concise operator workflow and recurring safety practices.                                                                 |
 | `docs/method/releases/`                                                  | Release packets, goalposts, and release evidence.                                                                         |
-| `docs/ROADMAP.md`                                                        | Human-readable release horizon derived from live GitHub tracker state.                                                    |
-| `docs/BEARING.md`                                                        | Current direction, immediate target, and active tensions.                                                                 |
 | `docs/CHANGELOG.md`                                                      | Release-visible historical ledger.                                                                                        |
 | `docs/archive/`, `docs/audit/`, `docs/audits/`, and `docs/method/retro/` | Historical snapshots. They explain prior state and MUST NOT pose as current truth.                                        |
 
-GitHub Issues, milestones, pull requests, and labels own live work state.
-Repository documentation explains contracts, decisions, evidence, and how live
-tracker items compose. When tracker state and planning prose disagree, GitHub
-wins and the documentation requires upkeep.
+GitHub issues and milestones own roadmap and release scope. Linear is the chosen
+execution tracker; migration is pending connection and workspace/team selection.
+Until verified Linear links exist, source GitHub issues remain live. Repository
+documentation explains contracts, decisions, and evidence, not mirrored queue state.
 
 Do not create empty placeholder directories. Add a page when it has a real
 reader job.
@@ -211,7 +208,7 @@ For a meaningful behavior, contract, or workflow change:
 5. Update living reference after the behavior exists.
 6. Mark planned cases implemented and record the actual evidence.
 7. Update `README.md`, `docs/README.md`, `docs/CHANGELOG.md`,
-   `docs/ROADMAP.md`, and `docs/BEARING.md` when public surface,
+   the external tracker when public surface,
    documentation routing, release status, or project posture changes.
 8. Run documentation upkeep before final self-review and before requesting
    final pull-request review.
@@ -470,8 +467,8 @@ Before calling a documentation change complete, check:
   when a visual materially helps.
 - New durable pages are linked from `docs/README.md`.
 - Release-visible changes update `docs/CHANGELOG.md`.
-- Direction or release-order changes update `docs/ROADMAP.md` and
-  `docs/BEARING.md`.
+- Direction or release-order changes update GitHub issues and milestones, with
+  linked Linear execution items once connected.
 - `npm run docs:inventory` and `git diff --check` pass.
 
 The objective is not a perfectly uniform library. The objective is a

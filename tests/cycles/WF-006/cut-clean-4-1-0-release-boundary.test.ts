@@ -32,14 +32,9 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
   });
 
   it('keeps the signposts honest after 4.1.0 ships', () => {
-    const bearing = readRepoFile('docs/BEARING.md');
     const releaseGuide = readRepoFile('docs/release.md');
     const workflowLegend = readRepoFile('docs/legends/WF-workflow-and-delivery.md');
     const dogfoodLegend = readRepoFile('docs/legends/DF-dogfood-field-guide.md');
-
-    // BEARING evolves across releases; check that 4.1.0 and RE-007 are acknowledged
-    expect(bearing).toContain('4.1.0');
-    expect(bearing).toContain('RE-007');
 
     // Release guide evolves; check that it references a concrete shipped release
     // instead of freezing this historical 4.1.0 cycle to the 4.x line forever.

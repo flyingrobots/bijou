@@ -160,7 +160,7 @@ from commit history.
 
 - [TypeScript Code Standards](../typescript-code-standards.editors-edition.md)
 - [Code Dojo Exceptions](../code-dojo-exceptions.md)
-- [Work Doctrine](../METHOD.md)
+- [Work Doctrine](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/METHOD.md)
 - [Documentation Standards](../DOCUMENTATION_STANDARDS.md)
 - Tracker issue:
   [#477](https://github.com/flyingrobots/bijou/issues/477)

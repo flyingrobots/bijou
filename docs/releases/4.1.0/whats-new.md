@@ -214,8 +214,8 @@ at `v4.0.0`.
 
 New or newly formalized repo surfaces include:
 
-- [METHOD](../../METHOD.md)
-- [BEARING](../../BEARING.md)
+- [METHOD](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/METHOD.md)
+- [BEARING](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md)
 - [VISION](../../VISION.md)
 - [System-Style JavaScript](../../system-style-javascript.md)
 - [Release Guide](../../release.md)

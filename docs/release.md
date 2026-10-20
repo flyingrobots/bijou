@@ -150,8 +150,8 @@ is truthful. The release evidence packet must record human review for:
   current release status changed.
 - `ARCHITECTURE.md` changed if ports, adapters, package boundaries, storage,
   rendering contracts, or runtime posture changed.
-- `docs/VISION.md`, `docs/METHOD.md`, `docs/ROADMAP.md`, and
-  `docs/BEARING.md` match the release posture.
+- `docs/VISION.md`, `docs/WORKFLOW.md`, and GitHub milestone scope match the
+  release posture; linked Linear items agree once migration is connected.
 - `docs/DOGFOOD.md` and DOGFOOD-facing markdown changed if the docs app,
   release title, navigation model, localization posture, or proof surface
   changed.
@@ -231,13 +231,15 @@ The latest shipped package release is `7.2.0`. The older `v6.0.0`, `v7.0.0`,
 release lineage, not as the next target. The current target is the `v8.0.0`
 milestone.
 
-New feature work should shape toward `8.0.0`. Do not reopen `7.2.0` for broad
+Keep V8 limited to stable-release closeout. Do not reopen `7.2.0` for broad
 Theme Lab, BlockLab, localization workbench, VISOR, Geordi, or Runtime Graph
 product work.
 
-Before the next release-prep cycle begins, keep the selected scope reflected in
-[`docs/ROADMAP.md`](./ROADMAP.md), [`docs/BEARING.md`](./BEARING.md), the live
-tracker, and the versioned release packet for that target.
+Keep selected release scope in the [GitHub milestone](https://github.com/flyingrobots/bijou/milestone/6)
+and proof in the versioned release packet. Stable `8.0.0` follows `8.0.0-rc.1`;
+#526 owns version-lock enforcement and #527 owns witness replay and documentation
+review. Linear execution migration is pending connection and workspace/team selection.
+Broad Sapphire and Theme Lab work remains in V9.
 
 ### Lock-step Versioned Units
 
@@ -423,7 +425,6 @@ first prints a release-readiness report and blocks before the gauntlet if:
 - the target GitHub milestone has open tracker items, including issues or pull
   requests
 - any milestone tracker item still has `work-in-progress`
-- `ROADMAP.md` and `BEARING.md` do not mention the target milestone
 - `CHANGELOG.md` does not have an `Unreleased` or versioned release boundary
 - `docs/releases/X.Y.Z/README.md` release evidence packet is missing
 - the command plan no longer includes package smoke or the release guide no

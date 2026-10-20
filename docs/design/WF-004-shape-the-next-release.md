@@ -108,7 +108,7 @@ repo artifacts:
 - `docs/releases/4.1.0/`
 - [docs/release.md](../release.md)
 - [docs/PLAN.md](../PLAN.md)
-- [docs/BEARING.md](../BEARING.md)
+- [docs/BEARING.md](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md)
 
 ## Non-goals
 

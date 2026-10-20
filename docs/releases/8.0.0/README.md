@@ -11,6 +11,16 @@ change and the status-fallback change from
 [`DX-052`](../../design/DX-052-no-color-is-not-a-capability.md) — against real
 applications before the stable `8.0.0` tag is cut.
 
+## Tracker Transition — 2026-10-19
+
+Repository planning mirrors and METHOD doctrine are retired. The RC review
+matrix below is historical evidence of what was reviewed at publication time.
+Its references to reviewing direction/roadmap files are superseded by reviewing
+GitHub issue and milestone scope, plus linked Linear execution items once the
+migration is connected. This does not close any inherited product witness gap.
+Stable-release work remains tracked by #526 and #527 in the
+[v8.0.0 milestone](https://github.com/flyingrobots/bijou/milestone/6).
+
 ## How to read this packet
 
 This packet is deliberately explicit about the difference between evidence

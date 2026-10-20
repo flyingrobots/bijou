@@ -38,31 +38,10 @@ describe('RE-035 layout envelope closeout', () => {
   });
 
   it('keeps compressed v6 lineage pointing to issue 180 evidence', () => {
-    const bearing = readRepoFile('docs/BEARING.md');
-    const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
-
-    expect(bearing).toContain('RE-035');
-    expect(bearing).not.toContain('[#180](https://github.com/flyingrobots/bijou/issues/180) — `RE-035`');
-
-    expect(roadmapClosedLineage).toContain('`v6.0.0`');
-    expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
-    expect(roadmapClosedLineage).toContain('Full lineage lives in the [v6.0.0 milestone]');
-    expect(roadmap).not.toContain('[#180](https://github.com/flyingrobots/bijou/issues/180)');
 
     expect(backlog).toContain('## Landed Layout Anchor');
     expect(backlog).toContain('PR #251');
     expect(backlog).toContain('issue #180');
   });
 });
-
-function sectionBetween(source: string, start: string, end: string): string {
-  const startIndex = source.indexOf(start);
-  const endIndex = source.indexOf(end, startIndex + start.length);
-
-  expect(startIndex).toBeGreaterThanOrEqual(0);
-  expect(endIndex).toBeGreaterThan(startIndex);
-
-  return source.slice(startIndex, endIndex);
-}

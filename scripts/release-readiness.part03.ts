@@ -84,8 +84,6 @@ export function readReleaseReadinessDocs(
 ): ReleaseReadinessDocsSnapshot {
   const version = milestone.replace(/^v/, '');
   return Object.freeze({
-    roadmap: readFileSync(resolve(cwd, 'docs/ROADMAP.md'), 'utf8'),
-    bearing: readFileSync(resolve(cwd, 'docs/BEARING.md'), 'utf8'),
     changelog: readFileSync(resolve(cwd, 'docs/CHANGELOG.md'), 'utf8'),
     releaseGuide: readFileSync(resolve(cwd, 'docs/release.md'), 'utf8'),
     releasePacketExists: existsSync(

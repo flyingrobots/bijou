@@ -15,8 +15,6 @@ const SECTIONS: readonly InventorySection[] = [
     entries: [
       'README.md',
       'docs/README.md',
-      'docs/METHOD.md',
-      'docs/BEARING.md',
       'docs/VISION.md',
       'docs/typescript-code-standards.editors-edition.md',
       'docs/code-dojo-exceptions.md',
@@ -24,7 +22,6 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/system-style-javascript.md',
       'docs/DOGFOOD.md',
       'docs/legends/README.md',
-      'docs/method/backlog/README.md',
       'docs/design/README.md',
       'docs/invariants/README.md',
       'docs/design-system/README.md',
@@ -48,7 +45,7 @@ const SECTIONS: readonly InventorySection[] = [
   {
     title: 'Historical And Legacy',
     entries: [
-      'docs/ROADMAP.md',
+      'docs/method/backlog/README.md',
       'docs/COMPLETED.md',
       'docs/GRAVEYARD.md',
       'docs/specs/README.md',

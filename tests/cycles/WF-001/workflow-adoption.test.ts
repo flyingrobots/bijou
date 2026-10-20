@@ -10,58 +10,6 @@ function read(relativePath: string): string {
 }
 
 describe('WF-001 workflow adoption', () => {
-  it('establishes the new planning directories and canonical workflow doc', () => {
-    expect(existsSync(resolve(ROOT, 'docs/WORKFLOW.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/method/backlog/README.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/design/README.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/legends/README.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/invariants/README.md'))).toBe(true);
-
-    const workflow = read('docs/WORKFLOW.md');
-    const method = read('docs/METHOD.md');
-    const normalizedWorkflow = normalizeWhitespace(workflow);
-    const normalizedMethod = normalizeWhitespace(method);
-    expect(workflow).toContain('Legends');
-    expect(workflow).toContain('Cycles');
-    expect(workflow).toContain('tests/cycles/<cycle>/');
-    expect(workflow).toContain('docs/specs/');
-    expect(workflow).toContain('cycle/<cycle_name>');
-    expect(normalizedWorkflow).toContain('open a non-draft pull request to `main`');
-    expect(method).toContain('cycle/<cycle_name>');
-    expect(normalizedMethod).toContain('open a non-draft pull request to `main`');
-  });
-
-  it('starts cycles with a synced branch, design issue, and non-draft PR', () => {
-    const agents = read('AGENTS.md');
-    const contributing = read('CONTRIBUTING.md');
-    const workflow = read('docs/WORKFLOW.md');
-    const method = read('docs/METHOD.md');
-    const issueTemplate = read('.github/ISSUE_TEMPLATE/work-item.yml');
-    const normalizedAgents = normalizeWhitespace(agents);
-    const normalizedContributing = normalizeWhitespace(contributing);
-    const normalizedWorkflow = normalizeWhitespace(workflow);
-    const normalizedMethod = normalizeWhitespace(method);
-
-    expect(normalizedMethod).toContain('git fetch');
-    expect(normalizedMethod).toContain('Sync to the merge target branch');
-    expect(normalizedMethod).toContain('Create `cycle/<cycle_name>` from the synced merge target');
-    expect(normalizedMethod).toContain('open a non-draft pull request to `main`');
-    expect(normalizedMethod).toContain('apply `work-in-progress` to the GitHub Issue');
-
-    expect(normalizedWorkflow).toContain('Sync to the merge target branch after `git fetch`.');
-    expect(normalizedWorkflow).toContain('open a non-draft pull request to `main` before implementation work starts.');
-    expect(normalizedWorkflow).toContain('Apply `work-in-progress` to the GitHub Issue.');
-
-    expect(normalizedContributing).toContain('Open a non-draft PR at cycle start');
-    expect(normalizedContributing).toContain('request final review only after validation and self-review pass');
-
-    expect(normalizedAgents).toContain('Start cycles from a synced merge target branch.');
-    expect(normalizedAgents).toContain('PRs are non-draft at cycle start.');
-    expect(normalizedAgents).toContain('link the issue, design doc, and PR');
-    expect(normalizedMethod).toContain('link the issue, design doc, and PR');
-
-    expect(issueTemplate).toContain('Issue, design doc, and non-draft PR are linked correctly.');
-  });
 
   it('adds explicit legend and invariant docs', () => {
     expect(existsSync(resolve(ROOT, 'docs/legends/WF-workflow-and-delivery.md'))).toBe(true);
@@ -96,7 +44,3 @@ describe('WF-001 workflow adoption', () => {
     expect(existsSync(resolve(ROOT, 'docs/specs/bijou-i18n-tools.spec.json'))).toBe(false);
   });
 });
-
-function normalizeWhitespace(source: string): string {
-  return source.replace(/\s+/g, ' ').trim();
-}

@@ -4,9 +4,9 @@ This directory mixes living doctrine with older planning notes.
 
 Do **not** start new delivery work here. Current queue truth lives in:
 
-- `docs/METHOD.md`
-- `docs/method/backlog/`
-- `docs/design/`
+- [GitHub issues](https://github.com/flyingrobots/bijou/issues)
+- [GitHub milestones](https://github.com/flyingrobots/bijou/milestones)
+- Linear execution items once connected; see [workflow](../WORKFLOW.md)
 
 Use strategy notes for doctrine, rationale, and historical reference.
 

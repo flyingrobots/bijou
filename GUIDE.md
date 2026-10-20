@@ -26,7 +26,7 @@ is too large to learn from.
 Understand the project's identity, work doctrine, and architectural boundaries.
 - **Read**: [`docs/README.md`](./docs/README.md) (The Documentation Map)
 - **Read**: [`docs/VISION.md`](./docs/VISION.md) (Core Tenets)
-- **Read**: [`docs/METHOD.md`](./docs/METHOD.md) (Work Doctrine)
+- **Read**: [Contributor workflow](./docs/WORKFLOW.md)
 
 ### 5. Proving Ground
 See Bijou in action by running the documentation app.
@@ -47,13 +47,13 @@ Bijou is a tiered engine. You choose your depth based on the task:
 - [ ] **I am building a full-screen dashboard**: Start with `packages/bijou-tui/GUIDE.md`.
 - [ ] **I need to localize my app**: Start with `packages/bijou-i18n/README.md`.
 - [ ] **I am debugging the render loop**: Start with `ADVANCED_GUIDE.md`.
-- [ ] **I am contributing to the repository**: Start with `docs/METHOD.md` and `docs/BEARING.md`.
+- [ ] **I am contributing to the repository**: Start with `docs/WORKFLOW.md` and the GitHub issue tracker.
 
 ## Rule of Thumb
 
 For a comprehensive inventory, use [docs/README.md](./docs/README.md).
 
-To know "what's true right now," use [docs/BEARING.md](./docs/BEARING.md).
+For current work and planned releases, use [GitHub issues](https://github.com/flyingrobots/bijou/issues) and [milestones](https://github.com/flyingrobots/bijou/milestones).
 
 New to the project? Start with the [README.md](./README.md) and the package guides linked above.
 

@@ -1,3 +1,6 @@
+> Historical METHOD material. This process is retired. Do not create new work
+> here; use GitHub issues/milestones and the execution workflow in `docs/WORKFLOW.md`.
+
 # METHOD Backlog Evidence
 
 This directory is retained as Method evidence and release lineage.

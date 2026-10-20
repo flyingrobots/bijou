@@ -52,19 +52,6 @@ export function buildReleaseReadinessReport(options: {
           : `${milestone} has work-in-progress labels on ${formatTrackerItems(wipTrackerItems)}`,
     },
     {
-      label: 'docs-roadmap-bearing',
-      status:
-        options.docs.roadmap.includes(milestone) &&
-        options.docs.bearing.includes(milestone)
-          ? 'pass'
-          : 'fail',
-      summary:
-        options.docs.roadmap.includes(milestone) &&
-        options.docs.bearing.includes(milestone)
-          ? `ROADMAP.md and BEARING.md mention ${milestone}`
-          : `ROADMAP.md and BEARING.md must both mention ${milestone}`,
-    },
-    {
       label: 'docs-changelog',
       status: hasChangelogBoundary ? 'pass' : 'fail',
       summary: hasChangelogBoundary

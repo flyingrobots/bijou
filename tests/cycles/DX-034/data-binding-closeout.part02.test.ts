@@ -1,11 +1,4 @@
-import {
-  describe,
-  expect,
-  it,
-  readRepoFile,
-  sectionBetween,
-  standardBlockStories,
-} from './data-binding-closeout.test-support.js';
+import { describe, expect, it, readRepoFile, standardBlockStories } from './data-binding-closeout.test-support.js';
 
 describe('DX-034 data binding closeout', () => {
   it('keeps binding-state story coverage visible for DOGFOOD and lower modes', () => {
@@ -57,16 +50,8 @@ describe('DX-034 data binding closeout', () => {
 
 describe('DX-034 data binding closeout', () => {
   it('keeps compressed v6 lineage pointing to issue 182 evidence', () => {
-    const bearing = readRepoFile('docs/BEARING.md');
     const design = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
-    const roadmap = readRepoFile('docs/ROADMAP.md');
     const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const roadmapClosedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
-
-    expect(bearing).not.toContain('[#182](https://github.com/flyingrobots/bijou/issues/182) — `DX-034`');
-    expect(roadmapClosedLineage).toContain('`v6.0.0`');
-    expect(roadmapClosedLineage).toContain('Skipped public release; complete lineage');
-    expect(roadmap).not.toContain('[#182](https://github.com/flyingrobots/bijou/issues/182)');
     expect(design).toContain('contract without keeping issue #182 open');
 
     expect(backlog).toContain('## Landed Data Binding Anchor');
