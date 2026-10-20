@@ -1,0 +1,402 @@
+\chapter{ComponentStory v0}\label{record-039}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/component-story-v0.md}\par}\smallskip
+
+\begin{quote}
+Historical note: this is an early DOGFOOD substrate design note. Use \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOGFOOD.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}} for the current docs-surface signpost and METHOD backlog/design docs for active queue work.
+\end{quote}
+
+\emph{Design note for the first DOGFOOD substrate}
+
+\section{Why this exists}\label{record-039-why-this-exists}
+
+Bijou currently has several near-miss representations of ``a component in context'':
+
+\begin{itemize}
+\tightlist
+\item
+  design-system family docs
+\item
+  package/example README prose
+\item
+  showcase \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}
+\item
+  smoke and canary examples
+\end{itemize}
+
+Those artifacts overlap, but they do not share one canonical contract. \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}v\allowbreak{}0} is the first attempt to fix that.
+
+The goal is not to design the forever-schema. The goal is to create the smallest structured record that can prove this loop:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  a component family can be documented from structured fields
+\item
+  the same record can render a live demo
+\item
+  the same record can show graceful lowering across profiles
+\item
+  the same record can later grow selectors and scenarios without being thrown away
+\end{enumerate}
+
+\section{\texorpdfstring{The problem with \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}}{The problem with }}\label{record-039-the-problem-with-componententry}
+
+Today's showcase contract in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/showcase/types.ts}{examples/showcase/types.ts} is useful, but too compressed:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} is one markdown blob
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{})} is one opaque demo function
+\item
+  graceful lowering is mostly described in prose, not structured
+\item
+  ``when to use / when not to use'' is not first-class data
+\item
+  selectors, scenarios, source snippets, and variant controls have nowhere to live
+\end{itemize}
+
+That means it is good enough for a showcase, but not strong enough to become the substrate for docs, tests, and tooling.
+
+\section{Design goals}\label{record-039-design-goals}
+
+\texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}v\allowbreak{}0} should:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Be structured enough for docs rendering} The docs surface should not have to parse one giant markdown blob to find summary, use, avoid, and lowering guidance.
+\item
+  \textbf{Stay small enough to author by hand} If the schema is too heavy, maintainers will bypass it and drift returns immediately.
+\item
+  \textbf{Support profile-aware demos directly} A story should be able to render itself in \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}.
+\item
+  \textbf{Model variants explicitly} Component families often have more than one canonical configuration worth teaching.
+\item
+  \textbf{Leave room for selectors and scenarios later} v0 should not depend on a selector model or scenario harness, but it should not block them either.
+\end{enumerate}
+
+\section{Non-goals for v0}\label{record-039-non-goals-for-v0}
+
+\texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}v\allowbreak{}0} is not trying to solve:
+
+\begin{itemize}
+\tightlist
+\item
+  every possible interactive scenario
+\item
+  full \texttt{P\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} design
+\item
+  visual editor compatibility
+\item
+  complete replay/assertion semantics
+\item
+  an exhaustive control/knob system
+\item
+  every component in the repo at once
+\end{itemize}
+
+\section{Proposed shape}\label{record-039-proposed-shape}
+
+\begin{CodeBlock}
+type StoryPackage = 'bijou' | 'bijou-tui' | 'bijou-tui-app';
+type StoryMode = 'interactive' | 'static' | 'pipe' | 'accessible';
+
+type StoryPreview = string | Surface;
+
+interface StoryLowering {
+  readonly interactive: string;
+  readonly static: string;
+  readonly pipe: string;
+  readonly accessible: string;
+}
+
+interface StoryDocs {
+  readonly summary: string;
+  readonly useWhen: readonly string[];
+  readonly avoidWhen: readonly string[];
+  readonly relatedFamilies: readonly string[];
+  readonly gracefulLowering: StoryLowering;
+}
+
+interface StoryVariant<State = void> {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly initialState?: State;
+  readonly render: (input: {
+    readonly width: number;
+    readonly ctx: BijouContext;
+    readonly state: State;
+  }) => StoryPreview;
+}
+
+interface StoryProfilePreset {
+  readonly id: string;
+  readonly label: string;
+  readonly mode: StoryMode;
+  readonly width: number;
+}
+
+interface StorySource {
+  readonly examplePath?: string;
+  readonly snippetLabel?: string;
+}
+
+interface ComponentStory<State = void> {
+  readonly kind: 'component';
+  readonly id: string;
+  readonly family: string;
+  readonly title: string;
+  readonly package: StoryPackage;
+  readonly docs: StoryDocs;
+  readonly profilePresets: readonly StoryProfilePreset[];
+  readonly variants: readonly StoryVariant<State>[];
+  readonly source?: StorySource;
+  readonly tags?: readonly string[];
+}
+\end{CodeBlock}
+
+\section{Why this shape}\label{record-039-why-this-shape}
+
+\subsection{\texorpdfstring{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s}}{}}\label{record-039-docs}
+
+This is the biggest difference from \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}.
+
+Instead of one markdown blob, the story has:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{u\allowbreak{}s\allowbreak{}e\allowbreak{}W\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+\item
+  \texttt{a\allowbreak{}v\allowbreak{}o\allowbreak{}i\allowbreak{}d\allowbreak{}W\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}F\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}f\allowbreak{}u\allowbreak{}l\allowbreak{}L\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\end{itemize}
+
+That makes the docs surface renderable without brittle parsing and keeps the design-system doctrine aligned with the story itself.
+
+\subsection{\texorpdfstring{\texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s}}{}}\label{record-039-profilepresets}
+
+This makes profile comparison explicit and small.
+
+v0 should not model every possible runtime knob. It only needs enough to render canonical comparisons:
+
+\begin{itemize}
+\tightlist
+\item
+  one rich preset
+\item
+  one static preset
+\item
+  one pipe preset
+\item
+  one accessible preset
+\end{itemize}
+
+Width is included because graceful lowering is often width-sensitive in terminal UIs.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s}}{}}\label{record-039-variants}
+
+Variants are first-class because many families are not taught well with one demo:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} needs more than one tone
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} may need a simple and structured-body variant
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} may need one text case and one structured case
+\end{itemize}
+
+v0 keeps this minimal:
+
+\begin{itemize}
+\tightlist
+\item
+  label
+\item
+  optional description
+\item
+  optional initial state
+\item
+  render function
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e}}{}}\label{record-039-source}
+
+This stays intentionally light in v0.
+
+The docs app only needs a way to say:
+
+\begin{itemize}
+\tightlist
+\item
+  where the canonical example lives
+\item
+  or what snippet label should be shown
+\end{itemize}
+
+Anything more ambitious can come later with story tooling.
+
+\section{\texorpdfstring{Migration from \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}}{Migration from }}\label{record-039-migration-from-componententry}
+
+The intended mapping is:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}
+ & \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}v\allowbreak{}0}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{i\allowbreak{}d} & \texttt{i\allowbreak{}d} \\
+\texttt{n\allowbreak{}a\allowbreak{}m\allowbreak{}e} & \texttt{t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} \\
+\texttt{s\allowbreak{}u\allowbreak{}b\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} & \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} \\
+\texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t} {i\allowbreak{}n\allowbreak{}t\allowbreak{}o} \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}*} {f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d\allowbreak{}s} \\
+\texttt{p\allowbreak{}k\allowbreak{}g} & \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e} \\
+\texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{})} & \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}[\allowbreak{}0\allowbreak{}]\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} \\
+\texttt{t\allowbreak{}i\allowbreak{}e\allowbreak{}r} & {d\allowbreak{}r\allowbreak{}o\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {v\allowbreak{}0} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{};} {t\allowbreak{}h\allowbreak{}i\allowbreak{}s} {i\allowbreak{}s} {s\allowbreak{}h\allowbreak{}o\allowbreak{}w\allowbreak{}c\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h} {m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{},} {n\allowbreak{}o\allowbreak{}t} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {t\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h} \\
+\end{longtable}
+}
+
+The important design choice here is dropping \texttt{t\allowbreak{}i\allowbreak{}e\allowbreak{}r} from the canonical story model.
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}i\allowbreak{}e\allowbreak{}r} is about embedding/showcase ergonomics
+\item
+  it is not a core truth about the component family itself
+\item
+  if a future workbench needs it, it can layer that on top instead of contaminating the story substrate
+\end{itemize}
+
+\section{Recommended first stories}\label{record-039-recommended-first-stories}
+
+The first v0 stories should cover three different teaching problems:
+
+\subsection{\texorpdfstring{1. \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}}{1.  / }}\label{record-039-alert-note}
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  low interaction complexity
+\item
+  clear graceful lowering
+\item
+  easy to render side-by-side
+\end{itemize}
+
+What they validate:
+
+\begin{itemize}
+\tightlist
+\item
+  structured docs fields
+\item
+  simple profile comparison
+\item
+  variant support
+\end{itemize}
+
+\subsection{\texorpdfstring{2. \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}}{2.  / }}\label{record-039-modal-drawer}
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  structured overlay content
+\item
+  clearer ``use vs avoid'' doctrine
+\item
+  richer TUI-only behavior without requiring a full app shell
+\end{itemize}
+
+What they validate:
+
+\begin{itemize}
+\tightlist
+\item
+  surface-native story previews
+\item
+  overlay-family doctrine in structured form
+\item
+  more than one meaningful variant
+\end{itemize}
+
+\subsection{\texorpdfstring{3. \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{3.  or }}\label{record-039-viewportsurface-or-navigabletablesurface}
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  tests a component whose value is not just appearance but behavior and composition
+\end{itemize}
+
+What they validate:
+
+\begin{itemize}
+\tightlist
+\item
+  structured TUI docs can still describe behavior honestly
+\item
+  the docs surface can present width-sensitive behavior
+\item
+  later selector/scenario integration has a real target
+\end{itemize}
+
+\section{Open questions}\label{record-039-open-questions}
+
+These are intentionally deferred, but should stay visible:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Should \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} carry source snippets directly, or only references to example files?
+\item
+  Should \texttt{f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y} be a free string in v0, or a stricter id shared with the design-system docs?
+\item
+  Should profile presets live on the story, or should the docs app own the canonical presets globally?
+\item
+  Should \texttt{P\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} share a common base with \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, or be defined independently later?
+\end{enumerate}
+
+\section{Recommended implementation sequence}\label{record-039-recommended-implementation-sequence}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define the v0 type in code without promising permanence.
+\item
+  Author three canonical stories by hand.
+\item
+  Build the first docs surface around those stories.
+\item
+  Only after that, revisit selectors and scenarios.
+\end{enumerate}
+
+That order matters because the immediate question is not ``what is the perfect schema?'' It is ``can one structured story record actually replace duplicated docs/demo truth?''
+

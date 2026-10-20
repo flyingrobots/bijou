@@ -1,0 +1,302 @@
+\chapter{Bijou Design System}\label{record-017}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/README.md}\par}\smallskip
+
+Bijou now has enough surface area that ``here are the exports'' is no longer a good documentation strategy.
+
+This section defines the design language behind the library:
+
+\begin{itemize}
+\tightlist
+\item
+  the foundations that shape the UI
+\item
+  the token vocabulary that turns color doctrine into API rules
+\item
+  the interaction and layout patterns that recur across apps
+\item
+  the component families and their intended jobs
+\item
+  the policy for visualizing data instead of guessing ad hoc each time
+\end{itemize}
+
+This is deliberately closer to Carbon than to an API reference.
+
+\section{What this section is for}\label{record-017-what-this-section-is-for}
+
+Use these docs when you need to answer:
+
+\begin{itemize}
+\tightlist
+\item
+  What problem does this component family solve?
+\item
+  Which variation should I use?
+\item
+  Which token family should this component use?
+\item
+  When should I choose one component over another?
+\item
+  When should I avoid this component entirely?
+\item
+  Does this belong in core \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} or in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}?
+\item
+  How should this degrade across interactive, static, pipe, and accessible runs?
+\item
+  What is the terminal-first equivalent of a desktop/web design-system pattern?
+\end{itemize}
+
+\section{Read in this order}\label{record-017-read-in-this-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/foundations.md}{Foundations}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-tokens.md}{Theme Token Vocabulary}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-authoring.md}{Theme Authoring Guide}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-rule-recipes.md}{Theme Rule Recipes}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/patterns.md}{Patterns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/blocks.md}{Blocks}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/pointer.md}{Pointer and Mouse Policy}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/component-families.md}{Component Families}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/data-visualization.md}{Data Visualization Policy}
+\end{enumerate}
+
+For the raw inventory and taxonomy work behind these docs, see \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/archive/component-system-audit.md}{../archive/component-system-audit.md}.
+
+\section{Core system ideas}\label{record-017-core-system-ideas}
+
+\subsection{Bijou is not just a component library}\label{record-017-bijou-is-not-just-a-component-library}
+
+Bijou is made of five layers:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Foundations}
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  color, spacing rhythm, text hierarchy, overflow, motion, focus, interruption
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \textbf{Theme vocabulary}
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  canonical token families and first-party usage rules
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  \textbf{Patterns}
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  status, selection, browsing, overlays, forms, shell composition
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  \textbf{Component families}
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  specific primitives that implement those patterns
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  \textbf{Blocks}
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  reusable product-level assemblies such as app frames, settings flows, and guided workflows
+\end{itemize}
+
+Components and blocks should be downstream of the first three layers. If the design language is weak, the component catalog and block library both become noisy no matter how many exports exist.
+
+\subsection{Core versus TUI ownership}\label{record-017-core-versus-tui-ownership}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} owns semantics that survive degradation.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} owns focus, motion, overlays, shell behavior, scrolling, history, and other lifecycle-heavy interactions.
+\end{itemize}
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} belongs in core.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} belongs in TUI.
+\item
+  notifications belong in TUI because they are a system, not just a rendering.
+\end{itemize}
+
+\subsection{Variations are not all equal}\label{record-017-variations-are-not-all-equal}
+
+Bijou uses three kinds of variation:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{semantic variants}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    for example status tone or severity
+  \end{itemize}
+\item
+  \textbf{interaction-layer variants}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    for example \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} versus \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  \textbf{render-path variants}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    for example \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} versus \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\end{itemize}
+
+Only the first kind is a ``visual variant'' in the usual design-system sense. The other two exist because Bijou has to survive different interaction and rendering layers.
+
+\subsection{Graceful lowering is a first-class design constraint}\label{record-017-graceful-lowering-is-a-first-class-design-constraint}
+
+Every family should answer:
+
+\begin{itemize}
+\tightlist
+\item
+  What does this look like in a rich interactive terminal?
+\item
+  What remains true in static CI output?
+\item
+  What remains true in pipe mode?
+\item
+  What becomes simpler in accessible mode?
+\end{itemize}
+
+If a component cannot answer that question, it probably belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}, not in core.
+
+\section{Carbon-style documentation standard}\label{record-017-carbon-style-documentation-standard}
+
+Every mature component-family page in Bijou should include:
+
+\begin{itemize}
+\tightlist
+\item
+  What it is
+\item
+  Variations
+\item
+  When to use
+\item
+  When not to use
+\item
+  Content guidance
+\item
+  Interaction ownership
+\item
+  Graceful lowering path
+\item
+  Related families
+\item
+  Closest Carbon analogue
+\end{itemize}
+
+The component-family guide now meets this structural baseline and its structure is checked by a repo preflight script. That preflight is intentionally structural: it verifies required family sections and graceful-lowering mode coverage inside the family guide. Semantic accuracy, package/example doc drift, and touched-component doc completeness are still review responsibilities, not something the current script can prove automatically.
+
+\section{Component-change gate}\label{record-017-component-change-gate}
+
+From the v4 pure-surface cleanup onward, any component-family change should be evaluated against the docs in the same slice.
+
+For every component or component family touched, verify:
+
+\begin{itemize}
+\tightlist
+\item
+  documentation exists
+\item
+  documented variants are current
+\item
+  \texttt{W\allowbreak{}h\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}u\allowbreak{}s\allowbreak{}e} guidance is present and still accurate
+\item
+  \texttt{W\allowbreak{}h\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}u\allowbreak{}s\allowbreak{}e} guidance is present and still accurate
+\item
+  core-versus-TUI ownership is explicit
+\item
+  graceful lowering is documented across \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} when applicable
+\item
+  related families are listed
+\end{itemize}
+
+The CI preflight enforces the structural minimum for the family guide. If any of the broader checks below are missing or materially wrong, the docs are still incomplete and that gap should be fixed in the same slice or explicitly logged as backlog debt before the work is considered done.
+
+\section{Current gaps this section is meant to close}\label{record-017-current-gaps-this-section-is-meant-to-close}
+
+Bijou is already strong on breadth and runtime architecture. The weaker parts are:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit usage guidance
+\item
+  family-level documentation
+\item
+  documentation completeness against the standard defined above
+\item
+  pattern-level decision support
+\item
+  data-visualization doctrine
+\item
+  mouse and multi-input policy
+\end{itemize}
+
+These docs exist to correct that.
+

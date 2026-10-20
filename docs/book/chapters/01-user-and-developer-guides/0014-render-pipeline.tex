@@ -1,0 +1,297 @@
+\chapter{Render Pipeline Guide}\label{record-014}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/guides/render-pipeline.md}\par}\smallskip
+
+The render pipeline in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} is a deterministic, stage-ordered execution chain.
+
+It runs as:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}
+\item
+  \texttt{P\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{D\allowbreak{}i\allowbreak{}f\allowbreak{}f}
+\item
+  \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}
+\end{enumerate}
+
+\section{Default Runtime Wiring}\label{record-014-default-runtime-wiring}
+
+\texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} installs middleware in this fixed stage order:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}: call \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})} and produce the layout output.
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}: apply motion reconciliation.
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}: apply BCSS middleware when \texttt{o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}s\allowbreak{}s} is present.
+\item
+  \texttt{P\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t}: paint the resolved layout tree into \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  \texttt{D\allowbreak{}i\allowbreak{}f\allowbreak{}f}: compute terminal diff and fill \texttt{o\allowbreak{}u\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}f}.
+\item
+  \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}: emit diff and swap framebuffers.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{})} if provided by the caller.
+\end{enumerate}
+
+Custom middleware runs after the built-ins in the same stage and cannot change stage ordering.
+
+\section{Default and Custom Stage Contract}\label{record-014-default-and-custom-stage-contract}
+
+Use \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when your middleware belongs to one of these five stages:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}: inspect or rewrite \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} trees.
+\item
+  \texttt{P\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t}: mutate \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} by painting extra marks directly.
+\item
+  \texttt{P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}: apply surface-wide shaders or instrumentation before diff.
+\item
+  \texttt{D\allowbreak{}i\allowbreak{}f\allowbreak{}f}: adjust output encoding just before emit (advanced usage).
+\item
+  \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}: run end-of-frame side-effects after terminal write and swap.
+\end{itemize}
+
+\section{Inter-Stage Data Contracts}\label{record-014-inter-stage-data-contracts}
+
+A \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} instance is shared across all middleware for a single frame. The key shared state channels are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}: current model value for this frame.
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}a\allowbreak{}p}: geometry metadata for resolved nodes.
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}t\allowbreak{}a}: unstructured scratchbag intended for middleware communication.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t} via \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a}}{ via }}\label{record-014-layoutroot-via-renderstate.data}
+
+In current runtime code, the \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} stage places the resolved layout tree in \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}[\allowbreak{}'\allowbreak{}\_\allowbreak{}\_\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}:\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}'\allowbreak{}]}.
+
+That object is then consumed by \texttt{m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}M\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}(\allowbreak{})} in later stages.
+
+Recommended access pattern for custom middleware:
+
+\begin{itemize}
+\tightlist
+\item
+  Read and write your own namespaced keys, for example:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}[\allowbreak{}'\allowbreak{}m\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}:\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}'\allowbreak{}]}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}[\allowbreak{}'\allowbreak{}m\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}:\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}'\allowbreak{}]}
+  \end{itemize}
+\end{itemize}
+
+This avoids private runtime keys and avoids coupling across feature layers.
+
+The built-in layout keys are intentionally not part of your public app contract.
+
+\subsection{LayoutMap Semantics}\label{record-014-layoutmap-semantics}
+
+\texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}a\allowbreak{}p} is currently populated with keyed geometry for internal systems such as a11y overlays, layout debugging, and event routing.
+
+If you need layout geometry from custom middleware, guard key lookups and treat missing values as an expected pre-layout state.
+
+\section{Framebuffer Flip Model (Current Surface Truth)}\label{record-014-framebuffer-flip-model-current-surface-truth}
+
+\texttt{D\allowbreak{}i\allowbreak{}f\allowbreak{}f} compares:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: the previous visible surface
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: the next surface under construction
+\end{itemize}
+
+After \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} runs, the runtime flips the internal buffers.
+
+The conceptual model is:
+
+\begin{CodeBlock}
+before Output:   currentSurface is frame N, targetSurface is frame N+1
+after Output:    currentSurface is frame N+1, targetSurface becomes previous frame N
+\end{CodeBlock}
+
+That means middleware appended to \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} after swap must not assume that \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} still points at the old frame unless it reads it before invoking default output semantics.
+
+In practical terms:
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} for diff inputs and visibility of the previous frame.
+\item
+  Use \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} as the paint target for the frame currently being built.
+\item
+  Do not retain references across frames outside \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}/\texttt{P\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t} middleware.
+\end{itemize}
+
+\section{Why the Pipeline Is Synchronous}\label{record-014-why-the-pipeline-is-synchronous}
+
+The pipeline is synchronous by design to keep frame cost measurable and predictable.
+
+Bijou's TEA runtime calls \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})} for a frame. That full-model render is intentional: state is explicit, the frame can be reproduced from one model snapshot, and tests can ask ``what would this model render?'' without replaying hidden mutations.
+
+The tradeoff is that expensive view work is paid on every rendered frame. Keep \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} pure and bounded:
+
+\begin{itemize}
+\tightlist
+\item
+  store durable app facts in the model,
+\item
+  derive only the visible slice needed for the current frame,
+\item
+  cache expensive non-visual preparation outside \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} when the model changes,
+\item
+  use commands for IO, timers, and other async work.
+\end{itemize}
+
+If each stage can run with bounded synchronous cost, the frame time budget is:
+
+\begin{CodeBlock}
+frameCost = layout + paint + postProcess + diff + output + middlewareOverhead
+\end{CodeBlock}
+
+If an asynchronous stage is inserted without careful partitioning, total frame cost becomes:
+
+\begin{CodeBlock}
+frameCost = layout + paint + postProcess + await(someAsyncIO) + diff + output
+\end{CodeBlock}
+
+That removes a strict per-frame budget and can stall rendering on unrelated IO.
+
+The architectural rule is therefore:
+
+\begin{itemize}
+\tightlist
+\item
+  Keep rendering synchronous and deterministic.
+\item
+  Move async work into commands.
+\item
+  Receive async results as messages, then update model and re-render.
+\end{itemize}
+
+Runtime diagnostics enforce that posture. If a render middleware returns a Promise, Bijou writes a pipeline diagnostic, keeps the current frame moving, and ignores any late \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} call for stage ordering. A rejected async middleware Promise is also reported through the pipeline error channel. The diagnostic is not a supported async render mode; it is a guardrail for finding accidental \texttt{a\allowbreak{}s\allowbreak{}y\allowbreak{}n\allowbreak{}c} middleware before it turns into frame latency or out-of-order painting.
+
+\section{Worked Example}\label{record-014-worked-example}
+
+The runtime pipeline supports middleware insertion points that preserve the fixed stage ordering.
+
+\begin{CodeBlock}
+import { run } from '@flyingrobots/bijou-tui';
+
+run(app, {
+  configurePipeline(pipeline) {
+    pipeline.use('PostProcess', (state, next) => {
+      state.targetSurface.set(0, 0, { char: 'X', empty: false });
+      next();
+    });
+  },
+});
+\end{CodeBlock}
+
+Because this middleware is registered before app execution, it runs on every frame after all built-ins for \texttt{P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} and before default diffing.
+
+\section{Timing Hooks}\label{record-014-timing-hooks}
+
+You can observe per-stage timings from middleware.
+
+\begin{CodeBlock}
+import { getRenderStageTimings, run } from '@flyingrobots/bijou-tui';
+
+run(app, {
+  configurePipeline(pipeline) {
+    pipeline.onStageComplete((stage, durationMs, state) => {
+      console.log(stage, durationMs);
+      console.log(getRenderStageTimings(state));
+    });
+  },
+});
+\end{CodeBlock}
+
+Notes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} fires once per stage, in fixed stage order.
+\item
+  \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{})} returns timings captured for that frame.
+\item
+  The timings array is replaced on every \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}x\allowbreak{}e\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{})} call.
+\item
+  Empty stages are represented in timing output.
+\end{itemize}
+
+\section{\texorpdfstring{\texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} Reference}{ Reference}}\label{record-014-renderstate-reference}
+
+The public shape is:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}: read by convention in rendering.
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x}: active \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}.
+\item
+  \texttt{d\allowbreak{}t}: wall time delta in seconds.
+\item
+  \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: previous frame surface, normally treated as read-only.
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: current frame paint surface.
+\item
+  \texttt{o\allowbreak{}u\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}f}: optional UTF-8 output buffer for default diff stage.
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}a\allowbreak{}p}: geometry metadata map.
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}t\allowbreak{}a}: middleware coordination bag.
+\end{itemize}
+
+\texttt{d\allowbreak{}a\allowbreak{}t\allowbreak{}a} is also where layout root and per-frame timing metadata are held.
+
+\section{Stage Failure Semantics}\label{record-014-stage-failure-semantics}
+
+A middleware exception does not kill the app immediately.
+
+\begin{itemize}
+\tightlist
+\item
+  The exception is routed through the same diagnostics path as other runtime faults.
+\item
+  The frame may render partially or degrade for that tick.
+\item
+  Rendering continues so the app remains recoverable and operational.
+\end{itemize}
+
+If your custom middleware must fail fast, emit a command or message to transition into an intentional error state during \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+
+\section{Read Next}\label{record-014-read-next}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{Layout Localization Pipeline}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\end{itemize}
+

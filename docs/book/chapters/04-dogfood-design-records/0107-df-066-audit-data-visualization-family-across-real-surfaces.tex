@@ -1,0 +1,145 @@
+\chapter{DF-066 Audit data visualization family across real surfaces}\label{record-107}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-066-audit-data-visualization-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-066 Audit data visualization family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - visualization
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-107-framing}
+
+The data visualization family proves that Bijou can render dense numeric signals without making glyph art the only source of truth. \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, and \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} should use rich terminal geometry when available, then lower to explicit numeric summaries when visual density is unavailable.
+
+This audit verifies the existing DOGFOOD data visualization stories against real story rendering, component-family doctrine, and mode-aware lowerings. It does not redesign charting; it turns current data-viz runtime truth into executable release proof.
+
+\section{Sponsored Users}\label{record-107-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors building dashboards, performance overlays, and status summaries from first-party visualization blocks.
+\item
+  Docs readers checking what happens when Unicode blocks, Braille cells, borders, and color are not meaningful output channels.
+\item
+  Maintainers who need one focused regression tying data-viz story metadata, variants, and component-family guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-107-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see when to use inline trends, dense area charts, metric panels, or the prebuilt performance overlay.
+\item
+  A reader can switch every data-viz story through interactive, static, pipe, and accessible profiles while preserving the numeric facts behind the visual shape.
+\item
+  A maintainer can run one cycle test that proves data-viz story metadata and design-system guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-107-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the data visualization family through all four shipped stories?
+\item
+  Do variants cover inline sparklines, fixed ranges, Braille charts, metric panels, and performance overlays?
+\item
+  Do rich/static previews preserve terminal-native visual density?
+\item
+  Do pipe lowerings replace visual density with explicit numeric summaries?
+\item
+  Do accessible lowerings describe the same trend and metric facts in reading order?
+\item
+  Do component-family docs still position the family as informative numeric visualization rather than decoration?
+\end{itemize}
+
+\section{Requirements}\label{record-107-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing story identities: \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}, \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}, and \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}.
+\item
+  Keep the shared \texttt{d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} coverage family id.
+\item
+  Render every data-viz story variant in every canonical story profile.
+\item
+  Treat block glyphs, Braille glyphs, and borders as visual-profile affordances only.
+\item
+  Keep pipe and accessible lowerings numeric-fact-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-107-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}6\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates all four DOGFOOD data-viz stories and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output preserves the expected visual affordance for each story.
+\item
+  Pipe and accessible output do not depend on block or Braille glyphs.
+\item
+  Pipe and accessible output preserve sample counts, ranges, latest values, trend notes, metric labels, and performance facts.
+\item
+  Component-family docs retain numeric trend, chart, metric panel, performance overlay, fixed-axis, pipe, and accessible guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-107-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-066 cycle test that renders all data-viz DOGFOOD stories through the shared story protocol.
+\item
+  Read-test the data visualization section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-107-drift-check}
+
+No runtime drift was found in this slice. The existing data visualization stories already render visual glyph density in interactive/static profiles, lower sparkline and Braille previews to numeric summaries in pipe mode, and linearize metric and performance summaries in accessible mode.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-107-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-066 playback test tied all shipped data-viz stories to every canonical profile.
+\item
+  GREEN: the new cycle test renders all \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}, \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}, and \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve block, Braille, or boxed metric affordances as appropriate.
+\item
+  Pipe previews preserve numeric summaries without block or Braille glyphs.
+\item
+  Accessible previews linearize the same metric and trend facts in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-107-retrospective}
+
+The visualization components did not need runtime changes. The useful release work was proving that visual density is backed by data facts, so future block and layout work can reuse these components without treating charts as opaque terminal art.
+

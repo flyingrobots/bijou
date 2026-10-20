@@ -1,0 +1,54 @@
+\chapter{RE-026 --- Drain runtime commands before shutdown}\label{record-384}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-026-drain-runtime-commands-before-shutdown.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-026 — Drain runtime commands before shutdown
+legend: RE
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-384-disposition}
+
+Completed on 2026-04-14 via commit fixing runtime shutdown drain semantics and bounded timeout behavior. Implementation landed in a follow-up commit after the 2026-04-14 audit and passed runtime-focused tests plus full release-readiness validation.
+
+\section{Original Proposal}\label{record-384-original-proposal}
+
+The runtime still exits without awaiting \texttt{b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{})}, which leaves async command cleanup timing less deterministic than it should be.
+
+\section{Problem}\label{record-384-problem}
+
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} tears down the session and disposes the bus after quit, but it does not explicitly wait for pending command work to drain. \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} already exposes \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{})}, and the driver uses it, but the production runtime does not.
+
+This creates a gap between test/runtime semantics: - tests can wait for pending command work deterministically - the real runtime can dispose while cleanup work is still in flight
+
+\section{Desired outcome}\label{record-384-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Make runtime shutdown await \texttt{b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{})} before final disposal.
+\item
+  Keep shutdown bounded with a timeout or other guard so the app cannot hang forever on a misbehaving command.
+\item
+  Add focused tests for long-lived commands that register cleanups asynchronously.
+\item
+  Preserve the current fast path for already-idle apps.
+\end{enumerate}
+
+\section{Why ASAP}\label{record-384-why-asap}
+
+\begin{itemize}
+\tightlist
+\item
+  This is one of the last concrete ship-readiness concerns left after the release gauntlet turned green.
+\item
+  The code already has most of the needed primitives; the gap is mostly runtime integration and proof.
+\end{itemize}
+
+\section{Hill}\label{record-384-hill}
+
+Quit semantics are deterministic: pending commands either drain cleanly before teardown or fail through one explicit, observable timeout path.
+

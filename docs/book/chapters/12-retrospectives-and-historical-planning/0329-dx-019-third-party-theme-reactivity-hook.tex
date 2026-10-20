@@ -1,0 +1,29 @@
+\chapter{DX-019 --- Third-Party Theme Reactivity Hook}\label{record-329}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-019-third-party-theme-reactivity-hook.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-329-problem}
+
+Bijou's theme/token system is strong inside core components, but third-party component authors do not have a clearly supported way to react to theme changes. Today this often falls back to manual context cloning or ambient-default assumptions.
+
+The 2026-04-11 code-quality audit explicitly called out the lack of a supported subscription path for external components.
+
+\section{Desired outcome}\label{record-329-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define a public reactivity seam for theme/token updates.
+\item
+  Decide whether that seam is a direct \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}(\allowbreak{})} export, a context-level wrapper, or a narrower theme-change subscription contract.
+\item
+  Document how third-party components should observe theme changes without mutating context or relying on private internals.
+\end{enumerate}
+
+\section{Effort}\label{record-329-effort}
+
+Medium --- public API design plus advanced-guide documentation.
+

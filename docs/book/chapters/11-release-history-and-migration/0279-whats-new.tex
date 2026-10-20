@@ -1,0 +1,82 @@
+\chapter{What's New in Bijou 4.4.1}\label{record-279}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.4.1/whats-new.md}\par}\smallskip
+
+\section{Framed Shell Backgrounds Render Correctly Again}\label{record-279-framed-shell-backgrounds-render-correctly-again}
+
+Bijou 4.4.1 fixes the \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} background-fill regression introduced in 4.4.0 and extends the fix to the stock shell chrome. Apps that set a custom \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g} could lose that body background when pane content, gutters, scrollbars, split dividers, or other frame-owned surfaces were rendered, causing the terminal default background to show through. The stock header and footer rows could also fall back to black when BCSS did not provide explicit shell backgrounds.
+
+\subsection{What changed}\label{record-279-what-changed}
+
+\begin{itemize}
+\tightlist
+\item
+  The frame body is now explicitly filled with the primary surface background before pane composition.
+\item
+  Pane surfaces stamp that background into otherwise unstyled cells before blitting, so plain text and blank cells inherit the intended body fill.
+\item
+  Gutter, scrollbar, split-divider, minimized-pane, and missing-grid placeholder writes now preserve an existing background instead of wiping it.
+\item
+  The stock header and footer rows now inherit the resolved frame background when shell-specific BCSS background rules are absent.
+\end{itemize}
+
+\subsection{What this means for app authors}\label{record-279-what-this-means-for-app-authors}
+
+If your app themes \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}, the framed shell should now render that color consistently across both the workspace body and the shell chrome.
+
+\section{\texorpdfstring{\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} Gets Stock Shell Themes}{ Gets Stock Shell Themes}}\label{record-279-createframedapp-gets-stock-shell-themes}
+
+\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} now supports opt-in, frame-owned shell theme cycling:
+
+\begin{CodeBlock}
+let currentCtx = ctx;
+const getCurrentCtx = () => currentCtx;
+const initialModel = {};
+
+const app = createFramedApp({
+  ctx: currentCtx,
+  shellThemes: [
+    { id: 'default', label: 'Default', theme: defaultTheme },
+    { id: 'verdant-plum', label: 'Verdant Plum', theme: plumTheme },
+  ],
+  onShellThemeChange: ({ ctx: nextCtx }) => {
+    currentCtx = nextCtx;
+  },
+  pages: [{
+    id: 'home',
+    title: 'Home',
+    init: () => [initialModel, []],
+    update: (msg, model) => [model, []],
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'main',
+      render: (width, height) => renderHome(getCurrentCtx(), model, width, height),
+    }),
+  }],
+});
+\end{CodeBlock}
+
+When \texttt{s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} are provided:
+
+\begin{itemize}
+\tightlist
+\item
+  the frame pre-resolves those themes once against the provided Bijou context, or the active default context when \texttt{c\allowbreak{}t\allowbreak{}x} is omitted
+\item
+  the stock settings drawer gets a built-in shell-theme choice row when two or more shell themes are available
+\item
+  the current selection is exposed as \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}d}
+\end{itemize}
+
+If your page renderers read from an explicit app-owned \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}, pass that context to \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{} \allowbreak{}\}\allowbreak{})}, mirror \texttt{o\allowbreak{}n\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e} back into your app state, and make your page renderers read the updated context on each render so the frame shell and page content stay on one theme source of truth. Apps that rely on the ambient default context can omit that wiring; the frame updates the default context when the stock shell theme changes.
+
+DOGFOOD now uses that shared frame-owned state so the title screen and docs explorer stay on one theme setting instead of drifting into mixed landing/app themes. The release also adds the new \texttt{V\allowbreak{}e\allowbreak{}r\allowbreak{}d\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}P\allowbreak{}l\allowbreak{}u\allowbreak{}m} palette used to prove the background-fill fix visually.
+
+\section{Quit Confirm Accepts Uppercase Input}\label{record-279-quit-confirm-accepts-uppercase-input}
+
+The stock shell quit dialog now accepts uppercase \texttt{Y} and \texttt{N} in addition to lowercase \texttt{y} and \texttt{n}. This does not change the overall quit policy or the existing \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r}, \texttt{E\allowbreak{}s\allowbreak{}c}, and \texttt{q} behavior.
+
+\section{Compatibility}\label{record-279-compatibility}
+
+Bijou 4.4.1 is a backwards-compatible patch release. The new framed shell theme support is optional.
+

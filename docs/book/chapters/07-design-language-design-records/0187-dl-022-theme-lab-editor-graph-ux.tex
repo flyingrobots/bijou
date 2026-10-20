@@ -1,0 +1,209 @@
+\chapter{DL-022 - Theme Lab Editor Graph UX}\label{record-187}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-022-theme-lab-editor-graph-ux.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DL-022
+title: Theme Lab Editor Graph UX
+status: active
+lane: asap
+priority: high
+github_issue: 450
+legend: DL
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-187-decision-summary}
+
+DL-019 and DL-020 made theme rule provenance inspectable, and DL-021 made the DOGFOOD Theme Inspector prove that its chrome consumes active theme tokens. The Theme Lab still reads like a static reference page. This cycle turns it into a bounded editor surface with visible controls and a live token graph that updates from the same in-memory draft theme when a color changes.
+
+The runtime truth for this slice is:
+
+\begin{CodeBlock}
+active DOGFOOD shell theme
+  -> editable DOGFOOD-local draft
+    -> selected editable color slot
+      -> derived theme token rows
+        -> live token relationship graph
+\end{CodeBlock}
+
+No external design-token package or design-book dependency is added. The useful idea is the relationship graph and immediate feedback loop, implemented through Bijou's existing theme and terminal surface contracts.
+
+\section{Sponsored Human}\label{record-187-sponsored-human}
+
+A DOGFOOD user opening \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} wants something that behaves like an editor, not a read-only list. They need a focused color row, obvious keyboard controls, a current hex value, and a graph that changes when the color changes.
+
+\section{Sponsored Agent}\label{record-187-sponsored-agent}
+
+An agent auditing theme behavior needs deterministic model functions and scripted preview tests that prove a color edit updates the editor state, rendered token values, and graph rows in the same frame.
+
+\section{Hill}\label{record-187-hill}
+
+Theme Lab exposes a first editing pass for active DOGFOOD theme colors. A user can move between editable colors, nudge RGB channels, reset the draft, and see a live graph of token relationships and changed colors without leaving the docs shell.
+
+\section{Playback Questions}\label{record-187-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the Theme Lab show editing affordances rather than only static swatches?
+\item
+  Can the selected editable row move deterministically with keyboard input?
+\item
+  Does changing a channel update the selected hex value and the rendered token graph in the same frame?
+\item
+  Does reset restore the draft graph to the active theme values?
+\item
+  Are all new visible labels catalog-backed?
+\end{itemize}
+
+\section{Scope}\label{record-187-scope}
+
+Included:
+
+\begin{itemize}
+\tightlist
+\item
+  a DOGFOOD-local theme draft model that clones the active shell theme
+\item
+  editable rows for a bounded set of high-signal tokens
+\item
+  deterministic key handling for selection, channel choice, nudging, and reset
+\item
+  a live graph renderer that shows token nodes, dependency edges, and edited nodes from the current draft
+\item
+  deterministic invalid-input handling: RGB channel nudges clamp to \texttt{0\allowbreak{}.\allowbreak{}.\allowbreak{}2\allowbreak{}5\allowbreak{}5}, unsupported keys are ignored, and this first pass exposes no free-form hex parser that could accept malformed color text
+\item
+  focused preview tests for editing state and graph updates
+\item
+  changelog and DOGFOOD i18n catalog updates
+\end{itemize}
+
+Out of scope:
+
+\begin{itemize}
+\tightlist
+\item
+  saving custom themes to disk
+\item
+  mutating exported preset constants
+\item
+  importing or integrating design-book
+\item
+  mouse or pointer editing
+\item
+  full authoring for every third-party preset
+\item
+  replacing \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h}, \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}, or the existing DOGFOOD shell theme model
+\end{itemize}
+
+\section{Runtime Contract}\label{record-187-runtime-contract}
+
+The editor state is owned by the DOGFOOD docs model. It is not a global theme registry and it does not mutate \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}A\allowbreak{}R\allowbreak{}K}, \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}L\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}T}, or shell theme constants.
+
+The renderer must consume one draft object for all Theme Lab editor output:
+
+\begin{itemize}
+\tightlist
+\item
+  editor row swatches
+\item
+  selected color hex
+\item
+  channel values
+\item
+  graph nodes
+\item
+  graph edges
+\item
+  palette preview rows
+\end{itemize}
+
+If a color changes, the graph changes because it is projected from the draft theme, not because the graph keeps its own color cache.
+
+This slice does not feed the draft into \texttt{C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} or replace the runtime \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} exposed by \texttt{C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t}. The docs shell still observes the active runtime theme through the normal context path, while Theme Lab builds a local presentation graph from the unsaved draft. That keeps third-party \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} guidance intact: unsaved editor previews are local to Theme Lab, and any future persisted theme must re-enter the canonical context and token-graph path.
+
+\section{Editable Slots}\label{record-187-editable-slots}
+
+The first pass edits a deliberately small set of active DOGFOOD runtime tokens:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}
+\end{itemize}
+
+Those slots are enough to prove text, surface, border, cursor, and status feedback without pretending this is a full theme persistence product.
+
+\section{Graph Shape}\label{record-187-graph-shape}
+
+The graph is textual and terminal-native. It should show:
+
+\begin{itemize}
+\tightlist
+\item
+  token path
+\item
+  current hex or foreground/background pair
+\item
+  edited marker when the draft differs from the active theme
+\item
+  dependency-style edges for major families, such as:
+\end{itemize}
+
+\begin{CodeBlock}
+semantic.accent #7aa7e8 *
+  -> border.secondary
+  -> ui.cursor
+  -> ui.focusGutter
+surface.primary.bg #171827
+  -> surface.primary
+  -> ui.focusGutter.bg
+\end{CodeBlock}
+
+\texttt{A\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}B} means the preview treats \texttt{B} as a consumer or dependent of editable source \texttt{A}. It does not mean runtime derivation has been committed to \texttt{C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h}.
+
+The graph is not renderer provenance. It explains theme-token relationships and draft changes only.
+
+\section{Lower Modes}\label{record-187-lower-modes}
+
+Swatches are optional visual assistance. The selected row, current hex, RGB channels, edited marker, graph node names, and graph edge labels remain visible as text.
+
+\section{Localization Posture}\label{record-187-localization-posture}
+
+All new Theme Lab labels, control hints, and graph section headings are DOGFOOD catalog keys in every supported runtime locale. Token paths and hex values are developer identifiers and are not localized. English \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t} fallbacks are permitted as developer scaffolding and runtime resilience only; generated catalog entries for the new keys must still exist before merge.
+
+\section{Tests To Write First}\label{record-187-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a pure editor-model test proving selection, channel nudge, and reset behavior
+\item
+  a graph projection test proving an edited token is marked and carries the new hex value
+\item
+  a same-frame coherence test proving a channel nudge updates the selected hex and the rendered graph node from the same draft state
+\item
+  a DOGFOOD preview test proving Theme Lab renders editor controls and the live graph after scripted key input
+\end{itemize}
+
+\section{Closeout Notes}\label{record-187-closeout-notes}
+
+Close this cycle when the focused Theme Lab tests, DOGFOOD i18n gates, Code Dojo changed-file gates, lint, and relevant preview checks are green. The PR summary should explicitly name the before/after behavior: static reference page to editable color lab with live graph feedback.
+

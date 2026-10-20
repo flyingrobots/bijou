@@ -1,0 +1,196 @@
+\chapter{WF-161 Respecting the Dojo Ratchet 262}\label{record-243}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-161-respecting-dojo-ratchet-262.md}\par}\smallskip
+
+\section{Decision Summary}\label{record-243-decision-summary}
+
+Cut \texttt{1\allowbreak{}0\allowbreak{}0} counted Code Dojo debt items from the merged \texttt{3\allowbreak{}6\allowbreak{}2} baseline and land the next Respecting the Dojo goalpost at \texttt{2\allowbreak{}6\allowbreak{}2} aggregate violations or lower.
+
+\section{Hill}\label{record-243-hill}
+
+The repository has zero ESLint and mock-ban debt, but it still carries broad file/context and code-size debt. This cycle removes a large chunk of that debt without weakening the standards: oversized test/spec files are decomposed into threshold-sized deterministic specs, and the ledgers are ratcheted down to the live count.
+
+\section{Current Truth}\label{record-243-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt: \texttt{3\allowbreak{}6\allowbreak{}2}
+\item
+  File/context baseline: \texttt{3\allowbreak{}0\allowbreak{}8}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline: \texttt{5\allowbreak{}4}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Required target for this cycle: \texttt{2\allowbreak{}6\allowbreak{}2} aggregate violations or lower
+\item
+  Tracker issue: \#437
+\end{itemize}
+
+\section{Scope}\label{record-243-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Split \texttt{9\allowbreak{}1} over-threshold test/spec files into grouped sub-spec files that each stay under \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Remove those original files from the file/context baseline.
+\item
+  Remove the \texttt{9} split test/spec files that were also over the \texttt{5\allowbreak{}0\allowbreak{}0} line code-size ratchet from the code-size baseline.
+\item
+  Lower \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}x} to the measured live count.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Preserve every assertion and public behavior; this is a decomposition pass, not a semantic rewrite.
+\end{itemize}
+
+\section{Non-Goals}\label{record-243-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No production API behavior changes.
+\item
+  No release-version work.
+\item
+  No rebase, amend, force push, or draft PR.
+\item
+  No large-file marker escape hatches and no standards carveout expansion.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-243-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add deterministic splitting support as a one-time mechanical transform for eligible test files:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keep imports and helper declarations;
+  \item
+    group adjacent \texttt{i\allowbreak{}t}/\texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t}/nested \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e} items under the same parent \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e};
+  \item
+    write each generated spec below file/context limits;
+  \item
+    delete the original oversized spec file.
+  \end{itemize}
+\item
+  Run the focused split specs first to prove assertion parity.
+\item
+  Recompute Code Dojo file/context and code-size ledgers.
+\item
+  Lower the aggregate \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} ceiling to \texttt{2\allowbreak{}6\allowbreak{}2} or lower.
+\item
+  Run the full local validation lane before opening the PR for final review.
+\end{enumerate}
+
+\section{Candidate Set}\label{record-243-candidate-set}
+
+The selected set removes exactly \texttt{1\allowbreak{}0\allowbreak{}0} aggregate items:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{9\allowbreak{}1} file/context entries from oversized test/spec files.
+\item
+  \texttt{9} matching code-size entries from split test/spec files that were also over \texttt{5\allowbreak{}0\allowbreak{}0} lines:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}t\allowbreak{}c\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}9\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\end{itemize}
+
+\section{Tests And Validation}\label{record-243-tests-and-validation}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused Vitest run for all generated split specs.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\item
+  Full pre-push verification before final PR handoff.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-243-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt is \texttt{2\allowbreak{}6\allowbreak{}2} or lower.
+\item
+  File/context baseline is \texttt{2\allowbreak{}1\allowbreak{}7} or lower.
+\item
+  Code-size baseline is \texttt{4\allowbreak{}5} or lower.
+\item
+  Mock-ban and ESLint baselines remain \texttt{0}.
+\item
+  No generated split spec exceeds \texttt{1\allowbreak{}5\allowbreak{}0} lines or \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  The full local and GitHub validation gates pass.
+\end{itemize}
+
+\section{Playback Questions}\label{record-243-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did the aggregate debt fall by at least \texttt{1\allowbreak{}0\allowbreak{}0}?
+\item
+  Did every split spec preserve its original assertions?
+\item
+  Did the split avoid creating new file/context or code-size violations?
+\item
+  Did the ledgers and ceiling match the measured live count?
+\item
+  Did the PR stay non-draft and linked to issue \#437?
+\end{enumerate}
+
+\section{Linked Invariants}\label{record-243-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Work doctrine: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+

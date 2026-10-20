@@ -1,0 +1,37 @@
+\chapter{DX-008 --- Render Pipeline Documentation Guide}\label{record-311}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-311-problem}
+
+The render pipeline (Layout → Paint → PostProcess → Diff → Output) is a powerful extension point but has zero documentation beyond type definitions. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} appears in RunOptions but there is no guide showing how to write middleware, what RenderState fields are available, or how stages interact.
+
+The perf-gradient demo proved this gap --- we could not instrument the pipeline from outside to measure per-stage timing.
+
+\section{Desired outcome}\label{record-311-desired-outcome}
+
+A guide at \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} covering:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The five render stages and what each does
+\item
+  How to write a custom RenderMiddleware (worked example)
+\item
+  RenderState fields and their lifecycle
+\item
+  How configurePipeline interacts with default stages
+\item
+  Limitations (sync-only, no stage replacement, no timing hooks)
+\end{enumerate}
+
+Link from the bijou-tui README's ``Building Blocks'' section.
+
+\section{Effort}\label{record-311-effort}
+
+Medium --- requires explaining internal architecture to external audience.
+

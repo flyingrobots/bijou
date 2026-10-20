@@ -1,0 +1,105 @@
+\chapter{RE-021 --- Frame Owns the Pump}\label{record-372}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v5.0.0/RE-021-frame-owns-the-pump.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-372-idea}
+
+Invert the runtime/frame relationship so \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} owns the render loop, timing, and frame budget --- not just the TEA model/view mapping. The frame becomes the ``batteries included'' entry point that handles everything: input acquisition, update dispatch, view rendering, diffing, performance measurement, and frame budget management.
+
+Raw \texttt{A\allowbreak{}p\allowbreak{}p} + \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} stays as the low-level TEA contract for users who want full control. The framed app is the path for everyone else.
+
+\section{Current architecture}\label{record-372-current-architecture}
+
+\begin{CodeBlock}
+runtime (owns loop, surfaces, differ, IO)
+  → App.update(msg, model)    ← frame returns [model, cmds]
+  → App.view(model)           ← frame returns Surface
+  → renderDiff(current, target, io, style)
+\end{CodeBlock}
+
+The runtime owns timing and the differ. The frame is a plain \texttt{A\allowbreak{}p\allowbreak{}p} that maps model → Surface. It has no visibility into render timing, frame budget, or memory pressure.
+
+\section{Proposed architecture}\label{record-372-proposed-architecture}
+
+\begin{CodeBlock}
+FramedApp (owns loop, timing, perf stats, frame budget)
+  → acquires input from IO
+  → page.update(msg, model)
+  → measures view() wall time
+  → renderDiff with timing
+  → perf overlay reads its own bookkeeping
+  → frame budget: skip non-essential overlays if overrunning
+\end{CodeBlock}
+
+\section{Why}\label{record-372-why}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Perf overlay is natural}: the frame knows render time, FPS, memory because it measures them. No message threading or capability injection.
+\item
+  \textbf{Frame budget management}: the frame can skip expensive overlays, reduce animation fidelity, or batch notification renders when behind.
+\item
+  \textbf{Simpler app authoring}: users write pages, not apps. The frame handles everything they'd otherwise copy from examples.
+\item
+  \textbf{Pipeline observability}: update phase, view phase, diff phase, and output phase can all be timed and exposed --- answering DX-006's open question about native phase timing.
+\end{itemize}
+
+\section{What stays the same}\label{record-372-what-stays-the-same}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p} interface --- unchanged, still the TEA contract
+\item
+  \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})} --- unchanged, still boots a raw TEA app
+\item
+  Component APIs --- unchanged, still pure functions
+\item
+  \texttt{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o} interface --- unchanged, bench harness still works
+\end{itemize}
+
+\section{What changes}\label{record-372-what-changes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} returns a self-running object (not \texttt{A\allowbreak{}p\allowbreak{}p})
+\item
+  New entry point: \texttt{a\allowbreak{}w\allowbreak{}a\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{} \allowbreak{}\}\allowbreak{})} or \texttt{a\allowbreak{}w\allowbreak{}a\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})}
+\item
+  The runtime's event loop, surface management, and differ invocation move into the framed app (or a shared internal engine it owns)
+\item
+  Frame model gains timing fields: \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}, \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}, \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}
+\item
+  Built-in perf overlay becomes trivial (reads frame's own timing state)
+\end{itemize}
+
+\section{Open questions}\label{record-372-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should the framed app delegate to \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} internally (composition) or replace it (fork)? Composition is safer but may over-abstract.
+\item
+  How does the dogfood app's landing page (custom \texttt{A\allowbreak{}p\allowbreak{}p} wrapping a \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p}) work? It currently calls \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} directly.
+\item
+  Should frame budget management be automatic or opt-in?
+\item
+  Test story: framed apps currently test via the \texttt{A\allowbreak{}p\allowbreak{}p} interface. If the frame owns the loop, testing needs a different harness.
+\end{itemize}
+
+\section{Related}\label{record-372-related}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/v5.0.0/DX_006-debug-performance-overlay-component.md}{DX-006 Debug Performance Overlay} --- becomes trivial once the frame owns timing
+\item
+  RE-017 byte pipeline --- the zero-alloc differ stays, frame just orchestrates it
+\item
+  The soak runner rewrite (this session) proved the framed app pattern works well for real apps
+\end{itemize}
+

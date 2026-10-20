@@ -1,0 +1,422 @@
+\chapter{DX-039 - BlockLab Product Parity}\label{record-135}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-039-blocklab-product-parity.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "DX-039 - BlockLab Product Parity"
+legend: DX
+lane: design
+issue: https://github.com/flyingrobots/bijou/issues/272
+
+\end{RecordMeta}
+
+\section{Linked Issue}\label{record-135-linked-issue}
+
+\begin{itemize}
+\tightlist
+\item
+  https://github.com/flyingrobots/bijou/issues/272
+\end{itemize}
+
+\section{Sponsored Human}\label{record-135-sponsored-human}
+
+A component author wants BlockLab to feel like a real component development product: searchable, controllable, inspectable, test-aware, and useful for building the next Bijou Block without dropping into the full DOGFOOD docs app.
+
+\section{Sponsored Agent}\label{record-135-sponsored-agent}
+
+An agent needs one stable story surface that can produce docs, fixtures, lower-mode captures, interaction playback, visual evidence, source links, and machine-readable reports without scraping terminal frames.
+
+\section{Hill}\label{record-135-hill}
+
+Evolve BlockLab from ``story catalog plus preview'' into a terminal-native component and Block laboratory that borrows the strongest workflows from the current Storybook product without cloning its browser UI.
+
+\section{Source Scan}\label{record-135-source-scan}
+
+Official Storybook documentation reviewed on 2026-06-03:
+
+\begin{itemize}
+\tightlist
+\item
+  Args: https://storybook.js.org/docs/writing-stories/args
+\item
+  Controls: https://storybook.js.org/docs/essentials/controls
+\item
+  Toolbars and globals: https://storybook.js.org/docs/essentials/toolbars-and-globals
+\item
+  Viewport: https://storybook.js.org/docs/essentials/viewport
+\item
+  Decorators: https://storybook.js.org/docs/writing-stories/decorators
+\item
+  Docs and Autodocs: https://storybook.js.org/docs/writing-docs/autodocs
+\item
+  MDX and doc blocks: https://storybook.js.org/docs/writing-docs/mdx
+\item
+  Interaction testing: https://storybook.js.org/docs/writing-tests/interaction-testing
+\item
+  Accessibility testing: https://storybook.js.org/docs/writing-tests/accessibility-testing
+\item
+  Visual testing: https://storybook.js.org/docs/writing-tests/visual-testing
+\item
+  Addon types: https://storybook.js.org/docs/addons/addon-types
+\item
+  Storybook composition: https://storybook.js.org/docs/sharing/storybook-composition
+\end{itemize}
+
+The product lesson is not ``make a browser Storybook clone.'' The lesson is that a mature story workbench separates story data, controls, global context, preview, generated docs, addon panels, and test artifacts while keeping them linked by stable story ids.
+
+\section{Current Bijou Truth}\label{record-135-current-bijou-truth}
+
+BlockLab's current pre-rename substrate already has:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} records with \texttt{i\allowbreak{}d}, \texttt{f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y}, \texttt{t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e}, docs, profile presets, variants, source, and tags
+\item
+  canonical profile presets for \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}(\allowbreak{})} for deterministic text output
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}(\allowbreak{})} for profile x variant capture
+\item
+  a three-pane interactive TUI: catalog, preview, and testing
+\item
+  AppFrame integration and a surface Block contract
+\end{itemize}
+
+The missing layer is product workflow.
+
+\section{Gap Table}\label{record-135-gap-table}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}k\allowbreak{}e} {p\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t} {c\allowbreak{}o\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t}
+ & {C\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t} {B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}L\allowbreak{}a\allowbreak{}b} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e}
+ & {N\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}e\allowbreak{}d} {B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}L\allowbreak{}a\allowbreak{}b} {f\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+{a\allowbreak{}r\allowbreak{}g\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}s} & {v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s} {h\allowbreak{}a\allowbreak{}v\allowbreak{}e} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} & {s\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {a\allowbreak{}r\allowbreak{}g\allowbreak{}s} {p\allowbreak{}l\allowbreak{}u\allowbreak{}s} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l} {s\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a} \\
+{g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}r\allowbreak{}s} & {p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} {k\allowbreak{}e\allowbreak{}y\allowbreak{}s} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} & {g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l} {t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}r} {f\allowbreak{}o\allowbreak{}r} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{},} {w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},} {l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{},} {d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{},} {t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{},} {d\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{},} {r\allowbreak{}e\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}e\allowbreak{}d} {m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} \\
+{d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} & {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} {m\allowbreak{}a\allowbreak{}n\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}y} {c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t} & {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {h\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {c\allowbreak{}h\allowbreak{}a\allowbreak{}i\allowbreak{}n} {f\allowbreak{}o\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{},} {p\allowbreak{}r\allowbreak{}o\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{},} {m\allowbreak{}o\allowbreak{}c\allowbreak{}k} {I\allowbreak{}O\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {d\allowbreak{}a\allowbreak{}t\allowbreak{}a} {b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} \\
+{d\allowbreak{}o\allowbreak{}c\allowbreak{}s} {b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s} & \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s} {f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} {s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} & {d\allowbreak{}o\allowbreak{}c} {b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g} {s\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{},} {s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{},} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{},} {l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{},} {c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{},} {r\allowbreak{}e\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} \\
+{a\allowbreak{}d\allowbreak{}d\allowbreak{}o\allowbreak{}n} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} & {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e} {o\allowbreak{}n\allowbreak{}l\allowbreak{}y} & {a\allowbreak{}d\allowbreak{}d\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}k\allowbreak{}e} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} {f\allowbreak{}o\allowbreak{}r} {a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{},} {a\allowbreak{}1\allowbreak{}1\allowbreak{}y\allowbreak{},} {v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}s\allowbreak{},} {p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{},} {b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{},} {e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s} \\
+{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e} {s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s} {l\allowbreak{}i\allowbreak{}v\allowbreak{}e} {e\allowbreak{}l\allowbreak{}s\allowbreak{}e\allowbreak{}w\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e} & {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l} {p\allowbreak{}l\allowbreak{}a\allowbreak{}y} {s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}s} {a\allowbreak{}n\allowbreak{}d} {p\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k} {r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s} \\
+{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} {i\allowbreak{}s} {d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {a\allowbreak{}1\allowbreak{}1\allowbreak{}y} {f\allowbreak{}a\allowbreak{}c\allowbreak{}t} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d} {a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} {c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e} {a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} \\
+{v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {m\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x} {c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}s} & {n\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d} {v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l} {a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{},} {d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e} {w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w} \\
+{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t} & {p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} {w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} {p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s} & {v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t} {p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s} {p\allowbreak{}l\allowbreak{}u\allowbreak{}s} {a\allowbreak{}r\allowbreak{}b\allowbreak{}i\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}r\allowbreak{}y} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} {s\allowbreak{}i\allowbreak{}z\allowbreak{}e} {p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s} \\
+{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {o\allowbreak{}n\allowbreak{}e} {D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g} & {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}d} {s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}s} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{},} {e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{},} {p\allowbreak{}l\allowbreak{}u\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {M\allowbreak{}C\allowbreak{}P} {e\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s} \\
+\end{longtable}
+}
+
+\section{TUI Mockup}\label{record-135-tui-mockup}
+
+Wide terminal with product-grade panels:
+
+\begin{CodeBlock}
+Bijou BlockLab                                      story: notification-system
++ catalog -------------------++ preview ---------------------------++ controls ----------------+
+| Search: notification        || + Live stack --------------------+ || Args                     |
+|                             || | release dashboard              | || severity: success        |
+| Feedback overlays           || | Canaries stable in eu-west     | || count: 2                 |
+| > notification-system       || +-------------------------------+ || compact: off             |
+|   toast                     ||                                   ||                           |
+|   modal                     || Docs | Source | Actions | A11y      || Globals                  |
+|                             || Use when                          || mode: interactive        |
+| Blocks                      || - status must stay observable     || locale: en               |
+|   app-shell                 || - lower modes need durable text    || width: 60                |
+|                             ||                                   || direction: ltr           |
++-----------------------------++-----------------------------------++---------------------------+
+tabs: preview docs source actions a11y visual perf bindings
+keys: / search | c controls | g globals | p play | v visual | a a11y | x export
+\end{CodeBlock}
+
+Interaction playback panel:
+
+\begin{CodeBlock}
++ interactions ----------------------------------------------------------------+
+| notification-system / live-stack                                             |
+|                                                                              |
+| 1. mount story                                           PASS  4ms            |
+| 2. press n to add notification                          PASS  2ms            |
+| 3. assert stack announces newest item                    PASS  1ms            |
+| 4. switch to accessible profile                          PASS  1ms            |
+|                                                                              |
+| artifact: artifacts/blocklab/notification-system/live-stack/playback.txt      |
++------------------------------------------------------------------------------+
+\end{CodeBlock}
+
+Visual artifact panel:
+
+\begin{CodeBlock}
++ visual ----------------------------------------------------------------------+
+| profile      variant          baseline       current        result            |
+| interactive  live-stack       60x18          60x18          unchanged         |
+| static       live-stack       60x18          60x18          changed +2 lines  |
+| pipe         framed-routing   52x18          52x18          unchanged         |
+| accessible   history-review   52x18          52x18          unchanged         |
++------------------------------------------------------------------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-135-lower-modes}
+
+Pipe mode should expose stable machine-readable sections:
+
+\begin{CodeBlock}
+blocklab story notification-system
+variant=live-stack
+profile=interactive
+globals.mode=interactive
+globals.locale=en
+globals.width=60
+args.severity=success
+args.count=2
+
+[preview]
+release dashboard
+Canaries stable in eu-west
+
+[tests]
+interaction=pass
+a11y=pass
+visual=changed +2 lines
+\end{CodeBlock}
+
+Accessible mode should prioritize the selected story and active findings:
+
+\begin{CodeBlock}
+BlockLab story notification-system. Variant Live stack.
+Controls: severity success, count two, compact off.
+Globals: interactive mode, English locale, left to right, sixty columns.
+Accessibility report passed. Visual report changed by two lines in static mode.
+\end{CodeBlock}
+
+\section{Protocol Sketch}\label{record-135-protocol-sketch}
+
+\texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} can grow without breaking existing records by adding optional fields:
+
+\begin{CodeBlock}
+interface BlockLabControl {
+  readonly id: string;
+  readonly label: string;
+  readonly kind: 'boolean' | 'number' | 'text' | 'select' | 'color' | 'json';
+  readonly defaultValue: unknown;
+  readonly options?: readonly unknown[];
+}
+
+interface BlockLabGlobals {
+  readonly mode?: OutputMode;
+  readonly width?: number;
+  readonly locale?: string;
+  readonly direction?: 'ltr' | 'rtl';
+  readonly theme?: string;
+  readonly density?: string;
+  readonly reducedMotion?: boolean;
+}
+
+interface BlockLabPanelReport {
+  readonly panelId: string;
+  readonly status: 'pass' | 'warn' | 'fail' | 'info';
+  readonly facts: readonly ExplanationFact[];
+  readonly output: string;
+}
+\end{CodeBlock}
+
+The first implementation should keep these fields optional and derive defaults from the current profile presets.
+
+\section{Feature Slices}\label{record-135-feature-slices}
+
+\subsection{1. Args/Controls}\label{record-135-argscontrols}
+
+Add serializable controls to stories and a control pane in BlockLab.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  controls render in TUI and lower modes
+\item
+  control changes feed story render input deterministically
+\item
+  CLI output includes selected args
+\end{itemize}
+
+\subsection{2. Globals/Toolbars}\label{record-135-globalstoolbars}
+
+Add global context for mode, width, locale, direction, theme, density, and reduced motion.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  global state affects preview context
+\item
+  lower modes report globals
+\item
+  locale/direction changes route through DOGFOOD localization ports
+\end{itemize}
+
+\subsection{3. Decorators/Harnesses}\label{record-135-decoratorsharnesses}
+
+Add a story harness chain for common setup: AppFrame, providers, mock IO, binding snapshots, theme, and viewport.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  harnesses compose without mutating base context
+\item
+  a story can declare provider data without bespoke preview code
+\end{itemize}
+
+\subsection{4. Docs Blocks}\label{record-135-docs-blocks}
+
+Replace fixed markdown assembly with docs block composition.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  docs view can show source, controls, lowerings, story matrix, and related stories as separate inspectable blocks
+\item
+  pipe mode can emit those blocks in deterministic order
+\end{itemize}
+
+\subsection{5. Addon-Like Panels}\label{record-135-addon-like-panels}
+
+Introduce panel slots for actions/events, accessibility facts, visual diffs, performance facts, binding state, and source.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  each panel has a stable id and lower-mode report
+\item
+  disabled panels do not affect preview rendering
+\end{itemize}
+
+\subsection{6. Interaction Playback}\label{record-135-interaction-playback}
+
+Let stories declare deterministic play steps that can run in BlockLab, CI, and text-first output.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  RED/GREEN tests for one story-local playback
+\item
+  playback report includes steps, status, elapsed time, and artifacts
+\end{itemize}
+
+\subsection{7. Composition}\label{record-135-composition}
+
+Allow BlockLab to import multiple story catalogs.
+
+Proof:
+
+\begin{itemize}
+\tightlist
+\item
+  composed catalogs preserve package/source facts
+\item
+  duplicate story ids fail loudly
+\item
+  CLI can filter by package, family, tag, and source
+\end{itemize}
+
+\section{Accessibility / Assistive Posture}\label{record-135-accessibility-assistive-posture}
+
+BlockLab parity must improve lower-mode truth, not just add visual panels. Every product feature needs accessible and pipe output:
+
+\begin{itemize}
+\tightlist
+\item
+  controls list active values
+\item
+  globals list current context
+\item
+  panels list status and findings
+\item
+  interactions list steps and outcomes
+\item
+  visual reports describe line/cell differences
+\item
+  docs blocks preserve heading order
+\end{itemize}
+
+\section{Localization / Directionality Posture}\label{record-135-localization-directionality-posture}
+
+Controls and globals are visible UI. Labels, panel names, and status text must go through DOGFOOD localization when they appear in DOGFOOD-owned surfaces. Story ids, arg ids, and artifact paths remain machine tokens.
+
+Directionality belongs in globals. RTL preview should be a first-class context state, not a separate story variant unless the variant is semantically different.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-135-agent-inspectability-explainability-posture}
+
+The text-first command should eventually emit:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x}
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}<\allowbreak{}i\allowbreak{}d\allowbreak{}>}
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}<\allowbreak{}i\allowbreak{}d\allowbreak{}>}
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}<\allowbreak{}i\allowbreak{}d\allowbreak{}>}
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}<\allowbreak{}i\allowbreak{}d\allowbreak{}>}
+\end{itemize}
+
+Each command should produce stable sections that agents can parse without screen scraping. JSON output can be added later, but plain text remains the first evidence surface because it is easier to review in PRs.
+
+\section{Tests To Write First}\label{record-135-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Protocol tests for optional controls and globals.
+\item
+  Workbench model tests proving controls, globals, panels, and docs blocks are discoverable without rendering.
+\item
+  TUI tests proving controls and globals change preview output.
+\item
+  Lower-mode tests proving pipe and accessible output include args/controls and panel statuses.
+\item
+  Interaction playback tests using fake clocks and deterministic input.
+\item
+  Visual artifact tests using fixed-size terminal captures.
+\end{itemize}
+
+\section{Non-Goals}\label{record-135-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No browser Storybook runtime.
+\item
+  No direct addon API compatibility promise.
+\item
+  No screenshots-only acceptance criteria.
+\item
+  No story catalog fork separate from DOGFOOD story truth.
+\item
+  No hidden global registry.
+\end{itemize}
+
+\section{Retrospective Target}\label{record-135-retrospective-target}
+
+BlockLab is product-grade when a maintainer can open one terminal workbench, adjust story inputs, switch global context, read generated docs, run playback, inspect a11y/visual/performance findings, and export deterministic evidence for CI or agents.
+

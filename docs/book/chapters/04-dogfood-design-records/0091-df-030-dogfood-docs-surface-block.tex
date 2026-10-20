@@ -1,0 +1,295 @@
+\chapter{DF-030 Dogfood Docs Surface Block}\label{record-091}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-030-dogfood-docs-surface-block.md}\par}\smallskip
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD Field Guide}
+
+Status: landed for \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} Issue: \href{https://github.com/flyingrobots/bijou/issues/244}{\#244} PR: \href{https://github.com/flyingrobots/bijou/pull/258}{\#258}
+
+\section{Framing}\label{record-091-framing}
+
+DOGFOOD is already the human-facing documentation app and proving ground, but its docs experience was still described as several nearby surfaces: navigation, article reader, search, proof panels, and footer/status evidence. DF-030 makes that product truth explicit as one inspectable Block contract.
+
+This cycle lands \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} as the canonical DOGFOOD docs workspace Block. It does not replace the existing leaf Blocks. Instead, it anchors them under one docs-surface identity so humans and agents can inspect the full documentation experience without reconstructing it from scattered rendering code.
+
+\section{Sponsored Perspectives}\label{record-091-sponsored-perspectives}
+
+Sponsored Human:
+
+\begin{itemize}
+\tightlist
+\item
+  A maintainer wants DOGFOOD to be the first-class documentation experience, not a secondary demo app.
+\item
+  A reader wants navigation, article content, search, and proof artifacts to feel like one documentation surface.
+\end{itemize}
+
+Sponsored Agent:
+
+\begin{itemize}
+\tightlist
+\item
+  An agent auditing docs truth needs one Block tree and stable lowering facts for the selected route, heading, search hit count, and proof artifacts.
+\item
+  An agent should not need provider handles, global app state, or rendered cell parsing to know what DOGFOOD is showing.
+\end{itemize}
+
+\section{Hill}\label{record-091-hill}
+
+A maintainer can open DOGFOOD and treat the docs app as the canonical Bijou documentation surface, with route, reader, search, and proof evidence exposed as typed Block metadata, schema-bound input, command intents, registry inventory, and stable lower-mode facts.
+
+\section{Playback Questions}\label{record-091-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Can DOGFOOD name its full docs workspace as one Block?
+\item
+  Can unknown docs-surface input be validated before rendering?
+\item
+  Do route, heading, search-hit-count, and proof-artifact facts survive every output mode as stable identities?
+\item
+  Does the DOGFOOD Blocks inventory show this surface as product truth?
+\item
+  Can lower modes explain the docs surface without borders, color, or terminal layout?
+\end{itemize}
+
+\section{Linked Invariants}\label{record-091-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Tests To Write First}\label{record-091-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: a DF-030 cycle test imports \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y} before those exports exist.
+\item
+  RED: the test asserts metadata, data requirement names, command intent ids, and schema-bound input validation for the docs-surface contract.
+\item
+  RED: the test rejects accessor-backed boundary input before getters can run.
+\item
+  RED: the test renders interactive, static, pipe, and accessible modes and checks that route, heading, search-hit-count, and proof-artifact facts remain stable.
+\item
+  RED: the test opens the DOGFOOD Blocks inventory and expects the new \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} registry entry to appear with a localized description.
+\end{itemize}
+
+\section{Block Contract}\label{record-091-block-contract}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{F\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d}
+ & {V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} {n\allowbreak{}a\allowbreak{}m\allowbreak{}e} & \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} \\
+{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e} & \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d} \\
+{F\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y} & \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} \\
+{S\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}e} & \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e} \\
+{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s} & \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}{,} \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}{,} \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}{,} \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} \\
+{R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} & \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} \\
+{R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y} {r\allowbreak{}o\allowbreak{}l\allowbreak{}e} & \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} \\
+\end{longtable}
+}
+
+Data requirements:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+Command intents:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}o\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{}L\allowbreak{}i\allowbreak{}n\allowbreak{}k}
+\end{itemize}
+
+Stable facts:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}i\allowbreak{}d}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}h\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f\allowbreak{}-\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t} as one fact per available artifact id, not the display label
+\end{itemize}
+
+\section{TUI Mockup}\label{record-091-tui-mockup}
+
+\begin{CodeBlock}
++-- DOGFOOD Docs Surface ------------------------------------------+
+| navigation             | reader                                  |
+| > Blocks               | # Blocks                                |
+|   Guides               | Blocks are reusable contracts...       |
+|   Packages             |                                         |
+|------------------------+-----------------------------------------|
+| search: table (2 hits) | proof: table-demo.gif available        |
++------------------------------------------------------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-091-lower-modes}
+
+Pipe mode:
+
+\begin{CodeBlock}
+route   heading search-hit-count    proofs
+blocks  blocks  2   table-demo.gif
+\end{CodeBlock}
+
+Accessible mode:
+
+\begin{CodeBlock}
+DOGFOOD docs surface. Blocks page selected. Reader heading blocks.
+Search query table has 2 hits. Proof artifacts: table-demo.gif.
+\end{CodeBlock}
+
+The lower-mode invariant is semantic parity. The route, heading, hit count, and proof artifact facts are inspected from \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}.\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s}, not parsed from terminal layout.
+
+\section{Accessibility And Assistive Posture}\label{record-091-accessibility-and-assistive-posture}
+
+\texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} must preserve docs meaning without relying on position, borders, color, or animation. Accessible mode lowers the selected route, reader heading, search summary, and proof artifact list into readable sentences, while facts preserve the same semantic payload for assistive and agent consumers.
+
+\section{Localization And Directionality Posture}\label{record-091-localization-and-directionality-posture}
+
+The registry description for \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} is catalog-backed through the DOGFOOD string table. This slice adds English source rows plus generated German, Spanish, and French runtime catalog entries for the docs-surface description and rendered-preview label. Any untranslated neighboring strings remain explicit catalog debt rather than hidden selected-locale fallback. The Block contract itself carries ids, routes, counts, and artifact labels as data so future locale and directionality adapters can format presentation without changing the semantic facts.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-091-agent-inspectability-and-explainability-posture}
+
+Agents should inspect this surface through typed Block metadata, view data requirements, command intents, schema-bound input, registry ownership, and mode-lowering facts. The registry intentionally remains render-free and avoids provider handles, subscriptions, mutable dispatch callbacks, or global Block lookup.
+
+\section{Implementation}\label{record-091-implementation}
+
+The implementation lives in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} metadata, data requirements, commands, render output, and stable facts.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} and \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} registry entry with role \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}.
+\item
+  \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e} as a valid block scale.
+\item
+  DOGFOOD Blocks inventory evidence and a code-backed rendered preview for the new surface.
+\end{itemize}
+
+The block composes the existing DOGFOOD docs leaf Blocks by contract:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{D\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{S\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+It does not add provider handles, global dispatch, subscriptions, or runtime tree traversal to the registry.
+
+\section{Tests}\label{record-091-tests}
+
+RED:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}0\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} failed because \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, its schema-bound wrapper, and registry entry did not exist.
+\end{itemize}
+
+GREEN:
+
+\begin{itemize}
+\tightlist
+\item
+  The DF-030 test validates metadata, schema binding, accessor rejection, render lowerings, stable facts, registry coverage, DOGFOOD inventory output, the code-backed rendered docs-surface preview, and proof artifact id facts when display labels differ.
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}9\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} now includes \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} in registry coverage.
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}7\allowbreak{}1\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} continues to prove the runtime DOGFOOD inventory renders registered surface Blocks.
+\end{itemize}
+
+\section{Future Declaration Shape}\label{record-091-future-declaration-shape}
+
+The YAML shape remains an authoring adapter over the typed Block contract:
+
+\begin{CodeBlock}
+block:
+  name: DogfoodDocsSurfaceBlock
+  family: docs-surface
+  scale: workspace
+  modes:
+    - interactive
+    - static
+    - pipe
+    - accessible
+data:
+  docsTree:
+    - Guides
+    - Blocks
+    - Packages
+  selectedRoute: blocks
+  selectedHeadingId: blocks
+  searchState:
+    query: table
+    hitCount: 2
+  proofArtifacts:
+    - id: table-demo.gif
+      label: table-demo.gif
+      available: true
+commands:
+  - docs.navigate
+  - docs.search
+  - docs.openProof
+  - docs.copyLink
+facts:
+  route: blocks
+  heading-id: blocks
+  search-hit-count: 2
+  proof-artifact: table-demo.gif
+\end{CodeBlock}
+
+\section{Closeout}\label{record-091-closeout}
+
+DF-030 moves DOGFOOD one step closer to being the canonical docs surface rather than a collection of adjacent examples. The useful boundary is the typed Block: metadata, schema-bound input, command intents, registry evidence, and lower-mode facts. The runtime app remains free to render through its existing TUI machinery, but the product truth is inspectable as a Block.
+

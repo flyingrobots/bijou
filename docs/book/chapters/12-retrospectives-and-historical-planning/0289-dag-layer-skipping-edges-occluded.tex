@@ -1,0 +1,99 @@
+\chapter{DAG --- Layer-Skipping Edges Silently Occluded By Intermediate Nodes}\label{record-289}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DAG-layer-skipping-edges-occluded.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-289-disposition}
+
+Fixed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0} in commit \texttt{6\allowbreak{}9\allowbreak{}2\allowbreak{}9\allowbreak{}1\allowbreak{}f\allowbreak{}a}. \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} now routes same-column skip edges through a detour column beside intermediate nodes instead of drawing straight through the occluding node column, \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s} now tracks inbound multiplicity without collapsing routes into a boolean set, and the regression coverage in \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} / \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} locks the visual invariant down.
+
+\section{Original Proposal}\label{record-289-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Severity}\label{record-289-severity}
+
+\textbf{Correctness bug, not cosmetic.} Downstream projects consume the DAG renderer to visualize graph-shaped data --- notably \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}p}, a graph-database project that renders its graphs through bijou. For those consumers, the DAG renderer must \textbf{never hide or drop information}. A missing edge is a wrong answer, not an ugly one.
+
+\section{Problem}\label{record-289-problem}
+
+When a DAG edge skips a layer (source at layer L, destination at layer L+2 or beyond) and both endpoints end up in the same column, the vertical edge line is routed straight down through the intermediate layer --- passing through the rows where the intermediate layer's node box is drawn. The node box has higher render priority than the edge line, so the edge is visually erased.
+
+The destination arrowhead survives because it lands in the gap row above the destination box. To a reader, it looks like the edge originates from the node directly above the destination, not from the real source.
+
+Multiple edges terminating at the same destination cell also collide: \texttt{a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s} is a \texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}<\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}>} keyed by \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}(\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{})}, so only one arrowhead is drawn per destination even when the grid has two or more inbound edges.
+
+\section{Evidence}\label{record-289-evidence}
+
+Minimal repro (three nodes, edges \texttt{A\allowbreak{}→\allowbreak{}B}, \texttt{A\allowbreak{}→\allowbreak{}C}, \texttt{B\allowbreak{}→\allowbreak{}C}):
+
+\begin{CodeBlock}
+bijou_dag({ nodes: [
+  { id: 'A', label: 'A', edges: ['B', 'C'] },
+  { id: 'B', label: 'B', edges: ['C'] },
+  { id: 'C', label: 'C', edges: [] },
+]});
+\end{CodeBlock}
+
+Expected: two arrows into C (one from A, one from B). Actual: one arrow into C. The A→C edge is silently lost.
+
+The loss was discovered while rendering the RE-017 byte-pipeline plan DAG --- \texttt{I\allowbreak{}-\allowbreak{}9\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}I\allowbreak{}I\allowbreak{}-\allowbreak{}1} and \texttt{I\allowbreak{}I\allowbreak{}I\allowbreak{}-\allowbreak{}5\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}I\allowbreak{}I\allowbreak{}I\allowbreak{}-\allowbreak{}6} (both layer-skipping, same-column) were invisible in the rendered output.
+
+\section{Root Cause}\label{record-289-root-cause}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}1\allowbreak{}4\allowbreak{}8\allowbreak{}-\allowbreak{}1\allowbreak{}4\allowbreak{}9} --- \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}E\allowbreak{}d\allowbreak{}g\allowbreak{}e} routes a same-column edge as a pure vertical segment from \texttt{s\allowbreak{}R\allowbreak{}o\allowbreak{}w} to \texttt{d\allowbreak{}R\allowbreak{}o\allowbreak{}w}, passing through intermediate layer rows.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}8\allowbreak{}3\allowbreak{}-\allowbreak{}4\allowbreak{}2\allowbreak{}0} --- \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}t} resolves nodes before edges, so any grid cell inside a node box returns the box character, occluding the edge line underneath.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}1\allowbreak{}6\allowbreak{}2} --- \texttt{g\allowbreak{}.\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}.\allowbreak{}a\allowbreak{}d\allowbreak{}d\allowbreak{}(\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}(\allowbreak{}d\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}d\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{})\allowbreak{})} collides for any two edges landing on the same destination row/col, discarding all but one arrowhead.
+\end{itemize}
+
+\section{Fix Options}\label{record-289-fix-options}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Detour around intermediate nodes.} When a layer-skipping edge would pass through a same-column intermediate node, route it through a jog column that's free of nodes at the intermediate layer. Biggest change; most visually correct.
+\item
+  \textbf{Column reassignment for skip edges.} When ordering columns, prefer to place layer-skipping edge endpoints in different columns so the straight-line route doesn't collide.
+\item
+  \textbf{Edge priority when no box char.} Keep the node-box priority for cells inside boxes, but detect pass-through and mark those cells with a ``node+edge'' flag so the box label area stays readable while still hinting that an edge crosses the box (e.g.~with a subdued glyph at the box border).
+\item
+  \textbf{Arrowhead multiplicity.} Change \texttt{a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s} from \texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}<\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}>} to \texttt{M\allowbreak{}a\allowbreak{}p\allowbreak{}<\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{},\allowbreak{} \allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}>} (count per cell) or allow the cell renderer to emit a divergent glyph when multiple edges converge.
+\end{enumerate}
+
+Option 1 is the most correct. Option 2 is probably the simplest and resolves the common case. At minimum, option 4 should ship so convergence isn't silently lost.
+
+\section{Tests To Add}\label{record-289-tests-to-add}
+
+\begin{itemize}
+\tightlist
+\item
+  Three-node repro above, asserting \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} shows \texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{},\allowbreak{} \allowbreak{}C} and \texttt{B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C} (source of truth) and that the rendered output contains two arrowheads entering C's row range.
+\item
+  Four-node diamond (\texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{},\allowbreak{} \allowbreak{}A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C\allowbreak{},\allowbreak{} \allowbreak{}B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D\allowbreak{},\allowbreak{} \allowbreak{}C\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D}) --- asserting both inbound edges to D are visible.
+\item
+  A layer-skipping chain (\texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}B\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}C}, plus \texttt{A\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}D} with D at layer 2) asserting A→D does not overlap B's column.
+\end{itemize}
+
+\section{Impact}\label{record-289-impact}
+
+The pipe and accessible renderers (\texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e}, \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} in \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}6\allowbreak{}9\allowbreak{}-\allowbreak{}5\allowbreak{}3\allowbreak{}0}) return the correct edge data, so any programmatic consumer is unaffected. Only the interactive (styled) renderer loses edges --- which is exactly the mode used for all human-facing output via the bijou MCP tool, the CLI, the bijou-tui panes, and the \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}p} graph-database visualizations.
+
+\section{Invariant To Enforce}\label{record-289-invariant-to-enforce}
+
+\begin{quote}
+The interactive DAG renderer MUST NOT hide, drop, or silently merge edges or arrowheads. Every edge in the input must be resolvable in the rendered output.
+\end{quote}
+
+This should become a repo invariant (\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/}) alongside a regression test that fails if any edge in a representative test graph is not visually present.
+

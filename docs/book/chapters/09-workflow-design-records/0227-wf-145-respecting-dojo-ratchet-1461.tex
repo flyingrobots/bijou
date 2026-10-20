@@ -1,0 +1,168 @@
+\chapter{WF-145 Respecting the Dojo Ratchet To 1461}\label{record-227}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-145-respecting-dojo-ratchet-1461.md}\par}\smallskip
+
+\section{Status}\label{record-227-status}
+
+Implemented; pending review.
+
+\section{Issue}\label{record-227-issue}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/395}{\#395}
+\end{itemize}
+
+\section{Context}\label{record-227-context}
+
+WF-144 landed the Respecting the Dojo burndown at \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}1} aggregate Code Dojo violations. The next ratchet must cut at least \texttt{5\allowbreak{}0} more violations and set the ceiling to \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower.
+
+The active objective remains zero ESLint errors, zero Code Dojo warnings/errors/issues, and zero length-restriction violations. This cycle is a bounded cleanup slice toward that endpoint.
+
+\section{Goal}\label{record-227-goal}
+
+Reduce aggregate Code Dojo debt from \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}1} to \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower by eliminating at least \texttt{5\allowbreak{}0} live findings with behavior-preserving TypeScript fixes.
+
+\section{Selected Slice}\label{record-227-selected-slice}
+
+The implementation used a non-DOGFOOD package/script/test cluster that avoided DOGFOOD raw visible-copy policy work, removed \texttt{6\allowbreak{}3} live ESLint findings, and retired one mock-ban violation:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{F\allowbreak{}i\allowbreak{}l\allowbreak{}e}
+ & \begin{minipage}[b]{\linewidth}\raggedleft
+{F\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}2} \\
+\texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}w\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}1} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}1} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}t\allowbreak{}c\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}1} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}0} \\
+{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t} {f\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}u\allowbreak{}p} {c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}u\allowbreak{}p} & {8} \\
+\textbf{{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {t\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}l}} & \textbf{{6\allowbreak{}3}} \\
+\end{longtable}
+}
+
+The selected cluster leaves every touched file raw-ESLint clean and at or below its stored file/context ceiling. The implementation intentionally avoided \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} because the former has a deliberate frame-scoped generic bridge and the latter needs broader recorder module validation than this bounded slice should carry.
+
+\section{Scope}\label{record-227-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Replace unsafe assertions, unused parameters, fake async commands, unchecked dynamic reads, and implicit interpolation with typed helpers, checked reads, explicit formatting, or narrowed runtime guards.
+\item
+  Preserve app-frame message contracts, example smoke orchestration, wall-time benchmark output, recorder behavior, and public TUI command types.
+\item
+  Lower ratchet artifacts only after live counts prove the reduction.
+\end{itemize}
+
+\section{Non-Goals}\label{record-227-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  ESLint rules, Code Dojo thresholds, hooks, and CI policy must not weaken.
+\item
+  File/context, mock-ban, and code-size ceilings must not rise.
+\item
+  DOGFOOD raw visible-copy cleanup is out of scope for this slice unless it is deliberately chosen as the primary goalpost.
+\item
+  Exception churn cannot stand in for real cleanup.
+\end{itemize}
+
+\section{Current Evidence}\label{record-227-current-evidence}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{f\allowbreak{}2\allowbreak{}7\allowbreak{}9\allowbreak{}b\allowbreak{}6\allowbreak{}d\allowbreak{}2}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}1}
+\item
+  ESLint findings: \texttt{1\allowbreak{},\allowbreak{}1\allowbreak{}0\allowbreak{}1}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}3}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target: \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower
+\end{itemize}
+
+Implemented counts on this branch before review:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}4\allowbreak{}3}
+\item
+  ESLint findings: \texttt{1\allowbreak{},\allowbreak{}0\allowbreak{}3\allowbreak{}4}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}2}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target: \texttt{1\allowbreak{},\allowbreak{}3\allowbreak{}9\allowbreak{}3} or lower
+\end{itemize}
+
+\section{Playback Questions}\label{record-227-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is aggregate Code Dojo debt at \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower?
+\item
+  Did the implementation remove at least \texttt{5\allowbreak{}0} real violations?
+\item
+  Did touched file/context, mock-ban, and code-size ceilings stay flat or lower?
+\item
+  Did focused behavior tests for touched surfaces pass?
+\end{enumerate}
+
+\section{Validation Plan}\label{record-227-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Probe the selected files with focused Code Dojo gates.
+\item
+  Run focused tests for touched package/script surfaces.
+\item
+  Check aggregate debt with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}.
+\item
+  Confirm standards gates with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}.
+\item
+  Validate documentation inventory with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-227-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The selected touched TypeScript files reduce live findings by at least \texttt{5\allowbreak{}0}.
+\item
+  Aggregate Code Dojo debt is \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower.
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} records the lower live ESLint count.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} report the lower ceiling.
+\item
+  Focused validation for the touched surfaces passes.
+\end{itemize}
+

@@ -1,0 +1,342 @@
+\chapter{Accessibility and Assistive Modes}\label{record-032}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/accessibility-and-assistive-modes.md}\par}\smallskip
+
+\emph{Design note for accessible Bijou experiences beyond visual rich-mode parity}
+
+\section{Why this exists}\label{record-032-why-this-exists}
+
+Bijou already has an \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} lowering target for many individual components.
+
+That is useful, but it is not enough.
+
+A component can lower honestly while the overall app still fails people who need:
+
+\begin{itemize}
+\tightlist
+\item
+  screen readers
+\item
+  low-vision support
+\item
+  color-blind-safe signaling
+\item
+  reduced motion
+\item
+  lower cognitive load
+\item
+  alternate input or assistive interaction
+\end{itemize}
+
+This note exists to make one thing explicit:
+
+\texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} output is necessary, but it is not the same thing as an accessible product.
+
+\section{Current reality}\label{record-032-current-reality}
+
+Today Bijou is relatively strong at:
+
+\begin{itemize}
+\tightlist
+\item
+  giving many core components an explicit \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} rendering path
+\item
+  avoiding purely decorative borders/backgrounds in accessible mode
+\item
+  encouraging explicit text like \texttt{W\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e} instead of ornamental styling
+\end{itemize}
+
+Today Bijou is not yet strong enough at:
+
+\begin{itemize}
+\tightlist
+\item
+  making a complex framed app like DOGFOOD truly usable in accessible mode
+\item
+  representing interactive structure in a semantic layer above pure visual layout
+\item
+  addressing low-vision and color-blind needs as first-class design inputs
+\end{itemize}
+
+\section{Product stance}\label{record-032-product-stance}
+
+Bijou should treat accessibility as a design system concern, not a fallback string concern.
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  a view may need to lower to a different experience, not merely a flatter rendering
+\item
+  linear reading order matters more than preserving spatial cleverness
+\item
+  visual semantics must become explicit text when required
+\item
+  assistive users should not be abandoned simply because a surface was originally designed for rich TUI interaction
+\end{itemize}
+
+\section{Design principles}\label{record-032-design-principles}
+
+\subsection{1. Linear truth beats spatial fidelity}\label{record-032-linear-truth-beats-spatial-fidelity}
+
+When an interface becomes hard to perceive spatially, Bijou should prefer a linear, explicit representation over a compressed imitation of the rich layout.
+
+For example:
+
+\begin{itemize}
+\tightlist
+\item
+  a three-pane docs shell should probably lower to a guided sequential reading model
+\item
+  not a cramped textual copy of the same spatial arrangement
+\end{itemize}
+
+\subsection{2. Important meaning must survive without color}\label{record-032-important-meaning-must-survive-without-color}
+
+State should not rely on hue alone.
+
+Selection, severity, status, and affordance should also be carried by:
+
+\begin{itemize}
+\tightlist
+\item
+  text
+\item
+  labels
+\item
+  structure
+\item
+  glyphs
+\item
+  grouping
+\end{itemize}
+
+\subsection{3. Reduced motion is a first-class mode}\label{record-032-reduced-motion-is-a-first-class-mode}
+
+Animation can enrich a TUI, but it should never be required for comprehension.
+
+Bijou should support:
+
+\begin{itemize}
+\tightlist
+\item
+  reduced-motion profiles
+\item
+  low-motion shell behavior
+\item
+  motion-free explanations of dynamic state
+\end{itemize}
+
+\subsection{4. Accessible mode is not a dump}\label{record-032-accessible-mode-is-not-a-dump}
+
+Plain text should still be:
+
+\begin{itemize}
+\tightlist
+\item
+  structured
+\item
+  oriented
+\item
+  navigable
+\item
+  intentional
+\end{itemize}
+
+Accessible lowering should not mean ``unstyled but still confusing.''
+
+\subsection{5. Cognitive load is part of accessibility}\label{record-032-cognitive-load-is-part-of-accessibility}
+
+Accessibility includes how much the user has to remember, infer, and hold in working memory.
+
+We should minimize:
+
+\begin{itemize}
+\tightlist
+\item
+  hidden modes
+\item
+  overloaded hint bars
+\item
+  unexplained jargon
+\item
+  surfaces with too many equally weighted actions
+\end{itemize}
+
+\section{Assistive posture}\label{record-032-assistive-posture}
+
+\subsection{Screen readers and terminal reality}\label{record-032-screen-readers-and-terminal-reality}
+
+Terminal screen-reader behavior varies and may not provide a rich widget model comparable to the web.
+
+Bijou should therefore not assume:
+
+\begin{itemize}
+\tightlist
+\item
+  semantic terminal accessibility metadata will rescue a visually dense TUI
+\item
+  a screen reader can infer pane relationships or control ownership from layout alone
+\end{itemize}
+
+Instead, Bijou should own semantic clarity in the content it emits.
+
+\subsection{Voice and alternate interaction}\label{record-032-voice-and-alternate-interaction}
+
+Bijou should eventually grow toward a semantic model that can describe:
+
+\begin{itemize}
+\tightlist
+\item
+  role
+\item
+  label
+\item
+  description
+\item
+  current state
+\item
+  available actions
+\item
+  focus order
+\end{itemize}
+
+That model could support:
+
+\begin{itemize}
+\tightlist
+\item
+  accessible lowering
+\item
+  docs
+\item
+  testing
+\item
+  explainability
+\item
+  future assistive adapters
+\end{itemize}
+
+This should be treated as a semantic shadow model rather than a visual clone of rich-mode layout.
+
+\section{Low-vision design posture}\label{record-032-low-vision-design-posture}
+
+Bijou should eventually support and audit for:
+
+\begin{itemize}
+\tightlist
+\item
+  high-contrast themes
+\item
+  monochrome-safe or low-hue themes
+\item
+  reduced visual clutter
+\item
+  larger spacing or simplified shell modes where appropriate
+\end{itemize}
+
+This does not mean every app must ship all of these immediately.
+
+It does mean the framework should make them possible and should not fight them.
+
+\section{Color-blindness posture}\label{record-032-color-blindness-posture}
+
+The framework should help builders avoid:
+
+\begin{itemize}
+\tightlist
+\item
+  meaning carried only by red/green or similar hue pairings
+\item
+  state changes visible only through chroma
+\item
+  token combinations that collapse under common color-vision deficiencies
+\end{itemize}
+
+Future tooling should include:
+
+\begin{itemize}
+\tightlist
+\item
+  contrast checks
+\item
+  token-pair warnings
+\item
+  color-blind simulation or heuristics
+\end{itemize}
+
+\section{DOGFOOD implication}\label{record-032-dogfood-implication}
+
+DOGFOOD is the proving surface, which means Bijou should eventually support an accessible DOGFOOD experience that is genuinely usable.
+
+The likely direction is:
+
+\begin{itemize}
+\tightlist
+\item
+  search-first
+\item
+  linear navigation
+\item
+  explicit ``you are here'' copy
+\item
+  explicit action lists
+\item
+  no dependence on three-pane spatial inference
+\end{itemize}
+
+That should be treated as a different truthful experience, not a cramped copy of the rich shell.
+
+That is a different experience, not just a visually flattened copy of the rich shell.
+
+\section{Backlog direction}\label{record-032-backlog-direction}
+
+Recommended next-layer backlog:
+
+\begin{itemize}
+\tightlist
+\item
+  high-contrast / low-motion shell profiles
+\item
+  token contrast and color-blind auditing tools
+\item
+  semantic shadow-model exploration for interactive surfaces
+\item
+  accessibility review of DOGFOOD as a full app, not just component stories
+\item
+  cognitive-load heuristics for shell and component surfaces
+\end{itemize}
+
+\section{Relationship to other doctrine}\label{record-032-relationship-to-other-doctrine}
+
+This note should be read alongside:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/bijou-ux-doctrine.md}{Bijou UX Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/humane-shell.md}{The Humane Shell}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/localization-and-bidirectionality.md}{Localization and Bidirectionality}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/content-guide.md}{Content Guide}
+\end{itemize}
+
+\section{Acceptance bar}\label{record-032-acceptance-bar}
+
+This direction is working when:
+
+\begin{itemize}
+\tightlist
+\item
+  Bijou stops equating accessible mode with ``flat text fallback''
+\item
+  rich-shell surfaces are evaluated as experiences, not just as render outputs
+\item
+  low-vision, motion, and color-blind needs influence design decisions early
+\item
+  the framework begins to grow explicit semantic and audit tooling in support of that goal
+\end{itemize}
+

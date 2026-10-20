@@ -1,0 +1,29 @@
+\chapter{RE-022 --- Unified Layout Calculation Engine}\label{record-376}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/bad-code/RE-022-unified-layout-calculation-engine.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-376-idea}
+
+Currently, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} provides string-first layout helpers like \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})}, while \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} provides surface-first companions like \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}. The underlying geometry calculation (ratios, areas, gaps, and constraints) is often duplicated or implemented with slight variations across these packages.
+
+Extract the ``pure geometry'' phase into a shared, zero-dependency engine in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. This engine should accept a layout definition and terminal dimensions, and return a set of resolved \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}t}s. The string-first and surface-first renderers can then consume these rects, ensuring pixel-perfect parity between \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} modes.
+
+\section{Why}\label{record-376-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Parity}: A 0.4 split-pane ratio should resolve to the same column boundary regardless of whether we are rendering a string box or a TUI surface.
+\item
+  \textbf{Maintenance}: Bug fixes in the gap/constraint logic only need to happen in one place.
+\item
+  \textbf{Purity}: Geometry calculation is inherently pure and belongs in the foundation, not the interactive runtime.
+\end{enumerate}
+
+\section{Effort}\label{record-376-effort}
+
+Medium --- extract logic from existing helpers and move to a unified core utility with shared tests.
+

@@ -1,0 +1,45 @@
+\chapter{HT-006 --- Allow pages to push notifications in createFramedApp}\label{record-350}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/HT-006-page-level-notification-push.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: HT-006 — Allow pages to push notifications in createFramedApp
+lane: retro
+legend: HT
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-350-disposition}
+
+Landed in \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0}. \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} now exposes \texttt{e\allowbreak{}m\allowbreak{}i\allowbreak{}t\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} and \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})} so framed pages can emit shell-owned transient notifications without reaching into frame state, the page command wrapper preserves frame-scoped messages instead of re-wrapping them as page messages, focused \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} coverage proves the runtime path, and the TUI guides now document the seam.
+
+\section{Original Proposal}\label{record-350-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+
+\section{Problem}\label{record-350-problem}
+
+Pages in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} cannot push transient notifications. The \texttt{p\allowbreak{}u\allowbreak{}s\allowbreak{}h\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} function operates on \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}, but pages only return \texttt{[\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>\allowbreak{}[\allowbreak{}]\allowbreak{}]} --- they have no access to frame-level state.
+
+Currently only the frame shell itself can push notifications (settings feedback, runtime issues). Page-level events like ``No more thoughts in this session'' have no way to surface as notifications.
+
+\section{Proposal}\label{record-350-proposal}
+
+Add a \texttt{p\allowbreak{}u\allowbreak{}s\allowbreak{}h\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} FrameAction that pages can emit via a command:
+
+\begin{CodeBlock}
+// In page update:
+return [model, [emitFrameAction({ type: 'push-notification', title: 'End of session', durationMs: 2000 })]];
+\end{CodeBlock}
+
+Or expose a \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})} command helper:
+
+\begin{CodeBlock}
+import { notify } from '@flyingrobots/bijou-tui';
+return [model, [notify({ title: 'End of session', variant: 'TOAST', durationMs: 2000 })]];
+\end{CodeBlock}
+
+\section{Workaround}\label{record-350-workaround}
+
+Render the notice as a positioned overlay via \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}F\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, which has access to the page model.
+

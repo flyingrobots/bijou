@@ -1,0 +1,488 @@
+\chapter{Bijou Vision}\label{record-035}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/bijou-vision.md}\par}\smallskip
+
+\begin{quote}
+Historical note: the canonical project-identity signpost is now \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/VISION.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}V\allowbreak{}I\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}}. This file remains as expanded background and provenance, not as the active queue surface.
+\end{quote}
+
+\emph{Living statement of what Bijou is for, how it should feel, and where it should be used}
+
+\section{What Bijou is}\label{record-035-what-bijou-is}
+
+Bijou is a framework for building \textbf{surface-native terminal applications} that are:
+
+\begin{itemize}
+\tightlist
+\item
+  styled
+\item
+  stateful
+\item
+  testable
+\item
+  humane
+\item
+  honest across different output modes
+\end{itemize}
+
+Bijou is not trying to pretend the terminal is a browser.
+
+It is trying to take the terminal seriously as its own medium:
+
+\begin{itemize}
+\tightlist
+\item
+  dense, but not cramped
+\item
+  expressive, but not decorative for its own sake
+\item
+  interactive, but still degradable
+\item
+  structured, inspectable, and testable
+\end{itemize}
+
+The long-term goal is not only to ship components.
+
+The goal is to make it straightforward to build terminal software that feels:
+
+\begin{itemize}
+\tightlist
+\item
+  calm
+\item
+  explicit
+\item
+  reliable
+\item
+  accessible
+\item
+  governable
+\end{itemize}
+
+\section{What Bijou is not}\label{record-035-what-bijou-is-not}
+
+Bijou is not primarily:
+
+\begin{itemize}
+\tightlist
+\item
+  a string-templating helper for ad hoc CLI output
+\item
+  a browser-emulation layer in a terminal window
+\item
+  a pile of isolated widgets without shell doctrine
+\item
+  a framework that treats docs, accessibility, and graceful degradation as afterthoughts
+\end{itemize}
+
+It should stay willing to say ``this belongs to the shell,'' ``this belongs to layout,'' or ``this should lower differently in a non-rich mode'' instead of flattening every concern into raw component calls.
+
+\section{Product vision}\label{record-035-product-vision}
+
+Bijou should become the framework people reach for when they want to build serious terminal software with:
+
+\begin{itemize}
+\tightlist
+\item
+  real application state
+\item
+  real interaction structure
+\item
+  real layout ownership
+\item
+  real testing and replayability
+\item
+  real design standards
+\end{itemize}
+
+The ideal Bijou app should be explainable in a few plain statements:
+
+\begin{itemize}
+\tightlist
+\item
+  where state lives
+\item
+  what views are visible
+\item
+  what currently owns input
+\item
+  how layout is being constrained
+\item
+  what commands can change state
+\item
+  what effects may happen as a consequence
+\end{itemize}
+
+That clarity is part of the product.
+
+\section{Design philosophy}\label{record-035-design-philosophy}
+
+\subsection{1. Hexagonal at the core}\label{record-035-hexagonal-at-the-core}
+
+The core should own:
+
+\begin{itemize}
+\tightlist
+\item
+  state
+\item
+  view stack
+\item
+  layout
+\item
+  routing
+\item
+  commands
+\item
+  effects
+\end{itemize}
+
+Adapters should own:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal protocols
+\item
+  Node boundaries
+\item
+  clocks, files, and platform APIs
+\item
+  transport and environment details
+\end{itemize}
+
+If a behavior is important enough to test, inspect, or lower accessibly, it should probably exist inside the hexagon.
+
+\subsection{2. Graceful lowering is part of the contract}\label{record-035-graceful-lowering-is-part-of-the-contract}
+
+Rich mode is not the only reality.
+
+Bijou should preserve meaning across:
+
+\begin{itemize}
+\tightlist
+\item
+  rich interactive mode
+\item
+  static mode
+\item
+  pipe mode
+\item
+  accessible mode
+\end{itemize}
+
+Visual parity is not the requirement. Semantic honesty is.
+
+\subsection{3. Layout is a first-class concern}\label{record-035-layout-is-a-first-class-concern}
+
+Components should not only know how to render.
+
+They should also have explicit answers for:
+
+\begin{itemize}
+\tightlist
+\item
+  how they size
+\item
+  how they stretch or shrink
+\item
+  how they align and anchor
+\item
+  how they overflow
+\item
+  when they need a viewport
+\end{itemize}
+
+If layout ownership is vague, interaction ownership becomes vague too.
+
+\subsection{4. Input belongs to the active interaction model}\label{record-035-input-belongs-to-the-active-interaction-model}
+
+Input should flow through explicit ownership:
+
+\begin{itemize}
+\tightlist
+\item
+  topmost active view/layer first
+\item
+  layout-defined interaction geometry
+\item
+  component-local handling
+\item
+  commands and effects emitted intentionally
+\end{itemize}
+
+This is how modals block lower layers, how shells avoid stale controls, and how input remains explainable instead of branch-order magic.
+
+\subsection{5. Commands and effects are not the same thing}\label{record-035-commands-and-effects-are-not-the-same-thing}
+
+Commands mean:
+
+\begin{itemize}
+\tightlist
+\item
+  ``app, change something meaningful''
+\end{itemize}
+
+Effects mean:
+
+\begin{itemize}
+\tightlist
+\item
+  ``runtime, perform this consequence''
+\end{itemize}
+
+Bijou should keep that distinction clean.
+
+It is not just type hygiene. It is how stateful behavior stays understandable.
+
+\subsection{6. The shell is a product surface, not glue}\label{record-035-the-shell-is-a-product-surface-not-glue}
+
+Search, help, settings, notifications, quit flows, and framing chrome are part of the user experience.
+
+They should not feel like bolted-on conveniences around ``the real app.''
+
+\subsection{7. The docs are the proving ground}\label{record-035-the-docs-are-the-proving-ground}
+
+DOGFOOD is important because it forces Bijou to live with its own decisions.
+
+The docs should not only describe the system. They should exercise it.
+
+\subsection{8. Human and agent users both matter}\label{record-035-human-and-agent-users-both-matter}
+
+Agents are first-class users of the framework and its artifacts.
+
+A good Bijou system should be understandable enough that:
+
+\begin{itemize}
+\tightlist
+\item
+  humans can reason about it
+\item
+  agents can inspect it
+\item
+  tests can prove it
+\item
+  docs can teach it
+\end{itemize}
+
+That means explicit contracts beat folklore.
+
+\section{Design values}\label{record-035-design-values}
+
+\subsection{Calm over noise}\label{record-035-calm-over-noise}
+
+Density is good. Chaos is not.
+
+\subsection{Explicit over magical}\label{record-035-explicit-over-magical}
+
+The framework should prefer clear ownership and named seams over hidden cleverness.
+
+\subsection{Honest over flashy}\label{record-035-honest-over-flashy}
+
+A simpler truthful fallback is better than a rich presentation that lies about capability.
+
+\subsection{Structured over stringly}\label{record-035-structured-over-stringly}
+
+Structured surfaces, layout nodes, and runtime objects are preferable where behavior needs to be inspectable or composable.
+
+\subsection{Testable by design}\label{record-035-testable-by-design}
+
+Important behavior should be expressible in deterministic tests instead of only in screenshots or subjective demos.
+
+\subsection{Humane by default}\label{record-035-humane-by-default}
+
+The framework should make it easier to do the right thing for:
+
+\begin{itemize}
+\tightlist
+\item
+  accessibility
+\item
+  localization
+\item
+  explainability
+\item
+  reduced motion
+\item
+  low cognitive load
+\end{itemize}
+
+\section{Recommended use cases}\label{record-035-recommended-use-cases}
+
+Bijou is a strong fit for:
+
+\subsection{Operator and internal tools}\label{record-035-operator-and-internal-tools}
+
+Apps where people live in terminals and need:
+
+\begin{itemize}
+\tightlist
+\item
+  dashboards
+\item
+  workflow tools
+\item
+  review surfaces
+\item
+  deployment or environment controls
+\item
+  data inspection
+\item
+  incident response interfaces
+\end{itemize}
+
+\subsection{Developer tools}\label{record-035-developer-tools}
+
+Apps where state, logs, structured output, and keyboard-driven flows matter:
+
+\begin{itemize}
+\tightlist
+\item
+  local dev control planes
+\item
+  test/replay tools
+\item
+  code review helpers
+\item
+  repo/workspace tools
+\item
+  build and release interfaces
+\end{itemize}
+
+\subsection{Guided and explainable interfaces}\label{record-035-guided-and-explainable-interfaces}
+
+Apps that need to teach, justify, or walk users through decisions:
+
+\begin{itemize}
+\tightlist
+\item
+  AI-assisted flows
+\item
+  operator handoff tools
+\item
+  approvals
+\item
+  audits
+\item
+  onboarding/tutorial surfaces
+\end{itemize}
+
+\subsection{Dense information browsing}\label{record-035-dense-information-browsing}
+
+Apps that need to browse or compare structured information:
+
+\begin{itemize}
+\tightlist
+\item
+  tables
+\item
+  trees
+\item
+  timelines
+\item
+  layered detail panes
+\item
+  searchable docs and knowledge systems
+\end{itemize}
+
+\subsection{Documentation and field guides}\label{record-035-documentation-and-field-guides}
+
+Apps where the documentation itself should be interactive, testable, and mode-aware.
+
+DOGFOOD is the canonical example of this.
+
+\section{Less ideal use cases}\label{record-035-less-ideal-use-cases}
+
+Bijou is probably a weaker fit when the primary requirement is:
+
+\begin{itemize}
+\tightlist
+\item
+  pixel-perfect graphical presentation
+\item
+  highly freeform mouse-first visual design
+\item
+  document editing that depends on browser/editor ecosystems Bijou does not aim to replace
+\item
+  experiences where the terminal itself is already the wrong medium
+\end{itemize}
+
+That is not a failure. It is a boundary.
+
+\section{What good Bijou apps should feel like}\label{record-035-what-good-bijou-apps-should-feel-like}
+
+A good Bijou app should answer these questions quickly:
+
+\begin{itemize}
+\tightlist
+\item
+  Where am I?
+\item
+  What can I do right now?
+\item
+  What currently owns input?
+\item
+  What changes if I activate this?
+\item
+  How do I dismiss or back out safely?
+\end{itemize}
+
+It should also make these answers legible to the builder:
+
+\begin{itemize}
+\tightlist
+\item
+  Which state is active?
+\item
+  Which views are stacked?
+\item
+  Which layout owns this space?
+\item
+  Which component owns this interaction?
+\item
+  Which command changes state?
+\item
+  Which effect leaves the core?
+\end{itemize}
+
+\section{Relationship to other docs}\label{record-035-relationship-to-other-docs}
+
+This document sits above more specific doctrine and design notes:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/bijou-ux-doctrine.md}{Bijou UX Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/humane-shell.md}{The Humane Shell}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/accessibility-and-assistive-modes.md}{Accessibility and Assistive Modes}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/localization-and-bidirectionality.md}{Localization and Bidirectionality}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/ai-explainability-standard.md}{AI Explainability Standard}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/content-guide.md}{Content Guide}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/ARCHITECTURE.md}{Architecture --- Bijou}
+\end{itemize}
+
+\section{Living-document note}\label{record-035-living-document-note}
+
+This document should evolve when Bijou's self-conception changes:
+
+\begin{itemize}
+\tightlist
+\item
+  if the architecture center of gravity changes
+\item
+  if the product promise changes
+\item
+  if the recommended use cases change
+\item
+  if the framework starts aiming at a different class of software
+\end{itemize}
+
+If those things change and this file stays stale, the repo will start lying about what Bijou is for.
+

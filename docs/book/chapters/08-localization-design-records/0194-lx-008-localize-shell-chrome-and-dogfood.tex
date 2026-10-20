@@ -1,0 +1,396 @@
+\chapter{LX-008 --- Localize Shell Chrome and DOGFOOD}\label{record-194}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-008-localize-shell-chrome-and-dogfood.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Why this cycle exists}\label{record-194-why-this-cycle-exists}
+
+LX-001 through LX-006 built the localization substrate:
+
+\begin{itemize}
+\tightlist
+\item
+  runtime catalogs
+\item
+  tools and exchange workflows
+\item
+  filesystem helpers
+\item
+  XLSX adapters
+\end{itemize}
+
+But the humane shell and DOGFOOD still ship mostly hardcoded English copy.
+
+This cycle exists to prove that the i18n work is real in product surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  shell chrome
+\item
+  shell overlays and drawers
+\item
+  DOGFOOD landing and onboarding copy
+\end{itemize}
+
+\section{Scope of this cycle}\label{record-194-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  a shell-level i18n seam for \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  localized shell-owned defaults such as:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    command palette title
+  \item
+    default search title
+  \item
+    settings drawer title
+  \item
+    quit confirm copy
+  \item
+    footer notification cue and shell drawer footer hints
+  \end{itemize}
+\item
+  DOGFOOD-localized copy for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    landing footer and prompt
+  \item
+    search/settings labels
+  \item
+    empty-state onboarding copy
+  \item
+    settings row labels, descriptions, and feedback
+  \end{itemize}
+\item
+  one visible direction-aware shell behavior driven by i18n direction metadata
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  full generic bidirectional layout support across every shell surface
+\item
+  localizing every example in the repo
+\item
+  provider/service adapters
+\item
+  persistence
+\end{itemize}
+
+The point is to prove the localization runtime in the shell and DOGFOOD without pretending RTL support is solved everywhere.
+
+\section{Human users}\label{record-194-human-users}
+
+\subsection{Primary human user}\label{record-194-primary-human-user}
+
+A builder or end user working in a non-English locale.
+
+They need to:
+
+\begin{itemize}
+\tightlist
+\item
+  see shell controls and onboarding copy in their locale
+\item
+  trust that shell labels, footer hints, and settings copy are not locked to English
+\item
+  see at least one shell behavior react to logical direction instead of physical left/right assumptions
+\end{itemize}
+
+\subsection{Human hill}\label{record-194-human-hill}
+
+A non-English user can enter DOGFOOD and immediately see localized shell/UI copy, while a builder can point to DOGFOOD as proof that Bijou localization is not theoretical.
+
+\section{Agent users}\label{record-194-agent-users}
+
+\subsection{Primary agent user}\label{record-194-primary-agent-user}
+
+An agent integrating or validating localized Bijou surfaces.
+
+It needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  load catalogs into the shell and docs proving surface
+\item
+  verify localized strings at the rendered shell boundary
+\item
+  reason about direction-aware shell behavior through explicit runtime metadata
+\end{itemize}
+
+\subsection{Agent hill}\label{record-194-agent-hill}
+
+An agent can localize shell chrome and DOGFOOD through explicit i18n contracts instead of editing hardcoded English strings in place.
+
+\section{Human playback}\label{record-194-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder creates a localized runtime.
+\item
+  They launch DOGFOOD in that locale.
+\item
+  The landing footer and prompt use localized copy.
+\item
+  After entering the docs, the shell drawer titles, search surface, footer hints, and settings copy use localized copy too.
+\item
+  In an RTL locale, at least one shell drawer placement mirrors logically instead of staying physically fixed.
+\end{enumerate}
+
+\section{Agent playback}\label{record-194-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent loads shell and DOGFOOD catalogs into an i18n runtime.
+\item
+  It passes that runtime into the shell/docs app.
+\item
+  It verifies localized shell strings in rendered frames.
+\item
+  It verifies pseudo-localized copy appears in DOGFOOD.
+\item
+  It verifies direction metadata changes a visible shell behavior.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-194-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-194-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} must own shell-localized defaults instead of pushing shell copy responsibility entirely to apps
+\item
+  DOGFOOD should prove canonical shell localization instead of inventing a separate one-off mechanism
+\item
+  the direction signal must cause at least one visible shell change
+\item
+  shell localization must degrade safely when an i18n runtime is absent
+\end{itemize}
+
+\section{Deliverable}\label{record-194-deliverable}
+
+Introduce:
+
+\begin{itemize}
+\tightlist
+\item
+  a shell i18n seam in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  a canonical shell catalog for frame-owned copy
+\item
+  DOGFOOD-localized catalogs and runtime wiring
+\end{itemize}
+
+So that shell chrome and DOGFOOD can run against locale/direction metadata instead of hardcoded English strings.
+
+\section{Proposed API direction}\label{record-194-proposed-api-direction}
+
+The first slice should be close to:
+
+\begin{CodeBlock}
+interface CreateFramedAppOptions<PageModel, Msg> {
+  readonly i18n?: I18nRuntime;
+}
+\end{CodeBlock}
+
+With:
+
+\begin{itemize}
+\tightlist
+\item
+  a built-in frame-shell catalog exported from \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  DOGFOOD creating and using an i18n runtime, loading both shell and docs catalogs
+\end{itemize}
+
+Exact names can still move, but the responsibilities should not.
+
+\section{Tests to write first}\label{record-194-tests-to-write-first}
+
+\subsection{Cycle-owned playback tests}\label{record-194-cycle-owned-playback-tests}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  a localized framed app shows translated shell-owned titles and hints
+\item
+  DOGFOOD renders pseudo-localized shell/docs copy when supplied localized catalogs
+\item
+  an RTL runtime changes a visible shell behavior such as drawer anchor placement
+\end{itemize}
+
+\subsection{Package-local tests}\label{record-194-package-local-tests}
+
+In existing package/example test surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  shell quit/search/settings defaults use localized copy when an i18n runtime is provided
+\item
+  DOGFOOD settings/landing/onboarding copy comes from catalogs rather than hardcoded strings
+\end{itemize}
+
+\section{Risks}\label{record-194-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  only partially localizing shell surfaces and leaving confusing English islands
+\item
+  adding an i18n seam that DOGFOOD does not actually prove
+\item
+  claiming direction-awareness without any visible shell behavior change
+\item
+  threading translator functions everywhere instead of defining one shell-localized seam
+\end{itemize}
+
+\section{Out of scope}\label{record-194-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  full generic RTL layout mirroring across every component
+\item
+  persistence
+\item
+  service-backed localization workflows
+\item
+  every example app in the repo
+\end{itemize}
+
+\section{Retrospective}\label{record-194-retrospective}
+
+\subsection{What landed}\label{record-194-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  a canonical shell i18n module in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  a \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{} \allowbreak{}\}\allowbreak{})} seam for shell-owned copy and direction metadata
+\item
+  localized shell defaults for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    command palette title
+  \item
+    default search title
+  \item
+    settings title and footer hint
+  \item
+    notification-center title, footer hint, and footer cue label
+  \item
+    help title and hint
+  \item
+    quit-confirm title, body, and footer hint
+  \item
+    shell mode labels
+  \end{itemize}
+\item
+  DOGFOOD-localized catalogs and runtime wiring for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    landing prompt and footer
+  \item
+    onboarding / empty-state copy
+  \item
+    localized search/settings surfaces
+  \item
+    settings-row labels, descriptions, value labels, and feedback toasts
+  \end{itemize}
+\item
+  visible direction-aware shell behavior:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    settings drawer resolves to logical \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t}
+  \item
+    notification center resolves to logical \texttt{e\allowbreak{}n\allowbreak{}d}
+  \item
+    the settings drawer visibly mirrors under RTL
+  \end{itemize}
+\item
+  cycle-owned playback coverage in:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8\allowbreak{}/\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-194-drift-from-ideal}
+
+This cycle proved the shell/runtime seam cleanly, but it did not finish every English island.
+
+Still intentionally incomplete:
+
+\begin{itemize}
+\tightlist
+\item
+  help-overlay keybinding descriptions still mostly fall back to English strings
+\item
+  notification history/body copy is only partially localized
+\item
+  direction awareness is real but still narrow; only a subset of shell drawer placement is mirrored so far
+\end{itemize}
+
+That drift is acceptable for LX-008 because the point of the cycle was to prove that shell localization and direction metadata are real in product surfaces, not to declare shell localization complete.
+
+\subsection{Debt spawned}\label{record-194-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-009-localize-shell-help-notification-and-directional-surfaces.md}{LX-009 --- Localize Shell Help, Notification, and Directional Surfaces}
+\end{itemize}
+

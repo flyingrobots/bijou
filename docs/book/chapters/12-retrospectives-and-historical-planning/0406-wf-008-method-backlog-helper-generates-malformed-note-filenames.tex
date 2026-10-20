@@ -1,0 +1,55 @@
+\chapter{WF-008 --- METHOD backlog helper generates malformed note filenames}\label{record-406}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/WF-008-method-backlog-helper-generates-malformed-note-filenames.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-008 — METHOD backlog helper generates malformed note filenames
+legend: WF
+lane: graveyard
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-406-disposition}
+
+Out of scope for Bijou. The malformed filename generation behavior belongs to the METHOD tooling in \textasciitilde/git/method, not to this repository's product or workflow backlog.
+
+\section{Original Proposal}\label{record-406-original-proposal}
+
+The METHOD backlog creation helper currently emits malformed filenames like \texttt{D\allowbreak{}X\allowbreak{}\_\allowbreak{}d\allowbreak{}x\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}2\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{D\allowbreak{}F\allowbreak{}\_\allowbreak{}d\allowbreak{}f\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}8\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}.\allowbreak{}m\allowbreak{}d} instead of the repo's canonical \texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}2\allowbreak{}-\allowbreak{}.\allowbreak{}.\allowbreak{}.} / \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}8\allowbreak{}-\allowbreak{}.\allowbreak{}.\allowbreak{}.} pattern.
+
+\section{Why this is bad-code}\label{record-406-why-this-is-bad-code}
+
+\begin{itemize}
+\tightlist
+\item
+  every newly added note has to be manually renamed after creation
+\item
+  it makes the filesystem less trustworthy than the title/frontmatter
+\item
+  it introduces needless churn into otherwise simple backlog-add flows
+\item
+  it risks broken expectations for scripts or humans relying on the ID-first filename convention
+\end{itemize}
+
+\section{Evidence}\label{record-406-evidence}
+
+This occurred repeatedly during the current \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} backlog shaping pass when creating new METHOD notes in \texttt{c\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}/}.
+
+\section{Expected behavior}\label{record-406-expected-behavior}
+
+The helper should derive filenames directly from the normalized backlog ID and slug, matching existing repo convention:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}2\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}8\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}4\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+\section{Fix direction}\label{record-406-fix-direction}
+
+Normalize filename generation inside the METHOD helper so legend prefixes and numeric IDs are not duplicated or lowercased into the stem.
+

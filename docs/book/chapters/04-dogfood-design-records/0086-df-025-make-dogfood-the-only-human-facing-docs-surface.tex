@@ -1,0 +1,296 @@
+\chapter{DF-025 --- Make DOGFOOD The Only Human-Facing Docs Surface}\label{record-086}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-021-shape-dogfood-as-terminal-docs-system.md}{DF-021 --- Shape DOGFOOD As Terminal Docs System}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md}{DF-022 --- Build Prose Docs Reader And Top-Level DOGFOOD Nav}
+\end{itemize}
+
+\section{Sponsor human}\label{record-086-sponsor-human}
+
+A builder or maintainer who should have exactly one obvious answer to ``where do I go to learn Bijou?''
+
+\section{Sponsor agent}\label{record-086-sponsor-agent}
+
+An agent that must determine, from repo artifacts alone, whether the public docs surface is DOGFOOD or the \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree.
+
+\section{Hill}\label{record-086-hill}
+
+DOGFOOD is the only human-facing docs surface for Bijou. The \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree remains useful, but only as a secondary/internal reference, regression, and migration substrate rather than a competing public docs front door.
+
+\section{Why this cycle exists}\label{record-086-why-this-cycle-exists}
+
+The repo currently carries two conflicting truths:
+
+\begin{itemize}
+\tightlist
+\item
+  strategy docs say DOGFOOD should replace example sprawl as the living docs system
+\item
+  front-door docs and release validation still treat \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} as a first-class public teaching path
+\end{itemize}
+
+That is not a harmless wording issue.
+
+If humans still have to browse \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} to understand the product, then DOGFOOD is not actually the docs surface yet. It is just a better example.
+
+For \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, Bijou needs a sharper stance:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD is where humans should learn Bijou
+\item
+  example programs are secondary and should not compete with DOGFOOD for repo-front-door authority
+\item
+  release smoke should follow the same truth instead of continuing to bless the broad examples tree as the main proving surface
+\end{itemize}
+
+\section{Human users}\label{record-086-human-users}
+
+\subsection{Primary human user}\label{record-086-primary-human-user}
+
+A curious builder evaluating Bijou and trying to find the canonical docs path quickly.
+
+\subsection{Human hill}\label{record-086-human-hill}
+
+A human can read the root docs surfaces and recover one clear story:
+
+\begin{itemize}
+\tightlist
+\item
+  start with DOGFOOD
+\item
+  use package docs and design docs as supporting corpus
+\item
+  treat \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} as secondary reference material, not as the main product documentation surface
+\end{itemize}
+
+\section{Agent users}\label{record-086-agent-users}
+
+\subsection{Primary agent user}\label{record-086-primary-agent-user}
+
+An agent updating docs, release automation, or backlog placement.
+
+\subsection{Agent hill}\label{record-086-agent-hill}
+
+An agent can point to explicit repo artifacts showing:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD is canonical
+\item
+  example inventory is secondary
+\item
+  the remaining release blockers needed to make runtime smoke and docs posture match that decision
+\end{itemize}
+
+\section{Playback questions}\label{record-086-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If a human asks ``where do I start learning Bijou?'', do the front-door docs point to DOGFOOD first?
+\item
+  Does \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} clearly read as a secondary/internal inventory instead of a public docs hub?
+\item
+  Do METHOD signposts and release blockers explicitly say that \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} is no longer acceptable as the release-facing end state?
+\item
+  Does the repo have a clear blocker capturing the remaining work to demote examples behind DOGFOOD?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-086-accessibility-assistive-reading-posture}
+
+This is a docs-information-architecture cycle. The important accessibility requirement is clarity: people using plain-text docs, terminal readers, or agent tooling should not have to infer canon from inconsistent link placement or filenames.
+
+\section{Localization / directionality posture}\label{record-086-localization-directionality-posture}
+
+This cycle does not add new localized copy requirements. It does require that section naming and docs routing remain cleanly separable from English-only filesystem trivia such as \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}.
+
+\section{Agent inspectability / explainability posture}\label{record-086-agent-inspectability-explainability-posture}
+
+The DOGFOOD-only decision must be visible in:
+
+\begin{itemize}
+\tightlist
+\item
+  this cycle doc
+\item
+  the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane
+\item
+  signposts such as \texttt{P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  front-door docs such as \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+Agents should not have to rely on chat memory to learn that \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} has been demoted.
+
+\section{Non-goals}\label{record-086-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  deleting the entire \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree immediately
+\item
+  pretending every example should disappear
+\item
+  relocating every implementation file currently under \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}
+\item
+  eliminating every migration/reference example before \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\end{itemize}
+
+The immediate requirement is policy honesty and release-blocker clarity, not blind deletion.
+
+\section{Evidence}\label{record-086-evidence}
+
+\subsection{Current contradiction}\label{record-086-current-contradiction}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}m\allowbreak{}d} says DOGFOOD should stop docs, demos, examples, and tests from drifting apart
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}E\allowbreak{}X\allowbreak{}A\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}E\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d} already says DOGFOOD is the primary living-docs surface
+\item
+  but the root docs still expose \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} as a public map, and release readiness still depends on \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*}
+\end{itemize}
+
+\subsection{Why that matters}\label{record-086-why-that-matters}
+
+If examples remain both:
+
+\begin{itemize}
+\tightlist
+\item
+  a public docs front door
+\item
+  and the main release smoke contract
+\end{itemize}
+
+then DOGFOOD cannot honestly be called ``the only way'' yet.
+
+\section{Decision}\label{record-086-decision}
+
+\subsection{\texorpdfstring{Public-docs rule for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}}{Public-docs rule for }}\label{record-086-public-docs-rule-for-4.1.0}
+
+For \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, DOGFOOD is the only human-facing docs surface.
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  root docs should send humans to DOGFOOD first
+\item
+  package/design/release corpus should be reachable through DOGFOOD
+\item
+  the example inventory should read as secondary/internal/reference material
+\item
+  release smoke should move off the broad \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree
+\end{itemize}
+
+\subsection{Example posture}\label{record-086-example-posture}
+
+Examples still matter, but their role is narrower:
+
+\begin{itemize}
+\tightlist
+\item
+  migration references
+\item
+  isolated API seam proofs
+\item
+  targeted regression fixtures
+\item
+  implementation sandboxes
+\end{itemize}
+
+They do \textbf{not} get to remain a competing public docs navigation layer.
+
+\section{Deliverables from this shaping cycle}\label{record-086-deliverables-from-this-shaping-cycle}
+
+This cycle should tighten the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane by:
+
+\begin{itemize}
+\tightlist
+\item
+  keeping \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md}{DF-023 --- Publish Repo, Package, And Release Guides In DOGFOOD} as a release blocker
+\item
+  keeping \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md}{DF-024 --- Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD} as a release blocker
+\item
+  moving \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}{WF-003 --- Replace \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} With \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}} into the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane
+\item
+  spawning \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-026-demote-examples-to-secondary-reference-status.md}{DF-026 --- Demote Examples To Secondary Reference Status} as an explicit docs-surface blocker
+\end{itemize}
+
+\section{Implementation outline}\label{record-086-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Publish a repo-owned DOGFOOD entrypoint under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}.
+\item
+  Rewrite front-door docs so DOGFOOD is the only obvious learning path.
+\item
+  Reframe the example inventory as secondary/internal/reference.
+\item
+  Move the smoke migration item into the active release-blocker lane.
+\item
+  Keep the remaining release blockers explicit instead of pretending the policy is already fully implemented.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-086-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}5\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the cycle doc exists and contains the DOGFOOD-only decision
+\item
+  a repo-owned DOGFOOD entrypoint exists under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}
+\item
+  \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} now lives in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane lists \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}3}, \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}4}, \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}6}, and \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3}
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} acknowledge the DOGFOOD-only posture
+\end{itemize}
+
+\section{Risks}\label{record-086-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  overswinging into ``delete examples'' theater before DOGFOOD and smoke coverage actually replace them
+\item
+  keeping the implementation physically under \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/} long enough that humans still infer the wrong authority from the path
+\item
+  leaving release validation on \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} long enough that the repo continues to reward the old posture
+\end{itemize}
+
+\section{Ready when}\label{record-086-ready-when}
+
+\begin{itemize}
+\tightlist
+\item
+  front-door docs treat DOGFOOD as the only human-facing docs path
+\item
+  the example inventory is clearly secondary/internal
+\item
+  \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} is promoted into the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane
+\item
+  \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}6} exists to capture the remaining example-demotion work needed before release
+\end{itemize}
+

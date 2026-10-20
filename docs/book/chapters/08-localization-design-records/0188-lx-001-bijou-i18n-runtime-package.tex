@@ -1,0 +1,354 @@
+\chapter{LX-001 --- bijou-i18n Runtime Package}\label{record-188}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-001-bijou-i18n-runtime-package.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Why this cycle exists}\label{record-188-why-this-cycle-exists}
+
+Bijou now has doctrine for localization and bidirectionality, but no runtime package boundary that applications or shell surfaces can actually consume.
+
+If we want \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} to be a real localization tool, the first step is not spreadsheets.
+
+The first step is a clean, in-memory runtime package.
+
+This cycle intentionally narrows scope to:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+\item
+  runtime catalogs
+\item
+  locale and direction
+\item
+  runtime-safe lookup and references
+\item
+  formatting seams
+\end{itemize}
+
+It does \textbf{not} try to ship spreadsheet workflows yet.
+
+\section{Human users}\label{record-188-human-users}
+
+\subsection{Primary human user}\label{record-188-primary-human-user}
+
+A builder who wants to localize Bijou shell or app content without inventing their own ad hoc runtime i18n substrate.
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  where does locale live?
+\item
+  where does direction live?
+\item
+  how do I register catalogs?
+\item
+  how do I look up a message or resource?
+\item
+  how do I do this without filesystem or service assumptions?
+\end{itemize}
+
+\subsection{Human hill}\label{record-188-human-hill}
+
+A builder can install and use a real \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} runtime package entirely in memory, with a clean catalog model and no spreadsheet baggage.
+
+\section{Agent users}\label{record-188-agent-users}
+
+\subsection{Primary agent user}\label{record-188-primary-agent-user}
+
+An agent that needs to inspect or generate localized UI against explicit runtime contracts instead of hidden string tables.
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  what is the active locale?
+\item
+  what is the active direction?
+\item
+  what keys and namespaces exist?
+\item
+  how do references resolve?
+\item
+  what happens when a translation is missing?
+\end{itemize}
+
+\subsection{Agent hill}\label{record-188-agent-hill}
+
+An agent can reason about localized runtime content through explicit catalog, locale, direction, and lookup APIs instead of implicit English defaults.
+
+\section{Human playback}\label{record-188-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder installs \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}.
+\item
+  They create an in-memory catalog with namespaced keys.
+\item
+  They load the catalog into a runtime.
+\item
+  They resolve messages and resources by key.
+\item
+  They switch locale and observe fallback behavior.
+\item
+  They read direction from the same runtime without inventing a second seam.
+\end{enumerate}
+
+\section{Agent playback}\label{record-188-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects the runtime package API.
+\item
+  It can enumerate or at least reason about namespaces, ids, locale, and direction.
+\item
+  It resolves a message key with interpolation values.
+\item
+  It resolves a resource/data key.
+\item
+  It observes missing-translation fallback and explicit missing-key behavior.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-188-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-188-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  runtime package must work entirely in memory
+\item
+  runtime package must not assume spreadsheets, files, services, or persistence
+\item
+  runtime package must expose direction as first-class metadata
+\item
+  runtime package must be string-first but not string-only
+\item
+  runtime package must support runtime-safe references without becoming a spreadsheet interpreter
+\end{itemize}
+
+\section{Deliverable}\label{record-188-deliverable}
+
+Introduce a new package:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+\end{itemize}
+
+With a minimal but real runtime surface:
+
+\begin{itemize}
+\tightlist
+\item
+  catalog types
+\item
+  key types
+\item
+  locale direction types
+\item
+  in-memory runtime / adapter
+\item
+  message lookup
+\item
+  generic resource lookup
+\item
+  fallback behavior
+\item
+  formatter hooks or default formatters
+\end{itemize}
+
+\section{Proposed API direction}\label{record-188-proposed-api-direction}
+
+The exact names can still evolve, but the first slice should be close to:
+
+\begin{CodeBlock}
+type LocaleDirection = 'ltr' | 'rtl' | 'auto';
+
+interface CatalogKey {
+  readonly namespace: string;
+  readonly id: string;
+}
+
+type CatalogEntryKind = 'message' | 'resource' | 'data';
+
+interface I18nCatalogEntry<T = unknown> {
+  readonly key: CatalogKey;
+  readonly kind: CatalogEntryKind;
+  readonly sourceLocale: string;
+  readonly values: Readonly<Record<string, T>>;
+  readonly fallbackValue?: T;
+}
+
+interface I18nRuntime {
+  readonly locale: string;
+  readonly direction: LocaleDirection;
+  loadCatalog(catalog: I18nCatalog): void;
+  unloadCatalog(namespace: string): void;
+  t(key: CatalogKey, values?: Record<string, unknown>): string;
+  resource<T = unknown>(key: CatalogKey): T | undefined;
+}
+\end{CodeBlock}
+
+The first slice does not need every possible authoring feature. It does need a clean runtime shape.
+
+\section{Tests to write first}\label{record-188-tests-to-write-first}
+
+\subsection{Cycle-owned playback tests}\label{record-188-cycle-owned-playback-tests}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  package exists and can be imported
+\item
+  in-memory catalogs can be loaded and unloaded
+\item
+  messages resolve by namespaced key
+\item
+  missing locale values fall back to source locale
+\item
+  runtime exposes locale and direction together
+\item
+  resource lookup supports non-string values
+\end{itemize}
+
+\subsection{Package-local unit tests}\label{record-188-package-local-unit-tests}
+
+Under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  missing-key behavior is explicit
+\item
+  namespace unload removes lookups cleanly
+\item
+  interpolation works for simple scalar values
+\item
+  runtime-safe references resolve or fail clearly
+\end{itemize}
+
+\section{Risks}\label{record-188-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  over-designing the runtime around tooling concerns too early
+\item
+  under-designing the runtime into string-only helpers
+\item
+  leaking layout or UI overflow policy into the i18n package
+\item
+  trying to implement tooling and runtime together in one cycle
+\end{itemize}
+
+\section{Out of scope}\label{record-188-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}
+\item
+  spreadsheet import/export
+\item
+  stale detection
+\item
+  pseudo-localization
+\item
+  RTL shell mirroring implementation
+\item
+  shell integration beyond light proving imports
+\end{itemize}
+
+\section{Retrospective}\label{record-188-retrospective}
+
+\subsection{What landed}\label{record-188-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new package: \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+\item
+  runtime types and exports for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    catalogs
+  \item
+    namespaced keys
+  \item
+    locale direction
+  \item
+    references
+  \item
+    runtime creation
+  \end{itemize}
+\item
+  in-memory runtime with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    catalog load/unload
+  \item
+    message lookup
+  \item
+    non-string resource lookup
+  \item
+    source-locale fallback
+  \item
+    runtime-safe reference resolution
+  \item
+    default Intl-based formatter seams
+  \end{itemize}
+\item
+  cycle-owned playback tests under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/}
+\item
+  package-local unit tests in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  workspace/build integration via root \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-188-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  the first slice does not yet integrate shell copy or DOGFOOD with message descriptors
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s} remains intentionally unstarted
+\item
+  message interpolation is currently simple scalar replacement only; richer reference-aware authoring remains a tooling concern for later
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-188-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-002-bijou-i18n-tools-package.md}{LX-002 --- bijou-i18n Tools Package}
+\end{itemize}
+

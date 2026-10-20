@@ -1,0 +1,227 @@
+\chapter{Validate And Adapt Packed Bijou Cell Receipts}\label{record-022}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/reference/packed-bijou-cells.md}\par}\smallskip
+
+Use \texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}(\allowbreak{})} to validate an unknown \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} value. Use \texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the validated bytes must become a Bijou terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+The adapter preserves the receipt's dimensions, ten-byte cell records, and grapheme side-table order. It does not normalize malformed input, reconstruct cells, render a terminal frame, or validate the complete source scene.
+
+\section{Public API}\label{record-022-public-api}
+
+The package exports:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{E\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t}
+ & {C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}(\allowbreak{})} & {V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e} {u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} {i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}n} {a} {f\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}h} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} \\
+\texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} & {V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e} {u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} {i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} {a\allowbreak{}n\allowbreak{}d} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y} {i\allowbreak{}t} {i\allowbreak{}n\allowbreak{}t\allowbreak{}o} {a} {p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} & {T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}d} {f\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}u\allowbreak{}r\allowbreak{}e} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e}{,} \texttt{p\allowbreak{}a\allowbreak{}t\allowbreak{}h}{,} {a\allowbreak{}n\allowbreak{}d} \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}C\allowbreak{}E\allowbreak{}L\allowbreak{}L\allowbreak{}S\allowbreak{}\_\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N} & \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}C\allowbreak{}E\allowbreak{}L\allowbreak{}L\allowbreak{}\_\allowbreak{}F\allowbreak{}O\allowbreak{}R\allowbreak{}M\allowbreak{}A\allowbreak{}T} & \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}u\allowbreak{}8\allowbreak{}x\allowbreak{}1\allowbreak{}0\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}1} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}C\allowbreak{}E\allowbreak{}L\allowbreak{}L\allowbreak{}\_\allowbreak{}S\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}D\allowbreak{}E} & \texttt{1\allowbreak{}0} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}G\allowbreak{}L\allowbreak{}Y\allowbreak{}P\allowbreak{}H\allowbreak{}\_\allowbreak{}P\allowbreak{}O\allowbreak{}L\allowbreak{}I\allowbreak{}C\allowbreak{}Y} & \texttt{u\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}1} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}S\allowbreak{}C\allowbreak{}E\allowbreak{}N\allowbreak{}E\allowbreak{}\_\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N} & \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} \\
+\texttt{M\allowbreak{}A\allowbreak{}X\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}C\allowbreak{}E\allowbreak{}L\allowbreak{}L\allowbreak{}S} & \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} \\
+\texttt{M\allowbreak{}A\allowbreak{}X\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}I\allowbreak{}M\allowbreak{}E\allowbreak{}N\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N} & \texttt{9\allowbreak{},\allowbreak{}9\allowbreak{}9\allowbreak{}9} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} {p\allowbreak{}e\allowbreak{}r} {a\allowbreak{}x\allowbreak{}i\allowbreak{}s} \\
+\texttt{M\allowbreak{}A\allowbreak{}X\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}G\allowbreak{}L\allowbreak{}Y\allowbreak{}P\allowbreak{}H\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}D\allowbreak{}E\allowbreak{}\_\allowbreak{}U\allowbreak{}N\allowbreak{}I\allowbreak{}T\allowbreak{}S} & \texttt{2\allowbreak{}5\allowbreak{}6} {p\allowbreak{}e\allowbreak{}r} {g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h} \\
+\texttt{M\allowbreak{}A\allowbreak{}X\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}G\allowbreak{}L\allowbreak{}Y\allowbreak{}P\allowbreak{}H\allowbreak{}\_\allowbreak{}U\allowbreak{}T\allowbreak{}F\allowbreak{}8\allowbreak{}\_\allowbreak{}B\allowbreak{}Y\allowbreak{}T\allowbreak{}E\allowbreak{}S} & \texttt{3\allowbreak{}2} {p\allowbreak{}e\allowbreak{}r} {g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h} \\
+\texttt{M\allowbreak{}A\allowbreak{}X\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}S\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}A\allowbreak{}B\allowbreak{}L\allowbreak{}E\allowbreak{}\_\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}E\allowbreak{}S} & \texttt{4\allowbreak{},\allowbreak{}0\allowbreak{}9\allowbreak{}6} \\
+\texttt{P\allowbreak{}A\allowbreak{}C\allowbreak{}K\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}C\allowbreak{}E\allowbreak{}L\allowbreak{}L\allowbreak{}S\allowbreak{}\_\allowbreak{}V\allowbreak{}A\allowbreak{}L\allowbreak{}I\allowbreak{}D\allowbreak{}A\allowbreak{}T\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}D\allowbreak{}E\allowbreak{}S} & {O\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d} {v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e} {i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} & {C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} {t\allowbreak{}y\allowbreak{}p\allowbreak{}e} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} & {S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}y} {a\allowbreak{}n\allowbreak{}d} {p\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}h\allowbreak{}i\allowbreak{}p} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} & {F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d} {a\allowbreak{}n\allowbreak{}d} {f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}e\allowbreak{}s} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}C\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}a} & {E\allowbreak{}x\allowbreak{}a\allowbreak{}c\allowbreak{}t} {a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}d} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}a} {p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} \\
+\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}d\allowbreak{}e} & {V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e} {u\allowbreak{}n\allowbreak{}i\allowbreak{}o\allowbreak{}n} \\
+\end{longtable}
+}
+
+Import the functions and receipt type from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}:
+
+\begin{CodeBlock}
+import {
+  adaptPackedBijouCellsToSurface,
+  parsePackedBijouCellsReceipt,
+  type PackedBijouCellsReceipt,
+} from '@flyingrobots/bijou';
+\end{CodeBlock}
+
+Validate unknown input without constructing a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}:
+
+\begin{CodeBlock}
+export function validateReceipt(
+  input: unknown,
+): PackedBijouCellsReceipt {
+  return parsePackedBijouCellsReceipt(input);
+}
+\end{CodeBlock}
+
+Adapt unknown input after validation:
+
+\begin{CodeBlock}
+export function adaptReceipt(input: unknown) {
+  return adaptPackedBijouCellsToSurface(input);
+}
+\end{CodeBlock}
+
+Both functions reject invalid input with \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}. Inspect its \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e}, \texttt{p\allowbreak{}a\allowbreak{}t\allowbreak{}h}, and \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l} fields instead of parsing the message.
+
+\section{Receipt Shape}\label{record-022-receipt-shape}
+
+Every field is required. Unknown or non-enumerable fields, accessors, symbols, sparse arrays, and non-JSON-shaped objects are rejected.
+
+\begin{CodeBlock}
+interface PackedBijouCellsReceipt {
+  readonly receiptVersion: 'packed-bijou-cells/1';
+  readonly widthCells: number;
+  readonly heightCells: number;
+  readonly cellFormatId: 'bijou-packed-cell-u8x10-le/1';
+  readonly glyphPolicyId: 'unicode-grapheme-side-table/1';
+  readonly bytes: readonly number[];
+  readonly sideTable: readonly string[];
+  readonly scene: {
+    readonly sceneVersion: 'ui-scene-ir/1';
+    readonly sceneHash: string;
+    readonly nodeIds: readonly string[];
+    readonly cellNodeIds: readonly string[];
+  };
+  readonly focus: {
+    readonly focusedNodeId: string | null;
+    readonly focusableNodeIds: readonly string[];
+  };
+  readonly chroma: {
+    readonly colorSpace: 'srgb';
+    readonly channelEncoding: 'uint8';
+    readonly alphaEncoding: 'uint6';
+    readonly terminalDefaultEncoding: 'presence-bits';
+  };
+}
+\end{CodeBlock}
+
+The maximum accepted receipt contains \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} cells, with no axis longer than \texttt{9\allowbreak{},\allowbreak{}9\allowbreak{}9\allowbreak{}9} cells. The byte payload must contain exactly ten unsigned bytes per cell. Negative zero is not a canonical unsigned byte and is rejected.
+
+\section{Cell And Glyph Rules}\label{record-022-cell-and-glyph-rules}
+
+\texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}I\allowbreak{}d} fixes each cell at ten bytes:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{O\allowbreak{}f\allowbreak{}f\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s}
+ & {M\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{0\allowbreak{}.\allowbreak{}.\allowbreak{}1} & {U\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}e\allowbreak{}d} {1\allowbreak{}6\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}t} {l\allowbreak{}i\allowbreak{}t\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}n} {c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}r} {v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} \\
+\texttt{2\allowbreak{}.\allowbreak{}.\allowbreak{}4} & {F\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}d\allowbreak{},} {g\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {b\allowbreak{}l\allowbreak{}u\allowbreak{}e} {c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} \\
+\texttt{5\allowbreak{}.\allowbreak{}.\allowbreak{}7} & {B\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}d\allowbreak{},} {g\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {b\allowbreak{}l\allowbreak{}u\allowbreak{}e} {c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} \\
+\texttt{8} & {M\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r} {a\allowbreak{}n\allowbreak{}d} {e\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {f\allowbreak{}l\allowbreak{}a\allowbreak{}g\allowbreak{}s} \\
+\texttt{9} & {S\allowbreak{}i\allowbreak{}x\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}t} {o\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}i\allowbreak{}t\allowbreak{}y} {p\allowbreak{}l\allowbreak{}u\allowbreak{}s} {f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e} {b\allowbreak{}i\allowbreak{}t\allowbreak{}s} \\
+\end{longtable}
+}
+
+Character values below \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} are direct Basic Multilingual Plane values. Direct values must be terminal-control safe and have terminal width \texttt{1}; UTF-16 surrogate values and the NUL sentinel are rejected. An empty cell uses a space glyph plus the empty-cell flag. Values at or above \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} select \texttt{s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}[\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0\allowbreak{}]}.
+
+Each side-table entry must be unique, terminal-control safe, and exactly one grapheme with terminal width \texttt{1}. An entry contains at most \texttt{2\allowbreak{}5\allowbreak{}6} UTF-16 code units and encodes to at most \texttt{3\allowbreak{}2} UTF-8 bytes. Format-control, mark-only, and default-ignorable-only graphemes are rejected. Every entry must be referenced by at least one cell. A directly encodable value below \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} is rejected from the side table. Side-table order is authoritative.
+
+When a foreground or background presence bit is unset, the corresponding three color channels must be zero. An absent color means terminal default, not black. A dashed flag is valid only with the dotted/dashed underline bits.
+
+\section{Scene, Focus, And Chroma Rules}\label{record-022-scene-focus-and-chroma-rules}
+
+\texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}a\allowbreak{}s\allowbreak{}h} is a lowercase SHA-256 hexadecimal digest. \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s} is a unique non-empty inventory, and \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s} contains one declared owner for every cell.
+
+Every focusable node must occur in \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}. \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d} is either \texttt{n\allowbreak{}u\allowbreak{}l\allowbreak{}l} or a member of \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}.
+
+Version \texttt{1} accepts only this chroma profile:
+
+\begin{CodeBlock}
+colorSpace: srgb
+channelEncoding: uint8
+alphaEncoding: uint6
+terminalDefaultEncoding: presence-bits
+\end{CodeBlock}
+
+No color-space or channel conversion occurs.
+
+\section{Diagnostics}\label{record-022-diagnostics}
+
+The deterministic message format is:
+
+\begin{CodeBlock}
+packed-bijou-cells/1 <code> at <path>: <detail>
+\end{CodeBlock}
+
+Paths escape control and default-ignorable characters as Unicode escape sequences so diagnostics remain visually stable.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{C\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+ & {M\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e} & {T\allowbreak{}h\allowbreak{}e} {v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} {i\allowbreak{}s} {n\allowbreak{}o\allowbreak{}t} {t\allowbreak{}h\allowbreak{}e} {r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d} {e\allowbreak{}x\allowbreak{}a\allowbreak{}c\allowbreak{}t} {J\allowbreak{}S\allowbreak{}O\allowbreak{}N} {s\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e} \\
+\texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} & {A\allowbreak{}n} {o\allowbreak{}b\allowbreak{}j\allowbreak{}e\allowbreak{}c\allowbreak{}t} {o\allowbreak{}r} {a\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y} {h\allowbreak{}a\allowbreak{}s} {a\allowbreak{}n} {u\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}d} {f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} \\
+\texttt{w\allowbreak{}r\allowbreak{}o\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}l} & {A} {v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n} {o\allowbreak{}r} {p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}y} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r} {i\allowbreak{}s} {u\allowbreak{}n\allowbreak{}s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {D\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} {a\allowbreak{}r\allowbreak{}e} {n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {u\allowbreak{}n\allowbreak{}s\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{},} {e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {o\allowbreak{}r} {o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e} & {A} {p\allowbreak{}a\allowbreak{}y\allowbreak{}l\allowbreak{}o\allowbreak{}a\allowbreak{}d} {v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} {i\allowbreak{}s} {n\allowbreak{}o\allowbreak{}t} {a\allowbreak{}n} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} \texttt{0} {t\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}g\allowbreak{}h} \texttt{2\allowbreak{}5\allowbreak{}5} \\
+\texttt{b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h} & {T\allowbreak{}h\allowbreak{}e} {p\allowbreak{}a\allowbreak{}y\allowbreak{}l\allowbreak{}o\allowbreak{}a\allowbreak{}d} {i\allowbreak{}s} {n\allowbreak{}o\allowbreak{}t} {e\allowbreak{}x\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}l\allowbreak{}y} {t\allowbreak{}e\allowbreak{}n} {b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s} {p\allowbreak{}e\allowbreak{}r} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h} & {A} {d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t} {g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{},} {s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{},} {o\allowbreak{}r} {r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e} {i\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} & {T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} {c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} {a\allowbreak{}r\allowbreak{}e} {n\allowbreak{}o\allowbreak{}n\allowbreak{}z\allowbreak{}e\allowbreak{}r\allowbreak{}o} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r} & {M\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r} {b\allowbreak{}i\allowbreak{}t\allowbreak{}s} {d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e} {a\allowbreak{}n} {i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d} {c\allowbreak{}o\allowbreak{}m\allowbreak{}b\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} & {S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}y} {o\allowbreak{}r} {p\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}h\allowbreak{}i\allowbreak{}p} {i\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} & {F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}y} {i\allowbreak{}s} {d\allowbreak{}u\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{},} {u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} \\
+\texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}a} & {T\allowbreak{}h\allowbreak{}e} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}a} {p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} {i\allowbreak{}s} {u\allowbreak{}n\allowbreak{}s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d} \\
+\end{longtable}
+}
+
+Paths identify the rejected location, for example \texttt{\$\allowbreak{}.\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}[\allowbreak{}1\allowbreak{}7\allowbreak{}]} or \texttt{\$\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d}.
+
+\section{Adapter Result}\label{record-022-adapter-result}
+
+\texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} validates the complete receipt before it calls \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}. On success:
+
+\begin{CodeBlock}
+surface.width === receipt.widthCells
+surface.height === receipt.heightCells
+Array.from(surface.buffer) deep-equals receipt.bytes
+surface.sideTable deep-equals receipt.sideTable
+\end{CodeBlock}
+
+All surface cells are marked dirty for their first render. Scene, focus, and chroma metadata remain receipt evidence; they are not stored inside \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+\section{Fixture And Verification}\label{record-022-fixture-and-verification}
+
+The checked fixture exercises direct glyphs, side-table glyphs, explicit and terminal-default colors, scene ownership, and focus:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/tests/fixtures/RE-036/packed-bijou-cells.v1.json}{Packed Bijou cell fixture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-036-packed-bijou-cells-surface-adapter.md}{RE-036 design record}
+\end{itemize}
+
+Run the focused contract evidence:
+
+\begin{CodeBlock}
+npx vitest run tests/cycles/RE-036
+\end{CodeBlock}
+

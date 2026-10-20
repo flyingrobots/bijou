@@ -1,0 +1,55 @@
+\chapter{Migrating to Bijou 4.3.0}\label{record-266}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.3.0/migration-guide.md}\par}\smallskip
+
+\section{From 4.2.0}\label{record-266-from-4.2.0}
+
+\subsection{No breaking changes}\label{record-266-no-breaking-changes}
+
+This is a performance-focused minor release. All existing public APIs remain unchanged. The packed surface is an internal implementation detail --- \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})}, \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})}, \texttt{b\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{})}, \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}, and \texttt{c\allowbreak{}l\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} all behave identically.
+
+\subsection{\texorpdfstring{New \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} API}{New  API}}\label{record-266-new-setrgb-api}
+
+If you have performance-sensitive rendering code that writes cells in a tight loop, consider using \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} instead of \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})}:
+
+\begin{CodeBlock}
+// Instead of this (parses hex on every call):
+for (let x = 0; x < width; x++) {
+  surface.set(x, y, { char: '█', fg: '#ff8800', bg: '#000000' });
+}
+
+// Use this (zero-alloc, ~10-50x faster per cell):
+for (let x = 0; x < width; x++) {
+  surface.setRGB(x, y, 0x2588, 255, 136, 0, 0, 0, 0);
+}
+\end{CodeBlock}
+
+Pass \texttt{-\allowbreak{}1} for fg or bg RGB values to use the terminal default color.
+
+Use flag constants for modifiers:
+
+\begin{CodeBlock}
+import { FLAG_BOLD, FLAG_DIM } from '@flyingrobots/bijou';
+
+surface.setRGB(x, y, 'A', 255, 255, 255, 0, 0, 0, FLAG_BOLD);
+\end{CodeBlock}
+
+\subsection{\texorpdfstring{\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} type}{ type}}\label{record-266-packedsurface-type}
+
+\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} now returns \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} (which extends \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}). If your code types surfaces explicitly, you can use either type --- \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} adds \texttt{.\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, \texttt{.\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, and \texttt{.\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}A\allowbreak{}l\allowbreak{}l\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} for advanced byte-level access.
+
+\subsection{Braille rendering}\label{record-266-braille-rendering}
+
+If you were working around braille corruption in \texttt{f\allowbreak{}l\allowbreak{}e\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} by rendering directly to stdout, you can now remove that workaround. Braille characters (U+2800--U+28FF) are preserved correctly through the entire surface pipeline.
+
+\subsection{\texorpdfstring{Theme token \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} / \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B}}{Theme token  / }}\label{record-266-theme-token-fgrgb-bgrgb}
+
+\texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} now includes optional \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} and \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} tuple fields. If you create custom tokens, you don't need to set these --- they're populated automatically during theme resolution. But if you want to pre-populate them for performance:
+
+\begin{CodeBlock}
+const token: TokenValue = {
+  hex: '#ff8800',
+  fgRGB: [255, 136, 0],
+};
+\end{CodeBlock}
+

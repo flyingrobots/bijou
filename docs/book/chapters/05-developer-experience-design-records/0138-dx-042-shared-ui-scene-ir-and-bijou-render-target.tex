@@ -1,0 +1,749 @@
+\chapter{DX-042 Shared UI Scene IR And Bijou Render Target}\label{record-138}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-042 Shared UI Scene IR And Bijou Render Target
+legend: DX
+lane: cool-ideas
+priority: medium
+github_issue: 302
+status: proposed
+keywords:
+  - developer-experience
+  - ir
+  - geordi
+  - wesley
+  - surface
+  - provenance
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-138-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  User story: \href{https://github.com/flyingrobots/bijou/issues/302}{\#302}
+\item
+  Roadmap candidate: Runtime Graph And Scene IR
+\item
+  This document is a planning artifact only. It records the shared IR boundary for the \#302 idea; it does not claim implementation of the IR, a compiler, or a renderer integration in this PR.
+\end{itemize}
+
+\section{Decision Summary}\label{record-138-decision-summary}
+
+Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} should be treated as a deterministic terminal render target for a portable UI scene IR, not as the portable IR itself.
+
+The shared IR should sit above Bijou and Geordi:
+
+\begin{CodeBlock}
+GraphQL SDL / authored source
+  -> Wesley semantic graph and domain law
+    -> ui-scene-ir/1
+      -> bijou-layout/1
+        -> Bijou Surface
+          -> terminal cells
+
+      -> geordi-ir/1
+        -> Geordi renderer
+          -> pixels and render receipts
+\end{CodeBlock}
+
+This keeps the final renderer substrates honest. Geordi owns pixel-oriented render proof. Bijou owns terminal cell rendering, input, focus, runtime interaction, and agent-legible surfaces. The shared IR owns portable scene structure, semantic identity, bindings, localization references, theme token references, actions, and source maps.
+
+\section{Sponsored Human}\label{record-138-sponsored-human}
+
+A builder wants to describe a UI scene once and render it through either Geordi or Bijou so that browser/native artifacts and terminal artifacts stay aligned without manually maintaining two different scene descriptions.
+
+\section{Sponsored Agent}\label{record-138-sponsored-agent}
+
+An agent wants a source-mapped, inspectable scene contract so it can audit which localized strings, theme tokens, bindings, actions, and rendered cells came from the same authored scene.
+
+\section{Hill}\label{record-138-hill}
+
+A scene authored as a semantic UI contract can lower to both a Geordi render artifact and a Bijou terminal surface, with structural receipts proving that node identity, text keys, token references, bindings, and actions stayed in sync across both targets.
+
+\section{Core Rule}\label{record-138-core-rule}
+
+The portable IR describes scene intent.
+
+Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} describes rendered terminal output.
+
+Those are different layers:
+
+\begin{CodeBlock}
+ui-scene-ir/1
+  describes: nodes, text keys, token refs, bindings, actions, source maps
+
+bijou-layout/1
+  describes: terminal layout, focus graph, keymap, viewport regions
+
+Bijou Surface
+  describes: final cell grid with glyphs, colors, modifiers, opacity, masks
+\end{CodeBlock}
+
+Bijou may render a shared scene IR. Geordi may render the same shared scene IR. Neither system should pretend that terminal cells and pixels are the same final substrate.
+
+\section{Playback Questions}\label{record-138-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Which authored scene node produced this rendered cell or pixel region?
+\item
+  Which localization key produced this text?
+\item
+  Which theme token produced this foreground or background color?
+\item
+  Which action or key binding is attached to this node?
+\item
+  Which renderer-specific target profile lowered this scene?
+\item
+  Which target-specific claims are proven, and which are explicit nonclaims?
+\item
+  Can the Geordi and Bijou outputs prove structural parity without claiming pixel parity?
+\item
+  Can compile-time checks catch missing localization keys and raw color usage before runtime?
+\end{enumerate}
+
+\section{Boundary}\label{record-138-boundary}
+
+This design is about a portable scene contract and renderer-specific lowering.
+
+It is not about:
+
+\begin{itemize}
+\tightlist
+\item
+  replacing Bijou's runtime loop
+\item
+  replacing Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  making terminal cells behave like pixels
+\item
+  making Geordi own terminal input or focus
+\item
+  making Wesley a renderer
+\item
+  forcing every existing Bijou block to be authored in GraphQL immediately
+\item
+  claiming pixel-perfect parity between terminal and browser render targets
+\end{itemize}
+
+\section{Role Model}\label{record-138-role-model}
+
+\subsection{Wesley}\label{record-138-wesley}
+
+Wesley owns semantic compilation and domain law.
+
+For this design, Wesley can:
+
+\begin{itemize}
+\tightlist
+\item
+  parse GraphQL SDL or another schema-backed authoring source
+\item
+  validate schema shape
+\item
+  generate TypeScript and Rust types
+\item
+  validate localization requirements
+\item
+  validate style token requirements
+\item
+  compute schema hashes
+\item
+  produce or validate \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}
+\end{itemize}
+
+Wesley should not render terminal cells or pixels.
+
+\subsection{Shared UI Scene IR}\label{record-138-shared-ui-scene-ir}
+
+\texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} owns portable scene structure.
+
+It should carry enough information for both Bijou and Geordi to lower the same scene while preserving source identity.
+
+It should know about:
+
+\begin{itemize}
+\tightlist
+\item
+  scene node IDs
+\item
+  node kinds
+\item
+  semantic roles
+\item
+  layout intent
+\item
+  text and localization references
+\item
+  theme token references
+\item
+  bindings
+\item
+  actions
+\item
+  source maps
+\item
+  target profile requirements
+\end{itemize}
+
+It should not know about:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal escape sequences
+\item
+  renderer dirty-region internals
+\item
+  final RGB cell caches
+\item
+  subpixel antialiasing details
+\item
+  host-specific input event loops
+\end{itemize}
+
+\subsection{Geordi}\label{record-138-geordi}
+
+Geordi owns pixel-oriented render artifacts and receipts.
+
+For this design, Geordi lowers \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} to \texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, then renders or verifies the pixel artifact under a declared target profile.
+
+Geordi claims:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit pixel geometry
+\item
+  font and asset requirements
+\item
+  visual receipt hashes
+\item
+  target profile facts
+\item
+  browser/native renderer parity where supported
+\end{itemize}
+
+Geordi does not claim:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal focus semantics
+\item
+  terminal key routing
+\item
+  cell-level glyph approximations
+\item
+  Bijou runtime state updates
+\end{itemize}
+
+\subsection{Bijou}\label{record-138-bijou}
+
+Bijou owns terminal runtime behavior and terminal render targets.
+
+For this design, Bijou lowers \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} to \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1}, then renders that layout into a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+Bijou claims:
+
+\begin{itemize}
+\tightlist
+\item
+  deterministic terminal cell output
+\item
+  focus and input routing
+\item
+  theme token resolution
+\item
+  localization lowering
+\item
+  cell-level provenance
+\item
+  surface receipts
+\item
+  agent-readable inspection through structured surfaces
+\end{itemize}
+
+Bijou does not claim:
+
+\begin{itemize}
+\tightlist
+\item
+  browser pixel parity
+\item
+  native canvas fidelity
+\item
+  subpixel antialiasing
+\item
+  font-pack proof identical to Geordi
+\end{itemize}
+
+\section{Relationship Diagram}\label{record-138-relationship-diagram}
+
+\begin{center}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[booknode/.style={draw=BookHeading,line width=.6pt,fill=BookPanel,rounded corners=1.5pt,align=center,text width=29mm,minimum height=10mm,inner sep=5pt,font=\small},bookedge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.65pt},every edge quotes/.style={font=\scriptsize,fill=white,inner sep=2pt,text=BookMuted}]
+\node[booknode] (SDL) at (0,0) {Graph\allowbreak{}QL SDL or authored source};
+\node[booknode] (W) at (0,-1.6) {Wesley semantic compiler};
+\node[booknode] (IR) at (0,-3.2) {ui-scene-ir/1};
+\node[booknode] (BIR) at (-3.5,-4.9) {bijou-layout/1};
+\node[booknode] (Surface) at (-3.5,-6.5) {Bijou Surface};
+\node[booknode] (Terminal) at (-5,-8.2) {Terminal cells};
+\node[booknode] (GIR) at (3.5,-4.9) {geordi-ir/1};
+\node[booknode] (Pixels) at (1.8,-6.8) {Pixels};
+\node[booknode] (GR) at (5.2,-6.8) {Geordi receipt};
+\node[booknode] (BR) at (-1.5,-8.2) {Bijou surface receipt};
+\draw[bookedge,] (SDL) to (W);
+\draw[bookedge,] (W) to (IR);
+\draw[bookedge,] (IR) to (BIR);
+\draw[bookedge,] (BIR) to (Surface);
+\draw[bookedge,] (Surface) to (Terminal);
+\draw[bookedge,] (Surface) to (BR);
+\draw[bookedge,] (IR) to (GIR);
+\draw[bookedge,] (GIR) to (Pixels);
+\draw[bookedge,] (GIR) to (GR);
+\end{tikzpicture}}
+\end{center}
+
+\section{Target Profile Diagram}\label{record-138-target-profile-diagram}
+
+\begin{CodeBlock}
+ui-scene-ir/1
+  targetProfiles:
+    - kind: geordi-pixel
+      width: 1280
+      height: 720
+      colorProfile: truecolor
+      claims:
+        - pixel geometry
+        - font metrics
+        - asset hashes
+
+    - kind: bijou-cell
+      cols: 120
+      rows: 40
+      glyphProfile: ansi-unicode
+      claims:
+        - structural hierarchy
+        - cell occupancy
+        - token provenance
+        - i18n provenance
+\end{CodeBlock}
+
+The target profile makes renderer differences explicit. A Bijou terminal render can claim structural parity and cell-level determinism without claiming that it matches Geordi pixels exactly.
+
+\section{Proposed IR Shape}\label{record-138-proposed-ir-shape}
+
+The shared scene IR should be plain data. The first draft can stay intentionally small:
+
+\begin{CodeBlock}
+type UiSceneIr = {
+  irVersion: 'ui-scene-ir/1';
+  id: string;
+  sourceHash: string;
+  rootNodeId: string;
+  nodes: UiNode[];
+  bindings: UiBinding[];
+  actions: UiAction[];
+  tokenUses: UiTokenUse[];
+  i18nUses: UiI18nUse[];
+  sourceMap: UiSourceMapEntry[];
+  targetProfiles: UiTargetProfile[];
+};
+\end{CodeBlock}
+
+\subsection{Nodes}\label{record-138-nodes}
+
+\begin{CodeBlock}
+type UiNode = {
+  id: string;
+  kind: 'box' | 'text' | 'image' | 'group' | 'list' | 'table' | 'custom';
+  role?: string;
+  parentId?: string;
+  children?: string[];
+  layout?: UiLayoutIntent;
+  text?: UiTextRef;
+  style?: UiStyleRef;
+  actions?: string[];
+  metadata?: Record<string, unknown>;
+};
+\end{CodeBlock}
+
+Nodes are semantic scene members. They are not terminal cells and they are not pixel rectangles, even when a renderer later lowers them into cells or rectangles.
+
+\subsection{Text}\label{record-138-text}
+
+\begin{CodeBlock}
+type UiTextRef =
+  | { kind: 'literal'; value: string }
+  | { kind: 'i18n'; key: string; fallback?: string };
+\end{CodeBlock}
+
+Literal text should be allowed for fixture work and generated artifacts, but product surfaces should prefer \texttt{i\allowbreak{}1\allowbreak{}8\allowbreak{}n} references when they are user-facing.
+
+\subsection{Style}\label{record-138-style}
+
+\begin{CodeBlock}
+type UiStyleRef = {
+  fg?: { token: string };
+  bg?: { token: string };
+  border?: { token: string };
+  modifiers?: string[];
+};
+\end{CodeBlock}
+
+The IR should carry token references, not only resolved colors. Renderers can resolve tokens later against dark or light themes. Lower modes can preserve the token name when color is unavailable.
+
+\subsection{Bindings}\label{record-138-bindings}
+
+\begin{CodeBlock}
+type UiBinding = {
+  id: string;
+  targetNodeId: string;
+  targetProperty: string;
+  source: {
+    kind: 'state' | 'query' | 'computed';
+    path: string;
+  };
+  when?: string;
+};
+\end{CodeBlock}
+
+Bindings are data, not hidden callbacks. They make dynamic surfaces auditable and compile-time-checkable.
+
+\subsection{Actions}\label{record-138-actions}
+
+\begin{CodeBlock}
+type UiAction = {
+  id: string;
+  label?: UiTextRef;
+  command: string;
+  keybindings?: string[];
+  targetNodeId?: string;
+};
+\end{CodeBlock}
+
+Actions let Bijou preserve focus and input contracts while Geordi can still render the same action affordances as visual artifacts.
+
+\section{Bijou Lowering}\label{record-138-bijou-lowering}
+
+Bijou lowering turns portable intent into a terminal-specific layout contract:
+
+\begin{CodeBlock}
+type BijouLayoutIr = {
+  irVersion: 'bijou-layout/1';
+  sceneHash: string;
+  nodes: LayoutNode[];
+  focusGraph: FocusGraph;
+  keymap: KeyBinding[];
+  viewportRegions: ViewportRegion[];
+  themeRequirements: TokenRequirement[];
+  localeRequirements: I18nRequirement[];
+  sourceMap: UiToCellSourceMap[];
+};
+\end{CodeBlock}
+
+The final render target remains \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+\begin{CodeBlock}
+ui-scene-ir/1
+  -> bijou-layout/1
+    -> Surface
+      -> terminal
+\end{CodeBlock}
+
+The \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} can then be inspected, hashed, diffed, serialized for MCP, or recorded in a renderer playback artifact.
+
+\section{Geordi Lowering}\label{record-138-geordi-lowering}
+
+Geordi lowering turns portable intent into a pixel-oriented render contract:
+
+\begin{CodeBlock}
+ui-scene-ir/1
+  -> geordi-ir/1
+    -> browser/native renderer
+      -> pixel buffer
+      -> receipt
+\end{CodeBlock}
+
+Geordi can preserve the same node IDs, token references, localization references, and source maps while resolving geometry and render-profile facts for pixel output.
+
+\section{Cross-Renderer Structural Receipt}\label{record-138-cross-renderer-structural-receipt}
+
+The first proof should not compare pixels to cells. It should compare shared structure.
+
+\begin{CodeBlock}
+type SharedSceneReceipt = {
+  sceneHash: string;
+  sourceHash: string;
+  nodeIds: string[];
+  i18nKeys: string[];
+  tokenRefs: string[];
+  actionIds: string[];
+  bindingIds: string[];
+  outputs: {
+    geordi?: {
+      irHash: string;
+      receiptHash: string;
+    };
+    bijou?: {
+      layoutHash: string;
+      surfaceHash: string;
+    };
+  };
+};
+\end{CodeBlock}
+
+This answers the important question:
+
+\begin{CodeBlock}
+Did both targets render the same authored scene contract?
+\end{CodeBlock}
+
+It does not falsely answer:
+
+\begin{CodeBlock}
+Are terminal cells pixel-perfect replicas of browser pixels?
+\end{CodeBlock}
+
+\section{Debug And Provenance Files}\label{record-138-debug-and-provenance-files}
+
+This design connects directly to the proposed stable debug logs:
+
+\begin{CodeBlock}
+<repo>/.bijou/debug.i18n.jsonl
+<repo>/.bijou/debug.style.jsonl
+\end{CodeBlock}
+
+The logs should record first appearance or provenance changes, not every frame.
+
+Example i18n line:
+
+\begin{CodeBlock}
+{"scene":"docs.home","node":"hero.title","key":"dogfood.home.title","locale":"en","status":"resolved"}
+\end{CodeBlock}
+
+Example style line:
+
+\begin{CodeBlock}
+{"scene":"docs.home","node":"hero.title","slot":"fg","token":"semantic.primary","mode":"dark","status":"resolved"}
+\end{CodeBlock}
+
+The eventual goal is to catch these issues earlier through IR validation:
+
+\begin{itemize}
+\tightlist
+\item
+  missing localization key
+\item
+  unsupported locale
+\item
+  raw color in product surface
+\item
+  unresolved token
+\item
+  unsafe token pair
+\item
+  binding target that does not exist
+\item
+  action without a command
+\end{itemize}
+
+Runtime logs remain useful as proof of what actually appeared.
+
+\section{Authoring Model}\label{record-138-authoring-model}
+
+GraphQL SDL remains the strongest candidate authoring source because Wesley and Geordi already use schema-backed compilation patterns.
+
+The authoring source may look like this in spirit:
+
+\begin{CodeBlock}
+type DocsHomeScene
+  @ui_scene(id: "docs.home")
+  @ui_target(kind: "bijou-cell", cols: 120, rows: 40)
+  @ui_target(kind: "geordi-pixel", width: 1280, height: 720) {
+  title: String!
+    @ui_node(id: "hero.title", kind: "text")
+    @ui_text(key: "dogfood.home.title")
+    @ui_style(fg: "semantic.primary")
+
+  openAction: String
+    @ui_action(id: "docs.open", command: "docs.open", keybindings: ["Enter"])
+}
+\end{CodeBlock}
+
+This is not final syntax. The important contract is that scene structure, text, style, binding, and action identity are compile-time data.
+
+\section{Lower Modes}\label{record-138-lower-modes}
+
+The shared IR should make lower modes more deterministic.
+
+For example, Bijou could render diagnostic modes:
+
+\begin{CodeBlock}
+normal:
+  Start Here
+
+i18n lowering:
+  dogfood.nav.startHere
+
+token lowering:
+  semantic.primary on surface.primary.bg
+
+binding lowering:
+  docs.currentPage.title <- route.currentPage.title
+\end{CodeBlock}
+
+These modes are easier to test than screenshots and more useful to agents than raw escape sequences.
+
+\section{Scope}\label{record-138-scope}
+
+The first implementation slice should include:
+
+\begin{itemize}
+\tightlist
+\item
+  a design document for \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}
+\item
+  one tiny fixture scene
+\item
+  a structural receipt format
+\item
+  a Bijou lowering proof to \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  a Geordi lowering proof or adapter stub if Geordi integration is not yet ready inside this repository
+\item
+  tests proving node IDs, token refs, i18n keys, actions, and bindings survive lowering
+\end{itemize}
+
+\section{Non-Goals}\label{record-138-non-goals}
+
+The first slice should not:
+
+\begin{itemize}
+\tightlist
+\item
+  migrate DOGFOOD wholesale to GraphQL-authored scenes
+\item
+  replace existing Bijou block APIs
+\item
+  implement a full Geordi renderer inside Bijou
+\item
+  require Geordi as a runtime dependency of every Bijou app
+\item
+  claim pixel/cell parity
+\item
+  solve every binding expression shape
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-138-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  A \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} fixture describes at least one text node, one token reference, one i18n key, and one action.
+\item
+  Bijou can lower the fixture into a terminal render target without losing node identity.
+\item
+  The resulting \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} can report a structural receipt or source-map facts tied back to the fixture.
+\item
+  The design names the distinction between shared IR, Bijou layout IR, and Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  The design names Geordi as the pixel-proof target and Bijou as the terminal-surface target.
+\item
+  The validation plan proves structure, not screenshot similarity.
+\end{itemize}
+
+\section{Slice Plan}\label{record-138-slice-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Document the shared IR contract and renderer boundaries.
+\item
+  Add a minimal \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} fixture package or test helper.
+\item
+  Add Bijou lowering from the fixture to a simple \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Add structural receipt generation for the fixture.
+\item
+  Add token and i18n provenance checks against the receipt.
+\item
+  Add a Geordi integration spike that either lowers to \texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} or records the adapter boundary needed to do so.
+\end{enumerate}
+
+\section{Validation Plan}\label{record-138-validation-plan}
+
+Focused proof should use deterministic fixture tests:
+
+\begin{CodeBlock}
+npm test -- --run shared-ui-scene-ir
+npm run typecheck:test
+npm run lint
+\end{CodeBlock}
+
+Future integration proof can add:
+
+\begin{CodeBlock}
+npm run dogfood:i18n:check
+npm run dogfood:i18n:debt
+npm run verify:interactive-examples
+\end{CodeBlock}
+
+The key invariant is that a passing test must prove software behavior or inspectable output. A design document alone is not completion proof for the implementation goalpost.
+
+\section{Risks}\label{record-138-risks}
+
+\subsection{Risk: The Shared IR Becomes A Renderer}\label{record-138-risk-the-shared-ir-becomes-a-renderer}
+
+If \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} starts carrying renderer internals, it will become too expensive to author and too vague to validate.
+
+Mitigation: keep final render details in \texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1}, and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+\subsection{Risk: Bijou Loses Terminal-Native Behavior}\label{record-138-risk-bijou-loses-terminal-native-behavior}
+
+If the IR treats keyboard routing, focus, and terminal viewports as afterthought metadata, Bijou scenes will look portable but feel broken.
+
+Mitigation: make Bijou target profiles carry focus, keymap, and viewport requirements explicitly.
+
+\subsection{Risk: Geordi And Bijou Drift Anyway}\label{record-138-risk-geordi-and-bijou-drift-anyway}
+
+If both lowerings are implemented independently without receipts, drift will come back.
+
+Mitigation: structural receipts compare node IDs, text keys, token refs, bindings, actions, and source hashes.
+
+\subsection{Risk: GraphQL Syntax Gets Overloaded}\label{record-138-risk-graphql-syntax-gets-overloaded}
+
+GraphQL SDL can describe contracts well, but directives can become JSON string dumps if the schema is not designed carefully.
+
+Mitigation: use Wesley domain law to validate directive shape and prefer typed schema contracts over ad hoc JSON blobs.
+
+\section{Open Questions}\label{record-138-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} live in Bijou, Geordi, Wesley, or a small shared package?
+\item
+  Should Bijou expose \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1} as a public artifact or keep it internal until the contract stabilizes?
+\item
+  Should Geordi consume \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} directly, or should Wesley emit \texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1} as sibling artifacts?
+\item
+  How much action/focus metadata belongs in the shared IR versus the Bijou target profile?
+\item
+  Should debug JSONL files be produced by the renderer, by the lowering layer, or by both with different provenance phases?
+\end{itemize}
+
+\section{Recommended Next Step}\label{record-138-recommended-next-step}
+
+Create a roadmap-backed issue for \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and start with one tiny fixture scene. The fixture should prove that Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} is a render target for the shared IR, while Geordi remains the pixel-proof target.
+

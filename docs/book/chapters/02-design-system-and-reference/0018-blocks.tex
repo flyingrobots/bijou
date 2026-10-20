@@ -1,0 +1,261 @@
+\chapter{Blocks}\label{record-018}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/blocks.md}\par}\smallskip
+
+This document defines what Bijou means by a reusable block.
+
+Blocks are larger, opinionated assemblies built from canonical patterns and component families.
+
+\section{What a block is}\label{record-018-what-a-block-is}
+
+A block is not:
+
+\begin{itemize}
+\tightlist
+\item
+  a one-off demo composition
+\item
+  a single primitive component
+\item
+  a shell-specific hack that only one proving surface understands
+\end{itemize}
+
+A block is:
+
+\begin{itemize}
+\tightlist
+\item
+  a reusable product-level assembly
+\item
+  composed from canonical patterns
+\item
+  built from existing component families and TUI ownership rules
+\item
+  documented with clear jobs, ownership, and lowering expectations
+\end{itemize}
+
+Blocks come after doctrine, patterns, and components.
+
+That ordering matters:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  doctrine explains what good Bijou UX should feel like
+\item
+  patterns explain recurring interaction language
+\item
+  component families provide reusable primitives
+\item
+  blocks compose those primitives into repeatable product structures
+\end{enumerate}
+
+If a block appears before the first three layers are clear, it usually hardcodes accidental taste instead of reusable language.
+
+\section{What blocks should standardize}\label{record-018-what-blocks-should-standardize}
+
+Blocks should standardize:
+
+\begin{itemize}
+\tightlist
+\item
+  composition
+\item
+  structure
+\item
+  copy rhythm
+\item
+  focus ownership
+\item
+  common shell or workflow affordances
+\end{itemize}
+
+Blocks should not hide:
+
+\begin{itemize}
+\tightlist
+\item
+  important interaction ownership
+\item
+  lowering behavior
+\item
+  accessibility semantics
+\item
+  localization or directional assumptions
+\end{itemize}
+
+\section{Current public contract}\label{record-018-current-public-contract}
+
+Bijou now exposes a metadata-first block authoring contract from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} declares a block's package, name, family, scale, modes, slots, variants, config options, composed components, semantic facts, story ids, and docs.
+\item
+  \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} pairs that metadata with an explicit render function.
+\item
+  \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t} declares the exported blocks, package version, Bijou peer range, docs, and tags for ordinary NPM distribution.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} validate definitions before authors publish or index them.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} can attach DX-034 view data contracts and command intents for discovery without provider handles or command callbacks.
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{s\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}C\allowbreak{}u\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, the DOGFOOD component-family block exports, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s}, and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t} expose the first-party block definitions: AppShell, ReaderSurface, InspectorPanel, inline status, in-flow status, transient overlay feedback, activity stream, shortcut cues, progress, grouping, explainability, documents, links, dividers, text entry, choices, navigation, disclosure, path progress, brand emphasis, mode-aware primitives, dense comparisons, hierarchies, exploration lists, and temporal dependency views. Their render functions now produce deterministic first-proof output across interactive, static, pipe, and accessible modes while keeping provider lifecycle, command dispatch, and production AppShell behavior out of the block definition layer.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} groups runtime-backed blocks into logical navigation, content, inspector, status, and overlay slots without rendering.
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} explicitly render nested block declarations when a host or preview wants child block output inside parent slots. Ordinary \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} remains a local single-block render contract.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, and \texttt{b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})} validate unknown boundary data before producing block render input and binding facts.
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})}, \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})}, and report helpers give tests, docs, DOGFOOD, MCP payloads, and agents a deterministic way to inspect block facts without rendering a terminal surface.
+\end{itemize}
+
+Blocks are described before they render, package authors avoid hidden global registration, and tooling can discover slots and mode support directly. Schema-bound blocks validate unknown boundary data without making Zod, GraphQL, or database schemas part of the core block dependency surface. Provider subscriptions, active hierarchy traversal, rendered AppShell, and DOGFOOD block multi-mode captures remain follow-on work.
+
+\section{First credible block candidates}\label{record-018-first-credible-block-candidates}
+
+\subsection{App frame}\label{record-018-app-frame}
+
+The framed shell is already one of Bijou's strongest recurring structures.
+
+As a future block, \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} should standardize:
+
+\begin{itemize}
+\tightlist
+\item
+  pane rhythm
+\item
+  active-region treatment
+\item
+  shell header/footer ownership
+\item
+  shell overlays such as settings and help
+\end{itemize}
+
+\subsection{Settings drawer}\label{record-018-settings-drawer}
+
+The settings drawer is a credible future block because it already has:
+
+\begin{itemize}
+\tightlist
+\item
+  canonical preference rows
+\item
+  shell-owned dismissal and discovery behavior
+\item
+  stable section rhythm
+\item
+  truthful active-row treatment
+\end{itemize}
+
+As a block, it should be reusable without depending on DOGFOOD-specific code.
+
+\subsection{Notification center}\label{record-018-notification-center}
+
+The notification center is a likely future block once Humane Terminal work resumes.
+
+It should eventually standardize:
+
+\begin{itemize}
+\tightlist
+\item
+  notice rows
+\item
+  archive/history review
+\item
+  filter rhythm
+\item
+  shell-owned interrupt versus review behavior
+\end{itemize}
+
+\subsection{Guided flow}\label{record-018-guided-flow}
+
+Guided flow is the general block family for:
+
+\begin{itemize}
+\tightlist
+\item
+  onboarding
+\item
+  setup sequences
+\item
+  explainability walkthroughs
+\item
+  multi-step assisted flows
+\end{itemize}
+
+This should compose:
+
+\begin{itemize}
+\tightlist
+\item
+  preference rows
+\item
+  alerts and notes
+\item
+  stepper or timeline language
+\item
+  explicit next actions
+\end{itemize}
+
+DL-005 proves the first canonical seam in this family through \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}, which turns the AI explainability doctrine into a structured guided-flow surface instead of leaving it as prose only. DL-008 promotes the reusable block seam through \texttt{g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}(\allowbreak{})}, which standardizes calmer multi-step assistance, section rhythm, and next-action treatment without forcing every guided surface to masquerade as AI explainability.
+
+\subsection{Inspector panel}\label{record-018-inspector-panel}
+
+An inspector-style side panel is another strong candidate because it naturally combines:
+
+\begin{itemize}
+\tightlist
+\item
+  titled sections
+\item
+  supporting copy
+\item
+  current-value emphasis
+\item
+  compact but calm spacing
+\end{itemize}
+
+DL-006 now proves the first canonical seam in this family through \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}, which turns inspector-panel rhythm into a reusable core component instead of leaving it trapped in a bespoke DOGFOOD detail box. DL-007 promotes the first block-level seam in this family through \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, which standardizes drawer-attached inspector composition in TUI shells instead of leaving existing inspector drawers to hand-compose strings.
+
+\section{Block acceptance bar}\label{record-018-block-acceptance-bar}
+
+A structure is ready to become a canonical block when:
+
+\begin{itemize}
+\tightlist
+\item
+  it recurs across more than one surface or product need
+\item
+  its interaction ownership is stable
+\item
+  its patterns are already canonical elsewhere
+\item
+  its lowering story is explicit
+\item
+  it improves reuse instead of trapping more quality inside one shell
+\end{itemize}
+
+\section{What not to do}\label{record-018-what-not-to-do}
+
+\begin{itemize}
+\tightlist
+\item
+  do not promote every nice-looking demo into a block
+\item
+  do not let blocks bypass canonical patterns
+\item
+  do not let blocks become storage, service, or app-domain assumptions
+\item
+  do not treat blocks as the first place where accessibility or localization is considered
+\end{itemize}
+
+\section{Relationship to the current cycle}\label{record-018-relationship-to-the-current-cycle}
+
+DL-002 does not implement a blocks runtime.
+
+This cycle exists to make the block layer explicit so future cycles can promote real recurring structures deliberately instead of accidentally.
+

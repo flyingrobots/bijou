@@ -1,0 +1,30 @@
+\chapter{Topmost Layer Dismisses First}\label{record-062}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/topmost-layer-dismisses-first.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-062-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+When multiple interactive layers are open, dismiss actions should target the topmost dismissible layer before they are interpreted as broader shell actions.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  overlays, drawers, palettes, and modals should dismiss in top-down order
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} should not both dismiss one layer and trigger quit or another action beneath it
+\item
+  the topmost layer owns the active controls and the visible footer/help hints
+\item
+  underlying panes and regions remain inert until the covering layer is dismissed
+\end{itemize}
+

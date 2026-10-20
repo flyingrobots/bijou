@@ -1,0 +1,143 @@
+\chapter{DF-065 Audit workspace layout family across real surfaces}\label{record-106}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-065-audit-workspace-layout-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-065 Audit workspace layout family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - layout
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-106-framing}
+
+Workspace layout is the family that proves spatial composition is semantic work, not decoration. \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} own the rich TUI surface path for simultaneous regions, while \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})}, \texttt{f\allowbreak{}l\allowbreak{}e\allowbreak{}x\allowbreak{}(\allowbreak{})}, \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, and \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} remain the lower-level composition seams for explicit text and surface layout.
+
+This audit verifies the existing DOGFOOD \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} story against real story rendering, component-family doctrine, and mode-aware lowerings. It does not redesign split, grid, flex, stack, or placement algorithms; it turns the current workspace-layout story into release proof.
+
+\section{Sponsored Users}\label{record-106-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors composing primary and secondary work regions in one shell.
+\item
+  Docs readers checking when spatial layout is useful and when sequential flow is clearer.
+\item
+  Maintainers who need one focused regression tying workspace story metadata, variants, and design-system guidance to rendered output.
+\end{itemize}
+
+\section{Hills}\label{record-106-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see the difference between split context and named-area grid composition.
+\item
+  A reader can switch both workspace-layout variants through interactive, static, pipe, and accessible profiles while preserving region identity.
+\item
+  A maintainer can run one cycle test that proves workspace-layout story metadata and family guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-106-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the family through the \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} story?
+\item
+  Do variants cover both split-pane and grid workspace composition?
+\item
+  Do rich/static previews keep spatial containment visible?
+\item
+  Do pipe lowerings preserve a sensible sequential reading order?
+\item
+  Do accessible lowerings linearize the same labeled regions predictably?
+\item
+  Do component-family docs still cover split, grid, flex, stack, and placement seams without pretending layout geometry is content?
+\end{itemize}
+
+\section{Requirements}\label{record-106-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} story identity and coverage family id.
+\item
+  Render every workspace-layout story variant in every canonical story profile.
+\item
+  Treat box drawing, dividers, and named-area geometry as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings region-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture for split, grid, flex, stack, and placement primitives.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-106-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}5\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve split and grid region identity.
+\item
+  Component-family docs retain split, grid, flex, stack, placement, content guidance, and lowering guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-106-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-065 cycle test that renders the \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the workspace layout section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-106-drift-check}
+
+No runtime drift was found in this slice. The existing \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} story already distinguishes split-pane context from grid dashboard composition, renders structured region geometry in interactive/static profiles, and lowers to region summaries in pipe/accessibility modes.
+
+The story intentionally demonstrates the two richest workspace compositions: split panes and grids. The component-family guide remains responsible for naming the lower-level flex, stack, and placement seams that apps use to build those regions.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-106-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-065 playback test tied workspace layout behavior to every canonical profile.
+\item
+  GREEN: the new cycle test renders both \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t} and \texttt{d\allowbreak{}a\allowbreak{}s\allowbreak{}h\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve split dividers, grid regions, and nested panel containment.
+\item
+  Pipe previews preserve region order without box drawing.
+\item
+  Accessible previews linearize the same workspace facts in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-106-retrospective}
+
+The workspace-layout story did not need runtime changes. The useful release work was proving that spatial layout is shared workspace truth, while constrained lowerings keep the same region semantics without pretending visual geometry survived.
+

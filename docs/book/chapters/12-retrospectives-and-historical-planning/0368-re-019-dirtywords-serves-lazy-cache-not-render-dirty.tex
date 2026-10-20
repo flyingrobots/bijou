@@ -1,0 +1,80 @@
+\chapter{RE-019 --- Surface dirtyWords Bitmap Serves The Wrong Master}\label{record-368}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-019-dirtyWords-serves-lazy-cache-not-render-dirty.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-019 — Surface `dirtyWords` Bitmap Serves The Wrong Master
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-368-disposition}
+
+Fixed earlier in the runtime engine: \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} now carries distinct \texttt{d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} and \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} responsibilities, and render dirtiness is tracked separately from lazy decode state in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}. This is no longer an active bad-code item.
+
+\section{Original Proposal}\label{record-368-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-368-problem}
+
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}5\allowbreak{}6} declares a per-cell dirty bitmap:
+
+\begin{CodeBlock}
+const dirtyWords = new Uint32Array(Math.ceil(size / 32));
+\end{CodeBlock}
+
+It is set on every \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} call (via \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y}) and used by \texttt{e\allowbreak{}n\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}C\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}(\allowbreak{})} in \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} to lazily re-decode the \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} object from the packed buffer when the buffer has been mutated since the last \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})}.
+
+The name ``dirty'' strongly suggests this tracks ``cells modified since last render'' --- which is exactly what the renderer would want for efficient diffing. But it does not. It tracks ``cells where the lazily-cached \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} object is stale relative to the buffer''. Two different meanings, one shared name, one shared data structure.
+
+\section{Why This Is Bad}\label{record-368-why-this-is-bad}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Misleading name.} Anyone reading \texttt{d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} will assume it's for render tracking, not lazy cache invalidation. The RE-017 audit caught exactly this confusion --- the renderer does not use the bitmap, even though the data is exactly what it needs.
+\item
+  \textbf{Serves a vestigial cache.} The \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]} array that the bitmap protects is a holdover from the pre-RE-008 cell-based surface API. In the byte-packed world, the buffer is the source of truth; the \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]} projection exists only to support legacy \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} callers and the legacy \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} path. Most hot-path code now uses \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} and byte comparisons, which bypass the cache entirely. The bitmap is protecting a cache that is increasingly irrelevant.
+\item
+  \textbf{Blocks the render-dirty optimization.} Task II-1 in RE-017 wants to reuse this exact bitmap as the render-dirty signal (``which cells were painted this frame, skip the rest on the diff scan''). Reusing the existing bitmap conflicts with its current lazy-cache purpose --- we'd have to clear it at end of render, but \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} would then re-decode unnecessarily on the next frame.
+\end{enumerate}
+
+\section{Fix Direction}\label{record-368-fix-direction}
+
+Two options, either works:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Drop the Cell{[}{]} projection from the packed hot path.} Make \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} decode on demand from the buffer every time, with no cache. Then the \texttt{d\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} bitmap is freed up to mean ``cells modified since last render''. \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} walks set bits. \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}A\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}(\allowbreak{})} is called at end of render. Clean and consistent.
+\item
+  \textbf{Split into two bitmaps.} \texttt{c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} for the lazy \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]} invalidation (current behavior) and \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s} for the render-dirty tracking (new behavior). More memory, but preserves the \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]} cache for any callers that still benefit from it.
+\end{enumerate}
+
+Option 1 is simpler and matches the direction RE-017 is going. Before picking, we should measure how often \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} is actually called in hot paths --- if it's rare, the lazy cache is buying nothing and should be removed. If it's common, we need Option 2 or a different solution.
+
+\section{Evidence}\label{record-368-evidence}
+
+\begin{itemize}
+\tightlist
+\item
+  Current bitmap definition + usage: \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}5\allowbreak{}6\allowbreak{}-\allowbreak{}4\allowbreak{}9\allowbreak{}1}, \texttt{5\allowbreak{}1\allowbreak{}4\allowbreak{}-\allowbreak{}5\allowbreak{}4\allowbreak{}0}.
+\item
+  Render path does not consult it: \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}0\allowbreak{}1} (\texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} walks all cells every frame with byte comparison; no bitmap check).
+\item
+  Task II-1 in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} proposes to repurpose it for render-dirty tracking.
+\end{itemize}
+
+\section{Tests To Add}\label{record-368-tests-to-add}
+
+\begin{itemize}
+\tightlist
+\item
+  Once repurposed: \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} should visit zero cells on a frame where \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} was called and no \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} followed.
+\item
+  Once repurposed: after a \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} at (5, 3), the next \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} call should visit (5, 3) and skip all other cells (assuming no other mutations).
+\item
+  Regression test: \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}x\allowbreak{},\allowbreak{} \allowbreak{}y\allowbreak{})} after a \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}x\allowbreak{},\allowbreak{} \allowbreak{}y\allowbreak{})} still returns the updated cell (decode path still works without the cache).
+\end{itemize}
+

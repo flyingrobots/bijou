@@ -1,0 +1,360 @@
+\chapter{DX-045 GraphQL Block Groups And Debug Facts}\label{record-141}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-045-graphql-block-groups-and-debug-facts.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-045 GraphQL Block Groups And Debug Facts
+legend: DX
+lane: cool-ideas
+priority: medium
+github_issue: 302
+status: landed
+keywords:
+  - developer-experience
+  - graphql
+  - blocks
+  - ir
+  - dogfood
+  - debug-facts
+  - render-everywhere
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-141-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub issue: \href{https://github.com/flyingrobots/bijou/issues/302}{\#302}
+\item
+  Prior slice: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md}{DX-044 GraphQL Authored Bijou Block IR Proof}
+\item
+  Runtime seed: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md}{DX-042 Shared UI Scene IR And Bijou Render Target}
+\item
+  Portable endpoint direction: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md}{DX-043 Portable Bijou Blocks And Multi-Endpoint IR}
+\end{itemize}
+
+DX-044 proved the smallest boring path:
+
+\begin{CodeBlock}
+GraphQL SDL
+  -> bijou-block/1
+    -> ui-scene-ir/1
+      -> terminal Surface proof
+\end{CodeBlock}
+
+DX-045 turns that proof into a more credible authoring pipeline by adding explicit group nodes and deterministic debug facts. It should still stay inside Bijou; Geordi remains the next endpoint after the semantic artifact is strong enough to hand across a repository boundary.
+
+\section{Decision Summary}\label{record-141-decision-summary}
+
+GraphQL-authored Bijou blocks need a hierarchy before Dogfood or BlockLab can use them naturally. The first hierarchy primitive should be a small field-attached group directive, not a general GraphQL execution model.
+
+The next flow is:
+
+\begin{CodeBlock}
+GraphQL SDL fixture
+  -> bijou-block/1 artifact with groups[]
+    -> ui-scene-ir/1 group/text node tree
+      -> terminal Surface proof
+        -> debug summary facts
+          -> ui-scene-receipt/1
+\end{CodeBlock}
+
+The debug summary is deliberately fact-shaped. It is not a renderer and not a test snapshot. It gives maintainers and agents one deterministic object that answers what source, artifact, scene, nodes, tokens, i18n keys, actions, bindings, and lower-mode witnesses exist.
+
+\section{Sponsored Human}\label{record-141-sponsored-human}
+
+A Bijou author wants to organize a GraphQL-authored block into named sections without hand-editing JSON IR, then confirm that the rendered terminal output and debug facts still point back to the right source fields.
+
+\section{Sponsored Agent}\label{record-141-sponsored-agent}
+
+An agent wants a deterministic summary of the GraphQL-to-IR pipeline so it can reason about a UI failure from source anchors, group ownership, token refs, i18n keys, bindings, actions, hashes, and lower-mode output instead of interpreting screenshots.
+
+\section{Hill}\label{record-141-hill}
+
+Given a constrained GraphQL SDL file with text fields assigned to named groups, Bijou can produce a stable grouped \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact, lower it into a valid \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} group/text node tree, render the text nodes to a terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and emit deterministic debug facts that preserve source maps, tokens, i18n keys, actions, bindings, lower-mode witnesses, and hashes.
+
+\section{Playback Questions}\label{record-141-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Can one SDL group directive become one \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} group and one \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} group node with stable parent/child relationships?
+\item
+  Can one SDL text field point to its owning group, text node, i18n key, token refs, action, binding, visible cells, and source anchor?
+\item
+  Can whitespace-only SDL edits preserve the artifact hash, scene hash, and debug summary hash?
+\item
+  Can lower modes prove the same grouped scene through node ids, i18n keys, and token refs?
+\item
+  Can unsupported duplicate group ids fail before lowering creates a misleading receipt?
+\end{itemize}
+
+\section{Scope}\label{record-141-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a constrained \texttt{@\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}G\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} directive.
+\item
+  Add \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}s\allowbreak{}[\allowbreak{}]} to \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} while preserving existing flat-field compatibility.
+\item
+  Lower block groups into \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} group nodes.
+\item
+  Preserve deterministic group source-map facts.
+\item
+  Add a public debug summary helper for the GraphQL block pipeline.
+\item
+  Add fixture-style tests for grouped SDL, duplicate groups, lower modes, and hash stability.
+\item
+  Update issue, roadmap, bearing, and changelog evidence.
+\end{itemize}
+
+\section{Non-Goals}\label{record-141-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No full GraphQL parser dependency.
+\item
+  No nested GraphQL execution or resolver runtime.
+\item
+  No automatic layout engine.
+\item
+  No Geordi repository changes in this slice.
+\item
+  No Dogfood-wide migration.
+\item
+  No browser endpoint.
+\item
+  No frame-capture file format.
+\end{itemize}
+
+\section{SDL Shape}\label{record-141-sdl-shape}
+
+The first grouped SDL shape stays explicit:
+
+\begin{CodeBlock}
+type ReleaseCard
+  @bijouBlock(id: "release.card", component: "ReleaseCardBlock")
+  @bijouTarget(kind: "bijou-terminal", cols: 48, rows: 8)
+  @bijouGroup(id: "release.card.header", label: "Header", x: 1, y: 1, width: 46, height: 3)
+  @bijouGroup(id: "release.card.footer", label: "Footer", x: 1, y: 5, width: 46, height: 2) {
+  heading: String!
+    @bijouText(id: "heading", group: "release.card.header", x: 2, y: 1)
+    @bijouI18n(key: "release.card.heading", fallback: "Bijou")
+    @bijouToken(fg: "semantic.title.fg")
+
+  openNotes: String
+    @bijouText(id: "open-notes", group: "release.card.footer", x: 2, y: 5)
+    @bijouAction(id: "release.openNotes", command: "release.openNotes", key: "Enter")
+    @bijouI18n(key: "release.card.openNotes", fallback: "Open release notes")
+    @bijouToken(fg: "semantic.action.fg", bg: "semantic.action.bg")
+}
+\end{CodeBlock}
+
+Group directives are type directives. Text fields opt into a group with \texttt{@\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}"\allowbreak{})}. Omitting \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p} preserves the DX-044 behavior and parents the text node to the block root.
+
+The subset allows only:
+
+\begin{itemize}
+\tightlist
+\item
+  one \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e}
+\item
+  type directives on the type declaration or following indented lines before \texttt{\{}
+\item
+  scalar fields
+\item
+  field directives on following indented lines
+\item
+  string and integer directive arguments
+\item
+  group ids that are unique and cannot collide with the root node or field node ids
+\end{itemize}
+
+\section{Artifact Contract}\label{record-141-artifact-contract}
+
+\texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} gains \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}s\allowbreak{}[\allowbreak{}]}:
+
+\begin{CodeBlock}
+bijou-block/1
+  id
+  component
+  sourceHash
+  rootNodeId
+  groups[]
+    id
+    label
+    source
+    layout
+  fields[]
+    fieldName
+    nodeId
+    groupId
+    text
+    action
+    binding
+    token refs
+    source
+  targetProfiles[]
+\end{CodeBlock}
+
+Existing consumers that only read \texttt{f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d\allowbreak{}s\allowbreak{}[\allowbreak{}]} remain valid. Lowering owns the new parent-child relationships.
+
+\section{Debug Summary Contract}\label{record-141-debug-summary-contract}
+
+The debug helper should return plain data:
+
+\begin{CodeBlock}
+graphql-bijou-block-debug/1
+  artifactVersion
+  artifactHash
+  sceneHash
+  rootNodeId
+  groups[]
+  fields[]
+  sourceMap[]
+  i18nKeys[]
+  tokenRefs[]
+  actionIds[]
+  bindingIds[]
+  lowerModes[]
+\end{CodeBlock}
+
+The summary should be stable enough to hash and inspect in tests. It should not include host paths, timestamps, process ids, terminal dimensions from the operator environment, or screenshots.
+
+\section{Accessibility And Lower Modes}\label{record-141-accessibility-and-lower-modes}
+
+Groups must preserve semantic organization even when terminal color and layout are unavailable. Lower modes must still expose:
+
+\begin{itemize}
+\tightlist
+\item
+  node ids for group and text nodes
+\item
+  i18n keys for localized text
+\item
+  token refs for styled text
+\item
+  source anchors for field and group facts
+\end{itemize}
+
+No meaning in this slice may depend only on color.
+
+\section{Localization And Directionality Posture}\label{record-141-localization-and-directionality-posture}
+
+The compiler continues to require fallback text for renderable i18n text nodes. Groups may carry labels for debug and inspector use, but group labels are not user-facing localized strings in this slice. Directionality remains deferred until multiline text and localized layout constraints exist in the IR.
+
+\section{Agent Inspectability}\label{record-141-agent-inspectability}
+
+The useful debug path should become:
+
+\begin{CodeBlock}
+SDL type directive / field directive
+  -> bijou-block/1 group / field
+    -> ui-scene-ir/1 group / text node
+      -> terminal cell source map
+        -> debug summary
+          -> receipt
+\end{CodeBlock}
+
+An agent should be able to answer, from committed facts:
+
+\begin{itemize}
+\tightlist
+\item
+  Which SDL directive created this group?
+\item
+  Which fields belong to this group?
+\item
+  Which visible cells came from a field in that group?
+\item
+  Which lower-mode output proves the same scene without color?
+\item
+  Which hashes bind the artifact, scene, surface, and debug summary?
+\end{itemize}
+
+\section{Linked Invariants}\label{record-141-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}: grouped SDL authoring must fail at compile time when ids collide or point to missing groups.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: the grouped artifact must preserve semantic organization through \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and terminal lower modes.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}: debug output must be serializable fact records, not executable renderer behavior.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: grouped authoring is complete only when focused tests prove the compiler, lowering, lower modes, and debug summary.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-141-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add this design doc and tracker updates.
+\item
+  Add grouped SDL fixture tests that fail against the DX-044 flat compiler.
+\item
+  Extend \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} types with \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}s\allowbreak{}[\allowbreak{}]} and \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}I\allowbreak{}d}.
+\item
+  Parse repeated \texttt{@\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}G\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} type directives.
+\item
+  Validate group ids and field group references before lowering.
+\item
+  Lower groups into \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} group nodes.
+\item
+  Add \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})}.
+\item
+  Prove normal rendering and lower modes for one grouped block.
+\item
+  Preserve whitespace-stable artifact, scene, and debug hashes.
+\item
+  Update changelog, issue, and PR evidence.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-141-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: grouped SDL should compile into two groups and two grouped fields.
+\item
+  RED: grouped lowering should produce a valid \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} tree with root children as group ids and group children as text node ids.
+\item
+  RED: debug summary should list artifact hash, scene hash, groups, fields, i18n keys, token refs, actions, bindings, source-map anchors, and lower-mode hashes.
+\item
+  RED: duplicate group ids and missing field group references should fail before lowering.
+\item
+  GREEN: terminal normal, \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}s}, \texttt{i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}s}, and \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}s} lower modes should render deterministic grouped-scene facts.
+\end{itemize}
+
+\section{Closeout}\label{record-141-closeout}
+
+The cycle is landed when:
+
+\begin{itemize}
+\tightlist
+\item
+  this design doc links \#302
+\item
+  the branch PR links this design and \#302
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} supports grouped authoring
+\item
+  \texttt{l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}o\allowbreak{}U\allowbreak{}i\allowbreak{}S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} preserves group hierarchy
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})} is exported
+\item
+  focused grouped GraphQL tests are green
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, and the relevant focused tests are green
+\item
+  the PR names what remains for Dogfood-wide authoring and Geordi endpoints
+\end{itemize}
+

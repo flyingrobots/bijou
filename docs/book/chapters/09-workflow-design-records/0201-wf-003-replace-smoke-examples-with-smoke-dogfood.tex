@@ -1,0 +1,252 @@
+\chapter{WF-003 --- Replace smoke:examples:* With smoke:dogfood}\label{record-201}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor human}\label{record-201-sponsor-human}
+
+A maintainer preparing \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} and needing the repo's release smoke contract to match the repo's stated DOGFOOD-first docs posture.
+
+\section{Sponsor agent}\label{record-201-sponsor-agent}
+
+An agent that must answer, from repo artifacts alone:
+
+\begin{itemize}
+\tightlist
+\item
+  what release smoke actually runs before \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  whether DOGFOOD or the broad \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree is the public proving surface
+\item
+  which scripts and workflows witness that answer
+\end{itemize}
+
+\section{Hill}\label{record-201-hill}
+
+The public \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} smoke contract now belongs to DOGFOOD.
+
+The workspace scripts, release-readiness gauntlet, CI workflow, release-dry-run workflow, publish workflow, and release docs all agree that DOGFOOD is the release-facing smoke surface.
+
+\section{Why this cycle exists}\label{record-201-why-this-cycle-exists}
+
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md}{DF-025} made the repo posture sharp: DOGFOOD, not \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/}, is the only human-facing docs surface for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+
+But the release contract was still lying:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} still exposed \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} as the main smoke family
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} still ran \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}a\allowbreak{}l\allowbreak{}l}
+\item
+  CI, release dry-runs, and publish verification still fanned out the old examples lanes
+\item
+  repo docs still talked about moving smoke to DOGFOOD as future work
+\end{itemize}
+
+That meant the repo could teach one surface while releasing against another.
+
+\section{Human users}\label{record-201-human-users}
+
+\subsection{Primary human user}\label{record-201-primary-human-user}
+
+A maintainer or reviewer checking whether \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is ready to release.
+
+\subsection{Human hill}\label{record-201-human-hill}
+
+A human can inspect the package scripts, workflows, and release docs and see one coherent answer: DOGFOOD is the release-facing smoke surface.
+
+\section{Agent users}\label{record-201-agent-users}
+
+\subsection{Primary agent user}\label{record-201-primary-agent-user}
+
+A coding or release agent that needs to run or explain pre-release validation without chat-memory folklore.
+
+\subsection{Agent hill}\label{record-201-agent-hill}
+
+An agent can recover the DOGFOOD smoke contract from repo artifacts alone without guessing whether examples are still canonical.
+
+\section{Playback questions}\label{record-201-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does the workspace expose \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}, \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}, and \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}?
+\item
+  Does \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} now run \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}s\allowbreak{}k\allowbreak{}i\allowbreak{}p\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d} instead of \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}a\allowbreak{}l\allowbreak{}l}?
+\item
+  Do CI, release dry-runs, and publish verification all fan out the DOGFOOD smoke lanes instead of the examples lanes?
+\item
+  Does the repo explicitly say that examples are secondary while DOGFOOD owns the release smoke contract?
+\item
+  Is \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} promoted into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}, with the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane pruned again because no cycle-shaped blockers remain?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-201-accessibility-assistive-reading-posture}
+
+This cycle is terminal-output shaped. The smoke harness must prove the landing and docs shell through stable, plain-text witnesses after ANSI noise is stripped.
+
+\section{Localization / directionality posture}\label{record-201-localization-directionality-posture}
+
+DOGFOOD is the localized, docs-bearing product surface. Release smoke should exercise that route rather than a grab bag of legacy examples.
+
+\section{Agent inspectability / explainability posture}\label{record-201-agent-inspectability-explainability-posture}
+
+The release smoke decision must be discoverable through:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}i\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l}
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l}
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}u\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}E\allowbreak{}X\allowbreak{}A\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}E\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  cycle tests
+\end{itemize}
+
+\section{Non-goals}\label{record-201-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  deleting every example-specific smoke helper immediately
+\item
+  removing reference or migration examples that still carry isolated API value
+\item
+  cutting the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} tag
+\item
+  changing the already-shaped \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release scope
+\end{itemize}
+
+\section{Evidence}\label{record-201-evidence}
+
+\subsection{Before this cycle}\label{record-201-before-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} exposed \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} still ran \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}a\allowbreak{}l\allowbreak{}l}
+\item
+  CI and release workflows still used \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, and \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} still described moving smoke to DOGFOOD as an open blocker
+\end{itemize}
+
+\subsection{Local validation witness}\label{record-201-local-validation-witness}
+
+These commands passed locally during this cycle:
+
+\begin{CodeBlock}
+npm test -- scripts/smoke-dogfood.test.ts scripts/release-readiness.test.ts
+npm run smoke:dogfood -- --skip-build
+\end{CodeBlock}
+
+The DOGFOOD smoke harness now drives the existing deterministic capture entrypoint in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s} through two scripted journeys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s}
+\end{itemize}
+
+\section{Decision}\label{record-201-decision}
+
+\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release smoke belongs to DOGFOOD, not the broad \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree.
+
+Bijou should therefore:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  expose DOGFOOD smoke as the public smoke family
+\item
+  run DOGFOOD smoke in local release readiness
+\item
+  fan DOGFOOD smoke out in CI and release workflows
+\item
+  describe example smoke as secondary/internal rather than release canonical
+\end{enumerate}
+
+\section{Implementation outline}\label{record-201-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DOGFOOD smoke harness around \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s} with stable \texttt{l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s} journeys.
+\item
+  Replace the public \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} package scripts with \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}, \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}, and \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}.
+\item
+  Switch \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} and the GitHub workflows to the new DOGFOOD smoke commands.
+\item
+  Update release docs, backlog/signpost docs, and examples posture docs so they stop describing DOGFOOD smoke as future work.
+\item
+  Promote \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and prune the now-empty \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} lane again.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-201-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a unit test for the DOGFOOD smoke runner's option parsing and launch plans
+\item
+  a release-readiness test proving the gauntlet now runs \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}
+\item
+  a cycle test proving \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} moved into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and the temporary blocker lane was pruned again
+\end{itemize}
+
+\section{Retrospective}\label{record-201-retrospective}
+
+\subsection{What landed}\label{record-201-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  the repo now exposes DOGFOOD-centered smoke scripts
+\item
+  release readiness and GitHub workflows now run DOGFOOD smoke instead of examples smoke
+\item
+  release/docs signposts no longer describe DOGFOOD smoke as unresolved
+\item
+  the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane is pruned again because the cycle-shaped blockers are cleared
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-201-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  the older example smoke harness still exists as internal tooling until a later cycle decides exactly which example-only proofs to keep or retire
+\item
+  release execution itself is still outstanding
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-201-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  no new cycle-shaped blocker; the next work is operational release execution or post-\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} follow-on backlog
+\end{itemize}
+

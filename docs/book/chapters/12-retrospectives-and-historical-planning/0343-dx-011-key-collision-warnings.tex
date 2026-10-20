@@ -1,0 +1,35 @@
+\chapter{DX-011 --- Key Collision Warnings at Registration Time}\label{record-343}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX_011-key-collision-warnings.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-011 — Key Collision Warnings at Registration Time
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-343-disposition}
+
+Repo truth already ships this warning. \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} queues a runtime warning when a page key binding is shadowed by a frame binding under \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}'}, and \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} already covers both the warning emission and the once-per-page guard. The backlog note is stale relative to shipped behavior.
+
+\section{Original Proposal}\label{record-343-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-343-idea}
+
+When \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} is called with pages that have keybindings which collide with the frame's built-in bindings (help \texttt{?}, settings \texttt{c\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{},}, quit \texttt{e\allowbreak{}s\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}e}, etc.), emit a warning through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} at app initialization time --- not at key-press time.
+
+\begin{CodeBlock}
+[Framework warning] Page "editor" binds "?" but frame-first key
+priority means the frame's help toggle will consume it. Use
+keyPriority: 'page-first' or choose a different key.
+\end{CodeBlock}
+
+\section{Why}\label{record-343-why}
+
+Currently, a developer binds \texttt{?} to ``show info'' in their page, runs the app, presses \texttt{?}, and sees the help overlay instead of their handler. There is no diagnostic --- the key is silently consumed. The developer has to read the frame-first/page-first docs to understand what happened.
+
+A warning at registration time catches this immediately.
+

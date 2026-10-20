@@ -1,0 +1,126 @@
+\chapter{Theme Rule Recipes}\label{record-027}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/theme-rule-recipes.md}\par}\smallskip
+
+Theme rules let Bijou themes describe how semantic colors are selected instead of only storing final hex values.
+
+The runtime contract is unchanged:
+
+\begin{CodeBlock}
+primitive colors
+  -> selector rules
+    -> TokenGraph
+      -> ThemeAccessors
+        -> terminal rendering
+\end{CodeBlock}
+
+Rules live in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. They do not depend on external design token packages and they compile to the same \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} objects the renderer already consumes.
+
+Bijou dogfoods this flow for the owned \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} presets: their primitive ink, brand, and surface palettes compile through \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} rules into the same public \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} objects existing consumers already use. Legacy vivid themes and third-party palette fixtures remain literal compatibility presets.
+
+\section{When To Use Rules}\label{record-027-when-to-use-rules}
+
+Use a rule when a token should follow a stable decision:
+
+\begin{itemize}
+\tightlist
+\item
+  readable foreground on a known surface
+\item
+  vivid accent that must not reuse success or error
+\item
+  muted candidate that still clears a contrast floor
+\item
+  closest palette color to a target
+\item
+  ordered ramp position such as the middle or final stop
+\end{itemize}
+
+Do not use rules to hide one-off taste decisions. If the product needs exactly one named color, write the token directly.
+
+\section{Primitive To Semantic Flow}\label{record-027-primitive-to-semantic-flow}
+
+Start with primitive colors, then derive product roles from them:
+
+\begin{CodeBlock}
+import {
+  bestContrastWith,
+  createTokenGraph,
+  mostVivid,
+  scope,
+} from '@flyingrobots/bijou';
+
+const graph = createTokenGraph({
+  palette: {
+    ink: '#0b1020',
+    paper: '#f8fafc',
+    blue: '#3399ff',
+    green: '#22c55e',
+    red: '#ef4444',
+  },
+  surface: {
+    primary: { fg: '#f8fafc', bg: { ref: 'palette.ink' } },
+  },
+  semantic: {
+    primary: bestContrastWith({ ref: 'surface.primary.bg' }, scope('palette')),
+    accent: mostVivid(scope('palette'), {
+      against: { ref: 'surface.primary.bg' },
+      minContrast: 4.5,
+      not: ['palette.green', 'palette.red'],
+    }),
+  },
+});
+\end{CodeBlock}
+
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} is now ``the highest-contrast palette color on the primary surface.'' \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} is ``the most vivid readable palette color that is not reserved for success or error.''
+
+\section{Inspect The Decision}\label{record-027-inspect-the-decision}
+
+Rules are useful only when they can explain themselves:
+
+\begin{CodeBlock}
+const fact = graph.inspect('semantic.accent');
+\end{CodeBlock}
+
+The inspection fact includes:
+
+\begin{itemize}
+\tightlist
+\item
+  the rule id
+\item
+  the selected candidate
+\item
+  candidate paths and resolved colors
+\item
+  excluded candidates
+\item
+  contrast failures
+\item
+  dependency paths
+\end{itemize}
+
+This is the data future Theme Inspector and Theme Lab surfaces should render. They should not infer token ownership from RGB equality or screenshots.
+
+\section{Selector Vocabulary}\label{record-027-selector-vocabulary}
+
+\texttt{b\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{})} chooses the highest-contrast candidate.
+
+\texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{} \allowbreak{}\}\allowbreak{})} chooses the first candidate that reaches the requested contrast ratio.
+
+\texttt{m\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} chooses the highest-chroma candidate; it is readable only when \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t} and \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t} are provided.
+
+\texttt{l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} chooses the lowest-chroma candidate; it uses the same readability rule.
+
+\texttt{c\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{})} chooses the closest RGB candidate.
+
+\texttt{n\allowbreak{}t\allowbreak{}h\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{})} chooses an ordered candidate by integer or relative index.
+
+Candidate scopes are deterministic. \texttt{s\allowbreak{}c\allowbreak{}o\allowbreak{}p\allowbreak{}e\allowbreak{}(\allowbreak{}'\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}'\allowbreak{})} reads direct children of the \texttt{p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} scope in definition order.
+
+\section{Lower-Mode Rule}\label{record-027-lower-mode-rule}
+
+Rules improve color choice. They do not make color the only source of meaning.
+
+Every UI that consumes these tokens still needs labels, symbols, structure, or state text that survives \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R}, pipe output, and accessible lowering.
+

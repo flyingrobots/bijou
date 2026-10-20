@@ -1,0 +1,208 @@
+\chapter{LX-020 - DOGFOOD Locale Demo Readiness}\label{record-196}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-020-dogfood-locale-demo-readiness.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: LX-020
+title: DOGFOOD Locale Demo Readiness
+status: active
+lane: asap
+priority: high
+github_issue: 340
+legend: LX
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX - Localization and Bidirectionality}
+
+\section{Decision Summary}\label{record-196-decision-summary}
+
+DOGFOOD should stop presenting non-English locale selection as if the whole app is fully translated. For \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, the honest release-demo contract is:
+
+\begin{itemize}
+\tightlist
+\item
+  core app chrome and release-demo navigation do not show missing localization placeholders
+\item
+  English-source documentation is labeled as such when selected locale content is intentionally unavailable
+\item
+  localization debt remains visible to maintainers without leaking broken UI into the user-facing demo path
+\end{itemize}
+
+\section{Sponsored Human}\label{record-196-sponsored-human}
+
+A release-video user needs DOGFOOD to survive a non-English locale switch without looking broken. Missing localization markers, accidental English chrome, and unclear partial-translation behavior make the shipped story feel unfinished.
+
+\section{Sponsored Agent}\label{record-196-sponsored-agent}
+
+An agent needs deterministic localization witnesses that distinguish three states:
+
+\begin{itemize}
+\tightlist
+\item
+  selected-locale translation exists and is rendered
+\item
+  selected-locale translation is intentionally unavailable and the app presents an English-source notice
+\item
+  selected-locale translation is missing by accident and should fail the gate
+\end{itemize}
+
+\section{Hill}\label{record-196-hill}
+
+After this cycle, DOGFOOD's non-English demo path is truthful enough for a release video: switching locales does not expose missing-placeholder strings in major app chrome, and documentation surfaces clearly explain when they remain English-source content.
+
+\section{Problem}\label{record-196-problem}
+
+Issue \#340 came from the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release-video rehearsal. DOGFOOD can switch to non-English locales, but much of the app still renders English copy or missing localization markers. Existing i18n gates prove debt is counted, not that the presentation path is demo-ready.
+
+The current debt ratchet is useful, but it is not sufficient for user-facing release claims:
+
+\begin{CodeBlock}
+dogfood-i18n-debt: ok (2772 raw strings; baseline 2772; 78 missing Markdown localizations; baseline 78)
+\end{CodeBlock}
+
+That output tells maintainers the known debt did not grow. It does not tell a viewer why non-English DOGFOOD still shows English documentation.
+
+\section{Scope}\label{record-196-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Audit the launch, navigation, settings, status/footer, and major tab chrome for the supported non-English DOGFOOD locales.
+\item
+  Add deterministic coverage that fails when the release-demo path renders visible missing-localization placeholders.
+\item
+  Add or update DOGFOOD copy so intentionally English-source documentation is labeled clearly when the selected locale lacks translated Markdown.
+\item
+  Keep the existing debt ratchet intact; this cycle strengthens the presentation contract around it.
+\item
+  Update release-facing docs/changelog so \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} describes the localization posture honestly.
+\end{itemize}
+
+\section{Non-Goals}\label{record-196-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not translate the full DOGFOOD documentation corpus in this cycle.
+\item
+  Do not build a localization workbench or dashboard.
+\item
+  Do not change the CSV/XLSX localization workflow.
+\item
+  Do not hide known debt from maintainer tooling.
+\item
+  Do not broaden \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} into the V8/V9 localization operations surface.
+\end{itemize}
+
+\section{User Experience Contract}\label{record-196-user-experience-contract}
+
+For non-English locales, DOGFOOD may show English documentation only if the UI makes that fallback explicit. The user should not have to infer whether English copy is a bug, an untranslated source document, or a missing catalog entry.
+
+Major app chrome should be localized or explicitly excluded from the release demo path. Missing-placeholder strings are not acceptable on the demo path.
+
+\section{Lower Modes}\label{record-196-lower-modes}
+
+\subsection{Static Mode}\label{record-196-static-mode}
+
+Static DOGFOOD render helpers should be able to render a selected-locale path and expose whether missing placeholders appear in visible output.
+
+\subsection{Pipe Mode}\label{record-196-pipe-mode}
+
+Pipe/smoke output should remain deterministic and suitable for release evidence. Locale-specific output checks must avoid terminal-profile assumptions.
+
+\subsection{Accessible Mode}\label{record-196-accessible-mode}
+
+English-source notices should be text, not color-only styling. Screen readers and terminal readers should receive the same partial-localization status.
+
+\section{Localization / Directionality Posture}\label{record-196-localization-directionality-posture}
+
+This cycle treats localization status as product truth. The app may still carry known translation debt, but the release-demo path must make that debt explicit instead of looking accidentally broken.
+
+No new right-to-left layout contract is introduced. Direction metadata should continue to flow from the selected locale through the existing localization port/runtime path.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-196-agent-inspectability-explainability-posture}
+
+Agents should be able to inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  which locale was selected
+\item
+  whether a rendered string came from selected-locale content, fallback content, or an English-source documentation notice
+\item
+  whether missing localization markers appeared in the tested output
+\end{itemize}
+
+The proof should be executable through focused tests and existing DOGFOOD i18n commands, not through screenshots alone.
+
+\section{Linked Invariants}\label{record-196-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD visible release claims must be true in the app.
+\item
+  Known localization debt must stay counted by the ratchet.
+\item
+  Missing localization placeholders must not appear in the release-demo path.
+\item
+  English-source documentation fallback must be explicit to users.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-196-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add focused failing tests that render representative non-English DOGFOOD paths and assert no visible missing-localization placeholders are present.
+\item
+  Identify the release-demo chrome surfaces that should be localized now.
+\item
+  Add an English-source documentation notice for intentionally untranslated Markdown/documentation surfaces.
+\item
+  Update catalog entries or DOGFOOD copy for the scoped chrome surfaces.
+\item
+  Preserve the existing \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}, \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}, and \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e} gates.
+\item
+  Update changelog and any release-facing wording needed to avoid overclaiming full DOGFOOD translation.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-196-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  A non-English DOGFOOD launch/render path fails if visible missing localization markers appear.
+\item
+  A selected non-English documentation path renders an explicit English-source notice when translated Markdown is unavailable.
+\item
+  Locale switching keeps major app chrome free of accidental missing markers.
+\item
+  Existing debt-ratchet behavior still reports known raw-string and Markdown localization debt.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-196-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Non-English release-demo path has deterministic missing-placeholder coverage.
+\item
+  Major DOGFOOD chrome on that path is localized or explicitly excluded from the release-demo claim.
+\item
+  English-source documentation fallback is visible and textual.
+\item
+  Existing i18n debt gates remain green.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the demo-readiness fix.
+\item
+  Issue \#340 is closed by the implementation PR.
+\end{itemize}
+
+\section{Retrospective}\label{record-196-retrospective}
+
+To be completed when the PR lands.
+

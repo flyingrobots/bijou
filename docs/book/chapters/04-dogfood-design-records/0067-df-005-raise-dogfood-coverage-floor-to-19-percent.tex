@@ -1,0 +1,293 @@
+\chapter{DF-005 --- Raise DOGFOOD Coverage Floor to 19\%}\label{record-067}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md}\par}\smallskip
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md}{DF-004 --- Raise DOGFOOD Coverage Floor to the Next 5-Point Target}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-067-why-this-cycle-exists}
+
+DF-004 proved the coverage ratchet can move honestly.
+
+The next promised step is now explicit:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD currently documents 5 of 35 component families
+\item
+  the enforced floor is 14\%
+\item
+  the next declared target is 19\%
+\end{itemize}
+
+This cycle exists to earn that next target with real component stories, not by moving the policy first.
+
+\section{Scope of this cycle}\label{record-067-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  adding enough real DOGFOOD component stories to move coverage from 5 to 7 families
+\item
+  documenting progress and loading surfaces with honest static and animated previews
+\item
+  raising the enforced floor from 14\% to 19\%
+\item
+  raising the next declared target from 19\% to 24\%
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  broad DOGFOOD navigation redesign
+\item
+  a full story-runtime state system for every component preview
+\item
+  pretending the progress/loading families are now exhaustively documented
+\item
+  changing the canonical component-family denominator
+\end{itemize}
+
+\section{Human users}\label{record-067-human-users}
+
+\subsection{Primary human user}\label{record-067-primary-human-user}
+
+A builder evaluating whether DOGFOOD explains Bijou's loading and progress affordances honestly.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  a static determinate progress preview they can scan quickly
+\item
+  a looping animated progress preview that proves the component is alive, not just described
+\item
+  explicit loading-placeholder guidance instead of only shell-level status chrome
+\end{itemize}
+
+\subsection{Human hill}\label{record-067-human-hill}
+
+A user can open DOGFOOD and see both static and animated progress examples plus real loading-placeholder guidance, and the documented coverage percentage moves for that real added content.
+
+\section{Agent users}\label{record-067-agent-users}
+
+\subsection{Primary agent user}\label{record-067-primary-agent-user}
+
+An agent tasked with expanding DOGFOOD coverage while preserving honesty and keeping previews deterministic.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  a clear smallest honest route from 14\% to 19\%
+\item
+  a preview seam that can animate without inventing a second runtime
+\item
+  tests that prove both the docs coverage and the animated preview behavior
+\end{itemize}
+
+\subsection{Agent hill}\label{record-067-agent-hill}
+
+An agent can raise DOGFOOD to the 19\% floor only by adding real stories for the \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} and \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s} families and proving that the progress preview actually animates on pulse.
+
+\section{Human playback}\label{record-067-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user enters DOGFOOD and opens the progress story.
+\item
+  They can see a static determinate progress example and a looping animated example.
+\item
+  They can open the loading-placeholder story and see realistic skeleton usage guidance.
+\item
+  The docs coverage card reports a higher percentage that corresponds to those real new stories.
+\end{enumerate}
+
+\section{Agent playback}\label{record-067-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DF-005 cycle doc.
+\item
+  It can see that the target is 19\%, which requires 7 covered families out of 35.
+\item
+  It adds real stories for \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} and \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s}.
+\item
+  It threads a minimal preview clock into DOGFOOD so the animated progress preview changes on pulse without inventing general mutable story state.
+\item
+  The cycle tests and gate confirm that coverage is now 20\%, which safely clears the 19\% floor, and the next target is recorded as 24\%.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-067-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-067-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  the floor must move only after real coverage moves
+\item
+  the progress story must include both a static and a looping animated preview
+\item
+  the animated preview must be driven by deterministic pulse time, not real wall-clock side effects
+\item
+  loading placeholders must be documented through a real \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} story before they count toward coverage
+\item
+  the denominator must still come from the canonical component-family reference
+\end{itemize}
+
+\section{Implementation outline}\label{record-067-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DF-005 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests that demand:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    7 of 35 documented families and 20\% real coverage
+  \item
+    coverage of \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} and \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+  \item
+    an enforced floor of 19 with a next target of 24
+  \item
+    a looping progress preview that visibly changes on pulse
+  \end{itemize}
+\item
+  Add the smallest honest DOGFOOD stories needed to hit the target.
+\item
+  Thread a preview clock into the docs story renderer for deterministic animation.
+\item
+  Raise the floor policy and spawn the next ratchet backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-067-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  DOGFOOD coverage resolves to 7 of 35 families and 20\%
+\item
+  the story catalog now covers \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} and \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+\item
+  the enforced floor is 19 and the next target is 24
+\item
+  the next DOGFOOD backlog item exists
+\end{itemize}
+
+And in the DOGFOOD preview integration bar:
+
+\begin{itemize}
+\tightlist
+\item
+  the static progress variant remains visually stable across a pulse
+\item
+  the animated progress variant changes across a pulse
+\end{itemize}
+
+\section{Risks}\label{record-067-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  adding an animation seam that is broader than this cycle actually needs
+\item
+  counting a family before the story is useful enough to teach with
+\item
+  letting the animated preview become a special-case runtime instead of a small deterministic rendering input
+\end{itemize}
+
+\section{Out of scope}\label{record-067-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  complete DOGFOOD coverage
+\item
+  shell help/localization work
+\item
+  service-backed localization tooling
+\item
+  a full generalized animation framework for stories
+\end{itemize}
+
+\section{Retrospective}\label{record-067-retrospective}
+
+\subsection{What landed}\label{record-067-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} DOGFOOD story with both a static determinate preview and a looping pulse-driven rollout preview
+\item
+  new \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} DOGFOOD story covering short-lived loading placeholders
+\item
+  a minimal preview clock in the docs explorer so stories can animate deterministically on pulse without a separate story runtime
+\item
+  canonical family coverage increased from \texttt{5\allowbreak{}/\allowbreak{}3\allowbreak{}5} to \texttt{7\allowbreak{}/\allowbreak{}3\allowbreak{}5}
+\item
+  DOGFOOD docs coverage now resolves to \texttt{2\allowbreak{}0\allowbreak{}\%}, which safely clears the \texttt{1\allowbreak{}9\allowbreak{}\%} floor
+\item
+  the enforced floor moved from \texttt{1\allowbreak{}4\allowbreak{}\%} to \texttt{1\allowbreak{}9\allowbreak{}\%}
+\item
+  the next declared target moved from \texttt{1\allowbreak{}9\allowbreak{}\%} to \texttt{2\allowbreak{}4\allowbreak{}\%}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-067-drift-from-ideal}
+
+No material drift.
+
+The only architectural addition beyond new stories was a tiny preview-time input for story rendering. That stayed appropriately narrow and did not turn into a generalized mutable story-state system.
+
+\subsection{Debt spawned}\label{record-067-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md}{DF-006 --- Raise DOGFOOD Coverage Floor to 24\%}
+\end{itemize}
+

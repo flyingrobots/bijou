@@ -1,0 +1,757 @@
+\chapter{DX-043 Portable Bijou Blocks And Multi-Endpoint IR}\label{record-139}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-043 Portable Bijou Blocks And Multi-Endpoint IR
+legend: DX
+lane: cool-ideas
+priority: medium
+status: proposed
+keywords:
+  - developer-experience
+  - blocks
+  - components
+  - ir
+  - geordi
+  - dogfood
+  - render-everywhere
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-139-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Prior Bijou design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md}{DX-042 Shared UI Scene IR And Bijou Render Target}
+\item
+  Geordi doctrine: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y\allowbreak{}w\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} in the Geordi repository.
+\item
+  Geordi pipeline: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}.\allowbreak{}m\allowbreak{}d} in the Geordi repository.
+\item
+  Jedit/Geordi packed-cell seed: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/\allowbreak{}0\allowbreak{}1\allowbreak{}0\allowbreak{}7\allowbreak{}-\allowbreak{}g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} in the jedit repository.
+\item
+  Geordi-side companion design: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/\allowbreak{}2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} in the Geordi repository.
+\end{itemize}
+
+This document is a planning artifact. It does not claim a GraphQL compiler, portable Bijou IR runtime, browser Dogfood endpoint, Geordi packed-cell target, or Unity endpoint already exists in this repository.
+
+\section{Decision Summary}\label{record-139-decision-summary}
+
+Bijou should grow toward a portable block and component semantics layer. Terminal rendering remains a first-class Bijou endpoint, but it should not be the only possible endpoint for Bijou-authored UI.
+
+The intended flow is:
+
+\begin{CodeBlock}
+Bijou Blocks + Components GraphQL
+  -> Wesley validation and generated DTOs
+    -> ui-scene-ir/1
+      -> Bijou terminal endpoint
+      -> Geordi browser/WebGL/WebGPU endpoint
+      -> Geordi image or video witness endpoint
+      -> Geordi packed Bijou cell endpoint
+      -> future engine endpoints such as GeordiUnityGameEngine
+\end{CodeBlock}
+
+The reverse direction should also be possible for visual surfaces:
+
+\begin{CodeBlock}
+Figma or other external design source
+  -> Geordi IR or compatible scene IR
+    -> BijouPackedCellRenderer
+      -> PackedBijouCells
+        -> Bijou Surface
+          -> terminal cells
+\end{CodeBlock}
+
+The important shift is this:
+
+\begin{CodeBlock}
+Bijou Surface is one render target.
+Bijou block and component semantics are the portable product contract.
+\end{CodeBlock}
+
+\section{Sponsored Human}\label{record-139-sponsored-human}
+
+A developer wants to define an app surface once and render it in a terminal, browser, visual witness, or future game-engine endpoint without maintaining parallel component trees by hand.
+
+\section{Sponsored Agent}\label{record-139-sponsored-agent}
+
+An agent wants deterministic UI IR and deterministic render witnesses so it can debug node identity, bindings, localization, theme tokens, focus, actions, and rendered output without scraping screenshots or inferring intent from terminal pixels.
+
+\section{Hill}\label{record-139-hill}
+
+Dogfood can be described by a Bijou-owned semantic UI contract, compiled into a deterministic IR, and rendered through both a terminal endpoint and a browser endpoint, with receipts proving that node IDs, token references, localization keys, actions, bindings, and target-specific outputs came from the same source.
+
+\section{Core Rule}\label{record-139-core-rule}
+
+Bijou owns the meaning of Bijou blocks and components.
+
+Renderers own how that meaning is drawn.
+
+\begin{CodeBlock}
+GraphQL source
+  describes: author intent
+
+ui-scene-ir/1
+  describes: portable semantic UI structure
+
+bijou-layout/1
+  describes: terminal layout, focus graph, keymap, and viewports
+
+Bijou Surface
+  describes: final terminal cell output
+
+Geordi endpoint IR or prepared target
+  describes: browser, image, GPU, packed-cell, or engine render state
+\end{CodeBlock}
+
+No endpoint owns the semantic truth of a Bijou component. An endpoint may render or inspect the component, but it must not silently redefine its behavior.
+
+\section{Relationship Diagram}\label{record-139-relationship-diagram}
+
+\begin{center}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[booknode/.style={draw=BookHeading,line width=.6pt,fill=BookPanel,rounded corners=1.5pt,align=center,text width=29mm,minimum height=10mm,inner sep=5pt,font=\small},bookedge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.65pt},every edge quotes/.style={font=\scriptsize,fill=white,inner sep=2pt,text=BookMuted}]
+\node[booknode] (Source) at (0,0) {Bijou Blocks And Components Graph\allowbreak{}QL};
+\node[booknode] (Wesley) at (0,-1.6) {Wesley Validation And DTO Generation};
+\node[booknode] (IR) at (0,-3.2) {ui-scene-ir/1};
+\node[booknode] (Receipt) at (-5,-5) {Structural Receipt};
+\node[booknode] (BijouLayout) at (-1.5,-5) {bijou-layout/1};
+\node[booknode] (Surface) at (-1.5,-7) {Bijou Surface};
+\node[booknode] (Terminal) at (-1.5,-9) {Terminal Cells};
+\node[booknode] (GeordiWeb) at (2,-5) {Geordi Browser Endpoint};
+\node[booknode] (GeordiImage) at (5.5,-5) {Geordi Image Or Video Endpoint};
+\node[booknode] (GeordiCells) at (5.5,-7) {Geordi Packed Bijou Cell Endpoint};
+\node[booknode] (Packed) at (5.5,-9) {Packed\allowbreak{}Bijou\allowbreak{}Cells};
+\node[booknode] (Unity) at (2,-9) {Future Geordi\allowbreak{}Unity\allowbreak{}Game\allowbreak{}Engine Endpoint};
+\draw[bookedge,] (Source) to (Wesley);
+\draw[bookedge,] (Wesley) to (IR);
+\draw[bookedge,] (IR) to (Receipt);
+\draw[bookedge,] (IR) to (BijouLayout);
+\draw[bookedge,] (BijouLayout) to (Surface);
+\draw[bookedge,] (Surface) to (Terminal);
+\draw[bookedge,] (IR) to (GeordiWeb);
+\draw[bookedge,] (IR) to (GeordiImage);
+\draw[bookedge,] (IR) to (GeordiCells);
+\draw[bookedge,] (GeordiCells) to (Packed);
+\draw[bookedge,bend left=15] (Packed) to (Surface);
+\draw[bookedge,] (IR) to (Unity);
+\end{tikzpicture}}
+\end{center}
+
+\section{Why This Matters}\label{record-139-why-this-matters}
+
+\subsection{Agent-Legible Debugging}\label{record-139-agent-legible-debugging}
+
+Screenshots are weak debugging artifacts. They show that something looked odd, but they do not directly answer what node, token, string, binding, or target rule produced the output.
+
+IR plus receipts can answer:
+
+\begin{itemize}
+\tightlist
+\item
+  Which source node produced this cell, pixel, or engine element?
+\item
+  Which localization key produced this text?
+\item
+  Which theme token produced this foreground or background?
+\item
+  Which action is attached to this focusable element?
+\item
+  Which endpoint lowered this scene?
+\item
+  Which target claims are proven, and which are explicit nonclaims?
+\item
+  Did two endpoints render the same semantic scene?
+\end{itemize}
+
+The expected debug artifact should be inspectable by agents:
+
+\begin{CodeBlock}
+{
+  "scene": "dogfood.docs",
+  "node": "nav.guides.startHere",
+  "component": "tree.item",
+  "textKey": "dogfood.nav.startHere",
+  "fgToken": "semantic.nav.item.active.fg",
+  "bgToken": "semantic.nav.item.active.bg",
+  "action": "dogfood.openDoc",
+  "target": "bijou-terminal",
+  "cellBounds": { "x": 12, "y": 4, "w": 22, "h": 1 }
+}
+\end{CodeBlock}
+
+\subsection{Render Anywhere}\label{record-139-render-anywhere}
+
+Bijou-authored UI should be able to leave the terminal:
+
+\begin{CodeBlock}
+Bijou Blocks -> IR -> GeordiWebGL
+Bijou Blocks -> IR -> GeordiWebGPU
+Bijou Blocks -> IR -> GeordiImage
+Bijou Blocks -> IR -> GeordiUnityGameEngine
+\end{CodeBlock}
+
+This does not mean every endpoint has identical pixels. It means every endpoint renders the same semantic contract under a declared target profile.
+
+\subsection{Render Other UI Into The Terminal}\label{record-139-render-other-ui-into-the-terminal}
+
+Bijou can also become the terminal endpoint for non-Bijou UI sources:
+
+\begin{CodeBlock}
+Figma -> Geordi IR -> BijouPackedCellRenderer -> terminal
+\end{CodeBlock}
+
+The first claim here is visual portability: can the source be approximated as terminal cells? Interactive portability requires additional semantics: focus, actions, state, localization, accessibility, and key routing.
+
+\section{Bijou Ownership}\label{record-139-bijou-ownership}
+
+Bijou should own portable terminal UI semantics:
+
+\begin{itemize}
+\tightlist
+\item
+  blocks and components
+\item
+  component identity
+\item
+  child hierarchy
+\item
+  layout intent
+\item
+  state bindings
+\item
+  actions and command IDs
+\item
+  focus and key routing intent
+\item
+  localization references
+\item
+  theme token references
+\item
+  accessibility labels and roles
+\item
+  terminal runtime behavior
+\item
+  \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and cell semantics
+\item
+  packed-cell validation rules when a packed target claims Bijou compatibility
+\end{itemize}
+
+Bijou should not own:
+
+\begin{itemize}
+\tightlist
+\item
+  Geordi browser renderer internals
+\item
+  GPU shader dispatch
+\item
+  image/video export internals
+\item
+  Unity scene graph adapters
+\item
+  Figma import specifics
+\item
+  Bunny geometry kernels
+\end{itemize}
+
+\section{Proposed Source Shape}\label{record-139-proposed-source-shape}
+
+GraphQL remains the best initial source-of-truth candidate because it can carry schema-backed fields and directives while letting Wesley generate DTOs and drift checks.
+
+Example shape:
+
+\begin{CodeBlock}
+type DogfoodDocsScene
+  @bijou_scene(id: "dogfood.docs")
+  @ui_target(kind: "bijou-terminal", cols: 160, rows: 48)
+  @ui_target(kind: "geordi-browser", width: 1440, height: 900)
+  @ui_target(kind: "geordi-packed-bijou-cells", cols: 160, rows: 48) {
+  navTitle: String!
+    @ui_node(id: "nav.title", kind: "text", component: "heading")
+    @ui_text(key: "dogfood.nav.title")
+    @ui_style(fg: "semantic.nav.title.fg")
+
+  startHere: String!
+    @ui_node(id: "nav.guides.startHere", kind: "text", component: "tree.item")
+    @ui_text(key: "dogfood.nav.startHere")
+    @ui_style(
+      fg: "semantic.nav.item.active.fg"
+      bg: "semantic.nav.item.active.bg"
+    )
+    @ui_action(id: "dogfood.openDoc", command: "dogfood.openDoc", keys: ["Enter"])
+
+  currentPage: String!
+    @ui_node(id: "content.currentPage", kind: "markdown", component: "doc.page")
+    @ui_binding(path: "docs.currentPage.markdown")
+}
+\end{CodeBlock}
+
+This syntax is not final. The contract matters more than the directive names: source nodes, text keys, style tokens, bindings, actions, and target profiles must be compile-time data.
+
+\section{IR Shape}\label{record-139-ir-shape}
+
+DX-042 proposes the first \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} shape. This design extends its intent with explicit component portability and endpoint requirements.
+
+\begin{CodeBlock}
+type UiSceneIr = {
+  irVersion: 'ui-scene-ir/1';
+  id: string;
+  sourceHash: string;
+  rootNodeId: string;
+  nodes: UiNode[];
+  bindings: UiBinding[];
+  actions: UiAction[];
+  tokenUses: UiTokenUse[];
+  i18nUses: UiI18nUse[];
+  sourceMap: UiSourceMapEntry[];
+  targetProfiles: UiTargetProfile[];
+  portability: UiPortabilityClaim;
+};
+
+type UiPortabilityClaim = {
+  level: 'portable' | 'terminal-native' | 'visual-only' | 'host-adapter';
+  reasons?: string[];
+};
+\end{CodeBlock}
+
+Portability should be explicit. Some Bijou surfaces may remain terminal-native because they inspect terminal escape behavior, alternate-screen state, or raw cell buffers. Those surfaces are still valuable, but they should not pretend to render everywhere.
+
+\section{Target Profiles}\label{record-139-target-profiles}
+
+The first target profile vocabulary should include:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{P\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e}
+ & {O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}
+ & {P\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} & \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} \\
+\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r} & {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r} {c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}e\allowbreak{}b\allowbreak{}G\allowbreak{}L\allowbreak{}/\allowbreak{}W\allowbreak{}e\allowbreak{}b\allowbreak{}G\allowbreak{}P\allowbreak{}U} {o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} \\
+\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e} & {R\allowbreak{}G\allowbreak{}B\allowbreak{}A} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{},} {P\allowbreak{}N\allowbreak{}G\allowbreak{},} {v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}o} {w\allowbreak{}i\allowbreak{}t\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} \\
+\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} & \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {p\allowbreak{}l\allowbreak{}u\allowbreak{}s} {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t} \\
+\texttt{g\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y} & {U\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {o\allowbreak{}r} {U\allowbreak{}I} {g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
+\texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t} & {v\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l} {s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {F\allowbreak{}i\allowbreak{}g\allowbreak{}m\allowbreak{}a} {o\allowbreak{}r} {s\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}r} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} \\
+\end{longtable}
+}
+
+Every target profile should name supported features. Unsupported features must fail before drawing.
+
+\section{Bijou Terminal Lowering}\label{record-139-bijou-terminal-lowering}
+
+The Bijou terminal endpoint lowers semantic UI IR into terminal runtime facts:
+
+\begin{CodeBlock}
+ui-scene-ir/1
+  -> bijou-layout/1
+    -> Surface
+      -> terminal cells
+\end{CodeBlock}
+
+\texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}/\allowbreak{}1} should carry:
+
+\begin{itemize}
+\tightlist
+\item
+  resolved terminal layout regions
+\item
+  focus graph
+\item
+  keymap
+\item
+  viewport regions
+\item
+  scroll policies
+\item
+  localized text after i18n resolution
+\item
+  theme token requirements
+\item
+  source-map entries from nodes to cells
+\item
+  target-specific nonclaims
+\end{itemize}
+
+The final \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} remains the rendered cell grid. It is not the portable IR.
+
+\section{Packed Cell Lowering}\label{record-139-packed-cell-lowering}
+
+The packed cell endpoint lets Geordi render directly into a Bijou-compatible terminal cell target:
+
+\begin{CodeBlock}
+ui-scene-ir/1 or geordi endpoint IR
+  -> Geordi packed-cell renderer
+    -> PackedBijouCells
+      -> Bijou Surface adapter
+        -> terminal cells
+\end{CodeBlock}
+
+This is useful when a renderer, CPU backend, or GPU backend can produce the terminal-native output directly instead of rendering a large image and then sampling it on the CPU.
+
+The contract should be explicit:
+
+\begin{CodeBlock}
+type PackedBijouCells = {
+  targetVersion: 'packed-bijou-cells/1';
+  widthCells: number;
+  heightCells: number;
+  cellFormatId: string;
+  sampleGrid?: '1x1' | '2x4' | 'custom';
+  colorPolicyId: string;
+  glyphResolvePolicyId: string;
+  cells: PackedBijouCell[];
+  facts: RenderFrameFacts;
+};
+
+type PackedBijouCell = {
+  char: string;
+  fg?: Rgb;
+  bg?: Rgb;
+  modifiers?: string[];
+  provenanceNodeId?: string;
+  tokenRefs?: {
+    fg?: string;
+    bg?: string;
+  };
+};
+\end{CodeBlock}
+
+Bijou should validate that a packed-cell buffer is structurally compatible with Bijou cell semantics before presenting it.
+
+\section{Dogfood Proof}\label{record-139-dogfood-proof}
+
+Dogfood is the best flagship proof because it contains:
+
+\begin{itemize}
+\tightlist
+\item
+  document navigation
+\item
+  panes
+\item
+  markdown rendering
+\item
+  theme tokens
+\item
+  light and dark modes
+\item
+  localization
+\item
+  focus
+\item
+  scrolling
+\item
+  keyboard actions
+\item
+  status rows
+\item
+  drawers
+\item
+  overlays
+\item
+  debug panels
+\end{itemize}
+
+The intended proof path is:
+
+\begin{CodeBlock}
+Dogfood source
+  -> Dogfood IR
+    -> Dogfood in the terminal
+    -> Dogfood in the browser
+    -> structural receipts proving semantic parity
+\end{CodeBlock}
+
+The first slice should not rewrite all of Dogfood. It should make one page or one pane undeniable.
+
+\section{Structural Receipt}\label{record-139-structural-receipt}
+
+The shared receipt proves semantic parity, not pixel parity:
+
+\begin{CodeBlock}
+type PortableUiReceipt = {
+  sceneHash: string;
+  sourceHash: string;
+  nodeIds: string[];
+  componentIds: string[];
+  i18nKeys: string[];
+  tokenRefs: string[];
+  actionIds: string[];
+  bindingIds: string[];
+  outputs: {
+    terminal?: {
+      layoutHash: string;
+      surfaceHash: string;
+    };
+    browser?: {
+      endpointHash: string;
+      witnessHash: string;
+    };
+    packedCells?: {
+      targetHash: string;
+      surfaceHash: string;
+    };
+  };
+};
+\end{CodeBlock}
+
+Endpoint receipts can add target-specific proof:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal cell hashes
+\item
+  browser pixel probes
+\item
+  packed-cell hashes
+\item
+  image frame hashes
+\item
+  engine object counts
+\item
+  target profile support matrix
+\end{itemize}
+
+\section{Accessibility And Assistive Posture}\label{record-139-accessibility-and-assistive-posture}
+
+Portable Bijou IR should preserve accessibility metadata even when a renderer does not directly display it.
+
+Required fields should include:
+
+\begin{itemize}
+\tightlist
+\item
+  semantic role
+\item
+  accessible label or i18n key
+\item
+  focusability
+\item
+  keyboard action hints
+\item
+  decorative vs meaningful marker
+\item
+  directionality and locale posture
+\item
+  reduced-motion or animation policy where relevant
+\end{itemize}
+
+Browser and engine endpoints can map this metadata to their own accessibility systems later. Terminal endpoints can expose it through debug modes, help surfaces, and structured MCP surfaces.
+
+\section{Localization And Directionality Posture}\label{record-139-localization-and-directionality-posture}
+
+Product text should enter the IR as localization keys, not resolved ad hoc strings. Render endpoints may resolve keys later against locale bundles, but receipts must preserve which key was used.
+
+Directionality should be target-aware:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal endpoint records whether a region is left-to-right or right-to-left
+\item
+  browser endpoint can map direction to layout/text properties
+\item
+  image endpoint records direction metadata in frame facts
+\item
+  packed-cell endpoint records the resolved order it actually emitted
+\end{itemize}
+
+\section{Agent Inspectability}\label{record-139-agent-inspectability}
+
+The IR and receipts should make these questions answerable by file inspection:
+
+\begin{itemize}
+\tightlist
+\item
+  What component rendered this cell?
+\item
+  What action would fire if the user pressed Enter here?
+\item
+  Why is this node not focusable?
+\item
+  Which token produced this color?
+\item
+  Which localization key produced this text?
+\item
+  Which target profile rejected this component?
+\item
+  Did terminal and browser outputs use the same semantic node tree?
+\end{itemize}
+
+This is the main reason the IR matters. It turns UI debugging into structured evidence instead of screenshot interpretation.
+
+\section{Scope}\label{record-139-scope}
+
+The first implementation arc should include:
+
+\begin{itemize}
+\tightlist
+\item
+  one portable Bijou component fixture
+\item
+  one GraphQL or JSON source-of-truth fixture
+\item
+  one \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} output
+\item
+  one terminal lowering to \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  one browser or Geordi endpoint stub
+\item
+  one structural receipt
+\item
+  one negative fixture proving fail-loud unsupported target requirements
+\end{itemize}
+
+\section{Non-Goals}\label{record-139-non-goals}
+
+The first arc should not:
+
+\begin{itemize}
+\tightlist
+\item
+  migrate all Dogfood pages
+\item
+  replace existing block APIs
+\item
+  require Geordi at runtime for every Bijou app
+\item
+  claim pixel parity between terminal and browser
+\item
+  implement Unity, Figma, WebGPU, or GPU packed-cell output immediately
+\item
+  make GraphQL directives the permanent final authoring syntax
+\item
+  erase terminal-native Bijou components
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-139-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  A portable Bijou component can be represented as deterministic IR.
+\item
+  The IR preserves node IDs, component IDs, token refs, i18n keys, actions, and bindings.
+\item
+  The same IR can lower to a Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  A second endpoint stub or fixture can consume the same IR and emit a receipt.
+\item
+  Receipts prove semantic parity across endpoints.
+\item
+  Unsupported endpoint requirements fail before drawing.
+\item
+  The design distinguishes portable components from terminal-native components.
+\item
+  Dogfood has a concrete first-page or first-pane migration target.
+\end{itemize}
+
+\section{Slice Plan}\label{record-139-slice-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Land this design and the Geordi companion design.
+\item
+  Define a tiny portable component fixture.
+\item
+  Define the first \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} fixture and canonical JSON rules.
+\item
+  Add a structural receipt fixture.
+\item
+  Lower the fixture to a Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Add a terminal receipt with source-map facts.
+\item
+  Add a Geordi browser endpoint stub or fixture consumer.
+\item
+  Add a fail-loud unsupported target fixture.
+\item
+  Add a Dogfood page/pane candidate map.
+\item
+  Emit Dogfood IR witness data beside the current runtime.
+\item
+  Render one Dogfood pane from IR to terminal.
+\item
+  Render the same pane through a browser witness endpoint.
+\end{enumerate}
+
+\section{Validation Plan}\label{record-139-validation-plan}
+
+Initial validation should be deterministic and file-backed:
+
+\begin{CodeBlock}
+npm test -- --run portable-bijou-ir
+npm run typecheck:test
+npm run lint
+npm run docs:inventory
+git diff --check
+\end{CodeBlock}
+
+Future validation should add:
+
+\begin{CodeBlock}
+npm run dogfood:i18n:check
+npm run dogfood:i18n:debt
+npm run verify:interactive-examples
+\end{CodeBlock}
+
+The important proof rule remains: design docs describe intent; executable fixtures and receipts prove behavior.
+
+\section{Risks}\label{record-139-risks}
+
+\subsection{Risk: Bijou Becomes Too Abstract}\label{record-139-risk-bijou-becomes-too-abstract}
+
+If portable IR hides terminal realities, Bijou components may render elsewhere but feel broken in the terminal.
+
+Mitigation: keep \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} as a first-class endpoint with focus, keymap, viewport, scroll, and cell-source-map requirements.
+
+\subsection{Risk: Geordi Redefines Bijou Semantics}\label{record-139-risk-geordi-redefines-bijou-semantics}
+
+If Geordi endpoints silently reinterpret Bijou components, parity becomes cosmetic.
+
+Mitigation: Bijou owns component semantics; Geordi owns endpoint rendering and receipts.
+
+\subsection{Risk: GraphQL Becomes An Unreadable Directive Dump}\label{record-139-risk-graphql-becomes-an-unreadable-directive-dump}
+
+GraphQL can carry schema-backed contracts, but overly complex directives can turn into JSON blobs.
+
+Mitigation: keep source syntax small, use Wesley validation, and treat early syntax as provisional.
+
+\subsection{Risk: Visual Import Pretends To Be Interactive}\label{record-139-risk-visual-import-pretends-to-be-interactive}
+
+A Figma-to-terminal path can render a visual mockup, but that does not mean it has focus, actions, state, or accessibility.
+
+Mitigation: distinguish visual portability from interactive portability in the target profile.
+
+\section{Recommended Next Step}\label{record-139-recommended-next-step}
+
+Create the smallest possible Dogfood proof:
+
+\begin{CodeBlock}
+one Dogfood nav or content pane
+  -> portable source fixture
+    -> ui-scene-ir/1
+      -> Bijou Surface
+      -> browser/Geordi endpoint receipt
+      -> structural parity receipt
+\end{CodeBlock}
+
+That proves the architecture without rewriting Dogfood or overbuilding the compiler.
+

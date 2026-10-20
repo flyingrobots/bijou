@@ -1,0 +1,291 @@
+\chapter{DF-008 --- Raise DOGFOOD Coverage Floor to 34\%}\label{record-070}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md}\par}\smallskip
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md}{DF-007 --- Raise DOGFOOD Coverage Floor to 29\%}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-070-why-this-cycle-exists}
+
+DF-007 proved the coverage ratchet can keep moving while staying focused on real product value.
+
+The next promised step is now explicit:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD currently documents 11 of 35 component families
+\item
+  the enforced floor is 29\%
+\item
+  the next declared target is 34\%
+\end{itemize}
+
+This cycle exists to earn that next target through the documentation-oriented families that make DOGFOOD feel more like a real field guide: bounded markdown prose and explicit linked destinations.
+
+\section{Scope of this cycle}\label{record-070-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  adding enough real DOGFOOD component stories to move coverage from 11 to 13 families
+\item
+  documenting \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} as the bounded formatted-document family
+\item
+  documenting \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} as the explicit link/destination family
+\item
+  raising the enforced floor from 29\% to 34\%
+\item
+  raising the next declared target from 34\% to 39\%
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  broad docs-shell redesign
+\item
+  full reference-doc navigation or pager workflows
+\item
+  introducing new component families into the canonical denominator
+\item
+  pretending DOGFOOD is now complete
+\end{itemize}
+
+\section{Human users}\label{record-070-human-users}
+
+\subsection{Primary human user}\label{record-070-primary-human-user}
+
+A builder evaluating whether DOGFOOD can now teach reference-style prose and explicit links as real Bijou surfaces instead of only showcasing status, overlays, and inspection panes.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  one story that shows \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} as bounded structured prose, not a substitute layout engine
+\item
+  one story that shows \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} as an honest terminal destination primitive with fallback behavior
+\item
+  coverage progress that rises only because those documentation-oriented families are genuinely present
+\end{itemize}
+
+\subsection{Human hill}\label{record-070-human-hill}
+
+A user can open DOGFOOD, learn when to use \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})}, and see the coverage number rise because the field guide now actually covers those reference surfaces.
+
+\section{Agent users}\label{record-070-agent-users}
+
+\subsection{Primary agent user}\label{record-070-primary-agent-user}
+
+An agent tasked with continuing the DOGFOOD ratchet without turning it into shallow catalog filler.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  a clear smallest honest route from 29\% to 34\%
+\item
+  tests that prove which documentation-oriented families were added
+\item
+  one integration check that the new story is reachable through the docs app itself
+\end{itemize}
+
+\subsection{Agent hill}\label{record-070-agent-hill}
+
+An agent can raise DOGFOOD to the 34\% floor only by adding real \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} stories, and the cycle tests prove both the coverage increase and the new floor policy.
+
+\section{Human playback}\label{record-070-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user enters DOGFOOD and opens the new markdown story.
+\item
+  They can see bounded reference prose with headings, lists, and links rendered honestly.
+\item
+  They open the new hyperlink story and see explicit destination labels and fallback behavior instead of vague ``click here'' copy.
+\item
+  The docs coverage card reports a higher percentage that corresponds to those real new stories.
+\end{enumerate}
+
+\section{Agent playback}\label{record-070-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DF-008 cycle doc.
+\item
+  It can see that the target floor is 34\%, which can be cleared by adding one family, but the cycle intentionally documents two related documentation families.
+\item
+  It adds real \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} stories.
+\item
+  It updates the floor policy only after those stories exist.
+\item
+  The cycle tests and gate confirm that coverage is now 37\%, which safely clears the 34\% floor, and the next target is recorded as 39\%.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-070-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-070-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  the floor must move only after real coverage moves
+\item
+  \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} coverage must teach bounded structured prose, not application chrome masquerading as markdown
+\item
+  \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} coverage must keep destinations explicit and meaningful instead of relying on generic labels
+\item
+  the new families must be backed by real DOGFOOD stories
+\item
+  the denominator must still come from the canonical component-family reference
+\end{itemize}
+
+\section{Implementation outline}\label{record-070-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DF-008 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests that demand:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    13 of 35 documented families and 37\% real coverage
+  \item
+    coverage of \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} and \texttt{L\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+  \item
+    an enforced floor of 34 with a next target of 39
+  \item
+    real \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} stories in DOGFOOD
+  \end{itemize}
+\item
+  Add the smallest honest DOGFOOD stories needed to hit the target.
+\item
+  Raise the floor policy and spawn the next ratchet backlog item.
+\item
+  Close the cycle with retrospective notes describing what actually landed.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-070-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  DOGFOOD coverage resolves to 13 of 35 families and 37\%
+\item
+  the story catalog now covers \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} and \texttt{L\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\item
+  the enforced floor is 34 and the next target is 39
+\item
+  the next DOGFOOD backlog item exists
+\end{itemize}
+
+And in the DOGFOOD preview integration bar:
+
+\begin{itemize}
+\tightlist
+\item
+  the new markdown story is reachable in component search and renders recognizable bounded document content
+\end{itemize}
+
+\section{Risks}\label{record-070-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  making the markdown story look like a generic blob of prose instead of a bounded structured document
+\item
+  making the hyperlink story feel redundant with markdown links instead of explaining explicit destination handling
+\item
+  overloading DOGFOOD with long prose blocks that crowd the existing three-pane shell
+\end{itemize}
+
+\section{Out of scope}\label{record-070-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  full docs-reader navigation
+\item
+  pager/localization follow-on work
+\item
+  shell help/localized directional surfaces
+\item
+  complete DOGFOOD coverage
+\end{itemize}
+
+\section{Retrospective}\label{record-070-retrospective}
+
+\subsection{What landed}\label{record-070-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new real \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} DOGFOOD story teaching bounded structured prose
+\item
+  new real \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} DOGFOOD story teaching explicit linked destinations and fallback behavior
+\item
+  canonical family coverage increased from \texttt{1\allowbreak{}1\allowbreak{}/\allowbreak{}3\allowbreak{}5} to \texttt{1\allowbreak{}3\allowbreak{}/\allowbreak{}3\allowbreak{}5}
+\item
+  DOGFOOD docs coverage now resolves to \texttt{3\allowbreak{}7\allowbreak{}\%}, which safely clears the \texttt{3\allowbreak{}4\allowbreak{}\%} floor
+\item
+  the enforced floor moved from \texttt{2\allowbreak{}9\allowbreak{}\%} to \texttt{3\allowbreak{}4\allowbreak{}\%}
+\item
+  the next declared target moved from \texttt{3\allowbreak{}4\allowbreak{}\%} to \texttt{3\allowbreak{}9\allowbreak{}\%}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-070-drift-from-ideal}
+
+No material drift.
+
+The cycle stayed focused on documentation-oriented surfaces instead of adding another status primitive, which makes DOGFOOD more credible as a field guide rather than only a component catalog.
+
+\subsection{Debt spawned}\label{record-070-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md}{DF-009 --- Raise DOGFOOD Coverage Floor to 39\%}
+\end{itemize}
+

@@ -1,0 +1,177 @@
+\chapter{WF-129 Path-Gate DOGFOOD CI}\label{record-211}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-129-path-gate-dogfood-ci.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-129 Path-Gate DOGFOOD CI
+legend: WF
+lane: bad-code
+priority: medium
+issue: https://github.com/flyingrobots/bijou/issues/293
+keywords:
+  - ci
+  - dogfood
+  - path-gates
+  - iteration-time
+  - workflow
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-211-framing}
+
+The CI loop is intentionally conservative, but ordinary workflow/documentation PRs currently run DOGFOOD-heavy gates even when they do not touch DOGFOOD, runtime components, localization, or CI scripts. That makes rapid-fire cycles pay duplicate install/build/smoke costs before review can close.
+
+This cycle adds a CI change classifier so DOGFOOD-specific checks run when they are relevant and skip when a PR is unrelated to DOGFOOD. Pushes to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} and tag workflows remain full-strength.
+
+\section{Sponsored Users}\label{record-211-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  A maintainer iterating on workflow documentation needs PR CI to avoid DOGFOOD smoke work when the branch cannot affect DOGFOOD.
+\item
+  A release maintainer needs \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} pushes and tags to continue running the full DOGFOOD proof path.
+\item
+  A review agent needs the path-gating contract to be visible in the workflow file and covered by a regression test.
+\end{itemize}
+
+\section{Hill}\label{record-211-hill}
+
+A contributor can open a PR that only changes non-DOGFOOD docs or workflow bookkeeping and see DOGFOOD-heavy CI lanes skipped, while any PR touching DOGFOOD, packages, localization, DOGFOOD scripts/tests, or CI workflows still runs DOGFOOD proof.
+
+\section{Current Truth}\label{record-211-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}h\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}u\allowbreak{}s\allowbreak{}h} runs DOGFOOD i18n, test typecheck, full Vitest, and interactive example smoke before every push.
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}i\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l} runs DOGFOOD coverage and i18n policy inside the Ubuntu Node 22 \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t} job for every PR.
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}i\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l} runs separate DOGFOOD landing/docs smoke jobs for every PR, with their own checkout, install, and build.
+\item
+  The latest main CI run after PR \#291 had a \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}(\allowbreak{}2\allowbreak{}2\allowbreak{})} critical path just under two minutes, plus separate DOGFOOD smoke jobs.
+\end{itemize}
+
+\section{Product Shape}\label{record-211-product-shape}
+
+\subsection{CI Classifier}\label{record-211-ci-classifier}
+
+\begin{CodeBlock}
+CI
+  changes
+    dogfood = true on main pushes and tags
+    dogfood = true on PRs touching:
+      .github/workflows/**
+      package.json
+      package-lock.json
+      packages/**
+      examples/docs/**
+      scripts/dogfood-*
+      scripts/smoke-dogfood*
+      tests/cycles/DF-*
+      tests/cycles/*dogfood*
+      docs/DOGFOOD.md
+      docs/design/DF-*
+      docs/legends/DF-*
+      docs/method/legends/DF-*
+\end{CodeBlock}
+
+\subsection{Gated DOGFOOD Proof}\label{record-211-gated-dogfood-proof}
+
+\begin{CodeBlock}
+test (22)
+  always: build, lint, npm test
+  when dogfood-relevant: DOGFOOD coverage + DOGFOOD i18n policy
+
+Smoke DOGFOOD (landing/docs)
+  when dogfood-relevant: run checkout, install, build, and smoke command
+  otherwise: keep check names present and skip expensive smoke steps
+\end{CodeBlock}
+
+\section{Runtime And API Contract}\label{record-211-runtime-and-api-contract}
+
+This cycle changes CI workflow behavior only. It does not change package APIs, runtime behavior, DOGFOOD rendering, localization catalogs, or release workflows.
+
+\section{Lower Modes}\label{record-211-lower-modes}
+
+No TUI output changes are included.
+
+\begin{itemize}
+\tightlist
+\item
+  Static mode: not applicable.
+\item
+  Pipe mode: not applicable.
+\item
+  Accessible mode: not applicable.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-211-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}9\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{}-\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  RED state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    CI lacks a \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}s} job exposing \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d} output
+  \item
+    DOGFOOD coverage/i18n policy steps are not guarded by the classifier
+  \item
+    DOGFOOD smoke job is not guarded by the classifier
+  \item
+    \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}/tag pushes are not documented as full DOGFOOD proof
+  \end{itemize}
+\item
+  GREEN state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    workflow text includes the classifier and relevant trigger paths
+  \item
+    workflow text gates DOGFOOD-heavy PR work on \texttt{n\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}
+  \item
+    changelog records the CI iteration-time cleanup
+  \end{itemize}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-211-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#293 is closed by the PR.
+\item
+  PR CI has an explicit \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}s} job.
+\item
+  DOGFOOD coverage/i18n policy steps run only when the classifier says DOGFOOD proof is needed.
+\item
+  DOGFOOD landing/docs smoke commands run only when the classifier says DOGFOOD proof is needed, while the check names remain present.
+\item
+  Pushes to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} and tags still set the DOGFOOD classifier to true.
+\item
+  WF-129 passes.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the change.
+\end{itemize}
+
+\section{Risks And Guardrails}\label{record-211-risks-and-guardrails}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not path-gate release dry-run or publish workflows in this cycle.
+\item
+  Do not skip full \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} in the core Ubuntu matrix yet.
+\item
+  Do not weaken DOGFOOD proof when \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*}, \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*}, or DOGFOOD-specific scripts/tests change.
+\item
+  Keep the classifier readable enough to audit in review.
+\end{itemize}
+

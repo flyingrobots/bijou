@@ -1,0 +1,230 @@
+\chapter{WF-163 Respecting the Dojo Ratchet 112}\label{record-245}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-163-respecting-dojo-ratchet-112.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor Human}\label{record-245-sponsor-human}
+
+James Ross.
+
+\section{Sponsor Agent}\label{record-245-sponsor-agent}
+
+Codex.
+
+\section{Decision Summary}\label{record-245-decision-summary}
+
+Cut at least \texttt{5\allowbreak{}0} counted Code Dojo debt items from the merged \texttt{1\allowbreak{}6\allowbreak{}2} baseline and land the next Respecting the Dojo checkpoint at \texttt{1\allowbreak{}1\allowbreak{}2} aggregate violations or lower.
+
+This is the explicit quality prerequisite for the Profunctor Page inspection target in issue \#468.
+
+\section{Hill}\label{record-245-hill}
+
+The remaining debt is structural. File/context and code-size ledgers identify modules that exceed the repository's bounded-context rules. The cycle must remove real entries by splitting coherent responsibilities while preserving tests, exports, behavior, and deterministic output.
+
+Ledger edits are evidence after implementation. They are not the implementation.
+
+\section{Current Truth}\label{record-245-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt before this cycle: \texttt{1\allowbreak{}6\allowbreak{}2}
+\item
+  File/context baseline before this cycle: \texttt{1\allowbreak{}3\allowbreak{}6}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline: \texttt{2\allowbreak{}6}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Required target: \texttt{1\allowbreak{}1\allowbreak{}2} aggregate violations or lower
+\item
+  Tracker issue: \#469
+\item
+  Downstream issue: \#468
+\end{itemize}
+
+\section{Result}\label{record-245-result}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt: \texttt{1\allowbreak{}1\allowbreak{}2}
+\item
+  File/context baseline: \texttt{8\allowbreak{}6}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline: \texttt{2\allowbreak{}6}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Removed debt: \texttt{5\allowbreak{}0} of the required \texttt{5\allowbreak{}0} violations
+\item
+  Next goalpost target: \texttt{6\allowbreak{}2} aggregate violations or lower
+\end{itemize}
+
+The cycle preserves public entrypoints and deterministic output while moving coherent responsibilities into focused modules. The resulting baseline is measured from live files; no threshold, exception marker, or rule was weakened.
+
+\section{Scope}\label{record-245-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Select the smallest safe set of remaining file/context and code-size offenders.
+\item
+  Prefer modules where one coherent extraction removes both a file/context entry and a code-size entry.
+\item
+  Preserve public entrypoints through compatibility facades when import paths are contractual.
+\item
+  Split tests at semantic \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e} or fixture-family boundaries.
+\item
+  Regenerate the file/context and code-size ledgers from measured files.
+\item
+  Lower \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}x} to \texttt{1\allowbreak{}1\allowbreak{}2} or lower.
+\item
+  Update the exception ledger, changelog, roadmap, and closeout evidence.
+\end{itemize}
+
+\section{Non-Goals}\label{record-245-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No Profunctor Page adapter implementation.
+\item
+  No public behavior or API redesign.
+\item
+  No release publication.
+\item
+  No new standards exception or large-file marker.
+\item
+  No weakened threshold, skipped gate, or hand-edited aspirational count.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-245-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inventory the remaining ledger entries through bounded repository projections.
+\item
+  Rank candidates by aggregate reduction, cohesion, and regression coverage.
+\item
+  Split deterministic tests and support modules at existing responsibility boundaries.
+\item
+  Extract production or tooling helpers only where public behavior is already pinned by focused tests.
+\item
+  Run focused tests after each candidate family.
+\item
+  Regenerate ledgers only after live files fall below their thresholds.
+\item
+  Run the full Code Dojo and repository gates before review.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-245-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a goalpost regression that binds the aggregate ceiling to the measured file/context ledger.
+\item
+  Add a roadmap regression that binds the completed prerequisite and next bounded target.
+\item
+  Add focused regressions before any extraction that changes behavior-bearing seams.
+\end{itemize}
+
+\section{Validation Plan}\label{record-245-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused Vitest runs for every split test or module family.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}:\allowbreak{}r\allowbreak{}u\allowbreak{}n}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-245-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt is \texttt{1\allowbreak{}1\allowbreak{}2} or lower.
+\item
+  File/context and code-size ledgers match measured live files.
+\item
+  Mock-ban and ESLint baselines remain \texttt{0}.
+\item
+  No split loses assertions, exports, runtime behavior, or deterministic output.
+\item
+  No newly created file exceeds \texttt{1\allowbreak{}5\allowbreak{}0} lines or \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Only pre-existing baselined paths may remain in the shrinking ledger.
+\item
+  Full local and GitHub validation gates pass.
+\item
+  Main at the resulting merge revision unblocks issue \#468.
+\end{itemize}
+
+\section{Playback Questions}\label{record-245-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did aggregate debt fall by at least \texttt{5\allowbreak{}0}?
+\item
+  Does every removed ledger entry correspond to a measured file reduction?
+\item
+  Did each split preserve its prior tests and public entrypoints?
+\item
+  Did the cycle avoid new exceptions and unrelated product work?
+\item
+  Is issue \#468 unblocked by merged evidence rather than a local claim?
+\end{enumerate}
+
+\section{Accessibility And Assistive Posture}\label{record-245-accessibility-and-assistive-posture}
+
+This is a structural standards cycle. Extracted modules must preserve existing text, focus, lower-mode, and assistive semantics. No visual or interaction redesign is in scope.
+
+\section{Localization And Directionality Posture}\label{record-245-localization-and-directionality-posture}
+
+Extracted modules must preserve catalog keys, localized values, reading order, and direction-sensitive behavior. Any touched DOGFOOD localization surface must keep the completeness and raw-string ratchets flat or lower.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-245-agent-inspectability-and-explainability-posture}
+
+Every extraction must retain a stable public facade or an explicit internal call site, focused verification evidence, and ledger-measured closure. The final package ceiling, exception ledger, roadmap, and design result must agree without requiring agents to infer progress from commit count.
+
+\section{Linked Invariants}\label{record-245-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Work doctrine: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Tracker issue: \#469
+\end{itemize}
+
+\section{Retrospective And Closeout}\label{record-245-retrospective-and-closeout}
+
+The cycle removed exactly \texttt{5\allowbreak{}0} measured file/context violations without adding mock-ban, ESLint, or code-size debt. Compatibility facades preserved public entrypoints while responsibility-bounded modules moved below the enforced thresholds. A separate 13-file MCP catalog precursor kept the final review at the repository's 140-path limit. The next bounded Code Dojo target is \texttt{6\allowbreak{}2}; issue \#468 is unblocked only after this result reaches \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}.
+

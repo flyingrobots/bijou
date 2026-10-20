@@ -1,0 +1,42 @@
+\chapter{RE-023 --- Stabilize Render Scheduling in runtime.ts}\label{record-379}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-023-stabilize-render-scheduling.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-023 — Stabilize Render Scheduling in runtime.ts
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-379-disposition}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0}. \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} now uses a stable render handle plus explicit \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}Q\allowbreak{}u\allowbreak{}e\allowbreak{}u\allowbreak{}e\allowbreak{}d} / \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} state instead of a bare \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} boolean. That gives the runtime one pending render at a time, safely coalesces same-timestamp input bursts into a single follow-up render, and flushes pending work cleanly during shutdown. Focused runtime tests now cover the coalesced-burst behavior directly.
+
+\section{Original Proposal}\label{record-379-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-379-idea}
+
+The current \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} implementation in \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} uses \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{})} and a \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} boolean. Under heavy input load or rapid async command resolution, this can lead to multiple overlapping render timeouts being scheduled if the boolean is reset at the wrong point in the microtask queue.
+
+Refactor \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} to use a single, stable \texttt{T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}H\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} (or a similar scheduling token) that is explicitly cleared and reset on every request. This ensures that only one render operation is ever pending or in flight at any given time.
+
+\section{Why}\label{record-379-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Determinism}: Ensures that the \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} function always operates on the most current model snapshot.
+\item
+  \textbf{Performance}: Prevents redundant rendering work during high-frequency update bursts.
+\item
+  \textbf{Safety}: Neutralizes potential race conditions where front/back buffers might be swapped mid-render.
+\end{enumerate}
+
+\section{Effort}\label{record-379-effort}
+
+Small --- refactor the \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} logic to use a persistent \texttt{T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}H\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} from the context clock.
+

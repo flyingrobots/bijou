@@ -1,0 +1,219 @@
+\chapter{Bijou Specifacts}\label{record-012}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/specs/README.md}\par}\smallskip
+
+This directory is \textbf{legacy} planning surface and is retained for historical context. Do \textbf{not} start new work here.
+
+This directory contains JSON acceptance artifacts that describe cross-cutting product expectations for rendering, layout, worker runtime, and component behavior.
+
+The repository currently treats these files as stable historical references plus living acceptance contracts for large features. When you add new behavior, prefer \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d} for planning and execution, then reflect the final contract here if it helps future maintainers.
+
+\section{Purpose}\label{record-012-purpose}
+
+Each \texttt{*\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} file captures:
+
+\begin{itemize}
+\tightlist
+\item
+  a concise feature name and design intent,
+\item
+  requirements and user story,
+\item
+  acceptance criteria (what can be tested or observed),
+\item
+  scope boundaries,
+\item
+  a minimal test plan.
+\end{itemize}
+
+They are useful for:
+
+\begin{itemize}
+\tightlist
+\item
+  onboarding new contributors to historical design decisions,
+\item
+  translating high-level design docs into concrete test scenarios,
+\item
+  aligning future implementation work with explicit pass/fail criteria.
+\end{itemize}
+
+\section{Current Directory Shape}\label{record-012-current-directory-shape}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}b\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}w\allowbreak{}e\allowbreak{}b\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}u\allowbreak{}m\allowbreak{}-\allowbreak{}b\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}z\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}v\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}v\allowbreak{}2\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}y\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}n\allowbreak{}a\allowbreak{}p\allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}t\allowbreak{}o\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}y\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}x\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\section{JSON Contract (Observed Shape)}\label{record-012-json-contract-observed-shape}
+
+A spec file generally follows this structure:
+
+\begin{CodeBlock}
+{
+  "name": "Feature Name",
+  "designPattern": "Component / Pattern Name",
+  "requirements": [
+    "Requirement 1",
+    "Requirement 2"
+  ],
+  "userStory": {
+    "asA": "Persona",
+    "iWant": "Desired behavior",
+    "soThat": "Resulting benefit"
+  },
+  "acceptanceCriteria": [
+    "Observable result that indicates success"
+  ],
+  "backwardCompatibility": "Compatibility notes or migration story",
+  "scope": {
+    "inScope": [
+      "Area 1",
+      "Area 2"
+    ],
+    "outScope": [
+      "Not covered in this slice"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Recommended manual/automated check",
+    "edgeCases": ["Edge case scenario"],
+    "fuzzStress": "Stress or scale scenario",
+    "failureCases": ["Known failure to catch"]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~200",
+    "timeComplexity": "O(...)",
+    "workEstimate": "Medium"
+  }
+}
+\end{CodeBlock}
+
+All fields are plain JSON strings, arrays, or small objects. The schema is intentionally simple so specs can be edited and reviewed without generated tooling.
+
+\section{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}(\allowbreak{})} Utility}{ Utility}}\label{record-012-validatespec-utility}
+
+At present, there is no globally required build-time validator for these files. For local consistency, follow this pattern before merging a spec change:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Parse JSON.
+\item
+  Validate that required top-level keys exist (\texttt{n\allowbreak{}a\allowbreak{}m\allowbreak{}e}, \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s}, \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}a}, \texttt{u\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}l\allowbreak{}a\allowbreak{}n}, \texttt{s\allowbreak{}c\allowbreak{}o\allowbreak{}p\allowbreak{}e}, \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y}).
+\item
+  Validate value shapes (\texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{a\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y}, and nested object forms).
+\item
+  Optionally add a unit test around the parse rule for your feature area.
+\end{enumerate}
+
+If you add or refactor a script, use a function named \texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}(\allowbreak{})} with this contract:
+
+\begin{CodeBlock}
+type SpecValidationError = { path: string; message: string };
+
+type SpecValidationResult = { ok: boolean; errors: readonly SpecValidationError[] };
+
+function validateSpec(value: unknown): SpecValidationResult {
+  // parse and validate contract, return shape errors only.
+}
+\end{CodeBlock}
+
+This keeps spec maintenance local and transparent, and lets future tooling consume the same contract without hard coupling to a single process.
+
+\section{How to Add a New Spec File}\label{record-012-how-to-add-a-new-spec-file}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}<\allowbreak{}n\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}>\allowbreak{}.\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} and keep it narrowly focused.
+\item
+  Use one user story and explicit acceptance criteria.
+\item
+  Distinguish in-scope and out-of-scope decisions.
+\item
+  Add at least one test plan section (\texttt{g\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}P\allowbreak{}a\allowbreak{}t\allowbreak{}h}, \texttt{e\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}C\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s}, \texttt{f\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}C\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s}).
+\item
+  Update any related design docs and add a short link from the spec if relevant.
+\item
+  Run a JSON parse check (manual \texttt{c\allowbreak{}a\allowbreak{}t} + \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}p}) before commit.
+\end{enumerate}
+
+Example quick-check:
+
+\begin{CodeBlock}
+node -e "const fs=require('node:fs'); JSON.parse(fs.readFileSync('docs/specs/rendering-pipeline.spec.json', 'utf8'));"
+\end{CodeBlock}
+
+\section{Operational Notes}\label{record-012-operational-notes}
+
+The spec directory is not a replacement for executable tests. It is a contract surface that should be supported by:
+
+\begin{itemize}
+\tightlist
+\item
+  unit tests,
+\item
+  integration tests,
+\item
+  DOGFOOD coverage checks,
+\item
+  release smoke and regression gates.
+\end{itemize}
+
+If a spec is no longer accurate, archive it in place and create an updated one rather than silently mutating historical evidence.
+

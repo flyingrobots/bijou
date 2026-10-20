@@ -1,0 +1,203 @@
+\chapter{WF-134 Code Dojo ESLint Ratchet 1}\label{record-216}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-134-code-dojo-eslint-ratchet-1.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-134 Code Dojo ESLint Ratchet 1
+legend: WF
+lane: bad-code
+priority: high
+github_issue: 364
+status: proposed
+keywords:
+  - code-dojo
+  - eslint
+  - standards
+  - ratchet
+  - v7.2.0
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/legends/WF-workflow-delivery.md}{WF - Workflow and Delivery}
+
+\section{Linked Work}\label{record-216-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue: \href{https://github.com/flyingrobots/bijou/issues/364}{\#364}
+\item
+  Follow-up ratchet: \href{https://github.com/flyingrobots/bijou/issues/366}{\#366}
+\item
+  Standards artifact: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/typescript-code-standards.editors-edition.md}{TypeScript Code Standards Editor's Edition}
+\item
+  Exception ledger: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/code-dojo-exceptions.md}{Code Dojo Exceptions}
+\item
+  Release milestone: \href{https://github.com/flyingrobots/bijou/milestone/5}{\texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}}
+\end{itemize}
+
+\section{Decision Summary}\label{record-216-decision-summary}
+
+\texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}f\allowbreak{}u\allowbreak{}l\allowbreak{} \allowbreak{}R\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}:\allowbreak{} \allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}C\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}D\allowbreak{}o\allowbreak{}j\allowbreak{}o} made the standards debt visible and ratcheted, but the ESLint debt is still the dominant exception class. The stored ESLint ceiling is \texttt{5\allowbreak{},\allowbreak{}3\allowbreak{}4\allowbreak{}5}, while a live type-aware ESLint run on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} reports \texttt{5\allowbreak{},\allowbreak{}1\allowbreak{}2\allowbreak{}1} findings. The first cleanup pass should convert that already observed shrink plus targeted high-yield fixes into a lower enforceable ceiling.
+
+This cycle deliberately starts with bounded test and tooling clusters instead of broad DOGFOOD example rewrites. The DOGFOOD files also carry localization and code-size tripwires, so they need their own carefully shaped pass.
+
+\section{Sponsored Human}\label{record-216-sponsored-human}
+
+A maintainer wants the new standards posture to burn down real lint debt now, not merely document it as a future aspiration.
+
+\section{Sponsored Agent}\label{record-216-sponsored-agent}
+
+An agent needs a concrete first ratchet target with inspectable before/after counts, so later cycles can keep reducing the ceiling without guessing which violations are already paid down.
+
+\section{Hill}\label{record-216-hill}
+
+Reduce live type-aware ESLint findings from \texttt{5\allowbreak{},\allowbreak{}1\allowbreak{}2\allowbreak{}1} to at most \texttt{4\allowbreak{},\allowbreak{}9\allowbreak{}0\allowbreak{}0}, then continue the same bounded cleanup pass to at most \texttt{4\allowbreak{},\allowbreak{}6\allowbreak{}0\allowbreak{}0} when the first target is comfortably met. Lower the official ESLint and aggregate Code Dojo debt ceilings so future work cannot regain the cleaned-up violations.
+
+\section{Scope}\label{record-216-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Target high-yield ESLint clusters first:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    docs-preview tests under \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    app-frame tests under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    single-rule test files such as \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  Prefer typed test helpers and guard functions over repeated casts.
+\item
+  Update \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} to the new live count and per-rule counts.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} and the \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}x} ceiling.
+\item
+  Keep the aggregate debt reduction at least 50 violations below the current \texttt{5\allowbreak{},\allowbreak{}7\allowbreak{}6\allowbreak{}8} ceiling.
+\end{itemize}
+
+\section{Non-Goals}\label{record-216-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not soften, disable, or narrow ESLint rules.
+\item
+  Do not raise any Code Dojo ceiling.
+\item
+  Do not mix unrelated product behavior changes into the cleanup.
+\item
+  Do not tackle DOGFOOD mega-file refactors in this first pass unless a touched file's policy requires it.
+\item
+  Do not try to clear all ESLint debt in one oversized branch.
+\end{itemize}
+
+\section{Current Evidence}\label{record-216-current-evidence}
+
+A live JSON ESLint run on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} before this cycle found:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{5\allowbreak{},\allowbreak{}1\allowbreak{}2\allowbreak{}1} findings across \texttt{5\allowbreak{}1\allowbreak{}1} files.
+\item
+  \texttt{2\allowbreak{},\allowbreak{}7\allowbreak{}4\allowbreak{}6} findings in test files.
+\item
+  \texttt{2\allowbreak{},\allowbreak{}3\allowbreak{}7\allowbreak{}5} findings in runtime/source/script files.
+\end{itemize}
+
+Top rule counts:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{R\allowbreak{}u\allowbreak{}l\allowbreak{}e}
+ & \begin{minipage}[b]{\linewidth}\raggedleft
+{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{@\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}n\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {1\allowbreak{},\allowbreak{}4\allowbreak{}3\allowbreak{}3} \\
+\texttt{@\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}s\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {7\allowbreak{}1\allowbreak{}9} \\
+\texttt{@\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} & {6\allowbreak{}6\allowbreak{}5} \\
+\texttt{@\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}y} & {3\allowbreak{}2\allowbreak{}3} \\
+\texttt{@\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}s\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {2\allowbreak{}3\allowbreak{}4} \\
+\end{longtable}
+}
+
+Top file clusters:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+ & \begin{minipage}[b]{\linewidth}\raggedleft
+{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c} & {1\allowbreak{},\allowbreak{}5\allowbreak{}5\allowbreak{}4} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c} & {1\allowbreak{},\allowbreak{}3\allowbreak{}5\allowbreak{}3} \\
+\texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s} & {7\allowbreak{}5\allowbreak{}0} \\
+\texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s} & {5\allowbreak{}4\allowbreak{}1} \\
+\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s} & {3\allowbreak{}0\allowbreak{}1} \\
+\end{longtable}
+}
+
+\section{Playback Questions}\label{record-216-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did the live ESLint count fall to \texttt{4\allowbreak{},\allowbreak{}9\allowbreak{}0\allowbreak{}0} or lower, then to \texttt{4\allowbreak{},\allowbreak{}6\allowbreak{}0\allowbreak{}0} or lower after the follow-up ratchet?
+\item
+  Did the stored ESLint baseline match the new live count?
+\item
+  Did the aggregate Code Dojo ceiling move down by at least 50 violations?
+\item
+  Do focused tests still prove the touched surfaces behave the same?
+\item
+  Does \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}i} pass after the lower ceiling is installed?
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-216-tests-to-write-first}
+
+This cycle mostly pays down static-analysis debt in already covered surfaces. When a cleanup changes runtime behavior or helper contracts, add a focused regression test before the fix. For purely type-safety rewrites, the RED signal is the existing ESLint finding and the GREEN signal is the lowered live ESLint count plus the relevant existing focused suite.
+
+\section{Acceptance Criteria}\label{record-216-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Live ESLint findings are \texttt{4\allowbreak{},\allowbreak{}9\allowbreak{}0\allowbreak{}0} or lower.
+\item
+  Follow-up ratchet findings are \texttt{4\allowbreak{},\allowbreak{}6\allowbreak{}0\allowbreak{}0} or lower.
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} records the lower live count.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} reports the lower aggregate debt count and next target.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} lowers \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}x} by at least 50.
+\item
+  Focused tests for touched clusters pass.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}i}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} pass before final review.
+\end{itemize}
+
+\section{Retrospective}\label{record-216-retrospective}
+
+To be completed when the PR lands.
+

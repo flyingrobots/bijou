@@ -1,0 +1,29 @@
+\chapter{DX-018 --- Runtime Test Harness for TEA Apps}\label{record-327}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/up-next/DX-018-runtime-test-harness.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-327-problem}
+
+Testing nontrivial apps still leaks internal runtime knowledge. Async commands, emitted messages, and lifecycle ordering can be tested today, but the path often requires understanding \texttt{E\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}s} details instead of staying at the app boundary.
+
+The 2026-04-11 code-quality audit called for a \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})}-style helper that behaves like a first-class harness rather than a bag of internal seams.
+
+\section{Desired outcome}\label{record-327-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Provide a \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} helper that returns a \texttt{T\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}H\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s}.
+\item
+  Support assertions on state snapshots, emitted messages, command resolution, and teardown behavior without hand-wiring the bus.
+\item
+  Use it in at least one runtime-facing example or test so the public testing story is obvious.
+\end{enumerate}
+
+\section{Effort}\label{record-327-effort}
+
+Medium --- test API design plus migration of at least one real suite.
+

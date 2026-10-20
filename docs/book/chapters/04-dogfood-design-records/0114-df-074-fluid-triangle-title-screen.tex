@@ -1,0 +1,497 @@
+\chapter{DF-074 Fluid Triangle Title Screen}\label{record-114}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-074-fluid-triangle-title-screen.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-074 Fluid Triangle Title Screen
+legend: DF
+lane: cool-ideas
+priority: medium
+status: proposed
+github_issue: 321
+keywords:
+  - dogfood
+  - title-screen
+  - fluid
+  - geordi
+  - gpu
+  - glyphs
+  - render-target
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/legends/DF-dogfood.md}{DF - DOGFOOD}
+
+\section{Linked Work}\label{record-114-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \#321
+\item
+  Inspiration: \url{https://github.com/javierbyte/fluid-triangle}
+\item
+  Prior title art: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-073-raster-to-glyph-title-art.md}{DF-073 Raster To Glyph Title Art}
+\item
+  Portable rendering direction: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md}{DX-042 Shared UI Scene IR And Bijou Render Target}
+\item
+  Portable endpoint direction: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md}{DX-043 Portable Bijou Blocks And Multi-Endpoint IR}
+\item
+  Related renderer experiments: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-031-raytrace-shader-kernel.md}{RE-031 Raytrace Shader Kernel}, \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-032-fit-cell-glyphs-from-coverage.md}{RE-032 Fit Cell Glyphs From Coverage}
+\end{itemize}
+
+This document is a planning artifact. It does not claim a GPU renderer, Geordi packed-cell target, browser endpoint, or new title screen implementation already exists in this repository.
+
+\section{Decision Summary}\label{record-114-decision-summary}
+
+Bijou should design a future DOGFOOD title screen around a live fluid field moving around a triangular obstacle, rendered as terminal glyphs. The immediate Bijou work should define the title-scene contract, deterministic CPU fallback, theme-token policy, and cell-level proof. The high-end renderer should be Geordi-backed when the shared render pipeline is ready.
+
+The intended long-term flow is:
+
+\begin{CodeBlock}
+Fluid Title Scene Spec
+  -> deterministic field state
+    -> Bijou CPU glyph renderer
+      -> Bijou Surface
+        -> terminal
+
+Fluid Title Scene Spec
+  -> Geordi fluid/shader endpoint
+    -> PackedBijouCells or image witness
+      -> Bijou Surface or browser/image output
+\end{CodeBlock}
+
+The goal is not to copy a browser demo into DOGFOOD. The goal is to turn the idea into a Bijou-native release-title system with deterministic witnesses and a future GPU render endpoint.
+
+\section{Sponsored Human}\label{record-114-sponsored-human}
+
+A Bijou maintainer wants a memorable title screen that feels alive, branded, and release-specific without making DOGFOOD startup flaky, slow, or impossible to test.
+
+\section{Sponsored Agent}\label{record-114-sponsored-agent}
+
+An agent wants a deterministic scene description, frame inputs, glyph outputs, and render receipts so it can explain title-screen pixels and terminal cells without depending on screenshots or manual terminal observation.
+
+\section{Hill}\label{record-114-hill}
+
+DOGFOOD can show a fluid triangle title screen where the fluid motion, glyph density, color tokens, and input behavior are deterministic under test, while the production renderer can later upgrade from a Bijou CPU path to a Geordi-backed GPU path without changing the title scene's product contract.
+
+\section{Inspiration Boundary}\label{record-114-inspiration-boundary}
+
+The reference project is useful because it combines:
+
+\begin{itemize}
+\tightlist
+\item
+  fluid-like motion
+\item
+  a triangular obstacle
+\item
+  ASCII rendering
+\item
+  per-column character sequences
+\item
+  a playful launch-screen posture
+\end{itemize}
+
+Bijou should borrow the interaction and rendering concept, not the browser runtime assumptions.
+
+The reference README states that its simulation code comes from Ten Minute Physics and that the project is MIT licensed. If Bijou ports substantial code from the reference or from the underlying Ten Minute Physics simulation, the ported file must preserve the relevant MIT attribution and copyright notice. The preferred first implementation is an original Bijou renderer inspired by the concept.
+
+\section{Title Concept}\label{record-114-title-concept}
+
+The title screen should feel like a fluid gate opening around a triangle:
+
+\begin{CodeBlock}
+..............................................................................
+....@@@@@###WWWW9876????abc;:+=-,._       _.,-=+:;cba????6789WWWW###@@@@@....
+...@@@###WWW9876????abc;:+=-,._          /\          _.,-=+:;cba????6789W....
+..@@###WW9876????abc;:+=-,._            /  \            _.,-=+:;cba????67....
+..@###W9876????abc;:+=-,._             /    \             _.,-=+:;cba????....
+..@@###WW9876????abc;:+=-,._           \    /           _.,-=+:;cba????67....
+...@@@###WWW9876????abc;:+=-,._         \  /         _.,-=+:;cba????6789....
+....@@@@@###WWWW9876????abc;:+=-,._      \/      _.,-=+:;cba????6789WWW....
+..............................................................................
+
+                                  BIJOU
+                              Press [Enter]
+\end{CodeBlock}
+
+The actual renderer should not draw this literal mockup. This is a spatial intent sketch:
+
+\begin{itemize}
+\tightlist
+\item
+  fluid surrounds a central triangular collider
+\item
+  density changes map to glyph ramps
+\item
+  the BIJOU mark remains readable above or inside the field
+\item
+  the Enter prompt remains clear and localized
+\item
+  the perf HUD and quit controls keep their existing ownership
+\end{itemize}
+
+\section{Scene Model}\label{record-114-scene-model}
+
+The title should be modeled as data before it is rendered.
+
+\begin{CodeBlock}
+type FluidTitleSceneSpec = {
+  id: 'dogfood.fluid-triangle-title';
+  version: 1;
+  seed: number;
+  cols: number;
+  rows: number;
+  quality: 'low' | 'medium' | 'high' | 'auto';
+  themeMode: 'dark' | 'light';
+  triangle: {
+    centerX: number;
+    centerY: number;
+    radius: number;
+    rotation: number;
+  };
+  glyphRamps: readonly string[];
+  titleKey: 'dogfood.title.bijou';
+  promptKey: 'dogfood.title.pressEnter';
+};
+\end{CodeBlock}
+
+The scene spec owns intent. Renderers own lowering.
+
+\section{Renderer Targets}\label{record-114-renderer-targets}
+
+\subsection{Bijou CPU Renderer}\label{record-114-bijou-cpu-renderer}
+
+The first implementation should be a deterministic Bijou CPU renderer. It does not need to be a full fluid solver. It needs to produce the right motion language, stay bounded, and be testable.
+
+Acceptable first algorithms:
+
+\begin{itemize}
+\tightlist
+\item
+  advected scalar density field
+\item
+  curl-noise-like deterministic flow
+\item
+  lightweight particle splat field
+\item
+  simplified stable fluid pass
+\end{itemize}
+
+The CPU renderer should emit:
+
+\begin{CodeBlock}
+FluidTitleSceneSpec + frame index
+  -> FluidTitleFrame
+    -> Surface
+    -> FluidTitleReceipt
+\end{CodeBlock}
+
+\subsection{Geordi GPU Renderer}\label{record-114-geordi-gpu-renderer}
+
+The intended high-end path is Geordi-rendered:
+
+\begin{CodeBlock}
+FluidTitleSceneSpec
+  -> Geordi fluid/shader endpoint
+    -> rgba image target
+    -> PackedBijouCells target
+    -> frame witness
+\end{CodeBlock}
+
+The Geordi endpoint should be allowed to compute richer fluid motion, higher resolution fields, better collider interaction, and image/video witnesses. Bijou should consume its output through a declared target profile rather than special-case a browser canvas.
+
+\subsection{Low Mode}\label{record-114-low-mode}
+
+Low mode must remain useful without GPU support.
+
+\begin{CodeBlock}
+seeded density wave
+  -> glyph ramp
+    -> token colors
+      -> Surface
+\end{CodeBlock}
+
+Low mode should be cheap enough for CI snapshots and slow terminals.
+
+\section{Quality Modes}\label{record-114-quality-modes}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{M\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+ & {R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r}
+ & {P\allowbreak{}u\allowbreak{}r\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{l\allowbreak{}o\allowbreak{}w} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {C\allowbreak{}P\allowbreak{}U} {d\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}y} {w\allowbreak{}a\allowbreak{}v\allowbreak{}e} & {C\allowbreak{}I\allowbreak{},} {S\allowbreak{}S\allowbreak{}H\allowbreak{},} {c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}s} \\
+\texttt{m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m} & {B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} {C\allowbreak{}P\allowbreak{}U} {p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}l\allowbreak{}e} {o\allowbreak{}r} {s\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}a\allowbreak{}r} {f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} & {d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l} {t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l} \\
+\texttt{h\allowbreak{}i\allowbreak{}g\allowbreak{}h} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {G\allowbreak{}P\allowbreak{}U} {e\allowbreak{}n\allowbreak{}d\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n} {a\allowbreak{}v\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} & {r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} {c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{},} {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e} {w\allowbreak{}i\allowbreak{}t\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} \\
+\texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o} & {r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {c\allowbreak{}h\allowbreak{}o\allowbreak{}i\allowbreak{}c\allowbreak{}e} & {b\allowbreak{}e\allowbreak{}s\allowbreak{}t} {a\allowbreak{}v\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e} {u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {b\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t} \\
+\end{longtable}
+}
+
+\texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o} must degrade deterministically by recorded facts:
+
+\begin{CodeBlock}
+{
+  "requestedQuality": "auto",
+  "selectedQuality": "medium",
+  "reason": "geordi-endpoint-unavailable",
+  "frameBudgetMs": 16
+}
+\end{CodeBlock}
+
+\section{Theme And Color Policy}\label{record-114-theme-and-color-policy}
+
+The renderer must use theme tokens rather than raw title-screen colors.
+
+Candidate tokens:
+
+\begin{CodeBlock}
+title.fluid.bg
+title.fluid.low
+title.fluid.mid
+title.fluid.high
+title.triangle.edge
+title.triangle.fill
+title.logo.fg
+title.prompt.fg
+title.prompt.enter.fg
+\end{CodeBlock}
+
+The glyph ramp and color ramp should be separate:
+
+\begin{CodeBlock}
+density -> glyph
+density -> token/color
+\end{CodeBlock}
+
+This avoids the prior title-screen failure mode where a visual layer appeared to set the wrong background because glyph, foreground, and background channels were not explicit enough.
+
+\section{Input Contract}\label{record-114-input-contract}
+
+The title screen must keep the current input discipline:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} proceeds to DOGFOOD.
+\item
+  Backtick toggles the normal shell perf HUD.
+\item
+  \texttt{q} opens the normal quit confirmation.
+\item
+  Theme or quality controls may remain title-owned only if documented.
+\item
+  No other ordinary key should accidentally skip the title.
+\end{itemize}
+
+Future optional interactions can perturb the field:
+
+\begin{itemize}
+\tightlist
+\item
+  mouse move nudges velocity
+\item
+  arrow keys shift the triangle
+\item
+  terminal resize reseeds layout while preserving deterministic frame facts
+\end{itemize}
+
+Those interactions are not required for the first slice.
+
+\section{Localization And Directionality}\label{record-114-localization-and-directionality}
+
+The visible title and prompt must be localization-backed strings. The fluid field itself is visual and does not require localization, but lower modes should expose the string keys.
+
+RTL posture:
+
+\begin{itemize}
+\tightlist
+\item
+  The prompt should use the app's existing text direction rules.
+\item
+  The fluid field can remain spatially symmetric.
+\item
+  Per-column glyph ramps should not encode English-only words in default mode.
+\end{itemize}
+
+The reference project's per-column letter sequences are useful as a visual trick, but a Bijou default should not rely on hidden English text in the fluid field.
+
+\section{Accessibility And Assistive Posture}\label{record-114-accessibility-and-assistive-posture}
+
+The title screen must not be the only source of release information.
+
+Required posture:
+
+\begin{itemize}
+\tightlist
+\item
+  prompt remains static enough to read
+\item
+  low-motion mode can freeze or heavily slow the field
+\item
+  status/lower-mode facts identify the release title
+\item
+  perf HUD remains accessible from the title screen
+\item
+  the screen does not flash at unsafe contrast/frequency patterns
+\end{itemize}
+
+\section{Agent Inspectability}\label{record-114-agent-inspectability}
+
+Every deterministic render pass should be able to emit a receipt:
+
+\begin{CodeBlock}
+{
+  "sceneId": "dogfood.fluid-triangle-title",
+  "frame": 120,
+  "seed": 700,
+  "renderer": "bijou-cpu-density",
+  "quality": "medium",
+  "triangle": { "centerX": 80, "centerY": 18, "radius": 9 },
+  "glyphRampHash": "fnv1a32:...",
+  "surfaceHash": "fnv1a32:...",
+  "tokenRefs": [
+    "title.fluid.low",
+    "title.fluid.mid",
+    "title.fluid.high",
+    "title.prompt.enter.fg"
+  ]
+}
+\end{CodeBlock}
+
+For Geordi output, the receipt should add endpoint facts:
+
+\begin{CodeBlock}
+{
+  "renderer": "geordi-fluid-gpu",
+  "endpoint": "packed-bijou-cells",
+  "shaderHash": "sha256:...",
+  "packedCellsHash": "fnv1a32:...",
+  "witnessHash": "sha256:..."
+}
+\end{CodeBlock}
+
+\section{Playback Questions}\label{record-114-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does the first frame read as Bijou before animation is observed?
+\item
+  Does \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} remain the only key that proceeds to DOGFOOD?
+\item
+  Does the prompt stay legible at 80x24 and larger terminals?
+\item
+  Can the title run in low mode without Geordi?
+\item
+  Can a test prove the triangle collider leaves a stable void or edge?
+\item
+  Can a receipt explain the selected renderer, quality, seed, tokens, and output hash?
+\item
+  Can the Geordi endpoint later replace the high-quality renderer without changing title-screen input behavior?
+\end{enumerate}
+
+\section{Implementation Outline}\label{record-114-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add the scene spec and receipt types.
+\item
+  Add a deterministic CPU low-mode density renderer.
+\item
+  Add glyph-ramp and theme-token lowering into \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Add title-screen integration behind a release-title switch.
+\item
+  Preserve existing perf HUD, quit, and Enter-only routing contracts.
+\item
+  Add a low-motion/frozen frame path.
+\item
+  Add tests for frame determinism, prompt visibility, key routing, and token use.
+\item
+  Add Geordi endpoint target profile once packed-cell or image witness support is ready.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-114-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Given the same spec, seed, size, and frame, the CPU renderer produces the same \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}H\allowbreak{}a\allowbreak{}s\allowbreak{}h}.
+\item
+  Given different frame indexes, at least one fluid-region cell changes while the prompt remains stable.
+\item
+  Given 80x24, the prompt and title are visible and not overwritten by fluid cells.
+\item
+  Given non-Enter printable key input, DOGFOOD remains on the title route.
+\item
+  Given \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r}, DOGFOOD proceeds to the main docs route.
+\item
+  Given backtick, the normal perf HUD toggles while the title route remains active.
+\item
+  Given low-motion mode, repeated frames produce either identical output or a documented bounded change.
+\item
+  Given missing Geordi endpoint, \texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o} selects a Bijou CPU renderer and emits a reason fact.
+\end{itemize}
+
+\section{Non-Goals}\label{record-114-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No browser canvas dependency in DOGFOOD startup.
+\item
+  No required GPU path for CI.
+\item
+  No direct code port from the reference project in the design slice.
+\item
+  No change to the public title-screen skip contract beyond preserving Enter-only proceed.
+\item
+  No claim that this implements shared UI scene IR.
+\end{itemize}
+
+\section{Slice Plan}\label{record-114-slice-plan}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedleft
+{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e}
+\end{minipage} & {O\allowbreak{}u\allowbreak{}t\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}e}
+ & {P\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+{1} & {D\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n} {d\allowbreak{}o\allowbreak{}c} {a\allowbreak{}n\allowbreak{}d} {i\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} & {d\allowbreak{}o\allowbreak{}c\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} \\
+{2} & {S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e} {s\allowbreak{}p\allowbreak{}e\allowbreak{}c} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} {t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s} & {t\allowbreak{}y\allowbreak{}p\allowbreak{}e} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{3} & {D\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} {l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e} {r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r} & {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} {h\allowbreak{}a\allowbreak{}s\allowbreak{}h} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{4} & {D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} {t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{5} & {I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t} {p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {k\allowbreak{}e\allowbreak{}y} {r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{6} & {T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} {r\allowbreak{}a\allowbreak{}m\allowbreak{}p} & {t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} {r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{7} & {L\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}z\allowbreak{}e\allowbreak{}n} {p\allowbreak{}a\allowbreak{}t\allowbreak{}h} & {d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+{8} & {G\allowbreak{}e\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i} {e\allowbreak{}n\allowbreak{}d\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t} {d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n} {h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}o\allowbreak{}f\allowbreak{}f} & {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}o\allowbreak{}n} {i\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c} \\
+\end{longtable}
+}
+
+\section{Closeout Notes}\label{record-114-closeout-notes}
+
+Open. This design should be closed only after the title screen either ships or is deliberately superseded by a different release-title direction.
+

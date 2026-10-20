@@ -1,0 +1,141 @@
+\chapter{DF-041 Audit inspector panels family across real surfaces}\label{record-095}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-041-audit-inspector-panels-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-041 Audit inspector panels family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - inspector
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-095-framing}
+
+\texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} is the canonical compact side-panel surface for the currently selected thing. It should keep one active value obvious while supporting sections stay calmer and structured. That makes it a first-blocks proof point: an inspector panel is a reusable block-shaped composition, not an arbitrary box with hand-written strings.
+
+This audit verifies the inspector family against real DOGFOOD story rendering, component-family doctrine, and mode-aware runtime behavior.
+
+\section{Sponsored Users}\label{record-095-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors building side panels for selected packages, records, rows, or rollout slices.
+\item
+  Docs readers checking how an inspector panel lowers when borders, color, and side-panel layout are not available.
+\item
+  Maintainers who need a focused regression proving inspector story metadata and design-system guidance stay aligned with runtime truth.
+\end{itemize}
+
+\section{Hills}\label{record-095-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect the DOGFOOD inspector story and see current-selection emphasis plus compact supporting sections.
+\item
+  A reader can switch inspector variants through interactive, static, pipe, and accessible profiles while preserving the same semantic fields.
+\item
+  A maintainer can run one cycle test that ties \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} behavior, DOGFOOD story metadata, and component-family guidance together.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-095-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the inspector family through the \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} story?
+\item
+  Do variants cover both package-summary and rollout-review side-panel usage?
+\item
+  Do rich/static previews preserve titled containment and section rhythm?
+\item
+  Do pipe lowerings produce labeled plain text with one obvious current selection?
+\item
+  Do accessible lowerings linearize the same fields without relying on borders, color, or pane position?
+\item
+  Do component-family docs still position \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} as side-panel context rather than a full guided recommendation or complex nested workflow?
+\end{itemize}
+
+\section{Requirements}\label{record-095-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r} story identity and \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} coverage family id.
+\item
+  Render every inspector story variant in every canonical story profile.
+\item
+  Treat borders and box-drawing characters as visual-profile affordances only.
+\item
+  Keep pipe and accessible lowerings field-label-first and meaning-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-095-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}4\allowbreak{}1\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes titled box containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve current selection, context, and section labels.
+\item
+  Component-family docs retain side-panel, current-selection, and compact section guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-095-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-041 cycle test that renders the \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the inspector section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-095-drift-check}
+
+No runtime drift was found in this slice. \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} already renders boxed, titled containment in interactive/static profiles, lowers to labeled grouped text in pipe mode, and linearizes the same fields in accessible mode.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-095-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-041 playback test tied the inspector story to real mode lowerings.
+\item
+  GREEN: the new cycle test renders both \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} and \texttt{r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve titled containment and section rhythm.
+\item
+  Pipe previews preserve labels and grouped plain text without box drawing.
+\item
+  Accessible previews linearize the same fields with explicit inspector language.
+\end{itemize}
+
+\section{Retrospective}\label{record-095-retrospective}
+
+The inspector component did not need runtime changes. The important release work was turning current story truth into executable proof so future block and workspace work cannot quietly turn inspector panels into generic nested boxes or mini dashboards.
+

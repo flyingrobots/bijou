@@ -1,0 +1,44 @@
+\chapter{Shell Owns Shell Concerns}\label{record-058}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/shell-owns-shell-concerns.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-058-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Global shell behavior should belong to the shell, not be reimplemented by each page.
+
+Examples:
+
+\begin{itemize}
+\tightlist
+\item
+  search
+\item
+  help
+\item
+  settings
+\item
+  notifications
+\item
+  quit and confirmation flows
+\end{itemize}
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  pages declare content and page-local behavior
+\item
+  shell layers own shell routing, chrome, and discoverability
+\item
+  polished shell patterns should graduate into canonical componentry when reusable
+\end{itemize}
+

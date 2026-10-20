@@ -1,0 +1,32 @@
+\chapter{Schemas Live At Boundaries}\label{record-056}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/schemas-live-at-boundaries.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-056-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX --- Developer Experience}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+\end{itemize}
+
+Schemas and parsers should reject malformed input at system edges, then hand trusted values to runtime-backed domain forms.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} belongs at the edge, not deep in the core
+\item
+  decoding and validation should happen before domain logic starts
+\item
+  core behavior should not keep re-validating already trusted values
+\item
+  plain decoded objects are not the final domain model
+\end{itemize}
+

@@ -1,0 +1,69 @@
+\chapter{DX-003 --- Rationalize Table APIs and Public Table Types}\label{record-335}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX_003-rationalize-table-apis-and-public-table-types.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-003 — Rationalize Table APIs and Public Table Types
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-335-disposition}
+
+Implemented on release/v4.5.0 by adding common table shorthands for table() and tableSurface(), introducing clearer public row types for plain and surface tables, and broadening navigable-table inputs so lightweight snapshots no longer require a separate state mental model for simple rendering. Focused table, surface, and navigable-table tests now prove the family feels consistent across plain and interactive use.
+
+\section{Original Proposal}\label{record-335-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-335-idea}
+
+Make the table family feel like one coherent surface instead of a cluster of near-related APIs with mismatched conventions.
+
+\section{Why}\label{record-335-why}
+
+The current table APIs create avoidable friction:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} and \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} use different calling conventions
+\item
+  the rows types are confusing between plain strings and \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\item
+  the common case for ``just show me a table'' is more verbose than it should be
+\end{itemize}
+
+This is exactly the kind of thing users discover by compiler error instead of by intention.
+
+\section{Captured feedback}\label{record-335-captured-feedback}
+
+From \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}p\allowbreak{}-\allowbreak{}t\allowbreak{}t\allowbreak{}d} TUI development:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} vs \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} calling conventions are inconsistent
+\item
+  \texttt{r\allowbreak{}o\allowbreak{}w\allowbreak{}s} typing is confusing around \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}[\allowbreak{}]\allowbreak{}[\allowbreak{}]} vs \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]\allowbreak{}[\allowbreak{}]}
+\item
+  \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l} is not obvious from the public surface
+\item
+  a simple \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{}?\allowbreak{})} style shorthand would help the common case
+\end{itemize}
+
+\section{Likely scope}\label{record-335-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  decide on consistent table-family calling conventions
+\item
+  make public table row/cell typing obvious and documented
+\item
+  consider a simpler high-frequency table helper for the 80\% case
+\item
+  add tests proving the table family feels consistent across plain and navigable flows
+\end{itemize}
+

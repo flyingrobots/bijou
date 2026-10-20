@@ -1,0 +1,158 @@
+\chapter{DL-020 - Dogfood Rule-Authored First-Party Themes}\label{record-185}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-020-dogfood-rule-authored-first-party-themes.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DL-020
+title: Dogfood Rule-Authored First-Party Themes
+status: active
+lane: cool-ideas
+priority: medium
+github_issue: 446
+legend: DL
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-185-decision-summary}
+
+DL-019 added Bijou-native theme selector rules and inspection facts. This cycle uses that system inside Bijou's own first-party defaults instead of keeping the new rule layer as a demo-only API.
+
+The public runtime contract remains unchanged:
+
+\begin{CodeBlock}
+rule-authored preset definitions
+  -> TokenGraph
+    -> concrete Theme
+      -> ResolvedTheme
+        -> terminal rendering, DTCG interop, and inspectors
+\end{CodeBlock}
+
+No external design-token dependency is introduced. The work is a narrow dogfood pass over Bijou-owned themes only.
+
+\section{Sponsored Human}\label{record-185-sponsored-human}
+
+A Bijou theme maintainer wants to adjust primitive palette choices and trust the system to derive readable semantic roles, accents, borders, and UI affordances without manually copying final hex values across every token family.
+
+\section{Sponsored Agent}\label{record-185-sponsored-agent}
+
+An agent auditing first-party themes wants deterministic provenance facts for why default theme tokens were selected, so it can review rule behavior instead of reverse-engineering intent from literal hex equality.
+
+\section{Hill}\label{record-185-hill}
+
+\texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} are authored from primitive palette definitions plus selector rules, materialize to the existing \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} shape, and expose rule inspection facts that explain their first-party semantic choices.
+
+\section{Playback Questions}\label{record-185-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Can Bijou-owned defaults use selector rules while preserving the public \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} object shape and registry keys?
+\item
+  Can tests prove first-party semantic choices through \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} rather than only final hex assertions?
+\item
+  Can DTCG round trips, resolver behavior, RGB caches, and gradient consumers keep working with compiled rule-authored presets?
+\item
+  Can third-party and legacy themes stay literal compatibility fixtures in this slice?
+\end{itemize}
+
+\section{Scope}\label{record-185-scope}
+
+Included:
+
+\begin{itemize}
+\tightlist
+\item
+  a small first-party preset authoring layer that compiles token graph definitions into \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}
+\item
+  rule-authored \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}
+\item
+  tests for compiled values, registry identity, and rule inspection provenance
+\item
+  docs/changelog updates that make dogfooding explicit
+\end{itemize}
+
+Out of scope:
+
+\begin{itemize}
+\tightlist
+\item
+  external \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k} integration
+\item
+  public breaking changes to \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}
+\item
+  rewriting \texttt{c\allowbreak{}y\allowbreak{}a\allowbreak{}n\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a}, \texttt{t\allowbreak{}e\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}k}, \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}d}, or \texttt{c\allowbreak{}a\allowbreak{}t\allowbreak{}p\allowbreak{}p\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}i\allowbreak{}n}
+\item
+  Theme Lab UI redesign
+\end{itemize}
+
+\section{Runtime Contract}\label{record-185-runtime-contract}
+
+Preset compilation must be pure and deterministic. It cannot read process state, terminal facts, filesystem data, clocks, or network data.
+
+The compiled object remains a normal \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}. Existing consumers can continue to read \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}h\allowbreak{}e\allowbreak{}x}, \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}, and surface tokens without knowing how first-party themes were authored.
+
+The preset authoring layer records the original rule definitions against the compiled \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} identity. \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})} uses those definitions when present, so \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} remains rule-authored for first-party presets. Cloned themes and DTCG imports fall back to concrete token graphs.
+
+Tests may assert rule ids, selected candidate paths, dependencies, and selected hex values from the same resolved graph inspectors consume.
+
+\section{Accessibility And Assistive Posture}\label{record-185-accessibility-and-assistive-posture}
+
+This slice improves color choice but does not make color the only carrier of meaning. Existing labels, text structure, \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} behavior, and lower-mode rendering remain the accessibility contract.
+
+\section{Localization And Directionality Posture}\label{record-185-localization-and-directionality-posture}
+
+This slice does not add DOGFOOD user-facing copy. Rule ids, token paths, design document prose, and changelog entries are developer-facing documentation and stable identifiers. Future DOGFOOD UI that renders these facts must use the localization catalog.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-185-agent-inspectability-explainability-posture}
+
+The primary agent-facing value is provenance. An audit should be able to inspect \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} and \texttt{d\allowbreak{}e\allowbreak{}c\allowbreak{}i\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t}, see the selector rule, enumerate candidates, and explain exclusions without comparing screenshots or final hex equality.
+
+\section{Implementation Outline}\label{record-185-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a small preset compiler that materializes graph definitions into \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}.
+\item
+  Move \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} into rule-authored preset modules.
+\item
+  Preserve first-party rule definitions through \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})}.
+\item
+  Keep literal legacy and third-party presets unchanged.
+\item
+  Update docs and changelog after the tests prove the behavior.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-185-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a red provenance test showing literal defaults expose \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} inspection instead of \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e}
+\item
+  a dark-theme accent test proving \texttt{m\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d} selects \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  a light-theme primary text test proving \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h} selects \texttt{i\allowbreak{}n\allowbreak{}k\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  existing preset and DTCG tests proving resolved values stay compatible
+\end{itemize}
+
+\section{Retrospective / Closeout Notes}\label{record-185-retrospective-closeout-notes}
+
+Close this cycle when CI is green, CodeRabbit is green, review threads are resolved, and the PR summary records the rule probe values.
+
+\section{Linked Invariants}\label{record-185-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}: compiled presets and inspection facts come from executing the graph.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: dogfood behavior lands through deterministic tests.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}: the docs record that Bijou's defaults use the system they document.
+\end{itemize}
+

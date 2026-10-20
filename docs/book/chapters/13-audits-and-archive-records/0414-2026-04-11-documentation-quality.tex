@@ -1,0 +1,102 @@
+\chapter{AUDIT: DOCUMENTATION QUALITY (2026-04-11)}\label{record-414}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/audit/2026-04-11_documentation-quality.md}\par}\smallskip
+
+\section{1. ACCURACY \& EFFECTIVENESS ASSESSMENT}\label{record-414-accuracy-effectiveness-assessment}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{1.1. Core Mismatch:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Answer:} The root \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} previously referred to ``Substrate Properties'' which was a tired and imprecise noun. This has been corrected to ``System Properties'' and ``Core Properties.'' Currently, the most significant mismatch is in the \texttt{A\allowbreak{}p\allowbreak{}p} interface example in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, which shows \texttt{a\allowbreak{}n\allowbreak{}y} types for the model, masking the actual TEA safety guarantees.
+  \end{itemize}
+\item
+  \textbf{1.2. Audience \& Goal Alignment:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Answer:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \textbf{Target Audience:} Terminal software architects and CLI developers.
+    \item
+      \textbf{Top 3 Questions addressed?}
+
+      \begin{enumerate}
+      \def\labelenumi{\arabic{enumi}.}
+      \tightlist
+      \item
+        \textbf{``How do I start?''}: Yes (Quick Start in README).
+      \item
+        \textbf{``How do I scale?''}: Yes (Sub-Apps and App Frame docs).
+      \item
+        \textbf{``How is it different?''}: Yes (``Why Bijou?'' section).
+      \end{enumerate}
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{1.3. Time-to-Value (TTV) Barrier:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Answer:} The dependency between \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} and \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} is implied but not always explicitly required for core components. A developer might try to use \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} from the core package and fail.
+  \end{itemize}
+\end{itemize}
+
+\section{2. REQUIRED UPDATES \& COMPLETENESS CHECK}\label{record-414-required-updates-completeness-check}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{2.1. README.md Priority Fixes:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    \textbf{App Interface Typing}: Update examples to use explicit model types instead of \texttt{a\allowbreak{}n\allowbreak{}y}.
+  \item
+    \textbf{Peer Dependency Clarity}: Explicitly state that \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} is the official host adapter for Node.js environments.
+  \item
+    \textbf{Visual Proofs}: Ensure the GIF demo in the README is updated to show the latest high-fidelity motion and transition shaders.
+  \end{enumerate}
+\item
+  \textbf{2.2. Missing Standard Documentation:}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    \textbf{\texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}}: Exists, but needs to be aligned with the new \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d} work doctrine.
+  \item
+    \textbf{\texttt{S\allowbreak{}E\allowbreak{}C\allowbreak{}U\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}.\allowbreak{}m\allowbreak{}d}}: Exists, but is generic. Should include terminal-specific security concerns (e.g., escape sequence sanitization).
+  \end{enumerate}
+\item
+  \textbf{2.3. Supplementary Documentation (Docs):}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Answer:} \textbf{Layout Engine internals}. The recursion logic in \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is complex and critical for performance but lacks a dedicated strategy doc explaining the ``localization'' vs.~``painting'' phases.
+  \end{itemize}
+\end{itemize}
+
+\section{3. FINAL ACTION PLAN}\label{record-414-final-action-plan}
+
+\begin{itemize}
+\item
+  \textbf{3.1. Recommendation Type:} \textbf{A. Incremental updates to the existing README and documentation.} (The core has been overhauled; now it needs polish).
+\item
+  \textbf{3.2. Deliverable (Prompt Generation):} \texttt{R\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{} \allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}t\allowbreak{}l\allowbreak{}y\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}s\allowbreak{}.\allowbreak{} \allowbreak{}A\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{} \allowbreak{}C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{}.\allowbreak{} \allowbreak{}C\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}'\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}g\allowbreak{}e\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.}
+\item
+  \textbf{3.3. Mitigation Prompt:} \texttt{U\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}'\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}'\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}'\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{}>\allowbreak{}'\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}'\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>\allowbreak{}'\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{} \allowbreak{}U\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}'\allowbreak{}C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}l\allowbreak{}y\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}'\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}p\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{} \allowbreak{}C\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}n\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{} \allowbreak{}'\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.}
+\end{itemize}
+

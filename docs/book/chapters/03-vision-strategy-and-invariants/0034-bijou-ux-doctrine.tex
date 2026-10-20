@@ -1,0 +1,64 @@
+\chapter{BIJOU UX DOCTRINE}\label{record-034}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/bijou-ux-doctrine.md}\par}\smallskip
+
+Bijou is a high-fidelity terminal UI engine with an explicit design stance on runtime truth, shell honesty, and human-centered interaction.
+
+\section{Core Tenets}\label{record-034-core-tenets}
+
+\subsection{1. Focus Owns Input}\label{record-034-focus-owns-input}
+
+The active region must be unambiguous and possess the primary control surface. The user should never wonder whether a keypress affects the current pane, a hidden modal, or a stale footer hint.
+
+\subsection{2. Visible Controls Are a Promise}\label{record-034-visible-controls-are-a-promise}
+
+If a control hint is visible, it must function for the active layer. Advertising inactive or covered controls is a failure of shell integrity.
+
+\subsection{3. Structural Selection}\label{record-034-structural-selection}
+
+Selection should be communicated through background fill, structural emphasis, or positional glyphs. Color may reinforce selection but must not be the sole differentiator.
+
+\subsection{4. Density Requires Rhythm}\label{record-034-density-requires-rhythm}
+
+TUI density is an industrial strength, not a license for visual noise. Gutters, margins, and consistent rhythm between labels and values must be preserved.
+
+\subsection{5. The Shell is a Product}\label{record-034-the-shell-is-a-product}
+
+The app frame---header, footer, help, search, settings, and notifications---is a unified human-facing product. It exists to orient the operator, centralize common behavior, and reduce anxiety.
+
+\subsection{6. Graceful Lowering is an Obligation}\label{record-034-graceful-lowering-is-an-obligation}
+
+Rich interactive mode is one profile. Bijou preserves semantic truth across \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} modes. Lower profiles do not need visual parity; they require semantic honesty.
+
+\subsection{7. Accessibility is a Substrate Property}\label{record-034-accessibility-is-a-substrate-property}
+
+Bijou considers reading order, low-vision, color-blindness, and cognitive load at the engine level. An application is not accessible merely because a component can lower to text.
+
+\subsection{8. Localization is Geometric}\label{record-034-localization-is-geometric}
+
+Locale affects wording, wrapping, and reading direction. Bijou avoids hardcoded assumptions that prioritize English or LTR layouts.
+
+\subsection{9. AI Surfaces Must Explain}\label{record-034-ai-surfaces-must-explain}
+
+AI-mediated output must be explicit about its nature, evidence, and confidence. It should guide the operator toward the expected next action.
+
+\section{Interaction Patterns}\label{record-034-interaction-patterns}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Keyboard-First, Mouse-Enhanced}: Everything important remains reachable by keyboard. In practice, the shell stays keyboard-first, mouse-enhanced, and mouse input enhances this truthful model through spatial interaction.
+\item
+  \textbf{Topmost Layer Dismisses First}: Layered TUIs must be predictable. Layers should dismiss from the top, and the top dismissible layer is the first to be dismissed by \texttt{E\allowbreak{}s\allowbreak{}c}.
+\item
+  \textbf{Top Layer Owns Visible Controls}: The layer on top owns the visible prompts, controls, and escape affordances until it yields or dismisses; in plain terms, the thing on top owns visible controls.
+\item
+  \textbf{DOGFOOD is the Proving Ground}: The documentation itself must exercise the shell, search, and accessibility posture truthfully.
+\item
+  \textbf{Doctrine Before Blocks}: Blocks come after doctrine. Reusable blocks come after interaction doctrine, not before it; policy should shape components instead of the other way around.
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{The goal is to move the terminal from a collection of widgets to a professional application bedrock.}
+

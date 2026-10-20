@@ -1,0 +1,141 @@
+\chapter{DF-061 Audit overlay primitives family across real surfaces}\label{record-102}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-061 Audit overlay primitives family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - overlays
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-102-framing}
+
+Overlay primitives are the family for layered UI that is not ordinary document flow: \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}, and \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}. They differ by interruption level. Tooltips explain locally, drawers supplement, modals block, and toasts announce transiently.
+
+This audit verifies overlay primitive stories against real story rendering, component-family doctrine, and mode-aware lowerings. It also closes the story drift where DOGFOOD already had modal and toast examples, but did not visibly exercise drawer or tooltip primitives as part of the same overlay family.
+
+\section{Sponsored Users}\label{record-102-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors choosing the right overlay primitive instead of overusing modals or toasts.
+\item
+  Docs readers checking how layered UI lowers when z-order is unavailable.
+\item
+  Maintainers who need one focused regression tying overlay story metadata, variants, and design-system guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-102-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see tooltip, drawer, modal, and toast primitives side by side as one overlay family.
+\item
+  A reader can switch every overlay primitive through interactive, static, pipe, and accessible profiles while preserving the right interruption level.
+\item
+  A maintainer can run one cycle test that proves overlay story metadata and design-system guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-102-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose all four overlay primitives?
+\item
+  Do variants cover explanatory, supplemental, blocking, and transient overlay jobs?
+\item
+  Do rich/static previews keep layering and containment visible?
+\item
+  Do pipe lowerings avoid fake z-order and preserve plain prompt/event text?
+\item
+  Do accessible lowerings linearize overlay relationships to their owning context?
+\item
+  Do component-family docs still separate primitive overlays from the full notification system?
+\end{itemize}
+
+\section{Requirements}\label{record-102-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l} and \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t} story identities while adding missing drawer and tooltip story coverage.
+\item
+  Ensure \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t} participates in the \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}s} coverage family while still retaining its lower-level transient-overlay coverage.
+\item
+  Render every overlay primitive story variant in every canonical story profile.
+\item
+  Treat borders, dimmed backdrops, anchor placement, and z-order as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings plain, explicit, and semantic-preserving.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-102-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}1\allowbreak{}/\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates DOGFOOD stories for \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})}, and \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}.
+\item
+  Every documented overlay variant renders non-empty output in every profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Constrained lowerings preserve blocking modal prompts, supplemental drawer context, local tooltip explanation, and transient toast events.
+\item
+  Component-family docs retain overlay primitive guidance and the boundary with notification system behavior.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-102-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add drawer and tooltip DOGFOOD stories under the overlay primitive family.
+\item
+  Add mode-aware constrained lowerings to modal and toast story variants.
+\item
+  Add a DF-061 cycle test that renders every overlay primitive through the shared story protocol.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\end{enumerate}
+
+\section{Drift Check}\label{record-102-drift-check}
+
+Runtime support already existed for all four primitives. The drift was in DOGFOOD: \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} and \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} were visible, but \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} and \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})} were only documented indirectly.
+
+This slice fixes the drift by adding the missing stories and making constrained lowerings explicitly textual. No runtime API changes were required.
+
+\section{Playback}\label{record-102-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note, and DOGFOOD did not visibly exercise every overlay primitive.
+\item
+  GREEN: the new cycle test renders modal, drawer, tooltip, and toast stories across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve layering, borders, anchors, and backdrop context.
+\item
+  Pipe previews preserve prompt, supplemental, explanation, and event content without box drawing.
+\item
+  Accessible previews linearize the same overlay facts in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-102-retrospective}
+
+The useful release work was not inventing another overlay. It was making DOGFOOD teach the existing overlay hierarchy honestly: explain with a tooltip, supplement with a drawer, block with a modal, and announce briefly with a toast.
+

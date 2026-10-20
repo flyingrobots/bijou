@@ -1,0 +1,337 @@
+\chapter{Data Visualization Policy}\label{record-020}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/data-visualization.md}\par}\smallskip
+
+Bijou already ships several data-display families:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})}
+\item
+  interactive siblings such as \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+This document defines when to use each one and when not to visualize at all.
+
+\section{1. Start with the question, not the component}\label{record-020-start-with-the-question-not-the-component}
+
+Before choosing a view, answer:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is the user comparing records?
+\item
+  Is the user following hierarchy?
+\item
+  Is the user following chronology?
+\item
+  Is the user following dependencies or flow?
+\item
+  Is the user inspecting, or just reading?
+\end{enumerate}
+
+If you do not know the question, the visualization choice will be decorative rather than informative.
+
+\section{2. Default selection ladder}\label{record-020-default-selection-ladder}
+
+\subsection{\texorpdfstring{Use \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} when comparison is primary}{Use  when comparison is primary}}\label{record-020-use-table-when-comparison-is-primary}
+
+Choose a table when:
+
+\begin{itemize}
+\tightlist
+\item
+  the same attributes matter across many rows
+\item
+  the user needs side-by-side comparison
+\item
+  scanability matters more than storytelling
+\end{itemize}
+
+Avoid \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} when:
+
+\begin{itemize}
+\tightlist
+\item
+  hierarchy is primary
+\item
+  chronology is primary
+\item
+  the dependency structure itself is the meaning
+\end{itemize}
+
+\subsection{\texorpdfstring{Use \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} when parent/child hierarchy is primary}{Use  when parent/child hierarchy is primary}}\label{record-020-use-tree-when-parentchild-hierarchy-is-primary}
+
+Choose a tree when:
+
+\begin{itemize}
+\tightlist
+\item
+  nesting is the message
+\item
+  branches matter more than attributes
+\item
+  the user needs to understand containment or lineage
+\end{itemize}
+
+Avoid \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} when:
+
+\begin{itemize}
+\tightlist
+\item
+  nodes have multiple parents
+\item
+  the user is comparing many scalar attributes across peers
+\end{itemize}
+
+\subsection{\texorpdfstring{Use \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when chronology is primary}{Use  when chronology is primary}}\label{record-020-use-timeline-when-chronology-is-primary}
+
+Choose a timeline when:
+
+\begin{itemize}
+\tightlist
+\item
+  sequence over time is the point
+\item
+  events build a story
+\item
+  state changes need a temporal narrative
+\end{itemize}
+
+Avoid \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when:
+
+\begin{itemize}
+\tightlist
+\item
+  side-by-side comparison matters more than order
+\item
+  timestamps are metadata rather than the central axis
+\end{itemize}
+
+\subsection{\texorpdfstring{Use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} when dependency or flow is primary}{Use  when dependency or flow is primary}}\label{record-020-use-dag-when-dependency-or-flow-is-primary}
+
+Choose a DAG when:
+
+\begin{itemize}
+\tightlist
+\item
+  nodes depend on one another
+\item
+  parallel branches matter
+\item
+  multiple parents or non-tree edges matter
+\end{itemize}
+
+Avoid \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} when:
+
+\begin{itemize}
+\tightlist
+\item
+  a plain tree or table already tells the truth
+\item
+  the graph is so large that the shape becomes noise
+\end{itemize}
+
+\section{3. Passive versus active inspection}\label{record-020-passive-versus-active-inspection}
+
+\subsection{Passive reading}\label{record-020-passive-reading}
+
+Use:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+when the user is reading or scanning.
+
+\subsection{Active inspection}\label{record-020-active-inspection}
+
+Use:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  future interactive tree/file-browser patterns
+\end{itemize}
+
+when the user needs focus, selection, keyboard traversal, or drill-in behavior.
+
+\section{4. Density policy}\label{record-020-density-policy}
+
+Terminals tolerate dense information, but the wrong kind of density becomes illegible quickly.
+
+\subsection{Good density}\label{record-020-good-density}
+
+\begin{itemize}
+\tightlist
+\item
+  aligned columns
+\item
+  consistent row shape
+\item
+  compact but meaningful labels
+\item
+  restrained use of borders and status color
+\end{itemize}
+
+\subsection{Bad density}\label{record-020-bad-density}
+
+\begin{itemize}
+\tightlist
+\item
+  too many competing tones
+\item
+  wide wrapped columns inside already dense tables
+\item
+  graphs with too many labels to read
+\item
+  timelines with so much metadata that order disappears
+\end{itemize}
+
+\section{5. Narrow terminal policy}\label{record-020-narrow-terminal-policy}
+
+Visualization must degrade honestly in narrow spaces.
+
+\subsection{Preferred behavior}\label{record-020-preferred-behavior}
+
+\begin{itemize}
+\tightlist
+\item
+  reflow to fewer columns
+\item
+  wrap supporting text
+\item
+  reduce metadata before reducing meaning
+\item
+  collapse to summary plus drill-in path where appropriate
+\end{itemize}
+
+\subsection{Avoid}\label{record-020-avoid}
+
+\begin{itemize}
+\tightlist
+\item
+  silently truncating the very field the user is trying to inspect
+\item
+  forcing a graph into a width where it no longer communicates structure
+\end{itemize}
+
+\section{6. When not to visualize}\label{record-020-when-not-to-visualize}
+
+Do not force a data structure into a component just because one exists.
+
+Avoid visualizing when:
+
+\begin{itemize}
+\tightlist
+\item
+  a short sentence says it more clearly
+\item
+  a count or badge communicates enough
+\item
+  the user only needs one record
+\item
+  the structure is incidental rather than informative
+\end{itemize}
+
+Examples:
+
+\begin{itemize}
+\tightlist
+\item
+  one build status: use \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}, not \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  one warning with context: use \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} or notification, not \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  one path: use \texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})} or plain text, not \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+\section{7. Data visualization and graceful lowering}\label{record-020-data-visualization-and-graceful-lowering}
+
+These families should preserve meaning across modes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} should still compare
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} should still show nesting
+\item
+  \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} should still show order
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} should still show dependency structure, or degrade to a truthful summary if a full graph is not legible
+\end{itemize}
+
+If the only good version of a view is the rich interactive one, then the family needs:
+
+\begin{itemize}
+\tightlist
+\item
+  a TUI-only interaction layer
+\item
+  a simplified lower-fidelity companion
+\item
+  or a different canonical representation
+\end{itemize}
+
+\section{8. Future chart policy}\label{record-020-future-chart-policy}
+
+When Bijou adds chart families such as sparklines, bars, or scatter plots, the default rules should be:
+
+\begin{itemize}
+\tightlist
+\item
+  use charts for trend, shape, or distribution
+\item
+  use tables for exact values
+\item
+  pair chart and summary where the chart alone cannot carry the meaning
+\item
+  do not make color the only way categories are distinguished
+\item
+  narrow terminals should prefer simpler marks over denser ones
+\end{itemize}
+
+\section{9. Practical recommendations for today}\label{record-020-practical-recommendations-for-today}
+
+\begin{itemize}
+\tightlist
+\item
+  Prefer \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for operational comparison.
+\item
+  Prefer \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} for histories and release/event storytelling.
+\item
+  Prefer \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} for nested structure and navigation lineage.
+\item
+  Prefer \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} for pipelines, dependencies, and workflow execution reasoning.
+\item
+  Prefer interactive siblings only when the user must inspect, not just read.
+\end{itemize}
+

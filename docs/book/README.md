@@ -23,6 +23,21 @@ READMEs remain beside their distributable code.
 Historical proposals retain their original status; GitHub issues and milestones
 own current release scope. `compiled-source-retirement.json` lists all removals.
 
+## LaTeX source layout
+
+`bijou-designs.tex` is the small book entrypoint. It uses `\input` to assemble:
+
+- `preamble.tex` — typography, palette and shared LaTeX configuration;
+- `frontmatter.tex` — cover, edition notes and contents;
+- `parts/` — 13 part files listing their chapters in reading order;
+- `chapters/` — one file per original document, grouped by book part;
+- `specimens/` — one file per rendered DOGFOOD component story;
+- `appendices/` — the component atlas wrapper and source inventory.
+
+Each entry in `source-manifest.json` includes its `latex_path`, so an original
+Markdown path maps directly to its chapter file. The original Markdown files
+remain retired. Compile the entrypoint from this directory as shown below.
+
 ## Typography and palette
 
 Jacquard 24 is used for the title and section headings. IBM Plex Mono is used
@@ -63,8 +78,13 @@ cp "$build_dir/bijou-designs.pdf" ./bijou-designs.pdf
 The committed edition was built in isolated temporary storage with LuaHBTeX
 1.15.0 / TeX Live 2022, Pandoc 3.12.1 and fontTools 4.67.0. The worker reused an
 existing TeX image without installing a global toolchain. Re-running the LaTeX
-is sufficient to build the retained edition; regenerating it from changed
-Markdown requires rebuilding the recorded chapter/diagram compilation.
+is sufficient to build the retained edition. Edit chapter files directly and
+keep shared styling in `preamble.tex`; the corpus remains the exact snapshot
+of the retired Markdown edition.
+
+The split source was rebuilt and checked against the published PDF: all 1,760
+pages have identical text, geometry, 36 DPI renders and named link destinations.
+See `latex-split-verification.json`. The published PDF is unchanged.
 
 ## Provenance and tracker reconciliation
 

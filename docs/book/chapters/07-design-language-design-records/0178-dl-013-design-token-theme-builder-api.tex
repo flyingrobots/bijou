@@ -1,0 +1,597 @@
+\chapter{DL-013 Design token and theme builder API}\label{record-178}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-013-design-token-theme-builder-api.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DL-013 Design token and theme builder API
+legend: DL
+lane: cool-ideas
+priority: medium
+github_issue: 308
+keywords:
+  - design-language
+  - themes
+  - tokens
+  - styles
+  - builder-api
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-178-decision-summary}
+
+Tokens describe semantic color slots in a theme.
+
+Themes own mode-specific token values.
+
+Dark and light are the required first theme modes.
+
+Styles consume resolved tokens at render time.
+
+Styles do not register tokens, own theme values, or decide dark/light mode.
+
+This design records the first official Bijou shape for a Lip Gloss-like builder API without copying Lip Gloss' object model wholesale. Bijou should expose a declarative style builder, but the theme graph must remain explicit because Bijou already treats rendering, lowering, and inspectability as first-class contracts.
+
+The short relationship is:
+
+\begin{CodeBlock}
+Theme
+  contains modes
+    contain token color values
+
+Style
+  contains layout and rendering rules
+  may reference token ids
+  resolves those references through one theme mode during render
+\end{CodeBlock}
+
+\section{Sponsored Human}\label{record-178-sponsored-human}
+
+A Bijou app author wants to declare semantic colors once and reuse them across dark and light modes so that components can stay visually coherent without passing raw RGB values through every call site.
+
+\section{Sponsored Agent}\label{record-178-sponsored-agent}
+
+An agent auditing a Bijou app wants theme tokens and style use to be separable and inspectable so that it can explain whether a rendered cell came from a semantic theme slot, a raw color override, or a lower-mode fallback.
+
+\section{Hill}\label{record-178-hill}
+
+A Bijou app author can define semantic color tokens once inside a theme, provide required dark and light mode values, and apply those tokens through a fluent style builder without allowing styles to become the owner of product theme truth.
+
+\section{Problem}\label{record-178-problem}
+
+Bijou has styleable surfaces, palettes, theme presets, and DOGFOOD chrome, but the authoring API still makes authors think in implementation details too early. A Lip Gloss-like builder can make styling feel natural, but a naive builder can blur three different responsibilities:
+
+\begin{itemize}
+\tightlist
+\item
+  declaring which semantic colors exist
+\item
+  assigning concrete colors to those semantic colors for dark and light modes
+\item
+  applying resolved colors and layout rules to rendered content
+\end{itemize}
+
+The user-facing syntax should be fluent, but the model should stay strict. Theme data is application and product identity. Style data is component presentation. Token references are the bridge.
+
+\section{Playback Questions}\label{record-178-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a theme define the same token id with separate dark and light values?
+\item
+  Does a style keep token references unresolved until render receives a theme and mode?
+\item
+  Can an inspector explain which theme, mode, token id, and lowering profile produced a rendered cell color?
+\item
+  Do unresolved tokens fail or fall back through an explicit policy instead of silently degrading?
+\item
+  Does the lower-mode path preserve meaning when truecolor is unavailable?
+\end{enumerate}
+
+\section{Scope}\label{record-178-scope}
+
+This spec covers the first color-token API only:
+
+\begin{itemize}
+\tightlist
+\item
+  semantic color token ids
+\item
+  dark and light theme modes
+\item
+  theme-local token registration and validation
+\item
+  token references inside styles
+\item
+  raw color escape hatches inside styles
+\item
+  deterministic lower-mode color resolution
+\item
+  runtime inspectability facts for token resolution
+\end{itemize}
+
+\section{Non-Goals}\label{record-178-non-goals}
+
+This slice does not design every future design-token category.
+
+\begin{itemize}
+\tightlist
+\item
+  No spacing tokens yet.
+\item
+  No typography tokens yet.
+\item
+  No motion tokens yet.
+\item
+  No border-shape tokens yet.
+\item
+  No global mutable token registry.
+\item
+  No runtime terminal background-color query requirement.
+\item
+  No implementation of the builder API in this planning slice.
+\end{itemize}
+
+Those can become follow-on issues once the color-token and theme-mode contract is landed.
+
+\section{Core Vocabulary}\label{record-178-core-vocabulary}
+
+\subsection{Token}\label{record-178-token}
+
+A token is a semantic color slot inside a theme. It has a stable id such as \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}b\allowbreak{}g}, but it does not carry a single universal color by itself. Its value comes from a theme mode.
+
+Good token ids name intent, not pigment:
+
+\begin{CodeBlock}
+color.surface.canvas.bg
+color.surface.canvas.fg
+color.status.danger.bg
+color.status.danger.fg
+color.chrome.focusGutter
+color.chrome.scrollThumb
+color.brand.primary
+\end{CodeBlock}
+
+Bad token ids encode mode or raw color:
+
+\begin{CodeBlock}
+color.dark.red900
+color.light.blueAccent
+color.hex.ff0000
+\end{CodeBlock}
+
+\subsection{Theme}\label{record-178-theme}
+
+A theme is an immutable named collection of modes. It is the owner of token values. A theme can declare that the same token has different concrete colors in dark and light modes.
+
+\subsection{Mode}\label{record-178-mode}
+
+A mode is a named token-value map inside a theme. \texttt{d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} are the required first modes because they cover the highest-value terminal theme split without requiring terminal background probing in the first implementation.
+
+Additional modes can be designed later, for example \texttt{h\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t}, \texttt{d\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}p\allowbreak{}i\allowbreak{}a}, or \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}t}.
+
+\subsection{Style}\label{record-178-style}
+
+A style is an immutable builder for presentation. It can hold foreground, background, border, padding, margin, width, wrapping, alignment, and other rendering rules. When a style uses a token, it stores a token reference rather than a concrete color.
+
+The concrete color is resolved only when rendering receives a theme and mode.
+
+\section{Proposed API}\label{record-178-proposed-api}
+
+The primary API should optimize for the common case: define a theme, define styles that reference semantic tokens, then render with a selected mode.
+
+\begin{CodeBlock}
+import {
+  defineTheme,
+  style,
+  tokenRef,
+} from '@flyingrobots/bijou';
+
+const theme = defineTheme()
+  .id('bijou.default')
+  .label('Bijou Default')
+  .mode("dark", mode => mode
+    .token('color.status.danger.bg')
+    .color({ r: 144, g: 0, b: 0 })
+    .token('color.status.danger.fg')
+    .color({ r: 255, g: 230, b: 230 }))
+  .mode("light", mode => mode
+    .token('color.status.danger.bg')
+    .color({ r: 255, g: 230, b: 230 })
+    .token('color.status.danger.fg')
+    .color({ r: 144, g: 0, b: 0 }))
+  .build();
+
+const warning = style()
+  .padding(0, 1)
+  .foreground(tokenRef("color.status.danger.fg"))
+  .background(tokenRef("color.status.danger.bg"));
+
+const surface = warning.render(surfaceText, { theme, mode: "dark" });
+\end{CodeBlock}
+
+The exact authoring names can still move during implementation, but the responsibility split should not.
+
+\section{Token Builder Variant}\label{record-178-token-builder-variant}
+
+The user-proposed token builder shape is useful, but it should be scoped to theme modes rather than become a global registry:
+
+\begin{CodeBlock}
+const theme = defineTheme()
+  .id('bijou.default')
+  .mode('dark', mode => mode
+    .token()
+    .id('color.status.danger.bg')
+    .color({ r: 144, g: 0, b: 0 })
+    .register())
+  .mode('light', mode => mode
+    .token()
+    .id('color.status.danger.bg')
+    .color({ r: 255, g: 230, b: 230 })
+    .register())
+  .build();
+\end{CodeBlock}
+
+The shorter \texttt{.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}(\allowbreak{}i\allowbreak{}d\allowbreak{})\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{})} form should exist for dense theme files. The longer \texttt{.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}(\allowbreak{})\allowbreak{}.\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} form is useful when an author wants comments, metadata, or validation hooks attached to one token entry.
+
+\section{Why Tokens Are Theme-Scoped}\label{record-178-why-tokens-are-theme-scoped}
+
+Theme-scoped token registration prevents three failure modes:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A token definition cannot silently survive without mode values.
+\item
+  A style cannot accidentally become the source of product theme truth.
+\item
+  A future theme inspector can show all missing mode values from one theme object instead of chasing global state.
+\end{enumerate}
+
+If Bijou later adds package-level token catalogs, those catalogs should declare allowed ids and descriptions. They should still not own the concrete dark and light mode colors for every consuming app.
+
+\section{Relationship Diagram}\label{record-178-relationship-diagram}
+
+\begin{CodeBlock}
+              +------------------+
+              | Theme            |
+              | id, label        |
+              +--------+---------+
+                       |
+              owns mode maps
+                       |
+          +------------+------------+
+          |                         |
++---------v---------+     +---------v---------+
+| Mode: dark        |     | Mode: light       |
+| token -> color    |     | token -> color    |
++---------+---------+     +---------+---------+
+          |                         |
+          +------------+------------+
+                       |
+                 resolves refs
+                       |
+              +--------v---------+
+              | Style            |
+              | fg: tokenRef(...)|
+              | bg: tokenRef(...)|
+              | layout rules     |
+              +--------+---------+
+                       |
+                 render context
+                       |
+              +--------v---------+
+              | Surface cells    |
+              | concrete colors  |
+              +------------------+
+\end{CodeBlock}
+
+\section{Style Builder Surface}\label{record-178-style-builder-surface}
+
+The style builder should feel familiar to authors who know fluent terminal style APIs, while still returning Bijou surfaces and facts.
+
+Candidate methods:
+
+\begin{CodeBlock}
+style()
+  .foreground(tokenRef('color.text.primary'))
+  .background(tokenRef('color.surface.canvas.bg'))
+  .bold(true)
+  .italic(true)
+  .underline(true)
+  .padding(1, 2)
+  .margin(0, 1)
+  .width(40)
+  .height(8)
+  .maxWidth(80)
+  .align('center')
+  .border('single')
+  .borderForeground(tokenRef('color.chrome.border'))
+  .render(surfaceText, { theme, mode: 'dark' });
+\end{CodeBlock}
+
+The style builder can support raw colors as an escape hatch:
+
+\begin{CodeBlock}
+style().foreground({ r: 250, g: 250, b: 250 });
+\end{CodeBlock}
+
+Raw colors should be visible in inspectability facts so an agent can distinguish deliberate hard-coded color from semantic token use.
+
+\section{Resolution Contract}\label{record-178-resolution-contract}
+
+Rendering a token-backed style requires:
+
+\begin{itemize}
+\tightlist
+\item
+  a theme
+\item
+  a mode id
+\item
+  a lowering profile
+\item
+  an unresolved-token policy
+\end{itemize}
+
+The default unresolved-token policy should fail in development and use a visible fallback in production-like rendering. The fallback must be deterministic and inspectable.
+
+\begin{CodeBlock}
+type TokenResolutionFact = {
+  tokenId: string;
+  themeId: string;
+  mode: string;
+  source: 'theme' | 'fallback' | 'raw-color';
+  requestedColor?: RgbColor;
+  resolvedColor: LoweredColor;
+  profile: 'truecolor' | 'ansi256' | 'ansi16' | 'mono' | 'plain';
+};
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-178-lower-modes}
+
+Color lowering belongs to the resolver, not to each style call site.
+
+The first resolver should support:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}: preserve RGB
+\item
+  \texttt{a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}2\allowbreak{}5\allowbreak{}6}: nearest palette index
+\item
+  \texttt{a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}1\allowbreak{}6}: nearest named ANSI color
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}n\allowbreak{}o}: intensity and emphasis only
+\item
+  \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}: no color, style facts preserved
+\end{itemize}
+
+This keeps the style syntax stable even when output moves from rich terminal to pipe, static snapshot, accessible text, or future frame capture.
+
+\section{Inheritance And Composition}\label{record-178-inheritance-and-composition}
+
+Bijou should support value-style copying and inheritance, but unset rules must stay distinguishable from intentionally raw or token-backed rules.
+
+Candidate API:
+
+\begin{CodeBlock}
+const base = style()
+  .foreground(tokenRef('color.text.primary'))
+  .background(tokenRef('color.surface.canvas.bg'));
+
+const danger = style()
+  .inherit(base)
+  .background(tokenRef('color.status.danger.bg'))
+  .foreground(tokenRef('color.status.danger.fg'));
+\end{CodeBlock}
+
+Inheritance should copy only unset rules on the receiver, matching the useful part of Lip Gloss while keeping the resolved-token facts intact.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-178-agent-inspectability-explainability-posture}
+
+Every rendered token-backed style should be able to expose:
+
+\begin{itemize}
+\tightlist
+\item
+  style id, when provided
+\item
+  theme id
+\item
+  mode id
+\item
+  token ids used
+\item
+  raw colors used
+\item
+  fallback tokens used
+\item
+  lowered output profile
+\item
+  concrete cell color results
+\end{itemize}
+
+This is a Bijou-specific requirement. The goal is not only nice terminal styling, but explainable rendering.
+
+\section{Accessibility / Assistive Reading Posture}\label{record-178-accessibility-assistive-reading-posture}
+
+Token ids should be semantic enough that an accessible renderer can report meaning even when color is stripped.
+
+For example, \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}b\allowbreak{}g} gives better assistive context than \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}9\allowbreak{}0\allowbreak{}0}. The style resolver should preserve facts for accessible surfaces even when the final text has no color escape sequences.
+
+\section{Localization / Directionality Posture}\label{record-178-localization-directionality-posture}
+
+No localized strings are introduced by this design. Public docs and DOGFOOD examples introduced during implementation must follow the repository localization policy and provide all supported DOGFOOD locales when new localized copy is added. Token ids are logical semantic identifiers and should not encode physical direction, locale, or translated prose.
+
+\section{Linked Invariants}\label{record-178-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}: resolved cell colors and resolver facts are stronger evidence than design prose.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: color cannot be the only carrier of status, focus, or warning meaning.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are The Spec}: the builder API should land through focused runtime tests, not just examples.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{Buffer Holds Facts}: rendered cells should preserve token-resolution facts for inspection and replay.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are The Demo}: DOGFOOD examples should exercise the same public builder API as consumers.
+\end{itemize}
+
+\section{Compatibility}\label{record-178-compatibility}
+
+The builder should be additive. Existing theme preset and surface APIs should continue to work while the builder is introduced.
+
+Migration can be staged:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add token references and theme builder types.
+\item
+  Convert one DOGFOOD shell theme path to prove the model.
+\item
+  Add docs and examples.
+\item
+  Expand first-party components to accept \texttt{S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e} values.
+\item
+  Deprecate ad hoc raw color plumbing only after call sites have a builder alternative.
+\end{enumerate}
+
+\section{Acceptance Criteria}\label{record-178-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} creates immutable theme definitions with required dark and light mode maps.
+\item
+  Theme builders reject duplicate token ids within one mode.
+\item
+  Theme builders reject themes missing required dark or light mode values for declared tokens.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{}i\allowbreak{}d\allowbreak{})} is accepted by style color setters.
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} produces immutable styles and does not mutate copied styles.
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} resolves token-backed colors through the selected mode.
+\item
+  The resolver emits inspectability facts for token, theme, mode, fallback, and lowering decisions.
+\item
+  Lower modes prove that token-backed styles render in truecolor, ANSI, mono, and plain profiles.
+\item
+  DOGFOOD includes one theme-builder example and one style-builder example once implementation lands.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-178-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Token and theme type contracts with focused tests.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} builder with dark/light validation.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{})} and color-reference resolution.
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} builder for foreground, background, emphasis, padding, width, and render.
+\item
+  Lower-mode resolver facts and fallback behavior.
+\item
+  DOGFOOD docs, examples, and package exports.
+\end{enumerate}
+
+\section{Implementation Progress}\label{record-178-implementation-progress}
+
+Slices 1 through 3 are the first runtime landing target for issue \href{https://github.com/flyingrobots/bijou/issues/308}{\#308}:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} creates immutable token-theme definitions with required \texttt{d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} mode maps.
+\item
+  Theme-scoped token registration rejects duplicate token ids within one mode and rejects required modes that omit a declared token.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{})} and \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{})} preserve resolution facts for selected theme mode, token id, raw colors, and explicit fallback colors.
+\end{itemize}
+
+Slice 4 intentionally tightens the current token vocabulary before adding more syntax:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} now gives every built-in token a per-token ``use when / do not use when'' contract.
+\item
+  DOGFOOD now uses explicit dark and light shell themes instead of deriving its docs chrome from one title-screen color ramp.
+\item
+  Focused DogFood preview tests prove that the shell themes keep readable surface text and common semantic roles above the contrast floor in both dark and light postures.
+\item
+  The next inspectability UX is \href{https://github.com/flyingrobots/bijou/issues/311}{\#311}, the Theme Inspector drawer: an opt-in \texttt{F\allowbreak{}1\allowbreak{}0} shell drawer that shows token swatches, dark/light values, contrast facts, and future renderer provenance when cell-level token facts exist.
+\end{itemize}
+
+Slice 5 promotes contrast from ad hoc tests into a reusable safe-pair contract:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DL-015-theme-safe-pairs-and-contrast-matrices.md}{DL-015} defines foreground/background safe pairs as design-system data.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} builds immutable \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e} pair matrices.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} can validate pair paths that target token background slots, such as \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}.
+\item
+  DOGFOOD exports \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E\allowbreak{}\_\allowbreak{}S\allowbreak{}A\allowbreak{}F\allowbreak{}E\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}I\allowbreak{}R\allowbreak{}S} so docs preview tests and the future Theme Inspector drawer consume the same pair contract.
+\item
+  This slice closes the implementation path for \href{https://github.com/flyingrobots/bijou/issues/314}{\#314}.
+\end{itemize}
+
+The remaining implementation work is the \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} builder, lower-mode resolution proof, package example coverage, and the optional Theme Inspector UX slice.
+
+\section{Tests To Write First}\label{record-178-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Theme builder rejects missing \texttt{d\allowbreak{}a\allowbreak{}r\allowbreak{}k} or \texttt{l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} modes.
+\item
+  Theme builder rejects duplicate mode token ids.
+\item
+  Style render resolves foreground and background token refs by selected mode.
+\item
+  Copied styles stay immutable after chained modifications.
+\item
+  Lower-mode rendering produces deterministic truecolor, ANSI, mono, and plain output.
+\item
+  Inspectability facts identify theme id, mode id, token id, and fallback status.
+\end{itemize}
+
+\section{Roadmap Placement}\label{record-178-roadmap-placement}
+
+This belongs in the Beyond lane as issue \href{https://github.com/flyingrobots/bijou/issues/308}{\#308} until implementation is scheduled into a versioned release. It should be grouped as the candidate goalpost \texttt{D\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{} \allowbreak{}T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{} \allowbreak{}A\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s} because it crosses design language, runtime rendering, DOGFOOD docs, and public package exports.
+
+\section{Open Questions}\label{record-178-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should \texttt{S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} accept strings only, surfaces only, or both?
+\item
+  Should style ids be required for inspectability, or optional metadata?
+\item
+  Should high-contrast mode land in the first implementation or immediately after dark/light?
+\item
+  Should token catalogs exist as package-level declarations separate from app-owned theme values?
+\end{itemize}
+
+\section{Retrospective}\label{record-178-retrospective}
+
+This slice is intentionally documentation and roadmap only. The important decision is the object model: tokens belong to themes, themes own modes, and styles consume resolved tokens. Implementation should start with failing runtime tests that prove that split instead of only matching fluent syntax.
+

@@ -1,0 +1,160 @@
+\chapter{DF-026 --- Demote Examples To Secondary Reference Status}\label{record-087}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-026-demote-examples-to-secondary-reference-status.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md}{DF-025 --- Make DOGFOOD The Only Human-Facing Docs Surface}
+\end{itemize}
+
+\section{Sponsor human}\label{record-087-sponsor-human}
+
+A learner or evaluator who should get one clear answer about where to start reading Bijou docs, instead of being bounced between DOGFOOD and a parallel example hub.
+
+\section{Sponsor agent}\label{record-087-sponsor-agent}
+
+An agent that must tell the difference between:
+
+\begin{itemize}
+\tightlist
+\item
+  the canonical docs surface
+\item
+  the internal example inventory
+\item
+  migration/reference fixtures
+\item
+  smoke and regression substrate
+\end{itemize}
+
+\section{Hill}\label{record-087-hill}
+
+The repo stops presenting \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} as a competing docs product. DOGFOOD is the canonical human-facing path. Examples remain valuable, but only as secondary/internal/reference material.
+
+\section{Why this cycle exists}\label{record-087-why-this-cycle-exists}
+
+\texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}5} set the policy direction, but policy alone was not enough.
+
+If DOGFOOD says ``start here'' while the example inventory still reads like a second docs hub, the public posture is still split.
+
+This cycle exists to make the repo-facing surfaces honest before \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+
+\section{Playback questions}\label{record-087-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Do front-door docs still clearly tell humans to start with DOGFOOD?
+\item
+  Does the example inventory now read as secondary/internal/reference instead of a public docs hub?
+\item
+  Can a user open DOGFOOD itself and understand why examples are secondary?
+\item
+  Do release-facing docs stop treating the example inventory as equal public navigation?
+\item
+  Is \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} now the only remaining \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-087-accessibility-assistive-reading-posture}
+
+The examples posture should be stated in text, not implied by color, layout, or repo folklore.
+
+\section{Localization / directionality posture}\label{record-087-localization-directionality-posture}
+
+This cycle does not translate the example posture copy, but it must keep the explanation inside the same localizable DOGFOOD shell.
+
+\section{Agent inspectability / explainability posture}\label{record-087-agent-inspectability-explainability-posture}
+
+An agent should be able to prove closure by inspecting:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}E\allowbreak{}X\allowbreak{}A\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}E\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  the DOGFOOD guide corpus
+\item
+  the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane
+\item
+  the cycle tests
+\end{itemize}
+
+\section{Non-goals}\label{record-087-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  deleting the whole \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree
+\item
+  replacing the release smoke contract
+\item
+  erasing migration or isolated API seam references that still matter
+\end{itemize}
+
+\section{Decision}\label{record-087-decision}
+
+For \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, DOGFOOD is the only human-facing docs surface. The example inventory remains, but it should read as:
+
+\begin{itemize}
+\tightlist
+\item
+  secondary/internal reference
+\item
+  migration substrate
+\item
+  isolated API proof
+\item
+  regression/smoke substrate
+\end{itemize}
+
+\section{Implementation outline}\label{record-087-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Publish the secondary-example posture inside DOGFOOD itself.
+\item
+  Tighten \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}E\allowbreak{}X\allowbreak{}A\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}E\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d} so it reads as an internal reference map.
+\item
+  Tighten \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} so it does not read like a docs hub.
+\item
+  Move \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}6} from the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the signposts/tests.
+\end{enumerate}
+
+\section{Evidence}\label{record-087-evidence}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD now exposes a \texttt{S\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{} \allowbreak{}E\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}M\allowbreak{}a\allowbreak{}p} guide
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}E\allowbreak{}X\allowbreak{}A\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}E\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d} reads as a maintainer/agent-facing reference map
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} explicitly reads as secondary/internal
+\item
+  the active \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane no longer lists \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}6}
+\end{itemize}
+
+\section{Retrospective}\label{record-087-retrospective}
+
+This cycle does not remove examples. It removes ambiguity about what examples are for.
+
+That leaves one remaining \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}{WF-003 --- Replace \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} With \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}}
+\end{itemize}
+

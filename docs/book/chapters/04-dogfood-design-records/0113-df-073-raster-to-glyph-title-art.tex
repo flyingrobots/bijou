@@ -1,0 +1,301 @@
+\chapter{DF-073 Raster-to-Glyph Title Art}\label{record-113}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-073-raster-to-glyph-title-art.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-073 Raster-to-Glyph Title Art
+legend: DF
+lane: release
+priority: high
+issue: https://github.com/flyingrobots/bijou/issues/303
+keywords:
+  - dogfood
+  - image-filter
+  - landing
+  - raster
+  - release
+  - title-screen
+  - v7
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-113-framing}
+
+Issue \#303 asks the current DOGFOOD landing screen to carry a unique \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} release identity. The first prototype used a textual wake ribbon; the current direction is stronger: render a deterministic stacked sine-wave wake as the animated title background and use the committed \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g} wordmark as a background-transparent glyph mask in complementary colors.
+
+The design follows a Design Thinking loop: observe that terminal title art is most useful when it can be generated, inspected, tested, and lowered; frame the problem as a reusable raster adapter rather than a one-off DOGFOOD paint pass; prototype a deterministic \texttt{R\allowbreak{}g\allowbreak{}b\allowbreak{}a\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} filter for vector and image masks; rasterize the committed SVG wordmark without adding a browser canvas dependency; and prove the result with synthetic-frame tests plus DOGFOOD rendered-frame tests.
+
+\section{Sponsor Human}\label{record-113-sponsor-human}
+
+\begin{itemize}
+\tightlist
+\item
+  A maintainer opening DOGFOOD after \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} wants the first screen to feel release-specific without becoming a blocking splash page.
+\item
+  A visual designer should be able to provide an image, generated frame, or procedural RGBA buffer and choose the terminal character set used to render it.
+\item
+  A reader should still see the normal DOGFOOD entry point, prompt, footer controls, and release documentation route.
+\end{itemize}
+
+\section{Sponsor Agent}\label{record-113-sponsor-agent}
+
+\begin{itemize}
+\tightlist
+\item
+  A review agent needs the release title, raster filter contract, renderer mode, charset, pulse behavior, and lower modes to remain inspectable through existing artifacts and tests.
+\item
+  A future capture/export agent should be able to feed decoded frames through the same primitive without depending on browser canvas or VHS.
+\end{itemize}
+
+\section{Hill}\label{record-113-hill}
+
+A DOGFOOD reader can open the landing title screen and see \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} named in the entry panel while stacked sine-wave glyph strata fill the terminal and the \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g} wordmark tints those foreground glyphs in complementary colors without painting an opaque background box. Braille is one supported glyph mode, but the renderer can also use custom density character sets such as \texttt{/\allowbreak{}\textbackslash{}\allowbreak{}M\allowbreak{}X\allowbreak{}Y\allowbreak{}Z\allowbreak{}a\allowbreak{}b\allowbreak{}c\allowbreak{}!\allowbreak{}?\allowbreak{}=\allowbreak{}-\allowbreak{}.}. The screen remains pulse-driven, deterministic, bounded by the current landing quality profiles, and lowerable through existing release-title facts.
+
+\section{Current Truth}\label{record-113-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} is already the current release-title artifact.
+\item
+  The landing renderer is already pulse-driven, cached, and quality-bucketed.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} already has shader-based \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} output for cell, quad, Braille, and fitted-glyph resolutions.
+\item
+  \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} already establishes density ramps and coverage fitting.
+\item
+  Static, pipe, and accessible release-title output already comes from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\end{itemize}
+
+\section{Product Shape}\label{record-113-product-shape}
+
+\subsection{Wide Landing Screen}\label{record-113-wide-landing-screen}
+
+The stacked sine-wave wake occupies the first-viewport title surface. It uses the existing landing pulse shader and quality buckets, so the field stays animated without adding a new image decode path or GPU dependency. Wake colors are written into cell backgrounds while the density glyphs keep the surface geometry stable with matching foreground colors. The visible Bijou wordmark is rasterized from \texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g}, fit to the terminal cell aspect, and used as a background-transparent mask that writes SVG glyphs without replacing existing backgrounds. The wordmark letters ride a staggered sine wave and tint their foreground fill from the landing ramps, so the logo can animate without owning a rectangular background. The lower FlyingRobots wordmark is read from \texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}o\allowbreak{}.\allowbreak{}t\allowbreak{}x\allowbreak{}t}, treats Braille blank cells as transparent holes, fits the visible logo glyphs to the available landing width, preserves the underlying cell background, and paints visible Braille glyphs with the opposite foreground color of that preserved background. This keeps the mark transparent through modal dimming because the logo does not own a rectangular background fill. FlyingRobots fades away after the first three seconds, leaving the Bijou wordmark, wake, release panel, prompt, footer, and version marker as the stable title composition.
+
+The title screen owns only title-screen controls. \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} is the only key that continues into the DOGFOOD documentation shell; backtick toggles the perf HUD in place, \texttt{E\allowbreak{}s\allowbreak{}c} / \texttt{q} use the shell quit policy, arrows and number keys adjust landing presentation, and other keys do not secretly route into docs. Pressing \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} switches the model directly to the docs route without a title-to-docs transition. That hard cut keeps the first documentation frame legible instead of briefly painting decorative raster residue over product content.
+
+\begin{CodeBlock}
++------------------------------------------------------------------------------+
+|                         BIJOU                                                |
+|                                                                              |
+|  ░░░████░░░░████░░████░░░░████░░░░████░░████░░░░████░░░░████░░              |
+|  ░███░░░████░░░░████░░░████░░░████░░░░████░░░████░░░████░░░                 |
+|  █░░████░░░████░░░░████░░░████░░░████░░░░████░░░████░░░████                |
+|                                                                              |
+|  + DOGFOOD / V7 Launch Wake ----------------------------------------------+ |
+|  | Documentation Of Good Foundational Onboarding and Discovery             | |
+|  +-------------------------------------------------------------------------+ |
+|                                                                              |
+|                              Press [Enter]                                  |
+| Esc/q quit ...                                      60 fps - auto/full v7.0.0 |
++------------------------------------------------------------------------------+
+\end{CodeBlock}
+
+The prompt keeps the localized \texttt{P\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}[\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}]} text while using a stronger foreground gradient over the \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} letters than over the surrounding line.
+
+\subsection{Small Landing Screen}\label{record-113-small-landing-screen}
+
+Small terminals keep the title identity and use fewer glyph cells.
+
+\begin{CodeBlock}
++------------------------------------------+
+|    ░░████░░███░░████░░███░░████        |
+|    ██░░░████░░███░░████░░███░░█        |
+| + DOGFOOD / V7 Launch Wake ------------+ |
+| | Documentation Of Good Foundational... | |
+| +---------------------------------------+ |
+|              Press [Enter]               |
+| Esc/q quit                auto/compact    |
++------------------------------------------+
+\end{CodeBlock}
+
+\subsection{Lower Modes}\label{record-113-lower-modes}
+
+The art is decorative. Lower modes keep exposing semantic release facts.
+
+\begin{CodeBlock}
+pipe:
+  release_id=v7.0.0
+  release_title="V7 Launch Wake"
+  release_motif="launch wake"
+
+accessible:
+  DOGFOOD opens on the V7 Launch Wake release title. The interactive
+  screen includes decorative raster title art rendered as terminal glyphs.
+\end{CodeBlock}
+
+\section{Raster Adapter}\label{record-113-raster-adapter}
+
+The primitive belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} so DOGFOOD is only the first consumer.
+
+\begin{CodeBlock}
+RgbaFrame
+  -> fit source pixels into target cell grid
+  -> sample brightness/alpha/color per cell or sub-cell
+  -> choose renderer:
+       charset: density ramp from custom characters
+       braille: 2x4 dot mask
+       quad:    2x2 quadrant mask
+  -> emit Bijou Surface
+\end{CodeBlock}
+
+\subsection{Input}\label{record-113-input}
+
+\begin{CodeBlock}
+interface RgbaFrame {
+  width: number;
+  height: number;
+  data: Uint8ClampedArray | readonly number[];
+}
+\end{CodeBlock}
+
+The public TUI primitive accepts already-decoded RGBA. DOGFOOD keeps SVG rasterization in the example app layer so the core package contract stays deterministic and dependency-free.
+
+\subsection{Renderer Modes}\label{record-113-renderer-modes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}t}: render each output cell with a density ramp. The caller can pass a custom glyph string such as \texttt{/\allowbreak{}\textbackslash{}\allowbreak{}M\allowbreak{}X\allowbreak{}Y\allowbreak{}Z\allowbreak{}a\allowbreak{}b\allowbreak{}c\allowbreak{}!\allowbreak{}?\allowbreak{}=\allowbreak{}-\allowbreak{}.} and choose whether it is ordered dark-to-light or light-to-dark.
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e}: render each output cell with a 2x4 Braille mask sampled from darkness/alpha.
+\item
+  \texttt{q\allowbreak{}u\allowbreak{}a\allowbreak{}d}: render each output cell with a 2x2 quadrant mask sampled from darkness/alpha.
+\end{itemize}
+
+\subsection{Fit Modes}\label{record-113-fit-modes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{f\allowbreak{}i\allowbreak{}t}: preserve aspect ratio, fill the target, crop overflow, and center both axes.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n}: preserve aspect ratio and letterbox with empty cells.
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}t\allowbreak{}c\allowbreak{}h}: map the frame directly into the requested grid.
+\end{itemize}
+
+\texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}R\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o} is the visual width divided by height of one terminal cell. The default is \texttt{1} for square-cell math. DOGFOOD uses \texttt{0\allowbreak{}.\allowbreak{}5} for the V7 SVG wordmark mask so the rendered logo fits the visible iTerm-style viewport instead of looking vertically stretched.
+
+\subsection{Color Modes}\label{record-113-color-modes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}o\allowbreak{}n\allowbreak{}e}: only glyphs.
+\item
+  \texttt{f\allowbreak{}g}: average visible source pixels into foreground RGB.
+\item
+  \texttt{f\allowbreak{}g\allowbreak{}-\allowbreak{}b\allowbreak{}g}: average visible/dark pixels into foreground and light pixels into background when available.
+\end{itemize}
+
+\section{Determinism And Performance}\label{record-113-determinism-and-performance}
+
+\begin{itemize}
+\tightlist
+\item
+  No browser canvas, wall clock, external image decoder, or GPU dependency is required.
+\item
+  DOGFOOD uses the existing pulse timestamp and quality frame-step quantization.
+\item
+  DOGFOOD computes the stacked sine-wave wake from quantized landing pulse time and current terminal dimensions, then paints it through the existing landing shader.
+\item
+  DOGFOOD reads \texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g} once, rasterizes the wordmark into a cached mask per terminal size, and uses the mask to write foreground glyphs without replacing the underlying backgrounds.
+\item
+  DOGFOOD derives the Bijou logo row offsets, fill colors, FlyingRobots fade, and prompt gradient from quantized landing pulse time.
+\item
+  Target dimensions are bounded by landing quality profiles before rendering.
+\item
+  Cache keys include viewport, theme, quality, quantized time, and FPS badge state, preserving the existing landing frame cache behavior.
+\end{itemize}
+
+\section{Accessibility / Assistive Posture}\label{record-113-accessibility-assistive-posture}
+
+The raster title art is decorative in interactive mode. Assistive output must not depend on parsing glyph art. It continues to rely on the release title, motif, proof lanes, and accessible release prose.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-113-agent-inspectability-explainability-posture}
+
+Agents should be able to prove the slice by checking:
+
+\begin{itemize}
+\tightlist
+\item
+  the current release title appears on the landing frame;
+\item
+  raster art uses the configured renderer and charset;
+\item
+  pulse changes the title art deterministically;
+\item
+  raw RGBA filter tests cover charset, Braille, quad, fit, color, and invalid charset behavior;
+\item
+  the stacked sine-wave wake remains the visible landing background;
+\item
+  pipe/accessibility release facts remain sourced from release-title metadata.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-113-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: \texttt{r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}T\allowbreak{}o\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} does not exist or is not exported.
+\item
+  RED: custom charset rendering cannot map a synthetic black/white frame.
+\item
+  RED: invalid charsets are not rejected.
+\item
+  RED: Braille rendering cannot map a single top-left subpixel to dot 1.
+\item
+  RED: terminal \texttt{f\allowbreak{}i\allowbreak{}t} mode stretches or letterboxes instead of centered fill-cropping.
+\item
+  RED: terminal \texttt{f\allowbreak{}i\allowbreak{}t} mode assumes square cells and crops the wrong axis in typical tall-cell terminals.
+\item
+  RED: DOGFOOD landing frame does not render enough stacked sine-wave glyph art.
+\item
+  RED: the committed \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g} wordmark is not rasterized into the rendered landing frame.
+\item
+  RED: the committed \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}v\allowbreak{}g} wordmark replaces backgrounds or paints transparent SVG pixels instead of acting as a background-transparent mask.
+\item
+  RED: the lower FlyingRobots wordmark is generated from the old wide text assets instead of \texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}o\allowbreak{}.\allowbreak{}t\allowbreak{}x\allowbreak{}t}.
+\item
+  RED: pressing backtick on the landing title enters the docs instead of toggling the shell perf HUD in place.
+\item
+  RED: the landing title perf HUD omits shell HUD rows or reports a permanently zero frame time because the root DOGFOOD render loop is not hydrating timing telemetry.
+\item
+  RED: DOGFOOD landing still paints the old procedural BIJOU title over the wake field.
+\item
+  RED: non-Enter keys route from the title screen into the docs shell.
+\item
+  RED: the lower FlyingRobots wordmark stays visible after the three-second fade window.
+\item
+  RED: the Bijou SVG title mask is static instead of moving each letter through a staggered sine-wave row offset and animated fill color.
+\item
+  RED: the \texttt{P\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}[\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}]} prompt does not draw attention to \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} with a gradient foreground.
+\item
+  RED: pressing Enter leaves any title-to-docs transition state or decorative transition artifact instead of hard-cutting to docs.
+\end{itemize}
+
+\section{Validation}\label{record-113-validation}
+
+Run focused tests first:
+
+\begin{CodeBlock}
+npx vitest run packages/bijou-tui/src/raster-glyph.test.ts
+npx vitest run scripts/svg-raster.test.ts
+npx vitest run scripts/docs-preview.test.ts -t "stacked sine-wave"
+\end{CodeBlock}
+
+Then run the relevant DOGFOOD and package validation lane:
+
+\begin{CodeBlock}
+npx vitest run scripts/docs-preview.test.ts
+npm run typecheck:test
+npm run docs:inventory
+npm run dogfood:i18n:check
+\end{CodeBlock}
+
+\section{Playback}\label{record-113-playback}
+
+This slice lands when DOGFOOD has a visible, localized \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} landing identity and a deterministic raster-to-glyph title treatment, without adding new strings, bypassing the landing cache, adding image decoding dependencies, or changing lower-mode release facts.
+

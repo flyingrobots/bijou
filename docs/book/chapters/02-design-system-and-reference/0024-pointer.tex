@@ -1,0 +1,137 @@
+\chapter{Pointer and Mouse Policy}\label{record-024}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/pointer.md}\par}\smallskip
+
+Bijou is keyboard-first, not keyboard-only.
+
+Mouse support should improve fluency without creating a second product that only works for pointer users.
+
+\section{What mouse is for}\label{record-024-what-mouse-is-for}
+
+Use mouse in Bijou to:
+
+\begin{itemize}
+\tightlist
+\item
+  switch visible context quickly
+\item
+  dismiss or activate transient overlays
+\item
+  inspect and select already-visible objects
+\item
+  adjust obviously spatial controls such as split dividers
+\end{itemize}
+
+Do not use mouse as the only path to:
+
+\begin{itemize}
+\tightlist
+\item
+  submit forms
+\item
+  dismiss critical errors
+\item
+  navigate core app flows
+\item
+  reveal essential state through hover alone
+\end{itemize}
+
+\section{Routing order}\label{record-024-routing-order}
+
+Pointer events should resolve from most interruptive layer to least:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  active modal or command surface
+\item
+  transient overlays and notifications
+\item
+  shell chrome
+\item
+  page content
+\end{enumerate}
+
+Background content should not keep receiving pointer actions while a true modal surface is open.
+
+For shell and overlay families specifically:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} should consume pointer input ahead of everything behind it
+\item
+  notifications and ad hoc overlays should consume clicks before shell chrome or page content
+\item
+  shell tabs, palette rows, and pane-scoped overlay controls should behave like pointer shortcuts for already-available keyboard actions, not as pointer-exclusive product paths
+\end{itemize}
+
+\section{Click policy}\label{record-024-click-policy}
+
+Clicks should usually mirror an existing keyboard action:
+
+\begin{itemize}
+\tightlist
+\item
+  clicking a tab should do what tab-switching already does
+\item
+  clicking a notification action should do what pressing \texttt{e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r} on the focused notification already does
+\item
+  clicking dismiss should do what the dismiss shortcut already does
+\end{itemize}
+
+If there is no keyboard-parity story, the pointer behavior is probably under-designed.
+
+\section{Hover policy}\label{record-024-hover-policy}
+
+Hover is optional and should never be the only carrier of important meaning.
+
+Terminals vary widely in pointer fidelity, update rate, and user expectation. Hover can be useful for polish, but it is a weak foundation for essential workflows.
+
+\section{Spatial policy}\label{record-024-spatial-policy}
+
+Use drag only for controls that are already spatial by nature:
+
+\begin{itemize}
+\tightlist
+\item
+  split-pane dividers
+\item
+  canvas or graph inspection surfaces
+\item
+  future resizable inspectors or drawers
+\end{itemize}
+
+Avoid inventing drag gestures for ordinary list, table, or form interactions.
+
+\section{Current library baseline}\label{record-024-current-library-baseline}
+
+The current first-class mouse baseline in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} should be:
+
+\begin{itemize}
+\tightlist
+\item
+  shell tabs are clickable
+\item
+  notification cards support click-to-dismiss and click-to-activate
+\item
+  mouse requires explicit runtime opt-in with \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{} \allowbreak{}\}\allowbreak{})}
+\item
+  modal-style overlays block background pointer interaction
+\item
+  shell/pane pointer routing should remain subordinate to overlay routing when interruptive surfaces are open
+\end{itemize}
+
+Further component adoption should follow the same rule:
+
+\begin{itemize}
+\tightlist
+\item
+  add mouse where it accelerates an existing interaction
+\item
+  keep keyboard parity
+\item
+  route overlays before background content
+\end{itemize}
+

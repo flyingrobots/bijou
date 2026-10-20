@@ -1,0 +1,384 @@
+\chapter{System-Style JavaScript}\label{record-060}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/system-style-javascript.md}\par}\smallskip
+
+\emph{How to write JavaScript infrastructure that lasts.}
+
+This is a repo-wide engineering doctrine for Bijou and other \texttt{f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s} codebases. It is not a formatting style guide. It is a doctrine for writing infrastructure that remains honest under execution, replay, migration, debugging, replication, failure, and time.
+
+\section{Bijou Adaptation}\label{record-060-bijou-adaptation}
+
+Bijou is currently implemented largely in TypeScript. That does not weaken this doctrine. It sharpens how TypeScript should be used here.
+
+In this repo:
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript is a useful dialect, not the final authority
+\item
+  runtime-backed modeling outranks type-only confidence
+\item
+  boundary parsing, explicit adapters, and tests outrank editor comfort
+\item
+  strong claims about architecture should be anchored in runtime code, invariants, and executable proof
+\end{itemize}
+
+This doctrine therefore does \textbf{not} mean ``rewrite Bijou into plain \texttt{.\allowbreak{}j\allowbreak{}s} tomorrow.'' It means Bijou should treat runtime truth as architectural authority even when the implementation language is TypeScript.
+
+\section{Rule 0: Runtime Truth Wins}\label{record-060-rule-0-runtime-truth-wins}
+
+When the program is running, one question matters above all others:
+
+\textbf{What is actually true right now, in memory, under execution?}
+
+If the answer depends on comments, conventions, vanished types, wishful thinking, or editor vibes, the code is lying.
+
+Trusted domain values must be created through runtime construction, parsing, or validation that establishes their invariants. Once established, those invariants must be preserved for as long as the value remains trusted.
+
+This rule outranks documentation, build steps, editor hints, static overlays, compile-time tooling, team folklore, and ``but the linter said it was fine.''
+
+\section{What This Means In Practice}\label{record-060-what-this-means-in-practice}
+
+Infrastructure cannot afford fake contracts:
+
+\begin{itemize}
+\tightlist
+\item
+  a type that vanishes at runtime is not an authoritative contract
+\item
+  a comment describing a shape is not an authoritative contract
+\item
+  a plain object that ``should'' have valid fields is not an authoritative contract
+\item
+  an IDE tooltip is not an authoritative contract
+\item
+  a compile step is not an authoritative contract
+\end{itemize}
+
+These tools can be useful. None of them outrank the runtime.
+
+\section{Why It Matters Here}\label{record-060-why-it-matters-here}
+
+Bijou is not just view glue. The repo touches:
+
+\begin{itemize}
+\tightlist
+\item
+  runtime state and event flow
+\item
+  host boundaries and adapters
+\item
+  deterministic tests and replayability
+\item
+  localization catalogs and exchange formats
+\item
+  long-lived public APIs
+\item
+  shell behavior that needs to stay explainable to both humans and agents
+\end{itemize}
+
+Mushy assumptions here turn into bugs with long half-lives.
+
+\section{The Hierarchy Of Truth}\label{record-060-the-hierarchy-of-truth}
+
+When layers disagree, authority flows in this order:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Runtime domain model}: constructors, invariants, methods, error types
+\item
+  \textbf{Boundary schemas and parsers}: Zod, decoders, protocol validators
+\item
+  \textbf{Tests}: the executable specification
+\item
+  \textbf{JSDoc and design docs}: human-facing explanations of the runtime model
+\item
+  \textbf{IDE and static tooling}: navigation, refactoring support
+\item
+  \textbf{TypeScript}: useful dialect, not final authority
+\end{enumerate}
+
+\section{Scope}\label{record-060-scope}
+
+This standard is optimized for:
+
+\begin{itemize}
+\tightlist
+\item
+  infrastructure code with strong invariants
+\item
+  long-lived systems with explicit boundaries
+\item
+  direct execution workflows portable across hosts
+\item
+  browser-capable cores
+\item
+  JavaScript-first or TypeScript-as-dialect repositories
+\item
+  code that must be teachable, legible, and publishable
+\end{itemize}
+
+It is not a claim that every JavaScript project should look like this. It \textbf{is} a claim that, for this family of repositories, runtime-backed domain modeling beats soft shape trust.
+
+\section{Language Policy}\label{record-060-language-policy}
+
+\subsection{JavaScript First, TypeScript Subordinate}\label{record-060-javascript-first-typescript-subordinate}
+
+JavaScript remains the conceptual base language for this doctrine:
+
+\begin{itemize}
+\tightlist
+\item
+  fast to write and change
+\item
+  direct to execute
+\item
+  portable
+\item
+  expressive enough for serious infrastructure
+\item
+  readable enough to teach from
+\end{itemize}
+
+Bijou currently uses TypeScript heavily, but the rule is the same: TypeScript may improve refactoring, editor support, and consumer ergonomics. It does \textbf{not} replace runtime validation, preserve invariants by itself, or excuse weak modeling.
+
+Use TypeScript where it helps. Never confuse it with the source of truth.
+
+\subsection{Escape Hatch: Rust Via WebAssembly}\label{record-060-escape-hatch-rust-via-webassembly}
+
+When JavaScript is insufficient for tight CPU work, hostile binary parsing, cryptographic kernels, or memory-sensitive hot loops, use Rust.
+
+Preferred split:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}
+ & {L\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}u\allowbreak{}a\allowbreak{}g\allowbreak{}e}
+ & {R\allowbreak{}o\allowbreak{}l\allowbreak{}e}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+{C\allowbreak{}o\allowbreak{}r\allowbreak{}e} {d\allowbreak{}o\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} {l\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}c} & {J\allowbreak{}a\allowbreak{}v\allowbreak{}a\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} {/} {T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d} {m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{},} {p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{},} {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} \\
+{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}l} {k\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s} & {R\allowbreak{}u\allowbreak{}s\allowbreak{}t} {-\allowbreak{}>} {W\allowbreak{}a\allowbreak{}s\allowbreak{}m} & {S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}t\allowbreak{}y} {a\allowbreak{}n\allowbreak{}d} {s\allowbreak{}p\allowbreak{}e\allowbreak{}e\allowbreak{}d} {w\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e} {j\allowbreak{}u\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}d} \\
+{H\allowbreak{}o\allowbreak{}s\allowbreak{}t} {a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s} & {J\allowbreak{}a\allowbreak{}v\allowbreak{}a\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} {/} {T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} & {N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{},} {b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{},} {w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} \\
+{O\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} & {J\allowbreak{}a\allowbreak{}v\allowbreak{}a\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} {/} {T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t} & {G\allowbreak{}l\allowbreak{}u\allowbreak{}e} {b\allowbreak{}e\allowbreak{}t\allowbreak{}w\allowbreak{}e\allowbreak{}e\allowbreak{}n} {c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}s} {a\allowbreak{}n\allowbreak{}d} {h\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}s} \\
+\end{longtable}
+}
+
+\section{Architecture}\label{record-060-architecture}
+
+\subsection{Browser-First Portability}\label{record-060-browser-first-portability}
+
+The browser is the most universal deployment platform and the ultimate portability test. Core logic should prefer web-platform-friendly primitives.
+
+\begin{CodeBlock}
+// Portable
+const bytes = new TextEncoder().encode(text);
+const arr = new Uint8Array(buffer);
+const url = new URL(path, base);
+
+// Node-only; belongs in adapters
+const buf = Buffer.from(text, 'utf8');
+const resolved = require('path').resolve(p);
+\end{CodeBlock}
+
+\subsection{Hexagonal Architecture Is Mandatory}\label{record-060-hexagonal-architecture-is-mandatory}
+
+Core domain logic must not depend directly on Node globals, filesystem APIs, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, or host-specific calls. Those belong behind adapter ports.
+
+\textbf{Core rule:} core logic should not know that Node exists.
+
+In Bijou terms:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} defines ports and pure helpers
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} owns Node integration
+\item
+  runtime, i18n, and tooling seams should stay explicit rather than leaking host assumptions inward
+\end{itemize}
+
+\section{Object Model}\label{record-060-object-model}
+
+System-style JavaScript organizes code around runtime-backed objects:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Value objects} for meaningful values with invariants
+\item
+  \textbf{Entities} for identity and lifecycle
+\item
+  \textbf{Results / outcomes} as runtime-dispatchable objects, not soft tagged bags
+\item
+  \textbf{Errors} as first-class domain failures, not stringly typed message parsing
+\end{itemize}
+
+Classes are often a good tool here, but the actual rule is stronger than ``use classes'': important concepts need runtime-backed forms with preserved invariants.
+
+\section{Principles}\label{record-060-principles}
+
+\subsection{P1: Domain Concepts Require Runtime-Backed Forms}\label{record-060-p1-domain-concepts-require-runtime-backed-forms}
+
+If a concept has invariants, identity, or behavior, it needs a runtime-backed representation. A typedef or plain object is not enough.
+
+\subsection{P2: Validation Happens At Boundaries And Construction Points}\label{record-060-p2-validation-happens-at-boundaries-and-construction-points}
+
+Untrusted input becomes trusted data only through constructors or dedicated parse methods. Constructors establish invariants and do not perform I/O.
+
+\subsection{P3: Behavior Belongs On The Type That Owns It}\label{record-060-p3-behavior-belongs-on-the-type-that-owns-it}
+
+Avoid switching on \texttt{k\allowbreak{}i\allowbreak{}n\allowbreak{}d} or \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e} tags when runtime dispatch will do. Put behavior on the owning type.
+
+\subsection{P4: Schemas Belong At Boundaries, Not In The Core}\label{record-060-p4-schemas-belong-at-boundaries-not-in-the-core}
+
+Use schemas to reject malformed input at the edge. Domain types own behavior and invariants inside the boundary.
+
+\subsection{P5: Serialization Is The Codec's Problem}\label{record-060-p5-serialization-is-the-codecs-problem}
+
+The byte layer stays separate from the meaning layer. Domain types do not need to know how they are encoded.
+
+\subsection{P6: Single Source Of Truth}\label{record-060-p6-single-source-of-truth}
+
+Do not duplicate the same contract across JSDoc, TypeScript, and validators. Define the runtime model first. Everything else derives from or documents it.
+
+\subsection{P7: Runtime Dispatch Over Tag Switching}\label{record-060-p7-runtime-dispatch-over-tag-switching}
+
+Inside a coherent runtime, \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}o\allowbreak{}f} is often correct. When values cross realms or duplicate module boundaries, use branding instead of pretending nominal identity still holds.
+
+\section{Practices}\label{record-060-practices}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{a\allowbreak{}n\allowbreak{}y} is banished; \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} is quarantined}: \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} is allowed only at raw edges and should be eliminated immediately through parsing
+\item
+  \textbf{trusted values must preserve integrity}: use \texttt{O\allowbreak{}b\allowbreak{}j\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}.\allowbreak{}f\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}z\allowbreak{}e\allowbreak{}(\allowbreak{})}, private state, or defensive copying where needed
+\item
+  \textbf{error type is primary; codes are optional metadata}: never branch on \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e}
+\item
+  \textbf{parameter objects must add semantic value}: do not normalize option sludge into public API design
+\item
+  \textbf{raw objects may carry bytes, not meaning}: plain objects are for decoded payloads or logging, not trusted domain semantics
+\item
+  \textbf{magic numbers and strings are banished}: give semantic constants real names
+\item
+  \textbf{boolean trap parameters are banished}: prefer named policies or separate methods
+\item
+  \textbf{structured data stays structured}: do not make machines parse prose to recover data
+\item
+  \textbf{module scope is the first privacy boundary}: if it is not exported, it is private
+\item
+  \textbf{JSDoc documents the runtime model; it does not replace it}
+\end{itemize}
+
+\section{Tooling Discipline}\label{record-060-tooling-discipline}
+
+\textbf{Lint is law.}
+
+\begin{itemize}
+\tightlist
+\item
+  lint errors fail CI
+\item
+  suppressions require a documented reason
+\item
+  the hardest enforcement should land on unsafe coercion, floating promises, raw \texttt{E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} use, and host-specific leakage into core code
+\end{itemize}
+
+When TypeScript is used:
+
+\begin{itemize}
+\tightlist
+\item
+  it remains subordinate to runtime validation
+\item
+  it must not substitute for domain modeling
+\item
+  \texttt{a\allowbreak{}n\allowbreak{}y} is banned
+\item
+  \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} belongs only at raw edges and should disappear quickly
+\end{itemize}
+
+\section{The Anti-Shape-Soup Doctrine}\label{record-060-the-anti-shape-soup-doctrine}
+
+Most bad infrastructure comes from weak modeling. The discipline is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  name the concept
+\item
+  construct the concept with validated invariants
+\item
+  protect the invariant
+\item
+  attach the behavior to the owning type
+\item
+  guard the boundary with schemas and parsers
+\item
+  separate the codec from the domain
+\item
+  isolate the host behind adapters
+\item
+  document the runtime that actually exists
+\item
+  test the truth
+\end{enumerate}
+
+\section{Review Checklist}\label{record-060-review-checklist}
+
+Before merging, ask:
+
+\begin{itemize}
+\tightlist
+\item
+  is this a real domain concept, and where is its runtime-backed form?
+\item
+  where is \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} eliminated?
+\item
+  does construction establish trust?
+\item
+  does behavior live on the type that owns it?
+\item
+  is anyone parsing \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e} like a raccoon in a dumpster?
+\item
+  are there magic numbers or strings?
+\item
+  could this logic run in a browser-capable core?
+\item
+  is tooling fiction being mistaken for architecture?
+\end{itemize}
+
+\section{Derived Invariants}\label{record-060-derived-invariants}
+
+This doctrine is reflected in these repo invariants:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live at Boundaries}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/host-apis-stay-behind-adapters.md}{Host APIs Stay Behind Adapters}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/codecs-are-not-domain-models.md}{Codecs Are Not Domain Models}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+This is infrastructure. Code cannot rely on costumes or pretend that comments are contracts. Runtime truth beats phantom certainty every time.
+

@@ -1,0 +1,39 @@
+\chapter{CI-003 --- Surface Shaders (CRT / Scanlines)}\label{record-287}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/CI-003-surface-shaders.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-287-idea}
+
+Add a ``Post-Process'' middleware to \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}'s render pipeline that operates directly on the final byte-buffer before it is diffed and emitted. This middleware could simulate:
+
+\begin{itemize}
+\tightlist
+\item
+  CRT scanlines (alternating row brightness/dimming)
+\item
+  Scanline flicker (subtle per-frame variation)
+\item
+  Signal static / noise (random cell or byte corruption)
+\item
+  ``Vignette'' effects (darkening edges of the terminal)
+\end{itemize}
+
+\section{Why}\label{record-287-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Expressivity}: It pushes the ``high-fidelity'' aesthetic to its limit, giving Bijou apps a distinct feel that is both professional and nostalgic.
+\item
+  \textbf{Low-Allocation Performance}: Since the pipeline is byte-packed, these effects can be implemented using zero-allocation loops on typed arrays.
+\item
+  \textbf{Product Differentiation}: It shows that the terminal can be an expressive visual medium, not just a static character grid.
+\end{enumerate}
+
+\section{Effort}\label{record-287-effort}
+
+Medium --- requires adding the middleware and a set of byte-manipulation shaders for common effects.
+

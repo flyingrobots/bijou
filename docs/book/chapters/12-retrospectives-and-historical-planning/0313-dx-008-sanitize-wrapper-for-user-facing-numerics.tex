@@ -1,0 +1,43 @@
+\chapter{DX-008 --- Sanitize Wrapper for User-Facing Numeric Inputs}\label{record-313}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-008-sanitize-wrapper-for-user-facing-numerics.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs"
+legend: DX
+lane: retro
+
+\end{RecordMeta}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as the shared numeric sanitizer module in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}s}. The repo now exports reusable finite and integer boundary helpers, uses them in shared layout/runtime/components code, and covers the wrapper behavior in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+
+\section{Original Proposal}\label{record-313-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-313-idea}
+
+Create a small shared utility for clamping and validating user-supplied numeric values at component boundaries:
+
+\begin{CodeBlock}
+function safeInt(n: number | undefined, fallback: number): number {
+  if (n == null || !Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.floor(n));
+}
+
+function safeFloat(n: number | undefined, fallback: number): number {
+  if (n == null || !Number.isFinite(n)) return fallback;
+  return n;
+}
+\end{CodeBlock}
+
+Every component that accepts \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, \texttt{m\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}x}, \texttt{c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t}, etc. from user options would call this instead of raw \texttt{?\allowbreak{}?} fallbacks.
+
+\section{Why}\label{record-313-why}
+
+The current pattern --- \texttt{o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}?\allowbreak{}?\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h} --- does not filter \texttt{N\allowbreak{}a\allowbreak{}N} (which is not nullish). This was the root cause of multiple v4.4.0 review findings. A shared wrapper makes the correct pattern easy and the wrong pattern harder.
+
+\section{Relationship}\label{record-313-relationship}
+
+Complements DX-007 (the audit). DX-007 identifies the gaps; this provides the tool to close them systematically.
+

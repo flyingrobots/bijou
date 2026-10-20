@@ -1,0 +1,78 @@
+\chapter{Invariants}\label{record-029}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/README.md}\par}\smallskip
+
+These are project-wide truths that design and implementation should treat as non-negotiable unless deliberately changed.
+
+When a design doc or legend references an invariant, it should link to the specific invariant file.
+
+Every invariant should also name at least one legend that protects it. If an invariant has no protecting legend, the repo has a governance gap.
+
+Current invariants:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/host-apis-stay-behind-adapters.md}{Host APIs Stay Behind Adapters}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/codecs-are-not-domain-models.md}{Codecs Are Not Domain Models}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\end{itemize}
+
+\section{Protection Map}\label{record-029-protection-map}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{I\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t}
+ & {P\allowbreak{}r\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}(\allowbreak{}s\allowbreak{})}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{{T\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s} {A\allowbreak{}r\allowbreak{}e} {t\allowbreak{}h\allowbreak{}e} {S\allowbreak{}p\allowbreak{}e\allowbreak{}c}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{{W\allowbreak{}F}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{{D\allowbreak{}F}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {T\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h} {W\allowbreak{}i\allowbreak{}n\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{{D\allowbreak{}X}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{{L\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{{S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}s} {L\allowbreak{}i\allowbreak{}v\allowbreak{}e} {A\allowbreak{}t} {B\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{{D\allowbreak{}X}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{{L\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/host-apis-stay-behind-adapters.md}{{H\allowbreak{}o\allowbreak{}s\allowbreak{}t} {A\allowbreak{}P\allowbreak{}I\allowbreak{}s} {S\allowbreak{}t\allowbreak{}a\allowbreak{}y} {B\allowbreak{}e\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}d} {A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/codecs-are-not-domain-models.md}{{C\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}c\allowbreak{}s} {A\allowbreak{}r\allowbreak{}e} {N\allowbreak{}o\allowbreak{}t} {D\allowbreak{}o\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} {M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{{L\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{{F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {O\allowbreak{}w\allowbreak{}n\allowbreak{}s} {I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{{H\allowbreak{}T}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{{T\allowbreak{}o\allowbreak{}p\allowbreak{}m\allowbreak{}o\allowbreak{}s\allowbreak{}t} {L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r} {D\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}s} {F\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{{H\allowbreak{}T}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{{V\allowbreak{}i\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} {C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}s} {A\allowbreak{}r\allowbreak{}e} {a} {P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}e}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{{H\allowbreak{}T}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{{D\allowbreak{}F}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{{G\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}f\allowbreak{}u\allowbreak{}l} {L\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {P\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}s} {M\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{{L\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{{S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {O\allowbreak{}w\allowbreak{}n\allowbreak{}s} {S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {C\allowbreak{}o\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{{H\allowbreak{}T}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{{D\allowbreak{}F}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{{D\allowbreak{}o\allowbreak{}c\allowbreak{}s} {A\allowbreak{}r\allowbreak{}e} {t\allowbreak{}h\allowbreak{}e} {D\allowbreak{}e\allowbreak{}m\allowbreak{}o}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{{D\allowbreak{}F}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{{W\allowbreak{}F}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s} {C\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e} {S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{},} {E\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s} {D\allowbreak{}o} {N\allowbreak{}o\allowbreak{}t}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{{D\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{{T\allowbreak{}h\allowbreak{}e} {B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} {H\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}s} {F\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{{D\allowbreak{}X}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} {O\allowbreak{}w\allowbreak{}n\allowbreak{}s} {I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {G\allowbreak{}e\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}r\allowbreak{}y}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}}{,} \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{{D\allowbreak{}L}} \\
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{{S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} {M\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}e} {a\allowbreak{}n\allowbreak{}d} {V\allowbreak{}i\allowbreak{}e\allowbreak{}w} {S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k} {A\allowbreak{}r\allowbreak{}e} {D\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}c\allowbreak{}t}} & \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{{R\allowbreak{}E}} \\
+\end{longtable}
+}
+

@@ -1,0 +1,762 @@
+\chapter{Theme Token Vocabulary}\label{record-028}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/theme-tokens.md}\par}\smallskip
+
+This document locks down the canonical token vocabulary for Bijou.
+
+The \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} type in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/src/core/theme/tokens.ts}{\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}} is the API truth. This page is the doctrine truth: it defines what each token family is for, what first-party components should prefer, and what counts as misuse.
+
+\section{Why this exists}\label{record-028-why-this-exists}
+
+Bijou already ships a typed token model:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{u\allowbreak{}i}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+What was missing was the rulebook. Without one, component authors end up choosing tokens by ``what looks right in this preset'' instead of by semantic job, and the design system drifts into an untyped color bucket.
+
+\section{Core rule}\label{record-028-core-rule}
+
+Choose tokens by meaning, not by color.
+
+If a component needs a green foreground because it means ``success'', use a success token. Do not reach for whichever family currently contains a green hex value in the active preset.
+
+\section{Canonical families}\label{record-028-canonical-families}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}}{}}\label{record-028-semantic}
+
+Use \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c} for general foreground meaning and emphasis inside a component.
+
+This is the default family for:
+
+\begin{itemize}
+\tightlist
+\item
+  primary text emphasis
+\item
+  supporting or muted text
+\item
+  active or focused emphasis inside a component
+\item
+  generic semantic cues that are not domain statuses
+\end{itemize}
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  prefer \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} for deliberate foreground emphasis
+\item
+  prefer \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} for metadata, hints, and supporting text
+\item
+  prefer \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} for local active/focused affordances inside a component
+\item
+  do not use \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}*} as a generic background-fill family
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}}{}}\label{record-028-surface}
+
+Use \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} for containment, fill, elevation, and interruption level.
+
+This is the default family for:
+
+\begin{itemize}
+\tightlist
+\item
+  panel and card backgrounds
+\item
+  sidebars and secondary rails
+\item
+  elevated regions
+\item
+  overlays, drawers, and modal fills
+\item
+  muted or disabled regions
+\end{itemize}
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}
+\item
+  \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  treat \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} as the default content-region fill
+\item
+  treat \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} as the secondary-pane or sidebar fill
+\item
+  treat \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d} as the default fill for bounded contained objects
+\item
+  treat \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} as the interruption or overlay fill
+\item
+  treat \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} as the disabled, inset, or de-emphasized fill
+\item
+  do not use surface choice to smuggle status meaning
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}}{}}\label{record-028-border}
+
+Use \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r} for structure, grouping, and boundary emphasis.
+
+This is the default family for:
+
+\begin{itemize}
+\tightlist
+\item
+  box outlines
+\item
+  separators that need tokenized color
+\item
+  severity-bearing frames when the frame itself carries meaning
+\end{itemize}
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  prefer \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} for ordinary structure
+\item
+  use \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} or \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} for stronger non-status grouping
+\item
+  use status-colored borders only when the border itself is part of the state
+\item
+  do not use warning/error borders as decoration
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{u\allowbreak{}i}}{}}\label{record-028-ui}
+
+Use \texttt{u\allowbreak{}i} for runtime chrome and reusable system affordances that do not belong to domain data.
+
+This is the default family for:
+
+\begin{itemize}
+\tightlist
+\item
+  cursor or selection chrome owned by the shell/runtime
+\item
+  focused pane gutters owned by reusable shell frames
+\item
+  scrollbars and tracks
+\item
+  section headers
+\item
+  logos or branded shell marks
+\item
+  table headers when they are part of reusable framework chrome
+\item
+  empty tracks and similar UI scaffolding
+\end{itemize}
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}o}
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}E\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  reserve \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}*} for framework/runtime chrome, not business-domain statuses
+\item
+  prefer a dedicated \texttt{u\allowbreak{}i} token when the same affordance recurs across shells
+\item
+  use \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} for focused shell pane gutters; use \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} for local active emphasis inside a component
+\item
+  do not use \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}*} as a back door for arbitrary one-off component colors
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}}{}}\label{record-028-status}
+
+Use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} for explicit state labels and indicators attached to an object, process, or record.
+
+This is the default family for:
+
+\begin{itemize}
+\tightlist
+\item
+  badges
+\item
+  timeline states
+\item
+  health/readiness indicators
+\item
+  process states such as pending or active
+\end{itemize}
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}
+\item
+  \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} when the UI is naming or signaling a real status
+\item
+  prefer \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} over reusing accent/focus tokens
+\item
+  do not use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} for focus, hover, or generic ``selected'' styling
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}}{}}\label{record-028-gradient}
+
+Use \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} for rare multi-stop emphasis that is intentionally decorative or specialized.
+
+Built-in keys:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d}
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\end{itemize}
+
+House rules:
+
+\begin{itemize}
+\tightlist
+\item
+  gradients are optional emphasis, not required meaning
+\item
+  never make critical status, navigation, or instructions depend on a gradient
+\item
+  prefer \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} only when the component is actually showing a progress fill or similar continuous range
+\item
+  keep logos and brand treatments rare
+\end{itemize}
+
+\section{Per-Token Library Reference}\label{record-028-per-token-library-reference}
+
+Every token below is a role, not a paint name. The examples are intentionally strict so components remain readable when a theme changes.
+
+\subsection{Semantic Tokens}\label{record-028-semantic-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} & {M\allowbreak{}a\allowbreak{}i\allowbreak{}n} {r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{},} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} {b\allowbreak{}o\allowbreak{}d\allowbreak{}y} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {d\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e} {f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {i\allowbreak{}s} {s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g} {m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{},} {a} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {l\allowbreak{}a\allowbreak{}b\allowbreak{}e\allowbreak{}l\allowbreak{},} {o\allowbreak{}r} {d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{}.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {S\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{},} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}s\allowbreak{},} {h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}e\allowbreak{}r} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{},} {i\allowbreak{}n\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {l\allowbreak{}a\allowbreak{}b\allowbreak{}e\allowbreak{}l\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s} {h\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}s} {t\allowbreak{}h\allowbreak{}a\allowbreak{}t} {m\allowbreak{}u\allowbreak{}s\allowbreak{}t} {s\allowbreak{}t\allowbreak{}i\allowbreak{}l\allowbreak{}l} {b\allowbreak{}e} {r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} {i\allowbreak{}s} {d\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{},} {d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {o\allowbreak{}r} {c\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}l} {t\allowbreak{}o} {t\allowbreak{}h\allowbreak{}e} {t\allowbreak{}a\allowbreak{}s\allowbreak{}k\allowbreak{}.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} & {L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s} {i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} {a} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{},} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d} {a\allowbreak{}f\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {c\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}s\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {m\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} {i\allowbreak{}s} {f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}d} {b\allowbreak{}y} {t\allowbreak{}h\allowbreak{}e} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{},} {a} {p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {a} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} {l\allowbreak{}o\allowbreak{}g\allowbreak{}o\allowbreak{}.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {H\allowbreak{}u\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{},} {p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {m\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d} {i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {U\allowbreak{}I} {i\allowbreak{}s} {o\allowbreak{}n\allowbreak{}l\allowbreak{}y} {d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}i\allowbreak{}n\allowbreak{}g} {a} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {d\allowbreak{}o\allowbreak{}t\allowbreak{},} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{},} {o\allowbreak{}r} {b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.} {U\allowbreak{}s\allowbreak{}e} \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {o\allowbreak{}r} \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}{.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} & {E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{},} {d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {f\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}u\allowbreak{}r\allowbreak{}e} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {r\allowbreak{}o\allowbreak{}l\allowbreak{}e} {i\allowbreak{}s} {m\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}y} {a\allowbreak{}n} {e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}d} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} {o\allowbreak{}r} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {c\allowbreak{}h\allowbreak{}i\allowbreak{}p\allowbreak{}.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {C\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}y} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y} {w\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e} {a} {u\allowbreak{}s\allowbreak{}e\allowbreak{}r} {m\allowbreak{}a\allowbreak{}y} {n\allowbreak{}e\allowbreak{}e\allowbreak{}d} {t\allowbreak{}o} {s\allowbreak{}l\allowbreak{}o\allowbreak{}w} {d\allowbreak{}o\allowbreak{}w\allowbreak{}n} {b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e} {a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} & {O\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}y} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{},} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {w\allowbreak{}a\allowbreak{}r\allowbreak{}m} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.} \\
+\texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}f\allowbreak{}o} & {I\allowbreak{}n\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{},} {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} {n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}g} {e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} & {A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{},} {f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}.} \\
+\end{longtable}
+}
+
+\subsection{Surface Tokens}\label{record-028-surface-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} & {T\allowbreak{}h\allowbreak{}e} {d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},} {e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{},} {o\allowbreak{}r} {m\allowbreak{}a\allowbreak{}i\allowbreak{}n} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} {b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}.} & {S\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{},} {m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}u\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{},} {d\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {w\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {o\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}o\allowbreak{}f\allowbreak{}f} {a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} {f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}.} \\
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} & {N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}s\allowbreak{},} {s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{},} {m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {w\allowbreak{}o\allowbreak{}r\allowbreak{}k} {r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.} & {M\allowbreak{}a\allowbreak{}i\allowbreak{}n} {r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s} {o\allowbreak{}r} {r\allowbreak{}a\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}d} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}s} {t\allowbreak{}h\allowbreak{}a\allowbreak{}t} {n\allowbreak{}e\allowbreak{}e\allowbreak{}d} {e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.} \\
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {C\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{},} {p\allowbreak{}o\allowbreak{}p\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{},} {f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} {g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}s\allowbreak{},} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d} {o\allowbreak{}b\allowbreak{}j\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s} {t\allowbreak{}h\allowbreak{}a\allowbreak{}t} {s\allowbreak{}i\allowbreak{}t} {a\allowbreak{}b\allowbreak{}o\allowbreak{}v\allowbreak{}e} {t\allowbreak{}h\allowbreak{}e} {b\allowbreak{}a\allowbreak{}s\allowbreak{}e} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.} & {F\allowbreak{}u\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} {r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} {o\allowbreak{}r} {m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l} {s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}s\allowbreak{}.} \\
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} & {M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l} {d\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}s\allowbreak{},} {d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{},} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d} {p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}u\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}.} & {D\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {t\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {m\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {o\allowbreak{}r} {o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}y} {s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}.} \\
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {D\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{},} {i\allowbreak{}n\allowbreak{}s\allowbreak{}e\allowbreak{}t} {w\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{},} {s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {d\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}l\allowbreak{}y} {d\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.} & {M\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} {f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} {U\allowbreak{}s\allowbreak{}e} \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}{.} \\
+\end{longtable}
+}
+
+\subsection{Border Tokens}\label{record-028-border-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} & {S\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}n\allowbreak{}g} {s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}a\allowbreak{}l} {g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} {o\allowbreak{}u\allowbreak{}t\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} {s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}.} & {L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s} {o\allowbreak{}r} {g\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c} {a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} {f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}.} \\
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} & {S\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {a\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}e} {s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {o\allowbreak{}u\allowbreak{}t\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} {d\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}.} & {W\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r\allowbreak{},} {o\allowbreak{}r} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.} \\
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {A} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {i\allowbreak{}t\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}f} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s} {a} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}f\allowbreak{}u\allowbreak{}l} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.} & {A} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e} {o\allowbreak{}r} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} {w\allowbreak{}o\allowbreak{}u\allowbreak{}l\allowbreak{}d} {b\allowbreak{}e} {c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}.} \\
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {A} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {i\allowbreak{}t\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}f} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s} {c\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {o\allowbreak{}r} {r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}n\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}e\allowbreak{}d} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.} & {D\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {w\allowbreak{}a\allowbreak{}r\allowbreak{}m} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}g} {o\allowbreak{}r} {h\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} \\
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} & {A} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {i\allowbreak{}t\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}f} {c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{},} {d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {o\allowbreak{}r} {f\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}d} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.} & {N\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s} {o\allowbreak{}r} {o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}y} {g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} \\
+\texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {b\allowbreak{}o\allowbreak{}x\allowbreak{}e\allowbreak{}s\allowbreak{},} {s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{},} {t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s} {s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}.} & {D\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {o\allowbreak{}r} {m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{}.} \\
+\end{longtable}
+}
+
+\subsection{UI Tokens}\label{record-028-ui-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r} & {R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} {c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{},} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {r\allowbreak{}o\allowbreak{}w} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {r\allowbreak{}e\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {a\allowbreak{}f\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}.} & {B\allowbreak{}u\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} {a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} {o\allowbreak{}r} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} {o\allowbreak{}n\allowbreak{}e} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} & {F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s} {o\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}d} {b\allowbreak{}y} {t\allowbreak{}h\allowbreak{}e} {a\allowbreak{}p\allowbreak{}p} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{},} {p\allowbreak{}a\allowbreak{}n\allowbreak{}e} {g\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{},} {o\allowbreak{}r} {r\allowbreak{}e\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}.} & {I\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g} {i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} {a} {c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b} & {S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}r} {t\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}s} {a\allowbreak{}n\allowbreak{}d} {v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}.} & {G\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}l} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} {b\allowbreak{}a\allowbreak{}r\allowbreak{}s} {o\allowbreak{}r} {s\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k} & {S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}r} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s} {a\allowbreak{}n\allowbreak{}d} {s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l} {w\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}.} & {D\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}s} {o\allowbreak{}r} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {R\allowbreak{}e\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{},} {s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l} {h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.} & {D\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} {b\allowbreak{}o\allowbreak{}d\allowbreak{}y} {h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} {w\allowbreak{}i\allowbreak{}t\allowbreak{}h} {p\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t} {s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}s\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}o} & {P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t} {m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{},} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} {l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}u\allowbreak{}p\allowbreak{},} {t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} {t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},} {o\allowbreak{}r} {r\allowbreak{}e\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}y} {m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}.} & {G\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c} {a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t} {o\allowbreak{}r} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r} & {R\allowbreak{}e\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e} {t\allowbreak{}h\allowbreak{}a\allowbreak{}t} {i\allowbreak{}s} {p\allowbreak{}a\allowbreak{}r\allowbreak{}t} {o\allowbreak{}f} {t\allowbreak{}h\allowbreak{}e} {f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}.} & {A\allowbreak{}r\allowbreak{}b\allowbreak{}i\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}r\allowbreak{}y} {t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l} {f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d} {o\allowbreak{}r} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {r\allowbreak{}o\allowbreak{}w} {s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} \\
+\texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}E\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y} & {E\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{},} {m\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{},} {a\allowbreak{}n\allowbreak{}d} {f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d} {s\allowbreak{}c\allowbreak{}a\allowbreak{}f\allowbreak{}f\allowbreak{}o\allowbreak{}l\allowbreak{}d} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.} & {S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l} {t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{},} {d\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} \\
+\end{longtable}
+}
+
+\subsection{Status Tokens}\label{record-028-status-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {A} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{},} {c\allowbreak{}h\allowbreak{}i\allowbreak{}p\allowbreak{},} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {t\allowbreak{}h\allowbreak{}e} {o\allowbreak{}b\allowbreak{}j\allowbreak{}e\allowbreak{}c\allowbreak{}t} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}.} & {S\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} {o\allowbreak{}r} {b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}y} {s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} & {A} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{},} {c\allowbreak{}h\allowbreak{}i\allowbreak{}p\allowbreak{},} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {t\allowbreak{}h\allowbreak{}e} {o\allowbreak{}b\allowbreak{}j\allowbreak{}e\allowbreak{}c\allowbreak{}t} {f\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}d} {o\allowbreak{}r} {i\allowbreak{}s} {i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}.} & {E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e} {o\allowbreak{}r} {d\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {b\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {A} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{},} {c\allowbreak{}h\allowbreak{}i\allowbreak{}p\allowbreak{},} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {c\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} {o\allowbreak{}r} {r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} {i\allowbreak{}s} {r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}.} & {W\allowbreak{}a\allowbreak{}r\allowbreak{}m} {d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {e\allowbreak{}m\allowbreak{}p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}f\allowbreak{}o} & {A} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{},} {c\allowbreak{}h\allowbreak{}i\allowbreak{}p\allowbreak{},} {t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} {i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {i\allowbreak{}n\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l} {o\allowbreak{}r} {n\allowbreak{}e\allowbreak{}u\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}l} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.} & {G\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}l} {i\allowbreak{}n\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l} {p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g} & {A} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {q\allowbreak{}u\allowbreak{}e\allowbreak{}u\allowbreak{}e\allowbreak{}d\allowbreak{},} {w\allowbreak{}a\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {o\allowbreak{}r} {n\allowbreak{}o\allowbreak{}t} {y\allowbreak{}e\allowbreak{}t} {r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}.} & {D\allowbreak{}i\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}d} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t} {o\allowbreak{}r} {m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} {m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} & {A} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {r\allowbreak{}u\allowbreak{}n\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{},} {l\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.} & {K\allowbreak{}e\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d} {f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{},} {s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d} {r\allowbreak{}o\allowbreak{}w\allowbreak{},} {o\allowbreak{}r} {c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r} {c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}.} \\
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} & {A} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} {i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r} {s\allowbreak{}a\allowbreak{}y\allowbreak{}s} {a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{},} {i\allowbreak{}n\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{},} {s\allowbreak{}k\allowbreak{}i\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}y} {q\allowbreak{}u\allowbreak{}i\allowbreak{}e\allowbreak{}t\allowbreak{}.} & {O\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}y} {s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} {c\allowbreak{}o\allowbreak{}p\allowbreak{}y\allowbreak{}.} \\
+\end{longtable}
+}
+
+\subsection{Gradient Tokens}\label{record-028-gradient-tokens}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}
+ & {U\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ & {D\allowbreak{}o} {n\allowbreak{}o\allowbreak{}t} {u\allowbreak{}s\allowbreak{}e} {w\allowbreak{}h\allowbreak{}e\allowbreak{}n}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} & {A} {r\allowbreak{}a\allowbreak{}r\allowbreak{}e} {b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d} {t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{},} {t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} {a\allowbreak{}r\allowbreak{}t\allowbreak{},} {o\allowbreak{}r} {i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}y} {m\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} {b\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{}s} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}p} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.} & {T\allowbreak{}h\allowbreak{}e} {u\allowbreak{}s\allowbreak{}e\allowbreak{}r} {m\allowbreak{}u\allowbreak{}s\allowbreak{}t} {i\allowbreak{}n\allowbreak{}f\allowbreak{}e\allowbreak{}r} {m\allowbreak{}e\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {i\allowbreak{}t\allowbreak{}.} \\
+\texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} & {A} {m\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{},} {p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} {f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{},} {o\allowbreak{}r} {c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}o\allowbreak{}u\allowbreak{}s} {r\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e} {b\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{}s} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l} {c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}.} & {S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c} {d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{},} {s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} {b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{},} {o\allowbreak{}r} {b\allowbreak{}o\allowbreak{}d\allowbreak{}y} {t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.} \\
+\end{longtable}
+}
+
+\section{Default Dark/Light UX Audit}\label{record-028-default-darklight-ux-audit}
+
+The legacy \texttt{C\allowbreak{}Y\allowbreak{}A\allowbreak{}N\allowbreak{}\_\allowbreak{}M\allowbreak{}A\allowbreak{}G\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}A} preset is useful as a vivid terminal-native preset, but it is not ideal as the model for dense product surfaces. It uses saturated terminal colors for many unrelated jobs: cyan appears as info, active state, cursor, scrollbar, logo, and primary border; magenta appears as accent, secondary border, and focus gutter. That makes the app energetic, but it also makes many regions compete at the same visual priority.
+
+Bijou's first-party defaults now use a calmer shell posture:
+
+\begin{itemize}
+\tightlist
+\item
+  neutral surfaces carry most of the screen
+\item
+  one accent family carries local emphasis and shell selection
+\item
+  status colors remain distinct from focus and brand
+\item
+  muted text remains contrast-safe instead of merely dim
+\item
+  dark and light themes both satisfy readable foreground/background pairs
+\end{itemize}
+
+The \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}A\allowbreak{}R\allowbreak{}K} preset uses dark neutral surfaces, readable cool/warm accents, and separate success/warning/error/info colors. The \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}L\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}T} preset uses light neutral surfaces with darker semantic colors instead of pastel foregrounds. DOGFOOD consumes those defaults directly as one \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} shell theme family with \texttt{D\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{L\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} modes, so the docs app proves the same palette family that first-party components should treat as the baseline. Both modes target at least 4.5:1 contrast for surface text and common semantic foregrounds on every shell surface.
+
+Compared with large design systems, Bijou is intentionally compact today. The runtime vocabulary has about thirty direct color-bearing slots plus two gradient roles. Material-style systems expose more paired foreground/background roles. Carbon and Atlassian-style systems go further with text hierarchy, interaction states, icon roles, and component-specific aliases. Bijou should grow only when a missing role causes repeated ambiguity in real components.
+
+\section{Safe-Pair Contrast Contract}\label{record-028-safe-pair-contrast-contract}
+
+Theme contrast is declared through safe pairs rather than buried inside one-off test loops. A safe pair names a foreground token path and a background token path that a theme promises will remain readable.
+
+Safe-pair background paths may target token background slots:
+
+\begin{CodeBlock}
+semantic.primary on surface.primary.bg
+semantic.muted on surface.secondary.bg
+status.active on surface.overlay.bg
+ui.cursor on surface.elevated.bg
+\end{CodeBlock}
+
+Use the \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} builder when a first-party app or component needs a reusable contrast matrix:
+
+\begin{CodeBlock}
+const pairs = defineThemeSafePairs()
+  .readable('semantic.primary', 'surface.primary.bg')
+  .status('status.error', 'surface.overlay.bg')
+  .chrome('ui.cursor', 'surface.secondary.bg')
+  .build();
+\end{CodeBlock}
+
+Then pass those pairs to \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})}:
+
+\begin{CodeBlock}
+const report = doctorTheme(theme, { contrastPairs: pairs });
+\end{CodeBlock}
+
+Safe-pair kinds communicate intent:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}: ordinary text or component foregrounds that must stay legible
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}: process, health, timeline, or object-state colors
+\item
+  \texttt{c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e}: shell/runtime affordances such as cursor and selection chrome
+\end{itemize}
+
+Do not use safe pairs as a way to bless every possible token combination. Declare pairs only when a component or product surface expects that combination to work.
+
+\section{Theme Debugger And Lab}\label{record-028-theme-debugger-and-lab}
+
+DOGFOOD now has two inspectability surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}1\allowbreak{}0} opens a bounded Theme Inspector drawer in the docs shell.
+\item
+  The \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} page publishes a Theme Lab with default palettes, shell-gallery facts, token swatches, and safe-pair diagnostics.
+\end{itemize}
+
+Current UX:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}1\allowbreak{}0} opens the drawer on the active DOGFOOD shell theme.
+\item
+  \texttt{F\allowbreak{}1\allowbreak{}0} or \texttt{E\allowbreak{}s\allowbreak{}c} closes the drawer.
+\item
+  The drawer shows token swatches grouped by \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{u\allowbreak{}i}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}.
+\item
+  Each swatch renders the token path and uses the token value as the swatch fill or foreground depending on token family.
+\item
+  The drawer reports the safe-pair pass count for the active theme.
+\item
+  The Theme Lab page lists the first-party dark/light defaults, DOGFOOD shell themes, landing palette themes, and token swatches.
+\end{itemize}
+
+Still deferred:
+
+\begin{itemize}
+\tightlist
+\item
+  dark/light preview without committing the app theme
+\item
+  element-level token overlays
+\item
+  renderer provenance that can report whether a cell came from a token, raw color, or lowered/no-color fallback
+\end{itemize}
+
+The current implementation inspects theme tokens only. Element-level token overlays should wait until renderer provenance is available, because guessing token ownership from final RGB values would be misleading.
+
+\section{First-Party Defaults}\label{record-028-first-party-defaults}
+
+When first-party components need a default token and do not have stronger domain-specific semantics, prefer these defaults:
+
+\begin{itemize}
+\tightlist
+\item
+  default supporting text: \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  explicit primary emphasis: \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  local active or focused affordance inside a component: \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  default structural border: \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  default contained-region fill: \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  default secondary-pane fill: \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  default overlay fill: \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}
+\item
+  default disabled or inset fill: \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  reusable shell cursor or selected-shell chrome: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r}
+\item
+  reusable focused shell gutter chrome: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}
+\item
+  reusable scrollbar chrome: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b} and \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  table header chrome: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  progress empty track: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}E\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y}
+\end{itemize}
+
+These defaults are conventions, not excuses to skip judgment. If a component has a stronger semantic job, use the family that matches the job.
+
+\section{First-Party Prohibitions}\label{record-028-first-party-prohibitions}
+
+First-party components should follow these rules:
+
+\begin{itemize}
+\tightlist
+\item
+  do not read raw token paths from \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}*} when an accessor exists
+\item
+  do not invent new first-party token families ad hoc
+\item
+  do not use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} when the real meaning is focus or selection
+\item
+  do not use \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}*} as a generic foreground-emphasis bucket
+\item
+  do not use gradients as a substitute for semantic color
+\item
+  do not rely on color alone; meaning must survive \texttt{n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\end{itemize}
+
+If the current token families are not expressive enough, change the theme contract and docs in the same slice instead of sneaking around the vocabulary.
+
+\section{Extension Rules}\label{record-028-extension-rules}
+
+Third-party and app-level code may extend:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
+\item
+  \texttt{u\allowbreak{}i}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+That is already part of the generic \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}<\allowbreak{}S\allowbreak{},\allowbreak{} \allowbreak{}U\allowbreak{},\allowbreak{} \allowbreak{}G\allowbreak{}>} contract.
+
+Rules for extension:
+
+\begin{itemize}
+\tightlist
+\item
+  extend when the new key represents a stable semantic role, not one component's temporary styling whim
+\item
+  keep first-party components on the built-in shared vocabulary unless the contract is intentionally widened
+\item
+  prefer wrapping a component with explicit token options over hard-coding raw token-path lookups
+\item
+  when theme changes must invalidate cached component work, prefer the public \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{},\allowbreak{} \allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{})} seam over direct \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\end{itemize}
+
+\section{Access Pattern}\label{record-028-access-pattern}
+
+Component code should prefer the accessor layer:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}u\allowbreak{}i\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\end{itemize}
+
+That keeps component code coupled to the public vocabulary instead of the raw object shape or token-graph internals.
+
+\section{Relationship To Foundations}\label{record-028-relationship-to-foundations}
+
+The design-system foundations describe the high-level visual roles:
+
+\begin{itemize}
+\tightlist
+\item
+  foreground
+\item
+  surface
+\item
+  status
+\item
+  accent
+\item
+  border or separator
+\end{itemize}
+
+This page maps those roles onto the shipped API vocabulary:
+
+\begin{itemize}
+\tightlist
+\item
+  foreground -\textgreater{} \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}
+\item
+  accent -\textgreater{} \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  surface -\textgreater{} \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  border or separator -\textgreater{} \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  reusable framework chrome -\textgreater{} \texttt{u\allowbreak{}i}
+\item
+  explicit named state -\textgreater{} \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
+\item
+  rare multi-stop emphasis -\textgreater{} \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+\section{Examples}\label{record-028-examples}
+
+Examples of the intended split:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} should use \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}(\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{})} plus a matching border, not a gradient
+\item
+  \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} should use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} when it is carrying a real status
+\item
+  \texttt{k\allowbreak{}b\allowbreak{}d\allowbreak{}(\allowbreak{})} should use muted structure tokens, not a status token
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} should use \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r} for reusable header chrome
+\item
+  shell cursor, focused gutters, scrollbars, and track fills should use \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}*}, not business statuses
+\item
+  overlays and drawers should communicate interruption primarily through \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}, not by tinting everything as a warning
+\end{itemize}
+

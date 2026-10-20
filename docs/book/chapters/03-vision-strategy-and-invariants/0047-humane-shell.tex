@@ -1,0 +1,977 @@
+\chapter{The Humane Shell}\label{record-047}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/humane-shell.md}\par}\smallskip
+
+\emph{Design note for a coherent human-centered app shell in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+\section{Why this exists}\label{record-047-why-this-exists}
+
+Bijou now has many of the right shell primitives:
+
+\begin{itemize}
+\tightlist
+\item
+  framed pages
+\item
+  focused panes
+\item
+  command palette
+\item
+  help overlay
+\item
+  settings drawer
+\item
+  notifications
+\item
+  confirmation flows
+\end{itemize}
+
+But having the primitives is not the same thing as having a product.
+
+The next quality bar is not ``can the shell do many things?'' It is:
+
+\begin{itemize}
+\tightlist
+\item
+  does the shell feel calm and intentional?
+\item
+  can a first-time user understand how to search, get help, adjust preferences, and quit safely within a few seconds?
+\item
+  do header, footer, palette, settings, help, notifications, and confirmations feel like one family?
+\item
+  does the shell tell the truth about what is active and what input goes where?
+\end{itemize}
+
+This note exists to define that product direction before more one-off shell tweaks accumulate.
+
+\section{Design-thinking frame}\label{record-047-design-thinking-frame}
+
+\subsection{Primary user}\label{record-047-primary-user}
+
+The primary user is the \textbf{workspace operator}:
+
+\begin{itemize}
+\tightlist
+\item
+  someone inside a real framed TUI
+\item
+  someone who wants to navigate, search, change settings, and recover safely without memorizing repo trivia
+\item
+  someone who expects the shell to make the application feel trustworthy
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Where do I go to search?''
+\item
+  ``How do I change preferences?''
+\item
+  ``What does this focused area mean?''
+\item
+  ``How do I get help without losing my place?''
+\item
+  ``How do I leave safely?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-047-secondary-user}
+
+The secondary user is the \textbf{workspace builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  a developer building on \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  someone who wants a good shell without rebuilding shell UX from scratch
+\item
+  someone who wants to declare page content and settings, not invent new chrome rules every time
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``What should a high-quality Bijou shell look like by default?''
+\item
+  ``Which concerns belong to the shell versus the page?''
+\item
+  ``How do I get consistency across apps without a giant pile of bespoke conditionals?''
+\end{itemize}
+
+\subsection{Jobs to be done}\label{record-047-jobs-to-be-done}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Help me get oriented immediately.} A user should understand the shell's major entry points quickly: search, help, settings, and quit.
+\item
+  \textbf{Help me trust focus and ownership.} When the shell highlights a pane or opens a layer, the active area should own input honestly.
+\item
+  \textbf{Help me adjust preferences without leaving context.} Settings should feel like a shell sidecar, not a page detour.
+\item
+  \textbf{Help me recover and leave safely.} Global quit behavior and confirmation flows should be predictable across framed apps.
+\item
+  \textbf{Help me keep feedback proportional.} Temporary information should not feel as heavy as persistent or reviewable information.
+\end{enumerate}
+
+\section{Hills}\label{record-047-hills}
+
+\subsection{Hill 1 --- First-use confidence}\label{record-047-hill-1-first-use-confidence}
+
+A new user can enter a framed Bijou app and discover search, help, settings, and quit without reading external documentation.
+
+\subsection{Hill 2 --- One shell, many surfaces}\label{record-047-hill-2-one-shell-many-surfaces}
+
+Header, footer, command palette, help, settings, notifications, and confirmations feel like one coherent shell family instead of unrelated overlays.
+
+\subsection{Hill 3 --- The shell is calm}\label{record-047-hill-3-the-shell-is-calm}
+
+The shell favors clear orientation and layered disclosure over dumping the full control scheme into the chrome at all times.
+
+\subsection{Hill 4 --- Safety is consistent}\label{record-047-hill-4-safety-is-consistent}
+
+Global quit, confirmation, and notification behavior is stable enough that users can trust it across framed apps.
+
+\section{Shell promise}\label{record-047-shell-promise}
+
+The shell should make the app feel:
+
+\begin{itemize}
+\tightlist
+\item
+  calm
+\item
+  legible
+\item
+  safe
+\item
+  consistent
+\item
+  honest about focus and control
+\end{itemize}
+
+The shell should not feel:
+
+\begin{itemize}
+\tightlist
+\item
+  noisy
+\item
+  tutorialized all the time
+\item
+  full of spilled key legends
+\item
+  visually clever but operationally unclear
+\end{itemize}
+
+\section{Product principles}\label{record-047-product-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Search is a front door} Users should be able to open a framed app and immediately search for what they want.
+\item
+  \textbf{Help is discoverable, not omnipresent} The shell should advertise that help exists, then reveal the deeper control map on demand.
+\item
+  \textbf{Footer is operational truth} The footer should carry the most important current-status and quick-control information.
+\item
+  \textbf{Visible controls are a promise} If the shell or page shows a control hint, that control should work for the active layer or focused region right now. Dead hints erode trust faster than missing hints.
+\item
+  \textbf{Header is identity and context} The header should identify where the user is, not attempt to explain every possible action.
+\item
+  \textbf{Settings are shell state} Preferences should live in a shell-owned drawer and behave the same way across framed apps.
+\item
+  \textbf{Settings should explain themselves} A setting row should make its control type, current value, and purpose legible without requiring users to infer them from a terse label.
+\item
+  \textbf{Shell polish should graduate into canonical componentry} If the shell discovers a reusable presentation pattern, that pattern should become a Bijou component family instead of staying trapped inside shell-local rendering.
+\item
+  \textbf{Quit is safe by default} Interactive framed apps should treat \texttt{E\allowbreak{}s\allowbreak{}c}, \texttt{q}, and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C} as quit requests routed through the shell.
+\item
+  \textbf{Notifications scale by weight} Short-lived notices, persistent notifications, and reviewable history should be separate layers, not one overloaded mechanism.
+\item
+  \textbf{Layers dismiss from the top} \texttt{E\allowbreak{}s\allowbreak{}c} should dismiss the topmost dismissible layer before it ever falls through to shell quit behavior.
+\item
+  \textbf{Input maps should drive truth} The same input map that governs the active layer should also govern the visible controls the shell advertises.
+\item
+  \textbf{Layers should be explicit objects} A shell layer should own its title, visible controls, and richer help metadata instead of forcing the shell to rediscover them in separate branches.
+\end{enumerate}
+
+\section{Layer stack doctrine}\label{record-047-layer-stack-doctrine}
+
+The shell should treat interactive surfaces as a stack of layers, not as a pile of unrelated branch checks.
+
+Candidate layers include:
+
+\begin{itemize}
+\tightlist
+\item
+  workspace base layer
+\item
+  pane-local modal layer
+\item
+  search / command palette layer
+\item
+  help layer
+\item
+  settings layer
+\item
+  notification-center layer
+\item
+  quit-confirm layer
+\end{itemize}
+
+The key rule is:
+
+\begin{itemize}
+\tightlist
+\item
+  only the topmost layer owns input
+\end{itemize}
+
+That rule should govern:
+
+\begin{itemize}
+\tightlist
+\item
+  routing
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} dismiss order
+\item
+  footer hints
+\item
+  help/control summaries
+\item
+  future agent-visible shell semantics
+\end{itemize}
+
+\subsection{Dismiss order}\label{record-047-dismiss-order}
+
+\texttt{E\allowbreak{}s\allowbreak{}c} should follow one humane rule:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  dismiss the topmost dismissible layer
+\item
+  restore the next layer beneath it
+\item
+  only when no dismissible layer remains, interpret \texttt{E\allowbreak{}s\allowbreak{}c} as a quit request
+\end{enumerate}
+
+This prevents the shell from closing one layer and accidentally acting on the thing beneath it in the same keystroke.
+
+\subsection{Input maps as the source of truth}\label{record-047-input-maps-as-the-source-of-truth}
+
+Each layer should eventually own an input map that describes:
+
+\begin{itemize}
+\tightlist
+\item
+  what keys it handles
+\item
+  what dismissal behavior it supports
+\item
+  what controls may be shown in the footer/help
+\item
+  whether it blocks, reviews, or augments underlying content
+\end{itemize}
+
+This is the cleanest seam for keeping:
+
+\begin{itemize}
+\tightlist
+\item
+  control hints truthful
+\item
+  agents able to reason about the active layer
+\item
+  focus semantics aligned with actual runtime routing
+\end{itemize}
+
+\section{Proposed shell anatomy}\label{record-047-proposed-shell-anatomy}
+
+\subsection{1. Landing screen}\label{record-047-landing-screen}
+
+The landing screen is allowed to be expressive, but it should still obey shell rules.
+
+Purpose:
+
+\begin{itemize}
+\tightlist
+\item
+  establish brand and atmosphere
+\item
+  provide one obvious next action
+\item
+  give a minimal escape hatch
+\end{itemize}
+
+Recommended structure:
+
+\begin{itemize}
+\tightlist
+\item
+  fullscreen art / shader treatment
+\item
+  no heavy header
+\item
+  one reserved footer line
+\end{itemize}
+
+Footer zones on landing:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{left}: brief controls
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{E\allowbreak{}s\allowbreak{}c\allowbreak{}/\allowbreak{}q\allowbreak{} \allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}t}
+  \item
+    \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}e} or \texttt{a\allowbreak{}n\allowbreak{}y\allowbreak{} \allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}e}
+  \end{itemize}
+\item
+  \textbf{center}: optional telemetry / mode
+
+  \begin{itemize}
+  \tightlist
+  \item
+    e.g.~\texttt{5\allowbreak{}4\allowbreak{} \allowbreak{}f\allowbreak{}p\allowbreak{}s\allowbreak{} \allowbreak{}•\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}/\allowbreak{}f\allowbreak{}u\allowbreak{}l\allowbreak{}l}
+  \end{itemize}
+\item
+  \textbf{right}: version
+
+  \begin{itemize}
+  \tightlist
+  \item
+    e.g.~\texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+  \end{itemize}
+\end{itemize}
+
+The key design decision:
+
+\begin{itemize}
+\tightlist
+\item
+  telemetry belongs in the footer, not floating in the canvas, because it is shell information, not part of the art
+\end{itemize}
+
+\subsection{2. Header}\label{record-047-header}
+
+The header should be terse.
+
+Its job is:
+
+\begin{itemize}
+\tightlist
+\item
+  identity
+\item
+  current page / workspace context
+\item
+  lightweight discoverability cues
+\end{itemize}
+
+It should not try to be a full control legend.
+
+Recommended header shape:
+
+\begin{itemize}
+\tightlist
+\item
+  left: app title and current page/title
+\item
+  right: short shell affordances
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{?\allowbreak{} \allowbreak{}H\allowbreak{}e\allowbreak{}l\allowbreak{}p}
+  \item
+    \texttt{/\allowbreak{} \allowbreak{}S\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h}
+  \item
+    \texttt{F\allowbreak{}2\allowbreak{} \allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}
+  \end{itemize}
+\end{itemize}
+
+Optional contextual detail:
+
+\begin{itemize}
+\tightlist
+\item
+  active pane name
+\item
+  current mode/profile
+\item
+  route breadcrumb if actually helpful
+\end{itemize}
+
+Avoid:
+
+\begin{itemize}
+\tightlist
+\item
+  long scrolling control strings
+\item
+  repeated legends that compete with page content
+\item
+  dense status dumps in the top chrome
+\end{itemize}
+
+\subsection{3. Footer}\label{record-047-footer}
+
+The footer should become the primary operational lane.
+
+Recommended footer zones:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{left}: core controls
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{E\allowbreak{}s\allowbreak{}c\allowbreak{}/\allowbreak{}q\allowbreak{} \allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}t}
+  \item
+    \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{} \allowbreak{}n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e}
+  \item
+    current route-specific primary action if needed
+  \end{itemize}
+\item
+  \textbf{center}: current context
+
+  \begin{itemize}
+  \tightlist
+  \item
+    focused pane
+  \item
+    landing FPS/mode
+  \item
+    selected profile / variant / state
+  \end{itemize}
+\item
+  \textbf{right}: status summary
+
+  \begin{itemize}
+  \tightlist
+  \item
+    version
+  \item
+    notification count
+  \item
+    connection / runtime status if relevant
+  \end{itemize}
+\end{itemize}
+
+This is the shell surface that should carry fast-truth information. The header should not have to do that job.
+
+The design rule is:
+
+\begin{itemize}
+\tightlist
+\item
+  if a focused pane owns special controls, the footer may advertise them
+\item
+  if that pane loses focus or a shell layer opens, those controls should disappear from visible chrome
+\item
+  the shell should never keep showing controls that the current layer cannot actually honor
+\end{itemize}
+
+\subsection{4. Workspace gutters and pane geometry}\label{record-047-workspace-gutters-and-pane-geometry}
+
+The shell should keep a one-cell breathing gutter between major structures:
+
+\begin{itemize}
+\tightlist
+\item
+  header and workspace
+\item
+  workspace and footer
+\item
+  left rail, center content, and right rail
+\end{itemize}
+
+This matters because otherwise the shell feels cropped or visually accidental.
+
+Pane focus should remain obvious, but focus styling should not overpower the content.
+
+\subsection{5. Command palette}\label{record-047-command-palette}
+
+The command palette should be treated as a universal front door, not a power-user afterthought.
+
+It should support:
+
+\begin{itemize}
+\tightlist
+\item
+  search by component/page name
+\item
+  shell actions
+\item
+  settings entry point
+\item
+  navigation
+\item
+  optional recent-history or notification recall later
+\end{itemize}
+
+Design direction:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{/} and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}P} both open it in interactive framed apps
+\item
+  palette search should be the first thing users reach for when they know what they want
+\end{itemize}
+
+\subsection{6. Help}\label{record-047-help}
+
+Help should be layered:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{short help affordance} in shell chrome
+\item
+  \textbf{full help surface} on demand
+\end{itemize}
+
+The full help surface should be:
+
+\begin{itemize}
+\tightlist
+\item
+  shell-owned
+\item
+  scrollable
+\item
+  truthful to the active context
+\end{itemize}
+
+Recommended help structure:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  shell/global controls
+\item
+  focused pane controls
+\item
+  active overlay controls
+\item
+  current page-specific shortcuts
+\end{enumerate}
+
+Long-term direction:
+
+\begin{itemize}
+\tightlist
+\item
+  help should become searchable or filterable once the command palette/search substrate is mature enough
+\end{itemize}
+
+\subsection{7. Settings drawer}\label{record-047-settings-drawer}
+
+The settings drawer should remain a left-edge shell sidecar.
+
+It should feel like:
+
+\begin{itemize}
+\tightlist
+\item
+  a stable shell surface
+\item
+  sectioned preferences
+\item
+  compact values on the trailing edge
+\end{itemize}
+
+The shell should own:
+
+\begin{itemize}
+\tightlist
+\item
+  open/close behavior
+\item
+  scrolling
+\item
+  row focus
+\item
+  activation
+\item
+  input capture
+\end{itemize}
+
+The app should provide:
+
+\begin{itemize}
+\tightlist
+\item
+  sections
+\item
+  rows
+\item
+  values
+\item
+  actions
+\end{itemize}
+
+The shell should keep owning drawer behavior, but the row treatment inside it should be allowed to graduate into canonical Bijou componentry once it proves itself. That follow-on direction is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/preference-lists-belong-to-bijou.md}{Preference Lists Belong to Bijou}.
+
+\subsection{8. Notifications and notification history}\label{record-047-notifications-and-notification-history}
+
+The shell should differentiate between:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{toast}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ephemeral
+  \item
+    low-weight
+  \item
+    auto-dismiss
+  \end{itemize}
+\item
+  \textbf{notification}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    persistent enough to matter
+  \item
+    shell-managed
+  \item
+    should be reviewable
+  \end{itemize}
+\item
+  \textbf{notification history}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    archive / inbox / center
+  \item
+    where missed or important notices can be recovered
+  \end{itemize}
+\end{itemize}
+
+Design direction:
+
+\begin{itemize}
+\tightlist
+\item
+  toasts should stay lightweight and not try to be a history mechanism
+\item
+  a future notification-history surface should be reachable from shell affordances or the command palette
+\item
+  the footer is a good place for a subtle notification count or inbox cue
+\end{itemize}
+
+That more detailed direction is now captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/notification-history-belongs-to-the-shell.md}{Notification History Belongs to the Shell} and the companion \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/shell-notification-center.spec.json}{Shell Notification Center spec}.
+
+\subsection{9. Confirmation flows}\label{record-047-confirmation-flows}
+
+Confirmation should be treated as a shell/system pattern, not ad hoc prose.
+
+Use confirmations for:
+
+\begin{itemize}
+\tightlist
+\item
+  destructive actions
+\item
+  irreversible actions
+\item
+  quitting when work could be lost or when the shell wants a consistent safe exit policy
+\end{itemize}
+
+Avoid confirmations for:
+
+\begin{itemize}
+\tightlist
+\item
+  trivial reversible actions
+\item
+  low-consequence navigation
+\item
+  ``are you sure?'' spam
+\end{itemize}
+
+Standard confirmation behavior should include:
+
+\begin{itemize}
+\tightlist
+\item
+  clear primary question
+\item
+  short consequence line
+\item
+  stable affordances:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{y}
+  \item
+    \texttt{n}
+  \item
+    \texttt{E\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r}
+  \item
+    \texttt{E\allowbreak{}s\allowbreak{}c}
+  \end{itemize}
+\end{itemize}
+
+\subsection{10. Global quit behavior}\label{record-047-global-quit-behavior}
+
+Interactive framed apps should have a standard shell-level quit policy.
+
+Recommended default:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c}
+\item
+  \texttt{q}
+\item
+  \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C}
+\end{itemize}
+
+all map to \textbf{request quit}
+
+Narrow exception:
+
+\begin{itemize}
+\tightlist
+\item
+  shell-owned text-entry surfaces may keep printable characters like \texttt{q} available for input
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C} should still request quit from those surfaces
+\end{itemize}
+
+The shell then applies a policy:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m} by default for interactive framed apps
+\item
+  \texttt{i\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}t\allowbreak{}e} for non-interactive/piped contexts
+\item
+  app-specific override only when truly justified
+\end{itemize}
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  this makes exit semantics predictable
+\item
+  it prevents every app from inventing its own ``sometimes q quits, sometimes it does nothing, sometimes Esc closes a random pane'' rules
+\end{itemize}
+
+The shell should expose this as a real policy, not just a hardcoded DOGFOOD behavior.
+
+\section{Recommended default shell policy}\label{record-047-recommended-default-shell-policy}
+
+\subsection{Header}\label{record-047-header-1}
+
+\begin{itemize}
+\tightlist
+\item
+  minimal and contextual
+\item
+  no long legends
+\end{itemize}
+
+\subsection{Footer}\label{record-047-footer-1}
+
+\begin{itemize}
+\tightlist
+\item
+  always present in framed interactive apps
+\item
+  reserved for controls, state, and operational truth
+\end{itemize}
+
+\subsection{Search}\label{record-047-search}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{/} and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}P}
+\item
+  palette visible in chrome by name
+\end{itemize}
+
+\subsection{Settings}\label{record-047-settings}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}2} and palette command
+\item
+  shell-owned drawer
+\end{itemize}
+
+\subsection{Help}\label{record-047-help-1}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{?}
+\item
+  shell-owned overlay
+\item
+  active-pane aware
+\end{itemize}
+
+\subsection{Quit}\label{record-047-quit}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c}, \texttt{q}, \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C}
+\item
+  shell \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t} policy
+\end{itemize}
+
+\subsection{Notifications}\label{record-047-notifications}
+
+\begin{itemize}
+\tightlist
+\item
+  toast for ephemeral updates
+\item
+  persistent notifications for important updates
+\item
+  planned history surface for recovery
+\end{itemize}
+
+\section{Out of scope for this note}\label{record-047-out-of-scope-for-this-note}
+
+\begin{itemize}
+\tightlist
+\item
+  exact BCSS token palette for the shell
+\item
+  final landing-screen motion style
+\item
+  every possible notification-center information architecture detail
+\item
+  full tutorial/onboarding flow design
+\end{itemize}
+
+Those are related, but this note is about the shell contract first.
+
+\section{Acceptance tests this design implies}\label{record-047-acceptance-tests-this-design-implies}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{A framed app shows a stable shell affordance set} Header and footer expose search, help, settings, and quit consistently.
+\item
+  \textbf{Header is concise} The shell does not regress into long truncated legends in the top chrome.
+\item
+  \textbf{Footer carries operational truth} Landing telemetry, version, and quit hints render in the reserved footer line instead of floating inside content.
+\item
+  \textbf{Global quit is shell-owned} \texttt{E\allowbreak{}s\allowbreak{}c}, \texttt{q}, and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C} route through one standard quit policy in interactive framed apps.
+\item
+  \textbf{Settings are shell-owned} Preferences open in the standard drawer and underlying page input is blocked while it is open.
+\item
+  \textbf{Help is layered and contextual} The full help surface includes shell controls and active-pane controls without implying that inactive panes still own input.
+\item
+  \textbf{Notifications are recoverable by weight} Toasts stay ephemeral, while persistent shell notifications can eventually be reviewed later.
+\end{enumerate}
+
+\section{Proving surface}\label{record-047-proving-surface}
+
+\texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} should be the first proving surface for this design.
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  it already uses the standard frame shell
+\item
+  it already has a landing screen
+\item
+  it already exposes search, help, settings, notifications, and quit behavior
+\item
+  it is visible enough that shell drift shows up quickly
+\end{itemize}
+
+The rule should be:
+
+\begin{quote}
+if the shell feels confusing in DOGFOOD, the shell contract is not ready yet.
+\end{quote}
+
+\section{Recommended implementation order}\label{record-047-recommended-implementation-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Footer-first shell cleanup}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    move landing telemetry into the footer permanently
+  \item
+    simplify the docs/footer roles until header and footer read cleanly
+  \end{itemize}
+\item
+  \textbf{Global quit policy}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    formalize shell \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t}
+  \item
+    route \texttt{E\allowbreak{}s\allowbreak{}c}, \texttt{q}, and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C} through that policy
+  \end{itemize}
+\item
+  \textbf{Search/help/settings discoverability pass}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    make shell entry points visible and calm in the chrome
+  \end{itemize}
+\item
+  \textbf{Notification history concept}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    add the first shell-level recovery path for persistent notifications
+  \end{itemize}
+\item
+  \textbf{FTUI onboarding primitives}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    once the shell itself is stable enough to teach honestly
+  \end{itemize}
+\end{enumerate}
+

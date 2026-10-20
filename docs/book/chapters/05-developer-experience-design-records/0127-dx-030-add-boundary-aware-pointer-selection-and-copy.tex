@@ -1,0 +1,408 @@
+\chapter{DX-030 Add boundary-aware pointer selection and copy}\label{record-127}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-030 Add boundary-aware pointer selection and copy
+legend: DX
+lane: design
+priority: high
+keywords:
+  - dogfood
+  - pointer
+  - selection
+  - clipboard
+  - geometry
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-127-framing}
+
+DOGFOOD currently depends on terminal-native selection. That is acceptable as a host fallback, but it is not the Bijou model. A drag gesture in a framed docs surface should not copy whatever cells happen to be painted across the whole terminal. It should resolve the owning pane, clamp the drag to that pane's geometry, and reconstruct text from the component's semantic content model.
+
+This cycle defines the contract and lands the pure selection coordinator in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. The runtime primitive consumes retained rectangles, viewport transforms, semantic content models, higher-priority blockers, and pointer ranges, then returns selected text plus an inspectable clipboard-effect record. It still does not implement OS clipboard writes, full app-frame drag capture, or cross-pane rich extraction. Those pieces remain host/runtime adapters rather than render logic.
+
+\section{Sponsored Users}\label{record-127-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD readers who want to drag-copy docs text without selecting shell chrome, neighboring panes, or visual gutters.
+\item
+  App authors who need copy behavior to respect pane and component boundaries.
+\item
+  Maintainers who need a stable target for later pointer-routing, clipboard, and semantic extraction work.
+\end{itemize}
+
+\section{Hills}\label{record-127-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A reader can expect selection to stay inside the pane or component that owns the drag start.
+\item
+  A builder can declare selection metadata on a surface or layout node without giving rendering authority over geometry.
+\item
+  A maintainer can implement runtime selection later by following an explicit hit-test, range, extraction, and clipboard-effect protocol.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-127-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  What metadata can a surface or layout node expose for selection?
+\item
+  How does retained layout geometry map a pointer drag to one owning component?
+\item
+  How is copied output reconstructed for prose, tables, and mixed panes?
+\item
+  How does the shell arbitrate selection against existing mouse routing?
+\item
+  Where does clipboard IO live so copying remains an effect, not render logic?
+\end{itemize}
+
+\section{Requirements}\label{record-127-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Selection ownership is opt-out default behavior for framed docs-style panes, but interactive controls may explicitly opt out or override drag handling.
+\item
+  Hit-testing must start from retained layout geometry, not rendered strings.
+\item
+  A drag starts from one \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}O\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r} and remains bounded to that owner unless a future explicit multi-owner policy allows otherwise.
+\item
+  Extraction reconstructs output from semantic content metadata, paragraph spans, table cells, or component-provided extractors, not raw terminal rows.
+\item
+  Viewports must map screen coordinates through scroll offsets before forming content ranges.
+\item
+  Copying to an OS clipboard is a host effect. Runtime selection should emit a command/effect fact; renderers should never write the clipboard.
+\end{itemize}
+
+\section{Contract}\label{record-127-contract}
+
+The contract introduces six conceptual records.
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}O\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r}
+
+The component, pane, or layout node that owns a selectable region.
+
+Required facts:
+
+\begin{itemize}
+\tightlist
+\item
+  stable owner id
+\item
+  retained layout node id
+\item
+  assigned screen rect
+\item
+  optional viewport transform
+\item
+  selection policy
+\item
+  content model reference
+\end{itemize}
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+
+The concrete selectable rectangle derived from layout truth.
+
+Required facts:
+
+\begin{itemize}
+\tightlist
+\item
+  owner id
+\item
+  screen rect
+\item
+  content rect
+\item
+  clipping rect
+\item
+  z/layer order
+\item
+  enabled/disabled state
+\end{itemize}
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e}
+
+The normalized content-space range derived from a pointer drag.
+
+Required facts:
+
+\begin{itemize}
+\tightlist
+\item
+  owner id
+\item
+  anchor point
+\item
+  focus point
+\item
+  normalized start/end points
+\item
+  content-space clipping rect
+\item
+  direction
+\item
+  drag source device
+\end{itemize}
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}
+
+The semantic model used to reconstruct selected text.
+
+Supported first models:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}e}: paragraph and wrapped-line spans
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: cell spans with optional semantic line grouping
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}: row and column cells with header context
+\item
+  \texttt{m\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d}: ordered child regions with their own extractors
+\end{itemize}
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}E\allowbreak{}x\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r}
+
+The pure function that turns a \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e} and content model into copied text.
+
+Rules:
+
+\begin{itemize}
+\tightlist
+\item
+  prose unwraps soft wraps while preserving hard paragraph breaks
+\item
+  tables preserve cell boundaries with tabs or another declared delimiter
+\item
+  mixed panes concatenate child extractions in semantic order
+\item
+  decorative chrome, gutters, scrollbars, and focus rails are excluded by default
+\item
+  extraction must be deterministic and inspectable
+\end{itemize}
+
+\texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r}
+
+The runtime service that arbitrates pointer selection.
+
+Responsibilities:
+
+\begin{itemize}
+\tightlist
+\item
+  receive pointer down/drag/up facts
+\item
+  hit-test the topmost retained layout region
+\item
+  choose the nearest selectable owner
+\item
+  respect higher-priority mouse handlers such as split dividers, buttons, drag/drop targets, and active overlays
+\item
+  clamp movement to the owner region
+\item
+  request extraction on release
+\item
+  emit a clipboard effect or copy result command
+\end{itemize}
+
+The shipped \texttt{c\allowbreak{}o\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} primitive covers this flow in pure package space. It does not own pointer capture or host clipboard IO; it gives those adapters a deterministic contract to call.
+
+\section{Runtime Flow}\label{record-127-runtime-flow}
+
+\begin{center}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[booknode/.style={draw=BookHeading,line width=.6pt,fill=BookPanel,rounded corners=1.5pt,align=center,text width=29mm,minimum height=10mm,inner sep=5pt,font=\small},bookedge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.65pt},every edge quotes/.style={font=\scriptsize,fill=white,inner sep=2pt,text=BookMuted}]
+\node[booknode] (P) at (0,0) {Pointer event};
+\node[booknode] (H) at (0,-1.5) {Retained layout hit-test};
+\node[booknode] (O) at (0,-3) {Nearest Selection\allowbreak{}Owner};
+\node[booknode] (A) at (0,-4.7) {Higher-priority mouse handler?};
+\node[booknode] (M) at (5,-6.4) {Route existing mouse command};
+\node[booknode] (S) at (0,-6.4) {Start selection capture};
+\node[booknode] (D) at (0,-7.9) {Drag updates Selection\allowbreak{}Range};
+\node[booknode] (C) at (0,-9.4) {Clamp through owner rect and viewport transform};
+\node[booknode] (X) at (0,-10.9) {Selection\allowbreak{}Extractor reconstructs text};
+\node[booknode] (E) at (0,-12.4) {Clipboard effect or copy result command};
+\draw[bookedge,] (P) to (H);
+\draw[bookedge,] (H) to (O);
+\draw[bookedge,] (O) to (A);
+\draw[bookedge,] (A) to node[midway,fill=white,inner sep=1.5pt,font=\scriptsize,text=BookMuted] {yes} (M);
+\draw[bookedge,] (A) to node[midway,fill=white,inner sep=1.5pt,font=\scriptsize,text=BookMuted] {no} (S);
+\draw[bookedge,] (S) to (D);
+\draw[bookedge,] (D) to (C);
+\draw[bookedge,] (C) to (X);
+\draw[bookedge,] (X) to (E);
+\end{tikzpicture}}
+\end{center}
+
+Selection is a pointer interaction that uses layout truth. It is not a render phase and not a terminal-row scrape.
+
+\section{Arbitration}\label{record-127-arbitration}
+
+Mouse routing keeps the same priority model as the rest of Bijou:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Active modal or overlay captures first.
+\item
+  Explicit drag handles and resize controls win over selection.
+\item
+  Component-owned pointer handlers win when the component declares a drag gesture, such as sliders, split panes, or draggable tabs.
+\item
+  Otherwise, the nearest selectable owner may start a selection capture.
+\item
+  Terminal-native selection remains a host fallback when Bijou is not in mouse mode or the app opts out.
+\end{enumerate}
+
+The rule is deliberately conservative: selection should never steal a gesture from an interactive control that already owns that drag.
+
+\section{Extraction Rules}\label{record-127-extraction-rules}
+
+Prose extraction:
+
+\begin{itemize}
+\tightlist
+\item
+  maps pointer positions to paragraph spans
+\item
+  unwraps soft wraps
+\item
+  preserves hard line breaks, blank lines, and list boundaries
+\item
+  excludes visible borders, scrollbars, and status gutters
+\end{itemize}
+
+Table extraction:
+
+\begin{itemize}
+\tightlist
+\item
+  maps selected cells through row and column coordinates
+\item
+  preserves headers when the selection crosses enough columns to need context
+\item
+  emits tab-delimited text by default
+\item
+  leaves room for CSV/TSV policy later
+\end{itemize}
+
+Mixed pane extraction:
+
+\begin{itemize}
+\tightlist
+\item
+  clips each child to the owner range
+\item
+  extracts children in semantic order
+\item
+  inserts declared separators only where the component model says they exist
+\item
+  refuses to infer meaning from visual adjacency alone
+\end{itemize}
+
+Viewport extraction:
+
+\begin{itemize}
+\tightlist
+\item
+  maps screen coordinates into content coordinates with scroll offsets
+\item
+  respects clipped content
+\item
+  may expose current scroll context in accessible copy, but copied prose should be the selected content, not the scrollbar state
+\end{itemize}
+
+\section{Non-Goals}\label{record-127-non-goals}
+
+This cycle does not:
+
+\begin{itemize}
+\tightlist
+\item
+  implement OS clipboard adapters
+\item
+  implement drag selection in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  define multi-pane selection
+\item
+  define cross-pane rich extraction
+\item
+  define rich clipboard formats
+\item
+  define image or shader-region copying
+\item
+  make terminal-native selection disappear
+\end{itemize}
+
+Those are follow-on implementation slices once host and framed-app adapters are ready to consume the pure coordinator.
+
+\section{Acceptance Criteria}\label{record-127-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The contract names selection owners, regions, ranges, content models, extractors, and the coordinator.
+\item
+  The contract states that hit-testing uses retained layout geometry.
+\item
+  The contract states that copied output comes from semantic extraction, not raw terminal rows.
+\item
+  The contract defines arbitration against overlays, drag handles, component pointer handlers, and terminal-native fallback.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports a pure selection coordinator that uses retained geometry and semantic extraction.
+\item
+  The v6 release lane points at this design closure instead of the backlog note.
+\item
+  The DX legend records this as the latest completed selection/copy closure.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-127-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Promote the backlog item into this design-cycle contract.
+\item
+  Add \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}O\allowbreak{}w\allowbreak{}n\allowbreak{}e\allowbreak{}r}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r}, and clipboard-effect records to \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  Implement \texttt{c\allowbreak{}o\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}, \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}, and \texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} as pure primitives backed by retained geometry and semantic content.
+\item
+  Add package and Method-cycle tests that prove bounded prose extraction, table extraction, topmost owner selection, higher-priority blocker arbitration, terminal-native fallback, and v6 closeout evidence.
+\item
+  Update the v6 lane, roadmap, bearing, changelog, and backlog anchors so issue \#186 closes through implementation rather than contract-only deferral.
+\end{enumerate}
+
+\section{Playback}\label{record-127-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the backlog named the need, but no stable design artifact defined the selection owner, range, extraction, and clipboard-effect contract; the new package and Method-cycle tests failed because no public selection module or v6 closeout evidence existed.
+\item
+  GREEN: this cycle defines the records, exports the pure selection coordinator, and proves semantic copy behavior without terminal-row scraping.
+\item
+  The contract keeps selection bounded by retained layout truth.
+\item
+  The contract keeps copying semantic and inspectable.
+\item
+  The contract keeps clipboard writes outside render logic.
+\end{itemize}
+
+\section{Retrospective}\label{record-127-retrospective}
+
+DX-030 is landed for the \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release boundary.
+
+The implementation intentionally stops at the pure selection coordinator because that is the correct package boundary for v6: layout truth and semantic content can now decide what would be copied, while host clipboard writes and framed-app drag capture remain explicit adapters. That keeps boundary-aware copy inspectable, deterministic, and test-protected without smuggling terminal row scraping into the renderer.
+

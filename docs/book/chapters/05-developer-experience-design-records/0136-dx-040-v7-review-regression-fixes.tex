@@ -1,0 +1,153 @@
+\chapter{DX-040 V7 Post-Merge Review Regression Fixes}\label{record-136}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-040-v7-review-regression-fixes.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-040 V7 post-merge review regression fixes
+legend: DX
+lane: bad-code
+priority: medium
+issue: https://github.com/flyingrobots/bijou/issues/283
+keywords:
+  - dogfood
+  - release-title
+  - table-surface
+  - wrapping
+  - review-follow-up
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-136-framing}
+
+PR \#282 merged the V7 Product Truth closeout. Codex review comments arrived after the admin merge and identified two P2 regressions that should be fixed before v7 is cut:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+{S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e}
+ & {F\allowbreak{}i\allowbreak{}l\allowbreak{}e}
+ & {P\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}m}
+ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\href{https://github.com/flyingrobots/bijou/pull/282\#discussion_r3348547178}{{P\allowbreak{}R} {\#\allowbreak{}2\allowbreak{}8\allowbreak{}2} {t\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}} & \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {I\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e} {r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} {o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} {c\allowbreak{}a\allowbreak{}n} {e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}e\allowbreak{}d} {t\allowbreak{}h\allowbreak{}e} {c\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}’\allowbreak{}s} {r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} {w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} {f\allowbreak{}o\allowbreak{}r} {w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}s} {f\allowbreak{}r\allowbreak{}o\allowbreak{}m} {4\allowbreak{}2} {t\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}g\allowbreak{}h} {5\allowbreak{}9} {c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{}.} \\
+\href{https://github.com/flyingrobots/bijou/pull/282\#discussion_r3348547191}{{P\allowbreak{}R} {\#\allowbreak{}2\allowbreak{}8\allowbreak{}2} {t\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}} & \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}v\allowbreak{}3\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {F\allowbreak{}i\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}d} \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} {s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} {h\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}-\allowbreak{}w\allowbreak{}r\allowbreak{}a\allowbreak{}p} {a\allowbreak{}t} {c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n} {b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} {i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}a\allowbreak{}d} {o\allowbreak{}f} {h\allowbreak{}o\allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} {d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} {w\allowbreak{}o\allowbreak{}r\allowbreak{}d} {w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.} \\
+\end{longtable}
+}
+
+This follow-up keeps the scope intentionally narrow: fix exactly the two review comments, preserve the v7 closeout behavior, and leave broader table or title treatment redesigns for later cycles.
+
+\section{Sponsored Users}\label{record-136-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  A DOGFOOD reader on a medium-width terminal needs the release-title guide to fit the actual viewport instead of drawing a wider box.
+\item
+  A TUI author using \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} expects readable fitted text by default, matching the word-wrap posture already established by \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  A review agent needs the reported regressions captured as deterministic tests so the branch proves the fix instead of relying on prose.
+\end{itemize}
+
+\section{Hill}\label{record-136-hill}
+
+A maintainer can run deterministic tests that reproduce both post-merge review comments, then see the title renderer stay within requested widths and \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} preserve word boundaries when fitting string cells.
+
+\section{Current Truth}\label{record-136-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}:\allowbreak{} \allowbreak{}4\allowbreak{}2\allowbreak{} \allowbreak{}\}\allowbreak{})} selects the wide renderer even though wide output is 60 columns.
+\item
+  The new fitted \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} path wraps shrunk string cells through \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})}, which chunks at hard cell boundaries and can split words such as \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and \texttt{e\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e}.
+\item
+  PR \#282 is already merged, so the fix must be a new branch and PR.
+\end{itemize}
+
+\section{Product Shape}\label{record-136-product-shape}
+
+\subsection{Release Title Width}\label{record-136-release-title-width}
+
+\begin{CodeBlock}
+width 42:
++ BIJOU DOGFOOD ----+
+| V7 Product Truth  |
+| Blocks prove UX.  |
+| lanes: table, io  |
+| gate: closeout    |
++-------------------+
+\end{CodeBlock}
+
+Every emitted line must be \texttt{<\allowbreak{}=\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}.
+
+\subsection{Table Surface Word Wrapping}\label{record-136-table-surface-word-wrapping}
+
+\begin{CodeBlock}
+| Release proof     |
+| canonical docs    |
+| surface carries   |
+| release title     |
+\end{CodeBlock}
+
+Default fitted string cells should break at word boundaries when possible. Explicit hard wrapping and truncation remain separate behaviors.
+
+\section{Runtime And API Contract}\label{record-136-runtime-and-api-contract}
+
+\begin{itemize}
+\tightlist
+\item
+  Release-title text rendering must honor the supplied \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} for interactive mode.
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} must preserve existing \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}'} behavior.
+\item
+  Default fitted string cells should use word-aware wrapping.
+\item
+  Surface cells that are already structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} values may continue to use the existing surface wrapping behavior because the original word boundaries are not recoverable from arbitrary surfaces.
+\end{itemize}
+
+\section{Lower Modes}\label{record-136-lower-modes}
+
+No lower-mode contract changes are intended. Existing static, pipe, and accessible release-title output should remain unchanged.
+
+\section{Tests To Write First}\label{record-136-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Extend \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}0\allowbreak{}/\allowbreak{}v\allowbreak{}7\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} with a width-42 regression that asserts every interactive line is at most 42 characters.
+\item
+  Extend \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}7\allowbreak{}/\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} with a default word-wrap regression that asserts fitted output does not split \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or \texttt{e\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e} across lines.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-136-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#283 is closed by the follow-up PR.
+\item
+  The exact Codex review cases are represented by tests that fail before the fix and pass after it.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, focused tests, and relevant DOGFOOD checks pass.
+\item
+  No broad redesign of release-title art, \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}, or \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is included.
+\end{itemize}
+
+\section{Risks And Guardrails}\label{record-136-risks-and-guardrails}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not change the public \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} signature unless the tests prove it is necessary.
+\item
+  Do not make title rendering depend on terminal state outside the supplied width.
+\item
+  Do not remove Storybook compatibility aliases while fixing BlockLab-adjacent follow-up behavior.
+\end{itemize}
+

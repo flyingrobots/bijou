@@ -1,0 +1,282 @@
+\chapter{LX-019 --- Localization Port Contract}\label{record-195}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-019-localization-port-contract.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Why This Cycle Exists}\label{record-195-why-this-cycle-exists}
+
+Bijou already has a runtime catalog engine, formatter ports, catalog loaders, string-table tooling, and DOGFOOD locale preference ports. Those pieces make localization possible, but DOGFOOD still tends to pass the concrete i18n runtime through rendering code and ask it for naked strings.
+
+That is too low-level for the long-term architecture.
+
+Views, blocks, and docs surfaces should ask an application-facing localization port for a localized object:
+
+\begin{CodeBlock}
+const title = localization.resolve({
+  key: { namespace: 'bijou.dogfood', id: 'blocks.preview.title' },
+});
+\end{CodeBlock}
+
+The result should preserve runtime truth:
+
+\begin{itemize}
+\tightlist
+\item
+  the requested key
+\item
+  selected locale
+\item
+  direction
+\item
+  entry kind
+\item
+  translated / fallback / missing status
+\item
+  localized value
+\item
+  issues and facts for tooling
+\end{itemize}
+
+The view should not know how catalogs were loaded, where JSON files live, which CSV source produced them, or how fallback catalogs were attached.
+
+\section{Core Rule}\label{record-195-core-rule}
+
+Localization in Bijou is a port/adapter boundary.
+
+\begin{itemize}
+\tightlist
+\item
+  Ports live where the localization vocabulary lives.
+\item
+  Adapters live where the external dependency lives.
+\item
+  Composition lives at the app boundary.
+\item
+  Views receive localized objects, not filesystem, catalog, or runtime machinery.
+\end{itemize}
+
+\section{Boundary}\label{record-195-boundary}
+
+This cycle is about the application-facing localization port contract and DOGFOOD wiring.
+
+It is not about:
+
+\begin{itemize}
+\tightlist
+\item
+  expanding translation coverage
+\item
+  adding a localization dashboard
+\item
+  adding a translation workbench
+\item
+  changing the CSV string-table workflow
+\item
+  loading every locale at runtime
+\item
+  implementing remote localization services
+\item
+  making blocks fetch localization data directly
+\item
+  replacing the lower-level i18n runtime
+\end{itemize}
+
+\section{Vocabulary}\label{record-195-vocabulary}
+
+\subsection{Localization Port}\label{record-195-localization-port}
+
+The app-facing port that resolves a localization request into a structured localized object.
+
+It should answer:
+
+\begin{CodeBlock}
+Given this key and interpolation values, what localized object should this view
+render in the selected locale?
+\end{CodeBlock}
+
+It should not answer:
+
+\begin{CodeBlock}
+Where are the catalog files?
+How do I read the filesystem?
+How do I compile CSV rows?
+How do I persist locale preferences?
+\end{CodeBlock}
+
+\subsection{Localized Object}\label{record-195-localized-object}
+
+The immutable result returned by the localization port.
+
+It contains:
+
+\begin{itemize}
+\tightlist
+\item
+  key
+\item
+  locale
+\item
+  direction
+\item
+  fallback locale
+\item
+  entry kind
+\item
+  resolution status
+\item
+  value
+\item
+  issues
+\item
+  facts
+\end{itemize}
+
+The value may be a message string, data payload, or resource payload depending on the catalog entry kind.
+
+\subsection{Runtime Adapter}\label{record-195-runtime-adapter}
+
+An adapter that wraps \texttt{I\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} and exposes it through \texttt{L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t}.
+
+The runtime continues to own catalog state, fallback behavior, locale switching, references, and formatting. The port makes that behavior consumable by application code without leaking the runtime surface everywhere.
+
+Runtime convenience methods that remain public, such as \texttt{t\allowbreak{}(\allowbreak{})}, should behave like stable API functions instead of receiver-sensitive object methods. Callers may pass or destructure these helpers without preserving a JavaScript \texttt{t\allowbreak{}h\allowbreak{}i\allowbreak{}s} binding; the runtime state remains closure-owned at the adapter boundary.
+
+\subsection{Node / Filesystem Adapters}\label{record-195-node-filesystem-adapters}
+
+Adapters that read selected-locale generated JSON catalogs from disk belong in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} or application composition code.
+
+They should return catalogs or construct runtime-backed localization ports. They should not redefine the generic localization port contract.
+
+\section{Package Split}\label{record-195-package-split}
+
+The contract belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}:
+
+\begin{CodeBlock}
+packages/bijou-i18n
+  LocalizationPort
+  LocalizationRequest
+  LocalizedObject
+  LocalizationStatus
+  LocalizationIssue
+  LocalizationFact
+  createRuntimeLocalizationPort()
+\end{CodeBlock}
+
+Node/file adapters stay in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}:
+
+\begin{CodeBlock}
+packages/bijou-i18n-tools-node
+  CSV and TSV string-table files
+  generated runtime catalog JSON files
+  selected-locale catalog directory loaders
+\end{CodeBlock}
+
+DOGFOOD composition lives in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}:
+
+\begin{CodeBlock}
+examples/docs
+  selected locale resolution
+  English fallback catalog attachment
+  development missing-marker policy
+  runtime-backed LocalizationPort assembly
+\end{CodeBlock}
+
+Views and block previews should receive the port or localized objects. They should not receive filesystem loaders, CSV data, generated catalog paths, or provider handles.
+
+\section{Expected Flow}\label{record-195-expected-flow}
+
+\begin{CodeBlock}
+CSV source string table
+  -> generated per-locale JSON catalogs
+  -> selected-locale catalog loader adapter
+  -> I18nRuntime
+  -> LocalizationPort
+  -> LocalizedObject
+  -> DOGFOOD / Blocks / shell surfaces
+\end{CodeBlock}
+
+The fallback posture remains:
+
+\begin{CodeBlock}
+production:
+  selected locale value
+  -> English fallback catalog
+
+non-production:
+  selected locale value
+  -> loud missing-localization object
+  -> English fallback only when missing markers are disabled
+\end{CodeBlock}
+
+\section{DOGFOOD Implications}\label{record-195-dogfood-implications}
+
+DOGFOOD should keep the concrete runtime at the composition boundary because the frame shell still consumes \texttt{I\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e} and the app still needs locale activation. Ordinary DOGFOOD text lookup should move behind \texttt{L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+
+The app may still hold both:
+
+\begin{CodeBlock}
+const runtime = createI18nRuntime(...);
+const localization = createRuntimeLocalizationPort(runtime);
+\end{CodeBlock}
+
+But render helpers should prefer:
+
+\begin{CodeBlock}
+localization.resolve({
+  key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
+});
+\end{CodeBlock}
+
+over:
+
+\begin{CodeBlock}
+runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' });
+\end{CodeBlock}
+
+\section{Acceptance Criteria}\label{record-195-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} exports a first-class localization port contract.
+\item
+  Runtime lookup helpers stay receiver-independent so app code can pass them around without binding \texttt{t\allowbreak{}h\allowbreak{}i\allowbreak{}s}.
+\item
+  The runtime adapter returns immutable localized objects.
+\item
+  Localized values enforce the portable JSON-shaped catalog boundary with deterministic errors for cyclic graphs, symbol-keyed properties, non-enumerable properties, accessors, class instances, functions, symbols, and bigint values.
+\item
+  Localized objects preserve key, locale, direction, kind, status, value, issues, and facts.
+\item
+  Missing selected-locale translations remain inspectable as missing localization results in non-production posture.
+\item
+  Production fallback remains explicit through fallback catalogs.
+\item
+  DOGFOOD text helpers use the localization port rather than direct runtime string lookups.
+\item
+  DOGFOOD still keeps catalog loading and locale activation at the app composition boundary.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-195-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Port resolution returns a localized object for a translated message.
+\item
+  Port resolution reports fallback status when selected-locale catalogs omit a value and fallback catalogs provide one.
+\item
+  Port resolution reports missing status and marker value when missing-marker policy is enabled.
+\item
+  Resource/data entries return localized object values without converting them to strings.
+\item
+  Localized objects and their issue/fact arrays are immutable.
+\item
+  DOGFOOD text lookup consumes \texttt{L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t} and does not call \texttt{I\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}(\allowbreak{})} directly.
+\end{itemize}
+
+\section{Retrospective}\label{record-195-retrospective}
+
+Not started.
+

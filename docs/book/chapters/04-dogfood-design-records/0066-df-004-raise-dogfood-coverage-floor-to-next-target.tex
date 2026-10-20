@@ -1,0 +1,279 @@
+\chapter{DF-004 --- Raise DOGFOOD Coverage Floor to the Next 5-Point Target}\label{record-066}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md}\par}\smallskip
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-003-enforce-dogfood-coverage-floor.md}{DF-003 --- Enforce DOGFOOD Coverage Floor}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DF-002-expand-dogfood-component-family-coverage.md}{DF-002 --- Expand DOGFOOD Component Family Coverage}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-066-why-this-cycle-exists}
+
+DF-003 made the current DOGFOOD coverage floor executable.
+
+That was necessary, but it still left the honest next step untouched:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD only documents 3 of 35 component families
+\item
+  the enforced floor is 9\%
+\item
+  the next declared target is 14\%
+\end{itemize}
+
+This cycle exists to earn that next target honestly by documenting enough additional component families that the floor can be raised without gaming the metric.
+
+\section{Scope of this cycle}\label{record-066-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  adding enough real DOGFOOD component stories to move coverage from 3 to 5 families
+\item
+  raising the enforced floor from 9\% to 14\%
+\item
+  raising the next declared target from 14\% to 19\%
+\item
+  proving the result through cycle tests and the existing gate script
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  pretending every component now has full docs coverage
+\item
+  changing the canonical family denominator
+\item
+  inventing placeholder stories with no real use/avoid/lowering guidance
+\item
+  broad DOGFOOD shell or navigation redesign
+\end{itemize}
+
+\section{Human users}\label{record-066-human-users}
+
+\subsection{Primary human user}\label{record-066-primary-human-user}
+
+A builder evaluating whether DOGFOOD is becoming meaningfully more complete over time.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  the progress bar and ratio to move for a real reason
+\item
+  newly documented families to be legitimate, not filler
+\item
+  the CI gate to reflect actual content growth
+\end{itemize}
+
+\subsection{Human hill}\label{record-066-human-hill}
+
+A user can see that DOGFOOD is more complete than before, and the reported progress corresponds to real newly documented families they can browse.
+
+\section{Agent users}\label{record-066-agent-users}
+
+\subsection{Primary agent user}\label{record-066-primary-agent-user}
+
+An agent tasked with growing DOGFOOD coverage while preserving honesty.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  an explicit target to hit
+\item
+  a clear smallest honest route to that target
+\item
+  tests that prove the new stories count toward canonical family coverage
+\end{itemize}
+
+\subsection{Agent hill}\label{record-066-agent-hill}
+
+An agent can raise the DOGFOOD floor to the next target only by adding real story coverage that the gate and docs app both recognize.
+
+\section{Human playback}\label{record-066-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user enters DOGFOOD.
+\item
+  The docs pane reports a higher coverage percentage than before.
+\item
+  The higher value corresponds to newly browseable component stories instead of a policy-only change.
+\item
+  The user can open those new stories and see real usage guidance, variants, and lowering notes.
+\end{enumerate}
+
+\section{Agent playback}\label{record-066-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DF-004 cycle doc.
+\item
+  It can see that the target is 14\%, which requires 5 covered families out of the current 35.
+\item
+  It adds real stories for the smallest credible uncovered families.
+\item
+  The cycle tests and gate script both confirm that coverage is now 14\% and the floor can be raised safely.
+\item
+  The next 5-point target is recorded for the following cycle.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-066-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-066-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  the floor must only move after real coverage moves
+\item
+  every newly counted family must have an actual DOGFOOD story with real docs guidance
+\item
+  the gate must reflect the new floor and the next declared target
+\item
+  the denominator must still come from the canonical component-family reference
+\end{itemize}
+
+\section{Implementation outline}\label{record-066-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DF-004 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests that demand:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    14\% coverage
+  \item
+    5 documented families out of 35
+  \item
+    two newly covered family ids
+  \item
+    a raised floor of 14 with a next target of 19
+  \end{itemize}
+\item
+  Add the smallest honest new DOGFOOD stories needed to hit the target.
+\item
+  Update the coverage floor policy and keep the gate green.
+\item
+  Close the cycle and spawn the next ratchet backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-066-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  DOGFOOD coverage resolves to 5 of 35 families and 14\%
+\item
+  the story catalog now covers \texttt{I\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} and \texttt{I\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{} \allowbreak{}c\allowbreak{}u\allowbreak{}e\allowbreak{}s}
+\item
+  the enforced floor is 14 and the next target is 19
+\item
+  the next DOGFOOD backlog item exists
+\end{itemize}
+
+\section{Risks}\label{record-066-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  adding superficial stories that technically count but do not teach
+\item
+  bumping the floor before the content really exists
+\item
+  choosing families that distort the docs app navigation without improving the field guide much
+\end{itemize}
+
+\section{Out of scope}\label{record-066-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  complete DOGFOOD component coverage
+\item
+  localization work
+\item
+  shell interaction redesign
+\item
+  changing the coverage metric itself
+\end{itemize}
+
+\section{Retrospective}\label{record-066-retrospective}
+
+\subsection{What landed}\label{record-066-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new DOGFOOD stories for \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{k\allowbreak{}b\allowbreak{}d\allowbreak{}(\allowbreak{})}
+\item
+  canonical family coverage increased from \texttt{3\allowbreak{}/\allowbreak{}3\allowbreak{}5} to \texttt{5\allowbreak{}/\allowbreak{}3\allowbreak{}5}
+\item
+  DOGFOOD docs coverage now resolves to \texttt{1\allowbreak{}4\allowbreak{}\%}
+\item
+  the enforced floor moved from \texttt{9\allowbreak{}\%} to \texttt{1\allowbreak{}4\allowbreak{}\%}
+\item
+  the next declared target moved from \texttt{1\allowbreak{}4\allowbreak{}\%} to \texttt{1\allowbreak{}9\allowbreak{}\%}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-066-drift-from-ideal}
+
+No material drift.
+
+This cycle stayed intentionally narrow: two honest families, one ratchet step, and no fake breadth.
+
+\subsection{Debt spawned}\label{record-066-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md}{DF-005 --- Raise DOGFOOD Coverage Floor to 19\%}
+\end{itemize}
+

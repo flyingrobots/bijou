@@ -1,0 +1,114 @@
+\chapter{Migrating to Bijou 8.0.0-rc.1}\label{record-273}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/8.0.0/migration-guide.md}\par}\smallskip
+
+This is a release candidate. Pin the exact version; do not use a caret range.
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou@8.0.0-rc.1 \
+            @flyingrobots/bijou-node@8.0.0-rc.1 \
+            @flyingrobots/bijou-tui@8.0.0-rc.1
+\end{CodeBlock}
+
+All workspace packages are versioned in lock-step, so mixing \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} with \texttt{7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} packages is unsupported.
+
+Two breaking changes, both from \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-052-no-color-is-not-a-capability.md}{\texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}2}}. Neither requires a code change for most applications; both change what your application \emph{does} in situations you may not have tested.
+
+\section{\texorpdfstring{1. \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} no longer forces \texttt{'\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}'} mode}{1.  no longer forces  mode}}\label{record-273-no_color-no-longer-forces-pipe-mode}
+
+\subsection{What changed}\label{record-273-what-changed}
+
+\texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})} no longer inspects \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R}. The detection order is now:
+
+\begin{CodeBlock}
+BIJOU_ACCESSIBLE=1  -> 'accessible'
+TERM=dumb           -> 'pipe'
+!stdout.isTTY       -> 'pipe'
+CI                  -> 'static'
+stdout.isTTY        -> 'interactive'
+\end{CodeBlock}
+
+\subsection{Why}\label{record-273-why}
+
+\texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} is a statement about colour. \href{https://no-color.org}{no-color.org} specifies that its presence ``prevents the addition of ANSI color'' and says nothing about cursor addressing or interactivity. Mapping it to \texttt{'\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}'} meant a user who exported \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R\allowbreak{}=\allowbreak{}1} in a shell profile --- common, and reasonable --- lost the entire TUI rather than only its colour: every component lowered to its single-frame form, and \texttt{s\allowbreak{}h\allowbreak{}o\allowbreak{}u\allowbreak{}l\allowbreak{}d\allowbreak{}U\allowbreak{}s\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m\allowbreak{}(\allowbreak{})} began returning \texttt{'\allowbreak{}i\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}'}.
+
+\subsection{\texorpdfstring{What did \emph{not} change}{What did not change}}\label{record-273-what-did-not-change}
+
+Colour output. \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} is read independently by \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})}, and \texttt{i\allowbreak{}s\allowbreak{}N\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}, none of which consult the mode. With \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} set you still get \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}=\allowbreak{}=\allowbreak{}=\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e}, \texttt{i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} returning \texttt{u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d}, and \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})} returning unstyled text.
+
+To be precise about the scope: an interactive session does emit cursor movement, screen updates, and possibly alternate-screen sequences --- it has to, or it is not a TUI. What \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} suppresses is \textbf{colour and style escapes}, which is what it asks for.
+
+\subsection{What you may need to do}\label{record-273-what-you-may-need-to-do}
+
+\textbf{If you relied on \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} to get single-frame output}, say in a script or a log-capturing harness, it no longer does that. Use whichever is accurate:
+
+\begin{CodeBlock}
+// The terminal genuinely cannot do cursor addressing:
+TERM=dumb
+
+// You are capturing output rather than driving a terminal:
+//   redirect stdout — a non-TTY stdout still yields 'pipe'
+
+// You want to force it from inside the app:
+const ctx = { ...createBijou(ports), mode: 'pipe' as const };
+\end{CodeBlock}
+
+\textbf{If you set \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} because you wanted a monochrome TUI}, you now get one. No action needed; this is the fix.
+
+\textbf{If you wrote your own detector to work around this} --- \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}s} and \texttt{m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} both did --- you can delete it. Check that your override does not also encode something else you still want.
+
+\section{2. An unknown status key no longer resolves to a struck-through token}\label{record-273-an-unknown-status-key-no-longer-resolves-to-a-struck-through-token}
+
+\subsection{What changed about the fallback}\label{record-273-what-changed-about-the-fallback}
+
+\texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{})} and \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{})} fall back to \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} instead of \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} when \texttt{k\allowbreak{}e\allowbreak{}y} is not in the theme.
+
+\subsection{Why the fallback moved}\label{record-273-why-the-fallback-moved}
+
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} carries \texttt{[\allowbreak{}'\allowbreak{}d\allowbreak{}i\allowbreak{}m\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}'\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}k\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}g\allowbreak{}h\allowbreak{}'\allowbreak{}]} in every shipped preset. That is reasonable for a token meaning ``retired'' --- and wrong as the answer to ``I don't know this key''. Because \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{})} accepts \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g}, a typo, or a key an application forgot to add to its theme, silently rendered text with a line through it. A reader sees ``cancelled''; the application said nothing of the kind.
+
+The new target matches the sibling \texttt{u\allowbreak{}i\allowbreak{}(\allowbreak{})} accessor, which already falls back to \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}.
+
+\subsection{What you may need to do about the fallback}\label{record-273-what-you-may-need-to-do-about-the-fallback}
+
+\textbf{Probably nothing.} \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} and \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} share a hex in every shipped preset, so the only visible difference is the absence of the strikethrough.
+
+\textbf{If you defined a theme where those two tokens have different hexes}, an unknown key now resolves to the \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d} hex. Check any custom preset.
+
+\textbf{If you were relying on the strikethrough fallback} as a way to spot undefined keys during development, it is gone. It was never a reliable signal --- it only appeared when a code path actually ran. \href{https://github.com/flyingrobots/bijou/issues/521}{\#521} tracks typing the accessors so a missing key becomes a compile error instead.
+
+\texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{}'\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}'\allowbreak{})} itself is unchanged, strikethrough intact.
+
+\section{\texorpdfstring{3. Additive: \texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} reaches all six token groups}{3. Additive:  reaches all six token groups}}\label{record-273-additive-extendtheme-reaches-all-six-token-groups}
+
+Not breaking. \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r} and \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c} join \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, \texttt{u\allowbreak{}i}, \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}, and \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}:
+
+\begin{CodeBlock}
+const theme = extendTheme(BIJOU_DARK, {
+  status: { guarded: tv('#4cc9c3') },
+  border: { primary: tv('#75798d') },     // now possible
+  semantic: { accent: tv('#d6c5ff') },    // now possible
+});
+\end{CodeBlock}
+
+Both are overridable rather than extensible with new keys, because \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} fixes their key sets.
+
+\subsection{Why this matters more than it looks}\label{record-273-why-this-matters-more-than-it-looks}
+
+The shipped presets alias heavily across groups. \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} uses \texttt{\#\allowbreak{}f\allowbreak{}2\allowbreak{}c\allowbreak{}4\allowbreak{}5\allowbreak{}d} for \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}, \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}, \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r}, \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}, \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}o}, \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y} \textbf{and} \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} --- ten tokens, one colour. \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} does the same with \texttt{\#\allowbreak{}7\allowbreak{}a\allowbreak{}5\allowbreak{}2\allowbreak{}0\allowbreak{}0}.
+
+So \texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}A\allowbreak{}R\allowbreak{}K\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{} \allowbreak{}\}\allowbreak{})} replaced your statuses and silently kept that amber for every heading, cursor, and border. If you have done that, your headings are probably the same colour as your \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}. That is not hypothetical --- it is how this was found, at ΔE 0.023 in OKLab, which is indistinguishable.
+
+If you override \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, consider auditing \texttt{u\allowbreak{}i} and \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r} too:
+
+\begin{CodeBlock}
+import { doctorTheme } from '@flyingrobots/bijou';
+console.log(doctorTheme(myTheme, { maxColorReuse: 2 }));
+\end{CodeBlock}
+
+Note that \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} checks contrast and reuse but not perceptual separation under colour-vision deficiency --- see \href{https://github.com/flyingrobots/bijou/issues/520}{\#520} --- and that the shipped presets do not currently satisfy it (\href{https://github.com/flyingrobots/bijou/issues/519}{\#519}).
+
+\section{Reporting rc feedback}\label{record-273-reporting-rc-feedback}
+
+This candidate exists to find out what these two changes break in real applications. Please file against \href{https://github.com/flyingrobots/bijou/issues/518}{\#518} or open a new issue with the \texttt{l\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} label.
+

@@ -1,0 +1,199 @@
+\chapter{WF-136 Respecting the Dojo Ratchet To 2018}\label{record-218}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-136-respecting-dojo-ratchet-2018.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-136 Respecting the Dojo Ratchet To 2018
+legend: WF
+lane: bad-code
+priority: high
+github_issue: 377
+status: complete
+keywords:
+  - code-dojo
+  - eslint
+  - standards
+  - ratchet
+  - respectful-repo
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/legends/WF-workflow-delivery.md}{WF - Workflow and Delivery}
+
+\section{Linked Work}\label{record-218-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue: \href{https://github.com/flyingrobots/bijou/issues/377}{\#377}
+\item
+  Standards artifact: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/typescript-code-standards.editors-edition.md}{TypeScript Code Standards Editor's Edition}
+\item
+  Exception ledger: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/code-dojo-exceptions.md}{Code Dojo Exceptions}
+\end{itemize}
+
+\section{Decision Summary}\label{record-218-decision-summary}
+
+WF-135 merged with aggregate Code Dojo debt at \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}6\allowbreak{}8}, including \texttt{1\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6} type-aware ESLint findings. The standing goal remains zero ESLint errors, zero Code Dojo issues, and zero files violating length restrictions. The current goalpost policy requires every met goalpost to remove at least 50 counted violations until the repository reaches zero.
+
+This cycle targets the next ratchet: lower aggregate debt from \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}6\allowbreak{}8} to \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}8} or lower without weakening rules, excluding files, or raising any baseline.
+
+\section{Sponsored Human}\label{record-218-sponsored-human}
+
+A maintainer wants each follow-on Dojo slice to keep earning the standards instead of letting the post-1000 burndown stall at a still-large exception ledger.
+
+\section{Sponsored Agent}\label{record-218-sponsored-agent}
+
+An agent needs a narrow, mechanically reviewable target that clears the next 50-count ratchet while avoiding broad edits to the largest DOGFOOD files.
+
+\section{Hill}\label{record-218-hill}
+
+Reduce aggregate Code Dojo debt from \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}6\allowbreak{}8} to \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}8} or lower by eliminating the current \texttt{5\allowbreak{}3} ESLint findings in:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} (\texttt{2\allowbreak{}1} findings)
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} (\texttt{2\allowbreak{}0} findings)
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} (\texttt{1\allowbreak{}2} findings)
+\end{itemize}
+
+\section{Scope}\label{record-218-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Replace unsafe \texttt{a\allowbreak{}n\allowbreak{}y} and unsafe assertion handoffs with explicit message, command, and worker-data contracts.
+\item
+  Replace non-null assertions around worker IPC with local parent-port guards.
+\item
+  Replace DAG renderer array assumptions with direct iteration, guarded reads, and explicit string formatting.
+\item
+  Replace preference-list index assertions with value iteration and remove the dead height assignment.
+\item
+  Keep worker-thread, DAG rendering, and preference-list behavior stable.
+\item
+  Lower \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} only after live counts prove the reduction.
+\end{itemize}
+
+\section{Non-Goals}\label{record-218-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Leave the 5,000-line DOGFOOD app untouched in this slice.
+\item
+  Keep ESLint rules at full strength; no softening, disabling, or narrowing.
+\item
+  Preserve existing file/context and code-size ceilings.
+\item
+  Preserve worker lifecycle semantics instead of changing them for static-analysis convenience.
+\end{itemize}
+
+\section{Current Evidence}\label{record-218-current-evidence}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{e\allowbreak{}c\allowbreak{}9\allowbreak{}4\allowbreak{}3\allowbreak{}7\allowbreak{}0\allowbreak{}6}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}6\allowbreak{}8}
+\item
+  ESLint findings: \texttt{1\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}3}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}3}
+\item
+  code-size baseline: \texttt{5\allowbreak{}6}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target: \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}8} or lower
+\end{itemize}
+
+Focused ESLint findings:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+{F\allowbreak{}i\allowbreak{}l\allowbreak{}e}
+ & \begin{minipage}[b]{\linewidth}\raggedleft
+{F\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {2\allowbreak{}1} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {2\allowbreak{}0} \\
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} & {1\allowbreak{}2} \\
+\textbf{{T\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}l}} & \textbf{{5\allowbreak{}3}} \\
+\end{longtable}
+}
+
+\section{Playback Questions}\label{record-218-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is aggregate Code Dojo debt at \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}8} or lower?
+\item
+  Does the stored ESLint baseline match the new live count?
+\item
+  Have file/context and code-size debt held or shrunk?
+\item
+  Do focused worker, DAG renderer, and preference-list tests pass?
+\item
+  Are the repo gates passing before review?
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-218-tests-to-write-first}
+
+The lint findings are the RED signal for pure type-safety rewrites. Add focused regression tests before changing worker lifecycle behavior, message routing, DAG rendering behavior, or preference-list layout.
+
+\section{Acceptance Criteria}\label{record-218-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} has zero ESLint findings.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} has zero ESLint findings.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} has zero ESLint findings.
+\item
+  Aggregate Code Dojo debt is \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}8} or lower.
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} records the lower live ESLint count.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} report the lower ceiling.
+\item
+  Focused validation for the touched worker, DAG renderer, and preference-list surfaces passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} pass before review.
+\end{itemize}
+
+\section{Retrospective}\label{record-218-retrospective}
+
+Completed with aggregate Code Dojo debt reduced from \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}6\allowbreak{}8} to \texttt{2\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}5} (\texttt{-\allowbreak{}5\allowbreak{}3}). The stored ESLint baseline now records \texttt{1\allowbreak{},\allowbreak{}6\allowbreak{}0\allowbreak{}3} live findings, down from \texttt{1\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6}, and the next aggregate target is \texttt{1\allowbreak{},\allowbreak{}9\allowbreak{}6\allowbreak{}5} or lower.
+
+The implementation cleaned the targeted worker IPC and component rendering files:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} now reads worker data through a typed guard, narrows \texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t} once, and validates raw worker IPC messages before dispatching them into proxy I/O handlers.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s} keeps worker-data validation out of the already-baselined worker runtime file.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} now iterates rendered graphemes and layer arrays without non-null assertions and formats accessible counts explicitly.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} now iterates value, description, section, row, and output character arrays directly without assertion-based indexing.
+\end{itemize}
+
+Touched file/context budgets held or shrank: \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} is now \texttt{3\allowbreak{}1\allowbreak{}8} lines / \texttt{1\allowbreak{}0\allowbreak{},\allowbreak{}6\allowbreak{}7\allowbreak{}6} bytes against a \texttt{3\allowbreak{}3\allowbreak{}4} / \texttt{1\allowbreak{}1\allowbreak{},\allowbreak{}4\allowbreak{}9\allowbreak{}6} baseline, \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} is now \texttt{6\allowbreak{}9\allowbreak{}2} lines / \texttt{2\allowbreak{}5\allowbreak{},\allowbreak{}0\allowbreak{}3\allowbreak{}9} bytes against a \texttt{6\allowbreak{}9\allowbreak{}3} / \texttt{2\allowbreak{}5\allowbreak{},\allowbreak{}0\allowbreak{}8\allowbreak{}8} baseline, and \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} is now \texttt{4\allowbreak{}2\allowbreak{}0} lines / \texttt{1\allowbreak{}3\allowbreak{},\allowbreak{}8\allowbreak{}7\allowbreak{}6} bytes against a \texttt{4\allowbreak{}2\allowbreak{}5} / \texttt{1\allowbreak{}4\allowbreak{},\allowbreak{}2\allowbreak{}4\allowbreak{}9} baseline.
+

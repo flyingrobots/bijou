@@ -1,0 +1,92 @@
+\chapter{What's New in Bijou 7.1.0}\label{record-282}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/7.1.0/whats-new.md}\par}\smallskip
+
+Bijou 7.1.0 is a focused post-V7 minor release. It does not try to become the full V8 Runtime Graph product. Instead, it makes the first portable UI proof chain inspectable, adds a real DOGFOOD GraphQL block fixture, tightens theme and terminal-rendering behavior, and gives release prep better executable guardrails.
+
+\section{Runtime Graph And Scene IR Proofs}\label{record-282-runtime-graph-and-scene-ir-proofs}
+
+The core package now exposes the first \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} runtime contract for portable Bijou UI proof. The seed includes deterministic scene hashing, structural receipts, node/action/binding/token/i18n validation, visible-cell source-map facts, terminal lowering receipts, and lower modes for inspecting node, token, and localization state.
+
+This is the first committed step toward a product-grade Runtime Graph lane: a Bijou surface can be described semantically, lowered deterministically, and verified without treating screenshots as the only evidence.
+
+\section{GraphQL-Authored Blocks}\label{record-282-graphql-authored-blocks}
+
+Bijou now has a constrained GraphQL authoring path for block artifacts:
+
+\begin{CodeBlock}
+GraphQL SDL
+  -> bijou-block/1
+    -> ui-scene-ir/1
+      -> terminal Surface proof
+      -> graphql-bijou-block-debug/1 facts
+\end{CodeBlock}
+
+\texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} and \texttt{l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}o\allowbreak{}U\allowbreak{}i\allowbreak{}S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} turn SDL into a stable \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact and a portable scene. Group directives, grouped field membership, semantic source anchors, token refs, i18n fallback facts, actions, bindings, lower modes, and debug summaries are all part of the proof surface.
+
+The release also checks in a real DOGFOOD NavigationListBlock GraphQL fixture, so the proof path is no longer only synthetic.
+
+\section{Theme Tokens, Modes, And Inspector Work}\label{record-282-theme-tokens-modes-and-inspector-work}
+
+The design-token lane is more concrete:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} creates immutable dark/light theme definitions.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{})} and \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f\allowbreak{}(\allowbreak{})} preserve semantic color facts.
+\item
+  \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}A\allowbreak{}R\allowbreak{}K} and \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}L\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}T} are first-party presets.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} records reusable contrast pair matrices.
+\item
+  DOGFOOD uses a high-contrast shell theme family with explicit dark and light modes.
+\item
+  The Theme Lab page and \texttt{F\allowbreak{}1\allowbreak{}0} Theme Inspector expose token swatches, color reuse diagnostics, and safe-pair diagnostics.
+\end{itemize}
+
+These pieces make theme behavior easier to inspect and harder to fake with one-off color strings.
+
+\section{Raster-To-Glyph And Title Surface Polish}\label{record-282-raster-to-glyph-and-title-surface-polish}
+
+The TUI package now includes deterministic raw-RGBA-to-\texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} rendering with ASCII, Braille, and quad modes. DOGFOOD uses that pipeline for release-title art, the V7 Launch Wake title surface, and image-to-glyph side-app previews.
+
+The side app opened by \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}i\allowbreak{}m\allowbreak{}g} or \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}e\allowbreak{}r} can preview SVG, PNG, and PPM/PNM files, pan and zoom the view, switch glyph modes, preserve sampled colors, tune Braille contrast, and enable deterministic ordered dithering.
+
+\section{DOGFOOD And Terminal Fixes}\label{record-282-dogfood-and-terminal-fixes}
+
+Several release-review fixes landed in the same release window:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal resize and display-resume repaint now invalidates the front buffer so blank cells repaint immediately after geometry changes
+\item
+  DOGFOOD Blocks navigation lets Up move from the first Block Preview child back to the parent row
+\item
+  ANSI foreground/background resets now honor scoped \texttt{3\allowbreak{}9} and \texttt{4\allowbreak{}9} resets without leaking colors into following labels
+\item
+  the quit confirmation modal no longer duplicates its controls
+\item
+  the DOGFOOD title perf HUD stays on the title screen and reports current frame timing
+\end{itemize}
+
+\section{Release Guardrails}\label{record-282-release-guardrails}
+
+The release process is stricter and more replayable:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} prints a milestone report and blocks incomplete release prep before running the full local gauntlet
+\item
+  DOGFOOD i18n debt discovery now scans \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} modules by default, with explicit tooling-only exclusions
+\item
+  release evidence packets are now required for versioned releases
+\item
+  the roadmap, bearing, and release runbook now describe the forward-looking V7.1/V8/V9 release posture
+\end{itemize}
+
+The practical result is a release that is easier to inspect: users get new portable proof primitives and DOGFOOD fixture evidence, and maintainers get better release gates before tags are cut.
+

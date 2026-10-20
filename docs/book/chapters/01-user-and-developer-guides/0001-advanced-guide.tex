@@ -1,0 +1,303 @@
+\chapter{Advanced Guide --- Bijou}\label{record-001}
+
+\noindent{\footnotesize\color{BookMuted}\path{ADVANCED_GUIDE.md}\par}\smallskip
+
+This is the second-track manual for Bijou.
+
+\begin{center}
+\resizebox{\linewidth}{!}{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (S1) at (-5.0,0.0) {Surface Definition / @flyingrobots/bijou (Foundation)};
+\node[box] (S2) at (0.0,0.0) {Component Rendering / @flyingrobots/bijou (Foundation)};
+\node[box] (T1) at (0.0,-2.6) {Layout Stage / @flyingrobots/bijou-tui (Engine)};
+\node[box] (T2) at (0.0,-5.2) {Paint Stage / @flyingrobots/bijou-tui (Engine)};
+\node[box] (T3) at (0.0,-7.800000000000001) {Post-Process Shaders / @flyingrobots/bijou-tui (Engine)};
+\node[box] (T4) at (0.0,-10.4) {Diffing Layer / @flyingrobots/bijou-tui (Engine)};
+\node[box] (N1) at (0.0,-13.0) {ANSI Emission / @flyingrobots/bijou-node (Host)};
+\node[box] (N2) at (5.0,0.0) {Worker Orchestration / @flyingrobots/bijou-node (Host)};
+\draw[edge,] (S2) to (T1);
+\draw[edge,] (T1) to (T2);
+\draw[edge,] (T2) to (T3);
+\draw[edge,] (T3) to (T4);
+\draw[edge,] (T4) to (N1);
+\end{tikzpicture}}
+\end{center}
+
+Use the root \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/README.md}{README} and the package \texttt{G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} files when you want the productive-fast path. Use this guide when you need the deeper doctrine, the proving surfaces, or the repo workflows that sit behind the public quick starts.
+
+\section{What Belongs Here}\label{record-001-what-belongs-here}
+
+This guide is for topics like:
+
+\begin{itemize}
+\tightlist
+\item
+  bytes-only internal rendering rules and explicit string boundaries
+\item
+  shell doctrine and \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} ownership
+\item
+  programmable pipeline, shaders, paint, transforms, and middleware seams
+\item
+  DOGFOOD as the canonical proving surface
+\item
+  performance and soak workflows
+\item
+  localization workflows and bidirectionality posture
+\item
+  worker/runtime boundaries and scripted capture
+\item
+  smoke, PTY, canary, and release-readiness expectations
+\end{itemize}
+
+\section{Reading Order}\label{record-001-reading-order}
+
+Use this sequence when you need repo-truth beyond the quick path:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/README.md}{Root README} for the package map and public posture.
+\item
+  Read the package guide you are actively using.
+\item
+  Read the matching package \texttt{A\allowbreak{}D\allowbreak{}V\allowbreak{}A\allowbreak{}N\allowbreak{}C\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Use DOGFOOD, the performance docs, and the strategy/spec docs as the proving surfaces for the subsystem you are touching.
+\end{enumerate}
+
+\section{Package Lanes}\label{record-001-package-lanes}
+
+\begin{itemize}
+\tightlist
+\item
+  Core advanced work: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/ADVANCED_GUIDE.md}{packages/bijou/ADVANCED\_GUIDE.md}
+\item
+  Runtime advanced work: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\item
+  Node/runtime-boundary work: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/ADVANCED_GUIDE.md}{packages/bijou-node/ADVANCED\_GUIDE.md}
+\item
+  Localization runtime: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n/README.md}{packages/bijou-i18n/README.md}
+\item
+  Localization tooling: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools/README.md}{packages/bijou-i18n-tools/README.md}
+\item
+  Filesystem exchange tooling: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools-node/README.md}{packages/bijou-i18n-tools-node/README.md}
+\item
+  Spreadsheet exchange tooling: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools-xlsx/README.md}{packages/bijou-i18n-tools-xlsx/README.md}
+\end{itemize}
+
+\section{Rendering Doctrine}\label{record-001-rendering-doctrine}
+
+The core rendering posture is simple:
+
+\begin{itemize}
+\tightlist
+\item
+  structured terminal UI should stay on the \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path
+\item
+  strings are explicit boundary output, not the internal runtime model
+\item
+  themes, backgrounds, and shell chrome should resolve to bytes before the hot render loop, not by reparsing strings every frame
+\item
+  lowering back to text is allowed, but it should happen deliberately at the boundary
+\end{itemize}
+
+Start here when that doctrine matters:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/ADVANCED_GUIDE.md}{packages/bijou/ADVANCED\_GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/perf/RE-017-byte-pipeline.md}{Byte-Pipeline Recovery}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/low-allocation-renderer.md}{Low-Allocation Renderer}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/rendering-pipeline.spec.json}{Rendering Pipeline Spec}
+\end{itemize}
+
+\section{Shells, DOGFOOD, And Proving Apps}\label{record-001-shells-dogfood-and-proving-apps}
+
+DOGFOOD is not a side example. It is the canonical human-facing docs and shell proving surface for the repo.
+
+Use these docs when you are shaping shell behavior, shell-owned overlays, settings, notification review, or documentation posture:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOGFOOD.md}{DOGFOOD}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/dogfood.md}{DOGFOOD strategy note}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/humane-shell.md}{Humane Shell}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/settings-belong-to-the-shell.md}{Settings Belong To The Shell}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/notification-history-belongs-to-the-shell.md}{Notification History Belongs To The Shell}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\end{itemize}
+
+Useful proving surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/docs/app.ts}{examples/docs/app.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/release-workbench/main.ts}{examples/release-workbench/main.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/scripts/docs-preview.test.ts}{scripts/docs-preview.test.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts}{tests/cycles/RE-017/frame-shell-theme-dogfood-demo.test.ts}
+\end{itemize}
+
+\section{Pipeline, Shaders, Painting, And Transforms}\label{record-001-pipeline-shaders-painting-and-transforms}
+
+If you are touching frame-to-frame rendering, post-process effects, or shader behavior, do not stop at the API entrypoints. Read the doctrine and the implementation seams together.
+
+Start here:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{Layout Localization Pipeline}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/pipeline/pipeline.ts}{packages/bijou-tui/src/pipeline/pipeline.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/pipeline/middleware/paint.ts}{paint middleware}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/pipeline/middleware/motion.ts}{motion middleware}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/pipeline/middleware/css.ts}{css middleware}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/pipeline/middleware/grayscale.ts}{grayscale middleware}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/transition-shaders.ts}{transition shaders}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/shader-v2.spec.json}{Shader V2 Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/BACKLOG/inbox/DX-008-render-pipeline-guide.md}{Render Pipeline guide backlog note}
+\end{itemize}
+
+\section{Performance And Soak Work}\label{record-001-performance-and-soak-work}
+
+Bijou treats performance as a product surface, not as a cleanup pass.
+
+The current performance and soak lane is spread across:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/perf-gradient/main.ts}{examples/perf-gradient/main.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/src/core/components/perf-overlay.ts}{perf overlay}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/perf/RE-017-byte-pipeline.md}{Byte-Pipeline Recovery}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/releases/4.4.0/whats-new.md}{4.4.0 release notes}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/BACKLOG/cool-ideas/DX-006-debug-performance-overlay-component.md}{Debug Performance Overlay Component}
+\end{itemize}
+
+That is the lane to read when you are investigating hot-loop cost, proving a new optimization, or deciding whether a feature belongs in the runtime, middleware, or shell.
+
+\section{Localization And I18n Workflows}\label{record-001-localization-and-i18n-workflows}
+
+Localization is not only string substitution. The repo posture includes directionality, shell copy, proving surfaces, and exchange workflows.
+
+Start here:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/localization-and-bidirectionality.md}{Localization and Bidirectionality}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{Layout Localization Pipeline}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n/README.md}{packages/bijou-i18n/README.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools/README.md}{packages/bijou-i18n-tools/README.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools-node/README.md}{packages/bijou-i18n-tools-node/README.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-i18n-tools-xlsx/README.md}{packages/bijou-i18n-tools-xlsx/README.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/LX-001-bijou-i18n-runtime-package.md}{LX-001 runtime package design}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/LX-002-bijou-i18n-tools-package.md}{LX-002 tooling package design}
+\end{itemize}
+
+When validating localization work, also look at the proving surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/docs/app.ts}{examples/docs/app.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/scripts/docs-preview.test.ts}{scripts/docs-preview.test.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/tests/cycles/LX-008/localized-shell-and-dogfood.test.ts}{tests/cycles/LX-008/localized-shell-and-dogfood.test.ts}
+\end{itemize}
+
+\section{Runtime Boundaries, Workers, And Capture}\label{record-001-runtime-boundaries-workers-and-capture}
+
+If the question is about Node ownership, worker threads, recorder flows, or how Bijou crosses the runtime boundary, read the Node lane directly:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/ADVANCED_GUIDE.md}{packages/bijou-node/ADVANCED\_GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/worker-runtime.spec.json}{worker runtime spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-worker/README.md}{examples/v3-worker/README.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-worker/main.ts}{examples/v3-worker/main.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-worker/record.ts}{examples/v3-worker/record.ts}
+\end{itemize}
+
+\section{Testing, PTY, And Release Proof}\label{record-001-testing-pty-and-release-proof}
+
+The advanced bar in Bijou is not ``unit tests only.'' Real proof usually spans:
+
+\begin{itemize}
+\tightlist
+\item
+  deterministic package tests
+\item
+  DOGFOOD/docs preview tests
+\item
+  PTY or canary smoke coverage
+\item
+  release-readiness and release-preflight
+\item
+  targeted performance probes when render-path work changes
+\end{itemize}
+
+Useful anchors:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/scripts/smoke-canaries.ts}{scripts/smoke-canaries.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/scripts/smoke-dogfood.test.ts}{scripts/smoke-dogfood.test.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/scripts/docs-preview.test.ts}{scripts/docs-preview.test.ts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/release.md}{docs/release.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/release-runbook.md}{docs/method/release-runbook.md}
+\end{itemize}
+
+\section{Rule Of Thumb}\label{record-001-rule-of-thumb}
+
+If the public \texttt{G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} got you productive, stay there.
+
+If you are asking ``how does the shell own this,'' ``where should this render-path decision live,'' ``how do we prove this in DOGFOOD,'' or ``what workflow keeps this truthful across runtime modes,'' you are in \texttt{A\allowbreak{}D\allowbreak{}V\allowbreak{}A\allowbreak{}N\allowbreak{}C\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E} territory.
+

@@ -1,0 +1,140 @@
+\chapter{DX-022 Layout Inspector Overlay}\label{record-122}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-022-layout-inspector-overlay.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-022 Layout Inspector Overlay
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-122-framing}
+
+Layout and overlay issues are hard to inspect in situ. Bijou now retains enough runtime geometry that pane bounds, clipping, scroll regions, focus ownership, and z-layer ordering should not stay invisible during development.
+
+DX-022 adds a first-party layout inspector overlay. The first slice is a pure surface helper: apps or framed shells can pass the retained regions they already know about and get a visible overlay plus a plain text report.
+
+\section{Sponsored Users}\label{record-122-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  App authors debugging split panes, clipped viewports, and mouse hit regions.
+\item
+  Maintainers investigating shell focus or overlay layering regressions.
+\item
+  Agent workflows that need a text report of layout truth without screenshot inspection.
+\end{itemize}
+
+\section{Hills}\label{record-122-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A developer can composite an inspector over any surface and see region borders, ids, and dimensions without changing the app layout itself.
+\item
+  A maintainer can mark one region as focused and visually distinguish it from sibling regions.
+\item
+  A test can ask for a text report that includes rects, clip rects, scroll offsets, focus, and layer ordering.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-122-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the overlay draw region bounds on top of an existing surface?
+\item
+  Does the overlay clip labels and borders to the target surface dimensions?
+\item
+  Does focused geometry stand out from non-focused geometry?
+\item
+  Does the text report preserve region ids, roles, rects, clips, scroll offsets, focus, and layers?
+\item
+  Does \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} export the inspector API from the source barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-122-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}(\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})} helper.
+\item
+  Add a \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} helper.
+\item
+  Support region \texttt{i\allowbreak{}d}, \texttt{r\allowbreak{}e\allowbreak{}c\allowbreak{}t}, optional \texttt{r\allowbreak{}o\allowbreak{}l\allowbreak{}e}, optional \texttt{c\allowbreak{}l\allowbreak{}i\allowbreak{}p}, optional \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l}, optional \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d}, and optional \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}.
+\item
+  Draw only within the background surface bounds.
+\item
+  Keep the helper independent of \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} internals so raw runtime apps can use it too.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-122-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused tests fail before implementation and pass after.
+\item
+  The overlay draws borders and labels for visible regions.
+\item
+  The overlay clips off-screen regions without throwing.
+\item
+  The text report includes all supplied geometry facts.
+\item
+  Docs and changelog describe the helper.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-122-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep drawing intentionally simple: ASCII borders, compact labels, and explicit text reports are more useful in debug output than elaborate chrome.
+\end{itemize}
+
+\section{Drift Check}\label{record-122-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed on the first pure helper slice. The runtime did not grow a global toggle, because callers can now compose the inspector over any retained geometry they already own.
+\item
+  The implementation accepts both debug-friendly \texttt{\{\allowbreak{} \allowbreak{}x\allowbreak{},\allowbreak{} \allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{} \allowbreak{}\}} rectangles and Bijou-native \texttt{\{\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{} \allowbreak{}\}} rectangles. That keeps the public helper ergonomic without forcing app-frame internals into the design contract.
+\item
+  Styling stayed out of the first pass. Plain ASCII borders make the overlay stable in tests, logs, and pipe captures.
+\end{itemize}
+
+\section{Playback}\label{record-122-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}(\allowbreak{})} draws clipped borders and compact labels over an existing surface.
+\item
+  Focused regions are distinguishable through the \texttt{*} label prefix.
+\item
+  Off-screen regions clip to the target surface instead of throwing.
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} emits ids, roles, rects, clip rects, scroll offsets, focus, and layer facts as deterministic text.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} exports the new API from the source barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-122-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  This is useful as a small diagnostic primitive rather than a shell feature. Apps can opt in during tests, demos, or debug modes without changing runtime ownership.
+\item
+  The native \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}t} mismatch was caught by package typecheck after the RED tests went green. Accepting both shapes is the right boundary behavior: app-frame can pass retained layout rects directly, while external tests can use x/y terminology.
+\end{itemize}
+

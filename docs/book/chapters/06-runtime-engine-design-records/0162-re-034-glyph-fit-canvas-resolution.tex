@@ -1,0 +1,147 @@
+\chapter{RE-034 Glyph-Fit Canvas Resolution}\label{record-162}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-034-glyph-fit-canvas-resolution.md}\par}\smallskip
+
+\section{Sponsored Users}\label{record-162-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Terminal app builders rendering shader-authored logos, minimaps, raytraced previews, and procedural diagrams.
+\item
+  Users whose terminals render Braille poorly or whose app style calls for solid, hatch, line, diagonal, or ASCII glyphs.
+\item
+  Agents migrating app-local cell reducers into reusable Bijou primitives.
+\end{itemize}
+
+\section{Problem}\label{record-162-problem}
+
+\texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} can collapse 2x4 coverage samples into a geometry-aware glyph, but \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} only exposes \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{q\allowbreak{}u\allowbreak{}a\allowbreak{}d}, and \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} resolution modes. Apps that want non-Braille high-resolution shader output still need to sample subpixels themselves, aggregate colors themselves, and call \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} outside the canvas pipeline.
+
+That duplicates the same sampling and style aggregation logic that already lives in \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+
+\section{Hills}\label{record-162-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can render a shader through \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} and receive a fitted cell glyph instead of Braille.
+\item
+  A builder can choose Unicode candidate fitting or ASCII density fitting through canvas options.
+\item
+  An agent can point to one canvas path for high-resolution sampling, color aggregation, and glyph collapse.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-162-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}'} sample all eight 2x4 subpixels?
+\item
+  Does diagonal coverage choose a diagonal Unicode glyph through the existing \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} candidate set?
+\item
+  Does \texttt{g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}F\allowbreak{}i\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}'\allowbreak{} \allowbreak{}\}} stay inside the ASCII density ramp?
+\item
+  Are subpixel foreground/background colors still averaged like the Braille and Quad paths?
+\end{enumerate}
+
+\section{Requirements}\label{record-162-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Extend \texttt{C\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} with \texttt{g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h}.
+\item
+  Add \texttt{g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}F\allowbreak{}i\allowbreak{}t\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}F\allowbreak{}i\allowbreak{}t\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} to \texttt{C\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}.
+\item
+  Reuse \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} rather than creating a second candidate scorer.
+\item
+  Reuse existing high-resolution color aggregation helpers.
+\item
+  Preserve existing \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{q\allowbreak{}u\allowbreak{}a\allowbreak{}d}, and \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} behavior.
+\item
+  Keep \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} available as a standalone helper.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-162-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  RED tests cover Unicode diagonal glyph fitting through \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})}.
+\item
+  RED tests cover ASCII glyph fitting through \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})}.
+\item
+  RED tests prove fitted glyph cells retain averaged RGB style.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passes.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passes.
+\end{itemize}
+
+\section{Design}\label{record-162-design}
+
+Add a \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} sibling to the existing Quad and Braille renderers. It samples a 2x4 grid, builds row-major coverage values, accumulates style from every sample, asks \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} for the output character, and writes one cell.
+
+Coverage defaults to \texttt{1} for non-space shader output and \texttt{0} for space output. Shaders may return a cell with explicit \texttt{c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e} when they want fractional samples for density or anti-aliasing experiments.
+
+\section{RED}\label{record-162-red}
+
+Initial RED run:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} failed because \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}'} was ignored by \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})}.
+\item
+  The diagonal test observed zero shader calls, the ASCII test received a blank cell, and the RGB averaging test received no \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B}.
+\end{itemize}
+
+\section{GREEN}\label{record-162-green}
+
+\texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} now accepts \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}'} and \texttt{g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}F\allowbreak{}i\allowbreak{}t} options. The new renderer samples 2x4 coverage, accumulates subpixel styles, collapses coverage through \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})}, and writes the fitted glyph through the existing cell write path.
+
+\texttt{S\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l} now allows optional fractional \texttt{c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e} for apps that want anti-aliased glyph fitting instead of boolean non-space samples.
+
+\section{Drift Check}\label{record-162-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passed with 21 tests.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passed.
+\end{itemize}
+
+\section{Playback}\label{record-162-playback}
+
+Playback answers:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{} \allowbreak{}2\allowbreak{}x\allowbreak{}4\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{}g\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e} proves the shader is called eight times for one terminal cell.
+\item
+  The same test proves diagonal coverage chooses \texttt{╱} through the existing Unicode candidate set.
+\item
+  \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}A\allowbreak{}S\allowbreak{}C\allowbreak{}I\allowbreak{}I\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}p} proves \texttt{g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}F\allowbreak{}i\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}'\allowbreak{} \allowbreak{}\}} stays in the ASCII ramp.
+\item
+  \texttt{a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s} proves glyph-fit rendering keeps the same color aggregation behavior as Braille and Quad.
+\end{enumerate}
+
+\section{Retrospective}\label{record-162-retrospective}
+
+The right boundary was to promote the reducer into \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} without removing the standalone \texttt{f\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}G\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}(\allowbreak{})} helper. Apps can now choose a complete canvas mode for common shader output, while still using the helper directly for custom pipelines.
+

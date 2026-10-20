@@ -1,0 +1,249 @@
+\chapter{DF-001 --- Show DOGFOOD Coverage Progress}\label{record-064}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-001-show-dogfood-coverage-progress.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+\section{Why this cycle exists}\label{record-064-why-this-cycle-exists}
+
+We want to release Bijou without pretending DOGFOOD is already a complete reference.
+
+The honest answer is not to block release forever. It is to make DOGFOOD visibly truthful about its current documentation coverage.
+
+This cycle exists to put that truth directly into the initial docs experience:
+
+\begin{itemize}
+\tightlist
+\item
+  a progress indicator
+\item
+  an explicit ratio
+\item
+  a defensible denominator tied to the canonical component-family reference
+\end{itemize}
+
+\section{Scope of this cycle}\label{record-064-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  a canonical DOGFOOD coverage metric based on documented component families
+\item
+  mapping current DOGFOOD stories onto that coverage model
+\item
+  a docs-pane progress bar and ratio
+\item
+  tests that prove the landing surface reflects real coverage instead of a hand-wavy claim
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  expanding story coverage itself
+\item
+  claiming feature completeness
+\item
+  a broader release-management dashboard
+\item
+  automatic release gating
+\end{itemize}
+
+\section{Human users}\label{record-064-human-users}
+
+\subsection{Primary human user}\label{record-064-primary-human-user}
+
+A user opening DOGFOOD to decide how complete and trustworthy the field guide currently is.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  a clear signal that DOGFOOD is still in progress
+\item
+  an honest coverage ratio
+\item
+  enough context to understand that the metric is about documented component families
+\end{itemize}
+
+\subsection{Human hill}\label{record-064-human-hill}
+
+A user can open DOGFOOD and immediately see that it is a living field guide with explicit progress, not a silently incomplete reference pretending to be finished.
+
+\section{Agent users}\label{record-064-agent-users}
+
+\subsection{Primary agent user}\label{record-064-primary-agent-user}
+
+An agent maintaining DOGFOOD story coverage over time.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  a stable coverage model
+\item
+  a defensible denominator
+\item
+  a way to add stories later and have the landing progress move automatically
+\end{itemize}
+
+\subsection{Agent hill}\label{record-064-agent-hill}
+
+An agent can add or remove DOGFOOD story coverage and see the docs-pane progress update from real source data rather than manual copy edits.
+
+\section{Human playback}\label{record-064-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user launches DOGFOOD.
+\item
+  The landing screen shows the normal hero treatment.
+\item
+  The initial docs content pane shows a progress bar and ratio for current DOGFOOD documentation coverage.
+\item
+  The user understands that DOGFOOD is in progress and can see how much of the canonical family map is currently covered.
+\end{enumerate}
+
+\section{Agent playback}\label{record-064-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DF-001 cycle doc.
+\item
+  It sees that the denominator is the canonical component-family reference, not a vague export count.
+\item
+  It runs the cycle and app tests.
+\item
+  It can verify that the docs-pane copy and progress bar are driven from real story coverage data.
+\item
+  It can point to the next backlog item for actually expanding coverage.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-064-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-064-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD must not imply fuller coverage than it actually has
+\item
+  the coverage denominator must be explicit and stable
+\item
+  adding story coverage later should update the progress metric automatically
+\item
+  the title screen must not present documentation coverage as though it were a loading state
+\item
+  the docs-pane coverage UI must remain secondary to the primary onboarding content
+\end{itemize}
+
+\section{Implementation outline}\label{record-064-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create a DOGFOOD legend and coverage-focused cycle doc.
+\item
+  Define the canonical coverage denominator from the design-system component-family reference.
+\item
+  Map current DOGFOOD stories onto that family coverage model.
+\item
+  Write failing cycle and app tests for the new landing progress treatment.
+\item
+  Render a progress bar and ratio in the initial docs content pane.
+\item
+  Close the cycle and spawn the next DOGFOOD coverage backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-064-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  DOGFOOD coverage resolves from canonical family reference data
+\item
+  the initial docs content surface shows the coverage ratio and percent
+\item
+  the next DOGFOOD backlog item exists
+\end{itemize}
+
+\section{Risks}\label{record-064-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  choosing a denominator that feels arbitrary or magical
+\item
+  making the title screen feel like a loading screen when it is actually a title screen
+\item
+  hardcoding a number that will drift the moment a new story lands
+\end{itemize}
+
+\section{Out of scope}\label{record-064-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  story authoring for additional families
+\item
+  docs completeness gating in CI
+\item
+  release automation
+\end{itemize}
+
+\section{Retrospective}\label{record-064-retrospective}
+
+\subsection{What landed}\label{record-064-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  a new DOGFOOD legend
+\item
+  a real coverage model based on canonical component families
+\item
+  story-to-family coverage mapping
+\item
+  a docs-pane progress bar and ratio that update from the current story set
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-064-drift-from-ideal}
+
+This cycle does not improve DOGFOOD coverage itself.
+
+That is intentional. The goal here is honesty first, not pretending that a progress indicator is the same thing as documentation work.
+
+\subsection{Debt spawned}\label{record-064-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DF-002-expand-dogfood-component-family-coverage.md}{DF-002 --- Expand DOGFOOD Component Family Coverage}
+\end{itemize}
+

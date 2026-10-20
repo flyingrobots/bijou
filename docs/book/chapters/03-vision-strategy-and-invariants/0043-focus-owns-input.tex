@@ -1,0 +1,32 @@
+\chapter{Focus Owns Input}\label{record-043}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/focus-owns-input.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-043-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+\end{itemize}
+
+The active thing should own the controls.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  inactive panes should not respond to active-pane controls
+\item
+  shell overlays and modal layers preempt underlying content
+\item
+  visible focus styling should correspond to real input ownership
+\item
+  help and footer hints should reflect the active input region
+\end{itemize}
+

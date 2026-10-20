@@ -1,0 +1,99 @@
+\chapter{Background fill regression in v4.4.0}\label{record-410}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/feedback/think-bg-fill-regression-v4.4.0.md}\par}\smallskip
+
+\textbf{Reporter:} Think repo (downstream consumer) \textbf{Bijou version:} 4.4.0 (worked in 4.2.0) \textbf{Date:} 2026-04-11
+
+\section{What broke}\label{record-410-what-broke}
+
+The Think browse TUI uses \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} + \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} with a custom theme that sets a plum background (\#2d1922). After upgrading from bijou 4.2.0 to 4.4.0, the background fill no longer renders --- the terminal shows a plain black background instead of the themed plum.
+
+\section{RE-017 workaround context}\label{record-410-re-017-workaround-context}
+
+Think has a standing workaround (RE-017) for ``frame doesn't fill surface.primary.bg''. Before calling \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})}, Think writes a raw ANSI escape to set the terminal background color:
+
+\begin{CodeBlock}
+process.stdout.write(`\x1b[48;2;${BG[0]};${BG[1]};${BG[2]}m`);
+await run(app, { ctx });
+\end{CodeBlock}
+
+This workaround worked on bijou 4.2.0 but stopped working on 4.4.0.
+
+\section{Suspected cause}\label{record-410-suspected-cause}
+
+The v4.4.0 zero-alloc frame chrome changes (\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}B\allowbreak{}C\allowbreak{}S\allowbreak{}S} repaint-in-place for header/footer) may have changed how the frame clears or fills the screen on entry, overriding the pre-set terminal background color.
+
+\section{How to reproduce}\label{record-410-how-to-reproduce}
+
+Minimal reproduction:
+
+\begin{CodeBlock}
+import { createBijou } from '@flyingrobots/bijou';
+import { nodeRuntime, nodeIO, chalkStyle } from '@flyingrobots/bijou-node';
+import { createFramedApp, run } from '@flyingrobots/bijou-tui';
+import { tv } from '@flyingrobots/bijou';
+
+const theme = {
+  name: 'repro',
+  surface: {
+    primary: { hex: '#fffcc9', bg: '#2d1922' },   // cream on dark plum
+    secondary: { hex: '#fffcc9', bg: '#3a2230' },
+    elevated: { hex: '#fffcc9', bg: '#46293a' },
+    overlay: { hex: '#fffcc9', bg: '#2d1922' },
+    muted: { hex: '#7b5770', bg: '#1e1018' },
+  },
+  semantic: {
+    accent: tv('#41b797'),
+    muted: tv('#7b5770'),
+    primary: tv('#fffcc9', ['bold']),
+  },
+  status: {},
+  border: { primary: tv('#7b5770') },
+  ui: {},
+};
+
+const ctx = createBijou({
+  runtime: nodeRuntime(),
+  io: nodeIO(),
+  style: chalkStyle(),
+  theme,
+});
+
+const app = createFramedApp({
+  pages: [{
+    id: 'test',
+    title: 'BG TEST',
+    init: () => [{ text: 'Hello' }, []],
+    update: (msg, model) => [model, []],
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'main',
+      render: (w, h) => model.text,
+    }),
+  }],
+});
+
+// RE-017 workaround: set terminal bg before run()
+process.stdout.write('\x1b[48;2;45;25;34m');
+
+await run(app, { ctx });
+\end{CodeBlock}
+
+\textbf{Expected:} Terminal background is dark plum (\#2d1922). \textbf{Actual on 4.4.0:} Terminal background is black. \textbf{Actual on 4.2.0:} Terminal background is dark plum (correct).
+
+\section{What should happen}\label{record-410-what-should-happen}
+
+The framed app should fill the terminal with the theme's primary background color, or at minimum the RE-017 pre-set bg should survive the \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} initialization.
+
+\section{Files in Think}\label{record-410-files-in-think}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}j\allowbreak{}s} --- RE-017 workaround at line 85
+\item
+  \texttt{s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s} --- full theme definition with plum bg
+\item
+  \texttt{s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s} --- palette with bg: {[}45, 25, 34{]}
+\end{itemize}
+

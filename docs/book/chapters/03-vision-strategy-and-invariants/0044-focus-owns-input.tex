@@ -1,0 +1,552 @@
+\chapter{Focus Owns Input}\label{record-044}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/focus-owns-input.md}\par}\smallskip
+
+\emph{Design note for pane-scoped input in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+\section{Why this exists}\label{record-044-why-this-exists}
+
+The first DOGFOOD docs shell exposed a real shell problem, not just a docs-app bug:
+
+\begin{itemize}
+\tightlist
+\item
+  visual focus can move to a different pane
+\item
+  the active pane can change in shell state
+\item
+  but page-wide bindings still handle keys as if nothing changed
+\end{itemize}
+
+That makes the app feel dishonest. If the right pane is focused and the left pane still reacts to arrow keys, the shell is lying about where input goes.
+
+This is not only a docs concern. Any multi-pane framed app will eventually want the same thing:
+
+\begin{itemize}
+\tightlist
+\item
+  the active area should own local controls
+\item
+  inactive areas should stop responding
+\item
+  shell overlays and modal layers should still preempt lower layers
+\item
+  mouse focus and keyboard focus should follow the same model
+\end{itemize}
+
+The right place to solve that is the standard app frame.
+
+\section{Design-thinking frame}\label{record-044-design-thinking-frame}
+
+\subsection{Primary user}\label{record-044-primary-user}
+
+The primary user is the \textbf{workspace builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  a developer building a multi-pane TUI with \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  someone who expects pane focus to mean something operational, not just visual
+\item
+  someone who does not want to cram every local interaction into one page-global \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Which area owns my keys right now?''
+\item
+  ``If focus moves, do the controls move with it?''
+\item
+  ``Will the shell still keep command palette, help, and tab management coherent?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-044-secondary-user}
+
+The secondary user is the \textbf{framework maintainer / docs author}:
+
+\begin{itemize}
+\tightlist
+\item
+  they need the shell to express local controls honestly
+\item
+  they need the help surface to describe the currently active area
+\item
+  they need mouse and keyboard behavior to align instead of drifting apart
+\end{itemize}
+
+\subsection{Jobs to be done}\label{record-044-jobs-to-be-done}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Help me trust focus.} When the shell highlights a pane as active, local input should target that pane and not a hidden sibling.
+\item
+  \textbf{Help me compose local interactions safely.} I want pane-local key and mouse behavior without rewriting the shell or creating one enormous page keymap.
+\item
+  \textbf{Help me keep shell behavior coherent.} Global shell actions like help, palette, tab switching, and modal capture should still work consistently.
+\item
+  \textbf{Help me explain the app truthfully.} The help surface should reflect the active area's local bindings, not stale page-wide assumptions.
+\end{enumerate}
+
+\section{Hills}\label{record-044-hills}
+
+\subsection{Hill 1 --- Focus means ownership}\label{record-044-hill-1-focus-means-ownership}
+
+When a user moves focus inside a framed app, the active area owns the next local interaction. Inactive panes do not keep responding as if they were still active.
+
+\subsection{Hill 2 --- Shell layers still win}\label{record-044-hill-2-shell-layers-still-win}
+
+Help, command palette, and modal capture continue to preempt lower layers. Local pane input should feel powerful, not anarchic.
+
+\subsection{Hill 3 --- Authors declare areas, not routing spaghetti}\label{record-044-hill-3-authors-declare-areas-not-routing-spaghetti}
+
+App authors should be able to declare pane-scoped input near the pane definition instead of encoding a whole workspace's behavior inside one page-global keymap.
+
+\section{The current problem}\label{record-044-the-current-problem}
+
+Today \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} already tracks:
+
+\begin{itemize}
+\tightlist
+\item
+  the active page
+\item
+  the focused pane per page
+\item
+  pane-local scroll positions
+\item
+  shell overlays like help and command palette
+\end{itemize}
+
+But it still routes most custom keyboard input through:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+\item
+  \texttt{C\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}s}
+\end{itemize}
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  focus affects scrolling, not input ownership
+\item
+  page-level bindings can keep mutating the wrong pane
+\item
+  help can only talk about shell/global/page bindings, not the active pane
+\item
+  mouse focus and keyboard routing are only partially aligned
+\end{itemize}
+
+The DOGFOOD docs shell is just the first visible symptom:
+
+\begin{itemize}
+\tightlist
+\item
+  focus can move to the variants pane
+\item
+  but the family lane still responds to arrow keys because the page keymap is still global
+\end{itemize}
+
+\section{Principles}\label{record-044-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Focus should imply local input ownership} If the shell says a pane is active, pane-local controls should route there.
+\item
+  \textbf{Layering should stay explicit} Shell overlays and modals must remain above pane input.
+\item
+  \textbf{Keyboard and mouse should share one focus model} Click-to-focus and key-based focus should activate the same local area.
+\item
+  \textbf{The frame should own the stack} Apps should declare local input sources. The frame should synthesize the routing model internally.
+\item
+  \textbf{Tests are the spec} The first implementation step is failing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} tests that describe routing truthfully.
+\end{enumerate}
+
+\section{Proposed concept}\label{record-044-proposed-concept}
+
+The philosophy is:
+
+\begin{quote}
+\textbf{Focus owns input.}
+\end{quote}
+
+In practical shell terms:
+
+\begin{itemize}
+\tightlist
+\item
+  the focused pane contributes a local input layer
+\item
+  when focus moves, that layer is replaced
+\item
+  inactive panes no longer receive local keys
+\item
+  shell overlays/modals still sit above pane-local behavior
+\end{itemize}
+
+The frame should manage this as an internal input stack, even if the first public API stays simple and declarative.
+
+\section{Proposed v0 API shape}\label{record-044-proposed-v0-api-shape}
+
+The first public step should stay pane-scoped and explicit:
+
+\begin{CodeBlock}
+interface FrameInputArea<PageModel, Msg> {
+  readonly paneId: string;
+  readonly keyMap?: KeyMap<Msg>;
+  readonly helpSource?: BindingSource;
+  readonly mouse?: (args: {
+    readonly msg: MouseMsg;
+    readonly model: PageModel;
+    readonly rect: LayoutRect;
+  }) => Msg | undefined;
+}
+
+interface FramePage<PageModel, Msg> {
+  // existing fields...
+  readonly inputAreas?: (model: PageModel) => readonly FrameInputArea<PageModel, Msg>[];
+}
+\end{CodeBlock}
+
+Why this shape:
+
+\begin{itemize}
+\tightlist
+\item
+  it stays close to the existing \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}I\allowbreak{}d}-based frame layout model
+\item
+  it does not force apps to manually manage an \texttt{I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  it leaves room for a richer future stack model without throwing away the first API
+\end{itemize}
+
+\section{Internal routing model}\label{record-044-internal-routing-model}
+
+\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} should internally synthesize a layered routing model from its existing shell state plus any active input areas.
+
+\subsection{Conceptual layers}\label{record-044-conceptual-layers}
+
+From highest priority to lowest:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Shell modal layers}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    help
+  \item
+    command palette
+  \item
+    future shell-owned overlays that capture input
+  \end{itemize}
+\item
+  \textbf{Page modal layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    existing \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+  \end{itemize}
+\item
+  \textbf{Frame shell layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tab switching
+  \item
+    pane cycling
+  \item
+    shell help/palette open
+  \item
+    shell scroll actions that intentionally target the focused pane
+  \end{itemize}
+\item
+  \textbf{Focused pane layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}s} entry whose \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}I\allowbreak{}d} matches the currently focused pane
+  \end{itemize}
+\item
+  \textbf{Page/global fallback layers}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    existing \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+  \item
+    existing \texttt{g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}s}
+  \end{itemize}
+\end{enumerate}
+
+The exact ordering of page/global/frame conflicts should preserve the spirit of the existing \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y} option:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}'} means shell bindings still win over page-derived bindings
+\item
+  \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}'} means page-derived bindings win before shell fallbacks
+\end{itemize}
+
+For v0, the focused pane should count as \textbf{page-derived}, not as a shell layer.
+
+\section{Mouse model}\label{record-044-mouse-model}
+
+Mouse should follow the same ownership concept.
+
+\subsection{v0 expectations}\label{record-044-v0-expectations}
+
+\begin{itemize}
+\tightlist
+\item
+  clicking inside a focusable pane focuses it first
+\item
+  after focus is updated, pane-local mouse handling can run for that pane
+\item
+  wheel scrolling over a pane focuses it and scrolls the hovered/focused pane
+\item
+  shell chrome and shell-owned overlays still intercept first
+\end{itemize}
+
+This keeps mouse support additive and consistent with the keyboard model instead of becoming a parallel routing system.
+
+\section{Help and discoverability}\label{record-044-help-and-discoverability}
+
+The help surface should become more truthful once pane-local input exists.
+
+For v0:
+
+\begin{itemize}
+\tightlist
+\item
+  the short help strip should continue to show shell-level controls first
+\item
+  the full help view should merge the active pane's \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} into the current binding view
+\item
+  inactive pane bindings should not be shown as if they are currently usable
+\end{itemize}
+
+This is a real product value of the feature, not just a nice-to-have.
+
+\section{Scope}\label{record-044-scope}
+
+\subsection{In scope for v0}\label{record-044-in-scope-for-v0}
+
+\begin{itemize}
+\tightlist
+\item
+  pane-scoped key handling in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  pane-scoped mouse handling in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  shell-managed focus-to-input ownership
+\item
+  help integration for the active pane
+\item
+  migration of the DOGFOOD docs shell as a proving surface
+\end{itemize}
+
+\subsection{Out of scope for v0}\label{record-044-out-of-scope-for-v0}
+
+\begin{itemize}
+\tightlist
+\item
+  arbitrary nested input graphs beyond framed panes
+\item
+  full public \texttt{I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k} authoring inside frame apps
+\item
+  generalized interactive-component protocol
+\item
+  animation work on the DOGFOOD landing hero
+\item
+  redesigning every shell binding or every scroll primitive
+\end{itemize}
+
+\section{Tests are the spec}\label{record-044-tests-are-the-spec}
+
+The first implementation step should be failing tests in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} and the docs preview tests.
+
+\subsection{Minimum acceptance tests}\label{record-044-minimum-acceptance-tests}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Focused pane keymaps only fire for the active pane}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If the variants pane is focused, local arrow bindings in the family pane do not fire.
+  \end{itemize}
+\item
+  \textbf{Changing focus replaces the active pane layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Tabbing or clicking into a different pane immediately changes which pane-local bindings are active.
+  \end{itemize}
+\item
+  \textbf{Page modal capture still blocks pane input}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Existing \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p} behavior remains stronger than pane-local bindings.
+  \end{itemize}
+\item
+  \textbf{Shell modal capture still blocks pane input}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Help and command palette continue to preempt lower layers.
+  \end{itemize}
+\item
+  \textbf{Shell bindings remain coherent}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Frame-level commands like pane cycling or help toggle still work while pane-local input exists.
+  \end{itemize}
+\item
+  \textbf{Pane-local mouse handlers only run for the focused/targeted pane}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    A click in one pane does not invoke another pane's local handler.
+  \end{itemize}
+\item
+  \textbf{Help reflects the active pane}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The full help surface shows the active pane's bindings instead of stale page-global guidance.
+  \end{itemize}
+\item
+  \textbf{DOGFOOD regression}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    In the docs shell, focusing the variants pane stops arrow keys from moving the family accordion.
+  \end{itemize}
+\end{enumerate}
+
+\section{Recommended implementation loop}\label{record-044-recommended-implementation-loop}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Write the shell tests first}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Add focused-pane keyboard routing tests to \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    Add a docs-preview regression that encodes the current broken behavior
+  \end{itemize}
+\item
+  \textbf{Add pane-scoped input areas to \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Start with declarative \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})}
+  \item
+    Keep all existing page/global APIs working
+  \end{itemize}
+\item
+  \textbf{Synthesize the active layer in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Resolve the focused pane
+  \item
+    Insert the active area into the internal routing order
+  \end{itemize}
+\item
+  \textbf{Wire help to the active pane}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Merge \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} from the focused area into the shell help surface
+  \end{itemize}
+\item
+  \textbf{Add mouse support to the same model}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Click-to-focus
+  \item
+    wheel-to-focus-and-scroll
+  \item
+    pane-local click dispatch after shell interception
+  \end{itemize}
+\item
+  \textbf{Migrate DOGFOOD}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Move its lane controls out of one page-global keymap and into pane-scoped areas
+  \end{itemize}
+\item
+  \textbf{Only then evaluate a richer public stack model}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If the abstraction proves out, consider whether framed apps should later expose a more direct layer/stack contract
+  \end{itemize}
+\end{enumerate}
+
+\section{Open questions}\label{record-044-open-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Should \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}s} eventually support non-pane regions inside a pane, or is pane scope enough for the first public step?
+\item
+  Should the active pane's bindings appear in the short help strip, or only in the full help overlay?
+\item
+  Should a pane-local keymap be able to override shell scroll keys like \texttt{j\allowbreak{}/\allowbreak{}k}, or should those remain shell-reserved in v0?
+\item
+  Should the internal routing eventually use the existing public \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} implementation directly, or keep a lighter frame-specific dispatcher?
+\end{enumerate}
+
+\section{Recommendation}\label{record-044-recommendation}
+
+Do \textbf{not} implement this as a docs-only fix.
+
+The docs shell merely surfaced the problem. The right solution is a frame-shell feature with the docs app as the first proving ground.
+

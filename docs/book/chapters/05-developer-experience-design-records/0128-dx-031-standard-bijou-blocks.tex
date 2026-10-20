@@ -1,0 +1,4468 @@
+\chapter{DX-031 Standard Bijou Blocks}\label{record-128}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-031-standard-bijou-blocks.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-031 Standard Bijou Blocks
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\emph{Cycle for declaring reusable app-building blocks that compose Bijou components into standard, inspectable surface patterns}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-025-component-metadata-contract.md}{DX-025 - Component Metadata Contract}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-031F-block-tree-rendering.md}{DX-031F - Block Tree Rendering}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-028-story-capture-matrix.md}{DF-028 - Story Capture Matrix}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-029-fixture-to-docs-promotion-path.md}{DF-029 - Fixture-to-Docs Promotion Path}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md}{RE-035}
+\end{itemize}
+
+\section{Why This Cycle Exists}\label{record-128-why-this-cycle-exists}
+
+Bijou has many capable components, but app builders still need to assemble common surfaces by hand: shells, readers, inspectors, command palettes, settings, modal stacks, notifications, and authentication flows.
+
+Blocks standardize those common compositions without turning them into new primitives.
+
+A block is a named composition of Bijou components with a documented layout, focus, input, mode-lowering, and semantic contract. Blocks are the layer a builder reaches for when they want to build an app quickly without re-deciding the same shell and workflow patterns every time.
+
+\section{Boundary}\label{record-128-boundary}
+
+\begin{itemize}
+\tightlist
+\item
+  Blocks compose primitives.
+\item
+  Blocks expose slots and semantic facts.
+\item
+  Blocks lower across interactive, static, pipe, and accessible modes.
+\item
+  Blocks do not mutate layout directly.
+\item
+  Blocks do not replace RE layout primitives.
+\item
+  Blocks do not become a hidden window manager.
+\end{itemize}
+
+\section{Relationship To RE-035}\label{record-128-relationship-to-re-035}
+
+Blocks depend on layout truth, but they do not define it.
+
+Each block should compile into ordinary visible nodes with mandatory layout envelopes. The block owns composition, slot names, default behavior, and semantic facts. The layout engine owns constraints, preferences, assigned rectangles, and explanations.
+
+That keeps the boundary simple:
+
+\begin{itemize}
+\tightlist
+\item
+  blocks choose what app surface exists
+\item
+  layout chooses where each visible node fits
+\item
+  focus and input consume retained layout facts
+\item
+  renderers paint assigned rectangles
+\item
+  modes lower semantic block facts
+\end{itemize}
+
+\section{Runtime Truth Vs App Truth}\label{record-128-runtime-truth-vs-app-truth}
+
+Blocks must preserve a hard boundary between primitive runtime truth and semantic app truth.
+
+Primitive runtime truth belongs to RE and adjacent runtime layers:
+
+\begin{itemize}
+\tightlist
+\item
+  layout envelope
+\item
+  constraints
+\item
+  preferences
+\item
+  assigned rectangles
+\item
+  fit policy
+\item
+  focus regions
+\item
+  hit regions
+\item
+  viewport facts
+\item
+  layer order
+\item
+  command and effect facts
+\end{itemize}
+
+Semantic app truth belongs to blocks and app code:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}s}
+\item
+  \texttt{C\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w}
+\item
+  \texttt{D\allowbreak{}a\allowbreak{}s\allowbreak{}h\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}
+\item
+  \texttt{T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  domain entities, statuses, actions, and relationships
+\end{itemize}
+
+The dependency direction only goes one way:
+
+\begin{itemize}
+\tightlist
+\item
+  semantic blocks compile into primitive runtime truth
+\item
+  runtime primitives do not learn product, commerce, docs, or chat semantics
+\item
+  app semantics do not mutate runtime geometry directly
+\item
+  inspectors may relate both layers, but must label which layer they explain
+\end{itemize}
+
+This prevents business semantics from leaking into the layout engine and keeps runtime primitives from becoming app-shaped.
+
+\section{Human Users / Jobs / Hill}\label{record-128-human-users-jobs-hill}
+
+\subsection{Primary Human Users}\label{record-128-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  App builders assembling Bijou tools from common surface patterns.
+\item
+  DOGFOOD maintainers turning docs, inspectors, settings, and command surfaces into reusable examples.
+\item
+  Component authors who need a standard target for real-world composition stories.
+\end{itemize}
+
+\subsection{Human Jobs}\label{record-128-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Pick a block for a common app surface instead of starting from blank layout.
+\item
+  Fill named slots with app-owned content.
+\item
+  Trust the block's default focus, input, responsive, and mode-lowering behavior.
+\item
+  Inspect how a block composes lower-level components.
+\end{enumerate}
+
+\subsection{Human Hill}\label{record-128-human-hill}
+
+A builder can create a useful Bijou app shell with navigation, content, settings, help, notifications, and modal behavior by composing documented blocks instead of hand-rolling every surface.
+
+\section{Agent Users / Jobs / Hill}\label{record-128-agent-users-jobs-hill}
+
+\subsection{Primary Agent Users}\label{record-128-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Agents generating Bijou app scaffolds.
+\item
+  Agents upgrading examples into DOGFOOD stories.
+\item
+  Agents explaining how an app surface is composed.
+\end{itemize}
+
+\subsection{Agent Jobs}\label{record-128-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Select an appropriate block from a stable catalog.
+\item
+  Fill required slots and avoid unsupported private layout behavior.
+\item
+  Generate tests against block contracts instead of snapshot-only output.
+\item
+  Preserve semantic facts when lowering to pipe and accessible modes.
+\end{enumerate}
+
+\subsection{Agent Hill}\label{record-128-agent-hill}
+
+An agent can inspect a block definition, identify its slots and mode behavior, and generate type-safe app code that uses the block without inventing new layout or input conventions.
+
+\section{Accessibility / Assistive Posture}\label{record-128-accessibility-assistive-posture}
+
+Blocks must preserve semantic meaning when visual chrome lowers away.
+
+Every standard block should identify:
+
+\begin{itemize}
+\tightlist
+\item
+  named regions
+\item
+  active item or selected entity, when relevant
+\item
+  available actions
+\item
+  validation or warning facts
+\item
+  modal or focus-trap state, when relevant
+\item
+  whether hidden visual content remains available in accessible mode
+\end{itemize}
+
+Auth blocks must never expose secrets in accessible, pipe, static, or diagnostic output.
+
+\section{Localization / Directionality Posture}\label{record-128-localization-directionality-posture}
+
+Blocks should describe layout in logical terms and inherit direction from the host context unless a block explicitly owns a local direction boundary.
+
+The first catalog should avoid physical left/right naming in slot contracts. For example:
+
+\begin{itemize}
+\tightlist
+\item
+  use \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} instead of \texttt{l\allowbreak{}e\allowbreak{}f\allowbreak{}t\allowbreak{}N\allowbreak{}a\allowbreak{}v}
+\item
+  use \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r} instead of \texttt{r\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e}
+\item
+  use \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} and \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} instead of button order names
+\end{itemize}
+
+Text, bidi, and locale-specific formatting stay outside this first blocks cycle, but block slots must not make later localization harder.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-128-agent-inspectability-explainability-posture}
+
+Blocks should be inspectable as data before rendering. An agent should be able to answer:
+
+\begin{itemize}
+\tightlist
+\item
+  which block is this?
+\item
+  which slots are required?
+\item
+  which slots are filled?
+\item
+  which lower-level components does it compose?
+\item
+  what semantic facts does it expose?
+\item
+  how does it lower by mode?
+\item
+  what are the expected focus and action surfaces?
+\end{itemize}
+
+The first implementation should prefer metadata and story captures over snapshot-only proof.
+
+\section{Linked Invariants}\label{record-128-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Block Contract}\label{record-128-block-contract}
+
+Every standard block should declare:
+
+\begin{itemize}
+\tightlist
+\item
+  purpose
+\item
+  required slots
+\item
+  optional slots
+\item
+  variants
+\item
+  configurable options
+\item
+  composed components
+\item
+  layout posture
+\item
+  focus posture
+\item
+  input posture
+\item
+  responsive posture
+\item
+  mode-lowering posture
+\item
+  accessibility facts
+\item
+  examples and story ids
+\item
+  tests that define the contract
+\end{itemize}
+
+The eventual metadata can align with \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})} and story capture records, but this cycle starts by standardizing the human-readable catalog.
+
+The entity relationship is:
+
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
+\node[classbox] (BlockPackageManifest) at (0,0) {\textbf{BlockPackageManifest}\\[-2pt]\rule{\linewidth}{.3pt}\\packageName\\version\\bijouPeerRange};
+\node[classbox] (BlockDefinition) at (4.7,0) {\textbf{BlockDefinition}\\[-2pt]\rule{\linewidth}{.3pt}\\metadata\\render};
+\node[classbox] (BlockMetadata) at (9.4,0) {\textbf{BlockMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
+\node[classbox] (SchemaBoundBlock) at (4.7,-3.5) {\textbf{SchemaBoundBlock}\\[-2pt]\rule{\linewidth}{.3pt}\\schema\\bind};
+\node[classbox] (BlockSchemaAdapter) at (0,-3.5) {\textbf{BlockSchemaAdapter}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\parse};
+\draw[rel,{Diamond[length=2mm]}-] (BlockPackageManifest) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {exports / 1 : 1..*} (BlockDefinition);
+\draw[rel,{Diamond[length=2mm]}-] (BlockDefinition) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {describes / 1 : 1} (BlockMetadata);
+\draw[rel,{Diamond[length=2mm]}-] (SchemaBoundBlock) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {wraps / 1 : 1} (BlockDefinition);
+\draw[rel,{Diamond[length=2mm]}-] (SchemaBoundBlock) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {validates / 1 : 1} (BlockSchemaAdapter);
+\end{tikzpicture}}
+\par\smallskip{\small\color{BookMuted}Definition and schema ownership}
+\end{center}
+
+\clearpage
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
+\node[classbox] (BlockMetadata) at (0,-7.5) {\textbf{BlockMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
+\node[classbox] (BlockSlot) at (7,0) {\textbf{BlockSlot}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\required\\description};
+\node[classbox] (BlockVariantMetadata) at (7,-2.5) {\textbf{BlockVariantMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
+\node[classbox] (BlockConfigOption) at (7,-5) {\textbf{BlockConfigOption}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\kind\\required};
+\node[classbox] (ComposedComponent) at (7,-7.5) {\textbf{ComposedComponent}\\[-2pt]\rule{\linewidth}{.3pt}\\componentId};
+\node[classbox] (OutputMode) at (7,-10) {\textbf{OutputMode}\\[-2pt]\rule{\linewidth}{.3pt}\\mode};
+\node[classbox] (SemanticFact) at (7,-12.5) {\textbf{SemanticFact}\\[-2pt]\rule{\linewidth}{.3pt}\\kind\\key};
+\node[classbox] (StoryCapture) at (7,-15) {\textbf{StoryCapture}\\[-2pt]\rule{\linewidth}{.3pt}\\storyId};
+\draw[rel,{Diamond[length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {required slots / 1 : 1..*\\optional slots / 1 : 0..*} (BlockSlot);
+\draw[rel,{Diamond[length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {variants / 1 : 0..*} (BlockVariantMetadata);
+\draw[rel,{Diamond[length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {config / 1 : 0..*} (BlockConfigOption);
+\draw[rel,{Diamond[open,length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {composes / 1 : 0..*} (ComposedComponent);
+\draw[rel,{Diamond[length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {lowers to / 1 : 1..*} (OutputMode);
+\draw[rel,{Diamond[length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {exposes / 1 : 0..*} (SemanticFact);
+\draw[rel,{Diamond[open,length=2mm]}-] (BlockMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {proves / 1 : 0..*} (StoryCapture);
+\end{tikzpicture}}
+\par\smallskip{\small\color{BookMuted}Slots, lowerings and proof metadata}
+\end{center}
+\clearpage
+
+\clearpage
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[classbox/.style={draw=BookHeading,fill=BookPanel,line width=.6pt,rounded corners=1.5pt,text width=37mm,align=left,inner sep=5pt,font=\scriptsize},rel/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.6pt}]
+\node[classbox] (BlockVariantMetadata) at (0,0) {\textbf{BlockVariantMetadata}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\name\\purpose};
+\node[classbox] (BlockSlot) at (-3,-3.5) {\textbf{BlockSlot}\\[-2pt]\rule{\linewidth}{.3pt}\\id\\required\\description};
+\node[classbox] (SemanticFact) at (3,-3.5) {\textbf{SemanticFact}\\[-2pt]\rule{\linewidth}{.3pt}\\kind\\key};
+\draw[rel,{Diamond[length=2mm]}-] (BlockVariantMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {variant slots / 1 : 0..*} (BlockSlot);
+\draw[rel,{Diamond[length=2mm]}-] (BlockVariantMetadata) to node[midway,fill=white,inner sep=2pt,font=\scriptsize,text=BookMuted,align=center] {variant facts / 1 : 0..*} (SemanticFact);
+\end{tikzpicture}}
+\par\smallskip{\small\color{BookMuted}Variant-specific slots and facts}
+\end{center}
+\clearpage
+
+Block package manifests expose definitions. Block metadata owns the contract. Variants, config, modes, semantic facts, and story captures hang off the block instead of being inferred from rendered output.
+
+Metadata sketch:
+
+\begin{CodeBlock}
+type BlockScale =
+  | 'app'
+  | 'workspace'
+  | 'section'
+  | 'panel'
+  | 'control'
+  | 'inline'
+  | 'item'
+  | 'data'
+  | 'diagnostic'
+  | 'overlay';
+
+interface BlockMetadataDocs {
+  readonly summary: string;
+  readonly useWhen?: readonly string[];
+  readonly avoidWhen?: readonly string[];
+  readonly relatedDocs?: readonly string[];
+}
+
+interface BlockSlot {
+  readonly id: string;
+  readonly label?: string;
+  readonly required?: boolean;
+  readonly description?: string;
+}
+
+interface BlockMetadata {
+  readonly packageName: string;
+  readonly blockName: string;
+  readonly family: string;
+  readonly scale: BlockScale;
+  readonly modes: readonly ('interactive' | 'static' | 'pipe' | 'accessible')[];
+  readonly docs: BlockMetadataDocs;
+  readonly sourcePath?: string;
+  readonly slots: readonly BlockSlot[];
+  readonly variants?: readonly BlockVariantMetadata[];
+  readonly configOptions?: readonly BlockConfigOption[];
+  readonly composedComponents?: readonly string[];
+  readonly semanticFacts?: readonly ModeLoweringFact[];
+  readonly storyIds?: readonly string[];
+  readonly examples?: readonly BlockExample[];
+  readonly tags?: readonly string[];
+}
+
+interface BlockVariantMetadata {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly requiredSlots?: readonly string[];
+  readonly optionalSlots?: readonly string[];
+  readonly facts?: readonly ModeLoweringFact[];
+}
+
+interface BlockConfigOption {
+  readonly id: string;
+  readonly label?: string;
+  readonly kind: 'boolean' | 'enum' | 'number' | 'string' | 'adapter';
+  readonly required?: boolean;
+  readonly description?: string;
+  readonly values?: readonly string[];
+}
+
+interface BlockExample {
+  readonly id: string;
+  readonly label: string;
+  readonly path?: string;
+  readonly command?: string;
+}
+
+type DeepReadonly<T> = T extends readonly (infer Item)[]
+  ? readonly DeepReadonly<Item>[]
+  : T extends object
+    ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+    : T;
+
+type BlockSchemaResult<Data> =
+  | { readonly ok: true; readonly data: DeepReadonly<Data> }
+  | { readonly ok: false; readonly issues: readonly BlockSchemaIssue[] };
+
+interface BlockSchemaIssue {
+  readonly severity: 'info' | 'warning' | 'error';
+  readonly code: string;
+  readonly message: string;
+  readonly path?: string;
+}
+
+interface BlockSchemaDescription {
+  readonly requiredFields?: readonly string[];
+  readonly optionalFields?: readonly string[];
+  readonly redactedFields?: readonly string[];
+  readonly facts?: readonly ModeLoweringFact[];
+}
+
+interface BlockDefinition<Config = unknown> {
+  readonly metadata: BlockMetadata;
+  readonly data?: ViewDataContract;
+  readonly commands?: readonly CommandIntent[];
+  readonly render: (input: BlockRenderInput<Config>) => BlockRenderResult;
+}
+
+interface BlockSchemaAdapter<Data> {
+  readonly id: string;
+  readonly parse: (input: unknown) => BlockSchemaResult<Data>;
+  readonly describe?: () => BlockSchemaDescription;
+}
+
+interface SchemaBoundBlockDefinition<Data, Config = unknown> {
+  readonly block: BlockDefinition<Config>;
+  readonly schema: BlockSchemaAdapter<Data>;
+  readonly bind: (
+    data: DeepReadonly<Data>,
+  ) => BlockRenderInput<Config> | {
+    readonly input: BlockRenderInput<Config>;
+    readonly facts?: readonly ModeLoweringFact[];
+  };
+}
+
+interface BlockPackageManifest {
+  readonly packageName: string;
+  readonly version: string;
+  readonly bijouPeerRange: string;
+  readonly blocks: readonly string[];
+  readonly docs?: readonly string[];
+  readonly tags?: readonly string[];
+}
+
+declare function defineBlock<Config>(
+  definition: BlockDefinition<Config>,
+): BlockDefinition<Config>;
+
+declare function validateBlockMetadata(
+  metadata: BlockMetadata,
+): BlockMetadataReport;
+
+declare function blockMetadataSummary(metadata: BlockMetadata): string;
+
+declare function defineSchemaBlock<Data, Config>(
+  definition: SchemaBoundBlockDefinition<Data, Config>,
+): SchemaBoundBlockDefinition<Data, Config>;
+
+declare function bindSchemaBlockInput<Data, Config>(
+  block: SchemaBoundBlockDefinition<Data, Config>,
+  input: unknown,
+): {
+  readonly ok: true;
+  readonly input: BlockRenderInput<Config>;
+  readonly facts: readonly ModeLoweringFact[];
+} | {
+  readonly ok: false;
+  readonly issues: readonly BlockSchemaIssue[];
+  readonly facts: readonly ModeLoweringFact[];
+};
+
+declare function defineBlockPackage(
+  manifest: BlockPackageManifest,
+): BlockPackageManifest;
+\end{CodeBlock}
+
+DX-031A lands this as a public metadata-first API in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+
+DX-031B Schema-Bound Blocks lands the schema adapter layer as a public boundary contract in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. Schema-bound blocks validate boundary data before producing block render input or binding facts. They do not fetch, subscribe, dispatch, compose runtime views, or render AppShell. The important boundary is that a block and its schema are described before rendering, and their slots, semantic facts, and validation facts are visible to tests, docs, DOGFOOD, and agents.
+
+\section{Public Block API And Distribution}\label{record-128-public-block-api-and-distribution}
+
+Blocks should become a user-facing Bijou API, not an internal DOGFOOD-only catalog.
+
+The public API should let Bijou users and community authors:
+
+\begin{itemize}
+\tightlist
+\item
+  define a block with typed metadata and a render function
+\item
+  validate block metadata before publishing
+\item
+  attach examples, story captures, and mode-lowering facts
+\item
+  package one or more blocks for reuse
+\item
+  distribute blocks through ordinary NPM packages
+\item
+  let apps import blocks without hidden registration side effects
+\end{itemize}
+
+The first distribution mechanism should be boring: NPM packages with a stable manifest. A future block registry can index NPM metadata, docs, and story captures, but the runtime should not need a central registry to use a block.
+
+Recommended package shape:
+
+\begin{CodeBlock}
+@scope/bijou-blocks-commerce
+  package.json
+  src/index.ts
+  blocks/product-list.ts
+  blocks/checkout-flow.ts
+  stories/product-list.story.ts
+  docs/README.md
+\end{CodeBlock}
+
+Rules for shared block packages:
+
+\begin{itemize}
+\tightlist
+\item
+  depend on \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} as a peer dependency
+\item
+  export block definitions explicitly from the package entrypoint
+\item
+  avoid global registration or import-time mutation
+\item
+  include block metadata and package metadata
+\item
+  include at least one story or fixture per exported block
+\item
+  declare supported output modes and semantic facts
+\item
+  keep host effects behind adapters supplied by the consuming app
+\item
+  never include secret values in metadata, stories, diagnostics, or snapshots
+\end{itemize}
+
+Example package entrypoint:
+
+\begin{CodeBlock}
+export const productListBlock = defineBlock({
+  metadata: productListMetadata,
+  render: productList,
+});
+
+export const checkoutFlowBlock = defineBlock({
+  metadata: checkoutFlowMetadata,
+  render: checkoutFlow,
+});
+
+export const commerceBlocks = defineBlockPackage({
+  packageName: '@example/bijou-blocks-commerce',
+  version: '1.0.0',
+  bijouPeerRange: '^5.0.0',
+  blocks: ['product-list', 'checkout-flow'],
+  tags: ['commerce', 'catalog', 'checkout'],
+});
+\end{CodeBlock}
+
+Runtime-engine posture:
+
+\begin{itemize}
+\tightlist
+\item
+  a block renders into ordinary Bijou visible nodes
+\item
+  visible nodes still resolve through RE-035 layout envelopes
+\item
+  interaction still emits commands instead of mutating geometry
+\item
+  modes lower semantic facts instead of parsing rendered cells
+\item
+  host adapters own files, credentials, network, storage, and process effects
+\end{itemize}
+
+That keeps third-party blocks powerful without making them runtime plugins with unbounded authority.
+
+\section{Relationship To DX-034}\label{record-128-relationship-to-dx-034}
+
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-034-declarative-view-data-binding.md}{DX-034 - Declarative View Data Binding} is the design gate between metadata-only blocks and provider-bound AppShell composition.
+
+DX-031 answers:
+
+\begin{itemize}
+\tightlist
+\item
+  what is a block?
+\item
+  what slots, variants, modes, facts, stories, and package metadata does it declare?
+\item
+  how can tooling discover block contracts before rendering?
+\end{itemize}
+
+DX-034 answers:
+
+\begin{itemize}
+\tightlist
+\item
+  how does an active block or view declare the data it needs?
+\item
+  which provider scope satisfies those requirements?
+\item
+  what immutable snapshot is currently rendered?
+\item
+  how do user interactions leave the view tree as Commands instead of direct data mutation?
+\end{itemize}
+
+Rendered AppShell work should build on both cycles. AppShell needs named block slots, but it also needs a unidirectional data-binding loop so nested navigation, content, inspector, status, and overlay blocks can render provider-backed snapshots without owning business state.
+
+\section{Schema-Bound Blocks}\label{record-128-schema-bound-blocks}
+
+The schema-bound boundary for app builders should be direct:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  define or import a schema
+\item
+  bind that schema to a block
+\item
+  pass a schema-compliant object
+\item
+  receive immutable block render input and validation facts
+\end{enumerate}
+
+In app code, the target ergonomics should feel like:
+
+\begin{CodeBlock}
+const productDetailsBaseBlock = defineBlock({
+  metadata: productDetailsMetadata,
+  render: productDetails,
+});
+
+const productDetailsBlock = defineSchemaBlock({
+  block: productDetailsBaseBlock,
+  schema: zodBlockSchema(productDetailsSchema),
+  bind: product => ({
+    input: {
+      slots: {
+        title: product.name,
+        summary: product.summary,
+        specs: product.specs,
+        reviews: product.reviews,
+        primaryAction: { id: 'add-to-cart', label: 'Add to cart' },
+      },
+      config: {
+        variant: 'purchase-detail',
+      },
+    },
+    facts: [{ kind: 'entity', key: 'product', value: product.id }],
+  }),
+});
+
+bindSchemaBlockInput(productDetailsBlock, {
+  id: 'bijou-pro',
+  name: 'Bijou Pro',
+  summary: 'Runtime truth for terminal apps.',
+  specs: [{ label: 'Mode', value: 'interactive' }],
+  reviews: [],
+});
+\end{CodeBlock}
+
+That is the real DX target for this layer: give the schema-bound block an unknown object and it should validate the boundary before producing immutable render input, validation issues, and lower-mode facts. Rendering remains the ordinary block renderer's job.
+
+Zod can become the first optional authoring adapter because it is familiar in the TypeScript ecosystem and Bijou already uses it in MCP tooling. The core block contract is schema-adapter shaped so the runtime does not require Zod as a hard dependency.
+
+Recommended split:
+
+\begin{itemize}
+\tightlist
+\item
+  core block API accepts \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}<\allowbreak{}D\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}>}
+\item
+  optional Zod helper adapts Zod schemas into that adapter
+\item
+  future helpers can adapt JSON Schema, Valibot, TypeBox, or generated schemas
+\item
+  block packages can choose the adapter they publish with
+\item
+  tooling can inspect schema facts when the adapter exposes them
+\end{itemize}
+
+Zod adapter sketch:
+
+\begin{CodeBlock}
+type ZodLikeResult<Data> =
+  | { readonly success: true; readonly data: Data }
+  | { readonly success: false; readonly error: unknown };
+
+interface ZodLikeSchema<Data> {
+  readonly safeParse: (input: unknown) => ZodLikeResult<Data>;
+}
+
+declare function zodBlockSchema<Data>(
+  schema: ZodLikeSchema<Data>,
+): BlockSchemaAdapter<Data>;
+\end{CodeBlock}
+
+Schema-bound blocks should standardize:
+
+\begin{itemize}
+\tightlist
+\item
+  validation errors into \texttt{E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n}, \texttt{B\allowbreak{}a\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r}, or field-level facts
+\item
+  defaults into config and slots
+\item
+  object fields into named block slots
+\item
+  object relationships into semantic facts
+\item
+  mode-lowering facts without parsing rendered output
+\item
+  docs, examples, and story captures from the same schema-bound fixture data
+\end{itemize}
+
+Rules:
+
+\begin{itemize}
+\tightlist
+\item
+  schema validation happens before rendering
+\item
+  invalid data produces explicit validation facts, not partial mystery UI
+\item
+  schema-bound blocks validate boundary data and do not fetch, subscribe, dispatch, compose runtime views, or render AppShell
+\item
+  schema-bound blocks still render through ordinary Bijou layout envelopes
+\item
+  schemas may describe data shape, but blocks still own presentation choices
+\item
+  secret fields must be redacted before metadata, diagnostics, or captures
+\end{itemize}
+
+\section{Compiler Path: Schema To Blocks}\label{record-128-compiler-path-schema-to-blocks}
+
+The schema-bound API opens a larger tooling path:
+
+\begin{CodeBlock}
+GraphQL schema / operations
+  -> semantic model
+  -> TypeScript types
+  -> Zod or schema adapter
+  -> block metadata
+  -> schema-bound block package
+  -> stories, captures, docs, and tests
+\end{CodeBlock}
+
+This is not first-slice block runtime work, but it is a coherent future lane. \texttt{\textasciitilde{}\allowbreak{}/\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}/\allowbreak{}w\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}e\allowbreak{}y} already points in this direction: it has GraphQL schema lowering, operation catalogs, TypeScript emission, and dialect seams that mention future SQLite and other SQL targets. Bijou should be able to consume that kind of semantic output and generate useful block packages.
+
+Potential compiler outputs:
+
+\begin{itemize}
+\tightlist
+\item
+  Zod schemas or generic \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} objects
+\item
+  TypeScript data types
+\item
+  default block choices by schema shape
+\item
+  candidate block metadata
+\item
+  fixture data and story captures
+\item
+  mode-lowering semantic facts
+\item
+  docs tables for fields, relationships, and actions
+\end{itemize}
+
+Useful mappings:
+
+\begin{itemize}
+\tightlist
+\item
+  GraphQL object type -\textgreater{} \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}s}, \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}, \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  GraphQL list query -\textgreater{} \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t}, \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}G\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{L\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  GraphQL mutation -\textgreater{} \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}, \texttt{C\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w}, \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}
+\item
+  GraphQL enum -\textgreater{} select, segmented control, or \texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} row
+\item
+  GraphQL relationship -\textgreater{} nested section, \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}, or detail pane
+\item
+  database table -\textgreater{} grid/list/detail blocks
+\item
+  database view -\textgreater{} read-only dashboard or data visualization block
+\end{itemize}
+
+Local storage can enter through the same seam. A SQLite-backed app, local JSON store, file-backed cache, or generated persistence adapter can provide the data object. The block should not care whether the object came from GraphQL, SQLite, REST, a file, or memory after it passes the schema adapter.
+
+The compiler should produce suggestions, not magic authority. Generated blocks still need:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit metadata
+\item
+  explicit schema adapters
+\item
+  explicit slot binding
+\item
+  explicit mode-lowering facts
+\item
+  story captures with representative data
+\item
+  human-reviewable output
+\end{itemize}
+
+The win is speed. A maintainer should be able to point a compiler at a semantic schema and get a boring, inspectable first draft of a Bijou app: lists, details, forms, dashboards, charts, empty/error states, and docs surfaces that already obey the block contract.
+
+\section{Tooling Payoff}\label{record-128-tooling-payoff}
+
+A metadata-first block API should make future Bijou tooling much cheaper.
+
+Tools should be able to index block packages and answer:
+
+\begin{itemize}
+\tightlist
+\item
+  which blocks exist?
+\item
+  which slots are required?
+\item
+  which variants are supported?
+\item
+  which modes does a block lower to?
+\item
+  which semantic facts does a block promise?
+\item
+  which stories or captures prove the block?
+\item
+  which components, themes, or adapters does the block depend on?
+\end{itemize}
+
+That directly supports:
+
+\begin{itemize}
+\tightlist
+\item
+  a Storybook-like block and component workstation
+\item
+  theme token inspectors
+\item
+  layout inspectors
+\item
+  focus and input routing inspectors
+\item
+  mode-lowering reports
+\item
+  DOGFOOD block galleries
+\item
+  MCP docs and block search payloads
+\item
+  fixture-to-docs promotion tooling
+\item
+  block package compatibility reports
+\item
+  visual and semantic regression review
+\end{itemize}
+
+The important constraint is that tooling reads declared block facts first. It may render stories, capture screenshots, inspect surfaces, or run assertions afterward, but it should not need to scrape terminal output just to discover what a block is.
+
+\section{Variants And Configuration}\label{record-128-variants-and-configuration}
+
+Blocks should offer named variants when the job is stable but the surface shape or input contract changes.
+
+A variant is still the same block. It should keep the same broad purpose while declaring any changed slots, focus rules, semantic facts, and mode-lowering behavior.
+
+Configuration is different from variants. Configuration changes parameters inside a chosen variant.
+
+Examples:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} can offer docs, workbench, and focused-task variants.
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} can offer commands-only, commands-with-preview, and destination-search variants.
+\item
+  \texttt{H\allowbreak{}e\allowbreak{}r\allowbreak{}o} can offer compact, branded, docs-landing, and playable-demo variants.
+\item
+  \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} can offer indeterminate, determinate, and staged-bootstrap variants.
+\item
+  \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} can offer press-enter, loading-gate, and auth-gateway variants.
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d} can offer compact overlay, detailed panel, and recorder variants.
+\item
+  \texttt{L\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m} can offer manual-password, one-time-code, and credential-provider variants.
+\item
+  \texttt{S\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}U\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m} can offer password, invite-code, and provider-handoff variants.
+\end{itemize}
+
+Rules:
+
+\begin{itemize}
+\tightlist
+\item
+  each variant must declare required slots and semantic facts
+\item
+  each variant must lower across interactive, static, pipe, and accessible modes
+\item
+  config must be inspectable without exposing secret values
+\item
+  unsupported variants should fail clearly instead of silently degrading
+\item
+  host adapters provide credentials, files, network access, and other effects
+\end{itemize}
+
+Secret-bearing config is not block metadata. The metadata may name a credential provider capability, but the secret value stays in host-owned state.
+
+Auth blocks should use a provider seam rather than hard-code a vault package. A host can adapt a provider such as \texttt{@\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} behind that seam, but the block contract should only see a named credential provider and its safe status facts.
+
+Sketch:
+
+\begin{CodeBlock}
+type LoginCredentialMode =
+  | 'manual-password'
+  | 'one-time-code'
+  | 'credential-provider';
+
+interface LoginBlockConfig {
+  readonly credentialMode: LoginCredentialMode;
+  readonly credentialProviderId?: string;
+  readonly allowRememberIdentity?: boolean;
+  readonly requireMfaCode?: boolean;
+}
+\end{CodeBlock}
+
+\section{Existing Proto-Blocks}\label{record-128-existing-proto-blocks}
+
+Some Bijou componentry is already block-shaped. DX-031 should inventory and promote that work instead of rebuilding it under new names.
+
+A component or component group is a proto-block when it already has:
+
+\begin{itemize}
+\tightlist
+\item
+  a recognizable product job
+\item
+  multiple composed lower-level pieces
+\item
+  stable visible regions
+\item
+  reusable input behavior
+\item
+  mode-lowering expectations
+\item
+  diagnostic or semantic facts worth testing
+\end{itemize}
+
+The promotion path should be:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  identify the existing component or story
+\item
+  name the block job it already performs
+\item
+  declare slots, variants, config, modes, and semantic facts
+\item
+  add story captures and mode-lowering assertions
+\item
+  keep the implementation if it already fits the contract
+\end{enumerate}
+
+The important rule is that ``block'' is a standardization level, not a rewrite mandate. If existing componentry already satisfies the contract, promotion should document and test it first.
+
+\section{Block Scale}\label{record-128-block-scale}
+
+Blocks can exist at different scales. DX-031 should name the scale instead of pretending every useful pattern is a full application shell.
+
+Block scales:
+
+\begin{itemize}
+\tightlist
+\item
+  app blocks: whole app states or persistent shells
+\item
+  workspace blocks: full app workspaces under a shell
+\item
+  section blocks: large content or product sections inside an app
+\item
+  panel blocks: reusable panes, drawers, modals, and diagnostics
+\item
+  control blocks: repeated input/action compositions
+\item
+  inline blocks: local status, hints, and compact feedback beside content
+\item
+  item blocks: repeated cards, comments, rows, and list entries
+\item
+  data blocks: tabular, chart, or evidence-focused semantic surfaces
+\item
+  diagnostic blocks: inspectable explanation, health, and instrumentation surfaces
+\item
+  overlay blocks: transient shell-level feedback or affordances
+\end{itemize}
+
+Some names are component-like on purpose. \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n} and \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r} may remain primitive components, while \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}r}, or \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l} can be blocks when they standardize layout, labels, validation, focus, and mode-lowering facts around those primitives.
+
+\section{Block Families}\label{record-128-block-families}
+
+The first catalog should group blocks by job rather than by implementation package. That keeps the list usable for humans and selectable by agents.
+
+App structure:
+
+\begin{itemize}
+\tightlist
+\item
+  AppShell
+\item
+  DashboardShell
+\item
+  HeaderBar
+\item
+  FooterBar
+\item
+  NavigationBar
+\item
+  ReaderSurface
+\item
+  NavigationList
+\item
+  TableOfContents
+\item
+  InspectorPanel
+\item
+  TitleScreen
+\item
+  HeroHeader
+\item
+  Hero
+\item
+  LoadingScreen
+\end{itemize}
+
+Content and marketing sections:
+
+\begin{itemize}
+\tightlist
+\item
+  FeatureBlock
+\item
+  FeaturesSection
+\item
+  FAQSection
+\item
+  Banner
+\item
+  CallToAction
+\item
+  PricingTiers
+\item
+  StatsPanel
+\item
+  ComparisonPanel
+\item
+  ErrorScreen
+\item
+  CommentsThread
+\item
+  Carousel
+\item
+  Timeline
+\end{itemize}
+
+Command and assistance:
+
+\begin{itemize}
+\tightlist
+\item
+  CommandPalette
+\item
+  HelpPanel
+\item
+  SettingsPanel
+\end{itemize}
+
+Transient and blocking overlays:
+
+\begin{itemize}
+\tightlist
+\item
+  NotificationStack
+\item
+  ModalDialogStack
+\item
+  QuitConfirmationDialog
+\end{itemize}
+
+Forms and identity:
+
+\begin{itemize}
+\tightlist
+\item
+  UserInfo
+\item
+  FormPanel
+\item
+  LoginForm
+\item
+  SignUpForm
+\end{itemize}
+
+Controls:
+
+\begin{itemize}
+\tightlist
+\item
+  ButtonSet
+\item
+  SliderControl
+\end{itemize}
+
+Data and workbench candidates:
+
+\begin{itemize}
+\tightlist
+\item
+  Grid
+\item
+  WorkbenchTable
+\item
+  FormFlow
+\item
+  ActivityLog
+\item
+  EmptyErrorState
+\item
+  DetailPane
+\item
+  SearchResultsPane
+\item
+  FileExplorerPane
+\item
+  ApplicationCard
+\item
+  ApplicationCardGrid
+\item
+  DataVisualizationPanel
+\item
+  ProductList
+\item
+  ProductDetails
+\item
+  ProductCategory
+\item
+  ProductSpecsSheet
+\item
+  BlogGrid
+\item
+  BlogPost
+\item
+  Leaderboard
+\item
+  TerminalPanel
+\end{itemize}
+
+Commerce:
+
+\begin{itemize}
+\tightlist
+\item
+  ShoppingCart
+\item
+  CheckoutFlow
+\item
+  PaymentMethods
+\item
+  OfferModal
+\item
+  ReviewsBlock
+\end{itemize}
+
+Communication:
+
+\begin{itemize}
+\tightlist
+\item
+  ChatPanel
+\end{itemize}
+
+Runtime diagnostics:
+
+\begin{itemize}
+\tightlist
+\item
+  PerfHud
+\item
+  LayoutInspectorPanel
+\item
+  InputRoutingInspector
+\item
+  SurfaceDiffPanel
+\end{itemize}
+
+\section{Initial Block Catalog}\label{record-128-initial-block-catalog}
+
+\subsection{AppShell}\label{record-128-appshell}
+
+Standard top-level app frame.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  docs shell
+\item
+  workbench shell
+\item
+  focused-task shell
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  header
+\item
+  navigation
+\item
+  content
+\item
+  inspector
+\item
+  status
+\item
+  overlays
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  owns the top-level app layout
+\item
+  switches between narrow, standard, and wide variants
+\item
+  keeps content primary in constrained terminals
+\item
+  exposes named regions for focus and accessibility
+\end{itemize}
+
+\subsection{ReaderSurface}\label{record-128-readersurface}
+
+Standard long-form reading surface for docs, guides, release notes, and prose.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  article reader
+\item
+  reference page
+\item
+  release notes
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  breadcrumbs
+\item
+  body
+\item
+  table of contents
+\item
+  source or provenance metadata
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  preserves full semantic content in pipe mode
+\item
+  reports current section and scroll facts in accessible mode
+\item
+  can live inside \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} as the primary content region
+\end{itemize}
+
+\subsection{NavigationList}\label{record-128-navigationlist}
+
+Grouped navigation list for sidebars, drawers, and quick navigation surfaces.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  grouped navigation
+\item
+  flat navigation
+\item
+  filtered navigation
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  groups
+\item
+  items
+\item
+  active item
+\item
+  badges
+\item
+  filter
+\item
+  empty state
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keeps the active item visible when possible
+\item
+  exposes grouped navigation facts
+\item
+  lowers to source-order destinations in pipe mode
+\end{itemize}
+
+\subsection{InspectorPanel}\label{record-128-inspectorpanel}
+
+Structured facts and contextual actions for selected entities, diagnostics, layout nodes, focus maps, runtime records, or theme reports.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  facts panel
+\item
+  diagnostics panel
+\item
+  action panel
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  summary
+\item
+  sections
+\item
+  facts
+\item
+  warnings
+\item
+  actions
+\item
+  footer
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  renders stable key-value facts
+\item
+  exposes warnings and actions semantically
+\item
+  works as a pane, drawer, or modal body
+\end{itemize}
+
+\subsection{PerfHud}\label{record-128-perfhud}
+
+Performance and runtime health surface for development builds, diagnostics, benchmarking, and DOGFOOD instrumentation.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact overlay
+\item
+  detailed panel
+\item
+  recorder
+\item
+  budget warning strip
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  metric set
+\item
+  sample interval
+\item
+  budget thresholds
+\item
+  history depth
+\item
+  overlay position
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  frame metrics
+\item
+  render metrics
+\item
+  memory metrics
+\item
+  event-loop metrics
+\item
+  budget warnings
+\item
+  history sparkline
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  can be promoted from existing Perf HUD componentry
+\item
+  renders as overlay, panel, drawer, or status strip
+\item
+  exposes current metrics as semantic facts
+\item
+  lowers to stable metric lines in static and pipe modes
+\item
+  reports threshold state in accessible mode
+\end{itemize}
+
+\subsection{CommandPalette}\label{record-128-commandpalette}
+
+Searchable command and destination picker.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  commands only
+\item
+  commands with preview
+\item
+  destination search
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  query
+\item
+  grouped results
+\item
+  selected result
+\item
+  preview
+\item
+  footer hints
+\item
+  empty state
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keyboard-first command execution
+\item
+  optional preview in wide layouts
+\item
+  accessible combobox/listbox-style facts
+\item
+  pipe mode can emit matching command ids and titles
+\end{itemize}
+
+\subsection{HelpPanel}\label{record-128-helppanel}
+
+Standard help and keybinding surface.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  global help
+\item
+  contextual help
+\item
+  searchable keybindings
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  context summary
+\item
+  command groups
+\item
+  shortcuts
+\item
+  search/filter
+\item
+  footer hints
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  can render as a panel, drawer, or modal
+\item
+  groups commands by context
+\item
+  exposes available actions in accessible mode
+\end{itemize}
+
+\subsection{SettingsPanel}\label{record-128-settingspanel}
+
+Standard preferences surface for theme, shell, density, mode, and app settings.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact settings
+\item
+  sectioned settings
+\item
+  full-screen narrow settings
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  sections
+\item
+  rows
+\item
+  active section
+\item
+  descriptions
+\item
+  actions
+\end{itemize}
+
+Rows:
+
+\begin{itemize}
+\tightlist
+\item
+  toggle
+\item
+  select
+\item
+  segmented choice
+\item
+  theme swatch
+\item
+  numeric stepper
+\item
+  readonly fact
+\item
+  danger action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  aligns values consistently
+\item
+  supports drawer or full-screen narrow presentation
+\item
+  lowers to \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}=\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} facts in pipe mode
+\end{itemize}
+
+\subsection{NotificationStack}\label{record-128-notificationstack}
+
+Stacked notifications and transient status messages.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  transient toasts
+\item
+  persistent history
+\item
+  mixed severity stack
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  notifications
+\item
+  active toast
+\item
+  history
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keeps transient display separate from notification history
+\item
+  exposes severity, title, body, and action facts
+\item
+  should eventually route hit-testing through retained layout
+\end{itemize}
+
+\subsection{ModalDialogStack}\label{record-128-modaldialogstack}
+
+Standard stacked modal surface for blocking overlays.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  single blocking modal
+\item
+  nested modal stack
+\item
+  confirmation flow
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  modal stack
+\item
+  active modal
+\item
+  backdrop
+\item
+  title
+\item
+  body
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  topmost modal receives input first
+\item
+  lower app surfaces are blocked while active
+\item
+  focus is trapped inside the active modal
+\item
+  accessible mode reports modal title, body, and available actions
+\end{itemize}
+
+\subsection{QuitConfirmationDialog}\label{record-128-quitconfirmationdialog}
+
+Specialized modal for quitting, closing, or abandoning dirty work.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  quit cleanly
+\item
+  quit with dirty work
+\item
+  save before quit
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  message
+\item
+  dirty summary
+\item
+  confirm action
+\item
+  cancel action
+\item
+  optional save action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  defaults to cancel as the safer action
+\item
+  reports destructive intent clearly
+\item
+  can be hosted by \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}D\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\subsection{LoadingScreen}\label{record-128-loadingscreen}
+
+Readiness surface for startup, connection, indexing, generation, or other bounded and unbounded waits.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  indeterminate loading
+\item
+  determinate progress
+\item
+  staged bootstrap
+\item
+  retryable failure
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  progress mode
+\item
+  stage labels
+\item
+  cancel policy
+\item
+  retry policy
+\item
+  timeout policy
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  current stage
+\item
+  progress value
+\item
+  progress label
+\item
+  detail message
+\item
+  cancel action
+\item
+  retry action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes readiness and progress facts without relying on animation
+\item
+  lowers to stable stage/progress text in static and pipe modes
+\item
+  reports retryable failure state accessibly
+\item
+  can be embedded inside \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n}
+\end{itemize}
+
+\subsection{TitleScreen}\label{record-128-titlescreen}
+
+App entry surface before the main application shell becomes active.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  press enter
+\item
+  loading gate
+\item
+  auth gateway
+\item
+  profile chooser
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  entry action
+\item
+  startup state
+\item
+  auth requirement
+\item
+  default next route
+\item
+  skip policy
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  subtitle
+\item
+  visual surface
+\item
+  loading surface
+\item
+  login form
+\item
+  sign-up form
+\item
+  primary action
+\item
+  secondary actions
+\item
+  status or version facts
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  owns the app entry state before \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} becomes active
+\item
+  can compose \texttt{H\allowbreak{}e\allowbreak{}r\allowbreak{}o}, \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n}, \texttt{L\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m}, and \texttt{S\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}U\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m}
+\item
+  exposes whether the app is waiting, ready, blocked, or authenticated
+\item
+  preserves title, readiness, and available actions in lower modes
+\end{itemize}
+
+\subsection{Hero}\label{record-128-hero}
+
+Opening/title surface for branded apps, demos, docs landing screens, and playable examples.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact hero
+\item
+  branded hero
+\item
+  docs landing hero
+\item
+  playable demo hero
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  subtitle
+\item
+  visual surface
+\item
+  primary action
+\item
+  secondary actions
+\item
+  status or version facts
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  remains useful when visual ornamentation lowers away
+\item
+  can host shader or canvas visuals inside a layout-owned envelope
+\item
+  pipe and accessible modes preserve title, purpose, and actions
+\end{itemize}
+
+\subsection{LoginForm}\label{record-128-loginform}
+
+Standard authentication form for email/password, token, or device-code flows.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  manual password
+\item
+  one-time code
+\item
+  credential provider
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  credential mode
+\item
+  credential provider id
+\item
+  remember identity policy
+\item
+  MFA requirement
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  fields
+\item
+  credential input
+\item
+  credential provider status
+\item
+  validation summary
+\item
+  submit action
+\item
+  secondary actions
+\item
+  provider options
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  never hides validation facts in styling alone
+\item
+  supports non-interactive pipe/accessibility summaries without exposing secrets
+\item
+  can request credentials from a host-owned provider seam
+\item
+  can adapt \texttt{@\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t} through that seam without hard-coding it
+\item
+  can compose with \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w} later
+\end{itemize}
+
+\subsection{SignUpForm}\label{record-128-signupform}
+
+Standard account creation form.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  password signup
+\item
+  invite-code signup
+\item
+  provider handoff
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  required field set
+\item
+  consent policy
+\item
+  provider id
+\item
+  validation mode
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  fields
+\item
+  validation summary
+\item
+  terms acknowledgement
+\item
+  submit action
+\item
+  secondary actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  separates validation, consent, and submit states
+\item
+  lowers field requirements and validation facts accessibly
+\item
+  can share form-row contracts with \texttt{L\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m}
+\end{itemize}
+
+\section{Additional Candidate Blocks}\label{record-128-additional-candidate-blocks}
+
+These blocks are useful enough to name now, but should follow the first implementation set unless an existing proto-block is ready to promote.
+
+\subsection{HeaderBar}\label{record-128-headerbar}
+
+Top chrome for application, section, or panel identity.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  app header
+\item
+  section header
+\item
+  compact header
+\item
+  hero header
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  subtitle
+\item
+  breadcrumbs
+\item
+  primary action
+\item
+  secondary actions
+\item
+  status facts
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes heading level and current location semantically
+\item
+  can host search, command, help, or account affordances
+\item
+  lowers to title, location, status, and actions in pipe mode
+\end{itemize}
+
+\subsection{FooterBar}\label{record-128-footerbar}
+
+Bottom chrome for status, actions, navigation, or provenance.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  status footer
+\item
+  action footer
+\item
+  pagination footer
+\item
+  provenance footer
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  status
+\item
+  primary action
+\item
+  secondary actions
+\item
+  pagination
+\item
+  provenance
+\item
+  shortcut hints
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keeps status and action facts separate
+\item
+  can host \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t} without hiding actions in decoration
+\item
+  lowers shortcut hints only when useful for the output mode
+\end{itemize}
+
+\subsection{TableOfContents}\label{record-128-tableofcontents}
+
+Structured navigation for long-form content.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  flat contents
+\item
+  nested contents
+\item
+  scroll-synced contents
+\item
+  filtered contents
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  sections
+\item
+  active section
+\item
+  progress facts
+\item
+  filter
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes document structure and active section
+\item
+  can live in \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, drawer, or narrow navigation mode
+\item
+  lowers to source-order section links in pipe mode
+\end{itemize}
+
+\subsection{HeroHeader}\label{record-128-heroheader}
+
+Header-scale opening region for pages that need title, pitch, status, and actions without becoming a full \texttt{H\allowbreak{}e\allowbreak{}r\allowbreak{}o}.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact page hero
+\item
+  product hero header
+\item
+  docs hero header
+\item
+  object hero header
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  summary
+\item
+  media or visual surface
+\item
+  primary action
+\item
+  secondary actions
+\item
+  status facts
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keeps the title as the first semantic signal
+\item
+  can degrade to an ordinary \texttt{H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}a\allowbreak{}r}
+\item
+  preserves actions and status in lower modes
+\end{itemize}
+
+\subsection{FeaturesSection}\label{record-128-featuressection}
+
+Grouped feature or capability presentation.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  feature list
+\item
+  feature grid
+\item
+  comparison features
+\item
+  checklist features
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  heading
+\item
+  feature items
+\item
+  icons or markers
+\item
+  supporting text
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes each feature as a semantic item
+\item
+  avoids relying on equal-height visual cards for meaning
+\item
+  lowers to a stable ordered list
+\end{itemize}
+
+\subsection{FAQSection}\label{record-128-faqsection}
+
+Question and answer disclosure surface.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  static FAQ
+\item
+  accordion FAQ
+\item
+  searchable FAQ
+\item
+  categorized FAQ
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  questions
+\item
+  answers
+\item
+  active question
+\item
+  categories
+\item
+  search/filter
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes expanded/collapsed state
+\item
+  preserves all answers in pipe mode by policy
+\item
+  can lower to headings and paragraphs without visual chrome
+\end{itemize}
+
+\subsection{Banner}\label{record-128-banner}
+
+Inline announcement, warning, success, or callout surface.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  info banner
+\item
+  warning banner
+\item
+  success banner
+\item
+  error banner
+\item
+  action banner
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  severity
+\item
+  title
+\item
+  body
+\item
+  icon or marker
+\item
+  actions
+\item
+  dismiss action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes severity as a semantic fact
+\item
+  does not rely on color alone
+\item
+  can promote to notification or modal behavior when configured
+\end{itemize}
+
+\subsection{ErrorScreen}\label{record-128-errorscreen}
+
+Full-screen or panel-sized error recovery surface.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  not found
+\item
+  permission denied
+\item
+  crashed
+\item
+  offline
+\item
+  retryable failure
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  message
+\item
+  diagnostic facts
+\item
+  retry action
+\item
+  fallback action
+\item
+  report action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  separates user-facing message from diagnostic facts
+\item
+  exposes recovery actions clearly
+\item
+  lowers to stable error text and available actions
+\end{itemize}
+
+\subsection{UserInfo}\label{record-128-userinfo}
+
+Account, identity, profile, or actor summary.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact identity
+\item
+  profile summary
+\item
+  account switcher item
+\item
+  permission summary
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  display name
+\item
+  handle or email
+\item
+  avatar or marker
+\item
+  role
+\item
+  status
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  keeps identity facts separate from authentication secrets
+\item
+  can compose into headers, title screens, settings, and comments
+\item
+  lowers to name, role, status, and actions
+\end{itemize}
+
+\subsection{FormPanel}\label{record-128-formpanel}
+
+General form composition for fields, validation, and actions.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  single step form
+\item
+  multi-step form
+\item
+  review form
+\item
+  readonly form summary
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  field groups
+\item
+  validation summary
+\item
+  dirty state
+\item
+  primary action
+\item
+  secondary actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes required fields, validation state, and dirty state
+\item
+  can compose \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}, \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}l}, \texttt{L\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m}, and \texttt{S\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}U\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m}
+\item
+  lowers to field facts and validation facts without secret values
+\end{itemize}
+
+\subsection{ButtonSet}\label{record-128-buttonset}
+
+Grouped action controls with explicit priority and focus order.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  primary and secondary
+\item
+  toolbar buttons
+\item
+  segmented action group
+\item
+  destructive confirmation actions
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  primary action
+\item
+  secondary actions
+\item
+  destructive action
+\item
+  disabled reasons
+\item
+  shortcut hints
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes action priority and disabled reasons
+\item
+  keeps destructive actions explicit
+\item
+  lowers to action labels and availability facts
+\end{itemize}
+
+\subsection{SliderControl}\label{record-128-slidercontrol}
+
+Labeled numeric control with value, range, and validation semantics.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  simple slider
+\item
+  stepped slider
+\item
+  range slider
+\item
+  setting row slider
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  label
+\item
+  value
+\item
+  minimum
+\item
+  maximum
+\item
+  step
+\item
+  help text
+\item
+  validation state
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes value and range as semantic facts
+\item
+  supports keyboard and pointer adjustment
+\item
+  lowers to \texttt{l\allowbreak{}a\allowbreak{}b\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} with min, max, and step facts
+\end{itemize}
+
+\subsection{Grid}\label{record-128-grid}
+
+General cell or item grid for selectable and scannable collections.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  fixed grid
+\item
+  responsive grid
+\item
+  selectable grid
+\item
+  virtualized grid
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  items
+\item
+  selected item
+\item
+  empty state
+\item
+  sort/filter controls
+\item
+  pagination or viewport facts
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  preserves source order and selection facts
+\item
+  can host \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d} or other item blocks
+\item
+  lowers to list/table shape depending on mode
+\end{itemize}
+
+\subsection{ApplicationCard}\label{record-128-applicationcard}
+
+Repeated app, tool, document, package, or integration summary.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact card
+\item
+  detailed card
+\item
+  selectable card
+\item
+  actionable card
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  summary
+\item
+  status
+\item
+  metadata
+\item
+  primary action
+\item
+  secondary actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes title, status, metadata, and actions semantically
+\item
+  avoids making visual card shape the only grouping signal
+\item
+  can live in \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}G\allowbreak{}r\allowbreak{}i\allowbreak{}d}, search results, or dashboards
+\end{itemize}
+
+\subsection{ApplicationCardGrid}\label{record-128-applicationcardgrid}
+
+Grid of application cards with filtering, selection, and status.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  app launcher
+\item
+  integration gallery
+\item
+  docs card grid
+\item
+  selectable dashboard
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  cards
+\item
+  filter
+\item
+  sort
+\item
+  selected card
+\item
+  empty state
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  composes \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d} and \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  keeps selected card and active filter visible to agents
+\item
+  lowers to ordered card summaries
+\end{itemize}
+
+\subsection{DataVisualizationPanel}\label{record-128-datavisualizationpanel}
+
+Chart or graph panel with accessible facts and fallback summaries.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  sparkline panel
+\item
+  bar chart panel
+\item
+  timeline panel
+\item
+  graph summary panel
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  title
+\item
+  visualization surface
+\item
+  legend
+\item
+  data summary
+\item
+  selected datum
+\item
+  actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes chart type, labels, values, and selected datum
+\item
+  lowers to data summaries when visual rendering is unavailable
+\item
+  does not make color or geometry the only carrier of meaning
+\end{itemize}
+
+\subsection{Carousel}\label{record-128-carousel}
+
+Ordered slide or item viewer with optional animated transitions.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  static carousel
+\item
+  spring slide carousel
+\item
+  paged carousel
+\item
+  autoplay carousel
+\end{itemize}
+
+Config:
+
+\begin{itemize}
+\tightlist
+\item
+  active index
+\item
+  transition policy
+\item
+  spring preset
+\item
+  autoplay policy
+\item
+  motion preference
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  slides
+\item
+  active slide
+\item
+  previous action
+\item
+  next action
+\item
+  page indicators
+\item
+  pause action
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  exposes active slide, count, and navigation actions
+\item
+  respects reduced-motion policy
+\item
+  lowers to active slide plus ordered slide summaries
+\item
+  treats spring animation as presentation, not semantic state
+\end{itemize}
+
+\subsection{CommentsThread}\label{record-128-commentsthread}
+
+Conversation, review, or annotation surface.
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  flat comments
+\item
+  threaded comments
+\item
+  review comments
+\item
+  composer with preview
+\end{itemize}
+
+Slots:
+
+\begin{itemize}
+\tightlist
+\item
+  comments
+\item
+  focused comment
+\item
+  author info
+\item
+  timestamps
+\item
+  reactions
+\item
+  composer
+\item
+  moderation actions
+\end{itemize}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  preserves author, time, reply, and moderation facts
+\item
+  can compose \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}, \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}, and \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}
+\item
+  lowers to source-order conversation text
+\end{itemize}
+
+\section{Application Domain Candidate Blocks}\label{record-128-application-domain-candidate-blocks}
+
+These blocks are broad app-building pieces. They should usually be cataloged before implementation, then proven by the app family that needs them first.
+
+\subsection{DashboardShell}\label{record-128-dashboardshell}
+
+Operational dashboard frame for metrics, feeds, actions, and drill-down panels.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  executive dashboard
+\item
+  operations dashboard
+\item
+  product analytics dashboard
+\item
+  personal workspace dashboard
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}a\allowbreak{}r}
+\item
+  \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}B\allowbreak{}a\allowbreak{}r}
+\item
+  \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{D\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}V\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}L\allowbreak{}o\allowbreak{}g}
+\item
+  \texttt{L\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  \texttt{D\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e}
+\end{itemize}
+
+\subsection{NavigationBar}\label{record-128-navigationbar}
+
+Horizontal or compact navigation chrome for app sections and top-level routes.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  top navbar
+\item
+  compact navbar
+\item
+  tab navbar
+\item
+  account navbar
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}a\allowbreak{}r}
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}
+\end{itemize}
+
+\subsection{FeatureBlock}\label{record-128-featureblock}
+
+Single feature item with title, support copy, marker, media, and action.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact feature
+\item
+  illustrated feature
+\item
+  checklist feature
+\item
+  feature with proof point
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}S\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}o\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\subsection{CallToAction}\label{record-128-calltoaction}
+
+Focused conversion block for a primary next step.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  inline CTA
+\item
+  banner CTA
+\item
+  modal CTA
+\item
+  footer CTA
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}
+\item
+  \texttt{B\allowbreak{}a\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{O\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l}
+\end{itemize}
+
+\subsection{PricingTiers}\label{record-128-pricingtiers}
+
+Plan comparison and purchase entry block.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  simple tiers
+\item
+  feature matrix tiers
+\item
+  usage-based tiers
+\item
+  enterprise contact tier
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}s\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}S\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t}
+\item
+  \texttt{C\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}o\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\subsection{StatsPanel}\label{record-128-statspanel}
+
+Metric summary block for counts, deltas, health, and status.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  KPI strip
+\item
+  metric cards
+\item
+  trend stats
+\item
+  budget stats
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{D\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}V\allowbreak{}i\allowbreak{}s\allowbreak{}u\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d}
+\item
+  \texttt{D\allowbreak{}a\allowbreak{}s\allowbreak{}h\allowbreak{}b\allowbreak{}o\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\end{itemize}
+
+\subsection{ComparisonPanel}\label{record-128-comparisonpanel}
+
+Side-by-side comparison block for products, options, plans, or entities.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compare A vs B
+\item
+  compare A vs B vs C
+\item
+  feature matrix
+\item
+  ranked comparison
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}S\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+\end{itemize}
+
+\subsection{Timeline}\label{record-128-timeline}
+
+Chronological event, release, activity, or process surface.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  release timeline
+\item
+  activity timeline
+\item
+  process timeline
+\item
+  audit timeline
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}L\allowbreak{}o\allowbreak{}g}
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}
+\end{itemize}
+
+\subsection{ProductList}\label{record-128-productlist}
+
+Browsable product collection with filters, sort, status, and actions.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  catalog list
+\item
+  marketplace grid
+\item
+  inventory list
+\item
+  selectable product picker
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}C\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  \texttt{S\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e}
+\end{itemize}
+
+\subsection{ProductDetails}\label{record-128-productdetails}
+
+Detailed product page or panel for title, media, specs, reviews, and purchase actions.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  product page
+\item
+  product drawer
+\item
+  product comparison detail
+\item
+  purchase detail
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{H\allowbreak{}e\allowbreak{}r\allowbreak{}o\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}S\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t}
+\item
+  \texttt{R\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{S\allowbreak{}h\allowbreak{}o\allowbreak{}p\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}t}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}o\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\subsection{ProductCategory}\label{record-128-productcategory}
+
+Category navigation and product grouping block.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  category list
+\item
+  category landing
+\item
+  faceted category
+\item
+  nested category tree
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}
+\end{itemize}
+
+\subsection{ProductSpecsSheet}\label{record-128-productspecssheet}
+
+Structured product, plan, or object specifications.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  key-value specs
+\item
+  grouped specs
+\item
+  comparison specs
+\item
+  technical sheet
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}s\allowbreak{}o\allowbreak{}n\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}s}
+\end{itemize}
+
+\subsection{ReviewsBlock}\label{record-128-reviewsblock}
+
+Ratings, reviews, testimonials, or feedback surface.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  rating summary
+\item
+  review list
+\item
+  review composer
+\item
+  testimonial carousel
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\end{itemize}
+
+\subsection{ShoppingCart}\label{record-128-shoppingcart}
+
+Cart contents, quantities, totals, discounts, and checkout entry.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  compact cart
+\item
+  full cart
+\item
+  cart drawer
+\item
+  saved cart
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+\item
+  \texttt{O\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l}
+\item
+  \texttt{C\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w}
+\end{itemize}
+
+\subsection{CheckoutFlow}\label{record-128-checkoutflow}
+
+Purchase flow from cart review through payment and confirmation.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  single-page checkout
+\item
+  stepped checkout
+\item
+  invoice checkout
+\item
+  confirmation summary
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{P\allowbreak{}a\allowbreak{}y\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}s}
+\item
+  \texttt{S\allowbreak{}h\allowbreak{}o\allowbreak{}p\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}t}
+\item
+  \texttt{E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n}
+\end{itemize}
+
+\subsection{PaymentMethods}\label{record-128-paymentmethods}
+
+Payment method selection and validation block.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  saved methods
+\item
+  card entry
+\item
+  provider handoff
+\item
+  invoice terms
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{B\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}e\allowbreak{}t}
+\item
+  \texttt{C\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w}
+\end{itemize}
+
+\subsection{OfferModal}\label{record-128-offermodal}
+
+Promotional, upgrade, discount, or retention offer.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  upgrade offer
+\item
+  coupon offer
+\item
+  trial-ending offer
+\item
+  retention offer
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}D\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}o\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{P\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+\end{itemize}
+
+\subsection{BlogGrid}\label{record-128-bloggrid}
+
+Collection of posts, guides, updates, or articles.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  publication grid
+\item
+  release notes grid
+\item
+  author archive
+\item
+  topic archive
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}r\allowbreak{}d}
+\item
+  \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}t}
+\end{itemize}
+
+\subsection{BlogPost}\label{record-128-blogpost}
+
+Long-form article, update, or guide page.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  article
+\item
+  release post
+\item
+  tutorial
+\item
+  changelog post
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}O\allowbreak{}f\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}o\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\subsection{Leaderboard}\label{record-128-leaderboard}
+
+Ranked list of users, runs, scores, packages, or entities.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  score leaderboard
+\item
+  performance leaderboard
+\item
+  contribution leaderboard
+\item
+  ranked products
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{G\allowbreak{}r\allowbreak{}i\allowbreak{}d}
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\end{itemize}
+
+\subsection{ChatPanel}\label{record-128-chatpanel}
+
+Conversation surface for human chat, support, agents, or collaboration.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  support chat
+\item
+  agent chat
+\item
+  team chat
+\item
+  command chat
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d}
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\item
+  \texttt{F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\subsection{TerminalPanel}\label{record-128-terminalpanel}
+
+Embedded terminal, command runner, REPL, log stream, or transcript viewer.
+
+Common variants:
+
+\begin{itemize}
+\tightlist
+\item
+  terminal session
+\item
+  command runner
+\item
+  readonly transcript
+\item
+  log tail
+\end{itemize}
+
+Composes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}L\allowbreak{}o\allowbreak{}g}
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d}
+\end{itemize}
+
+\section{Remaining Useful Candidates}\label{record-128-remaining-useful-candidates}
+
+With the current list, the catalog can cover most app scaffolds. The remaining blocks I would still keep in reserve are:
+
+\begin{itemize}
+\tightlist
+\item
+  OnboardingFlow
+\item
+  SearchFilterBar
+\item
+  UploadDropzone
+\item
+  FilePreview
+\item
+  CalendarPanel
+\item
+  KanbanBoard
+\item
+  MapPanel
+\item
+  PermissionsMatrix
+\item
+  TeamMembersPanel
+\item
+  AuditLog
+\item
+  ImportExportPanel
+\item
+  EmptyState
+\item
+  ReleaseNotesPanel
+\item
+  AIConversationPanel
+\item
+  DiffViewer
+\end{itemize}
+
+\section{Second-Wave Blocks}\label{record-128-second-wave-blocks}
+
+These are likely useful, but should follow the first catalog once the block contract is proven:
+
+\begin{itemize}
+\tightlist
+\item
+  DashboardShell
+\item
+  NavigationBar
+\item
+  HeaderBar
+\item
+  FooterBar
+\item
+  TableOfContents
+\item
+  HeroHeader
+\item
+  FeatureBlock
+\item
+  FeaturesSection
+\item
+  FAQSection
+\item
+  Banner
+\item
+  CallToAction
+\item
+  PricingTiers
+\item
+  StatsPanel
+\item
+  ComparisonPanel
+\item
+  ErrorScreen
+\item
+  UserInfo
+\item
+  FormPanel
+\item
+  ButtonSet
+\item
+  SliderControl
+\item
+  Grid
+\item
+  ApplicationCard
+\item
+  ApplicationCardGrid
+\item
+  DataVisualizationPanel
+\item
+  Carousel
+\item
+  CommentsThread
+\item
+  Timeline
+\item
+  ProductList
+\item
+  ProductDetails
+\item
+  ProductCategory
+\item
+  ProductSpecsSheet
+\item
+  ReviewsBlock
+\item
+  ShoppingCart
+\item
+  CheckoutFlow
+\item
+  PaymentMethods
+\item
+  OfferModal
+\item
+  BlogGrid
+\item
+  BlogPost
+\item
+  Leaderboard
+\item
+  ChatPanel
+\item
+  TerminalPanel
+\item
+  WorkbenchTable
+\item
+  FormFlow
+\item
+  ActivityLog
+\item
+  EmptyErrorState
+\item
+  DetailPane
+\item
+  SearchResultsPane
+\item
+  FileExplorerPane
+\end{itemize}
+
+\section{First Implementation Set}\label{record-128-first-implementation-set}
+
+The first implementation should be small:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  AppShell
+\item
+  ReaderSurface
+\item
+  InspectorPanel
+\end{enumerate}
+
+These prove shell/content/inspectable composition without dragging in auth, workspace docking, or complex table behavior.
+
+\section{Terminal Screen Sketches}\label{record-128-terminal-screen-sketches}
+
+These sketches are not renderer snapshots. They are shape contracts for the kind of TUI surfaces the first blocks should make easy to assemble.
+
+\texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} with a simple press-enter gate:
+
+\begin{CodeBlock}
++------------------------------------------+
+|                                          |
+|                 BIJOU                    |
+|        Terminal apps with runtime truth   |
+|                                          |
+|              Press Enter                 |
+|                                          |
+|  v5.0.0                         Help     |
++------------------------------------------+
+\end{CodeBlock}
+
+\texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} composing \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n}:
+
+\begin{CodeBlock}
++ Bijou --------------------------------------------------- startup: loading +
+|                                                                          |
+|                         Preparing workspace                              |
+|                                                                          |
+|  [############----------------------------]  32%                          |
+|                                                                          |
+|  stage 2/5: indexing docs                                                |
+|                                                                          |
+|  Cancel                                                                  |
++ static output reports stage and progress, not animation frames ----------+
+\end{CodeBlock}
+
+\texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} with an auth gateway:
+
+\begin{CodeBlock}
++ Bijou -------------------------------------------------- account required +
+| Welcome back                                                             |
+|                                                                          |
+| Email                                                                    |
+| [james@example.com                    ]                                  |
+|                                                                          |
+| Password                                                                 |
+| [********************************      ]                                  |
+|                                                                          |
+| [Sign in]     [Create account]                                  Help     |
++ lower modes expose available actions without exposing credentials --------+
+\end{CodeBlock}
+
+Wide \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} with \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}:
+
+\begin{CodeBlock}
++ Bijou Docs ---------------------------------------------- mode: interactive +
+| Nav                     | Reader                         | Inspector        |
+| > Guide                 | # Layout envelopes             | node docs.body   |
+|   API                   |                                | role viewport    |
+|   Examples              | Every visible node resolves    | inline 24..72    |
+|                         | a layout envelope before       | block 1..21      |
+|                         | rendering.                     | reason stack     |
+|                         |                                | actions          |
+|                         |                                | - explain        |
+|                         |                                | - copy facts     |
++ status: section 2/8 ------------------------------ notifications: 1 pending +
+\end{CodeBlock}
+
+Narrow \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} preserving primary content:
+
+\begin{CodeBlock}
++ Bijou Docs ------------------------------+
+| # Layout envelopes                       |
+|                                          |
+| Every visible node resolves a layout     |
+| envelope before rendering.               |
+|                                          |
+| [nav] [search] [help] [inspect]          |
++ section 2/8 -----------------------------+
+\end{CodeBlock}
+
+\texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} hosted by \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}D\allowbreak{}i\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}:
+
+\begin{CodeBlock}
+| App content is inert while the modal stack owns focus                  |
+|                                                                        |
+|   + Command Palette ------------------------------------------------+  |
+|   | > layout                                                       |  |
+|   |                                                                |  |
+|   | Commands                                                       |  |
+|   |   Explain current layout node                                  |  |
+|   |   Toggle layout inspector                                      |  |
+|   |   Copy layout facts                                            |  |
+|   |                                                                |  |
+|   | Destinations                                                    |  |
+|   |   Layout envelopes                                              |  |
+|   |   Viewports and overflow                                        |  |
+|   + enter run --------------------------------------------- esc close +  |
+\end{CodeBlock}
+
+\texttt{L\allowbreak{}o\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m} credential variants:
+
+\begin{CodeBlock}
++ Sign in: manual password ----------------+
+| Email                                    |
+| [james@example.com                    ]  |
+|                                          |
+| Password                                 |
+| [********************************      ]  |
+|                                          |
+| [Sign in]                         Help   |
++ static/pipe output must not expose secret+
+
++ Sign in: one-time code ------------------+
+| Email                                    |
+| [james@example.com                    ]  |
+|                                          |
+| Code                                     |
+| [123456                              ]   |
+|                                          |
+| [Verify]                  Resend    Help |
++ accessible output exposes expiry, not code+
+
++ Sign in: credential provider ------------+
+| Account                                  |
+| james@example.com                        |
+|                                          |
+| Provider                                 |
+| @git-stunts/vault adapter: available     |
+|                                          |
+| [Unlock]                         Cancel  |
++ block sees provider status, not secret   +
+\end{CodeBlock}
+
+\section{SVG Block Mockups}\label{record-128-svg-block-mockups}
+
+These SVGs are visual mockups of TUI block shapes. They are not layout diagrams, renderer snapshots, or pixel-perfect specs. The point is to make common block compositions easier to scan in docs and reviews.
+
+App structure block mockups
+
+Wide and narrow app shell mockups showing navigation, reader, and inspector blocks. AppShell wide Bijou Docs interactive
+
+NavigationList \textgreater{} Guide API Examples
+
+ReaderSurface \# Layout envelopes Every visible node resolves layout truth before rendering.
+
+InspectorPanel node docs.body role viewport reason stack - explain - copy facts
+
+status: section 2/8 notifications: 1
+
+AppShell narrow Bijou Docs ReaderSurface \# Layout envelopes Primary content stays visible on small terms. nav search help ins section 2/8
+
+Navigation drawer variant Navigation \textgreater{} Current Search Drawer overlays content focus and source order stay explicit
+
+Inspector as modal body InspectorPanel same facts, different host
+
+App structure blocks show the same semantic regions in wide, narrow, drawer, and modal-hosted forms.
+
+Entry and readiness block mockups
+
+Title, hero, and loading screen variants for app entry flows. TitleScreen: press enter BIJOU runtime truth for terminals Press Enter v5.0.0 Help
+
+TitleScreen + LoadingScreen Preparing workspace stage 2/5: indexing docs Cancel
+
+TitleScreen: auth gateway Welcome back Email james@example.com Password ************ Sign in Create account
+
+Hero: docs landing Bijou Guide Learn by running DOGFOOD. Open Browse
+
+LoadingScreen: retryable failure Workspace unavailable retryable failure Retry Quit
+
+TitleScreen: profile chooser Choose profile \textgreater{} James Guest Enter select Esc quit
+
+Entry blocks separate title, hero, readiness, authentication, and profile selection while allowing those surfaces to compose.
+
+Authentication block mockups
+
+Login and sign-up variants covering password, one-time code, provider, and invite flows. LoginForm: manual password Email james@example.com Password ************ Sign in Help
+
+LoginForm: one-time code Email james@example.com Code 123456 expires in 02:00 Verify Resend
+
+LoginForm: credential provider Account james@example.com Provider @git-stunts/vault ready Unlock Cancel
+
+SignUpForm: password signup Email Password + confirm Create account
+
+SignUpForm: invite code Invite code BIJOU-2026 Terms accepted: yes Continue
+
+SignUpForm: provider handoff Create with provider Use workspace SSO Consent required before handoff
+
+Authentication blocks expose credential modes and provider state without putting secret values into metadata, diagnostics, or lower-mode output.
+
+Command and overlay block mockups
+
+Command palette, help, settings, notifications, modal, and quit dialog block forms. CommandPalette with preview \textgreater{} layout Commands Explain layout node Toggle inspector Copy layout facts Preview node docs.body assigned 72x22 enter run esc close
+
+HelpPanel and SettingsPanel HelpPanel Navigation Enter: open /: search ?: help SettingsPanel Theme {[}dark{]} Density {[}cozy{]} Mode {[}auto{]} Apply
+
+NotificationStack Saved workspace Index still running Sync failed: retry
+
+ModalDialogStack Active modal focus is trapped lower app blocked
+
+QuitConfirmationDialog Quit with unsaved work? 2 docs changed Quit Save Cancel
+
+Command, assistance, notification, and modal blocks show focus ownership and available actions as explicit surface facts.
+
+Runtime diagnostic block mockups
+
+Performance HUD variants showing compact overlay, detailed panel, recorder, and budget warning strip forms. PerfHud: compact overlay fps 60 frame 7ms heap 42MB App content stays behind HUD
+
+PerfHud: detailed panel Runtime metrics render 7ms layout 2ms input 1ms heap 42MB
+
+PerfHud: recorder Capture performance Record Mark samples: 240 last spike: render
+
+PerfHud: budget warning strip layout budget exceeded: 18ms \textgreater{} 12ms actions: explain copy metrics hide
+
+Diagnostic blocks are often existing componentry promoted into explicit slots, variants, config, mode-lowering facts, and story captures.
+
+Section and control block mockups
+
+Header, footer, cards, grids, forms, controls, chart, carousel, FAQ, banner, error, table of contents, and comments block forms. HeaderBar + FooterBar Project Atlas Help content region status ready Save
+
+Grid + ApplicationCard Docs Bench MCP TUI
+
+HeroHeader + Banner Runtime docs Learn layout truth New RE-035 draft Open Compare
+
+FormPanel + controls Preferences Density Mode {[}auto{]} Save Cancel
+
+DataVisualizationPanel Frame time selected: render 18ms
+
+Carousel with spring motion Feature tour Slide 2 of 5 \textless{} Prev Next \textgreater{} Pause
+
+TOC + FAQ + Comments TOC: Overview Layout Blocks FAQ: What is a block? Comments: James replied
+
+ErrorScreen Could not load workspace Retry Open logs Quit
+
+FeaturesSection - retained layout facts - mode lowering - inspector-friendly contracts
+
+Section, control, item, and data blocks standardize recurring app content without making primitive buttons or sliders pretend to be full app blocks.
+
+Application domain block mockups
+
+Product, commerce, publishing, dashboard, leaderboard, chat, and terminal block forms. ProductList + ProductCategory Category: Components Runtime DOGFOOD filter sort compare
+
+ProductDetails + specs Bijou Pro status available specs: 12 facts reviews: 4.8 / 5 Add to cart Compare
+
+PricingTiers + CTA Free \$0 Pro \$20 Ent Start trial
+
+ShoppingCart + CheckoutFlow Cart 2 items \$48 payment: card ending 4242 discount: SPRING Checkout Payment methods
+
+BlogGrid + BlogPost RE-035 Blocks selected post TOC comments CTA
+
+DashboardShell + leaderboard Today runs 128 pass 98\% 1. docs smoke 2. mcp docs 3. tui app
+
+ChatPanel James: ship the floor Agent: facts updated message composer\ldots{}
+
+TerminalPanel \$ npm run docs:inventory Current Truth: ok
+
+ComparisonPanel A vs B vs C speed cost support winner: B for this job
+
+Application-domain blocks cover commerce, publishing, dashboards, chat, and terminal workflows by composing the smaller shell, section, data, and control blocks.
+
+\section{Implementation Outline}\label{record-128-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Done: add the human-readable block catalog and keep it independent from low-level layout implementation.
+\item
+  Done: define a minimal public \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a}, \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, and \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t} shape in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  Done: add \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} authoring helpers, validation/report helpers, and compact summaries.
+\item
+  Done: formalize provider-bound view data requirements in DX-034 before hardening rendered AppShell APIs.
+\item
+  Done: attach DX-034 view data contracts and command intents to block definitions for discovery.
+\item
+  Done: add a structural AppShell composition contract for logical block slots and nested data/command introspection without rendering.
+\item
+  Done: prove active runtime binding collection, provider snapshot invalidation into new immutable frames, and command intent routing before rendered AppShell work begins.
+\item
+  Done: add adapter-first \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} support without making Zod, provider lifecycle, AppShell rendering, or DOGFOOD proof part of the core schema-bound block contract.
+\item
+  Done: add first-party block definitions and story declarations for \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} without making them rendered block products.
+\item
+  Done: replace the first-party definition placeholders with deterministic rendered proof output and stable lowering facts for \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}.
+\item
+  Done: add explicit block-tree rendering so nested block declarations render child output without making ordinary \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} recursive.
+\item
+  Done: expand the standard catalog through the explicit DF-031 status/feedback Block slice.
+\item
+  Next: add an optional Zod schema adapter package or helper.
+\item
+  Done: capture interactive, static, pipe, and accessible outputs for the first implementation set.
+\item
+  Done: prove the first three blocks in DOGFOOD before broadening the catalog.
+\item
+  Next: add catalog-only variant/config metadata for later blocks without implementing those blocks yet.
+\item
+  Keep modal stacks, notifications, auth forms, animated carousels, complex controls, and workspace-like behavior outside DX-031; each needs an explicit later block cycle with its own tests and Method evidence.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-128-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Block catalog tests proving the declared first blocks have metadata.
+\item
+  Public API tests proving community authors can define a block without relying on DOGFOOD internals.
+\item
+  Public API tests proving a package can declare exported blocks and Bijou peer compatibility.
+\item
+  Public API tests proving importing a block package does not mutate global runtime state.
+\item
+  Public API tests proving a schema-bound block validates data before bind or render output is consumed.
+\item
+  Public API tests proving an adapter can bind valid data into block slots, config, and semantic facts without a hard Zod dependency.
+\item
+  Public API tests proving invalid schema data becomes validation facts instead of partial rendered UI.
+\item
+  Tooling tests proving block metadata can be indexed without rendering a terminal surface.
+\item
+  Tooling tests proving schema facts can be indexed when the schema adapter exposes them.
+\item
+  Compiler-path tests proving generated block metadata remains explicit and reviewable instead of hidden behind schema inference.
+\item
+  Block catalog tests proving each declared variant has a stable id, required slots, and semantic facts.
+\item
+  Block catalog tests proving config options are visible without storing secret values.
+\item
+  Block catalog tests proving \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} can declare press-enter, loading, and auth-gateway variants.
+\item
+  Block catalog tests proving \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} exposes readiness, stage, and progress facts without depending on animation.
+\item
+  Block catalog tests proving proto-blocks such as \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d} can be promoted by declaring slots, variants, config, modes, and semantic facts.
+\item
+  Block catalog tests proving section, control, item, and data blocks declare their scale and mode-lowering facts.
+\item
+  Block catalog tests proving application-domain blocks declare their composed lower-level blocks instead of re-owning primitive layout behavior.
+\item
+  Story tests proving each first block has interactive, static, pipe, and accessible captures.
+\item
+  DOGFOOD tests proving \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} can compose into a real docs page.
+\item
+  Mode-lowering tests proving semantic facts survive when visual chrome is removed.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-128-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The block catalog defines the first block names, purposes, slots, and behavior contracts.
+\item
+  Blocks are documented as compositions, not new primitives.
+\item
+  Blocks have a public authoring API.
+\item
+  Blocks can be distributed as ordinary NPM packages.
+\item
+  Block packages declare exported blocks, docs, tags, and Bijou compatibility.
+\item
+  Importing a block package does not register runtime behavior globally.
+\item
+  Blocks can bind schema-compliant data objects to slots, config, validation, semantic facts, and render input.
+\item
+  The core schema-bound block API is adapter-first and does not require Zod as a hard dependency.
+\item
+  GraphQL, database, or local-storage schema compilers can generate draft block metadata, schema adapters, stories, and semantic facts.
+\item
+  Tooling can discover block slots, variants, modes, semantic facts, and story captures from metadata before rendering.
+\item
+  Blocks are grouped by scale so primitive components and app-level blocks do not blur together.
+\item
+  Blocks can declare variants and configurable options.
+\item
+  Title and loading blocks are separate but composable.
+\item
+  \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} can represent press-enter, loading-gate, and auth-gateway entry flows.
+\item
+  \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n} can represent indeterminate, determinate, staged, and retryable readiness states.
+\item
+  Existing block-shaped componentry can be promoted without rewriting it.
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d} is captured as a runtime diagnostics block candidate.
+\item
+  Headers, footers, grids, cards, controls, charts, carousels, FAQs, banners, errors, tables of contents, and comments are captured as candidate blocks.
+\item
+  Product, commerce, publishing, dashboard, leaderboard, chat, and terminal workflows are captured as application-domain candidate blocks.
+\item
+  Auth blocks can describe manual-password, one-time-code, and credential-provider modes without exposing credential values.
+\item
+  The original first implementation milestone landed as \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}.
+\item
+  Follow-on blocks are captured or promoted through explicit issue-backed slices instead of hidden first-implementation scope.
+\item
+  DOGFOOD is named as the proving surface for block behavior.
+\end{itemize}
+
+\section{Risks / Unknowns}\label{record-128-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  Blocks can become too magical if they hide layout or input behavior instead of exposing slots and facts.
+\item
+  Bijou's block ecosystem can make the project feel like an operating environment instead of a small terminal widget library. That is acceptable only if runtime truth and app truth stay separate.
+\item
+  Third-party block packages add supply-chain and compatibility risk, so the first sharing model should be explicit imports from NPM packages, not remote runtime loading.
+\item
+  A central block registry may be useful later, but it should index package metadata rather than become required infrastructure.
+\item
+  Schema-bound blocks can become too magical if schemas are allowed to own presentation. Schemas validate data; blocks own mapping and rendering.
+\item
+  Making Zod a hard core dependency would make the API less portable. Zod should be the first adapter, not the only possible schema source.
+\item
+  Schema-to-block compilers can overfit to names and shapes. Generated output should be reviewable suggestions, not uninspectable app authority.
+\item
+  Auth blocks need careful secret-handling posture before implementation.
+\item
+  Credential-provider blocks need a narrow host adapter seam so vault integrations stay out of block internals.
+\item
+  Startup blocks need stable lower-mode facts because loading animation is not meaningful in static, pipe, or accessible output.
+\item
+  Animated carousels need reduced-motion behavior and stable lower-mode facts before spring transitions become implementation scope.
+\item
+  Proto-block promotion can reveal older component assumptions that do not yet fit the block contract cleanly.
+\item
+  Modal and notification stacks depend on retained layout hit-testing work.
+\item
+  Workspace-style docking should remain outside this cycle.
+\end{itemize}
+
+\section{Playback}\label{record-128-playback}
+
+DX-031A Block Contract lands the public, metadata-first slice of this cycle.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a}, \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})}, validation/report helpers, and compact summary helpers.
+\item
+  Block metadata declares package identity, block name, family, scale, modes, docs, slots, variants, config options, composed components, semantic facts, stories, examples, and tags.
+\item
+  Block package manifests declare version, Bijou peer compatibility, exported blocks, docs, and tags without hidden global registration.
+\item
+  Public API tests prove authors can define blocks and package manifests without importing DOGFOOD internals.
+\item
+  The design-system blocks entrypoint now points to the current public contract instead of only naming future candidates.
+\end{itemize}
+
+DX-031B Schema-Bound Blocks adds the boundary validation slice.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}(\allowbreak{})}, and \texttt{b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})}.
+\item
+  Schema-bound blocks wrap an existing \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, preserving block metadata, data contracts, command intents, and ordinary render ownership.
+\item
+  Schema adapters validate unknown input into immutable typed data or immutable deterministic issues.
+\item
+  Schema adapters snapshot their parse/describe callbacks at definition time.
+\item
+  Binding schema data produces immutable block render input and optional semantic facts without rendering, subscribing, dispatching, resolving providers, or owning AppShell behavior.
+\item
+  Bind outputs must be plain objects with supported render-input keys, so class instances, built-ins, and backchannel handles cannot silently normalize into empty input.
+\end{itemize}
+
+DX-031C First-Party Block Definitions adds the first-party standard block definition slice.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s}, and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t}.
+\item
+  The first-party \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} blocks are real \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} outputs with valid metadata.
+\item
+  \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} declare DX-034 data contracts and command intents.
+\item
+  Reader and Inspector schema-bound wrappers validate boundary data before producing render input.
+\item
+  AppShell uses semantic slots: \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t}, \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}s}.
+\item
+  Definition and composition introspection do not render blocks, subscribe, dispatch, resolve providers, or walk the active runtime tree.
+\end{itemize}
+
+Still out of scope after this slice:
+
+\begin{itemize}
+\tightlist
+\item
+  Zod adapters and schema-to-block compilers.
+\item
+  DOGFOOD block galleries and multi-mode story captures for rendered blocks.
+\item
+  Modal stacks, notifications, auth blocks, workspace docking, and complex domain-specific block packages.
+\end{itemize}
+
+DX-031D DOGFOOD Blocks Section publishes the standard blocks through the project's proving surface.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD exposes a top-level Blocks section with ``What are Blocks'', authoring, pre-made catalog, surface-block, preview, and lowering pages.
+\item
+  Standard block preview pages are selectable from side navigation and render live \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} examples instead of raw metadata dumps.
+\item
+  The preview keeps lower-mode output visible as a compact lowering summary.
+\item
+  The local \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} fixture proves a block-shaped command-intent surface can update through DOGFOOD without becoming part of the shipped standard block package.
+\item
+  DOGFOOD tests assert the Blocks section, preview routing, curated catalog, live examples, lowering posture, and fixture command keys.
+\end{itemize}
+
+DX-031E Rendered Standard Block Proof replaces the first-party placeholders with deterministic render output.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} render concrete string output for interactive, static, pipe, and accessible modes.
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} renders semantic region output for \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t}, \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}s}.
+\item
+  \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} renders content, navigation, and outline output.
+\item
+  \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} renders selection, details, and actions output.
+\item
+  Render facts stay stable across modes so lowering checks do not need to parse rendered text.
+\item
+  Render results do not expose provider handles, subscription handles, refresh methods, active-tree traversal, or command dispatch callbacks.
+\end{itemize}
+
+Still out of scope after this slice:
+
+\begin{itemize}
+\tightlist
+\item
+  Provider subscriptions and cache policy.
+\item
+  Active runtime traversal.
+\item
+  Command dispatch integration.
+\item
+  Production AppShell behavior.
+\item
+  Hidden catalog expansion beyond \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}.
+\end{itemize}
+
+DF-031 Status Feedback Expansion makes the next catalog step explicit.
+
+What is now true:
+
+\begin{itemize}
+\tightlist
+\item
+  Issues \#220 through \#225 moved into \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as a focused status/feedback Block slice.
+\item
+  The standard status/feedback block names now include \texttt{I\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{I\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{T\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}C\allowbreak{}u\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}.
+\item
+  The public package barrel exposes the matching lower-camel definitions: \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{s\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}C\allowbreak{}u\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, plus matching \texttt{*\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} and \texttt{*\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} exports.
+\item
+  The new Blocks use the same DX-031/DX-034 public contract: validated block metadata, view data contracts, schema-bound adapters, command intents, story ids, deterministic render output, and stable lowering facts.
+\item
+  Status and feedback block expansion is now explicit issue-backed v6 work through \#220 through \#225, not hidden DX-031 scope.
+\item
+  YAML/JSON declaration remains a future adapter over the typed Blocks API, not a second runtime IR in this slice.
+\end{itemize}
+
+\section{Retrospective}\label{record-128-retrospective}
+
+DX-031 is landed for the \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release boundary. The shipped release floor is the standard block set: public block metadata, package manifests, adapter-first schema-bound block contracts, first-party \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}, \texttt{I\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{I\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{T\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}C\allowbreak{}u\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} definitions and schema-bound wrappers, deterministic rendered output for interactive, static, pipe, and accessible modes, block-tree rendering, and a DOGFOOD Blocks section that proves the standard set in product context.
+
+DOGFOOD multi-mode proof is present for the release slice through the standard block render tests, DOGFOOD preview tests, lowering posture checks, and story declarations. Broader ``full block availability'' remains intentionally larger than this release issue: optional Zod adapters, schema-to-block compilers, modal stacks, notifications, auth blocks, workspace docking, and broad catalog expansion should land as explicit future issues with their own tests and Method evidence.
+

@@ -1,0 +1,413 @@
+\chapter{DL-019 - Theme Rule Selection And Inspection}\label{record-184}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-019-theme-rule-selection-and-inspection.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DL-019
+title: Theme Rule Selection And Inspection
+status: active
+lane: cool-ideas
+priority: medium
+github_issue: 444
+legend: DL
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-184-decision-summary}
+
+Bijou should adopt the strongest ideas from reactive design-token systems without importing an incompatible dependency or replacing the existing runtime theme contract.
+
+The runtime truth remains:
+
+\begin{CodeBlock}
+Theme
+  -> ResolvedTheme
+    -> TokenGraph
+      -> ThemeAccessors
+        -> terminal cells, lower modes, and DTCG interop
+\end{CodeBlock}
+
+This cycle adds a Bijou-native rule layer for theme authoring and inspection:
+
+\begin{itemize}
+\tightlist
+\item
+  selector rules such as best contrast, minimum contrast, most vivid, least vivid, closest color, and ordered choice
+\item
+  explicit candidate exclusions for reserved roles such as success and error
+\item
+  structured inspection facts explaining why a rule chose a token
+\item
+  dependency facts that Theme Inspector and tests can consume later
+\item
+  compiled output that remains a normal Bijou \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} or token graph entry
+\end{itemize}
+
+No \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k} runtime, dev, peer, optional, or generated dependency is added. The external package is useful prior art, but its license and general CSS surface do not belong in Bijou's Apache-2.0 zero-dependency core.
+
+\section{Sponsored Human}\label{record-184-sponsored-human}
+
+A Bijou theme author wants to tune primitive palettes while keeping semantic roles stable. They should be able to say ``choose readable text for this surface'' or ``choose a vivid accent that is not success or error'' instead of manually maintaining every derived hex value.
+
+\section{Sponsored Agent}\label{record-184-sponsored-agent}
+
+An agent auditing theme behavior wants deterministic facts for rule inputs, candidate rejection, selected values, dependencies, and contrast proof so it can explain a theme without sampling screenshots or guessing from final RGB values.
+
+\section{Hill}\label{record-184-hill}
+
+A Bijou theme author can define semantic theme roles through pure selector rules, replay the product questions below with tests, compile the rules into the existing theme/token graph contract, and inspect which candidates were considered, rejected, and selected.
+
+\section{Playback Questions}\label{record-184-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Can a semantic foreground choose a readable color from a primitive palette without hard-coding the final hex value?
+\item
+  Can a vivid accent selector exclude reserved success and error roles while still proving contrast against its surface?
+\item
+  Can \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} explain every candidate read by a rule, including selected, eligible, excluded, invalid, and contrast-failed candidates?
+\item
+  Can malformed rule inputs fail with the missing target, scope, candidate, or exclusion path instead of silently choosing a surprising color?
+\item
+  Can the rule layer preserve existing \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} behavior for callers that only need a resolved \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e}?
+\end{itemize}
+
+\section{Current Truth}\label{record-184-current-truth}
+
+Bijou already has:
+
+\begin{itemize}
+\tightlist
+\item
+  a public \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} contract with \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{u\allowbreak{}i}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} token families
+\item
+  a \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} with references, light/dark definitions, transforms, cache invalidation, and subscribers
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} for mode-aware token themes
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}D\allowbreak{}T\allowbreak{}C\allowbreak{}G\allowbreak{}(\allowbreak{})} and \texttt{t\allowbreak{}o\allowbreak{}D\allowbreak{}T\allowbreak{}C\allowbreak{}G\allowbreak{}(\allowbreak{})} for token document interop
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} for concrete contrast checks
+\item
+  DOGFOOD Theme Lab and Theme Inspector surfaces for concrete token facts
+\end{itemize}
+
+The missing piece is rule provenance. Today a derived token can be encoded as a manual hex, a direct reference, or a transform. It cannot yet say:
+
+\begin{itemize}
+\tightlist
+\item
+  choose the highest-contrast color from this palette
+\item
+  choose the first color that reaches a contrast floor
+\item
+  choose the most vivid color that is still readable
+\item
+  exclude reserved role tokens from an accent search
+\item
+  explain which candidates failed and why
+\end{itemize}
+
+\section{Problem}\label{record-184-problem}
+
+Manual semantic token maintenance creates drift:
+
+\begin{itemize}
+\tightlist
+\item
+  a primitive palette can change while semantic foregrounds stay stale
+\item
+  a vivid accent may accidentally reuse a destructive or success role
+\item
+  contrast proof happens after values are chosen instead of during selection
+\item
+  Theme Inspector can show final values but not why those values won
+\item
+  tests can assert concrete hex values but not the decision rule behind them
+\end{itemize}
+
+The answer is not to replace Bijou's runtime theme model. The runtime model already encodes terminal-specific facts: \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R}, foreground/background tokens, text modifiers, RGB caches, ANSI downsampling, lower-mode behavior, and safe-pair checks.
+
+\section{Scope}\label{record-184-scope}
+
+This cycle adds pure core support for rule-based color selection and inspection.
+
+Included:
+
+\begin{itemize}
+\tightlist
+\item
+  color candidate scopes represented as token paths or explicit color values
+\item
+  selector functions for contrast, vividness, closeness, ordered position, and minimum contrast
+\item
+  explicit \texttt{n\allowbreak{}o\allowbreak{}t} exclusions by token path
+\item
+  selector result facts with candidate pass/fail reasons
+\item
+  dependency extraction for references and candidate scopes
+\item
+  \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} support for rule definitions if that can land without breaking existing callers
+\item
+  focused tests for selection, exclusion, dependency, and cycle behavior
+\item
+  design-system docs and changelog notes
+\end{itemize}
+
+Out of scope:
+
+\begin{itemize}
+\tightlist
+\item
+  no external \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k} package integration
+\item
+  no CSS renderer
+\item
+  no typography, spacing, motion, or duration token categories
+\item
+  no Figma adapter
+\item
+  no Theme Lab redesign in this slice
+\item
+  no element-level renderer provenance
+\item
+  no app-frame theme-mode UX changes
+\end{itemize}
+
+\section{API Direction}\label{record-184-api-direction}
+
+The first public API should be small and structural. Exact names can move in implementation, but the shape should stay close to this:
+
+\begin{CodeBlock}
+const graph = createTokenGraph({
+  palette: {
+    ink: "#0b1020",
+    paper: "#f8fafc",
+    cyan: "#38bdf8",
+    green: "#22c55e",
+    red: "#ef4444",
+  },
+  surface: {
+    primary: { fg: "#f8fafc", bg: { ref: "palette.ink" } },
+  },
+  semantic: {
+    primary: bestContrastWith(
+      { ref: "surface.primary.bg" }, // token background slot
+      scope("palette"),
+    ),
+    accent: mostVivid(scope("palette"), {
+      against: { ref: "surface.primary.bg" },
+      minContrast: 4.5,
+      not: ["palette.green", "palette.red"],
+    }),
+  },
+});
+\end{CodeBlock}
+
+If the fluent helper API is too large for the first slice, the serialized graph definition may use plain discriminated data instead:
+
+\begin{CodeBlock}
+semantic: {
+  primary: {
+    rule: "best-contrast-with",
+    target: { ref: "surface.primary.bg" },
+    candidates: { kind: "scope", path: "palette" },
+  },
+}
+\end{CodeBlock}
+
+Slot-path references ending in \texttt{.\allowbreak{}b\allowbreak{}g} are part of this cycle's contract. A reference such as \texttt{\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g\allowbreak{}"\allowbreak{} \allowbreak{}\}} resolves the background color of the \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} token while \texttt{\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}"\allowbreak{} \allowbreak{}\}} keeps the existing foreground-reference behavior.
+
+The graph should expose inspection facts separately from resolved values:
+
+\begin{CodeBlock}
+const fact = graph.inspect("semantic.accent", "dark");
+\end{CodeBlock}
+
+The returned fact should be structured enough for tests and future Theme Inspector rows:
+
+\begin{CodeBlock}
+semantic.accent
+  rule: most-vivid
+  selected: palette.cyan (#38bdf8)
+  dependencies: surface.primary.bg, palette.ink, palette.paper, palette.cyan,
+    palette.green, palette.red
+  rejected:
+    palette.paper - eligible, not selected
+    palette.green - excluded
+    palette.red - excluded
+    palette.ink - contrast below 4.5
+\end{CodeBlock}
+
+\section{Selector Vocabulary}\label{record-184-selector-vocabulary}
+
+The initial selector vocabulary should cover the high-value color decisions. Selectors that compare against a target put the target first. Selectors that rank only a candidate collection put the collection first.
+
+\texttt{b\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{})} chooses the candidate with the highest contrast ratio against the target. Equal scores keep candidate order.
+
+\texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{} \allowbreak{}\}\allowbreak{})} chooses the first candidate that clears the requested contrast ratio, using deterministic candidate order.
+
+\texttt{m\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} chooses the highest-chroma candidate, with optional \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t}, \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t}, and \texttt{n\allowbreak{}o\allowbreak{}t} constraints. First-slice chroma is the deterministic RGB channel spread: \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{},\allowbreak{} \allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{},\allowbreak{} \allowbreak{}b\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{})\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{},\allowbreak{} \allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{},\allowbreak{} \allowbreak{}b\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{})}. If \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t} is present, \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t} is required.
+
+\texttt{l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} chooses the lowest-chroma candidate, with the same optional constraints and the same \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t} rule.
+
+\texttt{c\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{})} chooses the closest candidate to a target color. The first slice uses squared RGB distance and keeps candidate order for equal distances.
+
+\texttt{n\allowbreak{}t\allowbreak{}h\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{})} chooses a candidate by ordered position. Integer indices use array-style ordering, negative integers count from the end, and out-of-range integers clamp to the nearest valid candidate. Fractional indices clamp to \texttt{0} through \texttt{1} and use \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}(\allowbreak{}(\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}1\allowbreak{})\allowbreak{} \allowbreak{}*\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{})}.
+
+\section{Runtime Contract}\label{record-184-runtime-contract}
+
+Selectors are pure. They do not read process state, filesystem data, terminal facts, or clocks.
+
+Selector helpers return plain \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} data. The token graph evaluates that intermediate rule definition, and the existing \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} path still returns a resolved \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e}.
+
+Rule failures are deterministic:
+
+\begin{itemize}
+\tightlist
+\item
+  missing target, explicit candidate, candidate-scope, and exclusion paths throw with the missing path
+\item
+  vividness selectors throw when \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t} is set without \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t}
+\item
+  no minimum-contrast candidate throws unless the selector defines an explicit fallback
+\item
+  cycles remain cycle errors
+\end{itemize}
+
+Inspection dependencies include target and \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t} references plus every candidate path read from explicit candidate lists or scopes, whether the candidate was selected, eligible-but-not-selected, excluded, invalid, or below the contrast floor.
+
+\section{Accessibility And Assistive Posture}\label{record-184-accessibility-and-assistive-posture}
+
+Selector rules improve color quality, but they do not make color sufficient as the only meaning carrier. The same graceful-lowering rule applies:
+
+\begin{itemize}
+\tightlist
+\item
+  no-color output must keep text, symbols, or structure
+\item
+  pipe output must not depend on swatches
+\item
+  accessible output must name state and intent
+\end{itemize}
+
+Contrast-aware selection is proof that a chosen color is readable when color is available. It is not proof that the UI is accessible by itself.
+
+\section{Localization And Directionality Posture}\label{record-184-localization-and-directionality-posture}
+
+No user-facing localized copy is required for the core rule primitives. Rule ids, token paths, candidate paths, and inspection facts are developer-facing identifiers.
+
+Future DOGFOOD Theme Inspector prose that explains rule facts must flow through the DOGFOOD localization catalog. Token paths remain stable identifiers and are not localized.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-184-agent-inspectability-explainability-posture}
+
+Inspection facts are a first-class product requirement. An agent should be able to assert:
+
+\begin{itemize}
+\tightlist
+\item
+  which selector rule resolved a token
+\item
+  which references and candidate scopes the rule read
+\item
+  which candidate won
+\item
+  which candidates were rejected
+\item
+  whether a candidate failed contrast, was excluded, or was the wrong type
+\item
+  which downstream token paths depend on the resolved token
+\end{itemize}
+
+These facts should not require terminal rendering, screenshot analysis, or RGB equality guessing.
+
+\section{Linked Invariants}\label{record-184-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}: resolved values and inspection facts come from executing the graph.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: selector behavior lands through deterministic tests before docs claims.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: color quality does not replace lower-mode structure.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}: future Theme Lab surfaces should consume the same inspection facts tests assert.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-184-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add selector definition types to the core theme graph.
+\item
+  Collect deterministic candidates from explicit paths and scopes.
+\item
+  Implement contrast, vividness, closeness, and ordered selection helpers.
+\item
+  Expose \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} or an adjacent pure inspection API.
+\item
+  Preserve existing \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} behavior for raw, ref, mode, and transform definitions.
+\item
+  Wire the new types and helpers into the theme barrel and root package.
+\item
+  Document the recipe pattern in the design-system theme authoring docs.
+\item
+  Record the shipped behavior in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-184-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})} chooses the readable foreground from a candidate scope.
+\item
+  \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})} rejects candidates below the minimum ratio and selects the first passing candidate.
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})} respects \texttt{a\allowbreak{}g\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t}, \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t}, and \texttt{n\allowbreak{}o\allowbreak{}t} exclusions.
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}V\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})} chooses the muted readable candidate.
+\item
+  \texttt{c\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} and \texttt{n\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})} are deterministic.
+\item
+  selector definitions participate in graph dependency inspection.
+\item
+  circular selector references still fail deterministically.
+\item
+  existing graph reference and transform tests keep passing.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-184-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Bijou has no dependency on \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k}.
+\item
+  Theme selectors are pure core functions.
+\item
+  Token graph rule definitions resolve to existing \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} objects.
+\item
+  Inspection facts explain selected and rejected candidates.
+\item
+  Exclusions by token path prevent reserved roles from winning accent rules.
+\item
+  The new API exports from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  Design-system docs show the primitive -\textgreater{} semantic rule -\textgreater{} UI token workflow.
+\item
+  Local validation includes focused theme tests, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}, and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}.
+\item
+  Code Dojo debt remains verifiable through \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}; this cycle does not claim the repo goalpost unless that aggregate report reaches \texttt{1\allowbreak{}1\allowbreak{}2} or lower.
+\end{itemize}
+
+\section{Retrospective}\label{record-184-retrospective}
+
+To be completed when the cycle lands.
+

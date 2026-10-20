@@ -1,0 +1,139 @@
+\chapter{DF-036 Audit loading placeholders family across real surfaces}\label{record-093}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-036 Audit loading placeholders family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - skeleton
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-093-framing}
+
+The loading placeholder family is intentionally small: \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} should cover short-lived, known-shape loading gaps and should not become a generic decorative filler. Because skeletons exist to preserve layout truth, they are a good v6 release proof point: rich/static output can preserve shape, but pipe and accessible lowerings must preserve meaning without relying on placeholder glyphs.
+
+This audit verifies the family against the real DOGFOOD story protocol, component-family doctrine, and mode-aware runtime behavior.
+
+\section{Sponsored Users}\label{record-093-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors deciding whether a known-shape loading gap should use \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}, or explicit prose.
+\item
+  Docs readers switching the loading story across rich, static, pipe, and accessible profiles.
+\item
+  Maintainers who need a focused regression proving DOGFOOD and design-system guidance match current runtime truth.
+\end{itemize}
+
+\section{Hills}\label{record-093-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect the DOGFOOD loading placeholder story and see both form-shaped and card-shaped placeholder regions.
+\item
+  A reader can switch the story through interactive, static, pipe, and accessible profiles without decorative placeholder glyphs leaking into constrained output.
+\item
+  A maintainer can run one cycle test that ties \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} behavior, DOGFOOD story metadata, and component-family guidance together.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-093-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the loading placeholder family through the \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} story?
+\item
+  Do the story variants cover both field/form and region/card skeleton usage?
+\item
+  Do interactive and static profiles preserve the placeholder shape?
+\item
+  Do pipe and accessible profiles avoid placeholder glyph leakage?
+\item
+  Do the design-system docs still describe skeletons as short-lived, known-shape placeholders rather than generic loading decoration?
+\end{itemize}
+
+\section{Requirements}\label{record-093-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n} story identity and \texttt{l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s} coverage family id.
+\item
+  Render every skeleton story variant in every canonical story profile.
+\item
+  Treat rich/static placeholder glyphs as allowed only in visual profiles.
+\item
+  Treat pipe output as label/context preserving, not placeholder-glyph preserving.
+\item
+  Treat accessible output as explicit loading-state language.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-093-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}6\allowbreak{}/\allowbreak{}l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} story and verifies the expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes placeholder shape; pipe output does not include placeholder glyphs; accessible output includes explicit loading text.
+\item
+  Component-family docs retain the known-shape, short-lived loading guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-093-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-036 cycle test that renders the \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the loading placeholder section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of silently widening this small audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-093-drift-check}
+
+No runtime drift was found in this slice. \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} already lowers to visual placeholder bars in interactive/static modes, no output in pipe mode, and explicit \texttt{L\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}.\allowbreak{}.} text in accessible mode. DOGFOOD wraps those primitives with labels and region titles, so pipe output remains meaningful without copying decorative placeholder glyphs.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-093-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-036 playback test tied the loading placeholder story to real mode lowerings.
+\item
+  GREEN: the new cycle test renders both \texttt{f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} and \texttt{c\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}o\allowbreak{}n} story variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve shape with placeholder glyphs.
+\item
+  Pipe previews preserve labels/regions while omitting placeholder glyphs.
+\item
+  Accessible previews include explicit loading text.
+\end{itemize}
+
+\section{Retrospective}\label{record-093-retrospective}
+
+The audit confirmed that the smallest block families still need first-class mode tests. There was no need to expand \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} itself; the valuable work was pinning its semantic limits so future loading-screen or block work cannot quietly turn skeletons into decorative filler.
+

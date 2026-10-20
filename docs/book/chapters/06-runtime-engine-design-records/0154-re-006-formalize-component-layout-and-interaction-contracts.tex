@@ -1,0 +1,349 @@
+\chapter{RE-006 --- Formalize Component Layout and Interaction Contracts}\label{record-154}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}\par}\smallskip
+
+\emph{Cycle for turning retained layout nodes into honest component contracts with explicit sizing, overflow, and interaction participation}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-001-define-runtime-engine-architecture.md}{RE-001 --- Define Runtime Engine Architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}{RE-002 --- Promote First-Class State Machine and View Stack}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}{RE-003 --- Retain Layout Trees and Layout Invalidation}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}{RE-004 --- Route Input Through Layouts and Layer Bubbling}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-154-why-this-cycle-exists}
+
+RE-003 through RE-005 gave the runtime:
+
+\begin{itemize}
+\tightlist
+\item
+  retained layouts
+\item
+  layout-driven routing
+\item
+  buffered commands and effects
+\end{itemize}
+
+But retained layout nodes are still just geometry plus painted content. The runtime still needs a first-class way for components to say:
+
+\begin{itemize}
+\tightlist
+\item
+  their explicit layout rules
+\item
+  how they align and anchor inside a parent-assigned rect
+\item
+  how they own overflow
+\item
+  whether they participate in input
+\item
+  what component-level handlers can emit commands and effects
+\end{itemize}
+
+This cycle exists to formalize those component contracts without dragging the framed shell migration in yet.
+
+\section{Human users / jobs / hills}\label{record-154-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-154-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers evolving the runtime tree
+\item
+  builders composing real interactive components instead of anonymous layout rectangles
+\item
+  shell authors who need component ownership to stay honest under resize, overflow, and modal layering
+\end{itemize}
+
+\subsection{Human jobs}\label{record-154-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Attach explicit layout rules to retained layout nodes.
+\item
+  Describe overflow ownership instead of improvising wrap vs clip vs viewport behavior.
+\item
+  Mark components enabled or disabled for interaction without stale registration side effects.
+\item
+  Resolve the deepest enabled interactive node from a retained hit path.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-154-human-hill}
+
+A human can inspect a retained component node and answer how it sizes, how it aligns, how it overflows, and whether it can currently accept input.
+
+\section{Agent users / jobs / hills}\label{record-154-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-154-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents inspecting retained trees for real component semantics
+\item
+  agents generating routing tests against enabled and disabled components
+\item
+  agents preparing later shell migration and component-family adoption work
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-154-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read explicit layout rules and overflow ownership from a retained component contract.
+\item
+  Resolve the deepest enabled interactive node inside a retained hit path.
+\item
+  Invoke component-level handlers that emit multiple commands and effects without bypassing runtime buffers.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-154-agent-hill}
+
+An agent can inspect a retained layout hit and explain which component would receive input, why disabled descendants were skipped, and whether scroll ownership aligns with viewport overflow.
+
+\section{Human playback}\label{record-154-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user clicks inside a confirmation card rendered as a retained component tree.
+\item
+  The hit path contains:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    card shell
+  \item
+    disabled secondary action
+  \item
+    enabled primary action
+  \end{itemize}
+\item
+  The runtime resolves the deepest enabled interactive node, which is the primary action.
+\item
+  The primary action's component handler emits:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s}
+  \end{itemize}
+\item
+  It also emits one effect:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}-\allowbreak{}c\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}k}
+  \end{itemize}
+\item
+  In a separate pane, a viewport-owned list component claims wheel scrolling because its block overflow is \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t}.
+\item
+  A non-viewport note block does not claim the same scroll input.
+\end{enumerate}
+
+\section{Agent playback}\label{record-154-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects a retained layout hit path with three nested component nodes.
+\item
+  The deepest node is disabled, so it should not receive input.
+\item
+  Its parent is enabled and accepts pointer presses.
+\item
+  The runtime resolves that parent as the deepest enabled interactive node.
+\item
+  The agent then invokes the component handler through the runtime contract seam.
+\item
+  The handler emits multiple commands and one effect.
+\item
+  The runtime keeps those commands and effects separate for later buffering and draining.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-154-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Implementation outline}\label{record-154-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extend the pure runtime-engine module with first-class component contracts for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    explicit layout rules
+  \item
+    explicit overflow ownership
+  \item
+    explicit interaction participation
+  \end{itemize}
+\item
+  Keep the layout contract small but honest:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    width and height behavior
+  \item
+    alignment and anchoring
+  \item
+    min/max or fixed sizing hooks where needed
+  \end{itemize}
+\item
+  Keep overflow ownership explicit:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    inline overflow for clip/truncate/viewport
+  \item
+    block overflow for wrap/stack/clip/viewport
+  \end{itemize}
+\item
+  Add pure helpers to:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    create retained component nodes with attached contracts
+  \item
+    read component contracts back from retained nodes
+  \item
+    resolve the deepest enabled interactive node from a retained hit path
+  \item
+    invoke component-level handlers that emit commands and effects
+  \end{itemize}
+\item
+  Formalize the rule that scroll ownership aligns with viewport overflow instead of arbitrary wheel handlers.
+\item
+  Identify first migration candidates without performing the shell migration yet.
+\end{enumerate}
+
+\section{First migration candidates}\label{record-154-first-migration-candidates}
+
+\begin{itemize}
+\tightlist
+\item
+  collection rows in command palettes and browsable lists
+\item
+  button-like activators in confirmation or guided-flow surfaces
+\item
+  viewport-owned panes where wheel/scroll ownership must stay truthful
+\end{itemize}
+
+\section{Tests to write first}\label{record-154-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving the legend now points at \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} as the active cycle and leaves \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} as the remaining runtime-engine backlog slice
+\item
+  package-local runtime tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    component contracts can carry explicit layout rules and overflow ownership
+  \item
+    deepest enabled interactive node resolution prefers the deepest eligible node
+  \item
+    disabled or unsupported descendants fall back to an enabled ancestor
+  \item
+    component-level handlers can emit multiple commands and effects
+  \item
+    scroll ownership aligns with viewport overflow instead of ordinary block content
+  \end{itemize}
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-154-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  the real shell migration may want richer layout rules than the first contract vocabulary here, so the initial contract should stay small and composable
+\item
+  some component families may need higher-level semantics later, but this cycle should land the common runtime contract first
+\item
+  the runtime should keep this retained-layout-first instead of drifting into ad hoc registration or shell-local shortcuts again
+\end{itemize}
+
+\section{Retrospective}\label{record-154-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  retained component nodes with explicit layout, overflow, and interaction contracts
+\item
+  pure helpers for resolving the deepest enabled interactive node
+\item
+  component-level handler dispatch that emits commands and effects
+\item
+  tests proving disabled/unsupported nodes are skipped honestly
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no framed-shell migration yet
+\item
+  no app-frame routing rewrite yet
+\item
+  no wholesale component-family migration yet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}
+\end{itemize}
+

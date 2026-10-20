@@ -1,0 +1,97 @@
+\chapter{DF-150 - DOGFOOD Terminal Guardrails}\label{record-119}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-150-dogfood-terminal-guardrails.md}\par}\smallskip
+
+Linked issues: \#150, \#151, \#152
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD Field Guide}
+
+\section{Sponsor Human}\label{record-119-sponsor-human}
+
+A learner launching DOGFOOD from a terminal who needs to know that it will take over the screen and how to leave it.
+
+\section{Sponsor Agent}\label{record-119-sponsor-agent}
+
+A docs-surface verification agent that can prove the DOGFOOD entrypoint behaves deterministically in TTY and non-TTY contexts.
+
+\section{Hill}\label{record-119-hill}
+
+DOGFOOD announces its full-screen behavior, prints explicit quit controls, and refuses to launch through non-interactive stdin/stdout paths that cannot host the TUI.
+
+\section{Scope}\label{record-119-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a terminal readiness helper for the DOGFOOD entrypoint.
+\item
+  Require both stdin and stdout to be TTYs before launching DOGFOOD.
+\item
+  Print a short full-screen notice and exit controls before \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}.
+\item
+  Point scripted callers to the existing smoke command instead of failing silently through a pipe or redirected output.
+\item
+  Cover the guard in docs preview tests.
+\end{itemize}
+
+\section{Playback Questions}\label{record-119-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does DOGFOOD tell the user it is about to launch a full-screen TUI?
+\item
+  Are the quit controls visible before terminal takeover?
+\item
+  Does a non-TTY stdin or stdout path fail with a useful message?
+\item
+  Does the message direct automation to the smoke command instead?
+\end{enumerate}
+
+\section{Accessibility / Assistive Reading Posture}\label{record-119-accessibility-assistive-reading-posture}
+
+The warning is plain text on stderr before alt-screen rendering, so screen readers and logs can capture it without needing the TUI frame.
+
+\section{Localization / Directionality Posture}\label{record-119-localization-directionality-posture}
+
+This launch warning is host-entrypoint English text in this cycle.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-119-agent-inspectability-explainability-posture}
+
+The readiness helper is a pure function over \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e}, so tests can assert TTY and non-TTY behavior without spawning a terminal.
+
+\section{Linked Invariants}\label{record-119-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Full-screen apps should declare terminal takeover before entering the app.
+\item
+  Non-interactive execution should point to scripted verification paths.
+\end{itemize}
+
+\section{Verification}\label{record-119-verification}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\end{itemize}
+
+\section{Tests To Write First}\label{record-119-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Docs preview tests for terminal readiness and entrypoint wiring.
+\end{itemize}
+
+\section{Retrospective}\label{record-119-retrospective}
+
+See \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/WF-122-day-zero-audit-fixes.md}{WF-122 day zero audit fixes}.
+
