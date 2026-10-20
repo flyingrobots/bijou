@@ -16,7 +16,7 @@ describe('DX-050 Profunctor Page inspection design', () => {
     expectClaims(design, [
       'github_issue: 468',
       'status: complete',
-      'Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)',
+      'Legend: [DX - Developer Experience]',
       '## Current Truth',
       '## Acceptance Criteria',
       '## Sponsor Human',

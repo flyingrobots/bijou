@@ -12,7 +12,7 @@ Closed the remaining live DX-005 import seam by re-exporting BijouContext, Cell,
 
 ## Original Proposal
 
-Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md)
 
 ## Idea
 

@@ -1,6 +1,6 @@
 # WF-004 — Shape The Next Release
 
-Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md)
 
 ## Sponsor human
 

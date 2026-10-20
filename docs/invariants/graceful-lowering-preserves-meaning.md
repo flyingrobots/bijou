@@ -2,8 +2,8 @@
 
 ## Protected by legends
 
-- [DL — Design Language](../legends/DL-design-language.md)
-- [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
+- [DL — Design Language](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md)
+- [LX — Localization and Bidirectionality](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md)
 
 Rich mode is not the only reality.
 

@@ -1,0 +1,36 @@
+{
+  "edition": "2026-10-19",
+  "pages": 1020,
+  "source_documents": 196,
+  "mermaid_sources_converted_to_tikz": 8,
+  "component_specimens": 42,
+  "source_hash_checks": "196/196 matched",
+  "svg_hash_and_xml_checks": "42/42 passed",
+  "pdf_sha256": "a156a864236dd9059238e70205a3069c5ebd4a5fa15ed3bb7a0d41da64aa7029",
+  "tex_sha256": "4b94a544f303d6299d2166cdd67978ce30dcfd19d8206311d787db63bdcc1c77",
+  "compiler": "LuaHBTeX 1.15.0 / TeX Live 2022",
+  "clean_build": "two passes from retained repository source and assets into temporary storage",
+  "missing_glyphs": 0,
+  "undefined_references": 0,
+  "maximum_text_overflow_pt": 3.84578,
+  "visual_inspection": [
+    "cover",
+    "ownership schema",
+    "metadata schema",
+    "variant schema",
+    "layout envelope",
+    "component atlas box specimen"
+  ],
+  "limitations": [
+    "Historical design records describe proposals and landed work; current tracker status remains authoritative.",
+    "Minor TeX box warnings remain, at most 3.84578 points."
+  ],
+  "resource_usage": {
+    "temporary_build_kib": 627012,
+    "host_free_bytes": 684619661312,
+    "worker": "bijou-design-book-worker",
+    "scratch_limit_bytes": 1610612736,
+    "worker_memory_bytes": 4294967296,
+    "worker_cpus": 2
+  }
+}

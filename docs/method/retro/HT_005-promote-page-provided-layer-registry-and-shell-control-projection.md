@@ -20,7 +20,7 @@ metadata is no longer limited to the older `modalKeyMap` seam.
 
 Legend:
 
-- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/HT-humane-terminal.md)
 
 Depends on:
 

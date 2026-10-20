@@ -2,7 +2,7 @@
 
 Linked issues: #123, #124, #153
 
-Linked legend: [WF - Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+Linked legend: [WF - Workflow and Delivery](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md)
 
 ## Sponsor Human
 

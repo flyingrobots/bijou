@@ -189,7 +189,7 @@ Useful anchors:
 - [scripts/smoke-dogfood.test.ts](./scripts/smoke-dogfood.test.ts)
 - [scripts/docs-preview.test.ts](./scripts/docs-preview.test.ts)
 - [docs/release.md](./docs/release.md)
-- [docs/method/release-runbook.md](./docs/method/release-runbook.md)
+- [docs/method/release-runbook.md](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/release-runbook.md)
 
 ## Rule Of Thumb
 

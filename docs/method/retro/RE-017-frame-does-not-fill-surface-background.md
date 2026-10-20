@@ -11,7 +11,7 @@ Fixed in the `v4.4.1` release line and already shipped on `main` at tag `v4.4.1`
 
 ## Original Proposal
 
-Legend: [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+Legend: [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md)
 
 ## Problem
 

@@ -4,7 +4,7 @@ _Cycle for formalizing Bijou's hexagonal runtime around state machines, view sta
 
 Legend:
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
 
 Depends on:
 
@@ -148,7 +148,7 @@ An agent can inspect the runtime model and answer what is visible, what is inter
 
 What landed:
 
-- a new [RE — Runtime Engine](../legends/RE-runtime-engine.md) legend
+- a new [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md) legend
 - explicit invariants for state/view separation, layout-owned interaction geometry, and command/effect separation
 - this cycle doc capturing the runtime model as the design source of truth
 - a decomposition backlog for implementation slices

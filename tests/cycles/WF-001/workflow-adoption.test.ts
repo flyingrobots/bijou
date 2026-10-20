@@ -12,9 +12,6 @@ function read(relativePath: string): string {
 describe('WF-001 workflow adoption', () => {
 
   it('adds explicit legend and invariant docs', () => {
-    expect(existsSync(resolve(ROOT, 'docs/legends/WF-workflow-and-delivery.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/legends/HT-humane-terminal.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/legends/LX-localization-and-bidirectionality.md'))).toBe(true);
 
     const invariants = read('docs/invariants/README.md');
     expect(invariants).toContain('Tests Are the Spec');

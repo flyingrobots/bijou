@@ -2,8 +2,8 @@
 
 ## Protected by legends
 
-- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [HT — Humane Terminal](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
 
 When multiple interactive layers are open, dismiss actions should target the topmost dismissible layer before they are interpreted as broader shell actions.
 

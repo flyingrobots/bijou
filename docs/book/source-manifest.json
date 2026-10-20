@@ -1,0 +1,1629 @@
+{
+  "base_revision": "1853ad90",
+  "source_count": 196,
+  "chapters": [
+    {
+      "chapter": 1,
+      "path": "docs/design/DF-001-show-dogfood-coverage-progress.md",
+      "title": "DF-001 \u2014 Show DOGFOOD Coverage Progress",
+      "bytes": 5068,
+      "sha256": "61cd9659a916704c7890910b5ecb36ac1d954418ba7f018d8c94388cba49acc8",
+      "group": "DF"
+    },
+    {
+      "chapter": 2,
+      "path": "docs/design/DF-003-enforce-dogfood-coverage-floor.md",
+      "title": "DF-003 \u2014 Enforce DOGFOOD Coverage Floor",
+      "bytes": 5163,
+      "sha256": "1517aa52da330ddc93c109654fcaa13f32184ae8f30e696591ea4b7a317e2d01",
+      "group": "DF"
+    },
+    {
+      "chapter": 3,
+      "path": "docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md",
+      "title": "DF-004 \u2014 Raise DOGFOOD Coverage Floor to the Next 5-Point Target",
+      "bytes": 5384,
+      "sha256": "eb3614ee5e51f39ecaf1fd65e2c4636eeb3d91c6cc24903db940ab8246f45386",
+      "group": "DF"
+    },
+    {
+      "chapter": 4,
+      "path": "docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md",
+      "title": "DF-005 \u2014 Raise DOGFOOD Coverage Floor to 19%",
+      "bytes": 6530,
+      "sha256": "eee2b24e0d469c086c4eb04fce1777d717dc03324ac7ad8ccd29f5b2b1bb449c",
+      "group": "DF"
+    },
+    {
+      "chapter": 5,
+      "path": "docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md",
+      "title": "DF-006 \u2014 Raise DOGFOOD Coverage Floor to 24%",
+      "bytes": 6538,
+      "sha256": "57eda4cdd7d86aafbbe00110d3c6a1c59c7d566737b5e8c050079cf78c34a327",
+      "group": "DF"
+    },
+    {
+      "chapter": 6,
+      "path": "docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md",
+      "title": "DF-007 \u2014 Raise DOGFOOD Coverage Floor to 29%",
+      "bytes": 6511,
+      "sha256": "52cb97b55c8d8ae0e43b20ae4d687ba1c65408cabb06bb3011f0b7d50f34f779",
+      "group": "DF"
+    },
+    {
+      "chapter": 7,
+      "path": "docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md",
+      "title": "DF-008 \u2014 Raise DOGFOOD Coverage Floor to 34%",
+      "bytes": 6663,
+      "sha256": "81bc86d24eb70a5505718a163d7c9c6cb374e4ff133e878c2bc80add26161ed9",
+      "group": "DF"
+    },
+    {
+      "chapter": 8,
+      "path": "docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md",
+      "title": "DF-009 \u2014 Raise DOGFOOD Coverage Floor to 39%",
+      "bytes": 6607,
+      "sha256": "4c399cf99a96acc37f9bda86962a8c9d72e98c6f642656db24e3c3fe8d19b8c5",
+      "group": "DF"
+    },
+    {
+      "chapter": 9,
+      "path": "docs/design/DF-010-raise-dogfood-coverage-floor-to-44-percent.md",
+      "title": "DF-010 \u2014 Raise DOGFOOD Coverage Floor to 44%",
+      "bytes": 6703,
+      "sha256": "0613b574e4c0aa62f21bb81086bb149bb7dc1d7c9c71d9e8278e0e99eec35f0b",
+      "group": "DF"
+    },
+    {
+      "chapter": 10,
+      "path": "docs/design/DF-011-raise-dogfood-coverage-floor-to-49-percent.md",
+      "title": "DF-011 \u2014 Raise DOGFOOD Coverage Floor to 49%",
+      "bytes": 6895,
+      "sha256": "5102f4689df11201c552cb3afa3abe483dde387c30d246050552fd2fc75f4404",
+      "group": "DF"
+    },
+    {
+      "chapter": 11,
+      "path": "docs/design/DF-012-raise-dogfood-coverage-floor-to-54-percent.md",
+      "title": "DF-012 \u2014 Raise DOGFOOD Coverage Floor to 54%",
+      "bytes": 7189,
+      "sha256": "6bb126dd8c28f14638ca1b2605e74a18ac8cb3e21f0e04a2eed1c23eac7ca979",
+      "group": "DF"
+    },
+    {
+      "chapter": 12,
+      "path": "docs/design/DF-013-raise-dogfood-coverage-floor-to-59-percent.md",
+      "title": "DF-013 \u2014 Raise DOGFOOD Coverage Floor to 59%",
+      "bytes": 7073,
+      "sha256": "04729d0116771eba77daae6a8c507ec92426bc8f300b698815ff1c7077d83234",
+      "group": "DF"
+    },
+    {
+      "chapter": 13,
+      "path": "docs/design/DF-014-raise-dogfood-coverage-floor-to-64-percent.md",
+      "title": "DF-014 \u2014 Raise DOGFOOD Coverage Floor to 64%",
+      "bytes": 3537,
+      "sha256": "844d11af787f87542f910104236fd09621e6252f01f0904dd855b82a9a5d7370",
+      "group": "DF"
+    },
+    {
+      "chapter": 14,
+      "path": "docs/design/DF-015-raise-dogfood-coverage-floor-to-69-percent.md",
+      "title": "DF-015 \u2014 Raise DOGFOOD Coverage Floor to 69%",
+      "bytes": 2772,
+      "sha256": "01d99e1b1b73929ac5f81c53f8f59bfda87e923acc9e2451038ab98871db62fe",
+      "group": "DF"
+    },
+    {
+      "chapter": 15,
+      "path": "docs/design/DF-016-raise-dogfood-coverage-floor-to-74-percent.md",
+      "title": "DF-016 \u2014 Raise DOGFOOD Coverage Floor to 74%",
+      "bytes": 2672,
+      "sha256": "86612f99ca41ce3151a3d441fa6bfe6392d749e1a43c42818f8520843ef88834",
+      "group": "DF"
+    },
+    {
+      "chapter": 16,
+      "path": "docs/design/DF-017-raise-dogfood-coverage-floor-to-79-percent.md",
+      "title": "DF-017 \u2014 Raise DOGFOOD Coverage Floor to 79%",
+      "bytes": 2580,
+      "sha256": "6fdc177257c82b9fc5f50667c127c2f41ba1b5a3b71ef05b9daf35edaa55fe59",
+      "group": "DF"
+    },
+    {
+      "chapter": 17,
+      "path": "docs/design/DF-018-raise-dogfood-coverage-floor-to-84-percent.md",
+      "title": "DF-018 \u2014 Raise DOGFOOD Coverage Floor to 84%",
+      "bytes": 2693,
+      "sha256": "853731a0a187f95e1908d2dd5ee0d67823676fabad1ce63e6e51f30bcfa70215",
+      "group": "DF"
+    },
+    {
+      "chapter": 18,
+      "path": "docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md",
+      "title": "DF-019 \u2014 Raise DOGFOOD Coverage Floor to 100%",
+      "bytes": 3839,
+      "sha256": "f38208c59ef961c8777c89a15dd7e34f9fd92f0d18be796d8bf59be556b0f53c",
+      "group": "DF"
+    },
+    {
+      "chapter": 19,
+      "path": "docs/design/DF-021-shape-dogfood-as-terminal-docs-system.md",
+      "title": "DF-021 \u2014 Shape DOGFOOD As Terminal Docs System",
+      "bytes": 9059,
+      "sha256": "83e93b082ba567c3288faa52db83e6bc9372f33fc96c96b58c5375fd63694bbd",
+      "group": "DF"
+    },
+    {
+      "chapter": 20,
+      "path": "docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md",
+      "title": "DF-022 \u2014 Build Prose Docs Reader And Top-Level DOGFOOD Nav",
+      "bytes": 4683,
+      "sha256": "f825c554f9635e2ca8d957630118733246d08071f23d5cca45f6eb36b4cde968",
+      "group": "DF"
+    },
+    {
+      "chapter": 21,
+      "path": "docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md",
+      "title": "DF-023 \u2014 Publish Repo, Package, And Release Guides In DOGFOOD",
+      "bytes": 4862,
+      "sha256": "8b7a4f0fff951298583272beda95577e7dc063f4eb535fcabcda87991358ad4e",
+      "group": "DF"
+    },
+    {
+      "chapter": 22,
+      "path": "docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md",
+      "title": "DF-024 \u2014 Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD",
+      "bytes": 4275,
+      "sha256": "d52d212a23e3a9c1b8061dfc5706c9fff4be24373148b32cd16903040a93b8fd",
+      "group": "DF"
+    },
+    {
+      "chapter": 23,
+      "path": "docs/design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md",
+      "title": "DF-025 \u2014 Make DOGFOOD The Only Human-Facing Docs Surface",
+      "bytes": 7608,
+      "sha256": "d31799de49ad53c2128a2ad2a144809dac74ef68e03a14141dd99a17f989f9a4",
+      "group": "DF"
+    },
+    {
+      "chapter": 24,
+      "path": "docs/design/DF-026-demote-examples-to-secondary-reference-status.md",
+      "title": "DF-026 \u2014 Demote Examples To Secondary Reference Status",
+      "bytes": 3482,
+      "sha256": "ed94bee69358ffba730a435da447f69a71eb54013e8a0b754704d44bf618c9e8",
+      "group": "DF"
+    },
+    {
+      "chapter": 25,
+      "path": "docs/design/DF-027-storybook-style-tool-for-bijou.md",
+      "title": "DF-027 \u2014 Storybook-Style Tool for Bijou",
+      "bytes": 5677,
+      "sha256": "edd4c3ee2ed1b611e2d8adbabdfa560b4f4b93bbcd97f0038bb5f37464efc32d",
+      "group": "DF"
+    },
+    {
+      "chapter": 26,
+      "path": "docs/design/DF-028-story-capture-matrix.md",
+      "title": "DF-028 Story Capture Matrix",
+      "bytes": 3969,
+      "sha256": "60f385389aaac9eb255a3f8efa356d3b3e2b40ff4ee46c846cfa5dbc705243d7",
+      "group": "DF"
+    },
+    {
+      "chapter": 27,
+      "path": "docs/design/DF-029-fixture-to-docs-promotion-path.md",
+      "title": "DF-029 Fixture-to-Docs Promotion Path",
+      "bytes": 3871,
+      "sha256": "a3b9d9aed8d17391d770d05de0751e07861a03fc2ca590cf9a39e07d42ab1857",
+      "group": "DF"
+    },
+    {
+      "chapter": 28,
+      "path": "docs/design/DF-030-dogfood-docs-surface-block.md",
+      "title": "DF-030 Dogfood Docs Surface Block",
+      "bytes": 8732,
+      "sha256": "8c4ca3282bcf95f7d76e139f84b57532d409dbf950ccbcb016cbd2b33ca04806",
+      "group": "DF"
+    },
+    {
+      "chapter": 29,
+      "path": "docs/design/DF-031-status-feedback-standard-blocks.md",
+      "title": "DF-031 Status and feedback standard Blocks",
+      "bytes": 10283,
+      "sha256": "2208d73c810b6ccc31e8c142b88eb71bde508d04947f4f053fb38cabff3c9c43",
+      "group": "DF"
+    },
+    {
+      "chapter": 30,
+      "path": "docs/design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md",
+      "title": "DF-036 Audit loading placeholders family across real surfaces",
+      "bytes": 4704,
+      "sha256": "e253691e10c9c6fa1938d1ec08a3d1037976ddd1b5fa25dc8d3a982d788eda33",
+      "group": "DF"
+    },
+    {
+      "chapter": 31,
+      "path": "docs/design/DF-039-component-family-standard-blocks.md",
+      "title": "DF-039 Component-family standard Blocks",
+      "bytes": 10347,
+      "sha256": "7c037924e05360af8ea5da18fbba4b9f513f04f041c6234fc411a958557183a1",
+      "group": "DF"
+    },
+    {
+      "chapter": 32,
+      "path": "docs/design/DF-041-audit-inspector-panels-family-across-real-surfaces.md",
+      "title": "DF-041 Audit inspector panels family across real surfaces",
+      "bytes": 4625,
+      "sha256": "1c7d242735e594ea8cecd34bdc9ffe54fd9026eaadd75c87837c3fca8e052c0c",
+      "group": "DF"
+    },
+    {
+      "chapter": 33,
+      "path": "docs/design/DF-046-choice-navigation-standard-blocks.md",
+      "title": "DF-046 Choice and navigation standard Blocks",
+      "bytes": 10842,
+      "sha256": "1890c6d2b7d1b6a1d5e749bc837bd50d699df1fc20e7a42561f19fede2f4a685",
+      "group": "DF"
+    },
+    {
+      "chapter": 34,
+      "path": "docs/design/DF-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.md",
+      "title": "DF-049 Audit multi-field and staged forms family across real surfaces",
+      "bytes": 4841,
+      "sha256": "169da48075fca574a3ce13732cd400a1fd5e72af0571dd898e95cff55a46b900",
+      "group": "DF"
+    },
+    {
+      "chapter": 35,
+      "path": "docs/design/DF-053-audit-motion-and-shader-effects-family-across-real-surfaces.md",
+      "title": "DF-053 Audit motion and shader effects family across real surfaces",
+      "bytes": 5601,
+      "sha256": "2e015eee341020fa9687f5f6935f2e07281d6e69d3b1d60dee6eda95f43e37b0",
+      "group": "DF"
+    },
+    {
+      "chapter": 36,
+      "path": "docs/design/DF-054-late-family-standard-blocks.md",
+      "title": "DF-054 Late-family standard Blocks",
+      "bytes": 11859,
+      "sha256": "613924de563a5e8e34843e86116ea9770a206d5c2a8412a80b7ccfad9044b45f",
+      "group": "DF"
+    },
+    {
+      "chapter": 37,
+      "path": "docs/design/DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md",
+      "title": "DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces",
+      "bytes": 5213,
+      "sha256": "e3aabb4b2f3dcd79e5e2be7490a19b1186b5942d39aa43e4e2a673fc57759fd8",
+      "group": "DF"
+    },
+    {
+      "chapter": 38,
+      "path": "docs/design/DF-060-v7-dogfood-release-title-screen.md",
+      "title": "DF-060 V7 DOGFOOD Release Title Screen And Closeout Six-Pack",
+      "bytes": 10458,
+      "sha256": "33315ff6fcca244f5b09f80643cb6a8f5bafcc1fe58b3413c770326885cc5164",
+      "group": "DF"
+    },
+    {
+      "chapter": 39,
+      "path": "docs/design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md",
+      "title": "DF-061 Audit overlay primitives family across real surfaces",
+      "bytes": 4789,
+      "sha256": "99daa0f9517d2a8210f49f4b5f8af3144a1ebef2263b1c2cc2c9340e99a39c1a",
+      "group": "DF"
+    },
+    {
+      "chapter": 40,
+      "path": "docs/design/DF-062-audit-notification-system-family-across-real-surfaces.md",
+      "title": "DF-062 Audit notification system family across real surfaces",
+      "bytes": 5460,
+      "sha256": "f66eb2198f03e120b7c8eb06a9df82176afda40ddc073c7cc84f8e8e1db2013d",
+      "group": "DF"
+    },
+    {
+      "chapter": 41,
+      "path": "docs/design/DF-063-audit-app-shell-family-across-real-surfaces.md",
+      "title": "DF-063 Audit app shell family across real surfaces",
+      "bytes": 4903,
+      "sha256": "c20fcab14a7d1db376cd17d0c83b01f82e689e5835c6e4a8ff7a47f1e3f4e608",
+      "group": "DF"
+    },
+    {
+      "chapter": 42,
+      "path": "docs/design/DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md",
+      "title": "DF-064 Audit keybinding help and shell hints family across real surfaces",
+      "bytes": 5000,
+      "sha256": "5f81e7a6cb62b8cf5f8acec813e1e43f46736c88a52c4d623f2910efc2865c06",
+      "group": "DF"
+    },
+    {
+      "chapter": 43,
+      "path": "docs/design/DF-065-audit-workspace-layout-family-across-real-surfaces.md",
+      "title": "DF-065 Audit workspace layout family across real surfaces",
+      "bytes": 5035,
+      "sha256": "3e31048ee3a73adfcf7087cecd74a0350bbd3b200faf251b78a44b20bdae0fbd",
+      "group": "DF"
+    },
+    {
+      "chapter": 44,
+      "path": "docs/design/DF-066-audit-data-visualization-family-across-real-surfaces.md",
+      "title": "DF-066 Audit data visualization family across real surfaces",
+      "bytes": 5149,
+      "sha256": "8e9bc3002922a8453d86ca478b3b5c2d3c2bcffe1e82e1ed8985addeac4cda01",
+      "group": "DF"
+    },
+    {
+      "chapter": 45,
+      "path": "docs/design/DF-067-prove-responsive-dogfood-layout-variants.md",
+      "title": "DF-067 Prove Responsive DOGFOOD Layout Variants",
+      "bytes": 4691,
+      "sha256": "7424af47e3a86c3262b6ee06b0e8ec10d4676f44dee49bc4be947f607ef2ce93",
+      "group": "DF"
+    },
+    {
+      "chapter": 46,
+      "path": "docs/design/DF-069-block-authored-dogfood.md",
+      "title": "DF-069 - Block-Authored DOGFOOD",
+      "bytes": 5474,
+      "sha256": "8b37312ac00ed529d5611285b4c542d6b447af5bf9ba65f174e4646c35c241b7",
+      "group": "DF"
+    },
+    {
+      "chapter": 47,
+      "path": "docs/design/DF-070-dogfood-block-product-polish.md",
+      "title": "DF-070 - DOGFOOD Block Product Polish",
+      "bytes": 3035,
+      "sha256": "f8f8dc0a54744179d981befd97d82ec9e23af67fd12732e5bfb4ac659cfc67d0",
+      "group": "DF"
+    },
+    {
+      "chapter": 48,
+      "path": "docs/design/DF-071-dogfood-block-authored-surfaces.md",
+      "title": "DF-071 - DOGFOOD Block-Authored Surfaces",
+      "bytes": 4012,
+      "sha256": "48aea9270294b6e29371fecc13031433b99821aeb850505c84b71ebd2c39e2e4",
+      "group": "DF"
+    },
+    {
+      "chapter": 49,
+      "path": "docs/design/DF-072-dogfood-release-title-artifact-gallery.md",
+      "title": "DF-072 DOGFOOD Release Title Artifact Gallery",
+      "bytes": 6809,
+      "sha256": "0a0ff711cfe9df9a00e5074609a3203eb9b297ae09b70f513eb040e10d374ed1",
+      "group": "DF"
+    },
+    {
+      "chapter": 50,
+      "path": "docs/design/DF-073-raster-to-glyph-title-art.md",
+      "title": "DF-073 Raster-to-Glyph Title Art",
+      "bytes": 13554,
+      "sha256": "5b33f30598a21bd0be7b6e012d3f0de8183c27639c1a0283e656bc27580dd350",
+      "group": "DF"
+    },
+    {
+      "chapter": 51,
+      "path": "docs/design/DF-074-fluid-triangle-title-screen.md",
+      "title": "DF-074 Fluid Triangle Title Screen",
+      "bytes": 12794,
+      "sha256": "d9dbc9c0386aa0b922b22919e00712474b4d5e1827a5bf4e40b4f122749e3d47",
+      "group": "DF"
+    },
+    {
+      "chapter": 52,
+      "path": "docs/design/DF-075-dogfood-post-release-polish.md",
+      "title": "DF-075 DOGFOOD Post-Release Polish",
+      "bytes": 5146,
+      "sha256": "d274b5a309403fcf1eb8d9e7966d72984c2f710dde976e6f327c51cbac62e321",
+      "group": "DF"
+    },
+    {
+      "chapter": 53,
+      "path": "docs/design/DF-076-blocklab-demo-readiness.md",
+      "title": "DF-076 - BlockLab Demo Readiness Navigation",
+      "bytes": 1253,
+      "sha256": "1a30d5ee1268129b2cfbe33b6055ef025e3f4fc58d7a80c84fb6c019b3f9f86a",
+      "group": "DF"
+    },
+    {
+      "chapter": 54,
+      "path": "docs/design/DF-077-dogfood-app-landing-extraction.md",
+      "title": "DF-077: DOGFOOD App Landing Extraction",
+      "bytes": 7533,
+      "sha256": "0148e3c2b2417471d29d0728e72a50e0466b39dfa2e0658e1f16e357c20dd8e6",
+      "group": "DF"
+    },
+    {
+      "chapter": 55,
+      "path": "docs/design/DF-078-dogfood-release-story-surfaces.md",
+      "title": "DF-078 DOGFOOD Release Story Surfaces",
+      "bytes": 8509,
+      "sha256": "ddf6519092c218ec85e065bfa2721f2cbf3d9890c4ad3c9bdcbfb9ba0964a6d7",
+      "group": "DF"
+    },
+    {
+      "chapter": 56,
+      "path": "docs/design/DF-150-dogfood-terminal-guardrails.md",
+      "title": "DF-150 - DOGFOOD Terminal Guardrails",
+      "bytes": 2345,
+      "sha256": "cf4e85be42bf6c3b3b84731fb68fa3a82d1a8982ff9857a05c20e2abdc771c0d",
+      "group": "DF"
+    },
+    {
+      "chapter": 57,
+      "path": "docs/design/DX-001-type-framed-app-messages-and-updates-end-to-end.md",
+      "title": "DX-001 \u2014 Type Framed App Messages and Updates End-to-End",
+      "bytes": 2266,
+      "sha256": "d2790f3d62d8996ca444ae18dc2c37cf2666c3a4bf82c77e76a9222b5e8783f9",
+      "group": "DX"
+    },
+    {
+      "chapter": 58,
+      "path": "docs/design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md",
+      "title": "DX-002 \u2014 Reconcile Cmd Typing With Cleanup and Effect Patterns",
+      "bytes": 2241,
+      "sha256": "3d5c54faa47d99a9b8e0ee65de503e9e938a2a976145437f7e8fde8d1382800e",
+      "group": "DX"
+    },
+    {
+      "chapter": 59,
+      "path": "docs/design/DX-022-layout-inspector-overlay.md",
+      "title": "DX-022 Layout Inspector Overlay",
+      "bytes": 4089,
+      "sha256": "600eab9e22bfa121475bffc3c5438e12c0b0abb51a35f07168b12dc050d19ed4",
+      "group": "DX"
+    },
+    {
+      "chapter": 60,
+      "path": "docs/design/DX-023-input-routing-inspector.md",
+      "title": "DX-023 Input Routing Inspector",
+      "bytes": 3766,
+      "sha256": "22d81459043c5af85b71db44c781df473bc4fbb542c8f893e1eb7d97e0ddfbba",
+      "group": "DX"
+    },
+    {
+      "chapter": 61,
+      "path": "docs/design/DX-024-surface-diff-viewer.md",
+      "title": "DX-024 Surface Diff Viewer",
+      "bytes": 3774,
+      "sha256": "a10888da7f39ac704536e4203b2aa25c02bf8637806f52c4baeae9b58edd74c2",
+      "group": "DX"
+    },
+    {
+      "chapter": 62,
+      "path": "docs/design/DX-025-component-metadata-contract.md",
+      "title": "DX-025 Component Metadata Contract",
+      "bytes": 4412,
+      "sha256": "551123bef08aaeb14a9fa65a18f0f501ee8cd180530b50bcf7b5c5dc6e66debb",
+      "group": "DX"
+    },
+    {
+      "chapter": 63,
+      "path": "docs/design/DX-026-mode-lowering-linter.md",
+      "title": "DX-026 Mode-Lowering Linter",
+      "bytes": 4583,
+      "sha256": "27174dae6a5eeeb44742c92d033d4f8bb6bcb0654ec0bc2f7aa1a919d5d51043",
+      "group": "DX"
+    },
+    {
+      "chapter": 64,
+      "path": "docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md",
+      "title": "DX-030 Add boundary-aware pointer selection and copy",
+      "bytes": 10356,
+      "sha256": "068762f2309fac8ded4174f241054590ea28e7fc3905c42ffe609164a8f64987",
+      "group": "DX"
+    },
+    {
+      "chapter": 65,
+      "path": "docs/design/DX-031-standard-bijou-blocks.md",
+      "title": "DX-031 Standard Bijou Blocks",
+      "bytes": 103095,
+      "sha256": "965b2ce53b21c31d32a23c31e19c4bb0ce1326fcff7bb38ea46de4101bc728a7",
+      "group": "DX"
+    },
+    {
+      "chapter": 66,
+      "path": "docs/design/DX-031F-block-tree-rendering.md",
+      "title": "DX-031F Block Tree Rendering",
+      "bytes": 8308,
+      "sha256": "47aa53de080d5a92d99a17ed64131b55c0a91bf1e58455cdbdaa5ba4cf46a11f",
+      "group": "DX"
+    },
+    {
+      "chapter": 67,
+      "path": "docs/design/DX-032-create-tui-app-skeleton-renders-consumer-pages.md",
+      "title": "DX-032 Create TUI app skeleton renders consumer pages",
+      "bytes": 4548,
+      "sha256": "dc881679f1df72ce14508a166176cba4c932a95cbbec21fbaee7d16ceb1789cc",
+      "group": "DX"
+    },
+    {
+      "chapter": 68,
+      "path": "docs/design/DX-033-remove-showcase-layout-sludge.md",
+      "title": "DX-033 Remove showcase layout sludge",
+      "bytes": 4533,
+      "sha256": "506135e7512138ff8f953e81005550e23023f733f774dced9db11155e5969f4a",
+      "group": "DX"
+    },
+    {
+      "chapter": 69,
+      "path": "docs/design/DX-034-declarative-view-data-binding.md",
+      "title": "DX-034 Declarative View Data Binding",
+      "bytes": 38781,
+      "sha256": "94b0d0ad19a0590c6dc35e7d6a86633c97458d52d4f6a9754b516b1c03b3fd41",
+      "group": "DX"
+    },
+    {
+      "chapter": 70,
+      "path": "docs/design/DX-036-responsive-table-layout-and-variants.md",
+      "title": "DX-036 Responsive Table Layout and Variants",
+      "bytes": 14041,
+      "sha256": "27bd4848d05715c01ac233048e7690edc76ad267a9870381a5f242979f706c69",
+      "group": "DX"
+    },
+    {
+      "chapter": 71,
+      "path": "docs/design/DX-038-blocklab-rename-and-migration.md",
+      "title": "DX-038 - BlockLab Rename And Migration",
+      "bytes": 8291,
+      "sha256": "a44cbf680ed11ec37fde107884191b3171d4f6bf1bd247d0ac8fbc83ffddcaa6",
+      "group": "DX"
+    },
+    {
+      "chapter": 72,
+      "path": "docs/design/DX-039-blocklab-product-parity.md",
+      "title": "DX-039 - BlockLab Product Parity",
+      "bytes": 12608,
+      "sha256": "eea297ae6816b24324ba5a6adc0d08fcf0cd17b63a16786d4befb6c72b73b3fe",
+      "group": "DX"
+    },
+    {
+      "chapter": 73,
+      "path": "docs/design/DX-040-v7-review-regression-fixes.md",
+      "title": "DX-040 V7 Post-Merge Review Regression Fixes",
+      "bytes": 4448,
+      "sha256": "148d2747fd10fdc2e7ae5334e0a8bb68b8c21b3cc97a24438751bff2f0802b53",
+      "group": "DX"
+    },
+    {
+      "chapter": 74,
+      "path": "docs/design/DX-041-image-to-glyph-side-app.md",
+      "title": "DX-041 Image-to-Glyph Side App",
+      "bytes": 6212,
+      "sha256": "351a631993b4e5c6cb0c2a1c9fb6100b5e8a53f7a5ee305a7d6c598c58f31c94",
+      "group": "DX"
+    },
+    {
+      "chapter": 75,
+      "path": "docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md",
+      "title": "DX-042 Shared UI Scene IR And Bijou Render Target",
+      "bytes": 17137,
+      "sha256": "bb9f2f1cf68bff4b8426e83f700ffa956a273592355501ff4eea55003cc05970",
+      "group": "DX"
+    },
+    {
+      "chapter": 76,
+      "path": "docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md",
+      "title": "DX-043 Portable Bijou Blocks And Multi-Endpoint IR",
+      "bytes": 18033,
+      "sha256": "3e8daa12545583370d1219e6ff97d327c2b0f5d8358715dfd8c03b01eb8e5d36",
+      "group": "DX"
+    },
+    {
+      "chapter": 77,
+      "path": "docs/design/DX-044-graphql-authored-bijou-block-ir-proof.md",
+      "title": "DX-044 GraphQL Authored Bijou Block IR Proof",
+      "bytes": 10002,
+      "sha256": "ce905c02be553b475bb336f0db42faa073698eb17ee685436021903ff38201a7",
+      "group": "DX"
+    },
+    {
+      "chapter": 78,
+      "path": "docs/design/DX-045-graphql-block-groups-and-debug-facts.md",
+      "title": "DX-045 GraphQL Block Groups And Debug Facts",
+      "bytes": 10401,
+      "sha256": "aabd2d6f4d6908a40cfe5af2f2707b4ea12c787768ed96c8399c00115b94bccd",
+      "group": "DX"
+    },
+    {
+      "chapter": 79,
+      "path": "docs/design/DX-046-graphql-authored-dogfood-block-fixture.md",
+      "title": "DX-046 GraphQL Authored DOGFOOD Block Fixture",
+      "bytes": 11347,
+      "sha256": "34ece72bb060027e7bc9971be67294e2b0dfd0a754a87295eeb5bbab6aa37f12",
+      "group": "DX"
+    },
+    {
+      "chapter": 80,
+      "path": "docs/design/DX-047-blocks-app-binding-snippets.md",
+      "title": "DX-047 - Blocks App Binding Snippets",
+      "bytes": 6889,
+      "sha256": "c09b51157054fb1ef9ab76aab1555c6a68d1eafb96e2c18506f548556d755f02",
+      "group": "DX"
+    },
+    {
+      "chapter": 81,
+      "path": "docs/design/DX-048-v8-runtime-graph-scene-ir-contract.md",
+      "title": "DX-048 V8 Runtime Graph And Scene IR Contract",
+      "bytes": 8630,
+      "sha256": "c4a11ecb9134d6c8e9e3a72f930a218804dbd22ff7b5f917a9dcf4ac0fbf10dc",
+      "group": "DX"
+    },
+    {
+      "chapter": 82,
+      "path": "docs/design/DX-049-visor-artifact-bundle-proof.md",
+      "title": "DX-049 VISOR Artifact Bundle Proof",
+      "bytes": 12767,
+      "sha256": "05200f144f8e1bc2d93c34b18e1d2fe6a56ae1a7daa78941242a03a847c525b4",
+      "group": "DX"
+    },
+    {
+      "chapter": 83,
+      "path": "docs/design/DX-050-profunctor-page-inspection.md",
+      "title": "DX-050-profunctor-page-inspection",
+      "bytes": 9565,
+      "sha256": "a57d7b4503520fb2645409f52be441115e8029666e1e1f055c46c21f4ff4b85d",
+      "group": "DX"
+    },
+    {
+      "chapter": 84,
+      "path": "docs/design/DX-052-no-color-is-not-a-capability.md",
+      "title": "DX-052 NO_COLOR Is Not a Capability",
+      "bytes": 9958,
+      "sha256": "ca919671d025139d4303cbeaa6510c345dceb305ebe9df1830b2a14a260dd361",
+      "group": "DX"
+    },
+    {
+      "chapter": 85,
+      "path": "docs/design/DX-125-day-zero-onboarding-bridge.md",
+      "title": "DX-125 - Day Zero Onboarding Bridge",
+      "bytes": 3190,
+      "sha256": "8080a9d2b189f33b4c11c5f3c5304225d6a4c6ccf31edc6958dbea8bc5a4403a",
+      "group": "DX"
+    },
+    {
+      "chapter": 86,
+      "path": "docs/design/RE-001-define-runtime-engine-architecture.md",
+      "title": "RE-001 \u2014 Define Runtime Engine Architecture",
+      "bytes": 8048,
+      "sha256": "adf8c9badd844de475b2892c96616be8e248e1bf0fb79135c7d9ef507ae4228c",
+      "group": "RE"
+    },
+    {
+      "chapter": 87,
+      "path": "docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md",
+      "title": "RE-002 \u2014 Promote First-Class State Machine and View Stack",
+      "bytes": 6666,
+      "sha256": "28ad8ed0d1f0bfa3c8cb9b37ddbb939b75d0928f770770efb1c3bd1b784fa6ef",
+      "group": "RE"
+    },
+    {
+      "chapter": 88,
+      "path": "docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md",
+      "title": "RE-003 \u2014 Retain Layout Trees and Layout Invalidation",
+      "bytes": 7115,
+      "sha256": "7fe01c3a240a1a9a7e32b41d5acd8be91567a1ee4ed886fbe054850187d7ba6f",
+      "group": "RE"
+    },
+    {
+      "chapter": 89,
+      "path": "docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md",
+      "title": "RE-004 \u2014 Route Input Through Layouts and Layer Bubbling",
+      "bytes": 6866,
+      "sha256": "7cb8caeb7ae6a6561880e475d5cd41e739c07e688595616f6fd2152bc5ae3801",
+      "group": "RE"
+    },
+    {
+      "chapter": 90,
+      "path": "docs/design/RE-005-buffer-commands-and-effects-separately.md",
+      "title": "RE-005 \u2014 Buffer Commands and Effects Separately",
+      "bytes": 7371,
+      "sha256": "a1b6c52004e9a2c6fb9f9f680d26c0507fbf04e12a6a18957bd920af029d55fd",
+      "group": "RE"
+    },
+    {
+      "chapter": 91,
+      "path": "docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md",
+      "title": "RE-006 \u2014 Formalize Component Layout and Interaction Contracts",
+      "bytes": 7433,
+      "sha256": "1089aac53d706bf949ba9dd3012b923447468093375f9696cba9cc2489ecdc34",
+      "group": "RE"
+    },
+    {
+      "chapter": 92,
+      "path": "docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md",
+      "title": "RE-007 \u2014 Migrate Framed Shell Onto Runtime Engine Seams",
+      "bytes": 14982,
+      "sha256": "5620ab061d0fa7fb30316e169a6532d2bf27f66d05bdbf3e7b1f1aedcf20cb93",
+      "group": "RE"
+    },
+    {
+      "chapter": 93,
+      "path": "docs/design/RE-008-perf-findings.md",
+      "title": "RE-008 \u2014 Rendering Performance Findings",
+      "bytes": 5437,
+      "sha256": "a0d148cb2eeeab89f40fd41ce8398aefef3e645de8bf2bee86c1541024867d2d",
+      "group": "RE"
+    },
+    {
+      "chapter": 94,
+      "path": "docs/design/RE-024-surface-budget-warnings.md",
+      "title": "RE-024 Surface Budget Warnings",
+      "bytes": 4276,
+      "sha256": "b096757954bdd73628309c4779d0a51d75dadf5f9946211f9a5b5926c83470df",
+      "group": "RE"
+    },
+    {
+      "chapter": 95,
+      "path": "docs/design/RE-030-average-high-resolution-canvas-colors.md",
+      "title": "RE-030 \u2014 Average High-Resolution Canvas Colors",
+      "bytes": 6789,
+      "sha256": "e1da38f52150253dec377a5e9836f08f9916d85e29e1c0d3fad456dddc374157",
+      "group": "RE"
+    },
+    {
+      "chapter": 96,
+      "path": "docs/design/RE-031-raytrace-shader-kernel.md",
+      "title": "RE-031 \u2014 Raytrace Shader Kernel",
+      "bytes": 5497,
+      "sha256": "c93782df0cd3be182875cea2b119e59ddd2b1bd0bb9079834435ae1341049848",
+      "group": "RE"
+    },
+    {
+      "chapter": 97,
+      "path": "docs/design/RE-032-fit-cell-glyphs-from-coverage.md",
+      "title": "RE-032 \u2014 Fit Cell Glyphs From Coverage",
+      "bytes": 5337,
+      "sha256": "2832fba24091cf839e468eaf1b27393d177f00dea0c6c8f7b9a2f03f1f3c7f74",
+      "group": "RE"
+    },
+    {
+      "chapter": 98,
+      "path": "docs/design/RE-033-stable-spring-pulse-integration.md",
+      "title": "RE-033 Stable Spring Pulse Integration",
+      "bytes": 4693,
+      "sha256": "46050ea887f478d0764bc6d82d2c9cd87f84644c50afefb2438215cf4ac8c3f6",
+      "group": "RE"
+    },
+    {
+      "chapter": 99,
+      "path": "docs/design/RE-034-glyph-fit-canvas-resolution.md",
+      "title": "RE-034 Glyph-Fit Canvas Resolution",
+      "bytes": 4635,
+      "sha256": "a210a823f84fbdb6916c982f0900809fb3f1d47a4c0ffd95841956e54cf6955f",
+      "group": "RE"
+    },
+    {
+      "chapter": 100,
+      "path": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md",
+      "title": "RE-035 Mandatory Layout Envelope And Constraint Negotiation",
+      "bytes": 26118,
+      "sha256": "505cd9de2b4a63a5142a4944962be3a5b2ebfe79d8137f69ef17c70a391fbc2f",
+      "group": "RE"
+    },
+    {
+      "chapter": 101,
+      "path": "docs/design/RE-036-packed-bijou-cells-surface-adapter.md",
+      "title": "RE-036 Packed Bijou Cells Surface Adapter",
+      "bytes": 19232,
+      "sha256": "0c3a57d326500bb5ca879f2d4c23f2bac6b1fc9fb9b8c693b2e6a3e3ea2797b1",
+      "group": "RE"
+    },
+    {
+      "chapter": 102,
+      "path": "docs/design/RE-041-v72-framework-input-stabilization.md",
+      "title": "RE-041 v7.2 Framework Input Stabilization",
+      "bytes": 5596,
+      "sha256": "176716f4fe1b4058fb35d46daa1b5ff17106a9739637da0fd306437c787b0d5c",
+      "group": "RE"
+    },
+    {
+      "chapter": 103,
+      "path": "docs/design/RE-127-command-and-render-runtime-guardrails.md",
+      "title": "RE-127 - Command And Render Runtime Guardrails",
+      "bytes": 2909,
+      "sha256": "e9f7081dda8810b54ebcef2b3e3758aeacf0e604422c18f5de600c16cb5ab456",
+      "group": "RE"
+    },
+    {
+      "chapter": 104,
+      "path": "docs/design/RE-142-node-bootstrap-failure-contract.md",
+      "title": "RE-142 - Node Bootstrap Failure Contract",
+      "bytes": 2192,
+      "sha256": "706deeb11a8c4f033693b9e9ddcd42851993ad2e2973aed76fb416ec41992551",
+      "group": "RE"
+    },
+    {
+      "chapter": 105,
+      "path": "docs/design/DL-001-capture-design-language-doctrine.md",
+      "title": "DL-001 \u2014 Capture Design Language Doctrine",
+      "bytes": 5446,
+      "sha256": "e7bece8c6aa43683a3c7bcc8655d3d4cc5475628e628c92149f03f9f33c8d70c",
+      "group": "DL"
+    },
+    {
+      "chapter": 106,
+      "path": "docs/design/DL-002-canonicalize-patterns-and-blocks.md",
+      "title": "DL-002 \u2014 Canonicalize Patterns and Blocks",
+      "bytes": 5961,
+      "sha256": "198e757525068a24a39d9f12301728bc2223390ec5b9209bb20856a6df6e1dba",
+      "group": "DL"
+    },
+    {
+      "chapter": 107,
+      "path": "docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md",
+      "title": "DL-003 \u2014 Prove Canonical Patterns in Shared Surfaces",
+      "bytes": 5583,
+      "sha256": "df6b469eb1f405f9dc8af6da1d3f05b1982c3deae382c34b2265b3c64cd0e259",
+      "group": "DL"
+    },
+    {
+      "chapter": 108,
+      "path": "docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md",
+      "title": "DL-004 \u2014 Prove Drawer Rhythm and Notice Rows",
+      "bytes": 5251,
+      "sha256": "f1b58cd0ea62db84ecac484095bf122cf25bf36f4b73ddc4fff03641530bb52a",
+      "group": "DL"
+    },
+    {
+      "chapter": 109,
+      "path": "docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md",
+      "title": "DL-005 \u2014 Prove Inspector and Guided Flow Rhythm",
+      "bytes": 5835,
+      "sha256": "505ea91e4a40a57d4bdbb43adfe749af6e41658357684d3c53e76dcf88d94ffd",
+      "group": "DL"
+    },
+    {
+      "chapter": 110,
+      "path": "docs/design/DL-006-prove-inspector-panel-rhythm.md",
+      "title": "DL-006 \u2014 Prove Inspector Panel Rhythm",
+      "bytes": 6002,
+      "sha256": "0631935205e82843aa3f7da3ce85d3e91635f42b752a18635af1ea61bd4fcb0a",
+      "group": "DL"
+    },
+    {
+      "chapter": 111,
+      "path": "docs/design/DL-007-promote-inspector-panel-block.md",
+      "title": "DL-007 \u2014 Promote Inspector Panel Block",
+      "bytes": 6474,
+      "sha256": "5b510a26dd32989c2969a5cd3525fa8e686f661d056acabaec914d4de7e3c930",
+      "group": "DL"
+    },
+    {
+      "chapter": 112,
+      "path": "docs/design/DL-008-promote-guided-flow-block.md",
+      "title": "DL-008 \u2014 Promote Guided Flow Block",
+      "bytes": 6275,
+      "sha256": "bb27eb6e16289357b2f17b904ae17bbbabb4f3ac37704b531599ecd42b96a6d2",
+      "group": "DL"
+    },
+    {
+      "chapter": 113,
+      "path": "docs/design/DL-011-theme-contrast-doctor.md",
+      "title": "DL-011 Theme Contrast Doctor",
+      "bytes": 3764,
+      "sha256": "88f51d925fd21608a34da537ed5d53a9401d6404b678b5543f813a4bb14aa460",
+      "group": "DL"
+    },
+    {
+      "chapter": 114,
+      "path": "docs/design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md",
+      "title": "DL-012 Separate focus gutter chrome from scrollbar UI tokens",
+      "bytes": 4000,
+      "sha256": "7c3124a282c3d6c851e8c1daddb92ec930d4cc249747a64acf61678b5543d62b",
+      "group": "DL"
+    },
+    {
+      "chapter": 115,
+      "path": "docs/design/DL-013-design-token-theme-builder-api.md",
+      "title": "DL-013 Design token and theme builder API",
+      "bytes": 18389,
+      "sha256": "caa44cc2fd59000877319963fc784be201d41dd9d5857f81b576962e0cb98981",
+      "group": "DL"
+    },
+    {
+      "chapter": 116,
+      "path": "docs/design/DL-014-theme-inspector-and-lab.md",
+      "title": "DL-014 Theme Inspector And Lab",
+      "bytes": 7793,
+      "sha256": "0051512868da8a90af1ea0a326dbb603aede9e0401872a8dba97e9c80e2b302f",
+      "group": "DL"
+    },
+    {
+      "chapter": 117,
+      "path": "docs/design/DL-015-theme-safe-pairs-and-contrast-matrices.md",
+      "title": "DL-015 Theme safe pairs and contrast matrices",
+      "bytes": 7948,
+      "sha256": "c6596b22c81afa350764944cbc7544fdc84f4908d04055455b9fc9407888637e",
+      "group": "DL"
+    },
+    {
+      "chapter": 118,
+      "path": "docs/design/DL-016-mode-aware-runtime-theme-adapter.md",
+      "title": "DL-016 Mode-aware runtime theme adapter",
+      "bytes": 6938,
+      "sha256": "e1566cd921a9b97267a1944dc7386a813a7e4ec0096ebc7d8b99ee5c96859308",
+      "group": "DL"
+    },
+    {
+      "chapter": 119,
+      "path": "docs/design/DL-017-dogfood-light-theme-readiness.md",
+      "title": "DL-017 - DOGFOOD Light Theme Readiness",
+      "bytes": 8300,
+      "sha256": "97cc468d372d6fd55c73413f07e18f759aab30911b3ff3cb0e622e821a21f8f9",
+      "group": "DL"
+    },
+    {
+      "chapter": 120,
+      "path": "docs/design/DL-018-first-party-theme-variant-coverage.md",
+      "title": "DL-018 - First-Party Theme Variant Coverage",
+      "bytes": 8136,
+      "sha256": "333e714552f3a96b4721b9d38a18157f8962754a3156105fe14f207ff1b51923",
+      "group": "DL"
+    },
+    {
+      "chapter": 121,
+      "path": "docs/design/DL-019-theme-rule-selection-and-inspection.md",
+      "title": "DL-019 - Theme Rule Selection And Inspection",
+      "bytes": 13656,
+      "sha256": "f0525b2fe1835af07a80e536445b6ec2833fca4aa0147a37170cb5edbd3f09ec",
+      "group": "DL"
+    },
+    {
+      "chapter": 122,
+      "path": "docs/design/DL-020-dogfood-rule-authored-first-party-themes.md",
+      "title": "DL-020 - Dogfood Rule-Authored First-Party Themes",
+      "bytes": 5558,
+      "sha256": "20a47e4edf6bef8c2621018e75e93a30677f6164016dc9010a4261f36105547a",
+      "group": "DL"
+    },
+    {
+      "chapter": 123,
+      "path": "docs/design/DL-021-dogfood-theme-token-usage-proof.md",
+      "title": "DL-021 - Dogfood Theme Token Usage Proof",
+      "bytes": 3801,
+      "sha256": "2e06c0effa59213d46b32c4d563d05cca2dbb23ae4446099ec87c4393f22c35d",
+      "group": "DL"
+    },
+    {
+      "chapter": 124,
+      "path": "docs/design/DL-022-theme-lab-editor-graph-ux.md",
+      "title": "DL-022 - Theme Lab Editor Graph UX",
+      "bytes": 6610,
+      "sha256": "bcac02b43a7d40fb0a1afbb8472f2a4849519549409f979e3a0d450ebfcaefa2",
+      "group": "DL"
+    },
+    {
+      "chapter": 125,
+      "path": "docs/design/LX-001-bijou-i18n-runtime-package.md",
+      "title": "LX-001 \u2014 bijou-i18n Runtime Package",
+      "bytes": 6415,
+      "sha256": "ef67d636b79340830657b9426975a73e8c72b972517432505b17cc73f422ece8",
+      "group": "LX"
+    },
+    {
+      "chapter": 126,
+      "path": "docs/design/LX-002-bijou-i18n-tools-package.md",
+      "title": "LX-002 \u2014 bijou-i18n Tools Package",
+      "bytes": 6667,
+      "sha256": "bc3ac6f92027a62229620bfda4ce1dc5e10b823764e7193ec595d563036a56e2",
+      "group": "LX"
+    },
+    {
+      "chapter": 127,
+      "path": "docs/design/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md",
+      "title": "LX-003 \u2014 Spreadsheet Adapters and Catalog Exchange Workflows",
+      "bytes": 7000,
+      "sha256": "b5f3643e06470e72a2240131d4b4a176e909377abc3ced4a22b23698a913a780",
+      "group": "LX"
+    },
+    {
+      "chapter": 128,
+      "path": "docs/design/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md",
+      "title": "LX-004 \u2014 Provider Adapters for Workbook and Bundle Exchange",
+      "bytes": 6227,
+      "sha256": "46f10f7556650408ff2f3e7db2afee9fe808fca2cd54049edf1c9695251a8a97",
+      "group": "LX"
+    },
+    {
+      "chapter": 129,
+      "path": "docs/design/LX-005-rich-spreadsheet-and-filesystem-adapters.md",
+      "title": "LX-005 \u2014 Rich Spreadsheet and Filesystem Adapters",
+      "bytes": 6383,
+      "sha256": "77dcfdfe7f24a4bbde47df99ac2de9076b95cc0fdd1191d98667f1e815bafd62",
+      "group": "LX"
+    },
+    {
+      "chapter": 130,
+      "path": "docs/design/LX-006-xlsx-localization-adapters.md",
+      "title": "LX-006 \u2014 XLSX Localization Adapters",
+      "bytes": 6013,
+      "sha256": "bc98e5ea25f5980dfd4dc497ff42be1111cefc7d964781bb6e2e7236a00a98a5",
+      "group": "LX"
+    },
+    {
+      "chapter": 131,
+      "path": "docs/design/LX-008-localize-shell-chrome-and-dogfood.md",
+      "title": "LX-008 \u2014 Localize Shell Chrome and DOGFOOD",
+      "bytes": 7493,
+      "sha256": "f9cd542a83629c283b7925d383bebe398ecd75b06a8ff486bec1064182fca790",
+      "group": "LX"
+    },
+    {
+      "chapter": 132,
+      "path": "docs/design/LX-019-localization-port-contract.md",
+      "title": "LX-019 \u2014 Localization Port Contract",
+      "bytes": 7189,
+      "sha256": "960e096c4b583676ba7724472cc0bf3fa84220194669b2f65bd9093022ce8c58",
+      "group": "LX"
+    },
+    {
+      "chapter": 133,
+      "path": "docs/design/LX-020-dogfood-locale-demo-readiness.md",
+      "title": "LX-020 - DOGFOOD Locale Demo Readiness",
+      "bytes": 6902,
+      "sha256": "01e6c84b3a6f1ceb97dd11f0acc450f8a1ba4bf6188623648c358d9d8c48e891",
+      "group": "LX"
+    },
+    {
+      "chapter": 134,
+      "path": "docs/design/LX-021-dogfood-string-debt-ratchet.md",
+      "title": "LX-021 DOGFOOD String Debt Ratchet",
+      "bytes": 5272,
+      "sha256": "cbb3bc4bd2960898f1284dd48f39ddbe41f342ac9ef79d20903b94efe4ee47d2",
+      "group": "LX"
+    },
+    {
+      "chapter": 135,
+      "path": "docs/design/LX-022-dogfood-app-main-ratchet.md",
+      "title": "LX-022 DOGFOOD App Main Ratchet",
+      "bytes": 5749,
+      "sha256": "6a1dbf1fa0830eaaa4eb72fbe1c8ce122f0daa90629136e8d8c600f3702dd493",
+      "group": "LX"
+    },
+    {
+      "chapter": 136,
+      "path": "docs/design/LX-023-dogfood-blocks-capture-ratchet.md",
+      "title": "LX-023: DOGFOOD Blocks And Capture Ratchet",
+      "bytes": 5079,
+      "sha256": "9538263458dba122a006d56e6e961242242e30a5d14a38474788a5bfb7fd416a",
+      "group": "LX"
+    },
+    {
+      "chapter": 137,
+      "path": "docs/design/WF-001-adopt-cycle-workflow.md",
+      "title": "WF-001 \u2014 Adopt the Legends/Cycles Workflow",
+      "bytes": 4642,
+      "sha256": "598f92584bd87ec46af7d059b47a15a7805a62b98be96b57f2131e3fffe1a658",
+      "group": "WF"
+    },
+    {
+      "chapter": 138,
+      "path": "docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md",
+      "title": "WF-003 \u2014 Replace smoke:examples:* With smoke:dogfood",
+      "bytes": 6351,
+      "sha256": "e0d2a8aa647cc514025d18871eb854c2a6e38547178249635f0c6e005e6c3683",
+      "group": "WF"
+    },
+    {
+      "chapter": 139,
+      "path": "docs/design/WF-004-shape-the-next-release.md",
+      "title": "WF-004 \u2014 Shape The Next Release",
+      "bytes": 9545,
+      "sha256": "23fcc1df5ed36dc47e123d7fcab8297ca74d270f1c3862567a9a61968da375f3",
+      "group": "WF"
+    },
+    {
+      "chapter": 140,
+      "path": "docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md",
+      "title": "WF-005 \u2014 Close 4.1.0 i18n Publish-Surface Gap",
+      "bytes": 6531,
+      "sha256": "bc035e080cb5138fae5cecfc718e22c1187a453cca6cadc24bd2b0ac96c150c2",
+      "group": "WF"
+    },
+    {
+      "chapter": 141,
+      "path": "docs/design/WF-006-cut-clean-4-1-0-release-boundary.md",
+      "title": "WF-006 \u2014 Cut Clean 4.1.0 Release Boundary",
+      "bytes": 5988,
+      "sha256": "cadb1e5ca3526270a255257f5142cc0df1d2edf4b0f54c93e12ab4f74137e113",
+      "group": "WF"
+    },
+    {
+      "chapter": 142,
+      "path": "docs/design/WF-009-keep-release-prs-under-automated-review-file-limits.md",
+      "title": "WF-009 - Keep Release PRs Under Automated Review File Limits",
+      "bytes": 3781,
+      "sha256": "846598b23d64463730f5fdc8f6db0b94fdb9c1d195fee042194b0fd26e5f9496",
+      "group": "WF"
+    },
+    {
+      "chapter": 143,
+      "path": "docs/design/WF-122-cross-platform-contributor-path.md",
+      "title": "WF-122 - Cross-Platform Contributor Path",
+      "bytes": 3191,
+      "sha256": "11e5fa9ae7cd6f3d83a80181a8681ce85526fb37980fb99558dfdce5652b1f43",
+      "group": "WF"
+    },
+    {
+      "chapter": 144,
+      "path": "docs/design/WF-123-issues-first-method-intake.md",
+      "title": "WF-123 - Issues-First Method Intake",
+      "bytes": 3332,
+      "sha256": "855da918ab4c9930f5d8765ddcc63e325dc4d57d6b8ec0eb3c2629096ee66727",
+      "group": "WF"
+    },
+    {
+      "chapter": 145,
+      "path": "docs/design/WF-125-draft-first-cycle-start-workflow.md",
+      "title": "WF-125 Draft-first cycle start workflow",
+      "bytes": 4042,
+      "sha256": "b5bec8a915be323165d0beaadf4ef73e0229e28e8905c4f7b5047ad08af2b890",
+      "group": "WF"
+    },
+    {
+      "chapter": 146,
+      "path": "docs/design/WF-127-v7-issue-complete-tracker-sync.md",
+      "title": "WF-127 V7 Issue-Complete Tracker Sync",
+      "bytes": 3666,
+      "sha256": "2528774cb6357c91c3237d501ad6ac11d2d2ba39b903759b21ab5459db2b880f",
+      "group": "WF"
+    },
+    {
+      "chapter": 147,
+      "path": "docs/design/WF-128-safe-gh-comments-and-milestone-items.md",
+      "title": "WF-128 Safe GitHub Comments And Milestone Item Mirrors",
+      "bytes": 4858,
+      "sha256": "da3464c163e1e7a3def66476e2d28043e58889b5bfd7a10917e98e04629eab89",
+      "group": "WF"
+    },
+    {
+      "chapter": 148,
+      "path": "docs/design/WF-129-path-gate-dogfood-ci.md",
+      "title": "WF-129 Path-Gate DOGFOOD CI",
+      "bytes": 4385,
+      "sha256": "0afb420a28c0d8b8165bec00c110bd6365e2b0ece25089466d81ef9c5873dfaa",
+      "group": "WF"
+    },
+    {
+      "chapter": 149,
+      "path": "docs/design/WF-130-roadmap-goalpost-policy.md",
+      "title": "WF-130 Roadmap Goalpost Policy",
+      "bytes": 6658,
+      "sha256": "e786c5100a29aa6f5d07a01287ce7279d1fa3d9e7f250e6dea158b000c8b6359",
+      "group": "WF"
+    },
+    {
+      "chapter": 150,
+      "path": "docs/design/WF-131-roadmap-current-reality-refresh.md",
+      "title": "WF-131 Roadmap Forward-Looking Refresh",
+      "bytes": 6365,
+      "sha256": "5ee5d7ab7a85f98a717b4aed08d34f79fcfc2c2c087724676aa32db18fa81776",
+      "group": "WF"
+    },
+    {
+      "chapter": 151,
+      "path": "docs/design/WF-132-release-readiness-and-dogfood-i18n-gates.md",
+      "title": "WF-132 - Release Readiness And DOGFOOD I18n Gates",
+      "bytes": 5258,
+      "sha256": "3d4992f83e24547115195d0261effb7ddbd7651d7f6f6155e4ecdf8df8b1f040",
+      "group": "WF"
+    },
+    {
+      "chapter": 152,
+      "path": "docs/design/WF-133-esbuild-security-patch.md",
+      "title": "WF-133 - Esbuild Security Patch",
+      "bytes": 2659,
+      "sha256": "21bb6bee3e77abc9ff962eec91e829e695e967354aad16663a57968108abda4f",
+      "group": "WF"
+    },
+    {
+      "chapter": 153,
+      "path": "docs/design/WF-134-code-dojo-eslint-ratchet-1.md",
+      "title": "WF-134 Code Dojo ESLint Ratchet 1",
+      "bytes": 5073,
+      "sha256": "de650a59345faa6f552271cad31fa485ea29e893cbabe78bad05dbdee2441de6",
+      "group": "WF"
+    },
+    {
+      "chapter": 154,
+      "path": "docs/design/WF-135-respecting-dojo-1000.md",
+      "title": "WF-135 Respecting the Dojo 1000-Count Burndown",
+      "bytes": 6123,
+      "sha256": "bac41e51c5ade73f149ac7daea32ebe6389c2e6b48bebff335dc91d226f6f900",
+      "group": "WF"
+    },
+    {
+      "chapter": 155,
+      "path": "docs/design/WF-136-respecting-dojo-ratchet-2018.md",
+      "title": "WF-136 Respecting the Dojo Ratchet To 2018",
+      "bytes": 5876,
+      "sha256": "7a14c246a1feb949109c438f238204d2f5f94aafb48c0fd3d16fdfa62937090b",
+      "group": "WF"
+    },
+    {
+      "chapter": 156,
+      "path": "docs/design/WF-137-respecting-dojo-ratchet-1965.md",
+      "title": "WF-137 Respecting the Dojo Ratchet To 1965",
+      "bytes": 6511,
+      "sha256": "ca68bd6b767b95d78bc881ea105e50cfe083f82b1174907433ba3877c8a37b5a",
+      "group": "WF"
+    },
+    {
+      "chapter": 157,
+      "path": "docs/design/WF-138-respecting-dojo-ratchet-1857.md",
+      "title": "WF-138 Respecting the Dojo Ratchet To 1857",
+      "bytes": 4753,
+      "sha256": "7f853ca8092db15fd2d778a30a8a4d53aa8b0a56261a51db8673deb9acc64291",
+      "group": "WF"
+    },
+    {
+      "chapter": 158,
+      "path": "docs/design/WF-139-respecting-dojo-ratchet-1796.md",
+      "title": "WF-139 Respecting the Dojo Ratchet To 1796",
+      "bytes": 4666,
+      "sha256": "5cbffe6cc86d04dcfd8448e264c969763118d2a9612946725786739e2673d505",
+      "group": "WF"
+    },
+    {
+      "chapter": 159,
+      "path": "docs/design/WF-140-respecting-dojo-ratchet-1729.md",
+      "title": "WF-140 Respecting the Dojo Ratchet To 1729",
+      "bytes": 3298,
+      "sha256": "401998654c4348fcb70bcac2a810f448200826b18db4475ee153092a9493006b",
+      "group": "WF"
+    },
+    {
+      "chapter": 160,
+      "path": "docs/design/WF-141-respecting-dojo-ratchet-1679.md",
+      "title": "WF-141 Respecting the Dojo Ratchet To 1679",
+      "bytes": 3547,
+      "sha256": "134e7f1a6f3c14664d3a014dbac1446198fb8ddcd285d83960911e50534956d6",
+      "group": "WF"
+    },
+    {
+      "chapter": 161,
+      "path": "docs/design/WF-142-respecting-dojo-ratchet-1621.md",
+      "title": "WF-142 Respecting The Dojo Ratchet To 1621",
+      "bytes": 3882,
+      "sha256": "73f48d80ca3965142b6569342eb44ba38829802f3832e64ebdc9dd223e9bf935",
+      "group": "WF"
+    },
+    {
+      "chapter": 162,
+      "path": "docs/design/WF-143-respecting-dojo-ratchet-1567.md",
+      "title": "WF-143 Respecting the Dojo Ratchet To 1564",
+      "bytes": 3960,
+      "sha256": "ae38fbaae0ba38444370e23da29b6b15f61bcc079972ca2aecf2c92ed5c54d72",
+      "group": "WF"
+    },
+    {
+      "chapter": 163,
+      "path": "docs/design/WF-144-respecting-dojo-ratchet-1514.md",
+      "title": "WF-144 Respecting the Dojo Ratchet To 1514",
+      "bytes": 3936,
+      "sha256": "9e2a49cb17d0b8bd1f724b9606c1cc18e80cde280bd0887889310c738ee51bfd",
+      "group": "WF"
+    },
+    {
+      "chapter": 164,
+      "path": "docs/design/WF-145-respecting-dojo-ratchet-1461.md",
+      "title": "WF-145 Respecting the Dojo Ratchet To 1461",
+      "bytes": 4046,
+      "sha256": "8ddcd4fb21b1580b285d89c89eb5c63718eb559be409e74516c301ae50934e6c",
+      "group": "WF"
+    },
+    {
+      "chapter": 165,
+      "path": "docs/design/WF-146-respecting-dojo-ratchet-1393.md",
+      "title": "WF-146 Respecting the Dojo Ratchet To 1393",
+      "bytes": 4252,
+      "sha256": "e440dd2ca21ec90e89572f28b099b753b93ef1220842d66d7d70f41279ebd305",
+      "group": "WF"
+    },
+    {
+      "chapter": 166,
+      "path": "docs/design/WF-147-respecting-dojo-ratchet-1319.md",
+      "title": "WF-147 Respecting the Dojo Ratchet To 1319",
+      "bytes": 2927,
+      "sha256": "7a87001f8821bf2c4822c9a54900641d22837afcc9e2646eec0660dec28b1471",
+      "group": "WF"
+    },
+    {
+      "chapter": 167,
+      "path": "docs/design/WF-148-respecting-dojo-ratchet-1268.md",
+      "title": "WF-148 Respecting the Dojo Ratchet To 1268",
+      "bytes": 3180,
+      "sha256": "c27ba69886d5b1299166cf38820effd6da1bd9e6f41225b3b2d47b90d6c4cb67",
+      "group": "WF"
+    },
+    {
+      "chapter": 168,
+      "path": "docs/design/WF-149-respecting-dojo-ratchet-1216.md",
+      "title": "WF-149 Respecting the Dojo Ratchet To 1216",
+      "bytes": 5081,
+      "sha256": "76fd5bd2032aa55345132bc46580c3706a8873898e54cdc4471dce21f37de4fc",
+      "group": "WF"
+    },
+    {
+      "chapter": 169,
+      "path": "docs/design/WF-150-respecting-dojo-ratchet-1165.md",
+      "title": "WF-150 Respecting the Dojo Ratchet To 1165",
+      "bytes": 5017,
+      "sha256": "c4006cad8fc9e09ef4304a0aca8fe1d5c8644d1361a59b972c8df562a74b9573",
+      "group": "WF"
+    },
+    {
+      "chapter": 170,
+      "path": "docs/design/WF-151-respecting-dojo-ratchet-1110.md",
+      "title": "WF-151 Respecting the Dojo Ratchet To 1110",
+      "bytes": 5148,
+      "sha256": "83ba80dae03c32f5a6514dccf83c35e79ae79c071e70f538fae0141a7085dcd5",
+      "group": "WF"
+    },
+    {
+      "chapter": 171,
+      "path": "docs/design/WF-152-respecting-dojo-ratchet-1055.md",
+      "title": "WF-152 Respecting the Dojo Ratchet To 1055",
+      "bytes": 5202,
+      "sha256": "858a64b63888310fa32804aceca3c6744679209b448b539154a91830b9226083",
+      "group": "WF"
+    },
+    {
+      "chapter": 172,
+      "path": "docs/design/WF-153-respecting-dojo-ratchet-1004.md",
+      "title": "WF-153 Respecting the Dojo Ratchet To 1004",
+      "bytes": 5376,
+      "sha256": "28e8d3c186911c00e60888065c30c0601367c28e24a2b49471f28b419298d9ad",
+      "group": "WF"
+    },
+    {
+      "chapter": 173,
+      "path": "docs/design/WF-154-respecting-dojo-ratchet-953.md",
+      "title": "WF-154 Respecting the Dojo Ratchet To 953",
+      "bytes": 4992,
+      "sha256": "f9b52c1de21efecaa3f4fd72e1dbf918fe99399040a6f3bf412bfa0fe0e0c64a",
+      "group": "WF"
+    },
+    {
+      "chapter": 174,
+      "path": "docs/design/WF-155-respecting-dojo-ratchet-624.md",
+      "title": "WF-155 Respecting the Dojo Ratchet To 624",
+      "bytes": 6145,
+      "sha256": "47994c2cdd62d87e0f898bd1d34a4f81286cb4e41c674a8063096094be7f889e",
+      "group": "WF"
+    },
+    {
+      "chapter": 175,
+      "path": "docs/design/WF-156-respecting-dojo-ratchet-573.md",
+      "title": "WF-156 Respecting the Dojo Ratchet To 573",
+      "bytes": 6574,
+      "sha256": "d8d7783a646b0d013f77e047f2165e8c4ec49c9db80c39a201611f218034c3de",
+      "group": "WF"
+    },
+    {
+      "chapter": 176,
+      "path": "docs/design/WF-157-respecting-dojo-ratchet-520.md",
+      "title": "WF-157 Respecting the Dojo Ratchet To 520",
+      "bytes": 6769,
+      "sha256": "de19ad74b1781349fd3b09b64fc43289a3661670f85ad2f5403d7bd22a12e593",
+      "group": "WF"
+    },
+    {
+      "chapter": 177,
+      "path": "docs/design/WF-158-respecting-dojo-ratchet-468.md",
+      "title": "WF-158 Respecting the Dojo Ratchet To 468",
+      "bytes": 7234,
+      "sha256": "f75d2f117b4748b342e713d9655bc72de50c004cb0eee2f3a295e3e0040ca3e7",
+      "group": "WF"
+    },
+    {
+      "chapter": 178,
+      "path": "docs/design/WF-159-respecting-dojo-ratchet-415.md",
+      "title": "WF-159 Respecting the Dojo Ratchet To 415",
+      "bytes": 6720,
+      "sha256": "85f8357b24a02d4c6f0e9c860a7330e270a2ff55ac4947b22e2d7db3d65c790d",
+      "group": "WF"
+    },
+    {
+      "chapter": 179,
+      "path": "docs/design/WF-160-respecting-dojo-ratchet-364.md",
+      "title": "WF-160 Respecting the Dojo Ratchet To 364",
+      "bytes": 6859,
+      "sha256": "7ca22aaca1263ffa75e390a9b2b36815c3f8cb3906ecbd24549d4ed370fc4dac",
+      "group": "WF"
+    },
+    {
+      "chapter": 180,
+      "path": "docs/design/WF-161-respecting-dojo-ratchet-262.md",
+      "title": "WF-161 Respecting the Dojo Ratchet 262",
+      "bytes": 4036,
+      "sha256": "20fb9a4069a8583149f8e7034b417cb408ac402392dac3d3f2c8519dd470c4c7",
+      "group": "WF"
+    },
+    {
+      "chapter": 181,
+      "path": "docs/design/WF-162-respecting-dojo-ratchet-162.md",
+      "title": "WF-162 Respecting the Dojo Ratchet 162",
+      "bytes": 5750,
+      "sha256": "5d41822478c3bd825cde7fe4e1baa5e1862ac50a9de35d86720e813085e23b89",
+      "group": "WF"
+    },
+    {
+      "chapter": 182,
+      "path": "docs/design/WF-163-respecting-dojo-ratchet-112.md",
+      "title": "WF-163 Respecting the Dojo Ratchet 112",
+      "bytes": 6119,
+      "sha256": "81096f4923a2ffd179b0b2050a4955dc95836a1411cd94db03af8d84714fce64",
+      "group": "WF"
+    },
+    {
+      "chapter": 183,
+      "path": "docs/design/WF-164-respecting-dojo-ratchet-62.md",
+      "title": "WF-164 Respecting the Dojo Ratchet 62",
+      "bytes": 7061,
+      "sha256": "d99fb1105217d7ca0c85eba0510215b06630c1c71478f65fd5cfbd4457788b97",
+      "group": "WF"
+    },
+    {
+      "chapter": 184,
+      "path": "docs/design/WF-165-respecting-dojo-ratchet-12.md",
+      "title": "WF-165 Respecting the Dojo Ratchet 12",
+      "bytes": 19511,
+      "sha256": "08afb281d849f071937d557b60563efe89108209fc5e7a6cb40f8588733e8644",
+      "group": "WF"
+    },
+    {
+      "chapter": 185,
+      "path": "docs/design/WF-166-v8-dependency-security-closeout.md",
+      "title": "WF-166 - V8 Dependency Security Closeout",
+      "bytes": 7847,
+      "sha256": "4691f7ff7f6062b1de637feab696a97ea438f32ae47176e6fcebb6de7fb14305",
+      "group": "WF"
+    },
+    {
+      "chapter": 186,
+      "path": "docs/design/WF-167-roadmap-milestone-authority.md",
+      "title": "WF-167 Roadmap Milestone Authority",
+      "bytes": 19455,
+      "sha256": "1b4ab3088f5e175f67bfa5703270bf72a677073250767dfc262267e2ba6ceaba",
+      "group": "WF"
+    },
+    {
+      "chapter": 187,
+      "path": "docs/design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md",
+      "title": "RE-008 \u2014 Byte-Packed Surface Representation",
+      "bytes": 4619,
+      "sha256": "d267cd75283d57488e59d4ba9ac94b4d6b89cb1c793a2d47ab645ea91905f271",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 188,
+      "path": "docs/design/ASAP-001-fix-mcp-dag-type-error.md",
+      "title": "ASAP-001 \u2014 Fix MCP DAG Type Error",
+      "bytes": 2744,
+      "sha256": "4e2616458260cb8b1894348d35d654486fb1cfd0acd70029ea9ae53b45745a9b",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 189,
+      "path": "docs/design/AUDIT-001-showcase-audit.md",
+      "title": "AUDIT-001 \u2014 Mentor Audit of examples/showcase",
+      "bytes": 2743,
+      "sha256": "768c32b25b65782723412fbcb4c46eec1699dd0d5515d562c08b2e377fd2c285",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 190,
+      "path": "docs/design/BE-001-dogfood-blocks-breakout.md",
+      "title": "BE-001 Project Big Extraction: DOGFOOD Blocks Breakout",
+      "bytes": 8442,
+      "sha256": "be5cc3b3cd0d81bbe99e124f8befa591151784b315b0ed7d5ec5b7d15115d3b2",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 191,
+      "path": "docs/design/HT-002-layered-focus-and-interaction.md",
+      "title": "HT-002 \u2014 Layered Focus and Interaction",
+      "bytes": 7862,
+      "sha256": "aa29b1cd2fe771eb17c53a1d0e154d347dc90da7ac7d374648f781f431e18388",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 192,
+      "path": "docs/design/HT-003-implement-layer-stack-and-input-map-routing.md",
+      "title": "HT-003 \u2014 Implement Layer Stack and Input Map Routing",
+      "bytes": 5597,
+      "sha256": "ee8522ae911693ae0a16612fbc30853aea1d0e3e2f9753e4aa2785a1dd4bbd05",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 193,
+      "path": "docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md",
+      "title": "HT-004 \u2014 Promote Explicit Layer Objects and Richer Shell Introspection",
+      "bytes": 6096,
+      "sha256": "1493a7d5551c23d2fff0f63682b4bac43dd700833f7ab3af516e59b4d29b0831",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 194,
+      "path": "docs/design/HT-007-focus-map-surface.md",
+      "title": "HT-007 Focus Map Surface",
+      "bytes": 3520,
+      "sha256": "5f0325b9a7cd7adda747d72ffc51cddf836bded08ac687b4563d3d8184689731",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 195,
+      "path": "docs/design/HT_HT-008-surface-native-text-bypasses-the-terminal-sanitization-boundary.md",
+      "title": "HT-008 \u2014 Surface-native text bypasses the terminal sanitization boundary",
+      "bytes": 2773,
+      "sha256": "f1a4cc8d25ea83d101ca277a420ed69892d150f135e28de802392d4d1cae8774",
+      "group": "OTHER"
+    },
+    {
+      "chapter": 196,
+      "path": "docs/design/README.md",
+      "title": "Design Records",
+      "bytes": 933,
+      "sha256": "290c5925eb6bed530b7581bb390b3acbb53163b65e4a0d5896cf603c0cf939dd",
+      "group": "OTHER"
+    }
+  ],
+  "diagrams": [
+    {
+      "source": "docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md",
+      "index": 1,
+      "kind": "flowchart TD",
+      "source_sha256": "526e0b4a1168dc8349159ffda5f687a08ffc69cd8e019692c41ca71edadd0ad4"
+    },
+    {
+      "source": "docs/design/DX-031-standard-bijou-blocks.md",
+      "index": 2,
+      "kind": "classDiagram",
+      "source_sha256": "0eb8f5fcbc188806311abe0e9b80c697ad8b250d536c7283a6410efe8d8cb46e"
+    },
+    {
+      "source": "docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md",
+      "index": 3,
+      "kind": "flowchart LR",
+      "source_sha256": "8c86fd5ebefaa296444caf4b219bb2b0ed83d7139fab383c87f7cd91a715cd78"
+    },
+    {
+      "source": "docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md",
+      "index": 4,
+      "kind": "flowchart TD",
+      "source_sha256": "5001286bb34c076472f1d6e775a197eb659245e9edbb887bffad1140c7e68aa4"
+    },
+    {
+      "source": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md",
+      "index": 5,
+      "kind": "flowchart LR",
+      "source_sha256": "c3b2afb46269c6aca2c3bdc816f18a6ba69c34efaa8c9db8b52050f7610b620a"
+    },
+    {
+      "source": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md",
+      "index": 6,
+      "kind": "classDiagram",
+      "source_sha256": "8e77c3eca16c7736f597d6d524bcac9b17a80a0bd3c92b9e6cba9d3731930b21"
+    },
+    {
+      "source": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md",
+      "index": 7,
+      "kind": "flowchart TD",
+      "source_sha256": "e0993152d40b82636ee9c073dedeefd197f774ba513b136a75835960f4ca0c71"
+    },
+    {
+      "source": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md",
+      "index": 8,
+      "kind": "flowchart TB",
+      "source_sha256": "3f5fc08f0bdb8683651b1ce0d01c2979057cd072a3fd4c428048cca3628554f0"
+    }
+  ],
+  "editorial_normalizations": {
+    "workstation_paths": 0,
+    "home_paths": 0,
+    "symbol_labels": 0
+  }
+}

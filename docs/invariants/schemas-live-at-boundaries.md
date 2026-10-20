@@ -2,9 +2,9 @@
 
 ## Protected by legends
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
-- [DX — Developer Experience](../legends/DX-developer-experience.md)
-- [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
+- [DX — Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md)
+- [LX — Localization and Bidirectionality](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md)
 
 Schemas and parsers should reject malformed input at system edges, then
 hand trusted values to runtime-backed domain forms.

@@ -2,8 +2,8 @@
 
 ## Protected by legends
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
-- [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
+- [LX — Localization and Bidirectionality](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md)
 
 Serialization formats and decoded payload objects are not the same thing
 as trusted domain values.

@@ -12,7 +12,7 @@ describe('RE-036 packed-bijou-cells/1 Surface adapter design', () => {
       'github_issue: 459',
       'parent_issue: 457',
       'status: complete',
-      'Legend: [RE - Runtime Engine](../legends/RE-runtime-engine.md)',
+      'Legend: [RE - Runtime Engine]',
       '## Current Truth',
       '## Receipt Contract',
       '## Dimension And Byte Laws',

@@ -50,7 +50,6 @@ Bijou keeps durable truth in a small set of known places.
 | `docs/design/`                                                           | Cycle design records. Active records define proposed contracts; landed records preserve why a change was made.            |
 | `tests/cycles/`                                                          | Executable cycle evidence. Tests are the specification when prose and executable behavior disagree.                       |
 | `docs/WORKFLOW.md`                                                       | Concise operator workflow and recurring safety practices.                                                                 |
-| `docs/method/releases/`                                                  | Release packets, goalposts, and release evidence.                                                                         |
 | `docs/CHANGELOG.md`                                                      | Release-visible historical ledger.                                                                                        |
 | `docs/archive/`, `docs/audit/`, `docs/audits/`, and `docs/method/retro/` | Historical snapshots. They explain prior state and MUST NOT pose as current truth.                                        |
 

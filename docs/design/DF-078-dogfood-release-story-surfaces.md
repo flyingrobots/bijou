@@ -16,7 +16,7 @@ keywords:
 
 # DF-078 DOGFOOD Release Story Surfaces
 
-Legend: [DF - DOGFOOD](../legends/DF-dogfood-field-guide.md)
+Legend: [DF - DOGFOOD](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md)
 
 ## Linked Work
 

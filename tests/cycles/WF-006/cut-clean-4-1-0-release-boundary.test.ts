@@ -33,15 +33,10 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
 
   it('keeps the signposts honest after 4.1.0 ships', () => {
     const releaseGuide = readRepoFile('docs/release.md');
-    const workflowLegend = readRepoFile('docs/legends/WF-workflow-and-delivery.md');
-    const dogfoodLegend = readRepoFile('docs/legends/DF-dogfood-field-guide.md');
 
     // Release guide evolves; check that it references a concrete shipped release
     // instead of freezing this historical 4.1.0 cycle to the 4.x line forever.
     expect(releaseGuide).toMatch(/The latest shipped release is \*\*`\d+\.\d+\.\d+`\*\*\./);
     expect(releaseGuide).not.toContain('The currently shaped next release target is **`4.1.0`**.');
-
-    expect(workflowLegend).toContain('no version-target release lane is active right now');
-    expect(dogfoodLegend).toContain('DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface');
   });
 });

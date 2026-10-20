@@ -4,7 +4,7 @@ _Cycle for turning DOGFOOD coverage honesty into a CI-enforced release gate inst
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md)
 
 Depends on:
 

@@ -51,10 +51,6 @@ describe('DX-034 data binding closeout', () => {
 describe('DX-034 data binding closeout', () => {
   it('keeps compressed v6 lineage pointing to issue 182 evidence', () => {
     const design = readRepoFile('docs/design/DX-034-declarative-view-data-binding.md');
-    const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
     expect(design).toContain('contract without keeping issue #182 open');
-
-    expect(backlog).toContain('## Landed Data Binding Anchor');
-    expect(backlog).toContain('issue #182');
   });
 });

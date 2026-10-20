@@ -4,7 +4,7 @@ _Cycle for defining how Bijou shells should treat focus layers, dismiss order, a
 
 Legend:
 
-- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md)
 
 ## Why this cycle exists
 

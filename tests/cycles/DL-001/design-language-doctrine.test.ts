@@ -1,18 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { readRepoFile } from '../repo.js';
 
-
 describe('DL-001 design language doctrine cycle', () => {
   it('creates a Design Language legend and cycle doc with required workflow sections', () => {
-    const legend = readRepoFile('docs/legends/DL-design-language.md');
     const cycle = readRepoFile('docs/design/DL-001-capture-design-language-doctrine.md');
-
-    expect(legend).toContain('# DL — Design Language');
-    expect(legend).toContain('[Bijou UX Doctrine]');
-    expect(legend).toContain('[Accessibility and Assistive Modes]');
-    expect(legend).toContain('[Localization and Bidirectionality]');
-    expect(legend).toContain('[AI Explainability Standard]');
-    expect(legend).toContain('[Content Guide]');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');

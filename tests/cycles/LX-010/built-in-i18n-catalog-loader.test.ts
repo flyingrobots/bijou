@@ -27,7 +27,6 @@ afterEach(async () => {
 describe('LX-010 built-in i18n catalog loader cycle', () => {
   it('records the loader seam as completed lineage', () => {
     expect(existsRepoPath('docs/method/retro/LX-010-built-in-i18n-catalog-loader.md')).toBe(true);
-    expect(existsRepoPath('docs/method/backlog/up-next/LX-010-built-in-i18n-catalog-loader.md')).toBe(false);
 
     const retro = readRepoFile('docs/method/retro/LX-010-built-in-i18n-catalog-loader.md');
     expect(retro).toContain('createI18nRuntimeAsync()');

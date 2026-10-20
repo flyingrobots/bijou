@@ -12,7 +12,7 @@ The component-family coverage expansion arc is complete. DOGFOOD reached 100% ca
 
 ## Original Proposal
 
-Legend: [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
+Legend: [DF — DOGFOOD Field Guide](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DF-dogfood-field-guide.md)
 
 ## Idea
 

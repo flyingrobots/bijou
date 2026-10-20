@@ -16,7 +16,7 @@ the top-level documentation path.
 
 ## Original Proposal
 
-Legend: [DL — Design Language](../legends/DL-design-language.md)
+Legend: [DL — Design Language](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DL-design-language.md)
 
 Many code examples in the repository's READMEs and GUIDEs currently use
 `App<any, any>` or `Model = any`. While concise, this masks the core

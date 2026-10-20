@@ -16,7 +16,7 @@ keywords:
 
 # RE-041 v7.2 Framework Input Stabilization
 
-Legend: [RE - Runtime Engine](../legends/RE-runtime-engine.md)
+Legend: [RE - Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
 
 ## Linked Work
 

@@ -12,3 +12,6 @@ results when the change lands.
 Existing cycle identifiers and templates preserve historical provenance. New
 work does not require METHOD ceremonies, sponsor fields, a cycle branch name,
 or an advance shaping commit. Keep existing filenames stable for linked evidence.
+
+The complete design corpus is also available as the [Design Book](../book/README.md),
+with LaTeX source, a PDF edition, TikZ diagrams, and actual DOGFOOD cell specimens.

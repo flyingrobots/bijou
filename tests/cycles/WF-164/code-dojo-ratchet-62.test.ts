@@ -33,7 +33,7 @@ describe('WF-164 Code Dojo ratchet', () => {
   it('records the complete modern-cycle ownership and review contract', () => {
     const design = read('docs/design/WF-164-respecting-dojo-ratchet-62.md');
     const requiredClaims = [
-      'Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)',
+      'Legend: [WF — Workflow and Delivery]',
       '## Sponsor Human',
       '## Sponsor Agent',
       '## Accessibility And Assistive Posture',

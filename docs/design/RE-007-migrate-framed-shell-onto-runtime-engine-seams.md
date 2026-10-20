@@ -4,7 +4,7 @@ _Cycle for proving the runtime engine through the framed shell instead of leavin
 
 Legend:
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
 
 Depends on:
 

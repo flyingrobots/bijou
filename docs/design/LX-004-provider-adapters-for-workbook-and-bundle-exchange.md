@@ -1,6 +1,6 @@
 # LX-004 — Provider Adapters for Workbook and Bundle Exchange
 
-Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 

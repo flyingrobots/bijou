@@ -17,7 +17,7 @@ the normal reading path instead of trapped in backlog prose.
 
 ## Original Proposal
 
-Legend: [DL — Design Language](../legends/DL-design-language.md)
+Legend: [DL — Design Language](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DL-design-language.md)
 
 ## Idea
 

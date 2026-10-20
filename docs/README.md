@@ -26,10 +26,9 @@ entrypoints below. For roadmap and release scope, use GitHub issues and mileston
 | :--- | :--- |
 | **[Workflow](./WORKFLOW.md)** | GitHub roadmap and milestones; pending Linear execution migration. |
 | **[VISION](./VISION.md)** | Core tenets and project identity. |
-| **[method/backlog/README.md](./method/backlog/README.md)** | Historical evidence: older backlog lanes and shaped release lineage. |
 | **[strategy/README.md](./strategy/README.md)** | Doctrine map: living strategy notes vs historical planning artifacts. |
+| **[Design Book](./book/README.md)** | Complete LaTeX/PDF compilation of design records and actual DOGFOOD component specimens. |
 | **[Design Cycles](./design/README.md)** | Active and landed cycle design docs. |
-| **[Legends](./legends/README.md)** | Thematic intent by lane and doctrine family. |
 | **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
 | **[TypeScript Code Standards](./typescript-code-standards.editors-edition.md)** | Verbatim Code Dojo doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture. |
 | **[Code Dojo Exceptions](./code-dojo-exceptions.md)** | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
@@ -44,7 +43,6 @@ entrypoints below. For roadmap and release scope, use GitHub issues and mileston
 | **[MCP](./MCP.md)** | MCP server posture and tool reference. |
 | **[Packed Bijou Cell Receipts](./reference/packed-bijou-cells.md)** | Exact `packed-bijou-cells/1` schema, validation diagnostics, and byte-preserving `Surface` adaptation. |
 | **[Profunctor Page Inspection](./reference/profunctor-page-inspection.md)** | Exact `lowerProfunctorPageArtifacts()` inputs, modes, outputs, diagnostics, and bounded target posture. |
-| **[Technical Teardown](./TECHNICAL_TEARDOWN.md)** | End-to-end architecture and runtime explanation for new readers. |
 | **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |
 | **[specs/README.md](./specs/README.md)** | Spec artifact format, acceptance criteria conventions, and validation guidance. |

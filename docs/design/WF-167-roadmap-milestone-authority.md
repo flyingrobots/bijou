@@ -1,6 +1,6 @@
 # WF-167 Roadmap Milestone Authority
 
-Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md)
 
 Tracker: [#514](https://github.com/flyingrobots/bijou/issues/514)
 
@@ -472,7 +472,7 @@ No agent must infer release scope from issue-number ranges, historical
 - [TypeScript Code Standards](../typescript-code-standards.editors-edition.md)
 - [Roadmap](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/ROADMAP.md)
 - [Bearing](https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md)
-- [Release Policy](../method/releases/README.md)
+- [Release Policy](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/releases/README.md)
 - Tracker synchronization idea:
   [#268](https://github.com/flyingrobots/bijou/issues/268)
 - Perceptual-colour goalpost:

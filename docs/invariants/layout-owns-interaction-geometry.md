@@ -2,8 +2,8 @@
 
 ## Protected by legends
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
-- [DL — Design Language](../legends/DL-design-language.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
+- [DL — Design Language](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md)
 
 The authoritative geometry for interaction comes from retained layout, not from ad hoc handler registration or render-time guessing.
 

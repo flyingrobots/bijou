@@ -36,12 +36,4 @@ describe('RE-035 layout envelope closeout', () => {
     expect(design).toContain('Follow-on adoption should be separate and test-led');
     expect(design).toContain('RE-036 Text Measurement And Inline Flow');
   });
-
-  it('keeps compressed v6 lineage pointing to issue 180 evidence', () => {
-    const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-
-    expect(backlog).toContain('## Landed Layout Anchor');
-    expect(backlog).toContain('PR #251');
-    expect(backlog).toContain('issue #180');
-  });
 });

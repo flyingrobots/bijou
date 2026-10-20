@@ -11,7 +11,7 @@ turning every block into an implicit runtime manager_
 
 Legend:
 
-- [DX - Developer Experience](../legends/DX-developer-experience.md)
+- [DX - Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md)
 
 Depends on:
 

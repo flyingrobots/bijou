@@ -2,8 +2,8 @@
 
 ## Protected by legends
 
-- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
-- [DX — Developer Experience](../legends/DX-developer-experience.md)
+- [RE — Runtime Engine](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md)
+- [DX — Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md)
 
 Commands are requests for app-owned stateful action. Effects are non-stateful runtime consequences.
 

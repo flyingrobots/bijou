@@ -19,7 +19,7 @@ style variants without forcing users to choose a separate component.
 
 Legend:
 
-- [DX - Developer Experience](../legends/DX-developer-experience.md)
+- [DX - Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md)
 
 ## Sponsor Human
 
@@ -385,6 +385,6 @@ Deferred debt:
 
 - `tableSurface()` still uses its older intrinsic surface sizing path. Follow-up
   work is tracked in
-  [DX-037](../method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md)
+  [DX-037](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md)
   so surface width negotiation can be designed deliberately instead of copied
   from the string renderer.

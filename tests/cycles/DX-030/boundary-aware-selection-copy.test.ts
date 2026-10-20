@@ -52,13 +52,10 @@ describe('DX-030 boundary-aware pointer selection and copy', () => {
   it('keeps compressed v6 lineage pointing to issue 186 evidence', () => {
     const design = readRepoFile('docs/design/DX-030-add-boundary-aware-pointer-selection-and-copy.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
-    const backlog = readRepoFile('docs/method/backlog/v6.0.0/README.md');
 
     expect(design).toContain('DX-030 is landed for the `v6.0.0` release boundary.');
     expect(design).toContain('pure selection coordinator');
     expect(changelog).toContain('DX-030 boundary-aware selection and copy');
     expect(design).toContain('issue #186 closes through implementation');
-    expect(backlog).toContain('## Landed Selection And Copy Anchor');
-    expect(backlog).toContain('issue #186');
   });
 });

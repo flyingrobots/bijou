@@ -10,7 +10,7 @@ legend: DX
 
 # DX-047 - Blocks App Binding Snippets
 
-Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)
+Legend: [DX - Developer Experience](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md)
 
 ## Decision Summary
 

@@ -12,7 +12,7 @@ Legacy planning entrypoints now identify themselves honestly: ROADMAP is referen
 
 ## Original Proposal
 
-Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/WF-workflow-and-delivery.md)
 
 ## Idea
 
