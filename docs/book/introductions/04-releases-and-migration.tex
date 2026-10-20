@@ -1,0 +1,18 @@
+\chapter*{From implementation to a release claim}
+\addcontentsline{toc}{chapter}{Introduction: From implementation to a release claim}
+
+Release material answers a different set of questions from a design proposal. What changed for a user of a particular version? Which contracts or defaults moved? What must an existing application do to upgrade? Which checks and artifacts support publishing that version?
+
+The chapters in this part retain release packets, change narratives, migration guides and release-mechanics notes from the source collection. Read each chapter with its version and date in view. A guide written for an earlier upgrade describes that transition; it does not automatically describe the steps required by a later release.
+
+\section*{Use the records together}
+
+A release narrative describes the intended user-facing change. Migration guidance explains the work that change asks of an adopter. A release packet can link the implementation, review and validation evidence behind the claim. The design records in the preceding part provide the earlier reasoning and boundaries.
+
+When a statement matters to an upgrade, follow it through those records and verify the package version being used. Distinguish a published package from a prerelease, a completed validation step from a planned gate, and a recorded limitation from a promised follow-up. An absence of a warning in a historical release note is not a fresh compatibility check.
+
+\section*{Scope and live operations}
+
+Roadmap counts, milestone assignments and tracker status can change after a document is written. Their historical wording remains useful for understanding a release decision, while the tracker remains the place to establish current scope. The same distinction applies to workflow and publishing instructions preserved in the book: current repository agreements and authorized release tooling govern a new publication.
+
+This part is most useful as a bridge. Read from the behaviour an application relies on, through the version that changed it, to the implementation and evidence that made the change acceptable.

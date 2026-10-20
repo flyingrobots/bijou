@@ -1,71 +1,104 @@
 {
-  "edition": "2026-10-20",
-  "pages": 1760,
+  "edition": "2026-10-20 reader-facing editorial revision",
+  "pages": 1771,
   "source_documents": 426,
   "original_design_documents": 196,
   "additional_documents": 230,
+  "editorial_parts": [
+    {
+      "number": 1,
+      "title": "Philosophy and architecture",
+      "source_chapters": 37
+    },
+    {
+      "number": 2,
+      "title": "Using Bijou",
+      "source_chapters": 24
+    },
+    {
+      "number": 3,
+      "title": "Design records",
+      "source_chapters": 196
+    },
+    {
+      "number": 4,
+      "title": "Releases and migration",
+      "source_chapters": 26
+    },
+    {
+      "number": 5,
+      "title": "Retrospectives and historical planning",
+      "source_chapters": 126
+    },
+    {
+      "number": 6,
+      "title": "Audits and archive records",
+      "source_chapters": 17
+    },
+    {
+      "number": 7,
+      "title": "Rendered components and provenance",
+      "component_specimens": 42
+    }
+  ],
+  "general_preface": true,
+  "part_introductions": 7,
+  "design_family_introductions": 7,
+  "source_chapter_bodies_preserved": 426,
   "mermaid_sources_converted_to_tikz": 32,
   "component_specimens": 42,
-  "source_hash_checks": "426/426 matched original bytes before retirement and preserved corpus after retirement",
-  "retired_source_checks": "426/426 individual source files removed",
-  "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b",
-  "tex_sha256": "02b9761521fb46039bcd66d1043438b2e7baff4d3b03cb93dc5f0b45e809150d",
+  "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
+  "tex_sha256": "b98a5b16a6d669f917c655cf1b193cf173bcc686e0ecaa194d059e10004dd165",
+  "tex_tree_sha256": "fc99e36810d80352c5c2ac7b83ed583c9659c4d8f56e89260e1b60077bf35c2a",
   "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "compiler": "LuaHBTeX 1.15.0 / TeX Live 2022",
-  "build": "two converged LuaLaTeX passes in bounded temporary storage",
+  "build": "Three clean LuaLaTeX passes from the modular source tree into bounded temporary storage.",
   "missing_glyphs": 0,
   "undefined_references": 0,
   "maximum_text_overflow_pt": 7.87482,
-  "reader_delivery": {
-    "id": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d",
-    "status": "awaiting_filing",
-    "integrity": "intact",
-    "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b"
+  "latex_structure": {
+    "entrypoint_lines": 13,
+    "reader_facing_parts": 7,
+    "source_chapters": 426,
+    "specimen_files": 42,
+    "tex_files": 502
   },
-  "visual_inspection": [
-    "coral cover",
-    "terminal scenarios flow and class diagrams",
-    "vision diagram",
-    "performance tables",
-    "retained component atlas"
+  "validation": [
+    "426/426 original source chapter files remain byte-identical.",
+    "426/426 source chapter destinations resolve to pages displaying their original source paths.",
+    "Preface and all seven part introductions appear in PDF bookmarks.",
+    "All 32 diagram conversions and 42 component specimens are retained.",
+    "Existing repository links to source chapter pages updated for the new reading order.",
+    "Focused documentation/corpus/entrypoint checks: 3 files, 12 tests passed; documentation inventory passed."
   ],
-  "retained_operating_sources": [
-    "docs/README.md",
-    "docs/CHANGELOG.md",
-    "docs/code-dojo-exceptions.md",
-    "docs/typescript-code-standards.editors-edition.md",
-    "docs/guides/framed-app-tutorial.md"
+  "visual_inspection": [
+    "preface opening",
+    "philosophy introduction",
+    "two-page design-record introduction"
   ],
   "resource_usage": {
-    "temporary_build_kib": 659856,
-    "host_free_bytes": 661544648704,
+    "temporary_build_kib": 670924,
+    "host_free_bytes": 646106288128,
     "worker": "bijou-design-book-worker",
     "scratch_limit_bytes": 1610612736,
     "worker_memory_bytes": 4294967296,
     "worker_cpus": 2
   },
+  "reader_previous_edition": {
+    "id": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b"
+  },
   "limitations": [
-    "Historical proposals retain their original status; current tracker scope remains authoritative.",
-    "Minor TeX box and font-shape substitution warnings remain; no glyphs are missing."
+    "Historical source claims retain their recorded scope and status; new introductions distinguish plans from evidence.",
+    "Minor existing TeX box and font-shape substitution warnings remain; no missing glyphs."
   ],
-  "validation": [
-    "215 files / 680 tests: 678 passed initially; two entrypoint wording assertions updated and all nine tests in those files passed on rerun.",
-    "Source-retirement regression reproduced three ENOENT failures before corpus adapter migration; the same doctrine checks passed afterward.",
-    "Documentation inventory and design-system preflight passed.",
-    "DOGFOOD coverage gate: 100% = 36/36 families.",
-    "Localization debt gate: 2316 raw strings and 78 untranslated Markdown documents, matching existing baselines.",
-    "Split LaTeX clean two-pass rebuild: all 1760 pages match the published PDF in text, geometry and 36 DPI raster; named link destinations identical."
-  ],
-  "latex_structure": {
-    "entrypoint_lines": 21,
-    "parts": 13,
-    "source_chapters": 426,
-    "specimen_files": 42,
-    "tex_files": 486,
-    "expanded_text_check": "Exact original text; only a whitespace separator added between appendix and part commands.",
-    "tree_sha256": "fe4bf0fce5636e2196f48b2823d346a7aec4288be932aafac9413ff044daed61",
-    "verification_report": "latex-split-verification.json",
-    "verified_pages": 1760,
-    "verification": "Every page has identical extracted text, page geometry, 36 DPI raster and named link destinations."
+  "reader_delivery": {
+    "id": "499c188f-2133-4469-9c7f-216d63386bdb",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
+    "supersedes": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d"
   }
 }

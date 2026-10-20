@@ -1,6 +1,7 @@
 {
-  "id": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d",
+  "id": "499c188f-2133-4469-9c7f-216d63386bdb",
   "status": "awaiting_filing",
   "integrity": "intact",
-  "pdf_sha256": "bf8dd184605c354516616d3527b538876967a45a6557754c899b3213cf0abf4b"
+  "pdf_sha256": "0237ffa6562c9dced474b1c786f75d596babdfcbce6abc5bd455fa42f04ef05c",
+  "supersedes": "12f0c95a-4da3-4b23-90ea-5cfa5eb3991d"
 }

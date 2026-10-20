@@ -1,0 +1,37 @@
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\label{preface}
+
+A terminal is a demanding place to build an application. Space is measured in cells. Input belongs to whichever surface has focus. A resize can change the useful shape of a page, and a different language can change the space its controls need. Colour, motion and cursor position help some readers; other readers encounter the same program through plain output, a screen reader, a script or an automated tool.
+
+Bijou grows out of taking those conditions seriously. Its ambition is to make terminal software whose behaviour, structure and meaning remain understandable across those settings. The visible interface and the facts behind it should agree. Layout should own the geometry used for interaction. State changes and side effects should have clear owners. Host services should sit behind explicit boundaries. These principles shape both the code and the way the project explains its decisions.
+
+This book brings that explanation together. It contains practical guides, architectural and design-language principles, records of proposed and completed changes, release and migration notes, retrospectives, audits, and rendered component specimens. The collection began as working repository documents. The editorial introductions provide a route through that collection while preserving the source records and their provenance.
+
+\section*{An order for reading}
+
+\hyperref[part-philosophy]{Part~\ref*{part-philosophy}, Philosophy and architecture}, establishes the ideas behind the system: runtime truth, explicit boundaries, humane interaction, graceful lowering, localization and inspectability. These chapters explain the constraints against which later choices should be judged.
+
+\hyperref[part-using]{Part~\ref*{part-using}, Using Bijou}, turns those ideas towards application work. Begin with the general Guide and the terminal-scenarios chapter, then follow the reference material needed for a particular task. The advanced guide, rendering material, package-development notes and component-family reference support deeper work. DOGFOOD is the documentation application; BlockLab is the standalone component workbench. Their presence throughout the book reflects the project's use of its own tools as a proving ground.
+
+\hyperref[part-design]{Part~\ref*{part-design}, Design records}, preserves the reasoning behind individual changes. Its introduction explains the recurring document format before the first record appears. The records are grouped by concern so a reader can follow a line of work across the documentation app, developer experience, runtime, design language, localization and delivery tooling.
+
+\hyperref[part-releases]{Part~\ref*{part-releases}, Releases and migration}, follows changes into release-facing claims and upgrade guidance. \hyperref[part-retrospectives]{Part~\ref*{part-retrospectives}, Retrospectives and historical planning}, records what happened during the work. \hyperref[part-audits]{Part~\ref*{part-audits}, Audits and archive records}, preserves assessments, experiments and discarded directions. Together they let a reader compare an intention, an implementation claim and its later consequences.
+
+\hyperref[part-atlas]{Part~\ref*{part-atlas}, Rendered components and provenance}, closes the book with actual component specimens and the inventory of original sources. It connects the written contracts to visible terminal surfaces and gives each source record a traceable identity.
+
+\section*{Why the records have a recurring shape}
+
+A design document is useful when it makes a decision easier to examine. The recurring fields in this collection ask who needs a change, what useful outcome it should produce, where its boundaries lie, and what observations would establish success. Questions about accessibility, language, directionality and automated inspection bring different ways of using the same feature into that discussion early.
+
+The resulting documents can look formal. Their value comes from the questions they expose: a named outcome can be challenged, a non-goal limits a promise, an invariant constrains an implementation, and a proposed test gives a reviewer something concrete to inspect. The introduction to the design-record part explains these fields in detail, including the distinction between tests proposed before implementation and evidence recorded after it.
+
+The collection spans changes in the project's working practices. Terms such as sponsor, hill, playback, cycle, lane and legend belong to that history. They help explain the records in which they appear. They do not impose the retired METHOD process on new work. Current operating agreements and the live issue tracker govern current execution.
+
+\section*{Reading with evidence in mind}
+
+Each source chapter retains its original path and text. Its status fields and future-tense promises describe the record at the time it was written. A design can contain a sound argument without proving that the feature shipped; a release note can state a result without establishing that the result still holds in today's code. Use linked issues, pull requests, commits and recorded checks to follow a claim into implementation. Read current tracker state from the tracker.
+
+When building an application, use this book to understand the contracts and choices, then verify the exact API against the version being used. When reviewing a change, read its design, closeout evidence and subsequent history together. When looking for a subject such as Theme Lab or BlockLab, follow its named records and the part introductions instead of treating every mention as a complete operating guide.
+
+The aim is a useful relationship between explanation and execution. A reader should be able to understand a choice, find the evidence behind it, and decide what still needs to be checked.

@@ -17,6 +17,9 @@ node --import tsx scripts/read-documentation.ts docs/ARCHITECTURE.md 1 80
 The arguments are the original path, first line and line limit (maximum 250).
 `npm run docs:inventory` lists the retained operating documents and book artifacts.
 
+Start with the [Preface](./book/bijou-designs.pdf#page=2). Each of the seven
+parts introduces its material; Part III explains how to read the design records.
+
 ## Current operating references
 
 - [Project front door](../README.md)

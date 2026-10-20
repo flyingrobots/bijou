@@ -2,7 +2,7 @@
 
 [Read the PDF](./bijou-designs.pdf) or inspect the [LaTeX source](./bijou-designs.tex).
 
-The 1,760-page edition of 2026-10-20 consolidates 426 source documents: the original 196
+The 1,771-page edition of 2026-10-20 consolidates 426 source documents: the original 196
 `docs/design/` records plus 230 guides, references, strategy notes, invariants,
 release documents, audits and historical records. All 32 Mermaid diagrams are
 converted to native TikZ. The atlas retains 42 actual DOGFOOD component stories.
@@ -23,20 +23,40 @@ READMEs remain beside their distributable code.
 Historical proposals retain their original status; GitHub issues and milestones
 own current release scope. `compiled-source-retirement.json` lists all removals.
 
+## Reading the book
+
+Start with the [Preface](./bijou-designs.pdf#page=2). The seven parts are:
+
+1. Philosophy and architecture
+2. Using Bijou
+3. Design records
+4. Releases and migration
+5. Retrospectives and historical planning
+6. Audits and archive records
+7. Rendered components and provenance
+
+Each part opens with an editorial introduction. The design-record introduction
+explains sponsorship, hills, playback questions, scope, accessibility,
+localization, inspection, proposed tests and closeout evidence. Family dividers
+orient readers within the design records. Original chapter bodies remain exact.
+
 ## LaTeX source layout
 
 `bijou-designs.tex` is the small book entrypoint. It uses `\input` to assemble:
 
-- `preamble.tex` — typography, palette and shared LaTeX configuration;
-- `frontmatter.tex` — cover, edition notes and contents;
-- `parts/` — 13 part files listing their chapters in reading order;
-- `chapters/` — one file per original document, grouped by book part;
-- `specimens/` — one file per rendered DOGFOOD component story;
-- `appendices/` — the component atlas wrapper and source inventory.
+- `preamble.tex` and `frontmatter.tex` — shared styling, cover and contents;
+- `preface.tex` and `edition-notes.tex` — orientation and provenance;
+- `parts/` — seven reader-facing part files;
+- `introductions/` — one introduction for every part;
+- `groups/` — chapter lists and design-family reading guidance;
+- `chapters/` — the 426 preserved source chapters;
+- `specimens/` — the 42 rendered component-story descriptions;
+- `appendices/` — the atlas wrapper and source inventory.
 
-Each entry in `source-manifest.json` includes its `latex_path`, so an original
-Markdown path maps directly to its chapter file. The original Markdown files
-remain retired. Compile the entrypoint from this directory as shown below.
+`source-manifest.json` maps original paths to stable `record_label` values,
+LaTeX paths, book parts and displayed chapter numbers. Source-file prefixes
+retain the earlier record identity; chapter numbers follow this reading order.
+Compile the entrypoint from this directory as shown below.
 
 ## Typography and palette
 
@@ -82,9 +102,10 @@ is sufficient to build the retained edition. Edit chapter files directly and
 keep shared styling in `preamble.tex`; the corpus remains the exact snapshot
 of the retired Markdown edition.
 
-The split source was rebuilt and checked against the published PDF: all 1,760
-pages have identical text, geometry, 36 DPI renders and named link destinations.
-See `latex-split-verification.json`. The published PDF is unchanged.
+The earlier source-split equivalence check is preserved under `history/` with
+its original PDF hash. This editorial edition intentionally changes reading
+order and pagination. `editorial-verification.json` records preserved source
+hashes, chapter destinations, introduced parts and the final PDF hash.
 
 ## Provenance and tracker reconciliation
 

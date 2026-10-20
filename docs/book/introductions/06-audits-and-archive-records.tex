@@ -1,0 +1,18 @@
+\chapter*{Reading assessments in context}
+\addcontentsline{toc}{chapter}{Introduction: Reading assessments in context}
+
+An audit takes a view of the system at a particular point in time. It may find a defect, identify a risk, measure a weakness in the evidence or propose a different direction. Those are distinct kinds of finding. The value of the assessment depends on the question it asked, the source revision it examined and the observations it retained.
+
+This part gathers quality and readiness assessments, performance notes, archived explorations and discarded directions. Their presence preserves a line of inquiry. It does not assign each finding the same confidence or imply that every recommendation was adopted.
+
+\section*{Follow the evidence boundary}
+
+For a defect claim, look for the trigger, the observed result and a check that can distinguish failure from success. For a performance claim, look for the workload, environment, measurement method and limits. For a recommendation, identify the need it serves and the assumptions it requires.
+
+A static reading can identify a plausible risk without reproducing a runtime failure. A benchmark can establish a result for its recorded workload without establishing a general performance guarantee. A later implementation can resolve a finding while leaving the original audit useful as the explanation of how it was discovered.
+
+\section*{Use the archive as a record of choices}
+
+Explorations and graveyard entries can explain why a tempting approach was abandoned or which missing constraint prevented adoption. Read them alongside later design records and release evidence before treating an older conclusion as current.
+
+When applying an assessment to today's code, first establish whether the relevant path and behaviour still exist. Then reproduce or re-evaluate the finding at the revision being considered. The archive helps frame that investigation by preserving the original observation and its context.

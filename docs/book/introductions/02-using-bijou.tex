@@ -1,0 +1,18 @@
+\chapter*{From principles to an application}
+\addcontentsline{toc}{chapter}{Introduction: From principles to an application}
+
+This part gathers the material used while building with Bijou. It begins with orientation and end-to-end terminal scenarios, moves through the documentation application and development tools, and then provides the design-system and API references needed for more detailed work.
+
+The package boundaries matter. Core components and surfaces express terminal content. The TUI runtime supplies the application loop, input and layout machinery. Node adapters provide terminal and host integration. The framed application shell assembles common application behaviour. Keeping those roles distinct helps a small command-line tool remain small and helps a larger application put each responsibility in the appropriate place.
+
+\section*{Choose a route through the material}
+
+For a first application, read the Guide and terminal-scenarios chapter before the advanced rendering material. For a specific capability, follow the package, component-family or reference chapter that owns its contract. Read the render-pipeline and advanced-guide chapters when frame production, effects or performance become the question. Migration chapters should be read with their release version in view.
+
+DOGFOOD and BlockLab provide two useful routes into the project. DOGFOOD presents the documentation and component explorer inside a full application shell. BlockLab concentrates on the story catalog, previews, variants and profiles. Theme Lab is an application surface for exploring theme editing and relationships. Their design records appear later in the book; the practical notes here explain how these surfaces fit into development and validation.
+
+\section*{Examples and reference material}
+
+Examples illustrate a contract within a particular context. Check which package version, output mode and host an example assumes before adapting it. A component that can be displayed in several modes still needs a caller to choose the correct runtime and output path.
+
+The reference chapters provide denser material: token rules, family inventories, schemas, diagnostics and exact boundary behaviour. They support lookup during implementation. The first part explains why those boundaries matter; the design-record part explains how individual boundaries were introduced or changed. Together they provide a path from an immediate task to the reasoning behind its constraints.

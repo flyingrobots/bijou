@@ -359,8 +359,8 @@ expect(report).toContain('[1] *editor');
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path for building apps.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Shell doctrine, shaders, and motion internals.
-- **[Render Pipeline Guide](../../docs/book/bijou-designs.pdf#page=70)**: Stage order, `RenderState`, and `configurePipeline()` truth.
-- **[Design System](../../docs/book/bijou-designs.pdf#page=100)**: Semantic guidance and patterns.
+- **[Render Pipeline Guide](../../docs/book/bijou-designs.pdf#page=226)**: Stage order, `RenderState`, and `configurePipeline()` truth.
+- **[Design System](../../docs/book/bijou-designs.pdf#page=232)**: Semantic guidance and patterns.
 
 ---
 Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)
