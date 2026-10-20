@@ -1,29 +1,29 @@
 {
-  "id": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
+  "id": "87d5bfaf-36bc-4c63-bf47-1905b07cf98c",
   "status": "awaiting_filing",
   "integrity": "intact",
-  "fingerprint": "4445c40be4917f6c7ff30aee6332c5eafc2a6e8a28d06d6000cfa726fb1039af",
-  "document_path": "/Users/j/git/reader/inbox/21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c/bijou-book-and-archive.md",
-  "received_at": "2026-10-20T21:49:24.407552+00:00",
-  "supersedes": "bdf1d8e9-27fc-40bd-8417-7ebba2543691",
+  "fingerprint": "4051d26a38dc86062e1e6e50c7d73c8eb3c996107887fadd7d788d7b0606d488",
+  "document_path": "/Users/j/git/reader/inbox/87d5bfaf-36bc-4c63-bf47-1905b07cf98c/bijou-progressive-build-edition.md",
+  "received_at": "2026-10-20T23:51:11.789082+00:00",
+  "supersedes": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
   "editions": {
     "teaching": {
       "pdf": "bijou-book.pdf",
-      "physical_pages": 95,
-      "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
-      "bytes": 14787647
+      "physical_pages": 106,
+      "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
+      "bytes": 14793930
     },
     "archive": {
       "pdf": "bijou-archive.pdf",
       "physical_pages": 1872,
-      "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
-      "bytes": 20332307
+      "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
+      "bytes": 20333134
     },
     "complete": {
       "pdf": "bijou-designs.pdf",
-      "physical_pages": 1922,
-      "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
-      "bytes": 22679362
+      "physical_pages": 1933,
+      "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
+      "bytes": 22710082
     }
   },
   "evidence_files": [
@@ -31,6 +31,8 @@
     "evidence/NOTICE.txt",
     "evidence/archive-record-hashes.json",
     "evidence/edition-manifest.json",
+    "evidence/historical-record-bodies.zip",
+    "evidence/learning-material-verification.json",
     "evidence/source-corpus.json",
     "evidence/source-manifest.json"
   ]

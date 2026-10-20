@@ -2,7 +2,7 @@
 
 \section{Reduce the available space}
 
-Resize the interactive monitor to twenty-four columns and eight rows. Below forty-two columns, its presentation changes from a table to compact job records. The renderer wraps the content into cells, keeps a small heading region, and provides a scrollable body with a footer. Moving selection brings the selected job into the visible body; \texttt{j} and \texttt{k} let the reader inspect more content. The model still owns job identities and selection while the geometry changes.
+Run \texttt{npm run stage -- 05}, then resize the interactive monitor to twenty-four columns and eight rows. Below forty-two columns, its presentation changes from a table to compact job records. The renderer wraps the content into cells, keeps a small heading region, and provides a scrollable body with a footer. Moving selection brings the selected job into the visible body; \texttt{j} and \texttt{k} let the reader inspect more content. The model still owns job identities and selection while the geometry changes.
 
 \subsection{Do not confuse clipping with usability}
 
@@ -18,7 +18,7 @@ The cost is another layout pass and a dependency on the terminal's width convent
 
 \subsection{Long copy and no color}
 
-Run checkpoint 05. Its long-copy fixture exposes assumptions hidden by short English labels. The fixture is not a localization catalog: it changes the title to exercise expansion while the rest of the application remains English. A real localization exercise would move complete messages, counts and direction into an explicit catalog and test their effect on focus and geometry. Translating a few words is not the same acceptance claim.
+Run the final stage with \texttt{--mode=static --locale=long}, or use the original checkpoint 05 for its fixed narrow fixture. Its long-copy fixture exposes assumptions hidden by short English labels. The fixture is not a localization catalog: it changes the title to exercise expansion while the rest of the application remains English. A real localization exercise would move complete messages, counts and direction into an explicit catalog and test their effect on focus and geometry. Translating a few words is not the same acceptance claim.
 
 Run the static mode with \texttt{NO\_COLOR=1}. A failed job must still have a word identifying its state and an explanation. Redirect output and inspect the TSV. A consumer should not have to strip interactive cursor control codes before reading the data. Force interactive mode without a TTY and observe the explicit error rather than an application pretending that raw keyboard input is available.
 

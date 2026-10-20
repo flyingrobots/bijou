@@ -7050,8 +7050,10 @@
     "latex_path": "teaching/contents.tex",
     "workshops": 7,
     "source_chapters": 0,
-    "commit": "92864e0f2512f59225b2f1f5b89a0678bd639e62",
-    "placement": "Seven workshops distributed across teaching Parts II–V; stable workshop labels retained."
+    "commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+    "placement": "Seven workshops distributed across teaching Parts II–V; stable workshop labels retained.",
+    "tag": "book-v2",
+    "progressive_stages": 5
   },
   "historical_parts_previous_edition": [
     {

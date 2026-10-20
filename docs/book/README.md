@@ -9,13 +9,13 @@ appendices and keeps the existing filename used by repository links.
 
 This build produces:
 
-- Teaching: 95 physical pages, 14,787,647 bytes.
-- Archive: 1,872 physical pages, 20,332,307 bytes.
-- Complete: 1,922 physical pages, 22,679,362 bytes.
+- Teaching: 106 physical pages, 14,793,930 bytes.
+- Archive: 1,872 physical pages, 20,333,134 bytes.
+- Complete: 1,933 physical pages, 22,710,082 bytes.
 
 ## Learn through one application
 
-The main text contains thirteen chapters, including seven runnable workshops,
+The main text contains fourteen chapters, including seven runnable workshops,
 organized into five Parts with introductions and explicit learning outcomes:
 
 1. **Why Bijou** — useful meaning, framework fit, tradeoffs and version boundaries.
@@ -24,16 +24,17 @@ organized into five Parts with introductions and explicit learning outcomes:
 4. **Make it dependable** — hostile terminal conditions, evidence and symptom-led troubleshooting.
 5. **Ship and maintain it** — reproducibility, packaging, a concrete regression repair and upgrades.
 
-A component atlas, renderer gallery, glossary and practical topic finder follow
-the main text. The atlas, gallery and glossary also appear in the archive; the practical topic finder belongs to the teaching text. The
+A component atlas, renderer gallery, glossary, practical topic finder, explained
+exercise answers and unfamiliar-reader protocol follow the main text. The atlas, gallery and glossary also appear in the archive; the practical topic finder belongs to the teaching text. The
 teaching book has no archived source chapters; historical guides and principles
 are kept with the other 426 records rather than mixed into the instructional route.
 
 The public companion is [flyingrobots/bijou-job-monitor](https://github.com/flyingrobots/bijou-job-monitor),
 pinned to published **Bijou 7.2.0**, commit
-**92864e0f2512f59225b2f1f5b89a0678bd639e62**, tagged `book-v1`.
-Its checkpoints select behaviors of the completed modules. They are not separate
-historical implementations. `companion.json` records the prior local evidence and
+**1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1**, tagged `book-v2`.
+Five independent source stages now build the application incrementally, with actual
+adjacent diffs and acceptance criteria. The original checkpoint commands remain
+inspections of the completed modules. `companion.json` records the prior local evidence and
 successful GitHub Actions runs at that exact commit. No new companion release is
 implied by this editorial restructuring.
 
@@ -87,7 +88,7 @@ redrawn by eye. See the capture manifests and `tools/README.md` for reproduction
   `bijou-designs.tex`: complete edition.
 - `preamble.tex`, `frontmatter.tex`, `copyright.tex`, `reproducibility.tex`,
   `preface.tex`, `edition-notes.tex`: shared publication setup and edition-aware front matter.
-- `teaching/`: the five-Part route, introductions and six connecting chapters.
+- `teaching/`: the five-Part route, introductions and seven connecting chapters.
 - `workshops/`: seven shared teaching chapters with stable workshop labels.
 - `archive/`, `parts/`, `introductions/`, `groups/`: historical assembly and guidance.
 - `chapters/`: 426 unchanged typeset source records.
@@ -130,6 +131,25 @@ retain their copyright statements; companion-snippets includes LICENSE and NOTIC
 record current output verification. Source-corpus checks and archive-body identity
 are distinct: the corpus preserves original Markdown; the unchanged TeX records
 retain the preceding edition's presentation edits. Historical tracker links and
-source-retirement manifests remain intact. The companion's fifteen tests and PTY
-observations are prior evidence at its fixed commit, not newly executed results.
+source-retirement manifests remain intact. The companion's 44 tests and six PTY cases were executed for book-v2 and its hosted CI passed at the pinned commit.
 No human screen-reader study or broad terminal-emulator matrix is claimed.
+
+## Progressive edition and human review
+
+The `book-v2` companion is published on `book/progressive-stages`, with the old
+`book-v1` tag preserved. All five source stages run without importing the final
+application or each other; a clean candidate install was tested with the finished
+source hidden. The final stage matches the eight `src/` modules byte for byte.
+Actual source diffs span 37, 123, 291 and 89 lines including context.
+
+The answer key explains hints, diagnoses, repairs, tempting failed alternatives
+and completion criteria. The user will arrange an unfamiliar reader. That human
+walkthrough is prepared and **not conducted**. Its protocol and blank form are
+in the companion and book appendix. No participant answers are prefilled. A real
+interactive screen-reader workflow remains unimplemented; accessible CLI output
+is a static fixture.
+
+`learning-material-manifest.json` identifies the exact companion Markdown sources
+typeset into the new appendices. `companion-material/` retains the stage hash
+manifest and blank observation form. The source corpus and all 426 historical
+TeX record bodies remain unchanged.

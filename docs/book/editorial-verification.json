@@ -1,7 +1,7 @@
 {
-  "edition": "2026-10-20 teaching book and historical archive",
-  "source_base_commit": "003da8d4eb76674fc67cf44a5886e39702a0da4f",
-  "shared_latex_tree_sha256": "cbf3024396dba5dbdf38c390c38ef0c2d1d4fe47f4694cf40680317af30539e7",
+  "edition": "2026-10-20 progressive build edition",
+  "source_base_commit": "32408df5abdcc70649f72fa7ebe18e930e835f2d",
+  "shared_latex_tree_sha256": "1bfbef68a08f0e6b58ad403868ab1ed650f82db22b233dba77d08b52e126e364",
   "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "archive_records": {
     "count": 426,
@@ -11,9 +11,9 @@
   },
   "main_text": {
     "parts": 5,
-    "numbered_chapters": 13,
+    "numbered_chapters": 14,
     "workshops": 7,
-    "connecting_chapters": 6,
+    "connecting_chapters": 7,
     "historical_records": 0
   },
   "updated_link_files": [
@@ -40,7 +40,7 @@
     "bun.lock"
   ],
   "verification_limits": [
-    "Companion verification is prior evidence at the unchanged pinned commit.",
+    "Companion book-v2 typecheck, 44 tests, five independent stages and six PTY cases passed; hosted CI passed at its pinned commit.",
     "Historical source assertions were not individually reclassified against current runtime.",
     "No human screen-reader study or broad emulator matrix performed.",
     "Unrelated dirty framed-app tutorial retains its pre-existing page links."
@@ -49,9 +49,9 @@
     "teaching": {
       "entrypoint": "bijou-book.tex",
       "pdf": "bijou-book.pdf",
-      "physical_pages": 95,
-      "bytes": 14787647,
-      "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
+      "physical_pages": 106,
+      "bytes": 14793930,
+      "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
       "copyright_page": 2,
       "source_records": 0,
       "missing_glyphs": 0,
@@ -64,8 +64,8 @@
       "entrypoint": "bijou-archive.tex",
       "pdf": "bijou-archive.pdf",
       "physical_pages": 1872,
-      "bytes": 20332307,
-      "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
+      "bytes": 20333134,
+      "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
       "copyright_page": 2,
       "source_records": 426,
       "missing_glyphs": 0,
@@ -77,9 +77,9 @@
     "complete": {
       "entrypoint": "bijou-designs.tex",
       "pdf": "bijou-designs.pdf",
-      "physical_pages": 1922,
-      "bytes": 22679362,
-      "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
+      "physical_pages": 1933,
+      "bytes": 22710082,
+      "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
       "copyright_page": 2,
       "source_records": 426,
       "missing_glyphs": 0,
@@ -89,19 +89,181 @@
       "full_apache_paragraphs_verified": 32
     }
   },
-  "documentation_checks": {
-    "npm_run_lint": "passed across all workspaces",
-    "focused_contracts": {
-      "files": 3,
-      "passed": 12
+  "learning_material": {
+    "companion_commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+    "tag": "book-v2",
+    "github_actions": {
+      "run": 39515958225,
+      "url": "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39515958225",
+      "conclusion": "success",
+      "tests": 44
     },
-    "npm_run_docs_inventory": "passed"
+    "local_companion": {
+      "candidate": "working source snapshot before companion commit",
+      "fresh_install": "npm ci --offline using project-owned npm cache",
+      "full_suite": {
+        "files": 8,
+        "tests": 44,
+        "passed": 44
+      },
+      "independent_stages": [
+        {
+          "stage": "01",
+          "directory": "01-model",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "02",
+          "directory": "02-modes",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "03",
+          "directory": "03-input",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "04",
+          "directory": "04-async",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "05",
+          "directory": "05-constraints",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        }
+      ],
+      "source_diffs": [
+        {
+          "from": "01-model",
+          "to": "02-modes",
+          "source_diff_matches": true,
+          "lines": 37
+        },
+        {
+          "from": "02-modes",
+          "to": "03-input",
+          "source_diff_matches": true,
+          "lines": 123
+        },
+        {
+          "from": "03-input",
+          "to": "04-async",
+          "source_diff_matches": true,
+          "lines": 291
+        },
+        {
+          "from": "04-async",
+          "to": "05-constraints",
+          "source_diff_matches": true,
+          "lines": 89
+        }
+      ],
+      "final_stage_modules_byte_identical_to_src": 8,
+      "exercises": {
+        "broken_exit": 1,
+        "repaired_exit": 0,
+        "cases": 4
+      },
+      "package_members": "stage sources, answers, walkthrough, LICENSE and NOTICE verified",
+      "human_walkthrough": "not_run",
+      "interactive_screen_reader_workflow": "not_implemented"
+    },
+    "pty": [
+      {
+        "stage": "03",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6410,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "03",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 861,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "04",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6875,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "04",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 917,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "05",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6926,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "05",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 950,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      }
+    ],
+    "historical_record_pairs_supplied_and_verified": 426,
+    "artifacts": {
+      "historical-record-bodies.zip": {
+        "sha256": "44010333bbb4c03b7b29ec8492bdb341a0771ebfd122d8e29c585cbc2d5be7a0",
+        "bytes": 2574546
+      },
+      "bijou-job-monitor-book-v2.tar.gz": {
+        "sha256": "a04c38b6b3a66efc8b746651846897a61f48e1908bbe084414d7d1341aa25a4f",
+        "bytes": 60457
+      }
+    },
+    "human_walkthrough": {
+      "status": "not_run",
+      "next_step": "User will arrange an unfamiliar reader",
+      "protocol": "appendices/reader-walkthrough.tex",
+      "blank_template": "companion-material/walkthrough/results-template.json"
+    },
+    "table_artwork": {
+      "changed_panel": "edition-versions-g1-1",
+      "other_panels_exact_capture_hashes_preserved": 158
+    },
+    "documentation_checks": {
+      "npm_run_lint": "passed",
+      "focused_contracts": {
+        "files": 3,
+        "passed": 12
+      },
+      "docs_inventory": "passed"
+    }
   },
   "visual_review": [
-    "coral title page",
-    "teaching chapter typography and new boundary diagram",
-    "historical notice and source path",
-    "final contents: one Reference entry",
-    "complete host entrypoint listing"
-  ]
+    "build-stage chapter, commands and TikZ progression",
+    "answer key with hint/diagnosis/repair subheadings",
+    "unfamiliar-reader protocol and explicit not-conducted status",
+    "actual Bijou version table for book-v2"
+  ],
+  "build_note": "All three entrypoints converged in three serial passes after publication copy review."
 }

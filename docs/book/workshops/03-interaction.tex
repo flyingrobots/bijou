@@ -2,7 +2,9 @@
 
 \section{Run the application}
 
-Run \texttt{npm run checkpoint -- 03} in a terminal. Up and Down select jobs. Enter starts the selected job. The \texttt{c} key opens cancellation confirmation; Enter confirms and Escape leaves the job running. The \texttt{l} key opens logs, \texttt{f} filters failures, and \texttt{j}/\texttt{k} scroll the viewport. Quitting is an explicitly global command: \texttt{q} or Ctrl+C closes the application even while a dialog is open.
+Run \texttt{npm run stage -- 03} in a terminal. Up and Down select jobs. Enter marks the selected job running. C opens cancellation; Enter confirms and Escape leaves it running. Q or Ctrl+C quits globally. There are no timers, logs or filtering yet, and the supported view is 80 by 24 cells. Run the stage's input checks before moving on.
+
+The complete trace below follows the final application. Its asynchronous effects arrive in stage 04; log, filter and scroll actions are available in the later implementation. Stage 03 returns a model directly, while the later transition also describes work to perform. Keeping that difference explicit lets the small program teach input ownership before scheduling is introduced.
 
 \subsection{Name the intermediate representations}
 

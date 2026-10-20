@@ -1,15 +1,15 @@
 {
-  "edition": "2026-10-20 teaching book and historical archive",
-  "source_base_commit": "003da8d4eb76674fc67cf44a5886e39702a0da4f",
-  "shared_latex_tree_sha256": "cbf3024396dba5dbdf38c390c38ef0c2d1d4fe47f4694cf40680317af30539e7",
+  "edition": "2026-10-20 progressive build edition",
+  "source_base_commit": "32408df5abdcc70649f72fa7ebe18e930e835f2d",
+  "shared_latex_tree_sha256": "1bfbef68a08f0e6b58ad403868ab1ed650f82db22b233dba77d08b52e126e364",
   "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "editions": {
     "teaching": {
       "entrypoint": "bijou-book.tex",
       "pdf": "bijou-book.pdf",
-      "physical_pages": 95,
-      "bytes": 14787647,
-      "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
+      "physical_pages": 106,
+      "bytes": 14793930,
+      "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
       "copyright_page": 2,
       "source_records": 0,
       "missing_glyphs": 0,
@@ -65,123 +65,138 @@
         },
         {
           "level": 2,
-          "title": "Workshop 1: A job worth monitoring",
+          "title": "Build from a working stage",
           "page": 20
         },
         {
           "level": 2,
-          "title": "Workshop 2: One application, four environments",
+          "title": "Workshop 1: A job worth monitoring",
           "page": 23
         },
         {
           "level": 2,
-          "title": "Workshop 3: Follow one keypress",
+          "title": "Workshop 2: One application, four environments",
           "page": 26
+        },
+        {
+          "level": 2,
+          "title": "Workshop 3: Follow one keypress",
+          "page": 29
         },
         {
           "level": 1,
           "title": "III Understand the machinery",
-          "page": 28
+          "page": 32
         },
         {
           "level": 2,
           "title": "Introduction: Give every change an owner",
-          "page": 29
+          "page": 33
         },
         {
           "level": 2,
           "title": "Find the application boundaries",
-          "page": 30
+          "page": 34
         },
         {
           "level": 2,
           "title": "Workshop 4: Results arrive after the screen changes",
-          "page": 35
-        },
-        {
-          "level": 2,
-          "title": "Turn meaning into cells",
-          "page": 37
-        },
-        {
-          "level": 1,
-          "title": "IV Make it dependable",
           "page": 39
         },
         {
           "level": 2,
+          "title": "Turn meaning into cells",
+          "page": 42
+        },
+        {
+          "level": 1,
+          "title": "IV Make it dependable",
+          "page": 44
+        },
+        {
+          "level": 2,
           "title": "Introduction: Make the promises observable",
-          "page": 40
+          "page": 45
         },
         {
           "level": 2,
           "title": "Workshop 5: When the terminal fights back",
-          "page": 41
+          "page": 46
         },
         {
           "level": 2,
           "title": "Workshop 6: How do we know it works?",
-          "page": 43
+          "page": 48
         },
         {
           "level": 2,
           "title": "Troubleshoot from the symptom",
-          "page": 46
+          "page": 51
         },
         {
           "level": 1,
           "title": "V Ship and maintain it",
-          "page": 49
+          "page": 54
         },
         {
           "level": 2,
           "title": "Introduction: Keep the example reproducible",
-          "page": 50
+          "page": 55
         },
         {
           "level": 2,
           "title": "Workshop 7: Ship a reproducible example",
-          "page": 51
-        },
-        {
-          "level": 2,
-          "title": "Maintain the promise after release",
-          "page": 53
-        },
-        {
-          "level": 1,
-          "title": "Reference",
           "page": 56
         },
         {
           "level": 2,
-          "title": "The component cell atlas",
+          "title": "Maintain the promise after release",
           "page": 58
+        },
+        {
+          "level": 1,
+          "title": "Reference",
+          "page": 61
+        },
+        {
+          "level": 2,
+          "title": "The component cell atlas",
+          "page": 63
         },
         {
           "level": 2,
           "title": "Renderer experiments from bijou-fun",
-          "page": 81
+          "page": 86
         },
         {
           "level": 2,
           "title": "Glossary",
-          "page": 84
+          "page": 89
         },
         {
           "level": 2,
           "title": "Find a practical answer",
-          "page": 88
+          "page": 93
+        },
+        {
+          "level": 2,
+          "title": "Exercise answer key",
+          "page": 95
+        },
+        {
+          "level": 2,
+          "title": "An unfamiliar reader walkthrough",
+          "page": 99
         },
         {
           "level": 2,
           "title": "Sources and further reading",
-          "page": 90
+          "page": 101
         },
         {
           "level": 2,
           "title": "Licenses and reproduction notices",
-          "page": 91
+          "page": 102
         }
       ]
     },
@@ -189,8 +204,8 @@
       "entrypoint": "bijou-archive.tex",
       "pdf": "bijou-archive.pdf",
       "physical_pages": 1872,
-      "bytes": 20332307,
-      "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
+      "bytes": 20333134,
+      "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
       "copyright_page": 2,
       "source_records": 426,
       "missing_glyphs": 0,
@@ -2489,9 +2504,9 @@
     "complete": {
       "entrypoint": "bijou-designs.tex",
       "pdf": "bijou-designs.pdf",
-      "physical_pages": 1922,
-      "bytes": 22679362,
-      "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
+      "physical_pages": 1933,
+      "bytes": 22710082,
+      "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
       "copyright_page": 2,
       "source_records": 426,
       "missing_glyphs": 0,
@@ -2547,2363 +2562,2378 @@
         },
         {
           "level": 2,
-          "title": "Workshop 1: A job worth monitoring",
+          "title": "Build from a working stage",
           "page": 39
         },
         {
           "level": 2,
-          "title": "Workshop 2: One application, four environments",
+          "title": "Workshop 1: A job worth monitoring",
           "page": 42
         },
         {
           "level": 2,
-          "title": "Workshop 3: Follow one keypress",
+          "title": "Workshop 2: One application, four environments",
           "page": 45
+        },
+        {
+          "level": 2,
+          "title": "Workshop 3: Follow one keypress",
+          "page": 48
         },
         {
           "level": 1,
           "title": "III Understand the machinery",
-          "page": 47
+          "page": 51
         },
         {
           "level": 2,
           "title": "Introduction: Give every change an owner",
-          "page": 48
+          "page": 52
         },
         {
           "level": 2,
           "title": "Find the application boundaries",
-          "page": 49
+          "page": 53
         },
         {
           "level": 2,
           "title": "Workshop 4: Results arrive after the screen changes",
-          "page": 54
-        },
-        {
-          "level": 2,
-          "title": "Turn meaning into cells",
-          "page": 56
-        },
-        {
-          "level": 1,
-          "title": "IV Make it dependable",
           "page": 58
         },
         {
           "level": 2,
+          "title": "Turn meaning into cells",
+          "page": 61
+        },
+        {
+          "level": 1,
+          "title": "IV Make it dependable",
+          "page": 63
+        },
+        {
+          "level": 2,
           "title": "Introduction: Make the promises observable",
-          "page": 59
+          "page": 64
         },
         {
           "level": 2,
           "title": "Workshop 5: When the terminal fights back",
-          "page": 60
+          "page": 65
         },
         {
           "level": 2,
           "title": "Workshop 6: How do we know it works?",
-          "page": 62
+          "page": 67
         },
         {
           "level": 2,
           "title": "Troubleshoot from the symptom",
-          "page": 65
+          "page": 70
         },
         {
           "level": 1,
           "title": "V Ship and maintain it",
-          "page": 68
+          "page": 73
         },
         {
           "level": 2,
           "title": "Introduction: Keep the example reproducible",
-          "page": 69
+          "page": 74
         },
         {
           "level": 2,
           "title": "Workshop 7: Ship a reproducible example",
-          "page": 70
-        },
-        {
-          "level": 2,
-          "title": "Maintain the promise after release",
-          "page": 72
-        },
-        {
-          "level": 1,
-          "title": "Reference",
           "page": 75
         },
         {
           "level": 2,
-          "title": "The component cell atlas",
+          "title": "Maintain the promise after release",
           "page": 77
+        },
+        {
+          "level": 1,
+          "title": "Reference",
+          "page": 80
+        },
+        {
+          "level": 2,
+          "title": "The component cell atlas",
+          "page": 82
         },
         {
           "level": 2,
           "title": "Renderer experiments from bijou-fun",
-          "page": 100
+          "page": 105
         },
         {
           "level": 2,
           "title": "Glossary",
-          "page": 103
+          "page": 108
         },
         {
           "level": 2,
           "title": "Find a practical answer",
-          "page": 107
-        },
-        {
-          "level": 1,
-          "title": "VI Historical appendices",
-          "page": 109
-        },
-        {
-          "level": 2,
-          "title": "Introduction: Historical appendices",
-          "page": 110
-        },
-        {
-          "level": 1,
-          "title": "VII Philosophy and architecture",
-          "page": 111
-        },
-        {
-          "level": 2,
-          "title": "Introduction: The ideas behind the system",
           "page": 112
         },
         {
           "level": 2,
-          "title": "VISION",
+          "title": "Exercise answer key",
           "page": 114
         },
         {
           "level": 2,
-          "title": "Bijou Vision",
-          "page": 116
+          "title": "An unfamiliar reader walkthrough",
+          "page": 118
+        },
+        {
+          "level": 1,
+          "title": "VI Historical appendices",
+          "page": 120
         },
         {
           "level": 2,
-          "title": "BIJOU UX DOCTRINE",
+          "title": "Introduction: Historical appendices",
+          "page": 121
+        },
+        {
+          "level": 1,
+          "title": "VII Philosophy and architecture",
+          "page": 122
+        },
+        {
+          "level": 2,
+          "title": "Introduction: The ideas behind the system",
           "page": 123
         },
         {
           "level": 2,
-          "title": "ARCHITECTURE",
-          "page": 126
+          "title": "VISION",
+          "page": 125
+        },
+        {
+          "level": 2,
+          "title": "Bijou Vision",
+          "page": 127
+        },
+        {
+          "level": 2,
+          "title": "BIJOU UX DOCTRINE",
+          "page": 134
         },
         {
           "level": 2,
           "title": "ARCHITECTURE",
-          "page": 130
+          "page": 137
+        },
+        {
+          "level": 2,
+          "title": "ARCHITECTURE",
+          "page": 141
         },
         {
           "level": 2,
           "title": "System-Style JavaScript",
-          "page": 131
-        },
-        {
-          "level": 2,
-          "title": "Invariants",
-          "page": 138
-        },
-        {
-          "level": 2,
-          "title": "Strategy Notes",
-          "page": 140
-        },
-        {
-          "level": 2,
-          "title": "Accessibility and Assistive Modes",
           "page": 142
         },
         {
           "level": 2,
+          "title": "Invariants",
+          "page": 149
+        },
+        {
+          "level": 2,
+          "title": "Strategy Notes",
+          "page": 151
+        },
+        {
+          "level": 2,
+          "title": "Accessibility and Assistive Modes",
+          "page": 153
+        },
+        {
+          "level": 2,
           "title": "AI Explainability Standard",
-          "page": 148
+          "page": 159
         },
         {
           "level": 2,
           "title": "The Buffer Holds Facts",
-          "page": 152
+          "page": 163
         },
         {
           "level": 2,
           "title": "Codecs Are Not Domain Models",
-          "page": 155
+          "page": 166
         },
         {
           "level": 2,
           "title": "Commands Change State, Effects Do Not",
-          "page": 156
+          "page": 167
         },
         {
           "level": 2,
           "title": "ComponentStory v0",
-          "page": 157
+          "page": 168
         },
         {
           "level": 2,
           "title": "Content Guide",
-          "page": 164
+          "page": 175
         },
         {
           "level": 2,
           "title": "Docs Are the Demo",
-          "page": 169
-        },
-        {
-          "level": 2,
-          "title": "DOGFOOD",
-          "page": 170
-        },
-        {
-          "level": 2,
-          "title": "Focus Owns Input",
-          "page": 179
-        },
-        {
-          "level": 2,
-          "title": "Focus Owns Input",
           "page": 180
         },
         {
           "level": 2,
-          "title": "Graceful Lowering Preserves Meaning",
-          "page": 188
+          "title": "DOGFOOD",
+          "page": 181
         },
         {
           "level": 2,
-          "title": "Host APIs Stay Behind Adapters",
-          "page": 189
-        },
-        {
-          "level": 2,
-          "title": "The Humane Shell",
+          "title": "Focus Owns Input",
           "page": 190
         },
         {
           "level": 2,
+          "title": "Focus Owns Input",
+          "page": 191
+        },
+        {
+          "level": 2,
+          "title": "Graceful Lowering Preserves Meaning",
+          "page": 199
+        },
+        {
+          "level": 2,
+          "title": "Host APIs Stay Behind Adapters",
+          "page": 200
+        },
+        {
+          "level": 2,
+          "title": "The Humane Shell",
+          "page": 201
+        },
+        {
+          "level": 2,
           "title": "Layout And Viewport Rules",
-          "page": 203
+          "page": 214
         },
         {
           "level": 2,
           "title": "Layout Localization Pipeline",
-          "page": 207
+          "page": 218
         },
         {
           "level": 2,
           "title": "Layout Owns Interaction Geometry",
-          "page": 212
+          "page": 223
         },
         {
           "level": 2,
           "title": "Localization and Bidirectionality",
-          "page": 213
+          "page": 224
         },
         {
           "level": 2,
           "title": "Low-Allocation Renderer",
-          "page": 219
+          "page": 230
         },
         {
           "level": 2,
           "title": "Notification History Belongs to the Shell",
-          "page": 226
+          "page": 237
         },
         {
           "level": 2,
           "title": "Preference Lists Belong to Bijou",
-          "page": 235
+          "page": 246
         },
         {
           "level": 2,
           "title": "Runtime Truth Wins",
-          "page": 241
-        },
-        {
-          "level": 2,
-          "title": "Schemas Live At Boundaries",
-          "page": 242
-        },
-        {
-          "level": 2,
-          "title": "Settings Belong to the Shell",
-          "page": 243
-        },
-        {
-          "level": 2,
-          "title": "Shell Owns Shell Concerns",
           "page": 252
         },
         {
           "level": 2,
-          "title": "State Machine and View Stack Are Distinct",
+          "title": "Schemas Live At Boundaries",
           "page": 253
         },
         {
           "level": 2,
-          "title": "Tests Are the Spec",
+          "title": "Settings Belong to the Shell",
           "page": 254
         },
         {
           "level": 2,
+          "title": "Shell Owns Shell Concerns",
+          "page": 263
+        },
+        {
+          "level": 2,
+          "title": "State Machine and View Stack Are Distinct",
+          "page": 264
+        },
+        {
+          "level": 2,
+          "title": "Tests Are the Spec",
+          "page": 265
+        },
+        {
+          "level": 2,
           "title": "Topmost Layer Dismisses First",
-          "page": 255
+          "page": 266
         },
         {
           "level": 2,
           "title": "Visible Controls Are a Promise",
-          "page": 256
+          "page": 267
         },
         {
           "level": 1,
           "title": "VIII Using Bijou",
-          "page": 257
+          "page": 268
         },
         {
           "level": 2,
           "title": "Introduction: From principles to an application",
-          "page": 258
+          "page": 269
         },
         {
           "level": 2,
           "title": "Guide — Bijou",
-          "page": 260
+          "page": 271
         },
         {
           "level": 2,
           "title": "End-To-End Terminal Scenarios",
-          "page": 262
+          "page": 273
         },
         {
           "level": 2,
           "title": "DOGFOOD",
-          "page": 281
+          "page": 292
         },
         {
           "level": 2,
           "title": "Package Development Guide",
-          "page": 285
+          "page": 296
         },
         {
           "level": 2,
           "title": "CLI",
-          "page": 288
+          "page": 299
         },
         {
           "level": 2,
           "title": "MCP",
-          "page": 290
+          "page": 301
         },
         {
           "level": 2,
           "title": "Advanced Guide — Bijou",
-          "page": 293
+          "page": 304
         },
         {
           "level": 2,
           "title": "Documentation Standards",
-          "page": 298
-        },
-        {
-          "level": 2,
-          "title": "Secondary Example Map",
           "page": 309
         },
         {
           "level": 2,
+          "title": "Secondary Example Map",
+          "page": 320
+        },
+        {
+          "level": 2,
           "title": "Migrating To Bijou v4.0.0",
-          "page": 311
+          "page": 322
         },
         {
           "level": 2,
           "title": "Bijou Specifacts",
-          "page": 317
+          "page": 328
         },
         {
           "level": 2,
           "title": "Render Pipeline Guide",
-          "page": 321
+          "page": 332
         },
         {
           "level": 2,
           "title": "Design system and reference",
-          "page": 326
+          "page": 337
         },
         {
           "level": 2,
           "title": "Bijou Design System",
-          "page": 327
+          "page": 338
         },
         {
           "level": 2,
           "title": "Blocks",
-          "page": 331
+          "page": 342
         },
         {
           "level": 2,
           "title": "Component Families",
-          "page": 336
+          "page": 347
         },
         {
           "level": 2,
           "title": "Data Visualization Policy",
-          "page": 373
+          "page": 384
         },
         {
           "level": 2,
           "title": "Foundations",
-          "page": 378
+          "page": 389
         },
         {
           "level": 2,
           "title": "Validate And Adapt Packed Bijou Cell Receipts",
-          "page": 385
+          "page": 396
         },
         {
           "level": 2,
           "title": "Patterns",
-          "page": 390
+          "page": 401
         },
         {
           "level": 2,
           "title": "Pointer and Mouse Policy",
-          "page": 411
+          "page": 422
         },
         {
           "level": 2,
           "title": "Inspect Profunctor Page Artifacts",
-          "page": 414
+          "page": 425
         },
         {
           "level": 2,
           "title": "Theme Authoring Guide",
-          "page": 418
+          "page": 429
         },
         {
           "level": 2,
           "title": "Theme Rule Recipes",
-          "page": 426
+          "page": 437
         },
         {
           "level": 2,
           "title": "Theme Token Vocabulary",
-          "page": 429
+          "page": 440
         },
         {
           "level": 1,
           "title": "IX Design records",
-          "page": 441
+          "page": 452
         },
         {
           "level": 2,
           "title": "Introduction: How to read a design record",
-          "page": 442
+          "page": 453
         },
         {
           "level": 2,
           "title": "DOGFOOD design records",
-          "page": 445
+          "page": 456
         },
         {
           "level": 2,
           "title": "DF-001 — Show DOGFOOD Coverage Progress",
-          "page": 446
+          "page": 457
         },
         {
           "level": 2,
           "title": "DF-003 — Enforce DOGFOOD Coverage Floor",
-          "page": 450
+          "page": 461
         },
         {
           "level": 2,
           "title": "DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target",
-          "page": 454
+          "page": 465
         },
         {
           "level": 2,
           "title": "DF-005 — Raise DOGFOOD Coverage Floor to 19%",
-          "page": 459
+          "page": 470
         },
         {
           "level": 2,
           "title": "DF-006 — Raise DOGFOOD Coverage Floor to 24%",
-          "page": 464
+          "page": 475
         },
         {
           "level": 2,
           "title": "DF-007 — Raise DOGFOOD Coverage Floor to 29%",
-          "page": 469
+          "page": 480
         },
         {
           "level": 2,
           "title": "DF-008 — Raise DOGFOOD Coverage Floor to 34%",
-          "page": 474
+          "page": 485
         },
         {
           "level": 2,
           "title": "DF-009 — Raise DOGFOOD Coverage Floor to 39%",
-          "page": 479
+          "page": 490
         },
         {
           "level": 2,
           "title": "DF-010 — Raise DOGFOOD Coverage Floor to 44%",
-          "page": 484
+          "page": 495
         },
         {
           "level": 2,
           "title": "DF-011 — Raise DOGFOOD Coverage Floor to 49%",
-          "page": 489
+          "page": 500
         },
         {
           "level": 2,
           "title": "DF-012 — Raise DOGFOOD Coverage Floor to 54%",
-          "page": 494
+          "page": 505
         },
         {
           "level": 2,
           "title": "DF-013 — Raise DOGFOOD Coverage Floor to 59%",
-          "page": 499
-        },
-        {
-          "level": 2,
-          "title": "DF-014 — Raise DOGFOOD Coverage Floor to 64%",
-          "page": 504
-        },
-        {
-          "level": 2,
-          "title": "DF-015 — Raise DOGFOOD Coverage Floor to 69%",
-          "page": 507
-        },
-        {
-          "level": 2,
-          "title": "DF-016 — Raise DOGFOOD Coverage Floor to 74%",
           "page": 510
         },
         {
           "level": 2,
+          "title": "DF-014 — Raise DOGFOOD Coverage Floor to 64%",
+          "page": 515
+        },
+        {
+          "level": 2,
+          "title": "DF-015 — Raise DOGFOOD Coverage Floor to 69%",
+          "page": 518
+        },
+        {
+          "level": 2,
+          "title": "DF-016 — Raise DOGFOOD Coverage Floor to 74%",
+          "page": 521
+        },
+        {
+          "level": 2,
           "title": "DF-017 — Raise DOGFOOD Coverage Floor to 79%",
-          "page": 513
+          "page": 524
         },
         {
           "level": 2,
           "title": "DF-018 — Raise DOGFOOD Coverage Floor to 84%",
-          "page": 516
+          "page": 527
         },
         {
           "level": 2,
           "title": "DF-019 — Raise DOGFOOD Coverage Floor to 100%",
-          "page": 519
+          "page": 530
         },
         {
           "level": 2,
           "title": "DF-021 — Shape DOGFOOD As Terminal Docs System",
-          "page": 522
-        },
-        {
-          "level": 2,
-          "title": "DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav",
-          "page": 529
-        },
-        {
-          "level": 2,
-          "title": "DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD",
           "page": 533
         },
         {
           "level": 2,
-          "title": "DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD",
-          "page": 537
-        },
-        {
-          "level": 2,
-          "title": "DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface",
+          "title": "DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav",
           "page": 540
         },
         {
           "level": 2,
+          "title": "DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD",
+          "page": 544
+        },
+        {
+          "level": 2,
+          "title": "DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD",
+          "page": 548
+        },
+        {
+          "level": 2,
+          "title": "DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface",
+          "page": 551
+        },
+        {
+          "level": 2,
           "title": "DF-026 — Demote Examples To Secondary Reference Status",
-          "page": 546
+          "page": 557
         },
         {
           "level": 2,
           "title": "DF-027 — Storybook-Style Tool for Bijou",
-          "page": 549
+          "page": 560
         },
         {
           "level": 2,
           "title": "DF-028 Story Capture Matrix",
-          "page": 553
+          "page": 564
         },
         {
           "level": 2,
           "title": "DF-029 Fixture-to-Docs Promotion Path",
-          "page": 556
+          "page": 567
         },
         {
           "level": 2,
           "title": "DF-030 Dogfood Docs Surface Block",
-          "page": 559
+          "page": 570
         },
         {
           "level": 2,
           "title": "DF-031 Status and feedback standard Blocks",
-          "page": 565
+          "page": 576
         },
         {
           "level": 2,
           "title": "DF-036 Audit loading placeholders family across real surfaces",
-          "page": 571
+          "page": 582
         },
         {
           "level": 2,
           "title": "DF-039 Component-family standard Blocks",
-          "page": 574
+          "page": 585
         },
         {
           "level": 2,
           "title": "DF-041 Audit inspector panels family across real surfaces",
-          "page": 580
+          "page": 591
         },
         {
           "level": 2,
           "title": "DF-046 Choice and navigation standard Blocks",
-          "page": 583
+          "page": 594
         },
         {
           "level": 2,
           "title": "DF-049 Audit multi-field and staged forms family across real surfaces",
-          "page": 590
+          "page": 601
         },
         {
           "level": 2,
           "title": "DF-053 Audit motion and shader effects family across real surfaces",
-          "page": 593
-        },
-        {
-          "level": 2,
-          "title": "DF-054 Late-family standard Blocks",
-          "page": 597
-        },
-        {
-          "level": 2,
-          "title": "DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces",
           "page": 604
         },
         {
           "level": 2,
+          "title": "DF-054 Late-family standard Blocks",
+          "page": 608
+        },
+        {
+          "level": 2,
+          "title": "DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces",
+          "page": 615
+        },
+        {
+          "level": 2,
           "title": "DF-060 V7 DOGFOOD Release Title Screen And Closeout Six-Pack",
-          "page": 607
+          "page": 618
         },
         {
           "level": 2,
           "title": "DF-061 Audit overlay primitives family across real surfaces",
-          "page": 613
+          "page": 624
         },
         {
           "level": 2,
           "title": "DF-062 Audit notification system family across real surfaces",
-          "page": 616
+          "page": 627
         },
         {
           "level": 2,
           "title": "DF-063 Audit app shell family across real surfaces",
-          "page": 620
+          "page": 631
         },
         {
           "level": 2,
           "title": "DF-064 Audit keybinding help and shell hints family across real surfaces",
-          "page": 623
+          "page": 634
         },
         {
           "level": 2,
           "title": "DF-065 Audit workspace layout family across real surfaces",
-          "page": 626
+          "page": 637
         },
         {
           "level": 2,
           "title": "DF-066 Audit data visualization family across real surfaces",
-          "page": 629
+          "page": 640
         },
         {
           "level": 2,
           "title": "DF-067 Prove Responsive DOGFOOD Layout Variants",
-          "page": 632
+          "page": 643
         },
         {
           "level": 2,
           "title": "DF-069 - Block-Authored DOGFOOD",
-          "page": 635
+          "page": 646
         },
         {
           "level": 2,
           "title": "DF-070 - DOGFOOD Block Product Polish",
-          "page": 639
-        },
-        {
-          "level": 2,
-          "title": "DF-071 - DOGFOOD Block-Authored Surfaces",
-          "page": 642
-        },
-        {
-          "level": 2,
-          "title": "DF-072 DOGFOOD Release Title Artifact Gallery",
-          "page": 645
-        },
-        {
-          "level": 2,
-          "title": "DF-073 Raster-to-Glyph Title Art",
           "page": 650
         },
         {
           "level": 2,
+          "title": "DF-071 - DOGFOOD Block-Authored Surfaces",
+          "page": 653
+        },
+        {
+          "level": 2,
+          "title": "DF-072 DOGFOOD Release Title Artifact Gallery",
+          "page": 656
+        },
+        {
+          "level": 2,
+          "title": "DF-073 Raster-to-Glyph Title Art",
+          "page": 661
+        },
+        {
+          "level": 2,
           "title": "DF-074 Fluid Triangle Title Screen",
-          "page": 657
+          "page": 668
         },
         {
           "level": 2,
           "title": "DF-075 DOGFOOD Post-Release Polish",
-          "page": 667
-        },
-        {
-          "level": 2,
-          "title": "DF-076 - BlockLab Demo Readiness Navigation",
-          "page": 671
-        },
-        {
-          "level": 2,
-          "title": "DF-077: DOGFOOD App Landing Extraction",
-          "page": 673
-        },
-        {
-          "level": 2,
-          "title": "DF-078 DOGFOOD Release Story Surfaces",
           "page": 678
         },
         {
           "level": 2,
-          "title": "DF-150 - DOGFOOD Terminal Guardrails",
+          "title": "DF-076 - BlockLab Demo Readiness Navigation",
+          "page": 682
+        },
+        {
+          "level": 2,
+          "title": "DF-077: DOGFOOD App Landing Extraction",
           "page": 684
         },
         {
           "level": 2,
-          "title": "Developer experience design records",
-          "page": 686
-        },
-        {
-          "level": 2,
-          "title": "DX-001 — Type Framed App Messages and Updates End-to-End",
-          "page": 687
-        },
-        {
-          "level": 2,
-          "title": "DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns",
+          "title": "DF-078 DOGFOOD Release Story Surfaces",
           "page": 689
         },
         {
           "level": 2,
-          "title": "DX-022 Layout Inspector Overlay",
-          "page": 691
+          "title": "DF-150 - DOGFOOD Terminal Guardrails",
+          "page": 695
         },
         {
           "level": 2,
-          "title": "DX-023 Input Routing Inspector",
-          "page": 694
-        },
-        {
-          "level": 2,
-          "title": "DX-024 Surface Diff Viewer",
+          "title": "Developer experience design records",
           "page": 697
         },
         {
           "level": 2,
-          "title": "DX-025 Component Metadata Contract",
+          "title": "DX-001 — Type Framed App Messages and Updates End-to-End",
+          "page": 698
+        },
+        {
+          "level": 2,
+          "title": "DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns",
           "page": 700
         },
         {
           "level": 2,
+          "title": "DX-022 Layout Inspector Overlay",
+          "page": 702
+        },
+        {
+          "level": 2,
+          "title": "DX-023 Input Routing Inspector",
+          "page": 705
+        },
+        {
+          "level": 2,
+          "title": "DX-024 Surface Diff Viewer",
+          "page": 708
+        },
+        {
+          "level": 2,
+          "title": "DX-025 Component Metadata Contract",
+          "page": 711
+        },
+        {
+          "level": 2,
           "title": "DX-026 Mode-Lowering Linter",
-          "page": 703
-        },
-        {
-          "level": 2,
-          "title": "DX-030 Add boundary-aware pointer selection and copy",
-          "page": 706
-        },
-        {
-          "level": 2,
-          "title": "DX-031 Standard Bijou Blocks",
           "page": 714
         },
         {
           "level": 2,
+          "title": "DX-030 Add boundary-aware pointer selection and copy",
+          "page": 717
+        },
+        {
+          "level": 2,
+          "title": "DX-031 Standard Bijou Blocks",
+          "page": 725
+        },
+        {
+          "level": 2,
           "title": "DX-031F Block Tree Rendering",
-          "page": 775
+          "page": 786
         },
         {
           "level": 2,
           "title": "DX-032 Create TUI app skeleton renders consumer pages",
-          "page": 780
+          "page": 791
         },
         {
           "level": 2,
           "title": "DX-033 Remove showcase layout sludge",
-          "page": 784
+          "page": 795
         },
         {
           "level": 2,
           "title": "DX-034 Declarative View Data Binding",
-          "page": 787
+          "page": 798
         },
         {
           "level": 2,
           "title": "DX-036 Responsive Table Layout and Variants",
-          "page": 811
+          "page": 822
         },
         {
           "level": 2,
           "title": "DX-038 - BlockLab Rename And Migration",
-          "page": 820
+          "page": 831
         },
         {
           "level": 2,
           "title": "DX-039 - BlockLab Product Parity",
-          "page": 826
+          "page": 837
         },
         {
           "level": 2,
           "title": "DX-040 V7 Post-Merge Review Regression Fixes",
-          "page": 834
+          "page": 845
         },
         {
           "level": 2,
           "title": "DX-041 Image-to-Glyph Side App",
-          "page": 838
+          "page": 849
         },
         {
           "level": 2,
           "title": "DX-042 Shared UI Scene IR And Bijou Render Target",
-          "page": 842
+          "page": 853
         },
         {
           "level": 2,
           "title": "DX-043 Portable Bijou Blocks And Multi-Endpoint IR",
-          "page": 856
+          "page": 867
         },
         {
           "level": 2,
           "title": "DX-044 GraphQL Authored Bijou Block IR Proof",
-          "page": 872
+          "page": 883
         },
         {
           "level": 2,
           "title": "DX-045 GraphQL Block Groups And Debug Facts",
-          "page": 879
+          "page": 890
         },
         {
           "level": 2,
           "title": "DX-046 GraphQL Authored DOGFOOD Block Fixture",
-          "page": 886
+          "page": 897
         },
         {
           "level": 2,
           "title": "DX-047 - Blocks App Binding Snippets",
-          "page": 893
-        },
-        {
-          "level": 2,
-          "title": "DX-048 V8 Runtime Graph And Scene IR Contract",
-          "page": 898
-        },
-        {
-          "level": 2,
-          "title": "DX-049 VISOR Artifact Bundle Proof",
           "page": 904
         },
         {
           "level": 2,
+          "title": "DX-048 V8 Runtime Graph And Scene IR Contract",
+          "page": 909
+        },
+        {
+          "level": 2,
+          "title": "DX-049 VISOR Artifact Bundle Proof",
+          "page": 915
+        },
+        {
+          "level": 2,
           "title": "DX-050-profunctor-page-inspection",
-          "page": 912
+          "page": 923
         },
         {
           "level": 2,
           "title": "DX-052 NO_COLOR Is Not a Capability",
-          "page": 917
+          "page": 928
         },
         {
           "level": 2,
           "title": "DX-125 - Day Zero Onboarding Bridge",
-          "page": 922
+          "page": 933
         },
         {
           "level": 2,
           "title": "Runtime engine design records",
-          "page": 925
-        },
-        {
-          "level": 2,
-          "title": "RE-001 — Define Runtime Engine Architecture",
-          "page": 926
-        },
-        {
-          "level": 2,
-          "title": "RE-002 — Promote First-Class State Machine and View Stack",
-          "page": 931
-        },
-        {
-          "level": 2,
-          "title": "RE-003 — Retain Layout Trees and Layout Invalidation",
           "page": 936
         },
         {
           "level": 2,
+          "title": "RE-001 — Define Runtime Engine Architecture",
+          "page": 937
+        },
+        {
+          "level": 2,
+          "title": "RE-002 — Promote First-Class State Machine and View Stack",
+          "page": 942
+        },
+        {
+          "level": 2,
+          "title": "RE-003 — Retain Layout Trees and Layout Invalidation",
+          "page": 947
+        },
+        {
+          "level": 2,
           "title": "RE-004 — Route Input Through Layouts and Layer Bubbling",
-          "page": 941
+          "page": 952
         },
         {
           "level": 2,
           "title": "RE-005 — Buffer Commands and Effects Separately",
-          "page": 946
+          "page": 957
         },
         {
           "level": 2,
           "title": "RE-006 — Formalize Component Layout and Interaction Contracts",
-          "page": 951
+          "page": 962
         },
         {
           "level": 2,
           "title": "RE-007 — Migrate Framed Shell Onto Runtime Engine Seams",
-          "page": 956
+          "page": 967
         },
         {
           "level": 2,
           "title": "RE-008 — Rendering Performance Findings",
-          "page": 965
-        },
-        {
-          "level": 2,
-          "title": "RE-024 Surface Budget Warnings",
-          "page": 969
-        },
-        {
-          "level": 2,
-          "title": "RE-030 — Average High-Resolution Canvas Colors",
-          "page": 972
-        },
-        {
-          "level": 2,
-          "title": "RE-031 — Raytrace Shader Kernel",
           "page": 976
         },
         {
           "level": 2,
-          "title": "RE-032 — Fit Cell Glyphs From Coverage",
+          "title": "RE-024 Surface Budget Warnings",
           "page": 980
         },
         {
           "level": 2,
-          "title": "RE-033 Stable Spring Pulse Integration",
-          "page": 984
+          "title": "RE-030 — Average High-Resolution Canvas Colors",
+          "page": 983
         },
         {
           "level": 2,
-          "title": "RE-034 Glyph-Fit Canvas Resolution",
+          "title": "RE-031 — Raytrace Shader Kernel",
           "page": 987
         },
         {
           "level": 2,
+          "title": "RE-032 — Fit Cell Glyphs From Coverage",
+          "page": 991
+        },
+        {
+          "level": 2,
+          "title": "RE-033 Stable Spring Pulse Integration",
+          "page": 995
+        },
+        {
+          "level": 2,
+          "title": "RE-034 Glyph-Fit Canvas Resolution",
+          "page": 998
+        },
+        {
+          "level": 2,
           "title": "RE-035 Mandatory Layout Envelope And Constraint Negotiation",
-          "page": 990
+          "page": 1001
         },
         {
           "level": 2,
           "title": "RE-036 Packed Bijou Cells Surface Adapter",
-          "page": 1006
+          "page": 1017
         },
         {
           "level": 2,
           "title": "RE-041 v7.2 Framework Input Stabilization",
-          "page": 1016
-        },
-        {
-          "level": 2,
-          "title": "RE-127 - Command And Render Runtime Guardrails",
-          "page": 1020
-        },
-        {
-          "level": 2,
-          "title": "RE-142 - Node Bootstrap Failure Contract",
-          "page": 1023
-        },
-        {
-          "level": 2,
-          "title": "Design language design records",
-          "page": 1026
-        },
-        {
-          "level": 2,
-          "title": "DL-001 — Capture Design Language Doctrine",
           "page": 1027
         },
         {
           "level": 2,
-          "title": "DL-002 — Canonicalize Patterns and Blocks",
-          "page": 1032
+          "title": "RE-127 - Command And Render Runtime Guardrails",
+          "page": 1031
         },
         {
           "level": 2,
-          "title": "DL-003 — Prove Canonical Patterns in Shared Surfaces",
+          "title": "RE-142 - Node Bootstrap Failure Contract",
+          "page": 1034
+        },
+        {
+          "level": 2,
+          "title": "Design language design records",
           "page": 1037
         },
         {
           "level": 2,
+          "title": "DL-001 — Capture Design Language Doctrine",
+          "page": 1038
+        },
+        {
+          "level": 2,
+          "title": "DL-002 — Canonicalize Patterns and Blocks",
+          "page": 1043
+        },
+        {
+          "level": 2,
+          "title": "DL-003 — Prove Canonical Patterns in Shared Surfaces",
+          "page": 1048
+        },
+        {
+          "level": 2,
           "title": "DL-004 — Prove Drawer Rhythm and Notice Rows",
-          "page": 1042
+          "page": 1053
         },
         {
           "level": 2,
           "title": "DL-005 — Prove Inspector and Guided Flow Rhythm",
-          "page": 1046
+          "page": 1057
         },
         {
           "level": 2,
           "title": "DL-006 — Prove Inspector Panel Rhythm",
-          "page": 1051
+          "page": 1062
         },
         {
           "level": 2,
           "title": "DL-007 — Promote Inspector Panel Block",
-          "page": 1056
+          "page": 1067
         },
         {
           "level": 2,
           "title": "DL-008 — Promote Guided Flow Block",
-          "page": 1061
-        },
-        {
-          "level": 2,
-          "title": "DL-011 Theme Contrast Doctor",
-          "page": 1066
-        },
-        {
-          "level": 2,
-          "title": "DL-012 Separate focus gutter chrome from scrollbar UI tokens",
-          "page": 1069
-        },
-        {
-          "level": 2,
-          "title": "DL-013 Design token and theme builder API",
           "page": 1072
         },
         {
           "level": 2,
-          "title": "DL-014 Theme Inspector And Lab",
+          "title": "DL-011 Theme Contrast Doctor",
+          "page": 1077
+        },
+        {
+          "level": 2,
+          "title": "DL-012 Separate focus gutter chrome from scrollbar UI tokens",
+          "page": 1080
+        },
+        {
+          "level": 2,
+          "title": "DL-013 Design token and theme builder API",
           "page": 1083
         },
         {
           "level": 2,
-          "title": "DL-015 Theme safe pairs and contrast matrices",
-          "page": 1088
-        },
-        {
-          "level": 2,
-          "title": "DL-016 Mode-aware runtime theme adapter",
+          "title": "DL-014 Theme Inspector And Lab",
           "page": 1094
         },
         {
           "level": 2,
-          "title": "DL-017 - DOGFOOD Light Theme Readiness",
+          "title": "DL-015 Theme safe pairs and contrast matrices",
           "page": 1099
         },
         {
           "level": 2,
+          "title": "DL-016 Mode-aware runtime theme adapter",
+          "page": 1105
+        },
+        {
+          "level": 2,
+          "title": "DL-017 - DOGFOOD Light Theme Readiness",
+          "page": 1110
+        },
+        {
+          "level": 2,
           "title": "DL-018 - First-Party Theme Variant Coverage",
-          "page": 1104
+          "page": 1115
         },
         {
           "level": 2,
           "title": "DL-019 - Theme Rule Selection And Inspection",
-          "page": 1109
+          "page": 1120
         },
         {
           "level": 2,
           "title": "DL-020 - Dogfood Rule-Authored First-Party Themes",
-          "page": 1117
+          "page": 1128
         },
         {
           "level": 2,
           "title": "DL-021 - Dogfood Theme Token Usage Proof",
-          "page": 1121
+          "page": 1132
         },
         {
           "level": 2,
           "title": "DL-022 - Theme Lab Editor Graph UX",
-          "page": 1124
+          "page": 1135
         },
         {
           "level": 2,
           "title": "Localization design records",
-          "page": 1129
+          "page": 1140
         },
         {
           "level": 2,
           "title": "LX-001 — bijou-i18n Runtime Package",
-          "page": 1130
+          "page": 1141
         },
         {
           "level": 2,
           "title": "LX-002 — bijou-i18n Tools Package",
-          "page": 1136
+          "page": 1147
         },
         {
           "level": 2,
           "title": "LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows",
-          "page": 1142
+          "page": 1153
         },
         {
           "level": 2,
           "title": "LX-004 — Provider Adapters for Workbook and Bundle Exchange",
-          "page": 1148
+          "page": 1159
         },
         {
           "level": 2,
           "title": "LX-005 — Rich Spreadsheet and Filesystem Adapters",
-          "page": 1154
-        },
-        {
-          "level": 2,
-          "title": "LX-006 — XLSX Localization Adapters",
-          "page": 1160
-        },
-        {
-          "level": 2,
-          "title": "LX-008 — Localize Shell Chrome and DOGFOOD",
           "page": 1165
         },
         {
           "level": 2,
-          "title": "LX-019 — Localization Port Contract",
+          "title": "LX-006 — XLSX Localization Adapters",
           "page": 1171
         },
         {
           "level": 2,
-          "title": "LX-020 - DOGFOOD Locale Demo Readiness",
-          "page": 1177
+          "title": "LX-008 — Localize Shell Chrome and DOGFOOD",
+          "page": 1176
         },
         {
           "level": 2,
-          "title": "LX-021 DOGFOOD String Debt Ratchet",
+          "title": "LX-019 — Localization Port Contract",
           "page": 1182
         },
         {
           "level": 2,
+          "title": "LX-020 - DOGFOOD Locale Demo Readiness",
+          "page": 1188
+        },
+        {
+          "level": 2,
+          "title": "LX-021 DOGFOOD String Debt Ratchet",
+          "page": 1193
+        },
+        {
+          "level": 2,
           "title": "LX-022 DOGFOOD App Main Ratchet",
-          "page": 1186
+          "page": 1197
         },
         {
           "level": 2,
           "title": "LX-023: DOGFOOD Blocks And Capture Ratchet",
-          "page": 1191
+          "page": 1202
         },
         {
           "level": 2,
           "title": "Workflow and delivery design records",
-          "page": 1195
+          "page": 1206
         },
         {
           "level": 2,
           "title": "WF-001 — Adopt the Legends/Cycles Workflow",
-          "page": 1196
+          "page": 1207
         },
         {
           "level": 2,
           "title": "WF-003 — Replace smoke:examples:* With smoke:dogfood",
-          "page": 1200
+          "page": 1211
         },
         {
           "level": 2,
           "title": "WF-004 — Shape The Next Release",
-          "page": 1205
+          "page": 1216
         },
         {
           "level": 2,
           "title": "WF-005 — Close 4.1.0 i18n Publish-Surface Gap",
-          "page": 1212
+          "page": 1223
         },
         {
           "level": 2,
           "title": "WF-006 — Cut Clean 4.1.0 Release Boundary",
-          "page": 1217
-        },
-        {
-          "level": 2,
-          "title": "WF-009 - Keep Release PRs Under Automated Review File Limits",
-          "page": 1222
-        },
-        {
-          "level": 2,
-          "title": "WF-122 - Cross-Platform Contributor Path",
-          "page": 1225
-        },
-        {
-          "level": 2,
-          "title": "WF-123 - Issues-First Method Intake",
           "page": 1228
         },
         {
           "level": 2,
+          "title": "WF-009 - Keep Release PRs Under Automated Review File Limits",
+          "page": 1233
+        },
+        {
+          "level": 2,
+          "title": "WF-122 - Cross-Platform Contributor Path",
+          "page": 1236
+        },
+        {
+          "level": 2,
+          "title": "WF-123 - Issues-First Method Intake",
+          "page": 1239
+        },
+        {
+          "level": 2,
           "title": "WF-125 Draft-first cycle start workflow",
-          "page": 1231
+          "page": 1242
         },
         {
           "level": 2,
           "title": "WF-127 V7 Issue-Complete Tracker Sync",
-          "page": 1234
-        },
-        {
-          "level": 2,
-          "title": "WF-128 Safe GitHub Comments And Milestone Item Mirrors",
-          "page": 1237
-        },
-        {
-          "level": 2,
-          "title": "WF-129 Path-Gate DOGFOOD CI",
-          "page": 1241
-        },
-        {
-          "level": 2,
-          "title": "WF-130 Roadmap Goalpost Policy",
           "page": 1245
         },
         {
           "level": 2,
+          "title": "WF-128 Safe GitHub Comments And Milestone Item Mirrors",
+          "page": 1248
+        },
+        {
+          "level": 2,
+          "title": "WF-129 Path-Gate DOGFOOD CI",
+          "page": 1252
+        },
+        {
+          "level": 2,
+          "title": "WF-130 Roadmap Goalpost Policy",
+          "page": 1256
+        },
+        {
+          "level": 2,
           "title": "WF-131 Roadmap Forward-Looking Refresh",
-          "page": 1250
+          "page": 1261
         },
         {
           "level": 2,
           "title": "WF-132 - Release Readiness And DOGFOOD I18n Gates",
-          "page": 1255
-        },
-        {
-          "level": 2,
-          "title": "WF-133 - Esbuild Security Patch",
-          "page": 1259
-        },
-        {
-          "level": 2,
-          "title": "WF-134 Code Dojo ESLint Ratchet 1",
-          "page": 1262
-        },
-        {
-          "level": 2,
-          "title": "WF-135 Respecting the Dojo 1000-Count Burndown",
           "page": 1266
         },
         {
           "level": 2,
-          "title": "WF-136 Respecting the Dojo Ratchet To 2018",
+          "title": "WF-133 - Esbuild Security Patch",
           "page": 1270
         },
         {
           "level": 2,
+          "title": "WF-134 Code Dojo ESLint Ratchet 1",
+          "page": 1273
+        },
+        {
+          "level": 2,
+          "title": "WF-135 Respecting the Dojo 1000-Count Burndown",
+          "page": 1277
+        },
+        {
+          "level": 2,
+          "title": "WF-136 Respecting the Dojo Ratchet To 2018",
+          "page": 1281
+        },
+        {
+          "level": 2,
           "title": "WF-137 Respecting the Dojo Ratchet To 1965",
-          "page": 1274
+          "page": 1285
         },
         {
           "level": 2,
           "title": "WF-138 Respecting the Dojo Ratchet To 1857",
-          "page": 1278
-        },
-        {
-          "level": 2,
-          "title": "WF-139 Respecting the Dojo Ratchet To 1796",
-          "page": 1282
-        },
-        {
-          "level": 2,
-          "title": "WF-140 Respecting the Dojo Ratchet To 1729",
-          "page": 1286
-        },
-        {
-          "level": 2,
-          "title": "WF-141 Respecting the Dojo Ratchet To 1679",
           "page": 1289
         },
         {
           "level": 2,
+          "title": "WF-139 Respecting the Dojo Ratchet To 1796",
+          "page": 1293
+        },
+        {
+          "level": 2,
+          "title": "WF-140 Respecting the Dojo Ratchet To 1729",
+          "page": 1297
+        },
+        {
+          "level": 2,
+          "title": "WF-141 Respecting the Dojo Ratchet To 1679",
+          "page": 1300
+        },
+        {
+          "level": 2,
           "title": "WF-142 Respecting The Dojo Ratchet To 1621",
-          "page": 1292
+          "page": 1303
         },
         {
           "level": 2,
           "title": "WF-143 Respecting the Dojo Ratchet To 1564",
-          "page": 1295
+          "page": 1306
         },
         {
           "level": 2,
           "title": "WF-144 Respecting the Dojo Ratchet To 1514",
-          "page": 1298
-        },
-        {
-          "level": 2,
-          "title": "WF-145 Respecting the Dojo Ratchet To 1461",
-          "page": 1301
-        },
-        {
-          "level": 2,
-          "title": "WF-146 Respecting the Dojo Ratchet To 1393",
-          "page": 1305
-        },
-        {
-          "level": 2,
-          "title": "WF-147 Respecting the Dojo Ratchet To 1319",
           "page": 1309
         },
         {
           "level": 2,
-          "title": "WF-148 Respecting the Dojo Ratchet To 1268",
+          "title": "WF-145 Respecting the Dojo Ratchet To 1461",
           "page": 1312
         },
         {
           "level": 2,
-          "title": "WF-149 Respecting the Dojo Ratchet To 1216",
-          "page": 1315
+          "title": "WF-146 Respecting the Dojo Ratchet To 1393",
+          "page": 1316
         },
         {
           "level": 2,
-          "title": "WF-150 Respecting the Dojo Ratchet To 1165",
-          "page": 1319
+          "title": "WF-147 Respecting the Dojo Ratchet To 1319",
+          "page": 1320
         },
         {
           "level": 2,
-          "title": "WF-151 Respecting the Dojo Ratchet To 1110",
+          "title": "WF-148 Respecting the Dojo Ratchet To 1268",
           "page": 1323
         },
         {
           "level": 2,
+          "title": "WF-149 Respecting the Dojo Ratchet To 1216",
+          "page": 1326
+        },
+        {
+          "level": 2,
+          "title": "WF-150 Respecting the Dojo Ratchet To 1165",
+          "page": 1330
+        },
+        {
+          "level": 2,
+          "title": "WF-151 Respecting the Dojo Ratchet To 1110",
+          "page": 1334
+        },
+        {
+          "level": 2,
           "title": "WF-152 Respecting the Dojo Ratchet To 1055",
-          "page": 1327
+          "page": 1338
         },
         {
           "level": 2,
           "title": "WF-153 Respecting the Dojo Ratchet To 1004",
-          "page": 1331
+          "page": 1342
         },
         {
           "level": 2,
           "title": "WF-154 Respecting the Dojo Ratchet To 953",
-          "page": 1335
+          "page": 1346
         },
         {
           "level": 2,
           "title": "WF-155 Respecting the Dojo Ratchet To 624",
-          "page": 1339
+          "page": 1350
         },
         {
           "level": 2,
           "title": "WF-156 Respecting the Dojo Ratchet To 573",
-          "page": 1344
+          "page": 1355
         },
         {
           "level": 2,
           "title": "WF-157 Respecting the Dojo Ratchet To 520",
-          "page": 1349
+          "page": 1360
         },
         {
           "level": 2,
           "title": "WF-158 Respecting the Dojo Ratchet To 468",
-          "page": 1354
+          "page": 1365
         },
         {
           "level": 2,
           "title": "WF-159 Respecting the Dojo Ratchet To 415",
-          "page": 1359
+          "page": 1370
         },
         {
           "level": 2,
           "title": "WF-160 Respecting the Dojo Ratchet To 364",
-          "page": 1364
+          "page": 1375
         },
         {
           "level": 2,
           "title": "WF-161 Respecting the Dojo Ratchet 262",
-          "page": 1369
+          "page": 1380
         },
         {
           "level": 2,
           "title": "WF-162 Respecting the Dojo Ratchet 162",
-          "page": 1372
+          "page": 1383
         },
         {
           "level": 2,
           "title": "WF-163 Respecting the Dojo Ratchet 112",
-          "page": 1376
+          "page": 1387
         },
         {
           "level": 2,
           "title": "WF-164 Respecting the Dojo Ratchet 62",
-          "page": 1381
+          "page": 1392
         },
         {
           "level": 2,
           "title": "WF-165 Respecting the Dojo Ratchet 12",
-          "page": 1386
-        },
-        {
-          "level": 2,
-          "title": "WF-166 - V8 Dependency Security Closeout",
           "page": 1397
         },
         {
           "level": 2,
-          "title": "WF-167 Roadmap Milestone Authority",
-          "page": 1403
+          "title": "WF-166 - V8 Dependency Security Closeout",
+          "page": 1408
         },
         {
           "level": 2,
-          "title": "Other design records",
+          "title": "WF-167 Roadmap Milestone Authority",
           "page": 1414
         },
         {
           "level": 2,
+          "title": "Other design records",
+          "page": 1425
+        },
+        {
+          "level": 2,
           "title": "RE-008 — Byte-Packed Surface Representation",
-          "page": 1415
+          "page": 1426
         },
         {
           "level": 2,
           "title": "ASAP-001 — Fix MCP DAG Type Error",
-          "page": 1418
+          "page": 1429
         },
         {
           "level": 2,
           "title": "AUDIT-001 — Mentor Audit of examples/showcase",
-          "page": 1421
+          "page": 1432
         },
         {
           "level": 2,
           "title": "BE-001 Project Big Extraction: DOGFOOD Blocks Breakout",
-          "page": 1424
+          "page": 1435
         },
         {
           "level": 2,
           "title": "HT-002 — Layered Focus and Interaction",
-          "page": 1430
-        },
-        {
-          "level": 2,
-          "title": "HT-003 — Implement Layer Stack and Input Map Routing",
-          "page": 1436
-        },
-        {
-          "level": 2,
-          "title": "HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection",
           "page": 1441
         },
         {
           "level": 2,
+          "title": "HT-003 — Implement Layer Stack and Input Map Routing",
+          "page": 1447
+        },
+        {
+          "level": 2,
+          "title": "HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection",
+          "page": 1452
+        },
+        {
+          "level": 2,
           "title": "HT-007 Focus Map Surface",
-          "page": 1446
+          "page": 1457
         },
         {
           "level": 2,
           "title": "HT-008 — Surface-native text bypasses the terminal sanitization boundary",
-          "page": 1449
+          "page": 1460
         },
         {
           "level": 2,
           "title": "Design Records",
-          "page": 1452
+          "page": 1463
         },
         {
           "level": 1,
           "title": "X Releases and migration",
-          "page": 1453
+          "page": 1464
         },
         {
           "level": 2,
           "title": "Introduction: From implementation to a release claim",
-          "page": 1454
+          "page": 1465
         },
         {
           "level": 2,
           "title": "Bijou Workflow",
-          "page": 1456
-        },
-        {
-          "level": 2,
-          "title": "Bijou 7.1.0 Release Evidence",
-          "page": 1458
-        },
-        {
-          "level": 2,
-          "title": "Bijou 7.2.0 Release Evidence",
           "page": 1467
         },
         {
           "level": 2,
-          "title": "Bijou 8.0.0 Release Evidence",
+          "title": "Bijou 7.1.0 Release Evidence",
+          "page": 1469
+        },
+        {
+          "level": 2,
+          "title": "Bijou 7.2.0 Release Evidence",
           "page": 1478
         },
         {
           "level": 2,
+          "title": "Bijou 8.0.0 Release Evidence",
+          "page": 1489
+        },
+        {
+          "level": 2,
           "title": "Release Docs",
-          "page": 1491
-        },
-        {
-          "level": 2,
-          "title": "Migration Guide: Bijou v4.0.0 To v4.1.0",
-          "page": 1493
-        },
-        {
-          "level": 2,
-          "title": "Migrating to Bijou 4.2.0",
-          "page": 1500
-        },
-        {
-          "level": 2,
-          "title": "Migrating to Bijou 4.3.0",
           "page": 1502
         },
         {
           "level": 2,
-          "title": "Migrating to Bijou 4.4.0",
+          "title": "Migration Guide: Bijou v4.0.0 To v4.1.0",
           "page": 1504
         },
         {
           "level": 2,
-          "title": "Migrating to Bijou 4.4.1",
-          "page": 1505
+          "title": "Migrating to Bijou 4.2.0",
+          "page": 1511
         },
         {
           "level": 2,
-          "title": "Migrating to Bijou 5.0.0",
-          "page": 1507
-        },
-        {
-          "level": 2,
-          "title": "Migrating to Bijou 7.0.0",
-          "page": 1510
-        },
-        {
-          "level": 2,
-          "title": "Migrating to Bijou 7.1.0",
+          "title": "Migrating to Bijou 4.3.0",
           "page": 1513
         },
         {
           "level": 2,
-          "title": "Migrating to Bijou 7.2.0",
+          "title": "Migrating to Bijou 4.4.0",
           "page": 1515
         },
         {
           "level": 2,
-          "title": "Migrating to Bijou 8.0.0-rc.1",
-          "page": 1517
+          "title": "Migrating to Bijou 4.4.1",
+          "page": 1516
         },
         {
           "level": 2,
-          "title": "Release",
+          "title": "Migrating to Bijou 5.0.0",
+          "page": 1518
+        },
+        {
+          "level": 2,
+          "title": "Migrating to Bijou 7.0.0",
           "page": 1521
         },
         {
           "level": 2,
+          "title": "Migrating to Bijou 7.1.0",
+          "page": 1524
+        },
+        {
+          "level": 2,
+          "title": "Migrating to Bijou 7.2.0",
+          "page": 1526
+        },
+        {
+          "level": 2,
+          "title": "Migrating to Bijou 8.0.0-rc.1",
+          "page": 1528
+        },
+        {
+          "level": 2,
+          "title": "Release",
+          "page": 1532
+        },
+        {
+          "level": 2,
           "title": "What's New In Bijou v4.1.0",
-          "page": 1535
+          "page": 1546
         },
         {
           "level": 2,
           "title": "What's New in Bijou 4.2.0",
-          "page": 1541
+          "page": 1552
         },
         {
           "level": 2,
           "title": "What's New in Bijou 4.3.0",
-          "page": 1544
+          "page": 1555
         },
         {
           "level": 2,
           "title": "What's New in Bijou 4.4.0",
-          "page": 1547
+          "page": 1558
         },
         {
           "level": 2,
           "title": "What's New in Bijou 4.4.1",
-          "page": 1550
+          "page": 1561
         },
         {
           "level": 2,
           "title": "What's New in Bijou 5.0.0",
-          "page": 1553
+          "page": 1564
         },
         {
           "level": 2,
           "title": "What's New in Bijou 7.0.0",
-          "page": 1556
+          "page": 1567
         },
         {
           "level": 2,
           "title": "What's New in Bijou 7.1.0",
-          "page": 1559
+          "page": 1570
         },
         {
           "level": 2,
           "title": "What's New in Bijou 7.2.0",
-          "page": 1562
-        },
-        {
-          "level": 2,
-          "title": "What's New in Bijou 8.0.0-rc.1",
-          "page": 1565
-        },
-        {
-          "level": 1,
-          "title": "XI Retrospectives and historical planning",
-          "page": 1568
-        },
-        {
-          "level": 2,
-          "title": "Introduction: Learning from the work",
-          "page": 1569
-        },
-        {
-          "level": 2,
-          "title": "CI-001 — mermaidSurface() Component",
-          "page": 1571
-        },
-        {
-          "level": 2,
-          "title": "CI-002 — Deterministic Time-Travel Debugger",
-          "page": 1572
-        },
-        {
-          "level": 2,
-          "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
           "page": 1573
         },
         {
           "level": 2,
-          "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
-          "page": 1574
-        },
-        {
-          "level": 2,
-          "title": "DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes",
+          "title": "What's New in Bijou 8.0.0-rc.1",
           "page": 1576
         },
         {
+          "level": 1,
+          "title": "XI Retrospectives and historical planning",
+          "page": 1579
+        },
+        {
           "level": 2,
-          "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
+          "title": "Introduction: Learning from the work",
           "page": 1580
         },
         {
           "level": 2,
-          "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
-          "page": 1581
-        },
-        {
-          "level": 2,
-          "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
+          "title": "CI-001 — mermaidSurface() Component",
           "page": 1582
         },
         {
           "level": 2,
-          "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
+          "title": "CI-002 — Deterministic Time-Travel Debugger",
+          "page": 1583
+        },
+        {
+          "level": 2,
+          "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
           "page": 1584
         },
         {
           "level": 2,
-          "title": "MCP interactive documentation for all Bijou components",
-          "page": 1586
+          "title": "CI-003 — Surface Shaders (CRT / Scanlines)",
+          "page": 1585
         },
         {
           "level": 2,
-          "title": "DL-008 — Promote Guided Flow Block",
-          "page": 1588
+          "title": "DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes",
+          "page": 1587
         },
         {
           "level": 2,
-          "title": "DL-009 — Formalize Layout and Viewport Rules",
-          "page": 1589
-        },
-        {
-          "level": 2,
-          "title": "DL-009 — Formalize Layout and Viewport Rules",
+          "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
           "page": 1591
         },
         {
           "level": 2,
-          "title": "DL-009 — Strictly Typed App Interface Examples",
+          "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
           "page": 1592
         },
         {
           "level": 2,
-          "title": "DL-009 — Strictly Typed App Interface Examples",
-          "page": 1594
+          "title": "DF-020 — Deepen DOGFOOD Story Depth and Variant Quality",
+          "page": 1593
         },
         {
           "level": 2,
-          "title": "DL-010 — Strictly Typed App Interface Examples",
+          "title": "DF-002 — Expand DOGFOOD Component Family Coverage",
           "page": 1595
         },
         {
           "level": 2,
+          "title": "MCP interactive documentation for all Bijou components",
+          "page": 1597
+        },
+        {
+          "level": 2,
           "title": "DL-008 — Promote Guided Flow Block",
-          "page": 1596
+          "page": 1599
         },
         {
           "level": 2,
-          "title": "DX-003 — Rationalize Table APIs and Public Table Types",
-          "page": 1598
-        },
-        {
-          "level": 2,
-          "title": "DX-004 — Smooth Surface and String Composition Seams",
+          "title": "DL-009 — Formalize Layout and Viewport Rules",
           "page": 1600
         },
         {
           "level": 2,
-          "title": "DX-005 — Polish Small Component and Import Ergonomics",
+          "title": "DL-009 — Formalize Layout and Viewport Rules",
           "page": 1602
         },
         {
           "level": 2,
-          "title": "DX-006 — Debug Performance Overlay Component",
-          "page": 1604
+          "title": "DL-009 — Strictly Typed App Interface Examples",
+          "page": 1603
         },
         {
           "level": 2,
-          "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
+          "title": "DL-009 — Strictly Typed App Interface Examples",
+          "page": 1605
+        },
+        {
+          "level": 2,
+          "title": "DL-010 — Strictly Typed App Interface Examples",
           "page": 1606
         },
         {
           "level": 2,
-          "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
-          "page": 1608
-        },
-        {
-          "level": 2,
-          "title": "DX-007 — Project-Wide Numeric Input Sanitization",
-          "page": 1610
-        },
-        {
-          "level": 2,
-          "title": "DX-007 — Project-Wide Numeric Input Sanitization",
-          "page": 1611
-        },
-        {
-          "level": 2,
-          "title": "DX-008 — PerformanceObserver('gc') Is Unreliable For Our Measurement Needs",
-          "page": 1613
-        },
-        {
-          "level": 2,
-          "title": "DX-008 — Render Pipeline Documentation Guide",
-          "page": 1616
-        },
-        {
-          "level": 2,
-          "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
-          "page": 1618
-        },
-        {
-          "level": 2,
-          "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
-          "page": 1620
-        },
-        {
-          "level": 2,
-          "title": "DX-009 — Auto-Init Context and Actionable Error Messages",
-          "page": 1622
-        },
-        {
-          "level": 2,
-          "title": "DX-010 — Typed Sub-App Adapter Factory",
-          "page": 1623
-        },
-        {
-          "level": 2,
-          "title": "DX-011 — Key Collision Warnings at Registration Time",
-          "page": 1624
-        },
-        {
-          "level": 2,
-          "title": "DX-012 — Document Render-Path Naming Convention",
-          "page": 1625
-        },
-        {
-          "level": 2,
-          "title": "DX-013 — Motion Key Lifecycle Warning",
-          "page": 1626
-        },
-        {
-          "level": 2,
-          "title": "DX-014 — Fix Root README Interactive Example",
-          "page": 1627
-        },
-        {
-          "level": 2,
-          "title": "DX-015 — Perf Gradient as CI Benchmark",
-          "page": 1628
-        },
-        {
-          "level": 2,
-          "title": "DX-016 — Error Surface for Crash Post-Mortems",
-          "page": 1630
-        },
-        {
-          "level": 2,
-          "title": "DX-016 — Error Surface for Crash Post-Mortems",
-          "page": 1632
-        },
-        {
-          "level": 2,
-          "title": "DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering",
-          "page": 1633
-        },
-        {
-          "level": 2,
-          "title": "DX-017 — Agent-First Bench Output Format",
-          "page": 1636
-        },
-        {
-          "level": 2,
-          "title": "DX-017 — One-Call Node Host Entry Point",
-          "page": 1639
-        },
-        {
-          "level": 2,
-          "title": "DX-017 — One-Call Node Host Entry Point",
-          "page": 1640
-        },
-        {
-          "level": 2,
-          "title": "DX-018 — Runtime Test Harness for TEA Apps",
-          "page": 1642
-        },
-        {
-          "level": 2,
-          "title": "DX-018 — Runtime Test Harness for TEA Apps",
-          "page": 1643
-        },
-        {
-          "level": 2,
-          "title": "DX-019 — Third-Party Theme Reactivity Hook",
-          "page": 1645
-        },
-        {
-          "level": 2,
-          "title": "DX-019 — Third-Party Theme Reactivity Hook",
-          "page": 1646
-        },
-        {
-          "level": 2,
-          "title": "DX-020 — Layout Localization Pipeline Guide",
-          "page": 1648
-        },
-        {
-          "level": 2,
-          "title": "DX-020 — Layout Localization Pipeline Guide",
-          "page": 1649
-        },
-        {
-          "level": 2,
-          "title": "DX-021 — Error Surface for Crash Post-Mortems",
-          "page": 1651
-        },
-        {
-          "level": 2,
-          "title": "DX-028 — Align front-door docs with repo truth",
-          "page": 1652
+          "title": "DL-008 — Promote Guided Flow Block",
+          "page": 1607
         },
         {
           "level": 2,
           "title": "DX-003 — Rationalize Table APIs and Public Table Types",
-          "page": 1654
+          "page": 1609
         },
         {
           "level": 2,
           "title": "DX-004 — Smooth Surface and String Composition Seams",
-          "page": 1656
+          "page": 1611
         },
         {
           "level": 2,
           "title": "DX-005 — Polish Small Component and Import Ergonomics",
-          "page": 1658
+          "page": 1613
         },
         {
           "level": 2,
           "title": "DX-006 — Debug Performance Overlay Component",
-          "page": 1660
+          "page": 1615
         },
         {
           "level": 2,
           "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
-          "page": 1663
+          "page": 1617
+        },
+        {
+          "level": 2,
+          "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
+          "page": 1619
+        },
+        {
+          "level": 2,
+          "title": "DX-007 — Project-Wide Numeric Input Sanitization",
+          "page": 1621
+        },
+        {
+          "level": 2,
+          "title": "DX-007 — Project-Wide Numeric Input Sanitization",
+          "page": 1622
+        },
+        {
+          "level": 2,
+          "title": "DX-008 — PerformanceObserver('gc') Is Unreliable For Our Measurement Needs",
+          "page": 1624
         },
         {
           "level": 2,
           "title": "DX-008 — Render Pipeline Documentation Guide",
-          "page": 1665
+          "page": 1627
+        },
+        {
+          "level": 2,
+          "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
+          "page": 1629
+        },
+        {
+          "level": 2,
+          "title": "DX-008 — Sanitize Wrapper for User-Facing Numeric Inputs",
+          "page": 1631
         },
         {
           "level": 2,
           "title": "DX-009 — Auto-Init Context and Actionable Error Messages",
-          "page": 1667
+          "page": 1633
         },
         {
           "level": 2,
           "title": "DX-010 — Typed Sub-App Adapter Factory",
-          "page": 1669
+          "page": 1634
         },
         {
           "level": 2,
           "title": "DX-011 — Key Collision Warnings at Registration Time",
-          "page": 1671
+          "page": 1635
         },
         {
           "level": 2,
           "title": "DX-012 — Document Render-Path Naming Convention",
-          "page": 1673
+          "page": 1636
         },
         {
           "level": 2,
           "title": "DX-013 — Motion Key Lifecycle Warning",
-          "page": 1675
+          "page": 1637
         },
         {
           "level": 2,
           "title": "DX-014 — Fix Root README Interactive Example",
-          "page": 1677
+          "page": 1638
         },
         {
           "level": 2,
           "title": "DX-015 — Perf Gradient as CI Benchmark",
-          "page": 1679
+          "page": 1639
         },
         {
           "level": 2,
-          "title": "HT-001 — Notification Center Polish and Discoverability",
-          "page": 1681
+          "title": "DX-016 — Error Surface for Crash Post-Mortems",
+          "page": 1641
         },
         {
           "level": 2,
-          "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
+          "title": "DX-016 — Error Surface for Crash Post-Mortems",
+          "page": 1643
+        },
+        {
+          "level": 2,
+          "title": "DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering",
+          "page": 1644
+        },
+        {
+          "level": 2,
+          "title": "DX-017 — Agent-First Bench Output Format",
+          "page": 1647
+        },
+        {
+          "level": 2,
+          "title": "DX-017 — One-Call Node Host Entry Point",
+          "page": 1650
+        },
+        {
+          "level": 2,
+          "title": "DX-017 — One-Call Node Host Entry Point",
+          "page": 1651
+        },
+        {
+          "level": 2,
+          "title": "DX-018 — Runtime Test Harness for TEA Apps",
+          "page": 1653
+        },
+        {
+          "level": 2,
+          "title": "DX-018 — Runtime Test Harness for TEA Apps",
+          "page": 1654
+        },
+        {
+          "level": 2,
+          "title": "DX-019 — Third-Party Theme Reactivity Hook",
+          "page": 1656
+        },
+        {
+          "level": 2,
+          "title": "DX-019 — Third-Party Theme Reactivity Hook",
+          "page": 1657
+        },
+        {
+          "level": 2,
+          "title": "DX-020 — Layout Localization Pipeline Guide",
+          "page": 1659
+        },
+        {
+          "level": 2,
+          "title": "DX-020 — Layout Localization Pipeline Guide",
+          "page": 1660
+        },
+        {
+          "level": 2,
+          "title": "DX-021 — Error Surface for Crash Post-Mortems",
+          "page": 1662
+        },
+        {
+          "level": 2,
+          "title": "DX-028 — Align front-door docs with repo truth",
+          "page": 1663
+        },
+        {
+          "level": 2,
+          "title": "DX-003 — Rationalize Table APIs and Public Table Types",
+          "page": 1665
+        },
+        {
+          "level": 2,
+          "title": "DX-004 — Smooth Surface and String Composition Seams",
+          "page": 1667
+        },
+        {
+          "level": 2,
+          "title": "DX-005 — Polish Small Component and Import Ergonomics",
+          "page": 1669
+        },
+        {
+          "level": 2,
+          "title": "DX-006 — Debug Performance Overlay Component",
+          "page": 1671
+        },
+        {
+          "level": 2,
+          "title": "DX-007 — Decompose app-frame.ts Mega-Closure",
+          "page": 1674
+        },
+        {
+          "level": 2,
+          "title": "DX-008 — Render Pipeline Documentation Guide",
+          "page": 1676
+        },
+        {
+          "level": 2,
+          "title": "DX-009 — Auto-Init Context and Actionable Error Messages",
+          "page": 1678
+        },
+        {
+          "level": 2,
+          "title": "DX-010 — Typed Sub-App Adapter Factory",
+          "page": 1680
+        },
+        {
+          "level": 2,
+          "title": "DX-011 — Key Collision Warnings at Registration Time",
           "page": 1682
         },
         {
           "level": 2,
-          "title": "HT-006 — Allow pages to push notifications in createFramedApp",
-          "page": 1683
+          "title": "DX-012 — Document Render-Path Naming Convention",
+          "page": 1684
         },
         {
           "level": 2,
-          "title": "HT-001 — Notification Center Polish and Discoverability",
-          "page": 1685
+          "title": "DX-013 — Motion Key Lifecycle Warning",
+          "page": 1686
         },
         {
           "level": 2,
-          "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
-          "page": 1687
+          "title": "DX-014 — Fix Root README Interactive Example",
+          "page": 1688
         },
         {
           "level": 2,
-          "title": "Upstream edge-overlay scrollbars and BCSS overflow handling",
-          "page": 1689
-        },
-        {
-          "level": 2,
-          "title": "Upstream edge-overlay scrollbars and BCSS overflow handling",
+          "title": "DX-015 — Perf Gradient as CI Benchmark",
           "page": 1690
         },
         {
           "level": 2,
-          "title": "LX-007 — Service-Oriented Localization Adapters",
-          "page": 1691
-        },
-        {
-          "level": 2,
-          "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
+          "title": "HT-001 — Notification Center Polish and Discoverability",
           "page": 1692
         },
         {
           "level": 2,
-          "title": "LX-010 — Built-in i18n Catalog Loader",
+          "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
           "page": 1693
         },
         {
           "level": 2,
-          "title": "LX-010 — Built-in i18n Catalog Loader",
-          "page": 1695
+          "title": "HT-006 — Allow pages to push notifications in createFramedApp",
+          "page": 1694
         },
         {
           "level": 2,
-          "title": "LX-012 — DOGFOOD i18n Debt Inventory",
-          "page": 1697
+          "title": "HT-001 — Notification Center Polish and Discoverability",
+          "page": 1696
         },
         {
           "level": 2,
-          "title": "LX-007 — Service-Oriented Localization Adapters",
-          "page": 1699
+          "title": "HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection",
+          "page": 1698
         },
         {
           "level": 2,
-          "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
+          "title": "Upstream edge-overlay scrollbars and BCSS overflow handling",
+          "page": 1700
+        },
+        {
+          "level": 2,
+          "title": "Upstream edge-overlay scrollbars and BCSS overflow handling",
           "page": 1701
         },
         {
           "level": 2,
-          "title": "RE-011 — Eliminate Per-Frame Allocation in Render Pipeline",
+          "title": "LX-007 — Service-Oriented Localization Adapters",
+          "page": 1702
+        },
+        {
+          "level": 2,
+          "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
           "page": 1703
         },
         {
           "level": 2,
-          "title": "RE-012 — Pipeline Observability Hooks",
+          "title": "LX-010 — Built-in i18n Catalog Loader",
           "page": 1704
         },
         {
           "level": 2,
-          "title": "RE-013 — Memoize Workspace Layout Tree",
+          "title": "LX-010 — Built-in i18n Catalog Loader",
           "page": 1706
         },
         {
           "level": 2,
-          "title": "RE-014 — Design Doctrine",
-          "page": 1707
+          "title": "LX-012 — DOGFOOD i18n Debt Inventory",
+          "page": 1708
         },
         {
           "level": 2,
-          "title": "RE-017 — Frame does not fill terminal background with surface.primary.bg",
-          "page": 1709
+          "title": "LX-007 — Service-Oriented Localization Adapters",
+          "page": 1710
         },
         {
           "level": 2,
-          "title": "RE-018 — Hex Color Strings As The Canonical fg/bg Representation",
-          "page": 1711
-        },
-        {
-          "level": 2,
-          "title": "RE-019 — Surface dirtyWords Bitmap Serves The Wrong Master",
-          "page": 1714
-        },
-        {
-          "level": 2,
-          "title": "RE-019 — Pre-Parse Theme Token Colors Into Bytes",
-          "page": 1717
-        },
-        {
-          "level": 2,
-          "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
-          "page": 1720
-        },
-        {
-          "level": 2,
-          "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
-          "page": 1723
-        },
-        {
-          "level": 2,
-          "title": "RE-021 — Frame Owns the Pump",
-          "page": 1725
-        },
-        {
-          "level": 2,
-          "title": "RE-021 — Frame Owns the Pump",
-          "page": 1728
-        },
-        {
-          "level": 2,
-          "title": "RE-022 — Public PackedSurface Type Guard",
-          "page": 1732
-        },
-        {
-          "level": 2,
-          "title": "RE-022 — Public PackedSurface Type Guard",
-          "page": 1733
-        },
-        {
-          "level": 2,
-          "title": "RE-022 — Unified Layout Calculation Engine",
-          "page": 1734
-        },
-        {
-          "level": 2,
-          "title": "RE-022 — Unified Layout Calculation Engine",
-          "page": 1735
-        },
-        {
-          "level": 2,
-          "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
-          "page": 1737
-        },
-        {
-          "level": 2,
-          "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
-          "page": 1738
-        },
-        {
-          "level": 2,
-          "title": "RE-024 — Terminal Content Sanitization Boundary",
-          "page": 1740
-        },
-        {
-          "level": 2,
-          "title": "RE-024 — Terminal Content Sanitization Boundary",
-          "page": 1741
-        },
-        {
-          "level": 2,
-          "title": "RE-025 — Scoped Node IO Adapter",
-          "page": 1743
-        },
-        {
-          "level": 2,
-          "title": "RE-025 — Scoped Node IO Adapter",
-          "page": 1744
-        },
-        {
-          "level": 2,
-          "title": "RE-026 — Drain runtime commands before shutdown",
-          "page": 1746
-        },
-        {
-          "level": 2,
-          "title": "Graveyard",
-          "page": 1748
-        },
-        {
-          "level": 2,
-          "title": "Legacy Backlog Archive",
-          "page": 1749
-        },
-        {
-          "level": 2,
-          "title": "Legacy ASAP Archive",
-          "page": 1751
-        },
-        {
-          "level": 2,
-          "title": "Legacy Bad-Code Archive",
-          "page": 1752
-        },
-        {
-          "level": 2,
-          "title": "Legacy Cool Ideas Archive",
-          "page": 1753
-        },
-        {
-          "level": 2,
-          "title": "Legacy Inbox Archive",
-          "page": 1754
-        },
-        {
-          "level": 2,
-          "title": "Legacy Up Next Archive",
-          "page": 1755
-        },
-        {
-          "level": 2,
-          "title": "v4.5.0 — Legacy Release Lane Snapshot",
-          "page": 1756
-        },
-        {
-          "level": 2,
-          "title": "v5.0.0 — Legacy Release Lane Snapshot",
-          "page": 1757
-        },
-        {
-          "level": 2,
-          "title": "Retro",
-          "page": 1758
-        },
-        {
-          "level": 2,
-          "title": "Retro",
-          "page": 1759
-        },
-        {
-          "level": 2,
-          "title": "RE-007 — Migrate Framed Shell Onto Runtime Engine Seams",
-          "page": 1760
+          "title": "LX-009 — Localize Shell Help, Notification, and Directional Surfaces",
+          "page": 1712
         },
         {
           "level": 2,
           "title": "RE-011 — Eliminate Per-Frame Allocation in Render Pipeline",
-          "page": 1762
+          "page": 1714
         },
         {
           "level": 2,
           "title": "RE-012 — Pipeline Observability Hooks",
-          "page": 1764
+          "page": 1715
         },
         {
           "level": 2,
           "title": "RE-013 — Memoize Workspace Layout Tree",
-          "page": 1766
+          "page": 1717
         },
         {
           "level": 2,
           "title": "RE-014 — Design Doctrine",
+          "page": 1718
+        },
+        {
+          "level": 2,
+          "title": "RE-017 — Frame does not fill terminal background with surface.primary.bg",
+          "page": 1720
+        },
+        {
+          "level": 2,
+          "title": "RE-018 — Hex Color Strings As The Canonical fg/bg Representation",
+          "page": 1722
+        },
+        {
+          "level": 2,
+          "title": "RE-019 — Surface dirtyWords Bitmap Serves The Wrong Master",
+          "page": 1725
+        },
+        {
+          "level": 2,
+          "title": "RE-019 — Pre-Parse Theme Token Colors Into Bytes",
+          "page": 1728
+        },
+        {
+          "level": 2,
+          "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
+          "page": 1731
+        },
+        {
+          "level": 2,
+          "title": "RE-020 — Typed Color Representation (ColorRef Branded Type)",
+          "page": 1734
+        },
+        {
+          "level": 2,
+          "title": "RE-021 — Frame Owns the Pump",
+          "page": 1736
+        },
+        {
+          "level": 2,
+          "title": "RE-021 — Frame Owns the Pump",
+          "page": 1739
+        },
+        {
+          "level": 2,
+          "title": "RE-022 — Public PackedSurface Type Guard",
+          "page": 1743
+        },
+        {
+          "level": 2,
+          "title": "RE-022 — Public PackedSurface Type Guard",
+          "page": 1744
+        },
+        {
+          "level": 2,
+          "title": "RE-022 — Unified Layout Calculation Engine",
+          "page": 1745
+        },
+        {
+          "level": 2,
+          "title": "RE-022 — Unified Layout Calculation Engine",
+          "page": 1746
+        },
+        {
+          "level": 2,
+          "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
+          "page": 1748
+        },
+        {
+          "level": 2,
+          "title": "RE-023 — Stabilize Render Scheduling in runtime.ts",
+          "page": 1749
+        },
+        {
+          "level": 2,
+          "title": "RE-024 — Terminal Content Sanitization Boundary",
+          "page": 1751
+        },
+        {
+          "level": 2,
+          "title": "RE-024 — Terminal Content Sanitization Boundary",
+          "page": 1752
+        },
+        {
+          "level": 2,
+          "title": "RE-025 — Scoped Node IO Adapter",
+          "page": 1754
+        },
+        {
+          "level": 2,
+          "title": "RE-025 — Scoped Node IO Adapter",
+          "page": 1755
+        },
+        {
+          "level": 2,
+          "title": "RE-026 — Drain runtime commands before shutdown",
+          "page": 1757
+        },
+        {
+          "level": 2,
+          "title": "Graveyard",
+          "page": 1759
+        },
+        {
+          "level": 2,
+          "title": "Legacy Backlog Archive",
+          "page": 1760
+        },
+        {
+          "level": 2,
+          "title": "Legacy ASAP Archive",
+          "page": 1762
+        },
+        {
+          "level": 2,
+          "title": "Legacy Bad-Code Archive",
+          "page": 1763
+        },
+        {
+          "level": 2,
+          "title": "Legacy Cool Ideas Archive",
+          "page": 1764
+        },
+        {
+          "level": 2,
+          "title": "Legacy Inbox Archive",
+          "page": 1765
+        },
+        {
+          "level": 2,
+          "title": "Legacy Up Next Archive",
+          "page": 1766
+        },
+        {
+          "level": 2,
+          "title": "v4.5.0 — Legacy Release Lane Snapshot",
+          "page": 1767
+        },
+        {
+          "level": 2,
+          "title": "v5.0.0 — Legacy Release Lane Snapshot",
           "page": 1768
         },
         {
           "level": 2,
-          "title": "RE-016: DAG renderer should handle cycles gracefully",
+          "title": "Retro",
           "page": 1769
         },
         {
           "level": 2,
-          "title": "RE-016 — graphemeWidth Miscounts Emoji-Like Icon Characters",
+          "title": "Retro",
+          "page": 1770
+        },
+        {
+          "level": 2,
+          "title": "RE-007 — Migrate Framed Shell Onto Runtime Engine Seams",
           "page": 1771
         },
         {
           "level": 2,
-          "title": "WritePort byte-level API for zero-alloc ANSI output",
+          "title": "RE-011 — Eliminate Per-Frame Allocation in Render Pipeline",
           "page": 1773
         },
         {
           "level": 2,
-          "title": "WF-002 — Migrate Legacy Planning Artifacts",
-          "page": 1774
-        },
-        {
-          "level": 2,
-          "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
+          "title": "RE-012 — Pipeline Observability Hooks",
           "page": 1775
         },
         {
           "level": 2,
-          "title": "WF-008 — METHOD backlog helper generates malformed note filenames",
+          "title": "RE-013 — Memoize Workspace Layout Tree",
           "page": 1777
         },
         {
           "level": 2,
-          "title": "WF-122 - Day Zero Audit Fixes",
+          "title": "RE-014 — Design Doctrine",
           "page": 1779
         },
         {
           "level": 2,
-          "title": "WF-002 — Migrate Legacy Planning Artifacts",
+          "title": "RE-016: DAG renderer should handle cycles gracefully",
+          "page": 1780
+        },
+        {
+          "level": 2,
+          "title": "RE-016 — graphemeWidth Miscounts Emoji-Like Icon Characters",
           "page": 1782
         },
         {
           "level": 2,
-          "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
+          "title": "WritePort byte-level API for zero-alloc ANSI output",
           "page": 1784
         },
         {
           "level": 2,
-          "title": "Background fill regression in v4.4.0",
-          "page": 1786
-        },
-        {
-          "level": 1,
-          "title": "XII Audits and archive records",
-          "page": 1789
+          "title": "WF-002 — Migrate Legacy Planning Artifacts",
+          "page": 1785
         },
         {
           "level": 2,
-          "title": "Introduction: Reading assessments in context",
+          "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
+          "page": 1786
+        },
+        {
+          "level": 2,
+          "title": "WF-008 — METHOD backlog helper generates malformed note filenames",
+          "page": 1788
+        },
+        {
+          "level": 2,
+          "title": "WF-122 - Day Zero Audit Fixes",
           "page": 1790
         },
         {
           "level": 2,
+          "title": "WF-002 — Migrate Legacy Planning Artifacts",
+          "page": 1793
+        },
+        {
+          "level": 2,
+          "title": "WF-007 — Align Local Validation With CI typecheck:test Gate",
+          "page": 1795
+        },
+        {
+          "level": 2,
+          "title": "Background fill regression in v4.4.0",
+          "page": 1797
+        },
+        {
+          "level": 1,
+          "title": "XII Audits and archive records",
+          "page": 1800
+        },
+        {
+          "level": 2,
+          "title": "Introduction: Reading assessments in context",
+          "page": 1801
+        },
+        {
+          "level": 2,
           "title": "Codebase Health Assessment — 2026-04-05",
-          "page": 1791
+          "page": 1802
         },
         {
           "level": 2,
           "title": "Documentation & README Audit — 2026-04-05",
-          "page": 1799
+          "page": 1810
         },
         {
           "level": 2,
           "title": "AUDIT: CODE QUALITY (2026-04-11)",
-          "page": 1804
+          "page": 1815
         },
         {
           "level": 2,
           "title": "AUDIT: DOCUMENTATION QUALITY (2026-04-11)",
-          "page": 1807
+          "page": 1818
         },
         {
           "level": 2,
           "title": "AUDIT: READY-TO-SHIP ASSESSMENT (2026-04-11)",
-          "page": 1809
+          "page": 1820
         },
         {
           "level": 2,
           "title": "Code Quality Audit",
-          "page": 1811
+          "page": 1822
         },
         {
           "level": 2,
           "title": "Documentation Quality Audit",
-          "page": 1817
-        },
-        {
-          "level": 2,
-          "title": "Ready-to-Ship Assessment",
-          "page": 1821
-        },
-        {
-          "level": 2,
-          "title": "Graveyard",
           "page": 1828
         },
         {
           "level": 2,
-          "title": "I-0d — Per-stage render pipeline instrumentation (buried 2026-04-09)",
-          "page": 1829
-        },
-        {
-          "level": 2,
-          "title": "I-3 — Custom baseline JSON format + compare tool (buried 2026-04-09)",
-          "page": 1831
-        },
-        {
-          "level": 2,
-          "title": "RE-017 — Byte-Pipeline Recovery",
+          "title": "Ready-to-Ship Assessment",
           "page": 1832
         },
         {
           "level": 2,
+          "title": "Graveyard",
+          "page": 1839
+        },
+        {
+          "level": 2,
+          "title": "I-0d — Per-stage render pipeline instrumentation (buried 2026-04-09)",
+          "page": 1840
+        },
+        {
+          "level": 2,
+          "title": "I-3 — Custom baseline JSON format + compare tool (buried 2026-04-09)",
+          "page": 1842
+        },
+        {
+          "level": 2,
+          "title": "RE-017 — Byte-Pipeline Recovery",
+          "page": 1843
+        },
+        {
+          "level": 2,
           "title": "Archive",
-          "page": 1864
+          "page": 1875
         },
         {
           "level": 2,
           "title": "Graveyard",
-          "page": 1865
+          "page": 1876
         },
         {
           "level": 2,
           "title": "Bijou Component System Audit",
-          "page": 1866
+          "page": 1877
         },
         {
           "level": 2,
           "title": "dag() — ASCII DAG Renderer for Bijou",
-          "page": 1879
+          "page": 1890
         },
         {
           "level": 2,
           "title": "Feature Request: Canvas Primitive & Box Width Override",
-          "page": 1892
+          "page": 1903
         },
         {
           "level": 2,
           "title": "Source inventory",
-          "page": 1897
+          "page": 1908
         },
         {
           "level": 2,
           "title": "Licenses and reproduction notices",
-          "page": 1918
+          "page": 1929
         }
       ]
     }
@@ -4916,9 +4946,9 @@
   },
   "main_text": {
     "parts": 5,
-    "numbered_chapters": 13,
+    "numbered_chapters": 14,
     "workshops": 7,
-    "connecting_chapters": 6,
+    "connecting_chapters": 7,
     "historical_records": 0
   },
   "updated_link_files": [
@@ -4945,7 +4975,7 @@
     "bun.lock"
   ],
   "verification_limits": [
-    "Companion verification is prior evidence at the unchanged pinned commit.",
+    "Companion book-v2 typecheck, 44 tests, five independent stages and six PTY cases passed; hosted CI passed at its pinned commit.",
     "Historical source assertions were not individually reclassified against current runtime.",
     "No human screen-reader study or broad emulator matrix performed.",
     "Unrelated dirty framed-app tutorial retains its pre-existing page links."

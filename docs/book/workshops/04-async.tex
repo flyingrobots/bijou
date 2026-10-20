@@ -2,7 +2,7 @@
 
 \section{Create the race deliberately}
 
-Open logs for the compile job, then select the test job before the old response arrives. The adapter deliberately gives compile logs a longer delay. The first response now belongs to an earlier selection. Without an ownership check, it can replace the test job's detail pane with compile output even though the current heading still names the test job.
+Run \texttt{npm run stage -- 04} in a terminal of at least 80 by 32 cells. Open logs for the compile job, then select the test job before the old response arrives. The adapter deliberately gives compile logs a longer delay. The first response now belongs to an earlier selection. Without an ownership check, it can replace the test job's detail pane with compile output even though the current heading still names the test job.
 
 \subsection{Identity has two dimensions}
 
@@ -14,7 +14,7 @@ Cancellation is useful resource management. The identity check is the correctnes
 
 \subsection{Trace the second interaction}
 
-The first request owns \texttt{compile / epoch 1}. Selecting the test job creates \texttt{test / epoch 2}, clears the displayed log and requests a new load. A late \texttt{compile / epoch 1} completion is ignored. A matching \texttt{test / epoch 2} completion can fill the pane. Closing that pane before the matching completion arrives also prevents it from reopening the screen. Run checkpoint 04 to reproduce the rejection without depending on wall-clock timing.
+The first request owns \texttt{compile / epoch 1}. Selecting the test job creates \texttt{test / epoch 2}, clears the displayed log and requests a new load. A late \texttt{compile / epoch 1} completion is ignored. A matching \texttt{test / epoch 2} completion can fill the pane. Closing that pane before the matching completion arrives also prevents it from reopening the screen. Run \texttt{npm run stage:check -- 04} to reproduce the rejection with its independent model and scheduler. The older checkpoint 04 also inspects the final model without depending on wall-clock timing.
 
 \section{Separate useful work from its presentation}
 

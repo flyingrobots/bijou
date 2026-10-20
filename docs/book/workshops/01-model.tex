@@ -24,9 +24,9 @@ A failed job remains failed when the terminal loses color. A running job remains
 
 It is tempting to store preformatted rows as the application's state. That works until filtering needs the job identity, cancellation needs its run, or a pipe consumer needs a numeric percentage. Parsing those facts back out of painted text reverses the dependency. Here, presentation consumes the facts. Commands and tests use those same facts directly.
 
-\subsection{Run the first checkpoint}
+\subsection{Run the first build stage}
 
-From the companion repository, run \texttt{npm ci}, then \texttt{npm run checkpoint -- 01}. The output contains three queued jobs. Read the rows with color disabled and answer: which job is selected, what state is each job in, and how much work is complete? The initial checkpoint introduces \path{src/job.ts}, the initial monitor snapshot, and the static presentation. The next workshop reuses that snapshot rather than inventing a separate model for each environment.
+From the companion repository, run \texttt{npm ci}, then \texttt{npm run stage -- 01}. The output contains three queued jobs. Read the rows with color disabled and answer: what stable identity does each job have, what state is it in, and how much work is complete? Stage 01 introduces its own \path{stages/01-model/job.ts}, monitor snapshot and plain presentation. Run \texttt{npm run stage:check -- 01} before reading the 01-to-02 source diff. The next workshop reuses that snapshot rather than inventing a separate model for each environment.
 
 \section{Try a real extension}
 

@@ -17,7 +17,7 @@ covers the workflow, expectations, and resources for contributors.
 Use GitHub issues and milestones for roadmap and release scope. Linear is the
 chosen execution tracker; the connection and workspace/team migration are still
 pending. Existing GitHub issues remain live until verified Linear links exist.
-See [the workflow](docs/book/bijou-designs.pdf#page=1456) for the current process.
+See [the workflow](docs/book/bijou-designs.pdf#page=1467) for the current process.
 
 - Name one observable outcome, its scope, acceptance checks, and prerequisites.
 - Use a descriptive branch and one coherent PR per outcome.

@@ -27,7 +27,10 @@ The arguments are the original path, first line and line limit (maximum 250).
 Start with the teaching book's Preface and version page. Every teaching Part
 has an introduction and a concrete learning outcome. The seven workshops use the
 separate [published companion repository](https://github.com/flyingrobots/bijou-job-monitor),
-pinned to Bijou 7.2.0. The glossary and topic finder support practical lookup.
+pinned to Bijou 7.2.0 at edition `book-v2`. Five independent build stages, actual
+source diffs and an explained exercise answer key support the workshops. The human
+walkthrough is prepared; the user will arrange an unfamiliar reader.
+The glossary and topic finder support practical lookup.
 
 ## Current operating references
 

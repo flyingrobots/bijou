@@ -77,7 +77,7 @@ The generated app is intentionally opinionated:
 
 Use this scaffolder when you want a real shell starter, not just an empty `run(app)` bootstrap.
 
-For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/book/bijou-designs.pdf#page=311) and [`../../docs/ARCHITECTURE.md`](../../docs/book/bijou-designs.pdf#page=130).
+For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/book/bijou-designs.pdf#page=322) and [`../../docs/ARCHITECTURE.md`](../../docs/book/bijou-designs.pdf#page=141).
 
 ## Documentation
 

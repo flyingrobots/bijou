@@ -3339,8 +3339,8 @@
       "row_count": 7,
       "width": 86,
       "height": 12,
-      "cell_sha256": "5c0d73416ca6f562d326598e2a70ac3ff339f490d56ca1975c4af588d2e2d69c",
-      "svg_sha256": "144858c51e99e09c6419c83040b4faeff89c294145c10a27547e682f88e3b8ed",
+      "cell_sha256": "63bca66d1ca0cda4d4ee21a055cb582b795ff5b896f83f37d829787e01585737",
+      "svg_sha256": "2d666f0575a30fba7a1783ee150a1f9859d746f3387a608ae022485de8594f78",
       "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
     }
   ],
@@ -4139,8 +4139,8 @@
     },
     {
       "id": "edition-versions-g1-1",
-      "pdf_sha256": "511fec5a3f6326123d89e661b5a8e83cb73e841691a293dc3cd0925519b8bc10",
-      "bytes": 61098
+      "pdf_sha256": "dfbfd213c50d3e53fbfe3af5a930496a88b8b49fe9aa853659758bdedc26709c",
+      "bytes": 61092
     }
   ]
 }

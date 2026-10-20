@@ -1,6 +1,6 @@
 {
-  "edition": "2026-10-20 teaching/archive split",
-  "comparison_base_commit": "003da8d4eb76674fc67cf44a5886e39702a0da4f",
+  "edition": "2026-10-20 progressive build edition",
+  "comparison_base_commit": "32408df5abdcc70649f72fa7ebe18e930e835f2d",
   "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
   "records": [
     {

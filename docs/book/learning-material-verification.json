@@ -1,0 +1,170 @@
+{
+  "companion_commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+  "tag": "book-v2",
+  "github_actions": {
+    "run": 39515958225,
+    "url": "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39515958225",
+    "conclusion": "success",
+    "tests": 44
+  },
+  "local_companion": {
+    "candidate": "working source snapshot before companion commit",
+    "fresh_install": "npm ci --offline using project-owned npm cache",
+    "full_suite": {
+      "files": 8,
+      "tests": 44,
+      "passed": 44
+    },
+    "independent_stages": [
+      {
+        "stage": "01",
+        "directory": "01-model",
+        "cli": "passed",
+        "independent_tests": "passed",
+        "finished_source_available": false
+      },
+      {
+        "stage": "02",
+        "directory": "02-modes",
+        "cli": "passed",
+        "independent_tests": "passed",
+        "finished_source_available": false
+      },
+      {
+        "stage": "03",
+        "directory": "03-input",
+        "cli": "passed",
+        "independent_tests": "passed",
+        "finished_source_available": false
+      },
+      {
+        "stage": "04",
+        "directory": "04-async",
+        "cli": "passed",
+        "independent_tests": "passed",
+        "finished_source_available": false
+      },
+      {
+        "stage": "05",
+        "directory": "05-constraints",
+        "cli": "passed",
+        "independent_tests": "passed",
+        "finished_source_available": false
+      }
+    ],
+    "source_diffs": [
+      {
+        "from": "01-model",
+        "to": "02-modes",
+        "source_diff_matches": true,
+        "lines": 37
+      },
+      {
+        "from": "02-modes",
+        "to": "03-input",
+        "source_diff_matches": true,
+        "lines": 123
+      },
+      {
+        "from": "03-input",
+        "to": "04-async",
+        "source_diff_matches": true,
+        "lines": 291
+      },
+      {
+        "from": "04-async",
+        "to": "05-constraints",
+        "source_diff_matches": true,
+        "lines": 89
+      }
+    ],
+    "final_stage_modules_byte_identical_to_src": 8,
+    "exercises": {
+      "broken_exit": 1,
+      "repaired_exit": 0,
+      "cases": 4
+    },
+    "package_members": "stage sources, answers, walkthrough, LICENSE and NOTICE verified",
+    "human_walkthrough": "not_run",
+    "interactive_screen_reader_workflow": "not_implemented"
+  },
+  "pty": [
+    {
+      "stage": "03",
+      "scenario": "keyboard",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 6410,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    },
+    {
+      "stage": "03",
+      "scenario": "sigterm",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 861,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    },
+    {
+      "stage": "04",
+      "scenario": "keyboard",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 6875,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    },
+    {
+      "stage": "04",
+      "scenario": "sigterm",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 917,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    },
+    {
+      "stage": "05",
+      "scenario": "keyboard",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 6926,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    },
+    {
+      "stage": "05",
+      "scenario": "sigterm",
+      "exit": 0,
+      "terminal_flags_restored": true,
+      "output_bytes": 950,
+      "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+    }
+  ],
+  "historical_record_pairs_supplied_and_verified": 426,
+  "artifacts": {
+    "historical-record-bodies.zip": {
+      "sha256": "44010333bbb4c03b7b29ec8492bdb341a0771ebfd122d8e29c585cbc2d5be7a0",
+      "bytes": 2574546
+    },
+    "bijou-job-monitor-book-v2.tar.gz": {
+      "sha256": "a04c38b6b3a66efc8b746651846897a61f48e1908bbe084414d7d1341aa25a4f",
+      "bytes": 60457
+    }
+  },
+  "human_walkthrough": {
+    "status": "not_run",
+    "next_step": "User will arrange an unfamiliar reader",
+    "protocol": "appendices/reader-walkthrough.tex",
+    "blank_template": "companion-material/walkthrough/results-template.json"
+  },
+  "table_artwork": {
+    "changed_panel": "edition-versions-g1-1",
+    "other_panels_exact_capture_hashes_preserved": 158
+  },
+  "documentation_checks": {
+    "npm_run_lint": "passed",
+    "focused_contracts": {
+      "files": 3,
+      "passed": 12
+    },
+    "docs_inventory": "passed"
+  }
+}

@@ -101,3 +101,7 @@ The result of applying an event to a model: a next model and any effect descript
 \subsection{Viewport}
 
 The width and height available for the current view, together with the application decisions governing what is visible.
+
+\subsection{Build stage}
+
+An independent source snapshot implementing a declared step of the application. The five stages share a dependency lock but import neither the finished application nor each other. They are distinct from the checkpoint commands that inspect the completed implementation.
