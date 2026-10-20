@@ -64,8 +64,12 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 
 - **`README.md`**: public front door and package quick start.
 - **`docs/README.md`**: live documentation map and bounded chapter-reading command.
+- **`docs/book/bijou-book.pdf`** and **`docs/book/bijou-book.tex`**:
+  five-part teaching book, seven workshops and practical reference.
+- **`docs/book/bijou-archive.pdf`** and **`docs/book/bijou-archive.tex`**:
+  all 426 preserved historical source records, identified as R1–R426.
 - **`docs/book/bijou-designs.pdf`** and **`docs/book/bijou-designs.tex`**:
-  compiled guides, architecture, strategy, design records and release history.
+  complete teaching edition with historical appendices; existing links target this PDF.
 - **`docs/book/source-manifest.json`**: original paths, chapter numbers and hashes.
 - **`docs/book/source-corpus.json`**: exact archived text used by DOGFOOD and checks;
   individual compiled Markdown files have been removed.

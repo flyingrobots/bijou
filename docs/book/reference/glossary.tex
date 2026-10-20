@@ -1,0 +1,103 @@
+\chapter{Glossary}\label{book-glossary}
+
+Terms in this glossary describe the teaching companion and the vocabulary used to explain it. An identifier in a historical record can have a different version-specific meaning.
+
+\subsection{Adapter}
+
+Code that connects a host or framework boundary to application contracts. The companion has keyboard, scheduler and shutdown adaptations.
+
+\subsection{App}
+
+The Bijou runtime contract implemented by init, update and view in the companion. AppModel includes viewport state around the task model.
+
+\subsection{Application model}
+
+A snapshot of facts used to decide behavior and presentation. The companion separates the Monitor task model from viewport dimensions and scroll offset.
+
+\subsection{Cancellation}
+
+A request to stop owned work. It manages resources; it does not by itself establish that a queued result can no longer arrive.
+
+\subsection{Cell}
+
+A unit in a terminal Surface. A code point, grapheme cluster and occupied terminal width are different concepts.
+
+\subsection{Checkpoint}
+
+A reproducible companion command that exposes a selected behavior of the finished implementation. It is not a separate historical code release.
+
+\subsection{Cmd}
+
+A framework command used by the App to perform work outside a pure transition or request runtime behavior such as quit.
+
+\subsection{Effect}
+
+An application description of work to request, such as starting a particular run or loading logs for a view epoch.
+
+\subsection{Epoch}
+
+A generation number for the current view request. A completion must match the selected job, screen and epoch before becoming visible detail.
+
+\subsection{Focus and input ownership}
+
+The policy determining which active surface receives an intention. Drawing a dialog does not establish this policy.
+
+\subsection{Grapheme cluster}
+
+A user-perceived text unit that can contain multiple code points. The companion wraps clusters and measures their terminal width.
+
+\subsection{Historical record}
+
+A preserved source document whose status and assertions retain their original context. It is not a current implementation guarantee.
+
+\subsection{Identity}
+
+A stable value used to address a job independently of its current position or display label.
+
+\subsection{Immutable snapshot}
+
+A model value that does not change after construction. Later transitions produce another snapshot.
+
+\subsection{Intention}
+
+An application event expressing a requested action, such as start, move or dismiss, after interpreting framework input.
+
+\subsection{KeyMsg}
+
+A decoded framework keyboard message translated by the companion App into an application intention.
+
+\subsection{Mode}
+
+A presentation and delivery choice. The companion offers interactive, static, pipe and accessible modes with distinct output contracts.
+
+\subsection{Port}
+
+An explicit interface to an external capability. The scheduler port permits deterministic tests and a host timer implementation.
+
+\subsection{Run identity}
+
+A generation identifying one attempt at a job. It prevents a completion from an earlier attempt updating a restarted job.
+
+\subsection{Semantic styling}
+
+Choosing appearance from a content role while keeping application meaning independent of color or other decoration.
+
+\subsection{Stale result}
+
+A result whose original owner or generation no longer matches the current model. The companion rejects stale job and view completions.
+
+\subsection{Surface}
+
+Bijou representation of rendered terminal cells used by the companion view and controlled rendering observations.
+
+\subsection{TEA}
+
+The Elm Architecture vocabulary for the state, update and view loop with explicit work outside the transition. The book uses the pinned App contract to make that vocabulary concrete.
+
+\subsection{Transition}
+
+The result of applying an event to a model: a next model and any effect descriptions.
+
+\subsection{Viewport}
+
+The width and height available for the current view, together with the application decisions governing what is visible.

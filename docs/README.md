@@ -1,12 +1,19 @@
 # Bijou documentation
 
-[Read the complete book](./book/bijou-designs.pdf), inspect its
-[LaTeX source](./book/bijou-designs.tex), or see [edition and build details](./book/README.md).
+[Read the teaching book](./book/bijou-book.pdf), use the
+[Design Archive](./book/bijou-archive.pdf), or
+[Read the complete book](./book/bijou-designs.pdf).
+See [LaTeX sources and edition details](./book/README.md).
 
-The book consolidates 426 guides, reference pages, design records, release notes,
-audits and retrospectives. The individual source Markdown files have been removed.
-Their exact text and checksums remain in the book corpus so DOGFOOD, localization
-checks and historical contract tests continue to work.
+The teaching book follows a job monitor through five Parts: why Bijou, building
+the application, understanding its machinery, making it dependable, and shipping
+and maintaining it. It includes practical reference material and the component atlas.
+
+The archive preserves 426 guides, principles, design records,
+release notes, audits and retrospectives as historical appendices. Their original
+claims and status have not been reclassified as current implementation guarantees.
+The complete edition combines both. Individual source Markdown files remain removed;
+their exact text and hashes survive in the frozen corpus for DOGFOOD and checks.
 
 For a bounded source excerpt, run from the repository root:
 
@@ -17,12 +24,10 @@ node --import tsx scripts/read-documentation.ts docs/ARCHITECTURE.md 1 80
 The arguments are the original path, first line and line limit (maximum 250).
 `npm run docs:inventory` lists the retained operating documents and book artifacts.
 
-Start with the [Preface](./book/bijou-designs.pdf#page=5). Each of the eight
-parts introduces its material; Part IV explains how to read the design records.
-
-The [job-monitor workshops](./book/bijou-designs.pdf#page=172) use the separate
-[published companion repository](https://github.com/flyingrobots/bijou-job-monitor),
-pinned to Bijou 7.2.0.
+Start with the teaching book's Preface and version page. Every teaching Part
+has an introduction and a concrete learning outcome. The seven workshops use the
+separate [published companion repository](https://github.com/flyingrobots/bijou-job-monitor),
+pinned to Bijou 7.2.0. The glossary and topic finder support practical lookup.
 
 ## Current operating references
 

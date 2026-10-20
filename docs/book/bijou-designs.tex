@@ -1,15 +1,25 @@
+\def\BookTitle{Bijou Complete Edition}
+\def\BookSubtitle{The teaching book and historical appendices}
+\def\BookRunningTitle{Complete Edition}
 \input{preamble}%
+\BookTeachingtrue
+\BookArchivetrue
 \begin{document}
 \input{frontmatter}%
 \mainmatter
-\input{parts/01-philosophy-and-architecture}%
-\input{parts/02-job-monitor}%
-\input{parts/02-using-bijou}%
-\input{parts/03-design-records}%
-\input{parts/04-releases-and-migration}%
-\input{parts/05-retrospectives-and-historical-planning}%
-\input{parts/06-audits-and-archive-records}%
+\ifBookTeaching
+  \input{teaching/contents}%
+\fi
 \appendix
-\input{parts/07-rendered-components-and-provenance}%
+\ifBookTeaching
+  \input{reference/contents}%
+\fi
+\ifBookArchive
+  \input{archive/contents}%
+\fi
+\ifBookTeaching\else
+  \input{reference/contents}%
+\fi
+\input{reference/provenance}%
 \input{appendices/licenses}%
 \end{document}

@@ -1,0 +1,40 @@
+\chapter{Turn meaning into cells}\label{teaching-layout}
+
+\section{Let geometry have one owner}
+\subsection{A model is not a screen coordinate}
+
+The monitor identifies a selected job by its stable ID. The view decides where that job appears at the current width, height and scroll offset. This distinction allows filtering and resizing to change the visible arrangement without changing the target of an asynchronous result.
+
+Bijou's Surface represents controlled terminal cells. In the companion, the App view returns a Surface directly. Historical design records also discuss layout trees and newer renderer contracts. Read those in their version context; the teaching example does not require a reader to adopt every intermediate representation described in the archive.
+
+\subsection{Width is measured in cells}
+
+A JavaScript string's length does not establish its painted width. A combining accent can extend an existing glyph; a wide character can occupy two cells; an emoji sequence can span several code points. The companion wraps grapheme clusters using Bijou's width calculation. A controlled width test checks the chosen cell contract, while a human terminal session checks the resulting experience in a particular environment.
+
+The narrow view uses compact records and a scrollable body. Selection changes bring the selected job into view. Manual scrolling can inspect more content. These are related behaviors with different acceptance checks: a frame can have correct bounds while the selected item remains offscreen.
+
+\section{Style a role without storing decoration as truth}
+\subsection{Keep the status as a fact}
+
+The domain stores \texttt{failed}, not a red escape sequence. A formatter can render that status as a word, a field or a styled component. Semantic styling means choosing appearance from the role of a piece of content. It helps a theme vary the presentation without changing what the application means.
+
+The teaching monitor prioritizes textual state and controlled presentations. It is not a comprehensive theme-authoring demonstration. The atlas shows richer component surfaces from its explicitly identified capture version. When extending the monitor's style, preserve the plain-text fact before adding color, icons or motion.
+
+\subsection{Pay the cost consciously}
+
+A textual status consumes more width than a dot. Separate presentation functions create several outputs to maintain. A semantic style vocabulary takes work to name and keep consistent. Those costs are justified when they protect important meaning across environments. They are not an invitation to build an elaborate theme system before the application has a useful task.
+
+\section{Design the small view as an interaction}
+\subsection{Choose what the person sees first}
+
+At twenty-four by eight, simultaneous visibility is scarce. Put the current context and actionable information ahead of decorative spacing. Preserve a reachable route to the error and the controls. If the required comparison will not fit, decide whether scrolling, a detail screen or an explicit minimum size best serves the task.
+
+A smaller font in the book cannot solve a terminal layout problem. The application receives cells, and the user's terminal chooses their appearance. The Recursive specimen font is a publication choice used to show those cells consistently in print.
+
+\subsection{Test a relationship, then inspect the result}
+
+Choose a narrow frame, move selection and verify which job becomes visible. Remove color and read the error. Expand the title and check what moves. Then inspect the rendered cells. This order keeps the interesting behavior from being replaced by an attractive screenshot assertion.
+
+\section{A component-reading exercise}
+
+Choose the alert, modal and table specimens in the atlas. For each, identify the facts a person needs without color, the space it occupies and the input policy that the image cannot establish. Check the installed 7.2.0 exports before using a pictured API. The specimen is evidence of a capture, not a universal compatibility promise.

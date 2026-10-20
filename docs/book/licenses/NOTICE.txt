@@ -1,4 +1,4 @@
-Bijou Documentation Book
+Bijou Book and Design Archive
 Copyright 2026 James Ross.
 
 Code examples reproduced or adapted from Bijou retain the Apache License,
@@ -21,3 +21,11 @@ license files accompany the fonts. DejaVu Sans retains the Bitstream Vera
 and DejaVu notices in fonts/DejaVu-LICENSE.txt. Recursive Mono files are static
 instances of Recursive with MONO=1, CASL=0; weights 400/700, slant 0/-15.
 The instances are publication build assets, not a new font family.
+
+Teaching/archive restructuring (2026): a five-part teaching sequence,
+connecting explanations, practical reference and historical notices were
+added. All 426 existing typeset source record bodies remain unchanged.
+Companion app.ts, main.ts and job.ts listings are reproduced without changes
+from commit 92864e0f2512f59225b2f1f5b89a0678bd639e62 of
+https://github.com/flyingrobots/bijou-job-monitor. The full companion LICENSE
+and NOTICE accompany those excerpts in companion-snippets/.

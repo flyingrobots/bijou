@@ -1,78 +1,135 @@
-# Bijou Documentation Book
+# The Bijou Book and Design Archive
 
-[Read the PDF](./bijou-designs.pdf) or inspect the [LaTeX entrypoint](./bijou-designs.tex).
+[The teaching book](./bijou-book.pdf) · [Design Archive](./bijou-archive.pdf) · [Complete edition](./bijou-designs.pdf)
 
-The 1,860-page edition retains 426 archived source documents: 196 design records and 230 guides, references, strategy notes, invariants, releases, audits and historical records. It adds a general preface, eight part introductions, seven practical job-monitor workshops, a version page, a copyright page, and renderer demonstrations.
+The publication has three PDFs assembled from one modular LaTeX source tree.
+The teaching book is the main reading path. The archive preserves the project's
+working history. The complete edition combines the teaching book with historical
+appendices and keeps the existing filename used by repository links.
 
-The book illustrates 83 source arrow figures and two teaching traces in native TikZ, alongside the original 32 Mermaid-to-TikZ conversions. All 123 tables use the actual Bijou table component, divided into 159 readable panels. There are 42 DOGFOOD specimens, four pinned-release job-monitor mode specimens and two renderer captures from `bijou-fun`.
+This build produces:
 
-## Read through one working application
+- Teaching: 95 physical pages, 14,787,647 bytes.
+- Archive: 1,872 physical pages, 20,332,307 bytes.
+- Complete: 1,922 physical pages, 22,679,362 bytes.
 
-The new teaching part follows one monitor through state, four presentations, keyboard ownership, cancellation, late results, terminal constraints, tests, deliberately broken exercises and source packaging.
+## Learn through one application
 
-The separate public companion is [flyingrobots/bijou-job-monitor](https://github.com/flyingrobots/bijou-job-monitor), pinned to published **Bijou 7.2.0**. This edition uses commit **92864e0f2512f59225b2f1f5b89a0678bd639e62**, tagged `book-v1`. `companion.json` records its local checks and successful GitHub Actions runs. Its 15 tests and PTY checks have explicit limits; no human screen-reader study is claimed.
+The main text contains thirteen chapters, including seven runnable workshops,
+organized into five Parts with introductions and explicit learning outcomes:
 
-Start with the [Preface](./bijou-designs.pdf#page=5) and [version page](./bijou-designs.pdf#page=3). The eight parts are:
+1. **Why Bijou** — useful meaning, framework fit, tradeoffs and version boundaries.
+2. **Build the job monitor** — the model, four environments and a complete keypress trace.
+3. **Understand the machinery** — App/model/effect boundaries, late results, layout and styling.
+4. **Make it dependable** — hostile terminal conditions, evidence and symptom-led troubleshooting.
+5. **Ship and maintain it** — reproducibility, packaging, a concrete regression repair and upgrades.
 
-1. Philosophy and architecture
-2. Build a job monitor
-3. Using Bijou
-4. Design records
-5. Releases and migration
-6. Retrospectives and historical planning
-7. Audits and archive records
-8. Rendered components and provenance
+A component atlas, renderer gallery, glossary and practical topic finder follow
+the main text. The atlas, gallery and glossary also appear in the archive; the practical topic finder belongs to the teaching text. The
+teaching book has no archived source chapters; historical guides and principles
+are kept with the other 426 records rather than mixed into the instructional route.
 
-The design-record introduction explains sponsorship, hills, playback questions, scope, accessibility, localization, inspection, proposed tests and closeout evidence. Family dividers orient readers within the historical designs. New editorial prose uses subheadings; historical headings retain their source structure.
+The public companion is [flyingrobots/bijou-job-monitor](https://github.com/flyingrobots/bijou-job-monitor),
+pinned to published **Bijou 7.2.0**, commit
+**92864e0f2512f59225b2f1f5b89a0678bd639e62**, tagged `book-v1`.
+Its checkpoints select behaviors of the completed modules. They are not separate
+historical implementations. `companion.json` records the prior local evidence and
+successful GitHub Actions runs at that exact commit. No new companion release is
+implied by this editorial restructuring.
 
-## Source preservation and presentation
+## Read the historical appendices as history
 
-The compiled Markdown originals were removed after verified Reader delivery. `source-corpus.json` preserves their exact UTF-8 bytes and SHA-256 values. `scripts/documentation-corpus.ts` validates those hashes, prefers live files and limits archive fallback to known original paths. Use the bounded excerpt command in `docs/README.md` to retrieve original passages.
+All **426 archived source record bodies are byte-identical to the preceding
+illustrated edition**. Their original paths, labels, figures and tables remain.
+Each record now carries a visible historical notice: original claims and status
+are retained, and implementation status has not been reassessed for this edition.
+We do not invent an implemented/superseded classification without code evidence.
 
-Typeset chapters intentionally replace conceptual arrow notation with figures and source tables with component renders. Code samples, type signatures, numeric comparisons and literal serialization examples retain their meaning as source notation. `flow-manifest.json` retains the original diagram text, graph topology and chapter identity. The original Markdown remains authoritative for source-byte preservation; the current TeX chapters are presentation edits.
+The standalone archive and complete edition identify them as **R1–R426**. The
+inventory's numeric chapter field is the numeric portion of that identity.
+`chapter-pages.json` maps original paths to physical pages in the complete edition;
+`archive-chapter-pages.json` does the same for the standalone archive. Page numbers
+differ; the R identity and original path are stable. `edition-manifest.json` records
+all three output hashes, pagination and structural checks.
 
-The live documentation index, changelog, canonical TypeScript standards, Code Dojo ledger and separate framed-app tutorial remain outside the compilation. Historical proposals retain their original status. GitHub issues and milestones own current release scope.
+The records cover philosophy and architecture, practical guides, design proposals,
+releases and migration, retrospectives and historical planning, and audits.
+Introductions explain their families and the retired design-document vocabulary.
+GitHub issues and milestones remain the authority for current scope.
 
-## Modular LaTeX
+## Preserve the original source and actual artwork
 
-The small `bijou-designs.tex` entrypoint assembles:
+`source-corpus.json` preserves exact original Markdown bytes and SHA-256 values.
+The compiled Markdown files remain removed. `scripts/documentation-corpus.ts`
+validates hashes, prefers live files and limits archive fallback to known paths.
+Use the bounded excerpt command in `docs/README.md` to retrieve source passages.
 
-- `preamble.tex`, `frontmatter.tex`, `copyright.tex`, `reproducibility.tex`, `preface.tex`, and `edition-notes.tex`;
-- `parts/`, `introductions/`, and `groups/` for reading order;
-- `workshops/` for the authored teaching path;
-- `chapters/` for 426 archived source records;
-- `diagrams/` for native TikZ flows, graphs and traces;
-- `tables/` for component-rendered table panels;
-- `specimens/` and `appendices/` for the atlas, renderer gallery, source inventory and full Apache license.
+Typeset archive records already replaced conceptual arrow notation with TikZ
+figures and source tables with component renders. This edition does not edit those
+bodies again. Earlier byte-equivalence and pagination reports remain in `history/`,
+identified with the PDF and source hashes to which they apply.
 
-`source-manifest.json` maps original paths to stable record labels, TeX files, book parts and displayed chapter numbers. Workshop headings are independently identified as W1–W7; they do not change the archived records' chapter identities.
+The existing palette anchored on `#F7685F` and requested font roles are retained:
+Jacquard 24 for every heading level, IBM Plex Mono for prose, VT323 for source
+listings, and Recursive Mono for terminal specimens and component tables. Original
+font licenses and instance parameters accompany the source.
 
-## Type, color and real component artwork
+Artwork has explicit version boundaries: **7.2.0** for the teaching companion,
+**8.0.0-rc.1** for the component capture checkout, and **7.1.0** for `bijou-fun`.
+A picture from a newer capture is not proof that its API exists in 7.2.0. SVGs
+project actual Surface cells; compact table PDFs use the same positions, colors
+and font outlines, with possible raster antialiasing differences. No component is
+redrawn by eye. See the capture manifests and `tools/README.md` for reproduction.
 
-**Jacquard 24** supplies titles and every heading level, including h3. **IBM Plex Mono** is prose; **VT323** is source listings. **Recursive Mono**, fixed at `MONO=1, CASL=0`, supplies terminal specimens and component tables, with DejaVu Sans for missing symbols. Google Fonts sources, hashes, static-instance axes and original licenses accompany the book under `fonts/` and `font-provenance.json`.
+## Source layout and builds
 
-The palette remains anchored on `#F7685F`: white pages, `#2D2726` ink, `#83312C` headings and links, `#645452` secondary text and `#FFEDEB` diagram panels. Component specimens retain their actual application colors.
+- `bijou-book.tex`: teaching book; `bijou-archive.tex`: historical volume;
+  `bijou-designs.tex`: complete edition.
+- `preamble.tex`, `frontmatter.tex`, `copyright.tex`, `reproducibility.tex`,
+  `preface.tex`, `edition-notes.tex`: shared publication setup and edition-aware front matter.
+- `teaching/`: the five-Part route, introductions and six connecting chapters.
+- `workshops/`: seven shared teaching chapters with stable workshop labels.
+- `archive/`, `parts/`, `introductions/`, `groups/`: historical assembly and guidance.
+- `chapters/`: 426 unchanged typeset source records.
+- `reference/`, `appendices/`, `specimens/`: practical reference, provenance and licenses.
+- `diagrams/`, `tables/`, `figures/`: actual component artwork and native TikZ figures.
+- `companion-snippets/`: exact pinned `job.ts`, `app.ts` and `main.ts` listings,
+  with the full companion license and notices.
 
-The SVGs project actual Surface cells with fixed geometry, colors and modifiers, using outlined glyphs. Table PDFs embed reusable font resources from the same cells instead of duplicating every glyph path; PDF and SVG antialiasing can differ while coordinates and font outlines agree. No component is redrawn by eye. These are generated cell projections, not photographs of an emulator.
-
-`component-manifest.json`, `table-manifest.json`, `monitor-manifest.json` and `demo-manifest.json` identify sources, parameters, dimensions and hashes. The book distinguishes the 8.0.0-rc.1 checkout used for current component artwork, the published 7.2.0 teaching API and the separate 7.1.0 renderer demos. Raw cell captures and exact mode outputs are retained. See `tools/README.md` for artwork regeneration.
-
-## Build
-
-Compile from this directory with LuaLaTeX, fontspec, luaotfload, TikZ, fvextra, titlesec, enumitem, xurl and the packages listed in `preamble.tex`. DejaVu Sans must be available to luaotfload. Three serial passes resolve the contents and cross-references:
+Compile from this directory with LuaLaTeX and the packages in `preamble.tex`.
+DejaVu Sans must be available to luaotfload. Run each entrypoint three times in
+one owned `/tmp` output directory to resolve contents and cross-references:
 
 ```sh
-lualatex --no-shell-escape --interaction=nonstopmode --halt-on-error --output-directory=/tmp/bijou-design-book/build bijou-designs.tex
+mkdir -p /tmp/bijou-design-book/teaching/build
+for name in bijou-book bijou-archive bijou-designs; do
+  for pass in 1 2 3; do
+    lualatex --no-shell-escape --interaction=nonstopmode --halt-on-error \
+      --output-directory=/tmp/bijou-design-book/teaching/build "$name.tex"
+  done
+done
 ```
 
-Repeat that invocation three times in the same owned output directory, then copy the PDF into this directory. The committed edition uses LuaHBTeX 1.15.0 / TeX Live 2022. It reuses `bijou-design-book-worker` and its existing TeX image; it does not install a global toolchain.
+On this shared workstation reuse `bijou-design-book-worker`, its existing TeX
+image and bounded runner. Acquire `host/docker/bijou-design-book-worker/` and
+`host/heavy-work` together in `/Users/Shared/git-locks/workstation.git`. Outputs
+belong in `/tmp`; the image and repository mount are read-only. The worker uses
+2 CPUs, 4 GiB RAM, bounded temporary storage and logs. Record the active guard,
+timeout, usage and free space before launch. Do not create another worker to
+avoid a reservation or resource limit.
 
-On the shared workstation, acquire `host/docker/bijou-design-book-worker/` in `/Users/Shared/git-locks/workstation.git` and use the bounded runner. The worker has a read-only root, 2 CPUs, 4 GiB RAM, bounded temporary storage and logging; monitored outputs stay within the recorded project budget. Build outputs belong in `/tmp`, not the image or repository. The build report records measured usage.
+## Licensing and verification
 
-## Licensing, verification and history
+Copyright © 2026 James Ross. Book content is CC BY 4.0 except code and separately
+licensed material. Code examples are Apache-2.0. Each PDF places the copyright
+page immediately after its title and includes the full Apache license and notices.
+The three copied companion files are byte-identical to the pinned source and
+retain their copyright statements; companion-snippets includes LICENSE and NOTICE.
 
-Copyright © 2026 James Ross. Except for code and separately licensed material, book content is **CC BY 4.0**. Code examples are **Apache-2.0**. The copyright page appears immediately after the title; the complete Apache license and reproduction notices appear in the final appendix. Any distributed code excerpts include the full license and applicable notices. Font software keeps its original licenses.
-
-`build-report.json` and `editorial-verification.json` record the current PDF, original-corpus checks, destinations and validation boundaries. Earlier pagination and byte-equivalence proofs remain under `history/` with their original PDF hashes. They describe those earlier editions.
-
-`backlog-reconciliation.json` retains 48 verified source links covering all 44 retired planning cards; no duplicate issues were created. `compiled-source-retirement.json` and `retired-documents.json` retain the removal inventory. Historical links target the pre-retirement revision.
+`build-report.json`, `editorial-verification.json` and `edition-manifest.json`
+record current output verification. Source-corpus checks and archive-body identity
+are distinct: the corpus preserves original Markdown; the unchanged TeX records
+retain the preceding edition's presentation edits. Historical tracker links and
+source-retirement manifests remain intact. The companion's fifteen tests and PTY
+observations are prior evidence at its fixed commit, not newly executed results.
+No human screen-reader study or broad terminal-emulator matrix is claimed.

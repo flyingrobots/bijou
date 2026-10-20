@@ -4,21 +4,21 @@
 \begin{tikzpicture}[remember picture,overlay]
 \fill[BookCoral] (current page.south west) rectangle (current page.north east);
 \end{tikzpicture}
-\vspace*{29mm}
-{\headingfont\fontsize{104}{110}\selectfont Bijou\par}
-\vspace{5mm}
-{\headingfont\fontsize{58}{64}\selectfont Documentation Book\par}
+\vspace*{24mm}
+{\headingfont\fontsize{94}{100}\selectfont Bijou\par}
+\vspace{6mm}
+{\headingfont\fontsize{48}{54}\selectfont \BookTitle\par}
 \vspace{15mm}
-{\large Design records, runtime contracts,\par terminal surfaces and product evidence.\par}
+{\large \BookSubtitle\par}
 \vfill
-{\small 426 source documents\quad /\quad illustrated flows and contracts\par
-42 actual DOGFOOD component specimens\par\medskip
-Jacquard 24\quad /\quad IBM Plex Mono\par
-20 October 2026\par}
+{\small James Ross\par\medskip
+\ifBookTeaching One application, four environments\par\fi
+\ifBookArchive 426 preserved source records\par\fi
+\medskip 20 October 2026\par}
 \end{titlepage}
 \frontmatter
 \input{copyright}%
 \input{reproducibility}%
-\input{preface}%
+\ifBookTeaching\input{preface}\else\input{archive/preface}\fi
 \input{edition-notes}%
 \tableofcontents

@@ -49,7 +49,7 @@ That is the right lane for:
 Read:
 
 - [GUIDE individual adapters](./GUIDE.md#individual-adapters)
-- [monorepo architecture guide](../../docs/book/bijou-designs.pdf#page=47)
+- [monorepo architecture guide](../../docs/book/bijou-designs.pdf#page=130)
 
 ## Scoped Filesystem Boundary
 

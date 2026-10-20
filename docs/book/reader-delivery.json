@@ -1,7 +1,37 @@
 {
-  "id": "bdf1d8e9-27fc-40bd-8417-7ebba2543691",
+  "id": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
   "status": "awaiting_filing",
   "integrity": "intact",
-  "pdf_sha256": "fb779af06ccfb046c51988f4583ee12e461130b5a0947f11872136e706b7febe",
-  "supersedes": "499c188f-2133-4469-9c7f-216d63386bdb"
+  "fingerprint": "4445c40be4917f6c7ff30aee6332c5eafc2a6e8a28d06d6000cfa726fb1039af",
+  "document_path": "/Users/j/git/reader/inbox/21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c/bijou-book-and-archive.md",
+  "received_at": "2026-10-20T21:49:24.407552+00:00",
+  "supersedes": "bdf1d8e9-27fc-40bd-8417-7ebba2543691",
+  "editions": {
+    "teaching": {
+      "pdf": "bijou-book.pdf",
+      "physical_pages": 95,
+      "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
+      "bytes": 14787647
+    },
+    "archive": {
+      "pdf": "bijou-archive.pdf",
+      "physical_pages": 1872,
+      "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
+      "bytes": 20332307
+    },
+    "complete": {
+      "pdf": "bijou-designs.pdf",
+      "physical_pages": 1922,
+      "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
+      "bytes": 22679362
+    }
+  },
+  "evidence_files": [
+    "evidence/Apache-2.0.txt",
+    "evidence/NOTICE.txt",
+    "evidence/archive-record-hashes.json",
+    "evidence/edition-manifest.json",
+    "evidence/source-corpus.json",
+    "evidence/source-manifest.json"
+  ]
 }

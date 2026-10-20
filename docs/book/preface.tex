@@ -1,49 +1,37 @@
-\chapter*{Preface}
+\chapter*{Preface}\label{preface}
 \addcontentsline{toc}{chapter}{Preface}
-\label{preface}
 
-A terminal is a demanding place to build an application. Space is measured in cells. Input belongs to whichever surface has focus. A resize can change the useful shape of a page, and a different language can change the space its controls need. Colour, motion and cursor position help some readers; other readers encounter the same program through plain output, a screen reader, a script or an automated tool.
+A useful terminal application has to keep its promises when its presentation changes. A failed job must still be recognizable without red. A cancellation dialog has to own its keys. A late response must not replace the detail for a different selection. A resize must leave a person a way to finish the task. These are everyday application problems, and they are the questions this book uses to teach Bijou.
 
-Bijou grows out of taking those conditions seriously. Its ambition is to make terminal software whose behaviour, structure and meaning remain understandable across those settings. The visible interface and the facts behind it should agree. Layout should own the geometry used for interaction. State changes and side effects should have clear owners. Host services should sit behind explicit boundaries. These principles shape both the code and the way the project explains its decisions.
+We will work through a job monitor. It starts small: three jobs, stable identities and explicit states. We then encounter four environments, keyboard routing, asynchronous work, constrained geometry and the evidence needed to trust each behavior. The application simulates its jobs. That makes races and failures reproducible without requiring the reader to build a process supervisor before learning the interface architecture.
 
-This book brings that explanation together. It contains practical guides, architectural and design-language principles, records of proposed and completed changes, release and migration notes, retrospectives, audits, and rendered component specimens. The collection began as working repository documents. The editorial introductions provide a route through that collection while preserving the source records and their provenance.
+\section*{The route through the book}
+\subsection*{Learn by building}
 
-\section*{An order for reading}
+\hyperref[part-why]{Part I, Why Bijou}, explains the principles and their costs. \hyperref[part-workshops]{Part II, Build the job monitor}, gets the model and its presentations working before following a keypress into a visible frame. \hyperref[part-machinery]{Part III, Understand the machinery}, explains ownership, effects, late results, layout and semantic styling.
 
-\subsection*{Foundations and practical work}
+\hyperref[part-dependable]{Part IV, Make it dependable}, puts the application under pressure, matches tests to claims and provides a troubleshooting route. \hyperref[part-maintain]{Part V, Ship and maintain it}, establishes the reproducible edition and walks through a maintenance change. The component atlas, renderer gallery, glossary and topic finder form a reference section after the teaching text.
 
-\hyperref[part-philosophy]{Part~\ref*{part-philosophy}, Philosophy and architecture}, establishes the ideas behind the system: runtime truth, explicit boundaries, humane interaction, graceful lowering, localization and inspectability. These chapters explain the constraints against which later choices should be judged.
+\subsection*{Choose a route that fits your work}
 
-\hyperref[part-workshops]{Part~\ref*{part-workshops}, Build a job monitor}, provides a progressive teaching path through one runnable application: four presentations, input ownership, asynchronous results, constrained terminals, tests and reproducible packaging. Its separate companion repository contains the checkpoints and deliberately broken exercises.
+If this is your first Bijou application, read the five Parts in order and run each checkpoint. If you already have an application with an input or asynchronous defect, begin with \hyperref[workshop-03]{the keypress trace}, \hyperref[workshop-04]{the late-result trace} and \hyperref[teaching-troubleshooting]{the troubleshooting chapter}. Component authors should read \hyperref[teaching-layout]{the layout and styling chapter}, then consult the atlas with its version boundary in mind. Framework contributors can use the same teaching route to identify the application contract before following the corresponding archive record.
 
-\hyperref[part-using]{Part~\ref*{part-using}, Using Bijou}, turns those ideas towards application work. Begin with the general Guide and the terminal-scenarios chapter, then follow the reference material needed for a particular task. The advanced guide, rendering material, package-development notes and component-family reference support deeper work. DOGFOOD is the documentation application; BlockLab is the standalone component workbench. Their presence throughout the book reflects the project's use of its own tools as a proving ground.
+\section*{A working example, an explicit version}
+\subsection*{Read and run together}
 
-\subsection*{Decisions and their consequences}
+The companion repository is \url{https://github.com/flyingrobots/bijou-job-monitor}. The version page fixes this edition to a published Bijou release and an immutable companion commit. Checkpoints select reproducible observations from the completed modules; they are not separate historical implementations. The broken exercises have observable failures and repaired paths. Their purpose is to make a design decision testable before its explanation becomes comfortable vocabulary.
 
-\hyperref[part-design]{Part~\ref*{part-design}, Design records}, preserves the reasoning behind individual changes. Its introduction explains the recurring document format before the first record appears. The records are grouped by concern so a reader can follow a line of work across the documentation app, developer experience, runtime, design language, localization and delivery tooling.
+The book's figures and source listings have different jobs. A component specimen shows actual rendered cells. A TikZ trace explains causality or ownership. A listing names the code involved. None of those artifacts, by itself, establishes every behavior of the running application. We will say what each check actually observes.
 
-\hyperref[part-releases]{Part~\ref*{part-releases}, Releases and migration}, follows changes into release-facing claims and upgrade guidance. \hyperref[part-retrospectives]{Part~\ref*{part-retrospectives}, Retrospectives and historical planning}, records what happened during the work. \hyperref[part-audits]{Part~\ref*{part-audits}, Audits and archive records}, preserves assessments, experiments and discarded directions. Together they let a reader compare an intention, an implementation claim and its later consequences.
+\section*{The archive has its own place}
+\subsection*{History supports the lesson}
 
-\subsection*{Visible output and provenance}
+Earlier editions assembled the project's working documents into a large collection. This edition gives the teaching text its own structure. All 426 source documents remain in the companion Design Archive and in the complete edition's historical appendices. They include guides and principles as well as proposals, releases, retrospectives and audits. Every archived record is marked as historical; its original status has not been independently reclassified as a current implementation claim.
 
-\hyperref[part-atlas]{Part~\ref*{part-atlas}, Rendered components and provenance}, closes the book with actual component specimens and the inventory of original sources. It connects the written contracts to visible terminal surfaces and gives each source record a traceable identity.
+Use the archive to examine an argument or follow a decision into its recorded evidence. Use the teaching book and pinned companion to learn the application in this edition. Exact original Markdown remains in the frozen source corpus, while the typeset records preserve the prior edition's illustrated presentation. A published proposal is useful history. Whether its promise holds in a particular release remains a question for that release's code and evidence.
 
-\section*{Why the records have a recurring shape}
-
-A design document is useful when it makes a decision easier to examine. The recurring fields in this collection ask who needs a change, what useful outcome it should produce, where its boundaries lie, and what observations would establish success. Questions about accessibility, language, directionality and automated inspection bring different ways of using the same feature into that discussion early.
-
-The resulting documents can look formal. Their value comes from the questions they expose: a named outcome can be challenged, a non-goal limits a promise, an invariant constrains an implementation, and a proposed test gives a reviewer something concrete to inspect. The introduction to the design-record part explains these fields in detail, including the distinction between tests proposed before implementation and evidence recorded after it.
-
-\subsection*{Historical vocabulary}
-
-The collection spans changes in the project's working practices. Terms such as sponsor, hill, playback, cycle, lane and legend belong to that history. They help explain the records in which they appear. They do not impose the retired METHOD process on new work. Current operating agreements and the live issue tracker govern current execution.
-
-\section*{Reading with evidence in mind}
-
-Each source chapter retains its original path and wording, with conceptual arrow notation illustrated as figures and tables rendered through Bijou. The frozen source corpus preserves the original notation. Its status fields and future-tense promises describe the record at the time it was written. A design can contain a sound argument without proving that the feature shipped; a release note can state a result without establishing that the result still holds in today's code. Use linked issues, pull requests, commits and recorded checks to follow a claim into implementation. Read current tracker state from the tracker.
-
-\subsection*{Choosing an evidence trail}
-
-When building an application, use this book to understand the contracts and choices, then verify the exact API against the version being used. When reviewing a change, read its design, closeout evidence and subsequent history together. When looking for a subject such as Theme Lab or BlockLab, follow its named records and the part introductions instead of treating every mention as a complete operating guide.
-
-The aim is a useful relationship between explanation and execution. A reader should be able to understand a choice, find the evidence behind it, and decide what still needs to be checked.
+\ifBookArchive
+The historical appendices follow the reference section in this complete edition. Their record identities R1 through R426 match the standalone archive.
+\else
+The separate \textit{Bijou Design Archive} PDF contains those historical appendices. The complete edition combines both volumes without maintaining another copy of their chapter sources.
+\fi

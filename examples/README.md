@@ -4,7 +4,7 @@ This is a secondary/internal inventory for maintainers, agents, and
 targeted reference use.
 
 If you are trying to learn Bijou, start with
-[DOGFOOD](../docs/book/bijou-designs.pdf#page=211), not this page.
+[DOGFOOD](../docs/book/bijou-designs.pdf#page=281), not this page.
 
 The example tree still matters for:
 
