@@ -1,5 +1,12 @@
 # Bijou documentation
 
+| Surface | Role |
+| :--- | :--- |
+| [Project README](../README.md) | Public front door |
+| [Teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) | Build and test the job monitor |
+| [Design Archive](./book/bijou-archive.pdf) | Historical design records |
+| [Complete edition](./book/bijou-designs.pdf) | Frozen teaching and historical collection |
+
 [Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf), use the
 [Design Archive](./book/bijou-archive.pdf), or
 [Read the complete book](./book/bijou-designs.pdf).
