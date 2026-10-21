@@ -1,0 +1,254 @@
+\chapter{AI Explainability Standard}\label{record-033}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/ai-explainability-standard.md}\par}\smallskip
+
+\emph{Design note for explicit, governed AI-mediated UX in Bijou surfaces}
+
+\section{Why this exists}\label{record-033-why-this-exists}
+
+If Bijou is going to support AI-mediated interfaces, suggestions, assistants, or explainability surfaces, it needs a product standard that is stricter than ``show some generated text.''
+
+The \texttt{x\allowbreak{}y\allowbreak{}p\allowbreak{}h} TUI already demonstrates a strong pattern:
+
+\begin{itemize}
+\tightlist
+\item
+  visible \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling
+\item
+  explicit explainability sections
+\item
+  rationale and evidence
+\item
+  expected next action
+\item
+  confidence-aware posture
+\end{itemize}
+
+Bijou should adopt that seriousness as doctrine.
+
+AI output should never feel like:
+
+\begin{itemize}
+\tightlist
+\item
+  hidden automation
+\item
+  unexplained authority
+\item
+  decorative speculation
+\end{itemize}
+
+\section{Product stance}\label{record-033-product-stance}
+
+AI-mediated UI in Bijou should be:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit
+\item
+  attributable
+\item
+  explainable
+\item
+  actionable
+\item
+  governed
+\end{itemize}
+
+AI should surface as advisory or assistive unless the app explicitly states otherwise.
+
+Users should be able to answer:
+
+\begin{itemize}
+\tightlist
+\item
+  what is AI-generated here?
+\item
+  why is it being shown?
+\item
+  what evidence or basis does it rely on?
+\item
+  what am I expected to do with it?
+\item
+  how confident is it?
+\end{itemize}
+
+\section{Core principles}\label{record-033-core-principles}
+
+\subsection{1. Mark AI visibly}\label{record-033-mark-ai-visibly}
+
+AI-mediated content should use an explicit \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} marker or equivalent canonical treatment.
+
+The user should not have to infer that a suggestion, explanation, or summary came from an agent.
+
+That marker should be part of a canonical explainability component/pattern, not a one-off badge.
+
+DL-005 establishes that first concrete seam through \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}.
+
+\subsection{2. Explain why}\label{record-033-explain-why}
+
+AI output should include or make available:
+
+\begin{itemize}
+\tightlist
+\item
+  why it was suggested
+\item
+  what it is based on
+\item
+  what decision or workflow it is trying to support
+\end{itemize}
+
+\subsection{3. Separate evidence from recommendation}\label{record-033-separate-evidence-from-recommendation}
+
+Recommendation should not masquerade as fact.
+
+Bijou should encourage surfaces that distinguish:
+
+\begin{itemize}
+\tightlist
+\item
+  observation
+\item
+  evidence
+\item
+  recommendation
+\item
+  next action
+\end{itemize}
+
+\subsection{4. Confidence must be interpretable}\label{record-033-confidence-must-be-interpretable}
+
+If confidence is shown, it should be attached to explainable reasoning rather than used as mystical authority.
+
+Confidence without context increases user anxiety and misuse.
+
+\subsection{5. AI should lead to governed next actions}\label{record-033-ai-should-lead-to-governed-next-actions}
+
+A useful AI surface should make it clear what comes next:
+
+\begin{itemize}
+\tightlist
+\item
+  review
+\item
+  accept
+\item
+  reject
+\item
+  inspect more evidence
+\item
+  do nothing
+\end{itemize}
+
+\subsection{6. AI should reduce ambiguity, not add it}\label{record-033-ai-should-reduce-ambiguity-not-add-it}
+
+An explainability surface is successful when it lowers uncertainty.
+
+It is unsuccessful when it adds more jargon or produces an attractive wall of text without operational value.
+
+\section{Canonical explainability fields}\label{record-033-canonical-explainability-fields}
+
+Bijou should gradually standardize around explainability structures like:
+
+\begin{itemize}
+\tightlist
+\item
+  label: \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]}
+\item
+  artifact kind
+\item
+  source
+\item
+  source mode
+\item
+  rationale / why
+\item
+  evidence basis
+\item
+  confidence
+\item
+  expected next action
+\item
+  governance or review note
+\end{itemize}
+
+This does not have to be one monolithic component immediately.
+
+It does need to become a consistent standard.
+
+\section{DOGFOOD and docs implication}\label{record-033-dogfood-and-docs-implication}
+
+DOGFOOD should eventually teach AI-mediated surfaces the same way it teaches other component families:
+
+\begin{itemize}
+\tightlist
+\item
+  labeled clearly
+\item
+  explained honestly
+\item
+  shown with rationale and next-action posture
+\end{itemize}
+
+This is especially important if Bijou later grows:
+
+\begin{itemize}
+\tightlist
+\item
+  AI-assisted blocks
+\item
+  AI-authored settings or recommendations
+\item
+  design/debug assistants
+\end{itemize}
+
+\section{Relationship to XYPH}\label{record-033-relationship-to-xyph}
+
+This direction is influenced by the stronger explainability posture already present in \texttt{x\allowbreak{}y\allowbreak{}p\allowbreak{}h}, including:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling in TUI views
+\item
+  structured explainability bodies
+\item
+  rationale and evidence sections
+\item
+  confidence-aware governance posture
+\end{itemize}
+
+Bijou should learn from that standard rather than reinventing a weaker one.
+
+\section{Relationship to other doctrine}\label{record-033-relationship-to-other-doctrine}
+
+This note should be read alongside:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/bijou-ux-doctrine.md}{Bijou UX Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/content-guide.md}{Content Guide}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/accessibility-and-assistive-modes.md}{Accessibility and Assistive Modes}
+\end{itemize}
+
+\section{Acceptance bar}\label{record-033-acceptance-bar}
+
+This direction is working when:
+
+\begin{itemize}
+\tightlist
+\item
+  AI-mediated surfaces in Bijou are visibly marked
+\item
+  explainability becomes a product standard rather than ad hoc copy
+\item
+  users can understand why an AI artifact is present and what they should do next
+\item
+  the framework encourages governed, attributable AI experiences instead of mysterious ones
+\end{itemize}
+

@@ -1,0 +1,30 @@
+\chapter{Commands Change State, Effects Do Not}\label{record-038}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/commands-change-state-effects-do-not.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-038-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX --- Developer Experience}
+\end{itemize}
+
+Commands are requests for app-owned stateful action. Effects are non-stateful runtime consequences.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  input events are not commands
+\item
+  effects such as sound, telemetry, or announcements should not be treated as state transitions
+\item
+  a single input may emit multiple commands and multiple effects
+\item
+  command and effect buffers should stay distinct so the runtime can apply each intentionally
+\end{itemize}
+

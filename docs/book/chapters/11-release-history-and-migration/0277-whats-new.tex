@@ -1,0 +1,80 @@
+\chapter{What's New in Bijou 4.3.0}\label{record-277}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.3.0/whats-new.md}\par}\smallskip
+
+\section{Byte-Packed Surface Rendering (RE-008)}\label{record-277-byte-packed-surface-rendering-re-008}
+
+The internal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} data structure is now backed by a packed \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y} --- 10 bytes per cell instead of heap-allocated JavaScript objects with string colors.
+
+\subsection{What changed}\label{record-277-what-changed}
+
+Every cell in a surface is now a contiguous 10-byte sequence:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bytes 0--1}: character code (uint16, with a side table for emoji and multi-codepoint grapheme clusters)
+\item
+  \textbf{Bytes 2--4}: foreground R, G, B
+\item
+  \textbf{Bytes 5--7}: background R, G, B
+\item
+  \textbf{Byte 8}: modifier flags bitfield (bold, dim, strikethrough, inverse, underline variants)
+\item
+  \textbf{Byte 9}: opacity + fg/bg presence bits
+\end{itemize}
+
+\subsection{What this means for performance}\label{record-277-what-this-means-for-performance}
+
+The differ now compares cells as 10-byte sequences instead of string equality on \texttt{f\allowbreak{}g}, \texttt{b\allowbreak{}g}, and \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}r} properties. Surface composition (\texttt{b\allowbreak{}l\allowbreak{}i\allowbreak{}t}) copies bytes directly between buffers. \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}(\allowbreak{})} and \texttt{c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} use a template-stamp approach. The ANSI output path emits SGR escape sequences directly from buffer bytes with a cached style lookup --- bypassing chalk entirely.
+
+\textbf{DOGFOOD landing render+diff: 7\% faster} than the pre-RE-008 baseline, with zero regressions on any real-world scenario.
+
+\subsection{\texorpdfstring{The \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} API}{The  API}}\label{record-277-the-setrgb-api}
+
+A new \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} method writes character code + numeric RGB values directly into the packed buffer with zero string parsing and zero object allocation. It's roughly 10--50x faster than \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} for per-cell writes.
+
+\begin{CodeBlock}
+// Before (allocates Cell object, parses hex strings)
+surface.set(x, y, { char: '█', fg: '#ff8800', bg: '#000000' });
+
+// After (zero-alloc — writes bytes directly)
+surface.setRGB(x, y, 0x2588, 255, 136, 0, 0, 0, 0);
+\end{CodeBlock}
+
+All built-in components use \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B} automatically when the surface is packed. The \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} convenience API is preserved and documented.
+
+\subsection{Numeric theme tokens}\label{record-277-numeric-theme-tokens}
+
+\texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} now carries optional \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} and \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} fields with pre-parsed numeric RGB channels. These are populated automatically at theme resolution time, enabling components to skip hex parsing when writing styled cells.
+
+\section{Braille Rendering Fix (RE-015)}\label{record-277-braille-rendering-fix-re-015}
+
+\texttt{f\allowbreak{}l\allowbreak{}e\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} with \texttt{a\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}'} no longer corrupts braille characters (U+2800--U+28FF). The packed byte-copy blit preserves all character codes directly without intermediate string processing. Verified with a 420×140 (58,800 cell) braille art test case --- zero mismatches.
+
+\section{New Exports}\label{record-277-new-exports}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} interface} --- extends \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} with \texttt{.\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, \texttt{.\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, and \texttt{.\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}A\allowbreak{}l\allowbreak{}l\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}
+\item
+  \textbf{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f}} --- subpath export for packed-cell utilities (\texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x}, \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}, flag constants)
+\item
+  \textbf{Modifier flag constants} --- \texttt{F\allowbreak{}L\allowbreak{}A\allowbreak{}G\allowbreak{}\_\allowbreak{}B\allowbreak{}O\allowbreak{}L\allowbreak{}D}, \texttt{F\allowbreak{}L\allowbreak{}A\allowbreak{}G\allowbreak{}\_\allowbreak{}D\allowbreak{}I\allowbreak{}M}, \texttt{F\allowbreak{}L\allowbreak{}A\allowbreak{}G\allowbreak{}\_\allowbreak{}S\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}K\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}R\allowbreak{}O\allowbreak{}U\allowbreak{}G\allowbreak{}H}, \texttt{F\allowbreak{}L\allowbreak{}A\allowbreak{}G\allowbreak{}\_\allowbreak{}I\allowbreak{}N\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}E}, \texttt{U\allowbreak{}N\allowbreak{}D\allowbreak{}E\allowbreak{}R\allowbreak{}L\allowbreak{}I\allowbreak{}N\allowbreak{}E\allowbreak{}\_\allowbreak{}S\allowbreak{}O\allowbreak{}L\allowbreak{}I\allowbreak{}D}, etc.
+\end{itemize}
+
+\section{Resolved Backlog Items}\label{record-277-resolved-backlog-items}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{RE-010 (mutable surface caches)} --- resolved by the packed buffer with lazy dirty bitmap
+\item
+  \textbf{RE-015 (braille corruption)} --- resolved by byte-copy blit
+\end{itemize}
+
+\section{Package Map}\label{record-277-package-map}
+
+All 10 workspace packages are versioned together at \texttt{4\allowbreak{}.\allowbreak{}3\allowbreak{}.\allowbreak{}0}. No new packages in this release.
+

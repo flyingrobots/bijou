@@ -1,0 +1,111 @@
+\chapter{RE-127 - Command And Render Runtime Guardrails}\label{record-166}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-127-command-and-render-runtime-guardrails.md}\par}\smallskip
+
+Linked issues: \#127, \#129
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE - Runtime Engine}
+
+\section{Sponsor Human}\label{record-166-sponsor-human}
+
+A runtime maintainer or app author who needs command and render behavior to degrade into visible diagnostics instead of opaque hangs or frame stalls.
+
+\section{Sponsor Agent}\label{record-166-sponsor-agent}
+
+A runtime verification agent that checks deterministic command queue, middleware, and framebuffer invariants.
+
+\section{Hill}\label{record-166-hill}
+
+Runaway command production and accidental async render middleware are observable and testable, while normal high-volume command workloads remain possible.
+
+\section{Scope}\label{record-166-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Expose EventBus command queue diagnostics.
+\item
+  Add a configurable command backpressure warning threshold.
+\item
+  Route runtime backpressure warnings through stderr and \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Diagnose render middleware that returns a Promise.
+\item
+  Prevent late async \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} calls from re-entering the synchronous pipeline.
+\end{itemize}
+
+\section{Playback Questions}\label{record-166-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a test observe pending command count before commands settle?
+\item
+  Does a command loop crossing the threshold fire exactly one overload diagnostic until it drains below the threshold?
+\item
+  Does async render middleware continue the current frame synchronously?
+\item
+  Does a late async \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} fail to re-run downstream stages?
+\end{enumerate}
+
+\section{Accessibility / Assistive Reading Posture}\label{record-166-accessibility-assistive-reading-posture}
+
+Runtime warnings should be short, concrete, and routed through existing stderr and application runtime-issue surfaces.
+
+\section{Localization / Directionality Posture}\label{record-166-localization-directionality-posture}
+
+Warnings are framework diagnostics, not localized user-facing app copy in this cycle.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-166-agent-inspectability-explainability-posture}
+
+Command diagnostics are explicit data via \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}D\allowbreak{}i\allowbreak{}a\allowbreak{}g\allowbreak{}n\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}s\allowbreak{}(\allowbreak{})}, and pipeline diagnostics are asserted through deterministic tests.
+
+\section{Linked Invariants}\label{record-166-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Render stages remain synchronous and stage-ordered.
+\item
+  Command effects may be async, but their queue state must be observable.
+\item
+  Diagnostics must not impose a hard cap on legitimate workloads.
+\end{itemize}
+
+\section{Decisions}\label{record-166-decisions}
+
+\begin{itemize}
+\tightlist
+\item
+  Backpressure is a warning, not a hard cap. Legitimate bursts can exceed the threshold, but the runtime reports when pending commands cross it.
+\item
+  The default threshold is 1000 pending commands. Set \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}:\allowbreak{} \allowbreak{}0} to disable the warning.
+\item
+  Render middleware remains a synchronous contract. Promise-returning middleware is diagnosed, the frame continues synchronously, and Promise rejection is reported.
+\end{itemize}
+
+\section{Verification}\label{record-166-verification}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\end{itemize}
+
+\section{Tests To Write First}\label{record-166-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  EventBus backpressure threshold tests.
+\item
+  Pipeline async-middleware continuation and rejection tests.
+\end{itemize}
+
+\section{Retrospective}\label{record-166-retrospective}
+
+See \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/WF-122-day-zero-audit-fixes.md}{WF-122 day zero audit fixes}.
+

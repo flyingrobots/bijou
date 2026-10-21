@@ -1,0 +1,638 @@
+\chapter{DOGFOOD}\label{record-042}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/dogfood.md}\par}\smallskip
+
+\begin{quote}
+Historical note: this milestone framing is kept for provenance. The current docs-surface signpost is \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOGFOOD.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}}, and new delivery work should start in METHOD backlog/design surfaces instead of here.
+\end{quote}
+
+\emph{Documentation Of Good Foundational Onboarding and Discovery}
+
+\emph{Milestone strategy for the post-v4 living docs platform}
+
+\section{Why this milestone exists}\label{record-042-why-this-milestone-exists}
+
+After \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, the next problem is not ``what capability can Bijou add next?'' It is:
+
+\begin{itemize}
+\tightlist
+\item
+  how does someone understand Bijou quickly?
+\item
+  how do docs, demos, examples, and tests stop drifting apart?
+\item
+  how do we show graceful lowering instead of merely describing it?
+\item
+  how do we make the system easy to explore without multiplying one-off example apps?
+\end{itemize}
+
+This milestone is the answer. It is the first post-v4 product milestone because it improves understanding, trust, and development speed at the same time.
+
+\texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} is a better name than ``Milestone 1'' because it reflects the actual philosophy:
+
+\begin{itemize}
+\tightlist
+\item
+  docs should be experiential, not only descriptive
+\item
+  components should be explored in the medium they are built for
+\item
+  users should be able to compare states, modes, and patterns directly
+\item
+  the same source of truth should drive teaching, testing, and tooling
+\end{itemize}
+
+\section{Design-thinking frame}\label{record-042-design-thinking-frame}
+
+\subsection{Primary user}\label{record-042-primary-user}
+
+The primary user is the \textbf{curious builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  a developer evaluating Bijou for a real terminal application
+\item
+  a contributor trying to understand a component family or pattern
+\item
+  a returning maintainer trying to remember what is canonical and what is not
+\end{itemize}
+
+They are not asking for infinite flexibility first. They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``What is this thing?''
+\item
+  ``When do I use it?''
+\item
+  ``What does it look like in real terminal conditions?''
+\item
+  ``How does it behave in \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}?''
+\item
+  ``Can I trust that the example, docs, and tests all describe the same thing?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-042-secondary-user}
+
+The secondary user is the \textbf{component author / framework maintainer}:
+
+\begin{itemize}
+\tightlist
+\item
+  they need a safe place to evolve a component family
+\item
+  they need stories and scenarios that can double as docs and regressions
+\item
+  they need a way to inspect behavior without hand-rolling a bespoke demo for every new idea
+\end{itemize}
+
+\subsection{Core jobs to be done}\label{record-042-core-jobs-to-be-done}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Help me understand Bijou without hunting across the repo.} I want one place where the doctrine, the live behavior, and the example source agree.
+\item
+  \textbf{Help me compare interaction profiles and states quickly.} I want to see the same component in \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} without writing four custom demos.
+\item
+  \textbf{Help me trust what I am seeing.} I want docs, demos, and regression scenarios to come from one structured source of truth instead of diverging copies.
+\item
+  \textbf{Help me evolve the system safely.} I want to add or refine a component family once and have that work propagate into docs, previews, and test surfaces.
+\end{enumerate}
+
+\section{The current problem}\label{record-042-the-current-problem}
+
+Today, Bijou is much healthier than it was pre-v4, but the learning surface is still fragmented:
+
+\begin{itemize}
+\tightlist
+\item
+  doctrine lives in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}*}
+\item
+  public teaching lives in package READMEs and example READMEs
+\item
+  interactive demonstrations live in example programs
+\item
+  regression coverage lives in smoke harnesses, PTY scripts, and targeted tests
+\end{itemize}
+
+Each of those serves a purpose, but they do not share one canonical representation of ``a component family in context.'' That fragmentation increases maintenance cost and makes the product harder to learn than it needs to be.
+
+\section{Principles}\label{record-042-principles}
+
+This milestone should follow these principles:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{One source of truth} Stories should be structured records that can feed docs, demos, previews, and tests.
+\item
+  \textbf{Show behavior, not only prose} Lowering, width sensitivity, and interaction changes should be visible side-by-side.
+\item
+  \textbf{Docs are product} The docs experience is not a sidecar artifact. It is part of Bijou's value proposition.
+\item
+  \textbf{Terminal-native first} Bijou should document itself in its own medium where possible.
+\item
+  \textbf{Regression surfaces should emerge from teaching surfaces} If a story is canonical enough to teach, it should be close to canonical enough to test.
+\end{enumerate}
+
+\section{Scope of DOGFOOD}\label{record-042-scope-of-dogfood}
+
+\subsection{Current validation slice}\label{record-042-current-validation-slice}
+
+The first implementation slice now lives in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/docs/README.md}{examples/docs}.
+
+It is intentionally small:
+
+\begin{itemize}
+\tightlist
+\item
+  three canonical component stories
+\item
+  one framed docs shell
+\item
+  one docs pane derived from structured story fields
+\item
+  one live demo pane driven by the same story record
+\item
+  profile switching across \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\end{itemize}
+
+That slice is not the final docs product. It is the first proof that the story substrate can drive teaching and live previews without re-encoding the doctrine by hand.
+
+It also exposed a broader shell need: when a docs lane is visually focused, that lane should own its local controls. The resulting shell/input design is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/focus-owns-input.md}{Focus Owns Input} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/focused-pane-input.spec.json}{Focused Pane Input}.
+
+The docs shell also now has two obvious shell-level proving surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  component search should feel like a standard shell affordance, not a bespoke docs shortcut
+\item
+  settings should open as a shell-owned drawer rather than as a custom page overlay
+\end{itemize}
+
+The resulting settings direction is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/settings-belong-to-the-shell.md}{Settings Belong to the Shell} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/frame-settings-drawer.spec.json}{Frame Settings Drawer}.
+
+As the settings drawer matured, another design truth became clear: if DOGFOOD is serious about proving Bijou, polished preference-row presentation should graduate into canonical Bijou componentry instead of remaining trapped inside shell-local drawing code. That direction is now captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/preference-lists-belong-to-bijou.md}{Preference Lists Belong to Bijou} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/preference-list-surface.spec.json}{Preference List Surface}.
+
+As the docs app grew, that broadened into a larger shell-quality question: the title screen, header, footer, search, help, settings, notifications, confirmation flows, and quit semantics all need to feel like one intentional product. That direction is now captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/humane-shell.md}{The Humane Shell}.
+
+The next shell-feedback layer under that umbrella is notification review: transient notices need a standard home once they disappear. That direction is now captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/notification-history-belongs-to-the-shell.md}{Notification History Belongs to the Shell} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/shell-notification-center.spec.json}{Shell Notification Center}.
+
+\subsection{1. Story Protocol}\label{record-042-story-protocol}
+
+This is the highest-leverage foundation.
+
+Reference documents:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/component-story-v0.md}{ComponentStory v0 design note}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/story-protocol.spec.json}{Story Protocol spec}
+\end{itemize}
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  a structured \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} / \texttt{P\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} model
+\item
+  enough metadata to drive:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    docs pages
+  \item
+    live demos
+  \item
+    examples/showcase entries
+  \item
+    scenario tests
+  \item
+    replay artifacts
+  \end{itemize}
+\end{itemize}
+
+What it should capture:
+
+\begin{itemize}
+\tightlist
+\item
+  title and summary
+\item
+  family / pattern identity
+\item
+  use / avoid guidance
+\item
+  graceful lowering descriptions
+\item
+  demo inputs / states
+\item
+  width and profile presets
+\item
+  optional source snippet references
+\item
+  optional selectors / semantics
+\item
+  optional scenario hooks
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  without this, every later investment duplicates logic
+\item
+  with it, the docs TUI, scenario harness, lab mode, and replay tooling all share the same substrate
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  one story format can serve both human-facing docs and machine-facing regression/tooling needs without becoming too heavy
+\end{itemize}
+
+\subsection{2. Bijou Docs TUI}\label{record-042-bijou-docs-tui}
+
+This is the flagship user-facing product surface.
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  a Bijou-native docs application
+\item
+  left navigation, content pane, demo pane
+\item
+  width and interaction-profile controls
+\item
+  source and guidance next to live render output
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  it lets Bijou document itself in the medium it is designed for
+\item
+  it makes the design system feel real instead of abstract
+\item
+  it provides a natural home for component families, patterns, and canonical demos
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  developers learn Bijou materially faster from a terminal-native docs surface than from disconnected README prose
+\end{itemize}
+
+\subsection{3. Interaction Profile Simulator}\label{record-042-interaction-profile-simulator}
+
+This makes graceful lowering concrete.
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  a shared control surface for \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\item
+  likely paired with width presets, reduced motion, and no-color modes
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  graceful lowering is one of Bijou's clearest differentiators
+\item
+  right now it is described better than it is demonstrated
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  showing profile shifts directly will reduce both documentation ambiguity and component misuse
+\end{itemize}
+
+\subsection{4. Surface Selector Model}\label{record-042-surface-selector-model}
+
+This makes stories and scenarios targetable in a stable way.
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  semantic targeting over surfaces and layout output
+\item
+  ids, classes, scoped regions, and text-based hooks where appropriate
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  docs and tests should not depend on brittle coordinates
+\item
+  selector semantics are the bridge between human-facing demos and machine-driven assertions
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  a small selector model can cover most docs/demo/test needs without turning into a fake DOM
+\end{itemize}
+
+\subsection{5. Surface Scenario Test Harness}\label{record-042-surface-scenario-test-harness}
+
+This turns stories into interactive truth surfaces.
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  a Playwright-like harness for Bijou apps and surface stories
+\item
+  scripted input, semantic selection, frame assertions, deterministic flows
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  it can make the same stories useful for docs demos and regression checks
+\item
+  it reduces the cost of verifying behavior that is currently trapped inside bespoke examples
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  once stories and selectors exist, scenarios can become the shared layer for docs, bug repros, and regression testing
+\end{itemize}
+
+\subsection{6. Component Lab Mode}\label{record-042-component-lab-mode}
+
+This is the interactive workbench inside the docs system, not a separate competing product.
+
+What it is:
+
+\begin{itemize}
+\tightlist
+\item
+  a knob-driven or control-driven exploration surface for stories
+\item
+  state toggles, width toggles, profile toggles, maybe timing or pointer toggles
+\end{itemize}
+
+Why it matters:
+
+\begin{itemize}
+\tightlist
+\item
+  it helps authors and users poke at a component family without writing another one-off demo
+\item
+  but it should live inside the docs/story system, not alongside it as another disconnected example app
+\end{itemize}
+
+Primary assumption to test:
+
+\begin{itemize}
+\tightlist
+\item
+  a lab mode is most valuable when it is powered by stories, not by custom per-example controls
+\end{itemize}
+
+\section{The next pass}\label{record-042-the-next-pass}
+
+The next pass should not try to build all six pieces at once. It should validate the smallest coherent loop:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Story Protocol v0}
+\item
+  \textbf{Docs TUI vertical slice}
+\item
+  \textbf{Interaction Profile Simulator}
+\item
+  \textbf{Surface Selector Model}
+\item
+  \textbf{Surface Scenario Test Harness}
+\item
+  \textbf{Component Lab Mode}
+\item
+  \textbf{Shell-owned settings drawer}
+\end{enumerate}
+
+\subsection{Why this order}\label{record-042-why-this-order}
+
+\subsubsection{1. Story Protocol v0}\label{record-042-story-protocol-v0}
+
+Build first because everything else gets cheaper and truer once stories exist.
+
+The goal is not to design the perfect eternal schema. The goal is to prove that one story record can power:
+
+\begin{itemize}
+\tightlist
+\item
+  one docs page
+\item
+  one live demo
+\item
+  one source snippet
+\item
+  one profile comparison
+\end{itemize}
+
+Recommended first families:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} for simple lowering
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} for richer structured overlays
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for structured TUI behavior
+\end{itemize}
+
+\subsubsection{2. Docs TUI vertical slice}\label{record-042-docs-tui-vertical-slice}
+
+Once the story shape exists, build a narrow docs app that renders a few canonical stories.
+
+The first slice should include:
+
+\begin{itemize}
+\tightlist
+\item
+  left nav
+\item
+  content pane
+\item
+  demo pane
+\item
+  one or two width presets
+\item
+  one or two family pages
+\end{itemize}
+
+Do not try to build the full docs universe first.
+
+\subsubsection{3. Interaction Profile Simulator}\label{record-042-interaction-profile-simulator-1}
+
+Add the control that most directly demonstrates Bijou's difference.
+
+The first simulator should support:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\end{itemize}
+
+Optional next toggles:
+
+\begin{itemize}
+\tightlist
+\item
+  reduced motion
+\item
+  narrow width
+\item
+  no color
+\end{itemize}
+
+\subsubsection{4. Surface Selector Model}\label{record-042-surface-selector-model-1}
+
+Once stories and docs exist, define the semantic targeting needed to make them testable and inspectable.
+
+Keep the first version minimal:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{i\allowbreak{}d}
+\item
+  \texttt{c\allowbreak{}l\allowbreak{}a\allowbreak{}s\allowbreak{}s}
+\item
+  scoped region / pane identity
+\item
+  text contains
+\end{itemize}
+
+\subsubsection{5. Surface Scenario Test Harness}\label{record-042-surface-scenario-test-harness-1}
+
+After stories and selectors exist, use them to prove the docs surface can also be exercised mechanically.
+
+The first version should be able to:
+
+\begin{itemize}
+\tightlist
+\item
+  open a story
+\item
+  toggle profile or width
+\item
+  assert on semantic targets
+\item
+  capture a frame sequence if needed
+\end{itemize}
+
+\subsubsection{6. Component Lab Mode}\label{record-042-component-lab-mode-1}
+
+Only after the above loop exists should the team add richer controls.
+
+That keeps the lab from becoming another disconnected example swamp.
+
+\section{Success criteria}\label{record-042-success-criteria}
+
+DOGFOOD is successful when:
+
+\begin{itemize}
+\tightlist
+\item
+  a new contributor can learn a component family from one canonical surface
+\item
+  docs, demos, and regressions are visibly converging instead of drifting
+\item
+  at least one family can be documented, previewed, profile-switched, and scenario-tested from the same story record
+\item
+  the docs app feels like a real product surface, not a pile of examples behind a menu
+\end{itemize}
+
+\section{Non-goals for the first iteration}\label{record-042-non-goals-for-the-first-iteration}
+
+\begin{itemize}
+\tightlist
+\item
+  replacing every example immediately
+\item
+  building the full visual studio
+\item
+  perfecting every replay or selector capability before the docs TUI exists
+\item
+  inventing a giant story schema before proving a narrow vertical slice
+\end{itemize}
+
+\section{Recommended first slice}\label{record-042-recommended-first-slice}
+
+If the team wants the most leverage with the least risk, start here:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  define \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} v0
+\item
+  author three canonical stories:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  build a docs TUI shell that renders those stories
+\item
+  add profile switching to those pages
+\end{enumerate}
+
+That is the smallest slice that proves the philosophy instead of merely describing it.
+

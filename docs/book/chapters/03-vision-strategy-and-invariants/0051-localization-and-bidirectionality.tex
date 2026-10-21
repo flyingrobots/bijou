@@ -1,0 +1,400 @@
+\chapter{Localization and Bidirectionality}\label{record-051}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/localization-and-bidirectionality.md}\par}\smallskip
+
+\emph{Design note for locale-aware Bijou shells, content, and directional layout}
+
+\section{Why this exists}\label{record-051-why-this-exists}
+
+Localization in Bijou should not mean:
+
+\begin{itemize}
+\tightlist
+\item
+  translating a few strings later
+\item
+  assuming English layout forever
+\item
+  bolting RTL support onto already hardcoded left/right shell behavior
+\end{itemize}
+
+Locale affects:
+
+\begin{itemize}
+\tightlist
+\item
+  copy
+\item
+  wrapping
+\item
+  value placement
+\item
+  date/time/number formatting
+\item
+  help and hint text
+\item
+  reading direction
+\item
+  layout mirroring
+\end{itemize}
+
+This note exists so Bijou can treat localization and bidirectionality as framework concerns early, before more LTR and English assumptions harden.
+
+Concrete follow-on package work is currently tracked as backlog under:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/LX-001-bijou-i18n-runtime-package.md}{LX-001 --- bijou-i18n Runtime and Tooling Packages}
+\end{itemize}
+
+\section{Product stance}\label{record-051-product-stance}
+
+Bijou should provide:
+
+\begin{itemize}
+\tightlist
+\item
+  localization-friendly APIs
+\item
+  catalog-based localization runtime
+\item
+  generic resource and data lookup, not only strings
+\item
+  shell support for localizable message descriptors
+\item
+  locale-aware formatting seams
+\item
+  logical layout direction
+\end{itemize}
+
+Bijou should not assume:
+
+\begin{itemize}
+\tightlist
+\item
+  filesystem storage
+\item
+  a specific translation backend
+\item
+  a specific persistence mechanism
+\item
+  English as the default spatial budget
+\end{itemize}
+
+By default, the framework can remain in-memory and adapter-driven.
+
+\section{Design principles}\label{record-051-design-principles}
+
+\subsection{1. Localized text must reflow honestly}\label{record-051-localized-text-must-reflow-honestly}
+
+A layout should not depend on one English string length.
+
+When localized text grows, Bijou should prefer:
+
+\begin{itemize}
+\tightlist
+\item
+  stacking
+\item
+  wrapping
+\item
+  secondary-line fallbacks
+\end{itemize}
+
+over:
+
+\begin{itemize}
+\tightlist
+\item
+  clipping
+\item
+  collision
+\item
+  ambiguous truncation
+\end{itemize}
+
+\subsection{2. Use logical direction, not only physical direction}\label{record-051-use-logical-direction-not-only-physical-direction}
+
+Framework APIs should increasingly think in:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t}
+\item
+  \texttt{e\allowbreak{}n\allowbreak{}d}
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\end{itemize}
+
+instead of only:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}f\allowbreak{}t}
+\item
+  \texttt{r\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}
+\end{itemize}
+
+Physical left/right should remain available as explicit escape hatches, but logical direction should become the default mental model.
+
+\subsection{3. Text direction and layout direction are not identical}\label{record-051-text-direction-and-layout-direction-are-not-identical}
+
+A locale may be RTL while still containing many LTR fragments:
+
+\begin{itemize}
+\tightlist
+\item
+  file paths
+\item
+  commands
+\item
+  IDs
+\item
+  URLs
+\item
+  code
+\item
+  numbers
+\end{itemize}
+
+Bijou should not mirror or reorder these blindly.
+
+\subsection{4. Shell chrome must be localizable}\label{record-051-shell-chrome-must-be-localizable}
+
+The shell should not hardcode English strings for:
+
+\begin{itemize}
+\tightlist
+\item
+  help labels
+\item
+  search labels
+\item
+  settings labels
+\item
+  notification labels
+\item
+  quit-confirm copy
+\item
+  empty states
+\end{itemize}
+
+Those surfaces should be designed to accept localized message descriptors later, even if today they are still powered by in-memory English defaults.
+
+\subsection{5. Translation workflow reality should be designed in}\label{record-051-translation-workflow-reality-should-be-designed-in}
+
+Real localization workflows involve:
+
+\begin{itemize}
+\tightlist
+\item
+  catalogs
+\item
+  changed-source detection
+\item
+  stale translations
+\item
+  spreadsheet exchange
+\item
+  translator-facing export and import
+\item
+  shared references to controlled terms or structured data
+\end{itemize}
+
+Bijou should treat that as normal rather than pretending localization is always a tiny in-code dictionary.
+
+\subsection{6. Overflow policy should be explicit}\label{record-051-overflow-policy-should-be-explicit}
+
+For localized text, Bijou should prefer:
+
+\begin{itemize}
+\tightlist
+\item
+  wrap
+\item
+  stack
+\item
+  reflow
+\end{itemize}
+
+before:
+
+\begin{itemize}
+\tightlist
+\item
+  clipping
+\item
+  collision
+\item
+  motion
+\end{itemize}
+
+marquee can exist, but only as an explicit overflow policy for compact single-line affordances and not as the default localization fix.
+
+\subsection{7. Bidirectionality should be intentional}\label{record-051-bidirectionality-should-be-intentional}
+
+Not everything should mirror.
+
+Bijou should define what is:
+
+\begin{itemize}
+\tightlist
+\item
+  logical and mirrored
+\item
+  physical and fixed
+\item
+  content and direction-sensitive
+\end{itemize}
+
+\section{RTL / BiDi posture}\label{record-051-rtl-bidi-posture}
+
+\subsection{What should generally mirror}\label{record-051-what-should-generally-mirror}
+
+\begin{itemize}
+\tightlist
+\item
+  shell drawer default side when it is conceptually ``start'' or ``end''
+\item
+  side-rail ordering in standard shells
+\item
+  breadcrumb flow
+\item
+  disclosure and directional affordances
+\item
+  pane sequencing where order is semantic rather than physical
+\end{itemize}
+
+\subsection{What should generally not blindly mirror}\label{record-051-what-should-generally-not-blindly-mirror}
+
+\begin{itemize}
+\tightlist
+\item
+  code
+\item
+  IDs
+\item
+  paths
+\item
+  commands
+\item
+  URLs
+\item
+  raw tabular data unless explicitly directional
+\end{itemize}
+
+\subsection{Why this matters early}\label{record-051-why-this-matters-early}
+
+If we hardcode left/right everywhere now, later RTL support becomes invasive across:
+
+\begin{itemize}
+\tightlist
+\item
+  app frame
+\item
+  split panes
+\item
+  drawers
+\item
+  notifications
+\item
+  help
+\item
+  settings
+\item
+  breadcrumbs
+\end{itemize}
+
+That is avoidable if we start naming and thinking logically now.
+
+\section{Framework direction}\label{record-051-framework-direction}
+
+Longer term, Bijou should likely carry directional state in context or equivalent render configuration, something like:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}l\allowbreak{}t\allowbreak{}r\allowbreak{}'\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}'\allowbreak{}r\allowbreak{}t\allowbreak{}l\allowbreak{}'\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}'\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}'}
+\end{itemize}
+
+That would allow shell, components, and later blocks to make consistent decisions without local hacks.
+
+\section{Localization tooling direction}\label{record-051-localization-tooling-direction}
+
+Future framework/tooling support should consider:
+
+\begin{itemize}
+\tightlist
+\item
+  message-descriptor APIs
+\item
+  catalogs for message, resource, and data entries
+\item
+  locale-aware formatting helpers
+\item
+  pseudo-localization mode
+\item
+  spreadsheet import/export workflows
+\item
+  stale-translation detection
+\item
+  long-string stress testing
+\item
+  layout overflow warnings for localized shells
+\item
+  audits for hardcoded user-facing strings in shell/component layers
+\item
+  dedicated runtime and tooling package boundaries for localization work
+\end{itemize}
+
+\section{DOGFOOD implication}\label{record-051-dogfood-implication}
+
+DOGFOOD should eventually prove:
+
+\begin{itemize}
+\tightlist
+\item
+  localized shell chrome
+\item
+  direction-aware shell layout
+\item
+  profile/help/search/settings copy that remains legible under localization pressure
+\end{itemize}
+
+Full RTL DOGFOOD does not need to be the first implementation target, but DOGFOOD should not keep teaching LTR-only assumptions forever.
+
+\section{Relationship to other doctrine}\label{record-051-relationship-to-other-doctrine}
+
+This note should be read alongside:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/bijou-ux-doctrine.md}{Bijou UX Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/accessibility-and-assistive-modes.md}{Accessibility and Assistive Modes}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/content-guide.md}{Content Guide}
+\end{itemize}
+
+\section{Acceptance bar}\label{record-051-acceptance-bar}
+
+This direction is working when:
+
+\begin{itemize}
+\tightlist
+\item
+  Bijou stops introducing new unnecessary physical left/right assumptions
+\item
+  shell/content copy is treated as localizable framework surface
+\item
+  long localized strings have honest layout behavior
+\item
+  RTL is designed as a first-class future capability instead of a retrofit fantasy
+\end{itemize}
+

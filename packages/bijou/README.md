@@ -150,7 +150,7 @@ fake duplication rather than a real second API.
 - **`ProfunctorPageTargetError`**: Inspect stable `code`, `path`, and `detail`
   fields when the bounded ProjectPage target rejects malformed,
   contradictory, or unsupported input.
-- **[Profunctor Page Inspection reference](../../docs/reference/profunctor-page-inspection.md)**:
+- **[Profunctor Page Inspection reference](../../docs/book/bijou-designs.pdf#page=425)**:
   Review the exact input versions, supported blocks, inspection modes, output
   contracts, diagnostics, and verification commands.
 
@@ -158,7 +158,7 @@ fake duplication rather than a real second API.
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Rendering doctrine, themes, and testing.
-- **[Design System](../../docs/design-system/README.md)**: Foundations, token vocabulary, and component families.
+- **[Design System](../../docs/book/bijou-designs.pdf#page=338)**: Foundations, token vocabulary, and component families.
 
 ---
 Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)

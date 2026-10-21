@@ -1,0 +1,318 @@
+\chapter{DL-001 --- Capture Design Language Doctrine}\label{record-168}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-001-capture-design-language-doctrine.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Why this cycle exists}\label{record-168-why-this-cycle-exists}
+
+Bijou already has strong local instincts:
+
+\begin{itemize}
+\tightlist
+\item
+  truthful controls
+\item
+  focus ownership
+\item
+  humane shell behavior
+\item
+  canonical preference-list treatment
+\item
+  localization and accessibility ambition
+\end{itemize}
+
+But those instincts are still split across:
+
+\begin{itemize}
+\tightlist
+\item
+  shell work
+\item
+  DOGFOOD polish
+\item
+  scattered strategy notes
+\item
+  conversation context
+\end{itemize}
+
+This cycle exists to turn those instincts into explicit design language.
+
+\section{Scope of this cycle}\label{record-168-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  creating a dedicated Design Language legend
+\item
+  capturing doctrine for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    mouse input
+  \item
+    cognitive load
+  \item
+    accessibility and assistive posture
+  \item
+    localization and bidirectionality
+  \item
+    AI explainability
+  \item
+    content style
+  \end{itemize}
+\item
+  parking notification polish explicitly on the Humane Terminal backlog so doctrine work can lead
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  implementing notification polish
+\item
+  shipping new shell or component behavior
+\item
+  creating the full blocks library
+\end{itemize}
+
+The point is to make the north star explicit before more product surfaces drift.
+
+\section{Human users}\label{record-168-human-users}
+
+\subsection{Primary human user}\label{record-168-primary-human-user}
+
+A Bijou builder or maintainer deciding how new shell and component work should feel.
+
+They need to:
+
+\begin{itemize}
+\tightlist
+\item
+  reason about product quality above the component level
+\item
+  know which UX choices are canonical
+\item
+  understand how accessibility, i18n, copy, and explainability fit together
+\end{itemize}
+
+\subsection{Human hill}\label{record-168-human-hill}
+
+A builder can describe Bijou's design language as a coherent system rather than a pile of good-looking exceptions.
+
+\section{Agent users}\label{record-168-agent-users}
+
+\subsection{Primary agent user}\label{record-168-primary-agent-user}
+
+An agent generating, auditing, or reviewing Bijou UX work.
+
+It needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  evaluate UX changes against written doctrine
+\item
+  distinguish invariant violations from taste disagreements
+\item
+  reason about humans and agents as separate first-class audiences
+\end{itemize}
+
+\subsection{Agent hill}\label{record-168-agent-hill}
+
+An agent can review or propose Bijou UX with explicit doctrine, playbacks, and backlog direction instead of inferring unwritten norms.
+
+\section{Human playback}\label{record-168-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer opens the design-language docs.
+\item
+  They can identify the relevant doctrine for shell behavior, accessibility, localization, AI, and copy.
+\item
+  They can see why notifications are parked on the backlog rather than being the next reactive polish slice.
+\item
+  They can point to a next backlog item for turning doctrine into reusable patterns and blocks.
+\end{enumerate}
+
+\section{Agent playback}\label{record-168-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent reads the design-language legend and cycle doc.
+\item
+  It can locate the doctrine docs that govern shell and component UX.
+\item
+  It can locate the parked notification backlog item.
+\item
+  It can identify the next follow-on cycle for patterns/blocks.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-168-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-168-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  doctrine should remain above component inventory
+\item
+  agents remain first-class users in design thinking, not an afterthought
+\item
+  notification work should stay parked as backlog while doctrine is captured
+\item
+  future blocks should follow doctrine and patterns, not precede them
+\end{itemize}
+
+\section{Deliverable}\label{record-168-deliverable}
+
+Land a design-language legend and enrich the doctrine set so Bijou has explicit guidance for:
+
+\begin{itemize}
+\tightlist
+\item
+  humane interaction
+\item
+  accessibility
+\item
+  localization
+\item
+  AI explainability
+\item
+  content
+\end{itemize}
+
+Then park notification polish on the backlog and spawn the next design-language backlog item for patterns and blocks.
+
+\section{Tests to write first}\label{record-168-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the Design Language legend exists and links to the doctrine set
+\item
+  the active cycle doc includes human/agent playbacks and linked invariants
+\item
+  the doctrine docs explicitly mention the newly captured concerns:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    mouse input
+  \item
+    cognitive load
+  \item
+    localization catalogs / references / spreadsheet reality
+  \item
+    \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling
+  \item
+    future blocks
+  \end{itemize}
+\item
+  notification polish is explicitly parked on the Humane Terminal backlog
+\end{itemize}
+
+\section{Risks}\label{record-168-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  creating a second doctrine layer that duplicates existing notes without clarifying them
+\item
+  keeping the design language too abstract to guide actual reviews
+\item
+  letting notification work stay implied instead of explicitly parked
+\end{itemize}
+
+\section{Out of scope}\label{record-168-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  implementing notification-center improvements
+\item
+  blocks library implementation
+\item
+  new shell or component code
+\end{itemize}
+
+\section{Retrospective}\label{record-168-retrospective}
+
+\subsection{What landed}\label{record-168-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  a dedicated Design Language legend:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}u\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \end{itemize}
+\item
+  enriched doctrine across:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}u\allowbreak{}x\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}a\allowbreak{}i\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \end{itemize}
+\item
+  an explicit Humane Terminal backlog item for notification polish:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}t\allowbreak{}r\allowbreak{}o\allowbreak{}/\allowbreak{}H\allowbreak{}T\allowbreak{}\_\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+  \end{itemize}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-168-drift-from-ideal}
+
+No material drift.
+
+This cycle intentionally stayed documentation-only and did not try to fold the doctrine into code or new shell surfaces yet.
+
+\subsection{Debt spawned}\label{record-168-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DL-002-canonicalize-patterns-and-blocks.md}{DL-002 --- Canonicalize Patterns and Blocks}
+\end{itemize}
+

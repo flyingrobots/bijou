@@ -1,0 +1,25 @@
+\def\BookTitle{Bijou Design Archive}
+\def\BookSubtitle{Historical records, reasoning and provenance}
+\def\BookRunningTitle{Design Archive}
+\input{preamble}%
+
+\BookArchivetrue
+\begin{document}
+\input{frontmatter}%
+\mainmatter
+\ifBookTeaching
+  \input{history/complete-edition-2026-10-20/teaching/contents}%
+\fi
+\appendix
+\ifBookTeaching
+  \input{reference/contents}%
+\fi
+\ifBookArchive
+  \input{archive/contents}%
+\fi
+\ifBookTeaching\else
+  \input{reference/contents}%
+\fi
+\input{reference/provenance}%
+\input{appendices/licenses}%
+\end{document}

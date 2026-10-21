@@ -1,0 +1,43 @@
+\chapter{Preserve the user's meaning}\label{teaching-meaning}
+
+\section{Start with an answer someone needs}
+\subsection{What the operator came to learn}
+
+Imagine that a build has stopped producing output. The operator needs to distinguish a slow job, a failed job and a disconnected presentation. A spinning marker may make the application look active while answering none of those questions. Start the design with facts the person needs: the job identity, its state, the last known progress, any failure explanation, and the actions that remain available.
+
+Our example has compile, test and publish jobs. Their names describe a familiar workflow; their execution is simulated. This keeps the learning problem small while preserving the architectural pressures: several things change over time, results arrive out of order, a selected item has detail, and cancellation needs an owner.
+
+\subsection{An observation before a component}
+
+Write an acceptance observation before choosing a widget: ``With color removed, I can identify the failed job and read its explanation.'' A badge might help fulfill that promise. It cannot define the promise by itself. Another observation is ``Opening confirmation prevents movement behind it.'' That property belongs to input routing, even if the dialog drawing is perfect.
+
+These observations are deliberately concrete. They can be challenged with a saved stream, a controlled transition or a keyboard session. ``The interface is polished'' does not tell the next engineer which behavior to preserve during a repair.
+
+\section{One meaning can have several presentations}
+\subsection{Four environments, four contracts}
+
+Interactive mode offers a loop, selection and actions. Static mode offers a completed snapshot suitable for a report or a CI log. Pipe mode offers stable fields that another program can consume. Accessible mode states important relationships explicitly in readable prose. In this companion, the noninteractive modes render the fixed example snapshot and exit; they do not observe live background jobs.
+
+The shared model is valuable because each presentation starts with the same facts. It does not make the presentations correct automatically. A pipe formatter can still omit the error field. A textual presentation can still forget to name the selected job. The useful test compares the facts each mode promises to preserve.
+
+\subsection{Honest degradation is a design decision}
+
+At a narrow width, our application gives up a simultaneous multi-column comparison and uses compact records with scrolling. This is a chosen loss. The job's identity, state and error remain available. If the task required comparing a hundred jobs at once, that choice might be inadequate even though every painted cell fitted its rectangle.
+
+The right fallback depends on the task. Before compressing a view, name what it may lose and what it must retain. There may be a minimum useful size below which the application should explain how to recover. A renderer's smallest legal Surface is not a promise that the workflow is useful at that size.
+
+\section{Make the boundaries visible}
+\subsection{Facts, intentions and effects}
+
+A job is running because the model says it is running. A keypress becomes an intention such as start or dismiss. The model returns a new state and descriptions of work to perform. An adapter owns timers and emits later results. A presentation reads the state and produces output. Each boundary makes a different question inspectable.
+
+This separation costs code and vocabulary. A tiny report may not need it. The cost begins to earn its place when a keyboard event, a background result and a resize can arrive independently. Explicit boundaries let us reproduce those situations without depending on luck or wall-clock timing.
+
+\subsection{The framework supplies tools; the application supplies policy}
+
+Bijou supplies the runtime and rendering contracts used by the example. The companion decides which keys are global, what cancellation means, how modes are chosen and which result still belongs to a screen. Treat those policies as application design. A framework cannot infer whether leaving a log pane should cancel the underlying build.
+
+\section{A small design exercise}
+\subsection{Write the contract in plain language}
+
+Choose another task: a download queue, deployment review or backup monitor. Identify three facts that must survive redirected output, one action that needs confirmation, and one result that could arrive after its owner changes. Describe observable success without naming a component. Keep that description beside the implementation; it gives future visual and architectural changes something concrete to answer to.

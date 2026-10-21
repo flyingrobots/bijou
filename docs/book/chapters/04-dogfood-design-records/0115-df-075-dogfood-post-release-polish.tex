@@ -1,0 +1,144 @@
+\chapter{DF-075 DOGFOOD Post-Release Polish}\label{record-115}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-075-dogfood-post-release-polish.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-075 DOGFOOD Post-Release Polish
+legend: DF
+lane: asap
+priority: medium
+status: proposed
+github_issue: 334
+keywords:
+  - dogfood
+  - app-shell
+  - quit-confirm
+  - blocks
+  - polish
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD}
+
+\section{Linked Work}\label{record-115-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \#334
+\item
+  Related future release-story work: \#335
+\item
+  Related future affordance work: \#336
+\end{itemize}
+
+This document scopes a bounded post-release polish cycle. It does not reopen the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} feature train and it does not claim the broader V8 Runtime Graph and Scene IR product surface.
+
+\section{Decision Summary}\label{record-115-decision-summary}
+
+DOGFOOD should absorb the three most visible post-release polish findings from the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} sanity pass without expanding into a broad shell redesign:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Disable the hidden double-\texttt{T\allowbreak{}a\allowbreak{}b} footer toggle until the AppShell has a visible command, animation, and restore affordance.
+\item
+  Restyle the quit confirmation so it is compact, themed, aligned, and easy to answer in the default theme.
+\item
+  Make the Blocks section lead with \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, because that is the most alive interactive proof of what Blocks are.
+\end{enumerate}
+
+\section{Sponsored Human}\label{record-115-sponsored-human}
+
+A DOGFOOD user wants the docs app to feel deliberate after \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}: no hidden state that leaves terminal background behind, no awkward quit prompt, and a Blocks page that immediately demonstrates an interactive block instead of starting on descriptive prose.
+
+\section{Sponsored Agent}\label{record-115-sponsored-agent}
+
+An agent wants deterministic behavior to assert: footer visibility should not change through undocumented key timing, the quit dialog should have stable themed geometry, and the Blocks default route should identify the same guide id that renders the interactive counter proof.
+
+\section{Hill}\label{record-115-hill}
+
+DOGFOOD can start the post-\texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} era with a cleaner shell and a stronger Blocks first impression while keeping the patch small, testable, and isolated from V8 product-contract work.
+
+\section{Scope}\label{record-115-scope}
+
+\subsection{Disable Hidden Footer Toggle}\label{record-115-disable-hidden-footer-toggle}
+
+The current hidden double-\texttt{T\allowbreak{}a\allowbreak{}b} footer toggle is not discoverable. When hidden, it can expose uncolored terminal background and does not explain how to recover the footer. This cycle should remove that key path from normal DOGFOOD/AppShell input handling. \texttt{T\allowbreak{}a\allowbreak{}b} should remain the normal focus traversal key.
+
+This does not forbid a future footer command. A future version can reintroduce footer visibility as an explicit command with visible state, animation, help text, and theme-safe repaint behavior.
+
+\subsection{Restyle Quit Confirmation}\label{record-115-restyle-quit-confirmation}
+
+The quit confirmation should render as a compact modal rather than a tall, skinny prompt. Its background, border, title, body, and actions should use the selected frame theme instead of leaving unthemed terminal patches.
+
+The action labels must be readable in the default DOGFOOD theme. The dialog should keep the existing command contract: confirm quits, reject closes the dialog, and normal app state remains underneath.
+
+\subsection{Counter-First Blocks}\label{record-115-counter-first-blocks}
+
+The Blocks section should open directly on \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}. Selecting the \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} parent row should also route to \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, making the preview group demonstrate an interactive block first.
+
+Static and descriptive block previews remain available below it. The prior navigation fix that lets focus move from the first preview child back to the \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} parent row must not regress.
+
+\section{Out Of Scope}\label{record-115-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  \#335 release-story surfaces: What's New, GraphQL proof, and CHANGELOG viewer.
+\item
+  \#336 future affordances: theme hotkey, tab badges, tutorial, and achievements.
+\item
+  A full AppShell animation or layout redesign.
+\item
+  A new \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} feature train.
+\item
+  Broad V8 Runtime Graph and Scene IR product-contract work.
+\end{itemize}
+
+\section{Playback Questions}\label{record-115-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does pressing \texttt{T\allowbreak{}a\allowbreak{}b} repeatedly leave the footer visible and themed?
+\item
+  Does the quit confirmation render with compact themed geometry and readable \texttt{Y\allowbreak{} \allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t} / \texttt{N\allowbreak{} \allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}y} actions?
+\item
+  Does opening Blocks, or activating \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w}, show \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} first?
+\item
+  Does arrow navigation still allow the \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} parent row to receive focus from the first standard block preview child?
+\end{enumerate}
+
+\section{Test Plan}\label{record-115-test-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Add or update DOGFOOD Blocks tests in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}1\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} for initial Blocks selection and \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} activation.
+\item
+  Add AppShell regression coverage proving \texttt{T\allowbreak{}a\allowbreak{}b} no longer emits a hidden footer toggle path.
+\item
+  Extend quit confirmation tests in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/} so the modal's compact geometry and action styling are observable.
+\item
+  Run the focused test files, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}, and the relevant broader suite before review.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-115-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Double-\texttt{T\allowbreak{}a\allowbreak{}b} no longer hides the DOGFOOD footer.
+\item
+  The quit confirmation is compact, filled, aligned, and theme-readable.
+\item
+  Blocks starts on \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and the \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} parent opens the same interactive demo.
+\item
+  Existing Blocks guide focus behavior remains intact.
+\item
+  The change is linked from \#334 and carried by a non-draft PR to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}.
+\end{itemize}
+

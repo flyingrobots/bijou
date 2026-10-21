@@ -1,0 +1,34 @@
+\chapter{Tests Are the Spec}\label{record-061}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/tests-are-the-spec.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-061-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+\end{itemize}
+
+If behavior matters, it must be proved in tests.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  design docs should identify the tests to write first
+\item
+  golden-path tests are not enough by themselves
+\item
+  edge cases, failure cases, and stress/fuzz cases matter when warranted
+\item
+  implementation does not get to quietly overrule tested behavior
+\end{itemize}
+

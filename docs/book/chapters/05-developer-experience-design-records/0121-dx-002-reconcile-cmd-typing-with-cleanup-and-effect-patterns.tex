@@ -1,0 +1,76 @@
+\chapter{DX-002 --- Reconcile Cmd Typing With Cleanup and Effect Patterns}\label{record-121}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Historical note}\label{record-121-historical-note}
+
+This slice is already landed.
+
+It originally lived as a backlog capture and was promoted into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} during METHOD adoption so the active backlog would stop advertising completed work as upcoming queue. The file is lighter than newer cycle docs for that reason.
+
+\section{Why this cycle existed}\label{record-121-why-this-cycle-existed}
+
+Make command typing match the cleanup-function and runtime-effect patterns Bijou actually encourages.
+
+\section{Why}\label{record-121-why}
+
+The current \texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>} typing does not line up cleanly with real usage:
+
+\begin{itemize}
+\tightlist
+\item
+  the pulse timer pattern returns a cleanup function
+\item
+  the existing type expects \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}Q\allowbreak{}U\allowbreak{}I\allowbreak{}T\allowbreak{}>}
+\item
+  consumers end up casting to \texttt{a\allowbreak{}n\allowbreak{}y} to express documented patterns
+\end{itemize}
+
+This is both a DX problem and a runtime-model problem, because it blurs the line between commands and effects.
+
+\section{Captured feedback}\label{record-121-captured-feedback}
+
+From \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}p\allowbreak{}-\allowbreak{}t\allowbreak{}t\allowbreak{}d} TUI development:
+
+\begin{itemize}
+\tightlist
+\item
+  the pulse timer cleanup pattern required \texttt{a\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y}
+\item
+  the types do not reflect the documented pattern
+\end{itemize}
+
+\section{Likely scope}\label{record-121-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  audit current \texttt{C\allowbreak{}m\allowbreak{}d} definitions and real runtime usage
+\item
+  decide whether cleanup handles, effects, and commands need clearer separation
+\item
+  align public typing with the documented timer/cleanup pattern
+\item
+  add tests proving the typed API supports cleanup-producing runtime work without casts
+\end{itemize}
+
+\section{Outcome}\label{record-121-outcome}
+
+This work landed and is reflected in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/CHANGELOG.md}{CHANGELOG.md}.
+
+\texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}>} now matches the cleanup-capable runtime patterns Bijou actually uses, and the runtime retains and disposes cleanup results instead of forcing those paths through fake message contracts.
+
+\section{Follow-on}\label{record-121-follow-on}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DX-003-rationalize-table-apis-and-public-table-types.md}{DX-003 --- Rationalize Table APIs and Public Table Types}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DX-004-smooth-surface-and-string-composition-seams.md}{DX-004 --- Smooth Surface and String Composition Seams}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DX-005-polish-small-component-and-import-ergonomics.md}{DX-005 --- Polish Small Component and Import Ergonomics}
+\end{itemize}
+

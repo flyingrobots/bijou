@@ -1,5 +1,11 @@
 # Bijou
 
+[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) ·
+[Design Archive](docs/book/bijou-archive.pdf) ·
+[Read the complete Bijou documentation book](docs/book/bijou-designs.pdf).
+The teaching book builds a reproducible job monitor; historical source documents
+live in the archive and the complete edition's appendices.
+
 Bijou is a TypeScript toolkit for building serious terminal software. It treats the terminal as a real two-dimensional character grid of cells, each cell carrying a glyph, color, and style, so you can reason about layout, diffing, and accessibility as first-class concerns instead of post-processing escape strings.
 
 [![npm version](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
@@ -27,7 +33,7 @@ instead of on higher-cost GitHub-hosted macOS runners. Release, publish, and
 benchmark workflows may still use Linux-hosted Bash where the workflow itself is
 intentionally platform-specific.
 
-The repo's primary human-facing guide is [DOGFOOD](./docs/DOGFOOD.md).
+The repo's primary human-facing guide is [DOGFOOD](docs/book/bijou-designs.pdf#page=292).
 The `examples/` tree is for runnable examples and is intentionally maintained as secondary/internal reference material.
 
 ## Start Here
@@ -66,10 +72,10 @@ The fastest path is to get to the first visible output in under a minute.
 
 | Need | Go to |
 | :--- | :--- |
-| Fast orientation after the first commands | [`GUIDE.md`](./GUIDE.md) |
+| Fast orientation after the first commands | [`GUIDE.md`](docs/book/bijou-designs.pdf#page=271) |
 | Complete documentation map | [`docs/README.md`](./docs/README.md) |
 | Middle path between counter and DOGFOOD | [Framed app tutorial](./docs/guides/framed-app-tutorial.md) |
-| Live documentation app | [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) |
+| Live documentation app | [`docs/DOGFOOD.md`](docs/book/bijou-designs.pdf#page=292) |
 
 ## What You Can Build
 
@@ -232,18 +238,19 @@ Most production apps eventually move to tier 2 or tier 3.
 
 | Document | Use it for |
 | :--- | :--- |
-| [`GUIDE.md`](./GUIDE.md) | Orientation, fast paths, and monorepo workflow. |
-| [`ADVANCED_GUIDE.md`](./ADVANCED_GUIDE.md) | Deeper runtime, rendering, shader, and proving workflows. |
-| [`docs/guides/render-pipeline.md`](./docs/guides/render-pipeline.md) | Render pipeline internals and middleware extension patterns. |
-| [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) | DOGFOOD command surface, keyboard orientation, and command coverage notes. |
-| [`DOGFOOD`](./docs/DOGFOOD.md) | Human-facing walkthrough and interactive proof surface. |
-| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Ports, adapters, package stack, and structural rules. |
+| [`GUIDE.md`](docs/book/bijou-designs.pdf#page=271) | Orientation, fast paths, and monorepo workflow. |
+| [`ADVANCED_GUIDE.md`](docs/book/bijou-designs.pdf#page=304) | Deeper runtime, rendering, shader, and proving workflows. |
+| [`docs/guides/render-pipeline.md`](docs/book/bijou-designs.pdf#page=332) | Render pipeline internals and middleware extension patterns. |
+| [`docs/DOGFOOD.md`](docs/book/bijou-designs.pdf#page=292) | DOGFOOD command surface, keyboard orientation, and command coverage notes. |
+| [`DOGFOOD`](docs/book/bijou-designs.pdf#page=292) | Human-facing walkthrough and interactive proof surface. |
+| [`ARCHITECTURE.md`](docs/book/bijou-designs.pdf#page=137) | Ports, adapters, package stack, and structural rules. |
 | [`docs/typescript-code-standards.editors-edition.md`](./docs/typescript-code-standards.editors-edition.md) | Verbatim Code Dojo doctrine for TypeScript, tests, adapters, scripts, and architecture changes. |
 | [`docs/code-dojo-exceptions.md`](./docs/code-dojo-exceptions.md) | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
-| [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
-| [`docs/BEARING.md`](./docs/BEARING.md) | Current execution direction and active tensions. |
-| [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Broad strategic direction and active themes. |
-| [`docs/design-system/README.md`](./docs/design-system/README.md) | Design language, components, and UI foundations. |
+| [`docs/VISION.md`](docs/book/bijou-designs.pdf#page=125) | Project identity and long-term product intent. |
+| [GitHub issues](https://github.com/flyingrobots/bijou/issues) | Roadmap and work scope. |
+| [GitHub milestones](https://github.com/flyingrobots/bijou/milestones) | Planned releases. |
+| [Workflow](docs/book/bijou-designs.pdf#page=1467) | Execution process and Linear migration status. |
+| [`docs/design-system/README.md`](docs/book/bijou-designs.pdf#page=338) | Design language, components, and UI foundations. |
 | [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | Historical truth of merged behavior. |
 
 ## Running Tests
@@ -349,7 +356,7 @@ it also forced `'pipe'`, so a terminal with `NO_COLOR=1` in the environment lost
 the whole TUI rather than only its colour. Also, an unknown status key now
 resolves to `semantic.muted` rather than `status.muted`, so a mistyped or
 undefined key no longer renders struck through. See
-[`DX-052`](./docs/design/DX-052-no-color-is-not-a-capability.md).
+[`DX-052`](docs/book/bijou-designs.pdf#page=928).
 
 - `extendTheme()` now reaches all six token groups — `border` and `semantic`
   join `status`, `ui`, `gradient`, and `surface`.
@@ -363,9 +370,9 @@ undefined key no longer renders struck through. See
   ratchet progress across tranches A–E.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/8.0.0/whats-new.md), the
-[migration guide](./docs/releases/8.0.0/migration-guide.md), and the
-[release evidence packet](./docs/releases/8.0.0/README.md).
+[What's New guide](docs/book/bijou-designs.pdf#page=1576), the
+[migration guide](docs/book/bijou-designs.pdf#page=1528), and the
+[release evidence packet](docs/book/bijou-designs.pdf#page=1489).
 
 ## Tests, Soak, and Performance
 
@@ -390,7 +397,7 @@ npm run bench
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for workflow and PR expectations.
 
-- For backlog-first contributions, start with `docs/method/backlog/inbox/`.
+- For contributions, start with the GitHub issue tracker and `docs/WORKFLOW.md`.
 - If you want beginner-friendly tickets, start from [`GOOD_FIRST_ISSUES.md`](./GOOD_FIRST_ISSUES.md).
 
 ## Future Direction

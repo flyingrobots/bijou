@@ -1,0 +1,142 @@
+\chapter{DOGFOOD}\label{record-006}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/DOGFOOD.md}\par}\smallskip
+
+\emph{Documentation Of Good Foundational Onboarding and Discovery}
+
+DOGFOOD is the canonical human-facing docs surface and proving ground for the Bijou engine.
+
+\section{Run}\label{record-006-run}
+
+\begin{CodeBlock}
+npm run dogfood
+\end{CodeBlock}
+
+DOGFOOD initializes its language through the host locale adapter and then lets users change the preferred language from the Settings drawer (\texttt{F\allowbreak{}2}). The docs app consumes this through a locale port rather than reading process state from view code, so localization remains behind the same hexagonal boundary as the rest of the host integration.
+
+To inspect and enforce the current source-level localization debt:
+
+\begin{CodeBlock}
+npm run dogfood:i18n:debt
+\end{CodeBlock}
+
+That report counts remaining localizable DOGFOOD UI strings by source surface and missing DOGFOOD Markdown localizations by locale. It is a source inventory, not a rendered-output scraper, so ids, paths, and catalog-backed fallback calls stay separate from visible raw copy.
+
+DOGFOOD Markdown files can declare localization metadata in YAML frontmatter:
+
+\begin{CodeBlock}
+---
+dogfood:
+  localization:
+    sourceLocale: en
+    locales: [fr, es, de]
+    localized:
+      fr: ./guide.fr.md
+      es:
+        path: ./es/guide.md
+---
+\end{CodeBlock}
+
+If a DOGFOOD Markdown file omits that frontmatter, the ratchet assumes the source locale is English and expects every supported non-English locale. It looks for conventional sibling files such as \texttt{g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}f\allowbreak{}r\allowbreak{}.\allowbreak{}m\allowbreak{}d} and locale-directory files such as \texttt{f\allowbreak{}r\allowbreak{}/\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}. \texttt{l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}<\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}>} paths are resolved relative to the source Markdown file before those conventional fallbacks are checked. The DOGFOOD Markdown loader strips frontmatter before rendering prose, so metadata can live beside the source document without leaking into the reader.
+
+DOGFOOD's catalog source is a committed CSV string table:
+
+\begin{CodeBlock}
+examples/docs/i18n/source/dogfood-strings.csv
+\end{CodeBlock}
+
+Build the selected-locale runtime JSON catalog files from that table with:
+
+\begin{CodeBlock}
+npm run dogfood:i18n:build
+npm run dogfood:i18n:check
+npm run dogfood:i18n:complete
+\end{CodeBlock}
+
+The generated runtime files live under:
+
+\begin{CodeBlock}
+examples/docs/i18n/catalogs/<locale>/<namespace>.json
+\end{CodeBlock}
+
+DOGFOOD loads the generated English catalog as an explicit production fallback, then loads only the selected locale directory at runtime. The generated catalog for \texttt{f\allowbreak{}r}, for example, carries French values only. English source values remain in the source table and the generated English catalog, not every translated payload.
+
+In non-production builds, missing selected-locale strings render as a bright missing-localization marker instead of quietly falling back to English. That keeps untranslated UI visible while development is running.
+
+New DOGFOOD localization keys, changed source strings, changed translated values, and removed keys must be handled semantically across every supported locale: \texttt{e\allowbreak{}n}, \texttt{f\allowbreak{}r}, \texttt{e\allowbreak{}s}, and \texttt{d\allowbreak{}e}. \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e} enforces that policy for localization keys changed relative to \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} by default, ratchets the full missing-translation count, and accepts \texttt{-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{} \allowbreak{}<\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}>} for CI comparison refs or \texttt{-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l} for a full-table audit. The pre-push hook and CI both run the completeness gate plus \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}, so a new string cannot merge with missing translations or stale generated catalogs.
+
+The raw-string debt gate is stricter than a global ratchet. If a branch touches a DOGFOOD TypeScript source file that still has raw visible-copy debt, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} fails until that file is cleaned or the strings are proved non-localizable by scanner policy. This prevents old localization debt from surviving in files that are actively being edited.
+
+Numbered extraction modules such as \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}0\allowbreak{}1\allowbreak{}.\allowbreak{}t\allowbreak{}s} retain the canonical \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} source identity for touched-file comparisons. The gate sums debt across the numbered parts and requires that total to fall below the merge-base root count; splitting a file cannot reset or merely redistribute its debt.
+
+The same source table can also be exported through the i18n workbook adapters instead of requiring translators to edit the docs app source directly:
+
+\begin{CodeBlock}
+npm run dogfood:i18n:export -- --locale fr --format csv
+npm run dogfood:i18n:export -- --locale fr --format tsv --out /tmp/dogfood-fr
+npm run dogfood:i18n:export -- --format json --bundle /tmp/dogfood-catalog.json
+npm run dogfood:i18n:coverage
+\end{CodeBlock}
+
+The CSV/TSV and JSON conversions are produced by \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}; DOGFOOD still loads generated runtime catalog JSON rather than parsing spreadsheet files during rendering.
+
+For the standalone BlockLab development and testing workbench:
+
+\begin{CodeBlock}
+npm run blocklab
+\end{CodeBlock}
+
+For the deterministic text-first story index and capture matrix:
+
+\begin{CodeBlock}
+npm run blocklab:index
+\end{CodeBlock}
+
+\section{Purpose}\label{record-006-purpose}
+
+DOGFOOD is where Bijou proves its architectural integrity by building itself. It is not an example; it is the repository's living docs application.
+
+It gathers the package guides for the published workspace, release guidance, and the doctrine, architecture, invariants, and design-system guidance that operators need when learning or validating Bijou.
+
+DOGFOOD also publishes its own docs experience as \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, the canonical app-level Block for navigation, reader content, search state, and proof artifacts. That contract gives humans and agents one inspectable surface identity for the docs app instead of reconstructing product truth from adjacent rendering code.
+
+\subsection{Today's Proof Points}\label{record-006-todays-proof-points}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shell Integrity}: Testing the framed shell, tabs, and pane focus in a production-grade surface.
+\item
+  \textbf{Canonical Docs Surface Block}: \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} owns the DOGFOOD docs surface contract across navigation, reader, search, proof artifacts, command intents, and lower-mode facts.
+\item
+  \textbf{Documentation Jump Search}: \texttt{/} opens a global documentation search that can jump across sections, activate the right page, and select the matching guide or component story.
+\item
+  \textbf{Component Explorer}: A live, interactive field guide to every component family.
+\item
+  \textbf{Blocks Section}: A first-class Blocks lane covering block purpose, authoring, first-party blocks, live surface-backed previews, and lowering posture.
+\item
+  \textbf{Locale Preference}: The Settings drawer can switch DOGFOOD's preferred language after startup, while startup itself uses the host locale adapter.
+\item
+  \textbf{Localization Debt Ratchet}: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} counts remaining localizable source strings by DOGFOOD surface across \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} modules, keeps tooling-only exclusions documented, counts missing Markdown localizations by locale, fails when either baseline increases, and blocks touched DOGFOOD TypeScript files that still contain raw visible-copy debt.
+\item
+  \textbf{Localization Completeness Gate}: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e} requires every changed DOGFOOD localization key to carry current values for all supported locales, and ratchets the full missing-translation count before pre-push or CI can pass.
+\item
+  \textbf{BlockLab Workstation}: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
+\item
+  \textbf{Graceful Lowering}: Verifying that documentation renders correctly across \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} modes.
+\item
+  \textbf{Responsive Product Layout}: Proving that resize is not enough by selecting \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d}, \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w}, and \texttt{t\allowbreak{}i\allowbreak{}n\allowbreak{}y} docs layouts that keep constrained terminals useful.
+\item
+  \textbf{Motion and Shader Surfaces}: Exercising canvas, glyph-fit raytracing, transitions, springs, and timelines from the docs app itself.
+\item
+  \textbf{Design Language}: Defining and enforcing the project's visual and interactive standards.
+\end{itemize}
+
+\subsection{Relationship to Examples}\label{record-006-relationship-to-examples}
+
+The \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} tree contains isolated reference material and API proofs. \textbf{DOGFOOD} is the primary entry point for understanding the system's unified behavior.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{DOGFOOD implementation lives in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}.}
+

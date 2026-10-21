@@ -1,0 +1,290 @@
+\chapter{DX-046 GraphQL Authored DOGFOOD Block Fixture}\label{record-142}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-046-graphql-authored-dogfood-block-fixture.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-046 GraphQL Authored DOGFOOD Block Fixture
+legend: DX
+lane: asap
+priority: high
+github_issue: 329
+parent_issue: 302
+status: landed
+keywords:
+  - developer-experience
+  - dogfood
+  - graphql
+  - blocks
+  - ir
+  - debug-facts
+  - v7.1.0
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-142-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  User story: \href{https://github.com/flyingrobots/bijou/issues/329}{\#329}
+\item
+  Parent tracker: \href{https://github.com/flyingrobots/bijou/issues/302}{\#302}
+\item
+  Prior slice: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-045-graphql-block-groups-and-debug-facts.md}{DX-045 GraphQL Block Groups And Debug Facts}
+\item
+  Runtime seed: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md}{DX-042 Shared UI Scene IR And Bijou Render Target}
+\item
+  Portable endpoint direction: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md}{DX-043 Portable Bijou Blocks And Multi-Endpoint IR}
+\item
+  DOGFOOD surface block lineage: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-030-dogfood-docs-surface-block.md}{DF-030 Dogfood Docs Surface Block}
+\end{itemize}
+
+This cycle is the narrow \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} implementation item. It must not move the broad \#302 tracker out of \texttt{B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d}; \#329 carries the release-scoped DX-046 proof.
+
+\section{Decision Summary}\label{record-142-decision-summary}
+
+DX-044 and DX-045 proved that constrained GraphQL SDL can produce \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, lower into \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, render terminal proof, and emit \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1} facts. DX-046 turns that compiler proof into a real DOGFOOD product fixture.
+
+The first DOGFOOD target is \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}. It is small enough for a release-boundary slice but real enough to carry product semantics: navigation items, selection state, command intents, i18n text, token styling, group structure, terminal proof, and debug facts.
+
+The useful flow is:
+
+\input{diagrams/flows/flow-021}
+
+\section{Sponsored Human}\label{record-142-sponsored-human}
+
+A maintainer wants the post-V7 GraphQL block compiler to prove it can describe an actual DOGFOOD surface, not only synthetic release-card examples.
+
+A DOGFOOD reader benefits because the docs navigation surface becomes inspectable from one source contract instead of only from runtime rendering code.
+
+\section{Sponsored Agent}\label{record-142-sponsored-agent}
+
+An agent wants to trace one DOGFOOD navigation field from SDL through \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, terminal cells, lower modes, debug summary facts, and receipt hashes without scraping screenshots or reconstructing product intent from rendered text.
+
+\section{Hill}\label{record-142-hill}
+
+Given a checked-in GraphQL SDL fixture for \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, Bijou can compile it into a deterministic grouped \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact, lower it into a valid \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} scene, render terminal proof, and emit \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1} facts that preserve source maps, token refs, i18n keys, actions, bindings, groups, lower-mode witnesses, and hashes.
+
+\section{Playback Questions}\label{record-142-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Which DOGFOOD product surface is now authored as GraphQL SDL?
+\item
+  Can a maintainer prove that the fixture is tied to the existing \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} registry entry and \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} component name?
+\item
+  Can one SDL field be traced through artifact field, scene node, terminal cell source map, lower-mode row, debug fact, and receipt dependency?
+\item
+  Can debug facts list the DOGFOOD groups, fields, i18n keys, token refs, action ids, binding ids, lower-mode hashes, artifact hash, and scene hash?
+\item
+  Can failure tests reject missing or broken product facts before terminal proof is generated?
+\end{itemize}
+
+\section{Scope}\label{record-142-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a checked-in GraphQL SDL fixture for \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}.
+\item
+  Keep the fixture inside the Bijou repository and inside the existing constrained compiler path.
+\item
+  Compile the fixture with \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}.
+\item
+  Lower the artifact with \texttt{l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}o\allowbreak{}U\allowbreak{}i\allowbreak{}S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Render deterministic terminal proof with \texttt{l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}U\allowbreak{}i\allowbreak{}S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}f\allowbreak{}(\allowbreak{})}.
+\item
+  Assert \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})} facts for the real DOGFOOD surface.
+\item
+  Add tests that bind the fixture to \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y} and the existing \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} surface.
+\item
+  Update changelog and issue/PR evidence.
+\end{itemize}
+
+\section{Non-Goals}\label{record-142-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not require Wesley or Geordi repository changes.
+\item
+  Do not migrate all DOGFOOD blocks to GraphQL.
+\item
+  Do not rewrite the DOGFOOD navigation runtime or docs app.
+\item
+  Do not introduce a general GraphQL parser or resolver runtime.
+\item
+  Do not create BlockLab, Theme Lab, localization workbench, or a browser endpoint.
+\item
+  Do not move parent issue \#302 out of the \texttt{B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d} milestone.
+\end{itemize}
+
+\section{Fixture Contract}\label{record-142-fixture-contract}
+
+The fixture should live at \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}/\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l} unless implementation finds a stronger local convention.
+
+Expected SDL shape:
+
+\begin{CodeBlock}
+type DogfoodNavigationList
+  @bijouBlock(id: "dogfood.navigation", component: "NavigationListBlock")
+  @bijouTarget(kind: "bijou-terminal", cols: 80, rows: 8)
+  @bijouGroup(id: "dogfood.navigation.header", label: "Header", x: 1, y: 0, width: 46, height: 2)
+  @bijouGroup(id: "dogfood.navigation.items", label: "Items", x: 1, y: 2, width: 46, height: 5) {
+  title: String!
+    @bijouText(id: "dogfood.navigation.title", group: "dogfood.navigation.header", x: 2, y: 0)
+    @bijouI18n(key: "dogfood.navigation.title", fallback: "Documentation")
+    @bijouToken(fg: "semantic.nav.title.fg")
+
+  activeItem: String!
+    @bijouText(id: "dogfood.navigation.active", group: "dogfood.navigation.items", x: 2, y: 2)
+    @bijouAction(id: "navigation.selectItem", command: "navigation.selectItem", key: "Enter")
+    @bijouBind(id: "navigation.selection.activeLabel", kind: "state", path: "navigation.selection.activeLabel")
+    @bijouI18n(key: "dogfood.navigation.active", fallback: "Active: Blocks")
+    @bijouToken(fg: "semantic.nav.item.active.fg", bg: "semantic.nav.item.active.bg")
+
+  itemCount: String!
+    @bijouText(id: "dogfood.navigation.itemCount", group: "dogfood.navigation.items", x: 2, y: 3)
+    @bijouBind(id: "navigation.items.count", kind: "computed", path: "navigation.items.count")
+    @bijouI18n(key: "dogfood.navigation.itemCount", fallback: "Items: 7")
+    @bijouToken(fg: "semantic.nav.item.fg")
+
+  expandHint: String
+    @bijouText(id: "dogfood.navigation.expandHint", group: "dogfood.navigation.items", x: 2, y: 4)
+    @bijouAction(id: "navigation.expandGroup", command: "navigation.expandGroup", key: "ArrowRight")
+    @bijouI18n(key: "dogfood.navigation.expandHint", fallback: "Expand group")
+    @bijouToken(fg: "semantic.nav.hint.fg")
+}
+\end{CodeBlock}
+
+The implementation may adjust coordinates, labels, or token names if existing terminal proof requires it, but the fixture must still preserve:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} as the component
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} as the artifact id
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} as the registry surface connected by tests
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}I\allowbreak{}t\allowbreak{}e\allowbreak{}m}, \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}G\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p}, and selection/item-count binding facts
+\end{itemize}
+
+\section{Accessibility And Assistive Posture}\label{record-142-accessibility-and-assistive-posture}
+
+Meaning must survive without color or borders. The \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}s}, \texttt{i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}s}, and \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}s} lower modes must expose the same DOGFOOD navigation nodes as the normal terminal proof, and the active selection must be identifiable through source maps and binding facts.
+
+\section{Localization And Directionality Posture}\label{record-142-localization-and-directionality-posture}
+
+Renderable fields must use \texttt{@\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}I\allowbreak{}1\allowbreak{}8\allowbreak{}n} with fallback text. This slice does not add runtime translation behavior or directionality rules; it preserves i18n keys and fallbacks so later locale-aware fixtures can replace the fallback text without changing the artifact contract.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-142-agent-inspectability-and-explainability-posture}
+
+The committed facts should let an agent inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  fixture source path and semantic source anchors
+\item
+  artifact id, component, source hash, and group hierarchy
+\item
+  scene id, root node, action ids, binding ids, i18n keys, and token refs
+\item
+  terminal cell source-map entries for visible navigation text
+\item
+  lower-mode rows and hashes
+\item
+  debug summary hash, artifact hash, and scene hash
+\end{itemize}
+
+No emitted artifact may include absolute local paths, timestamps, process ids, or screenshots.
+
+\section{Linked Invariants}\label{record-142-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}: the DOGFOOD SDL fixture must fail before lowering when required source facts are malformed or missing.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: the fixture must preserve DOGFOOD navigation meaning across \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, terminal cells, and lower modes.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}: debug output must stay inspectable as serializable facts.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: DX-046 is not complete until focused tests prove the real DOGFOOD fixture contract.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-142-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add this design doc and issue/roadmap updates.
+\item
+  Add failing tests for the checked-in DOGFOOD GraphQL fixture.
+\item
+  Add the \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} SDL fixture.
+\item
+  Add any small fixture loader or export needed by tests.
+\item
+  Compile the fixture into \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} and assert DOGFOOD registry alignment.
+\item
+  Lower the artifact into \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and assert terminal proof facts.
+\item
+  Assert \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1} fields, groups, lower modes, and hashes.
+\item
+  Add failure coverage for missing DOGFOOD product facts.
+\item
+  Update changelog and issue/PR evidence.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-142-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: loading the checked-in DOGFOOD navigation SDL fixture should fail before the fixture exists.
+\item
+  RED: compiling the fixture should produce \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, two groups, DOGFOOD fields, token refs, i18n keys, action ids, binding ids, and a neutral source name.
+\item
+  RED: registry alignment should prove \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y} maps \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} to \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}.
+\item
+  RED: lowering and terminal proof should expose visible navigation text and source-map entries for the active item.
+\item
+  RED: debug summary should include artifact hash, scene hash, summary hash, groups, fields, i18n keys, token refs, actions, bindings, and normal / \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}s} / \texttt{i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}s} / \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}s} lower modes.
+\item
+  RED: malformed DOGFOOD fixture variants should fail before terminal proof when they omit required i18n, action, binding, group, or token facts.
+\end{itemize}
+
+\section{Closeout}\label{record-142-closeout}
+
+The cycle is landed when:
+
+\begin{itemize}
+\tightlist
+\item
+  \#329 links this design doc and the PR
+\item
+  \#302 remains the broad Beyond tracker
+\item
+  \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} keeps \#329 as the release-scoped tracker item
+\item
+  the branch PR links \#329, \#302, and this design
+\item
+  focused DX-046 tests are green
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, focused tests, and the relevant full validation are green
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the real DOGFOOD GraphQL fixture under \texttt{U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d}
+\end{itemize}
+
+\section{Implementation Notes}\label{record-142-implementation-notes}
+
+This cycle adds \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}/\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l} as the first checked-in DOGFOOD GraphQL SDL fixture. Focused tests compile it into the \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact, prove that it matches the existing \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} registry entry and \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, lower it to \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, render terminal proof, assert debug facts, and reject malformed fixture variants before terminal proof.
+

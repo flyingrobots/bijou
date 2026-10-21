@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-
+import { readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
 export function readMarkdownDoc(path: string): string {
   return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
 }

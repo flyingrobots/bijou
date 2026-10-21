@@ -1,0 +1,346 @@
+\chapter{Migrating To Bijou v4.0.0}\label{record-010}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/MIGRATING_TO_V4.md}\par}\smallskip
+
+This guide is for existing Bijou apps moving onto the \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release line.
+
+The short version:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} is still the degradation-first toolkit for CLIs, prompts, logs, and composable terminal output.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} is the high-fidelity runtime for fullscreen and app-like terminal experiences.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} is the framed shell built on top of that runtime.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} provides the Node adapters plus the worker runtime and native demo recorder.
+\end{itemize}
+
+\section{Upgrade Checklist}\label{record-010-upgrade-checklist}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Upgrade all Bijou packages together to \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+\item
+  Decide whether each part of your app is a core string-first flow or a V4 runtime flow.
+\item
+  Treat \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}-returning helpers as real render values, not implicit strings.
+\item
+  Keep the fullscreen runtime pure: \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} and framed pane renderers return \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}, never raw strings.
+\item
+  Prefer the \texttt{*\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} companion helpers for common runtime chrome, and cross string boundaries explicitly with \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{})} only when you truly need a string endpoint.
+\item
+  If you use nested TEA apps, prefer \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} and \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} for lifecycle wiring, with \texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})} for rendering.
+\item
+  If you adopt BCSS, stay within the documented supported scope for the current release line.
+\item
+  If you author custom transition shaders, use the v4 override names: \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r}, \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l}, and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}l\allowbreak{}e}.
+\end{enumerate}
+
+\section{Package Roles In v4}\label{record-010-package-roles-in-v4}
+
+\subsection{\texorpdfstring{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}}{}}\label{record-010-flyingrobotsbijou}
+
+Use this for:
+
+\begin{itemize}
+\tightlist
+\item
+  prompts and forms
+\item
+  CLI output and logs
+\item
+  boxes, tables, trees, badges, alerts, progress bars
+\item
+  themes, output-mode detection, and test adapters
+\end{itemize}
+
+\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} remains the stable, pure, degradation-first package. It contains both string-oriented and surface-oriented primitives. \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} does not require every core helper to return \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+\subsection{\texorpdfstring{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}}{}}\label{record-010-flyingrobotsbijou-tui}
+
+Use this for:
+
+\begin{itemize}
+\tightlist
+\item
+  fullscreen TEA apps
+\item
+  layout trees and surface composition
+\item
+  motion, overlays, and shell-style interaction
+\item
+  programmable pipeline features
+\end{itemize}
+
+The runtime now treats \texttt{V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} as the public render contract.
+
+\begin{CodeBlock}
+type ViewOutput = Surface | LayoutNode;
+\end{CodeBlock}
+
+\subsection{\texorpdfstring{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}}{}}\label{record-010-flyingrobotsbijou-tui-app}
+
+Use this when you want:
+
+\begin{itemize}
+\tightlist
+\item
+  framed shell chrome
+\item
+  tabs, footer/help chrome, overlays, drawer/modal flows
+\item
+  a batteries-included app skeleton
+\end{itemize}
+
+The shell accepts pane renderers that return \texttt{V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}, not just string blocks.
+
+\subsection{\texorpdfstring{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}}{}}\label{record-010-flyingrobotsbijou-node}
+
+Use this for:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  raw input, resize events, styling, file access
+\item
+  \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}I\allowbreak{}n\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}G\allowbreak{}i\allowbreak{}f\allowbreak{}(\allowbreak{})} and related native recorder helpers
+\end{itemize}
+
+\section{The Biggest Behavioral Change: Pure Runtime Boundaries}\label{record-010-the-biggest-behavioral-change-pure-runtime-boundaries}
+
+Some runtime-first helpers now return \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}. The most visible example is \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+
+That means this old pattern is no longer safe everywhere:
+
+\begin{CodeBlock}
+console.log(badge('OK'));
+\end{CodeBlock}
+
+If the surrounding API expects a string, convert explicitly:
+
+\begin{CodeBlock}
+import { badge, surfaceToString } from '@flyingrobots/bijou';
+
+const ctx = initDefaultContext();
+const text = surfaceToString(badge('OK', { ctx }), ctx.style);
+console.log(text);
+\end{CodeBlock}
+
+The same rule applies when you feed \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} or other surface output into:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  template strings
+\item
+  \texttt{A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}j\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  string-first helpers like \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} cells
+\end{itemize}
+
+For common app-shell composition, prefer the surface-native companions instead of converting back to strings:
+
+\begin{CodeBlock}
+import { badge, separatorSurface, tableSurface } from '@flyingrobots/bijou';
+
+const table = tableSurface({
+  columns: [{ header: 'Service' }, { header: 'Status' }],
+  rows: [['api', badge('LIVE', { variant: 'success', ctx })]],
+  ctx,
+});
+\end{CodeBlock}
+
+The preferred surface-native companions are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+Transition-era aliases were removed from the runtime-facing API surface:
+
+\begin{itemize}
+\tightlist
+\item
+  use \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, not \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}V\allowbreak{}3\allowbreak{}(\allowbreak{})}
+\item
+  use \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, not \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}V\allowbreak{}3\allowbreak{}(\allowbreak{})}
+\item
+  use \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, not \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}V\allowbreak{}3\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+\section{\texorpdfstring{\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}(\allowbreak{})} Now Needs A Style Port}{ Now Needs A Style Port}}\label{record-010-surfacetostring-now-needs-a-style-port}
+
+In \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}(\allowbreak{})} requires a \texttt{S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t}.
+
+\begin{CodeBlock}
+surfaceToString(surface, ctx.style);
+\end{CodeBlock}
+
+If you previously called \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}(\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{})} with one argument, update those call sites.
+
+\section{\texorpdfstring{\texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} And Framed Pane Renderers}{ And Framed Pane Renderers}}\label{record-010-app.view-and-framed-pane-renderers}
+
+The runtime now documents the truth:
+
+\begin{CodeBlock}
+interface App<Model, Msg> {
+  view(model: Model): Surface | LayoutNode;
+}
+\end{CodeBlock}
+
+Framed pane renderers follow the same rule. Return:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} for direct rendering
+\item
+  \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} for layout-tree composition
+\end{itemize}
+
+If you still have string-returning runtime views, convert them explicitly before they cross the runtime boundary.
+
+\section{Sub-Apps: Prefer Lifecycle Helpers}\label{record-010-sub-apps-prefer-lifecycle-helpers}
+
+For nested TEA apps, the release-ready pattern is:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} for child startup
+\item
+  \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} for child updates and command mapping
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})} for rendering the child view into the parent
+\item
+  \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} when you need direct command mapping
+\end{itemize}
+
+\texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})} alone is not the full lifecycle story.
+
+\section{\texorpdfstring{BCSS Scope In \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}}{BCSS Scope In }}\label{record-010-bcss-scope-in-4.0.0}
+
+BCSS is real in \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, but intentionally scoped.
+
+Supported:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{T\allowbreak{}y\allowbreak{}p\allowbreak{}e}, \texttt{.\allowbreak{}c\allowbreak{}l\allowbreak{}a\allowbreak{}s\allowbreak{}s}, and \texttt{\#\allowbreak{}i\allowbreak{}d} selectors
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{})} lookups
+\item
+  \texttt{@\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{} \allowbreak{}(\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} and \texttt{@\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}a\allowbreak{} \allowbreak{}(\allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  supported text-style properties on documented V3 surface components
+\item
+  frame shell regions that expose BCSS identity
+\end{itemize}
+
+Not promised in \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}:
+
+\begin{itemize}
+\tightlist
+\item
+  a global CSS cascade across arbitrary layout nodes
+\item
+  blanket styling of every component in the repository
+\end{itemize}
+
+If you need a good template, start from \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-css}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}c\allowbreak{}s\allowbreak{}s}}.
+
+\section{Recommended Migration Flow}\label{record-010-recommended-migration-flow}
+
+\subsection{1. Upgrade dependencies together}\label{record-010-upgrade-dependencies-together}
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou@4.0.0 @flyingrobots/bijou-node@4.0.0
+\end{CodeBlock}
+
+Add the runtime packages if the app uses them:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-tui@4.0.0 @flyingrobots/bijou-tui-app@4.0.0
+\end{CodeBlock}
+
+\subsection{2. Fix string/surface seams first}\label{record-010-fix-stringsurface-seams-first}
+
+Look for:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{})}
+\item
+  \texttt{`\allowbreak{}\$\allowbreak{}\{\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{}\}\allowbreak{}`}
+\item
+  arrays of mixed strings and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  string-only helper APIs receiving \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\end{itemize}
+
+\subsection{\texorpdfstring{3. Update framed panes to \texttt{V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t}}{3. Update framed panes to }}\label{record-010-update-framed-panes-to-viewoutput}
+
+If your app uses \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}, return \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} directly. Remove any string-returning pane shims.
+
+\subsection{4. Update nested app wiring}\label{record-010-update-nested-app-wiring}
+
+If you built manual child \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}/\allowbreak{}u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e} plumbing, consider moving to \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} and \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}.
+
+\subsection{5. Add smoke coverage}\label{record-010-add-smoke-coverage}
+
+At minimum, run:
+
+\begin{CodeBlock}
+npm run build
+npm test
+npm run typecheck:test
+npm run smoke:dogfood -- --skip-build
+\end{CodeBlock}
+
+\section{Canonical Runtime References}\label{record-010-canonical-runtime-references}
+
+These directories keep their historical \texttt{v\allowbreak{}3\allowbreak{}-\allowbreak{}*} names, but they are still the canonical runtime references for the \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} line on this branch.
+
+\begin{itemize}
+\tightlist
+\item
+  Runtime starter: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-demo}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}m\allowbreak{}o}}
+\item
+  BCSS: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-css}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}c\allowbreak{}s\allowbreak{}s}}
+\item
+  Motion: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-motion}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}}
+\item
+  Sub-apps: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-subapp}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}a\allowbreak{}p\allowbreak{}p}}
+\item
+  Workers: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-worker}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r}}
+\item
+  Pipeline extension: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/v3-pipeline}{\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}}
+\end{itemize}
+

@@ -1,0 +1,4146 @@
+{
+  "renderer": "Bijou tableSurface, checkout 836878a8, 8.0.0-rc.1",
+  "font": "Recursive Mono, MONO=1, CASL=0",
+  "tables": 123,
+  "panels": [
+    {
+      "id": "table-001-g1-1",
+      "table": "table-001",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "ARCHITECTURE.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 8,
+      "cell_sha256": "47c208dabfa7cc6317f4f6b3c1efd639663f74908e940c588eb79f57c0376d75",
+      "svg_sha256": "423810c4ae59a1fa584906067b901b737654c7d57ac4af7ceed4e574e3d1553e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-002-g1-1",
+      "table": "table-002",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/system-style-javascript.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 13,
+      "cell_sha256": "d73eaf40e5b9e232d62217b38c89e9ebcdb7dc7aaad78d4dc4ab5451fe5723c6",
+      "svg_sha256": "7cfc916b9e82685c06527061e171d9b8fbb3deee3901618dd4b01974344c1b84",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-003-g1-1",
+      "table": "table-003",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/invariants/README.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 15,
+      "width": 68,
+      "height": 19,
+      "cell_sha256": "6cb935c9f7d33928ca17798c56e60febd713179f1dfb5595ead8f10ceb536312",
+      "svg_sha256": "e2290b4c02a5c98561874355c12deff95229249d0c5a869183953f7ff67f1a4d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-004-g1-1",
+      "table": "table-004",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/strategy/component-story-v0.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "50cc994bbaf0ecfc74597e89f05275721281f31b55e51feea043a4bcd0c1e35a",
+      "svg_sha256": "48760d616c0041cbcba4aabfea54c0f22b0235d551fe67d5e4e9d3c895405d45",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-005-g1-1",
+      "table": "table-005",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/guides/terminal-scenarios.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "1119425e80b86f6764a913f2da0f47582d7b230f422c0e889bc63a62174c0448",
+      "svg_sha256": "970a27feaf6a3221557bdaab94501967a7b9f8d4250dca10b3e501e00b236d0b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-006-g1-1",
+      "table": "table-006",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/guides/terminal-scenarios.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 14,
+      "cell_sha256": "c7a3778a312a837b9d67ff01c95cf6032a4278294431b8eee7e49cb852be8b54",
+      "svg_sha256": "31d1bd91ea6cb6df6a5c724974421b80b7d34c14b49f7ec9d608e36a3e33819d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-007-g1-1",
+      "table": "table-007",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/DOCUMENTATION_STANDARDS.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 15,
+      "width": 86,
+      "height": 43,
+      "cell_sha256": "32a3e284ab8c4da056a3fb4da8aae8f750b8bcc0d2c815f4d0757d684bd2f7ad",
+      "svg_sha256": "66fce8d5bcc068507df2fc1e22e2e05736b737bcedb9933953e3449f93da83c7",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-008-g1-1",
+      "table": "table-008",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/DOCUMENTATION_STANDARDS.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 80,
+      "height": 9,
+      "cell_sha256": "2bd75b53be5bb517467fe0bb887e43977eaf5cdca0ae4702b38934f6cdc6172a",
+      "svg_sha256": "2b33bacdf006a0ef86d50cc288514ab2ac3f4a2843577940f74156c013ad5d32",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-009-g1-1",
+      "table": "table-009",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/packed-bijou-cells.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 19,
+      "width": 86,
+      "height": 25,
+      "cell_sha256": "5e45fec9e6515aa82cbf9da47e93d9b7b9b9d05f8226be45c32dbc89acd63668",
+      "svg_sha256": "eca7fc7f2fe40041abab58525857622e4cf360a29f50afdc51ab25bdfce58192",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-010-g1-1",
+      "table": "table-010",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/packed-bijou-cells.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 70,
+      "height": 9,
+      "cell_sha256": "15e54c0760836d9d1c85a9d6a7d85a9070e7fbe6aac04e4e5e4c91e848b88d64",
+      "svg_sha256": "f136200e9a1f47ba4f9d9c684f5e8ecadcb12abc8f58856521d02d634b0d6427",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-011-g1-1",
+      "table": "table-011",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/packed-bijou-cells.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 12,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "382964bf5b2d82493a3005bfe00e87f2d35ff65295a335f5d758f5bc5f5740ce",
+      "svg_sha256": "afd3e239bb81baf9af132e944915693e48dc5f2e7bf8ed7ebd6efb720708dd32",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-012-g1-1",
+      "table": "table-012",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/profunctor-page-inspection.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "4f64c0953f0d8ab4c71da71d4c3b7f58c1a9b7738c607a3c0e78f43541d05a87",
+      "svg_sha256": "4839b60b4c013bfe071fe3d5da95a68c148f90af6390e4d2d94f490bd77fe14e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-013-g1-1",
+      "table": "table-013",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/profunctor-page-inspection.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "9cf0f40cea62d47887b894d829a05e8b11182554623e5dd02311ee8a4f2150c9",
+      "svg_sha256": "dd771dda99a0e8b243a63aadf526f5f83efaa3d6b7a1d225a9d920c89c52c91c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-014-g1-1",
+      "table": "table-014",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/profunctor-page-inspection.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 15,
+      "cell_sha256": "b6050067bd457c2c1c584d489d89e96c4d58e1e7b5be57019e82e28ee98b0145",
+      "svg_sha256": "a3621ec16185dded97e243cf0c5b99c8c8151db2ff2031e06c8ad30eccffa526",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-015-g1-1",
+      "table": "table-015",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/reference/profunctor-page-inspection.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 17,
+      "cell_sha256": "7baeb18e932567f99310b82a0f7fc6702fe7d790720540976a5b1e25a603f235",
+      "svg_sha256": "adca9f2f321f93135c41bcf981585d53eb05d22c3cc7186d84b1c8e9f1d9c914",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-016-g1-1",
+      "table": "table-016",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 29,
+      "cell_sha256": "3165ecb85b8c425be2ac5c9b9f0b1545b1cfa7a64aa9291c671902d9816d8a16",
+      "svg_sha256": "3ffe8d3ceb7c3b16f304dcfccafc1ea62320de140872677ba3f5a36de783ad66",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-017-g1-1",
+      "table": "table-017",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 21,
+      "cell_sha256": "ba177deccd079dfac27d015b64e1fa3d804bc014360f7d167ec19a47c1794321",
+      "svg_sha256": "18e5b397ba17fc2574440766f49a767ff7eea8e1dee32e6cf2cf2664189c6e5d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-018-g1-1",
+      "table": "table-018",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 20,
+      "cell_sha256": "8988576f3a997b1761bf1f4f101323764b6fbb7921c1ad380a2db0fc397db215",
+      "svg_sha256": "f19474812503d08ddae813877e814dc45db85c97f06b5b16b2c3fcd59e2b8284",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-019-g1-1",
+      "table": "table-019",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 26,
+      "cell_sha256": "c4937a7a87b47d95dcb9379198947a4e260fb272ba8789f2de9f7a7ae9845ad4",
+      "svg_sha256": "53ae3998c90308e56ab8bcf83f6c7303ef6faad1389f5ad1a1aa1540a1bd7bd3",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-020-g1-1",
+      "table": "table-020",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 24,
+      "cell_sha256": "13946f053a97b57cb2ad52e9d94af82dcda40dc28789525c636bfde4cf8eb0c1",
+      "svg_sha256": "3334a82c8c8c304c7ed49028c8803c7bc92faa51d83dfa670c5df1f77a972e59",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-021-g1-1",
+      "table": "table-021",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design-system/theme-tokens.md, table 6",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 2,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "c6cbae4d25ee8e200b606e76c9833397167133a512ab6e142e50b375b19a882c",
+      "svg_sha256": "dc631c4e40420d61af9f0cc99f486a2edbc7e0b08888c6903532ff464c816773",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-022-g1-1",
+      "table": "table-022",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-030-dogfood-docs-surface-block.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 60,
+      "height": 11,
+      "cell_sha256": "6009c2fb433756eddbacbd7f451c7a414623decc1aed6a08235608ee0f69762e",
+      "svg_sha256": "dfea45c1c2dee100a47d44742e0b77df8057c3adab687a44332226675eac9111",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-023-g1-1",
+      "table": "table-023",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-031-status-feedback-standard-blocks.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "93b188c849dc6e695db1b4359fd03b1f9f71623d982c6fa24c2f26b9e362e4a2",
+      "svg_sha256": "d86505a9a9df85b5408aa78b4e26ffababcb57f8e733c3c13c18435cea8cfc2e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-024-g1-1",
+      "table": "table-024",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-039-component-family-standard-blocks.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 60,
+      "height": 10,
+      "cell_sha256": "cb19ee80a52d6bc3cb5ce23554e111febd6977294e64c48f1051cc622297fa9e",
+      "svg_sha256": "7747f64a6fa4c13a3345d6191f2e9cc7b2e06eba70ecb522b77a140f9032739f",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-025-g1-1",
+      "table": "table-025",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-039-component-family-standard-blocks.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "b5cb84488b91007172d55de711f47533b862f9aa20aed1cb285c49bdf52764d1",
+      "svg_sha256": "536378543eda273234294ffaf6caf0b09a0607e7fc016044978ed6767d733be8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-026-g1-1",
+      "table": "table-026",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-046-choice-navigation-standard-blocks.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 52,
+      "height": 10,
+      "cell_sha256": "00d892295a17ff8af4a751f561c0dbf70afb7f986565ff91a9c5825a1ba26417",
+      "svg_sha256": "5d02d1b588a510760144eab5d2342b111f2161977f67fa547deb40000d88e181",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-027-g1-1",
+      "table": "table-027",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-046-choice-navigation-standard-blocks.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "8f307f541805613bf1aa307c6f2d5791d30c8ddb1cce94e9747d94c3351dd8d5",
+      "svg_sha256": "22a58144d6e43a932a80cb366bbd298b922bb44b7664e40db7ccbcdb18a622c4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-028-g1-1",
+      "table": "table-028",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-054-late-family-standard-blocks.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 49,
+      "height": 10,
+      "cell_sha256": "f1fe19eb2826ef0e69eed2c841cf30145e983ddb340dcfb7dcb633e688111e57",
+      "svg_sha256": "af85fdda1b5ecd9f0cf8166639a2bbb55e7a459bd018fa37b638943665b838f0",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-029-g1-1",
+      "table": "table-029",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-054-late-family-standard-blocks.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "2ec5a0f07938ce584a3718fbd7d228b902dd4f46b8f7833a9ea6d105c354f159",
+      "svg_sha256": "f4430779a9fdc7444cd5b5db4110713252a70e4c8b20c8ab03328c3855e120dd",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-030-g1-1",
+      "table": "table-030",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-060-v7-dogfood-release-title-screen.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 13,
+      "cell_sha256": "a9da885aa0ea720b882c2f73bf748c3baa90065eb7483aa95d4309a23267ef28",
+      "svg_sha256": "17743356d2234db1a12e78074357fa36f0b345d40cb50bb481f3972a5d55d1b4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-031-g1-1",
+      "table": "table-031",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-074-fluid-triangle-title-screen.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "49a48f71c97f5ae2f26a81834e9608a9af86b88717358f602cc85c0d16b13aff",
+      "svg_sha256": "edaf21865666efc78624e4f09f57f3e2bdb986fb8cd74dcf3d84e7a41b064fa0",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-032-g1-1",
+      "table": "table-032",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DF-074-fluid-triangle-title-screen.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 72,
+      "height": 12,
+      "cell_sha256": "007c1f83e2b253b301094cf37555ac55bcd399a55689a28e793b73f535d17341",
+      "svg_sha256": "7f05aeb3b4690991515f4146ccf593152a7294e08ada8c203f4ca99db4f8844d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-033-g1-1",
+      "table": "table-033",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-038-blocklab-rename-and-migration.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 52,
+      "height": 11,
+      "cell_sha256": "f1dc477a37a52619831445302ebd7f4b8d6035b322105c2fc5f6b5230828efb6",
+      "svg_sha256": "08db0d30c46bf3b244bf927073649755611da0a0081aa7810eb453d0534130bd",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-034-g1-1",
+      "table": "table-034",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-039-blocklab-product-parity.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 36,
+      "cell_sha256": "d375aa654590972ae0c4da39860d1877e4ebf6eb991ad3b2703bf5659913cc51",
+      "svg_sha256": "19e40c0f3bb3bccfa39390cd415f1d62eb85335c2d00e35208c84905b3e0fc72",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-035-g1-1",
+      "table": "table-035",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-040-v7-review-regression-fixes.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 2,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "bff325efee935cc4a5791513f171fad5f336bec2d39debf9e5b94466fab63ce4",
+      "svg_sha256": "7a4d3df1cbac7d1f42a3e46b9824128ca765fd4348250f202dcd7d67e58d0518",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-036-g1-1",
+      "table": "table-036",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 13,
+      "cell_sha256": "21a698c1bb9c4f0f54eb569463899e201af5f9038e1d03d3e1fb9834a88a7b9c",
+      "svg_sha256": "6f791b203a5d9a8d34bd4307dfe6b5e522c41d29eacb081a042c694511d75e90",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-037-g1-1",
+      "table": "table-037",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-052-no-color-is-not-a-capability.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 9,
+      "cell_sha256": "4eaef27b9f9ffa8c3f92ceb76161e847b2c50c8e3a2d2a1bf2ddf22b0dd2b944",
+      "svg_sha256": "3b397daa22910ef87b9888e520686ca88309f65e302fe4592218b3b101bb6fcf",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-038-g1-1",
+      "table": "table-038",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/DX-052-no-color-is-not-a-capability.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 14,
+      "cell_sha256": "ed9f979099eb605134d1d6cf9b41a6675a13a04767f621ce2d3592cb82cc7867",
+      "svg_sha256": "a7ac9fc5e3fb7e7265eb3e983115a0851273cca652562188c916560148c0367e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-039-g1-1",
+      "table": "table-039",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/RE-008-perf-findings.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 9,
+      "cell_sha256": "db83700101cd5581d11de716a5b5f4f3f7c9a3f854149a36d4f7a2a795707adb",
+      "svg_sha256": "14d8c6a232fd4da91cd6154d51bc9466842fb59b3ee0af7ee4502a8eeec09e9a",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-040-g1-1",
+      "table": "table-040",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/RE-008-perf-findings.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 80,
+      "height": 7,
+      "cell_sha256": "0c988bcfc47eaa8c19df56b7006799447d23f0af15dcf103dc6134b3fc616a60",
+      "svg_sha256": "a5200faa09b18fcfbb572a74c875f7b6ab490d679607c39938d369a32d6d6b52",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-041-g1-1",
+      "table": "table-041",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/RE-008-perf-findings.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "6fbfabe7fbb2da05f427979d03f206e75515632e547bae3c32a97dd45b5c96ea",
+      "svg_sha256": "bbf579fa4534b51e411289b0f02e13d94ff05eabc02d45af05a5dbb027066995",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-042-g1-1",
+      "table": "table-042",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 44,
+      "cell_sha256": "37423c545c867f4fe7dcdf8d105fec8da73573ce5b85c51c2a6ca1a8e473b49f",
+      "svg_sha256": "0427661d996fb73ef15edc10922ef55bbc9298e687976bf1b8514ca7e13d1ba4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-043-g1-1",
+      "table": "table-043",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-134-code-dojo-eslint-ratchet-1.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 61,
+      "height": 9,
+      "cell_sha256": "e95e2faff7fc15da4d08d471770ca93b69f5c44c0e4d28719a700d30f1b7c52c",
+      "svg_sha256": "eade7db031284d1eb2d6e34586ea29aec95ea32164417475e48c592b794e3c44",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-044-g1-1",
+      "table": "table-044",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-134-code-dojo-eslint-ratchet-1.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 35,
+      "height": 9,
+      "cell_sha256": "8b057075455a00e8adf17fbfa4442eb79a83276e12f8f992830d3908b047f278",
+      "svg_sha256": "bc822bfd3bf58e5f4c282a5a1264229513866c487e5c14aeadf3b7dab8172bbe",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-045-g1-1",
+      "table": "table-045",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-135-respecting-dojo-1000.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 61,
+      "height": 14,
+      "cell_sha256": "c8b920bc6428702febd0e0aeb656479ad66509606d68153d8ddf81c9cfe9ddeb",
+      "svg_sha256": "71f89bbf63e0a6e7d5249f204fa50bec2c4ff1f4757953b56499e49eb8fcb421",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-046-g1-1",
+      "table": "table-046",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-136-respecting-dojo-ratchet-2018.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 68,
+      "height": 8,
+      "cell_sha256": "d994f02778d10c88090f7a11fcd2bd39866249700b45d4ea4bec9830791ac257",
+      "svg_sha256": "5c2975bfa0a489b5a50655185db146b807d3492b9d8d3b7ce1f690f24fee93a4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-047-g1-1",
+      "table": "table-047",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-137-respecting-dojo-ratchet-1965.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 58,
+      "height": 9,
+      "cell_sha256": "d2baf0be7a3cc47b358d9d863dcb32e37161c1bab193423f14ac82e02da3052f",
+      "svg_sha256": "6c4dc45ac7bfb0ef8e85dde73e7fd758f72a2f79de395d7e093e8a8f28eb4476",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-048-g1-1",
+      "table": "table-048",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-138-respecting-dojo-ratchet-1857.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 68,
+      "height": 9,
+      "cell_sha256": "9cb087ad7f05244f15762d45044b9c00e70e51a87c35a044e160dc4c2a3ba0e2",
+      "svg_sha256": "3eb3b6d60c92a807dc4a8bcbf268e773b9af9603fa225cfb6b63bc7a715236a5",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-049-g1-1",
+      "table": "table-049",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-139-respecting-dojo-ratchet-1796.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 67,
+      "height": 9,
+      "cell_sha256": "05f9921f87c0d984b39c00d157ba12c7173670faff86eb07968d29b9f96c6e8c",
+      "svg_sha256": "feacc1141802ad4efa3ae78ed2ad3ff38a4cb5fa8e8246ccebd6cb54f6437a0b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-050-g1-1",
+      "table": "table-050",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-140-respecting-dojo-ratchet-1729.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 67,
+      "height": 9,
+      "cell_sha256": "300ab36974dce9cad1ff9243a1e589d2f7f82f285fae7a0ecf6399d5fb12b672",
+      "svg_sha256": "286d2d9e9f269935901fe53911c011ff286dd64099e4c59a9cc4f18c638800dc",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-051-g1-1",
+      "table": "table-051",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-141-respecting-dojo-ratchet-1679.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 63,
+      "height": 10,
+      "cell_sha256": "a5ced79946af075010acce54fdec40605b0eb87dd96ee0725930956bc706aaf2",
+      "svg_sha256": "710c83dc4b9a98b2483efcd2f016979bf09517f3c8cc2dd841925f7e061e4eac",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-052-g1-1",
+      "table": "table-052",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-142-respecting-dojo-ratchet-1621.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 63,
+      "height": 12,
+      "cell_sha256": "62686ff491d37433231e0eeccb88601766fd6864280af95c356067449c85ea65",
+      "svg_sha256": "d370ee54edcd5ff62a180cb83a69994de03f97de35a0a7211191f2ddc0fb130c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-053-g1-1",
+      "table": "table-053",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-143-respecting-dojo-ratchet-1567.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 65,
+      "height": 11,
+      "cell_sha256": "ee32ea776c8d45f20036952ae20bef456d92b9ffbbfaaf22295b0f8926912c38",
+      "svg_sha256": "4f0f06eede8dc4bd4af9f30cb6849b0438fb354551547e49670ff4eb80725a08",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-054-g1-1",
+      "table": "table-054",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-144-respecting-dojo-ratchet-1514.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 68,
+      "height": 11,
+      "cell_sha256": "cd1fc8c90e2ce1e7462a7f31243ae47bf70e0587ba3ca2f33dcca6bba9f75f52",
+      "svg_sha256": "446df93475b8f6b195f167bdbd1a1973054ea4ce3df0270fdd51519ab64b88b6",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-055-g1-1",
+      "table": "table-055",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-145-respecting-dojo-ratchet-1461.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 68,
+      "height": 11,
+      "cell_sha256": "6ec180b049297c43372133b4c288bd89aa589f8f44eb49b80bac7184ea509827",
+      "svg_sha256": "1461c209899931fd578d6c817b66dbb6d204d50d71c3a7c598ae45a5e32df62c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-056-g1-1",
+      "table": "table-056",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-146-respecting-dojo-ratchet-1393.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 14,
+      "cell_sha256": "b3c33c0b3eba6a7046198752127d1ca3691a87a01825e8e906712c9495ff598e",
+      "svg_sha256": "d7c5ea71e733f50fac6eb02b2cb7103e7c2e735b728de3a9e99c3e0831c1b351",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-057-g1-1",
+      "table": "table-057",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-165-respecting-dojo-ratchet-12.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 14,
+      "cell_sha256": "9b59a0f55de316ba296f5d493d494d8bd14f2c16bc28c018df67ab5cd0509157",
+      "svg_sha256": "445c7b86af8bc0a985a642dd93e508c15a6e53e8424f799be695a32f8c7b83e8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-058-g1-1",
+      "table": "table-058",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-165-respecting-dojo-ratchet-12.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 19,
+      "cell_sha256": "5722080236e6d355471101cabf035e4f1dcf56cf6d6f5350ea56089e5ef592fc",
+      "svg_sha256": "697ea9486eb85166d67d3b856330b706cdfbf407815b93bcfffa02e9cbe43191",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-059-g1-1",
+      "table": "table-059",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-165-respecting-dojo-ratchet-12.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 25,
+      "cell_sha256": "712987ff17dbe7ef6a81e3e5c98bf00c074d3a98f37a26df9d75ca65812273b9",
+      "svg_sha256": "5b92cbc30cd6ed65941299aab9f3d4610bf1361ec1c8dc5760e85af9ddc9de4e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-060-g1-1",
+      "table": "table-060",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-165-respecting-dojo-ratchet-12.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 21,
+      "cell_sha256": "d895db2245a86e0a8f2b490a0c96fea3eeee01258e686eb0d63a21d6c5cb70d9",
+      "svg_sha256": "e115ba5fcc9b3a2346feed10189ded678239774ba013762dc0ca857918289f11",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-061-g1-1",
+      "table": "table-061",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-165-respecting-dojo-ratchet-12.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 22,
+      "cell_sha256": "4a5a470d6614ed818582d7fdd81b1cf24e741665f3fdc74c2485b1c8e263cfe5",
+      "svg_sha256": "36ef986eb3d8852d209995d13a10f5465cbfe89cd25edaeec5181dd2d845d2cd",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-062-g1-1",
+      "table": "table-062",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-167-roadmap-milestone-authority.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 69,
+      "height": 10,
+      "cell_sha256": "8fd790f62f4d152e0639cb6ca11b420c632061ef582825235d4dbce569f65073",
+      "svg_sha256": "4a02d95cc821a3c87ac11f523d6f403d7d59abf223dc66c723b50d3df594085c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-063-g1-1",
+      "table": "table-063",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/WF-167-roadmap-milestone-authority.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "8afa83bcd20669089f52682faae0b4d0b5996dc2f93c10265d2dda593cc8fbb1",
+      "svg_sha256": "38ad2b6491b7dbd3b326fddd7983829e66f96a55cd855e4c9e7479865da59da4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-064-g1-1",
+      "table": "table-064",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 66,
+      "height": 11,
+      "cell_sha256": "f41db090bcc92cd5672d017295f54e1010a9c420cc50784b26dca021b0f0ebc1",
+      "svg_sha256": "4de2263e957a0c74625b479c4b4b48eeb1d3e1be6bd16e8d945a25586332af48",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-065-g1-1",
+      "table": "table-065",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.1.0/README.md, table 1",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 11,
+      "width": 86,
+      "height": 50,
+      "cell_sha256": "1f0bdeeca313e26c0f2192a576c43cd53d12ed428bcfacb822776747d87202be",
+      "svg_sha256": "66546b44c9f307f810f2686d1d7c58dc8fdd5284b6a0054b788fdcfd383bd9a6",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-065-g1-2",
+      "table": "table-065",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.1.0/README.md, table 1",
+      "part": 2,
+      "parts": 2,
+      "row_start": 11,
+      "row_count": 1,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "6433e5d3b716bdc573431ed59d314ea6e804e60303aeda45b9e7a2d71986f292",
+      "svg_sha256": "1a8d0c784079acee940160f9aa4e01c21b0489106abcf50cf11f170c67b776ea",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-066-g1-1",
+      "table": "table-066",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.1.0/README.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 26,
+      "cell_sha256": "b0a5a0b72660e13fe6b5d27a3177416998319e593dd1fedaf496764d01edc6dd",
+      "svg_sha256": "a78dfd9a90ea07c0fbd64c116803a175ba37e850800d8c06d80a3ccd15095596",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-067-g1-1",
+      "table": "table-067",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.1.0/README.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 44,
+      "cell_sha256": "af7207ddb6974d6a54856eb4b0ebbb79c1989a48bfef797fec06ec74462df528",
+      "svg_sha256": "2d5c36252c92640ca998b3c6c8aded6de037144175023d6f7413af909e05b3cb",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-068-g1-1",
+      "table": "table-068",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.2.0/README.md, table 1",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "9fa0cb092a3f39a17140f6a2280b965e8119de3622e8ecc912d09b0d99c10431",
+      "svg_sha256": "7367404296e77fc048a4b006778fb09e303db0750dca500cf757ffb7a8d8168e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-068-g1-2",
+      "table": "table-068",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.2.0/README.md, table 1",
+      "part": 2,
+      "parts": 2,
+      "row_start": 7,
+      "row_count": 6,
+      "width": 86,
+      "height": 29,
+      "cell_sha256": "571679239e26aae0ea0da4b6fdcfa12b4fae820f13e9e0b5aa20654a0c4a31c5",
+      "svg_sha256": "0ecfc5a677e71176451cd5ef9d6725dd6daaad94929bc0154ac6a775510ed25a",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-069-g1-1",
+      "table": "table-069",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.2.0/README.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 32,
+      "cell_sha256": "33db8e40d9dd04fff82d02a8c594189edcddbe9d516cfacf06934803d2be11c0",
+      "svg_sha256": "157432ba813fe5ff5171f8e40860027fc6a43151a2268158ac07d618228e794f",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-070-g1-1",
+      "table": "table-070",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/7.2.0/README.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 85,
+      "height": 14,
+      "cell_sha256": "2055a4398ad1120767e1bd8f405ae5ecd1a40aa027d8cd7de54ef0829bb84c52",
+      "svg_sha256": "9dd83cf4b47d28105e4d1bab209a7c82bfeff0352c2492f2259ec961aee5a9dc",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-071-g1-1",
+      "table": "table-071",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 1",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 51,
+      "cell_sha256": "62892935b5874e27f3e5e3b7eba4315e841ecdb94a68914e48d823886d4c0bba",
+      "svg_sha256": "7b7dd6f38da8258185a7a3dc700c71497a4a35ba1255f15aaf079ef40f7c69c8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-071-g1-2",
+      "table": "table-071",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 1",
+      "part": 2,
+      "parts": 2,
+      "row_start": 8,
+      "row_count": 6,
+      "width": 86,
+      "height": 33,
+      "cell_sha256": "ca6358a04bc925f4d14e35cab92b9b5ebfe59c5c0f472c23c0bb4f73aa6c4847",
+      "svg_sha256": "112e40f612ca5518f2557c655a0f40a0c64a52008bffa53f312527368e589085",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-072-g1-1",
+      "table": "table-072",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 41,
+      "cell_sha256": "d2863b01da20faf9d2032a3d8735590b6525434f3655b697f895ecae66f6d9c4",
+      "svg_sha256": "19c61351cfe8f5f20197e6a384272fb00a3972cc332f4fe131a06874255caf5d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-073-g1-1",
+      "table": "table-073",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "6ccb57208b0316e088ddac3b9209efe036de46109ac1af01106753fd97a345fc",
+      "svg_sha256": "c36eb5780c025aac5ba19fa331b8bbe687c2106ec822f4b29ef87bfa7dfb2c96",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-074-g1-1",
+      "table": "table-074",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 4",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 50,
+      "cell_sha256": "012702e6a9dc6918443497a1b21e8b8a71cd709437252352eb5e47225368ed78",
+      "svg_sha256": "54b9929335f495abf7d958be83fce5ff71ddad621b9a5b07d80d89fc0f0838a6",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-074-g1-2",
+      "table": "table-074",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/8.0.0/README.md, table 4",
+      "part": 2,
+      "parts": 2,
+      "row_start": 3,
+      "row_count": 1,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "6ea16724d1e2dcfb79f29e3d8212b01e19c2bc671fa01c3a24114df7c0eb1c6f",
+      "svg_sha256": "0c653a7d930f68eea76c7e4e259b345a1d99a5398eb74757b3bce8a937e56ca3",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-075-g1-1",
+      "table": "table-075",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/4.1.0/migration-guide.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 25,
+      "cell_sha256": "5579c60d0e1b77c6b9e3e90a80a1b927cf95df6297888e3a6f8ecf1dac5ed3a9",
+      "svg_sha256": "b09df6184bb642e9ac7bd013c7212153f8ba07b77d5b506cedcafc3d72641ae1",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-076-g1-1",
+      "table": "table-076",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/release.md, table 1",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 14,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "4f4b06873ec6cadae362c6e491d3c196a65a376fdb0b78602500e3b4d0ea5347",
+      "svg_sha256": "bc17ab250cd28030dbf447746ffd78f7880a71be04a97f92cd4734bf29100848",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-076-g1-2",
+      "table": "table-076",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/release.md, table 1",
+      "part": 2,
+      "parts": 2,
+      "row_start": 14,
+      "row_count": 4,
+      "width": 86,
+      "height": 15,
+      "cell_sha256": "2d13f3698301e38cee07dd595654f5dd1d9f900b13250f1f3cefc5c039b25ad1",
+      "svg_sha256": "0ec575f2bbb77e35421b2ae2989ef42c05ed9ed54a9c330e321640378800427c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-077-g1-1",
+      "table": "table-077",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/release.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 26,
+      "cell_sha256": "73fedd481afeaf37eca9fd8e20abdce46988ffdbafe6eedd2cd7e5a3071695a1",
+      "svg_sha256": "8f6ea80939fdbf6f36d124f922716fd12e964ef61853ffd6cedefe3261368293",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-078-g1-1",
+      "table": "table-078",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/releases/4.2.0/whats-new.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 1,
+      "width": 84,
+      "height": 5,
+      "cell_sha256": "521af7c190748c0b0e867a9bf1c2305b7c98997822c2f797b2f5e5c9c09ee0b6",
+      "svg_sha256": "e5a64936fbe174ce1ec586fed53a68b21b02f3ece77c900b8c8fdeba2d1a9c29",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-079-g1-1",
+      "table": "table-079",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/method/retro/RE_016-grapheme-width-miscounts-emoji-like-icons.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 84,
+      "height": 7,
+      "cell_sha256": "e86feaa58234321de05e08ff64444485e457b261b1d233864d54edd9d0a3bb64",
+      "svg_sha256": "760a8166cc8020cb20be0398746642af669acabe8839d3d6c51da2c5ce043569",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-080-g1-1",
+      "table": "table-080",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/method/retro/WF-122-day-zero-audit-fixes.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 22,
+      "width": 86,
+      "height": 30,
+      "cell_sha256": "583ff881d76d732bdc81a6c1a52957f2aca1ed706eb8229d222d76cea1824349",
+      "svg_sha256": "bd935913b9d212f9ac7c4f5a816616f06a431a32f8c60e7f6d7cbad081ee85e3",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-081-g1-1",
+      "table": "table-081",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 17,
+      "cell_sha256": "11df56b620e9c67259424ccff8fc0dfca03703814848989041bacf93e080707e",
+      "svg_sha256": "59bc540aa5d3d466b6a2475745ffa49d1e67eb930a62de8093c5ded4403be742",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-082-g1-1",
+      "table": "table-082",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "31445336a8033bc0511a28fe6a2d7c8d9cb71be19483900f68e0ef801bcb2b0a",
+      "svg_sha256": "c3be3bedf6be825b325713e1633afc03194e4377ef356b62649f5fe40960e9b8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-083-g1-1",
+      "table": "table-083",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 68,
+      "height": 7,
+      "cell_sha256": "97a4086b910d217442370c837bc7f9f9d15077a53bec091f17be4ddeffbc132c",
+      "svg_sha256": "f021efb3e934777e72781ffb9b655aee18353432ffe0eee9ff837e88a62c6eb5",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-084-g1-1",
+      "table": "table-084",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 62,
+      "height": 7,
+      "cell_sha256": "2b3e455eac116b484fb5f33b50f0c4430c3d3b92863dbcb17c009f59b54c5431",
+      "svg_sha256": "32b68859785c4246cff602c1c20df1aafefc39c0306443545c4d60ce8715a904",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-085-g1-1",
+      "table": "table-085",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 71,
+      "height": 8,
+      "cell_sha256": "bbacfc31d886a2cbe5fd50b96dad5d03a7594d8ef6c081f0d02ebf79e58cfcaf",
+      "svg_sha256": "95b86dd903124ff7c5faa91a74c26f36da13389c6d18dc2e7e4aa3e869671d56",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-086-g1-1",
+      "table": "table-086",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-codebase-health-assessment.md, table 6",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 48,
+      "height": 7,
+      "cell_sha256": "9698912e8febfb5cd4873f5fceb03a6a815d357af111cd70531b728c7c53df20",
+      "svg_sha256": "42c7b03348871c5a2fee20ab4a7e8d02e86895460e899fa189036be14533ac53",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-087-g1-1",
+      "table": "table-087",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-documentation-audit.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "57d90a6a31cc297d0ed235efc6b2a3358272df6b454cf6a9ce5b3fd273c1b58e",
+      "svg_sha256": "169ec8c1336152788ab9f612402bc8891f069a6df0b3c11d982954155033aa2c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-088-g1-1",
+      "table": "table-088",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-documentation-audit.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 18,
+      "cell_sha256": "1d7895a0b3608e2ab030da65846a685301aedbd49286dd50d2a57be74c4940b4",
+      "svg_sha256": "f2108efd63a889d43dd97641b77aab1e33e43d8fad7b7b527b25bf74eba2e0c0",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-089-g1-1",
+      "table": "table-089",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audits/2026-04-05-documentation-audit.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 57,
+      "height": 11,
+      "cell_sha256": "695af58a9e3bfa0958ec5e6298d62206ee9ceebe90fff391e44ae2d65db3a42c",
+      "svg_sha256": "6c9f1528b1e1684875e987e62ef16cc725f5f237e8905d9265ffbdd202161a98",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-090-g1-1",
+      "table": "table-090",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audit/2026-04-11_code-quality.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "610fb013ac7d3e612a718a6e690d868f6006cc219c706d5b15eb2f8cb7c00a73",
+      "svg_sha256": "f73043e5a78650e376115d3c54e8200a91daef0520c94b71c6416fada6d7f95b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-091-g1-1",
+      "table": "table-091",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/audit/2026-04-14_code-quality.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 18,
+      "cell_sha256": "04a14c735f96f00e778b8ff2ed2aadd36ed17094f327b1c69f8d81aa922b9276",
+      "svg_sha256": "461cf7910a7e3590c1e47c9b4864cd6b816c1899835eaa1ec195e3a35bfb723e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-092-g1-1",
+      "table": "table-092",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 60,
+      "height": 14,
+      "cell_sha256": "9f17adf1e364347d0da790540c5388d37ac833618818c9ebf9e4c3a72c01bcde",
+      "svg_sha256": "6da5d33638099ac2c93dc007e910659b20fa9654c7813529dc71da3892e7b469",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-093-g1-1",
+      "table": "table-093",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 2",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 47,
+      "cell_sha256": "541848fa60134f04c049b6b40e029e58cd0440fd6c12fb2e9927541ebd94b10c",
+      "svg_sha256": "8df1b05bd7f25ec616eb1d260d2241c54790301d839e3774b47bdf988c08bc80",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-093-g1-2",
+      "table": "table-093",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 2",
+      "part": 2,
+      "parts": 2,
+      "row_start": 9,
+      "row_count": 1,
+      "width": 86,
+      "height": 11,
+      "cell_sha256": "941a75e6da2d66c6aab8a430129466a0d0a17a94ddf905441a7476445c19bb1d",
+      "svg_sha256": "a4c92ab464eb87020c5c62e04a5cc2909f7a5a98a6e65e881eda938b9436130d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-094-g1-1",
+      "table": "table-094",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 24,
+      "cell_sha256": "ac73df72d55a0f2a13110d93f149d7fb9c48aceeb1f3feb4bc1f39097d070f35",
+      "svg_sha256": "404c8db06ba24c08a3093297cf45584dbc34d6c1a41e61d750c91b214e6803a9",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-095-g1-1",
+      "table": "table-095",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 3,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 57,
+      "height": 14,
+      "cell_sha256": "4f9add9142f42c8215d65a11c8caa66178cddf1ce8cdff207663c985adb5c744",
+      "svg_sha256": "2f79058780b65db4f7800af6da31585f5a3a6479fc60cd8a8452e039ef63abc8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-095-g2-1",
+      "table": "table-095",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 3,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 57,
+      "height": 14,
+      "cell_sha256": "57fd30aba6943a780b25864ff8e67fc588fc27de5cbebf6c2f52469b1d3e1498",
+      "svg_sha256": "e451030accacb45477c38f168a112126162c4cc45bcdae045aa717f3b6a6d3b9",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-095-g3-1",
+      "table": "table-095",
+      "column_indices": [
+        0,
+        7,
+        8
+      ],
+      "column_group": 3,
+      "column_groups": 3,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 48,
+      "height": 14,
+      "cell_sha256": "99c923232822738e8e0e0716767cb60a066e2a3fd02cfcfb98e94022198c50d2",
+      "svg_sha256": "fd08bbea5d3d5972527f4ffc0250e37533f2c7f9068055b0c0124aa89c0b7cf8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-096-g1-1",
+      "table": "table-096",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 66,
+      "height": 14,
+      "cell_sha256": "45d109ffcb1dfb2ff7ba565e74cd1ec4e10e8597d53e8744e0248724e2548de7",
+      "svg_sha256": "be2795e65de8b645d9b9ea4ff0b7510d3569a7c6b23e39020c5b9e4f12e47673",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-096-g2-1",
+      "table": "table-096",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 67,
+      "height": 14,
+      "cell_sha256": "5d84b00464472796b6dcef23eede60b7d7a730ad0cfd1168884dbfd6ee5cf755",
+      "svg_sha256": "b520cef904bc38daecd98849d9016b186a9506ac3b50eae039e5c643ec8d27ee",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-097-g1-1",
+      "table": "table-097",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 6",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "ab2d70c91a67b6d52d16bc15441ad0a2238571b041bd45615fa22794369cc636",
+      "svg_sha256": "02f21252b3e896d322f74f192855da8bf3ab5203d21b4cb43d323c178762c9fa",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-098-g1-1",
+      "table": "table-098",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 7",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 86,
+      "height": 9,
+      "cell_sha256": "3f510b5224a3f3441bd4c25317792aab26547167cb30181edc8d5c60484c0db1",
+      "svg_sha256": "7456ee96dc5b2815a7968954348eb7d38c537a9482be64f0b2034ad19e637eb5",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-099-g1-1",
+      "table": "table-099",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 8",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 61,
+      "height": 8,
+      "cell_sha256": "0e0b14f68c752573ef8ea522c9bc571875fab9f4e05325ae1901d69562a523e7",
+      "svg_sha256": "52d73cc3b1b91e75bf077f4e88933c6614a005c47934efcfcd387094e12cdb9b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-099-g2-1",
+      "table": "table-099",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 8",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 58,
+      "height": 8,
+      "cell_sha256": "cafd8db0a635bf8f86ef67fa4113e9c1d306fdcbdd120be0c2f0d9d914bfe188",
+      "svg_sha256": "dc79c72c98cbea5c79023aa00c999070e85fc6ce5c0535ddb58f18f4cd82ab0d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-100-g1-1",
+      "table": "table-100",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 9",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "77507d74d204ff346cb6664d991941bc5ee6e9bea09cb67612366dac1e32bf4d",
+      "svg_sha256": "09fedce907f059b9d839197c43687d84673c646ff1bad5c635f67c432a9a48db",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-101-g1-1",
+      "table": "table-101",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 10",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "0869de17a249af0fa2d56de6f3ae895c3ac3d9ce99dabfb7e4d4a41e418ee686",
+      "svg_sha256": "3d5001a7e29a48654731ee302b05b63bcdafae2c70e3c0fa3d14caecf9a009e5",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-102-g1-1",
+      "table": "table-102",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 11",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 15,
+      "cell_sha256": "330a34951c67f997ed058e9e06b02018ea599029cee2da7de9370623dd8e3297",
+      "svg_sha256": "5ac76e552114cc692e0aaceaf983917a94cbee4d66e857525b1b5068db49897c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-103-g1-1",
+      "table": "table-103",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 12",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 18,
+      "cell_sha256": "4b7be42c4d2124a5a5d629117d53a089839d62dbce3ae5e89df0d8e612701d59",
+      "svg_sha256": "b538ad15e7c02c605b549dfc9f1368ec67be7ed462743424b8e25a3408783ef4",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-104-g1-1",
+      "table": "table-104",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 13",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 64,
+      "height": 7,
+      "cell_sha256": "5cbfe4aae28bb90de696133c98375bdb1ab431ed4de0ba871e047d267270a3e8",
+      "svg_sha256": "a4d014f449b6724f3b14c3ae7c8e331878362fa23cdd0c852f9db0930f6f9eb8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-105-g1-1",
+      "table": "table-105",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 14",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 74,
+      "height": 13,
+      "cell_sha256": "025bb902ec9d8d31fc03e06bd9088ae0395c846aa41a44978b888f9ad8ade118",
+      "svg_sha256": "324bec19015b61a40d0ca0dfceef9b4bb5f09028a4ce1f878a82f152f064bd91",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-106-g1-1",
+      "table": "table-106",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 15",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 67,
+      "height": 7,
+      "cell_sha256": "c57e0fc5ac4d2980dc90845451f3baca440a366238617d618abb0dcee5d06510",
+      "svg_sha256": "26700e94c337c18b40fdc92cb35d8f0437e58cfecd61b57602421d8874ccfa09",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-107-g1-1",
+      "table": "table-107",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 16",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 75,
+      "height": 13,
+      "cell_sha256": "5b1c5a494d2a5f1cdcaa9c2e135bd7376f679ee11e593e9135bc344b716850e9",
+      "svg_sha256": "aca6f29dcd16bbd4f14c7f5aaf2eea4c8370c5f1ac5b82aea7a87d36a8d50974",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-108-g1-1",
+      "table": "table-108",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 17",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 66,
+      "height": 7,
+      "cell_sha256": "46aaf42ae9a38d3326b41c48b40e6dbdb15f1c6fdd779c736f681712b3bd831a",
+      "svg_sha256": "70d0c97ebe9790f616faa876b1218123af89d4b22714a0b6cc7485597cbf3af1",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-109-g1-1",
+      "table": "table-109",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 18",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 75,
+      "height": 13,
+      "cell_sha256": "4d9914a2cb59d0b9fb5ca4815621c66cd7ad86c1d0e31b0a33b454291eb02274",
+      "svg_sha256": "9eb5b3c6e6941ed3dc5984d6256b015c6eb59b67fb1745a94fae56ebd906d63c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-110-g1-1",
+      "table": "table-110",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 19",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 70,
+      "height": 10,
+      "cell_sha256": "21b90ddef1a5835147a225eec9a657a1d9ab7831208cc6f0167064d753b6a72a",
+      "svg_sha256": "d02a65649d52cff9b9816617e6783bd3af57abcae2eb6dcaaf9e0990ce96d05d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-111-g1-1",
+      "table": "table-111",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 20",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 4,
+      "width": 68,
+      "height": 8,
+      "cell_sha256": "f4b537d6dc0ff635dd6c95006fe33f0feff02220b02d888f24f38ceadadc4828",
+      "svg_sha256": "21ebaa4ddba3739624554bb35d7bfad77ca1f818d2ae5b431873c6de80d0a335",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-112-g1-1",
+      "table": "table-112",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/perf/RE-017-byte-pipeline.md, table 21",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 72,
+      "height": 13,
+      "cell_sha256": "9e0cfe6ba711f245e6729d32840318741e2da4d208de8756ec2cd363e0f614b1",
+      "svg_sha256": "bdedc7c062b43c1595b6ac9418429f41b0180640d13bec25cd3324ad7c0704fa",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-113-g1-1",
+      "table": "table-113",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 1",
+      "part": 1,
+      "parts": 2,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "d953a332d8492d763af02600a9f71cd9d16d922e59c1a558fdf8038fab085812",
+      "svg_sha256": "5e82e8804b20fb809071dfcd25b0eb7cc4a393f8f7fe7071be2dbda78dc674f6",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-113-g1-2",
+      "table": "table-113",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 1",
+      "part": 2,
+      "parts": 2,
+      "row_start": 10,
+      "row_count": 4,
+      "width": 86,
+      "height": 21,
+      "cell_sha256": "b41dc5adec21d05054c58081897e61bab402d50aa5a5ce8cb67bfccda4949b7b",
+      "svg_sha256": "dca3484e8ab18e9e95bbb72d12dcd8d65874e0635382c93c4abf1ab8bca94fff",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-113-g2-1",
+      "table": "table-113",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 14,
+      "width": 86,
+      "height": 37,
+      "cell_sha256": "22bd7dd90538695e38d3b49dc4584df787084e2ea874e04406b8cd188b019e6f",
+      "svg_sha256": "cc235540d201bbc14e0f328a2523392346b48f75db8694b93f3402185ff65e8f",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-114-g1-1",
+      "table": "table-114",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "e92882cbf04f74bffeb2fd5647f755a130856391ac547d0453557cce492475bf",
+      "svg_sha256": "f6d2812505835a15d5eb9ec8f3140640f9265d6bae58bbcfa60a1cb7ada4aacf",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-114-g2-1",
+      "table": "table-114",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 10,
+      "width": 86,
+      "height": 29,
+      "cell_sha256": "f00d3ff5664b066b4aa8acedd86e8b922bbb9d4535ec70c392c1c44682479692",
+      "svg_sha256": "7764c2cafb1242932a2ea9f707fe2b7467804dee310ce876faaa789cd682e669",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-115-g1-1",
+      "table": "table-115",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 31,
+      "cell_sha256": "9707fc23f7ecd117994c5e5fde3ee2e9e13d6dd294d3573b69836ace6b4dceb8",
+      "svg_sha256": "9b805c90bd73364277c52b34282deecee14af1bc523c475a189a90b0ad3c249b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-115-g2-1",
+      "table": "table-115",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 3",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 8,
+      "width": 86,
+      "height": 22,
+      "cell_sha256": "a5fa4b7475a413fa8e823d3560c593eeea219710dad540a4718580c9980fb330",
+      "svg_sha256": "dbcb5c01931a9393a6eb71fb2f0f5a340074ca7922a3f10c0306c472209abca8",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-116-g1-1",
+      "table": "table-116",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 41,
+      "cell_sha256": "1345e237064d6669e242d98796ef4ebc388c216cb68fc309fc209a399f7c5bf4",
+      "svg_sha256": "93f1c49d7ac979fe687c73d29aaae01fd651ded95fdefdaf1a06450e50905db2",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-116-g2-1",
+      "table": "table-116",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 4",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 9,
+      "width": 86,
+      "height": 29,
+      "cell_sha256": "8da4750e5de92fb4ba587e4f7656ee2c0941f97a1864fba9c72109d5dc70f536",
+      "svg_sha256": "eee72100d921d7a0bbea7ad66507c826dbb24a3008e7a01e29cead0d56025aa6",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-117-g1-1",
+      "table": "table-117",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 27,
+      "cell_sha256": "3fe410d8984906e8d62423e2b75ecba680045ed01abf78c563bd7d87d9ba2a2c",
+      "svg_sha256": "19520fe591627d851ae4a9f30c2e7aa36eab2e0fa6e929215f1ede32e655a507",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-117-g2-1",
+      "table": "table-117",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 5",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 20,
+      "cell_sha256": "99a8f32c11a4fd3aa704715c1e27a065abd05a8eff815db59548ec798c968a13",
+      "svg_sha256": "358f9c4fb3bbb9a2d4176b9b5e26683ad6a520f3a0d6b7779798c10a0463cbea",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-118-g1-1",
+      "table": "table-118",
+      "column_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_group": 1,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 6",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 23,
+      "cell_sha256": "683636c7bbe45cdf228326c7bbf6134fd78bc34e221ac2ba29b37f4be3aa6ead",
+      "svg_sha256": "aa713dc984bb998671b6081be87f7f573e8a84487f6f28d53a2592e07bdbf77b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-118-g2-1",
+      "table": "table-118",
+      "column_indices": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_group": 2,
+      "column_groups": 2,
+      "title": "docs/archive/component-system-audit.md, table 6",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 6,
+      "width": 86,
+      "height": 22,
+      "cell_sha256": "e8ddd059fd238fb3dc8653fd8de7ad455810ff9c4dd2f3356dc03736c7748d9f",
+      "svg_sha256": "982729bd92e17fbff95d50f280313caad9a5b0ec45a17e73d5c48ca4387b863e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-119-g1-1",
+      "table": "table-119",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/requests/xyph-title.md, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 10,
+      "cell_sha256": "01b469b12dd4e7063d5234daab0797004c7adcc5848e4c802ebe85b4f2e1320c",
+      "svg_sha256": "8fcc773f71c2ea345f6e17ea2b09bb335b1e9f736270129f0d2a055a8ae33d6a",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "table-120-g1-1",
+      "table": "table-120",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "docs/requests/xyph-title.md, table 2",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 3,
+      "width": 56,
+      "height": 7,
+      "cell_sha256": "ad6860184ea14ab200fd0f23325129a24b170afa7195a19d4f3e23192e096be3",
+      "svg_sha256": "ffb71dba3604acd1653f5f243701168a726806757f87eb67793d39033593a665",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-1",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 1,
+      "parts": 20,
+      "row_start": 0,
+      "row_count": 25,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "15f964d8d281689f70f12972c6d081d13fa8224c2231a509d3e4c31784a85c46",
+      "svg_sha256": "336a404d3d7ce39d390f33fbdc0e268db78607d4cb1f6532e2455a632980c9e1",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-2",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 2,
+      "parts": 20,
+      "row_start": 25,
+      "row_count": 25,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "7585797d044bf54abc559008982bca947b1f6f99105ab5bc6fdf8835dba56325",
+      "svg_sha256": "699bc91bc71270a44a5c35dce709257c61f175a7b2cdb68e971501f249b40095",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-3",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 3,
+      "parts": 20,
+      "row_start": 50,
+      "row_count": 21,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "934c0061acdf4952199072d4ba0402ac517bdc91280835573240d453046819dc",
+      "svg_sha256": "ec568885007409daa3f963ed85db242cc2caadc537b485863f0b6d16546e30c5",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-4",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 4,
+      "parts": 20,
+      "row_start": 71,
+      "row_count": 18,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "598ebd5866feee231a24c4e527cc8ae78433d646a753165cfc66c68235a04ce4",
+      "svg_sha256": "4f4c25f9052a154fed393dc910708ca4df77d7b32f34319d78941d5b550d0a40",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-5",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 5,
+      "parts": 20,
+      "row_start": 89,
+      "row_count": 19,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "51617b3901c5a520b7c9c9de738f9610c6d1d163d554b34d02b91c6d6a6a9107",
+      "svg_sha256": "e2dfa322cada9194d3378015d625cbb5612735a8a9d0aad6b7c3d33950ba2b2c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-6",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 6,
+      "parts": 20,
+      "row_start": 108,
+      "row_count": 23,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "a3f845076bd11ecd490956fe82a1a75ca351d156819508978e99c61587c65788",
+      "svg_sha256": "007e7b3a209e38c751e96c2cc83fe784005d035c7488b2c9311bb5cfe71a4265",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-7",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 7,
+      "parts": 20,
+      "row_start": 131,
+      "row_count": 21,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "29378b9ecde37e5adc609da5912530eac27331c8ae1b4dfda43619744dc31107",
+      "svg_sha256": "cd98600203e81ee7e972f1d3e8bc7e59495f3df33d1331102b4328b2553a988b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-8",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 8,
+      "parts": 20,
+      "row_start": 152,
+      "row_count": 23,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "0c4298b7f13fdc5da96b09f5129c6ebae9b0814873769e6335c7eaaa2a9756ea",
+      "svg_sha256": "0e57e311ffa1e37e083f40383c7b86cf04ce6382a841adea1d97dde614c4dc4c",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-9",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 9,
+      "parts": 20,
+      "row_start": 175,
+      "row_count": 24,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "5c073456cf0f484820e9d8c465f55b10cd7cd881558a251624979a048fd12f24",
+      "svg_sha256": "4f337b014002acbaac3c6af50b52d0214a193ac0fc615d0b5a1958f050ccc021",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-10",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 10,
+      "parts": 20,
+      "row_start": 199,
+      "row_count": 24,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "1b546d37067917123123f8af4aa1d558f80e4621709638647b032dac16efb7f2",
+      "svg_sha256": "b0d1a97412e7733b9be257976c3d5083ddf4e0e202a035d8ef061ce07560687b",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-11",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 11,
+      "parts": 20,
+      "row_start": 223,
+      "row_count": 24,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "e8d3eebae53ff784371d7116a679b7bff5261384316faa35becac2ba46081174",
+      "svg_sha256": "5e421ac74e7972d45c236e5ebc2e12ad9c0128e2f9cd287d5b9a95776c3d5dec",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-12",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 12,
+      "parts": 20,
+      "row_start": 247,
+      "row_count": 23,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "8bc46ae59b206dd8ef645d10751fd4cdefb3cc30dbddffc1c9447f2871960bf2",
+      "svg_sha256": "9308beeed00be0c6289a4136893681e97ab1b7226c2d8cfe541349a38af3980d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-13",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 13,
+      "parts": 20,
+      "row_start": 270,
+      "row_count": 21,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "a5c05b49b26b019c8576d014634697a6256cd75f7041efd53ca145c7b164a426",
+      "svg_sha256": "1b98843bc23aa11baae2f47b77017ea917cf06948c7a7cde9a1122371f930f20",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-14",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 14,
+      "parts": 20,
+      "row_start": 291,
+      "row_count": 18,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "7fd910c9aa90c3d01ffd1636aa6125168bee584542d03c87ef35b51049273a2a",
+      "svg_sha256": "c483fd2e9b05f25a352406012d3e088af4b9abae0e50e63b46889e09dec62d6f",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-15",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 15,
+      "parts": 20,
+      "row_start": 309,
+      "row_count": 18,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "f4c02fdf1206a3db467c7842c522f24dfc5e22d8c94a468a87902d3b2c204ac9",
+      "svg_sha256": "709b66573f3ce0020834b1709d6b76f211b4af54858bc2a61178a54d8170b76f",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-16",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 16,
+      "parts": 20,
+      "row_start": 327,
+      "row_count": 20,
+      "width": 86,
+      "height": 53,
+      "cell_sha256": "d21880e2cedae881499eca198120dbd79960f0b08ac169a2f952952521499f89",
+      "svg_sha256": "7c2f49ed68129ab06f2a1c0beaf216e6c98cc5700fef63968f34d9745ffc748e",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-17",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 17,
+      "parts": 20,
+      "row_start": 347,
+      "row_count": 17,
+      "width": 86,
+      "height": 52,
+      "cell_sha256": "def0a755e908af87b871d065001220acaa2422d95816f23c612c9c9ef0392d01",
+      "svg_sha256": "95538bf2866f43d8bf8c13c2ce68dbb49bab992d6a5b1489aa5cfecf3d9d64e2",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-18",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 18,
+      "parts": 20,
+      "row_start": 364,
+      "row_count": 19,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "b1b4959362ee546e2cfbf48407cada147197d21ec27688417d0d3bf213f2a2ad",
+      "svg_sha256": "c5868de3412ac34f382ca62ed9272b9610a53ae771212bcbfbb50a304e45fe5d",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-19",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 19,
+      "parts": 20,
+      "row_start": 383,
+      "row_count": 22,
+      "width": 86,
+      "height": 54,
+      "cell_sha256": "6bdc87d9dcbe5cf30fb5fb583e7fb45ce25f9c00c7ae463275e0964c8a4228f8",
+      "svg_sha256": "fbae5bc6b894e987a7882cc1f72290e62d1d09c717626e205438090df3b2d8ca",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "source-inventory-g1-20",
+      "table": "source-inventory",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Book source inventory, table 1",
+      "part": 20,
+      "parts": 20,
+      "row_start": 405,
+      "row_count": 21,
+      "width": 86,
+      "height": 47,
+      "cell_sha256": "872bf504f2fd1d8595fa0904384ba7f4d5e133db63e0f00569793ad3dbe4e7e7",
+      "svg_sha256": "144a867d422b04cddbca229463415a9fca4189855d51f5e223002c74016797fb",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "workshop-evidence-g1-1",
+      "table": "workshop-evidence",
+      "column_indices": [
+        0,
+        1,
+        2
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Workshop 6: evidence levels, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 5,
+      "width": 86,
+      "height": 16,
+      "cell_sha256": "b1c9ae17a2e85dccabf45b36cfc689113dc5e45c58cb816b1316669f2fc28bca",
+      "svg_sha256": "c70a52debca6ada9d116199178d2a48240607ae537fd6cfc7f6618e06c7f0f5a",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    },
+    {
+      "id": "edition-versions-g1-1",
+      "table": "edition-versions",
+      "column_indices": [
+        0,
+        1
+      ],
+      "column_group": 1,
+      "column_groups": 1,
+      "title": "Version and reproducibility page, table 1",
+      "part": 1,
+      "parts": 1,
+      "row_start": 0,
+      "row_count": 7,
+      "width": 86,
+      "height": 12,
+      "cell_sha256": "63bca66d1ca0cda4d4ee21a055cb582b795ff5b896f83f37d829787e01585737",
+      "svg_sha256": "2d666f0575a30fba7a1783ee150a1f9859d746f3387a608ae022485de8594f78",
+      "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+    }
+  ],
+  "layout": "86 columns, maximum 54 rows, repeated headers, wide tables split into explicit column groups with identity column repeated",
+  "pdf_projection": "Actual cell coordinates and Recursive font glyphs with reusable embedded PDF fonts; outlined SVG companions use the same font files and coordinates.",
+  "pdf_files": [
+    {
+      "id": "table-001-g1-1",
+      "pdf_sha256": "d6b1705736010d520d32578533b349178320419da14f2ee1d3b149c20602baa1",
+      "bytes": 59754
+    },
+    {
+      "id": "table-002-g1-1",
+      "pdf_sha256": "069976f4aabccc27a786b6d5b0eba4c312bcf65ca4464a9e9b8434765eb5ad90",
+      "bytes": 59667
+    },
+    {
+      "id": "table-003-g1-1",
+      "pdf_sha256": "f917dcca41371f7ee50f74a5945456370dad94d2cfe20a704082efce005c2a42",
+      "bytes": 58351
+    },
+    {
+      "id": "table-004-g1-1",
+      "pdf_sha256": "540618b8af80b4427238eaca4dcd19027ed1be8205e07090c6fdea36c4650fb1",
+      "bytes": 58717
+    },
+    {
+      "id": "table-005-g1-1",
+      "pdf_sha256": "c35b29d5228ea38f2d904a479f8e6c557e0982e2ddc2173b36264c3c2843028f",
+      "bytes": 59777
+    },
+    {
+      "id": "table-006-g1-1",
+      "pdf_sha256": "e2c65b2e064c91f51da1f0c6c8b75db0fa16bbb064325845fbe8b886e9610f04",
+      "bytes": 59489
+    },
+    {
+      "id": "table-007-g1-1",
+      "pdf_sha256": "6992538ae8204a208dee8382ba93858b40739358b12d7ffa26fb59d517a18e5f",
+      "bytes": 62034
+    },
+    {
+      "id": "table-008-g1-1",
+      "pdf_sha256": "64737f148760ae69c6c59fcffc0201c06e7be35e37d3202e76d86c0cf5a45ffd",
+      "bytes": 59482
+    },
+    {
+      "id": "table-009-g1-1",
+      "pdf_sha256": "941b5b7f2e2fe65352fb4b4f61cfe87c3dd6625975fce4469d69617cb482fd48",
+      "bytes": 62654
+    },
+    {
+      "id": "table-010-g1-1",
+      "pdf_sha256": "b6e8fa69ba2a76425447de05c3e7305745b5a5cd9a06791e7f56cf282233a697",
+      "bytes": 57317
+    },
+    {
+      "id": "table-011-g1-1",
+      "pdf_sha256": "14ce6207d0b1843a2a4f5cfe213dc99735434a97b393c638bd2f620bc4fb9ddf",
+      "bytes": 60035
+    },
+    {
+      "id": "table-012-g1-1",
+      "pdf_sha256": "43198f1d96fa6807eb2e0c7449abf86c94d4cef7db326a2153a8854919b3855d",
+      "bytes": 59895
+    },
+    {
+      "id": "table-013-g1-1",
+      "pdf_sha256": "64a15cab3f1e61bb7160381b8ce1dd665e208174619cfe7f92472cc6824d0a35",
+      "bytes": 58381
+    },
+    {
+      "id": "table-014-g1-1",
+      "pdf_sha256": "e971c4410200812ae22b7f12c7bf2dc9144af162b76467e1b880236e7e2f0044",
+      "bytes": 59483
+    },
+    {
+      "id": "table-015-g1-1",
+      "pdf_sha256": "0b6400ebece582c699e4bde61f8bc2a0505c38e2fbd5cf173806d1149f1ebbd8",
+      "bytes": 60826
+    },
+    {
+      "id": "table-016-g1-1",
+      "pdf_sha256": "5afdf58a866babd4b20c99e03a30247cd21e8aa53a44473d16ef101405f4c9f8",
+      "bytes": 59944
+    },
+    {
+      "id": "table-017-g1-1",
+      "pdf_sha256": "d31e12ef54958a50c6d57e0c3c9d50f04fb896c195dfb3cb29043a799dc5d58a",
+      "bytes": 59563
+    },
+    {
+      "id": "table-018-g1-1",
+      "pdf_sha256": "7c177ee6f30c733ba1274a7ee81350ec3671151743674acecccec42f6fc14789",
+      "bytes": 59057
+    },
+    {
+      "id": "table-019-g1-1",
+      "pdf_sha256": "92effe56f199e3686ac5cafbcff3656121f449786b59639951c1e0dda22e6e69",
+      "bytes": 59958
+    },
+    {
+      "id": "table-020-g1-1",
+      "pdf_sha256": "6c040c5e2c321ff4e72a016e024e495cbd10dd986add5719701be5a421ec7c0f",
+      "bytes": 59629
+    },
+    {
+      "id": "table-021-g1-1",
+      "pdf_sha256": "12bd886185a579bde40f3393baae76c58fc30afecfdd5d90abac444e6d5ffe22",
+      "bytes": 57855
+    },
+    {
+      "id": "table-022-g1-1",
+      "pdf_sha256": "1840651b7ba51dbdc2973b536fbe54e46dd5452cb92a09646f7826f39b3eb0b1",
+      "bytes": 54661
+    },
+    {
+      "id": "table-023-g1-1",
+      "pdf_sha256": "575fc2538b0bba1c5a593474112cc22d9c732acf42d457547ffffaa7c34edebc",
+      "bytes": 60545
+    },
+    {
+      "id": "table-024-g1-1",
+      "pdf_sha256": "0d6c883ca366f8bba5ade063c12f7b711eb9d1e577834d5b13e6bc6626afc0c3",
+      "bytes": 56173
+    },
+    {
+      "id": "table-025-g1-1",
+      "pdf_sha256": "e37028d9db398976f4edaca5ef06bd307e952cfdab78dea782a844783bd73389",
+      "bytes": 59742
+    },
+    {
+      "id": "table-026-g1-1",
+      "pdf_sha256": "0bc67ad11571daa79601486f2cba56f58c8e339f823f25f2848e706af55bd0de",
+      "bytes": 54245
+    },
+    {
+      "id": "table-027-g1-1",
+      "pdf_sha256": "c3f859198a1393692991453f7ad4a02b8608b95daceedbab8490496e54ef2b8f",
+      "bytes": 59954
+    },
+    {
+      "id": "table-028-g1-1",
+      "pdf_sha256": "c7fa473c69a8d0b1486bc9e986fb67d874d44d69558392ca8181529181a177c6",
+      "bytes": 54649
+    },
+    {
+      "id": "table-029-g1-1",
+      "pdf_sha256": "dd8df2e56f90af6938b57debbe699d8765f53f222ad5bbdc50c9b59e86b991c0",
+      "bytes": 60185
+    },
+    {
+      "id": "table-030-g1-1",
+      "pdf_sha256": "8162095637e38de757509cdc0febb35c8b7e87acaeda760b0ddaf26d5f8f00ae",
+      "bytes": 61290
+    },
+    {
+      "id": "table-031-g1-1",
+      "pdf_sha256": "619f88fd4979b699dab6e53780ae3a5a70048c41aa28da985a994385bcbe75df",
+      "bytes": 58744
+    },
+    {
+      "id": "table-032-g1-1",
+      "pdf_sha256": "2ef757118ad7d0cbc4c0afa90714558caaacf2036b3039b6486d732d425aac36",
+      "bytes": 57842
+    },
+    {
+      "id": "table-033-g1-1",
+      "pdf_sha256": "9bf220f3c8f5541328c46ccc8662e29dbcfc020a2f6435d56403f4ed574c3e4d",
+      "bytes": 52714
+    },
+    {
+      "id": "table-034-g1-1",
+      "pdf_sha256": "4b00fb9c1c5b83b176ca528071540d00dee781e03bd5cbb98a7f97699495874c",
+      "bytes": 75110
+    },
+    {
+      "id": "table-035-g1-1",
+      "pdf_sha256": "0fbe67e9d1f71bfda6c36fa1a7edc28e687df0a2d7ed6a0a47fa140a193e6d53",
+      "bytes": 59935
+    },
+    {
+      "id": "table-036-g1-1",
+      "pdf_sha256": "1344ef33eac32d9289a10919e61f18ed2bc7f908bbef2d0d49112d23cf164878",
+      "bytes": 60507
+    },
+    {
+      "id": "table-037-g1-1",
+      "pdf_sha256": "2dbd346905b0e50594fe658f9abb0141d3e26eb16e26018e72f960ff809a2207",
+      "bytes": 59035
+    },
+    {
+      "id": "table-038-g1-1",
+      "pdf_sha256": "5fab246c5c5ee67cb26d3bcc7506f81fff4bd0d724a2a080287039ed3c9dc42d",
+      "bytes": 60037
+    },
+    {
+      "id": "table-039-g1-1",
+      "pdf_sha256": "8c6aa0446c5914d4be18c89f41e296414e66b4d36ec17e4beff7d5729eecd1ad",
+      "bytes": 72830
+    },
+    {
+      "id": "table-040-g1-1",
+      "pdf_sha256": "6deadc45d0bae9b78fb1cbab01563c42b758bff5de696db3d929609e4c610a73",
+      "bytes": 58808
+    },
+    {
+      "id": "table-041-g1-1",
+      "pdf_sha256": "80c6e36f48acdf5bc138703c9acbbe9eaacf6a430487b6488a0528c0dcb1ff6f",
+      "bytes": 61878
+    },
+    {
+      "id": "table-042-g1-1",
+      "pdf_sha256": "d377014116712f0da1e2f264ef118ce653a0d1aa73cef0a3e25da345797e8a4c",
+      "bytes": 63073
+    },
+    {
+      "id": "table-043-g1-1",
+      "pdf_sha256": "662e1b2647b6f389997d1474c99439c898386fad2b73eb33af16946794befcd6",
+      "bytes": 54086
+    },
+    {
+      "id": "table-044-g1-1",
+      "pdf_sha256": "36fff9e54b803ef906d9b63efe2f42c3491ed4cbbb68206fd659cfbfabc13349",
+      "bytes": 50416
+    },
+    {
+      "id": "table-045-g1-1",
+      "pdf_sha256": "770fbd095ca2b83afedb8bc3d5e8f746f40effb6812a8a68906b031bb432d955",
+      "bytes": 55103
+    },
+    {
+      "id": "table-046-g1-1",
+      "pdf_sha256": "f58572daccb734748d5a81d09d4a85f2bb99e95528cb778a82ec95766f127251",
+      "bytes": 55113
+    },
+    {
+      "id": "table-047-g1-1",
+      "pdf_sha256": "de454f97ea42ae586a2b29add7710d2738eb468dc5cf0d533a19fbc5f59a1fef",
+      "bytes": 53881
+    },
+    {
+      "id": "table-048-g1-1",
+      "pdf_sha256": "c642490af921f62229a9daf24d2b671484dc1be6bec1a3a328faa74b9c48f122",
+      "bytes": 55310
+    },
+    {
+      "id": "table-049-g1-1",
+      "pdf_sha256": "d30193860a2a47a400638cb64fb2e4eb8b81e89027f317e21695798d752455d2",
+      "bytes": 55101
+    },
+    {
+      "id": "table-050-g1-1",
+      "pdf_sha256": "5957d98f748a32b25e8fa66f6ffcc52bcc882052a786eb5c6cfcc562936282bc",
+      "bytes": 55289
+    },
+    {
+      "id": "table-051-g1-1",
+      "pdf_sha256": "03a8de032255bfe13a26b0318a2d15d3b9161854d3ae2c8c2d4c827fcdf06082",
+      "bytes": 54716
+    },
+    {
+      "id": "table-052-g1-1",
+      "pdf_sha256": "c261f1e5711b7495e2ccdce21feffc1eade58250c03a923541028140003022c1",
+      "bytes": 54956
+    },
+    {
+      "id": "table-053-g1-1",
+      "pdf_sha256": "7a83cfc0a01f6760145edd87af0fe0bda13f0de8f45a1ff3aaff29e62dc05869",
+      "bytes": 54980
+    },
+    {
+      "id": "table-054-g1-1",
+      "pdf_sha256": "172dbf278ff186194379156b3692b6ccc74f22e0e089f46fd65e28c92c0d3051",
+      "bytes": 55477
+    },
+    {
+      "id": "table-055-g1-1",
+      "pdf_sha256": "a2259bbd1c1dbb154904df31b486ac7e88958dcc74a7ba579c7f8a70bf27742f",
+      "bytes": 55823
+    },
+    {
+      "id": "table-056-g1-1",
+      "pdf_sha256": "70348e29d9cf791efdd9ea2cc26cfef5f35d472e6d5b9588760b5dcd34bd831e",
+      "bytes": 60302
+    },
+    {
+      "id": "table-057-g1-1",
+      "pdf_sha256": "bf5b3fee33a2905610d0ce16cae0c5e598008a68c098449f464308d97c23210c",
+      "bytes": 59995
+    },
+    {
+      "id": "table-058-g1-1",
+      "pdf_sha256": "67d24cc3beb041e4614376f18ca725bef6004aaa9e33b3428533fd4af920d754",
+      "bytes": 60295
+    },
+    {
+      "id": "table-059-g1-1",
+      "pdf_sha256": "3a8c0b73e099ca96d109debbf8505de418cf9e80998f3e184466f0ef837bb06b",
+      "bytes": 60826
+    },
+    {
+      "id": "table-060-g1-1",
+      "pdf_sha256": "5e6864f8d28f545b4d45567d04a66dbff6909e5d100d0acc13b8ed50f924d49c",
+      "bytes": 61203
+    },
+    {
+      "id": "table-061-g1-1",
+      "pdf_sha256": "9ca55a3b024d5be845828963f30f77c8590de1d381af1dd1dfb53ac63510c9bc",
+      "bytes": 60201
+    },
+    {
+      "id": "table-062-g1-1",
+      "pdf_sha256": "c95985aae4842afb7eddc35db121e211f04dcebf78dd0d1a9ff9ab52e18c0337",
+      "bytes": 56637
+    },
+    {
+      "id": "table-063-g1-1",
+      "pdf_sha256": "340ea17e7e9cf4cc88e1de4b2233fe545399f8ae932839639ca6c812ee0b8cb4",
+      "bytes": 58825
+    },
+    {
+      "id": "table-064-g1-1",
+      "pdf_sha256": "ddb80a848cb2dc396e3ce2015d40cb02e0570a9625d99207bbcdbe4a6016d8a8",
+      "bytes": 57553
+    },
+    {
+      "id": "table-065-g1-1",
+      "pdf_sha256": "bf22f5af1faf0a5d65a5dbe79acc4861caa859818b1a9cd2b6161cd603d6b0b2",
+      "bytes": 63674
+    },
+    {
+      "id": "table-065-g1-2",
+      "pdf_sha256": "722205ed962e622fc8358cc5aab8889abb7a3222093374d5b777eb932d953f3c",
+      "bytes": 61188
+    },
+    {
+      "id": "table-066-g1-1",
+      "pdf_sha256": "ea6c6e58c0969376dba4d9a61031cb691f8506cabfc4fd5af7e0ac65c5bd522a",
+      "bytes": 63444
+    },
+    {
+      "id": "table-067-g1-1",
+      "pdf_sha256": "457f8a06a41a1bf0c66c1f718cb44eb78453dfbec5338b5a2edb701f1673ce21",
+      "bytes": 64740
+    },
+    {
+      "id": "table-068-g1-1",
+      "pdf_sha256": "eabaadae6101c594142089068b8c0515ade2608e54705e87b045f36d016fd77a",
+      "bytes": 62380
+    },
+    {
+      "id": "table-068-g1-2",
+      "pdf_sha256": "f8e2b3b7fbec12e09e739a28937b5e051072fbb67d7969f1eb8f86ad8eb00563",
+      "bytes": 62467
+    },
+    {
+      "id": "table-069-g1-1",
+      "pdf_sha256": "3a3fa30ea8cf3f1f463be84d67d2114ce819141b1f522ecf965aaf64d06ad8fa",
+      "bytes": 63677
+    },
+    {
+      "id": "table-070-g1-1",
+      "pdf_sha256": "d519ea72fad4c2516aa6bc7ee95f7ebb88fe2354ea96d0cbc518d52ad304cc93",
+      "bytes": 59122
+    },
+    {
+      "id": "table-071-g1-1",
+      "pdf_sha256": "caeaa2d1c184c4a878aa6f37dd289d46c0dbcce95ffa4815ae4be506b785ab05",
+      "bytes": 63646
+    },
+    {
+      "id": "table-071-g1-2",
+      "pdf_sha256": "1dcadfb5dd4e0fabd0dda1f0863610b8ca686dbf6ba5a144c52e5b857277ae68",
+      "bytes": 62618
+    },
+    {
+      "id": "table-072-g1-1",
+      "pdf_sha256": "654b28f8b15749c9f9ecb8d93d9dee39c7db6751ea3537fc89fe0abce318c789",
+      "bytes": 63908
+    },
+    {
+      "id": "table-073-g1-1",
+      "pdf_sha256": "2697c30a417348ef22677a4a8424766f2ff9a0961b1cbe79a6ca2f4d068f8193",
+      "bytes": 60422
+    },
+    {
+      "id": "table-074-g1-1",
+      "pdf_sha256": "d4a963606bc99c7374910c380d9c488b6716ad59e4682b7b7e53df92844f0b91",
+      "bytes": 76989
+    },
+    {
+      "id": "table-074-g1-2",
+      "pdf_sha256": "53ab6e32c15b01fd8e17f080ef02e4f5edcd091f451f895af18600e707e73f6b",
+      "bytes": 74191
+    },
+    {
+      "id": "table-075-g1-1",
+      "pdf_sha256": "ca846cd33d4e6bd6b4026c82602668d4ffb3f97ddff0933b96f33a28100795ca",
+      "bytes": 75297
+    },
+    {
+      "id": "table-076-g1-1",
+      "pdf_sha256": "b674ddafed48b76aad49691496dd72bb752b2a46ecb36b308ec7e9fbcf25f4d5",
+      "bytes": 62631
+    },
+    {
+      "id": "table-076-g1-2",
+      "pdf_sha256": "0ffa1b050fdac1d37b624f240dcf655e6463dc34247d6bb729e49440ea8bbf0c",
+      "bytes": 61374
+    },
+    {
+      "id": "table-077-g1-1",
+      "pdf_sha256": "4b116d663138e4ecb93440a313b72fee27d846aaf7d7ddac0f7f004fe6f639ff",
+      "bytes": 60640
+    },
+    {
+      "id": "table-078-g1-1",
+      "pdf_sha256": "2065ae337c0425625e8a0753e005ef672d33822bac59001ecbba72453784f4d1",
+      "bytes": 58081
+    },
+    {
+      "id": "table-079-g1-1",
+      "pdf_sha256": "7c5514f286ae75243917e087cb7e39e37a9fc078a8e92c62d348b4747ce18e42",
+      "bytes": 60624
+    },
+    {
+      "id": "table-080-g1-1",
+      "pdf_sha256": "c772701c67f9be59c8e26f2738de6fcae7901825e4227142c027fb0d9ebf4268",
+      "bytes": 63211
+    },
+    {
+      "id": "table-081-g1-1",
+      "pdf_sha256": "3e0aecc59e1c0a48aee02c94de02d8aaf9e27fb90db23df8cc93964efd61d05e",
+      "bytes": 62762
+    },
+    {
+      "id": "table-082-g1-1",
+      "pdf_sha256": "6e29a54a852dcad4ec6d7c2e82e0b4c73da0681c197ad722cb02f4bf6026fe3d",
+      "bytes": 61310
+    },
+    {
+      "id": "table-083-g1-1",
+      "pdf_sha256": "b03a7d81e8a9cffadde1cb0f1cb165d033234f2ed866f68a923824b63181b8cb",
+      "bytes": 56292
+    },
+    {
+      "id": "table-084-g1-1",
+      "pdf_sha256": "96758bf78712184bcc5cbeb6757a94bb0daac53217d29ec737d2bd9d474be642",
+      "bytes": 53896
+    },
+    {
+      "id": "table-085-g1-1",
+      "pdf_sha256": "b81cbd4e50552740c6ca83fba703777aef000faa375de0fe888d6549abbd6d4f",
+      "bytes": 56215
+    },
+    {
+      "id": "table-086-g1-1",
+      "pdf_sha256": "26b0a1ffba0f5702650b50cbd44356d7e27e15bc55161b394bf92afebfad3e0f",
+      "bytes": 52135
+    },
+    {
+      "id": "table-087-g1-1",
+      "pdf_sha256": "fbfe5aa591ad08f68730a0ba2000e130c2abf97baf52a6ff0b356d549af6d8dd",
+      "bytes": 61349
+    },
+    {
+      "id": "table-088-g1-1",
+      "pdf_sha256": "983abde968dd754269868f8805841d1f9827137dc7faadccc57776994f81712f",
+      "bytes": 61230
+    },
+    {
+      "id": "table-089-g1-1",
+      "pdf_sha256": "0a28531a08f6093363f983be75e2a98bfa7f681da3e5e1fd16223e7ebf3c6360",
+      "bytes": 54817
+    },
+    {
+      "id": "table-090-g1-1",
+      "pdf_sha256": "6cb994f266931f54dd647b475a2939601c20a6b3bfaa4291110f3ed022531136",
+      "bytes": 61770
+    },
+    {
+      "id": "table-091-g1-1",
+      "pdf_sha256": "af709ac8974df744abb848debf26d359f08b194902abdbd95872e7a11f37b6f1",
+      "bytes": 61908
+    },
+    {
+      "id": "table-092-g1-1",
+      "pdf_sha256": "e032c859a03f88fab162f86e8552947bf2804709e78ad85d6b66f680da8acd5f",
+      "bytes": 56129
+    },
+    {
+      "id": "table-093-g1-1",
+      "pdf_sha256": "dc91b0b1edacc5e76955ddff602c81901922022dd8f02e3b2af42e401829b392",
+      "bytes": 63169
+    },
+    {
+      "id": "table-093-g1-2",
+      "pdf_sha256": "3ce99ad8073888e58bac22d084af3dd9e65a0ee75de1784ee0e82fc424dd0f4c",
+      "bytes": 59951
+    },
+    {
+      "id": "table-094-g1-1",
+      "pdf_sha256": "4e2855bc802dbd8d2bb26bd0b0532c33d3bb0e57f5e25816d11309b338e68169",
+      "bytes": 61222
+    },
+    {
+      "id": "table-095-g1-1",
+      "pdf_sha256": "dee1f05ba5ebec7d0917c937bac1c176e5bb71675f8547e715ad96d9377cb1ca",
+      "bytes": 54590
+    },
+    {
+      "id": "table-095-g2-1",
+      "pdf_sha256": "9399725e243d43fddd2804c3a4622154a360a15f3cb6513f186b43aaca1622ef",
+      "bytes": 54474
+    },
+    {
+      "id": "table-095-g3-1",
+      "pdf_sha256": "e31fadd73e2c00b7fb854da813e0939b2f2fe8882255633253d55bb3ca700416",
+      "bytes": 53111
+    },
+    {
+      "id": "table-096-g1-1",
+      "pdf_sha256": "5cc0e30e3f8f69ed4d28f1955c2210fd5c499fffd0fc8fe8f5b64a2beeb7b99f",
+      "bytes": 56352
+    },
+    {
+      "id": "table-096-g2-1",
+      "pdf_sha256": "c27c31e1c09019b2101095697fb3e222cd508af9f6dd0bd21bce89b0dfcf7c34",
+      "bytes": 56767
+    },
+    {
+      "id": "table-097-g1-1",
+      "pdf_sha256": "b147f6e07d9556cdfbb070e4cd31abf115d4dae00db83356e997c58c4ce823dd",
+      "bytes": 61066
+    },
+    {
+      "id": "table-098-g1-1",
+      "pdf_sha256": "c805875b3d4acb1ab79cb420df9dce53833685088c198f8762308a1631fa38ce",
+      "bytes": 60997
+    },
+    {
+      "id": "table-099-g1-1",
+      "pdf_sha256": "655a7f5994b1e00c7fb84ef108c9286de3c82ec5abd7910da82c6a15f5fcfc66",
+      "bytes": 54657
+    },
+    {
+      "id": "table-099-g2-1",
+      "pdf_sha256": "1b0b6a526d5a55594c17a86d22439b1034e656702923456a563bb33ef25f7765",
+      "bytes": 54718
+    },
+    {
+      "id": "table-100-g1-1",
+      "pdf_sha256": "c80aff94d504de1f6afbf1e60ae8d586ba8ffeff6035e3f6d8247bde7517fba0",
+      "bytes": 60965
+    },
+    {
+      "id": "table-101-g1-1",
+      "pdf_sha256": "755101331ae406e212ee6a0a24e5fb6951e1617a2beabc4151993aacd6ab16ed",
+      "bytes": 61299
+    },
+    {
+      "id": "table-102-g1-1",
+      "pdf_sha256": "39c90bb9498a69ca28f345c499e6ec4266acd4cfcaa842dd177575e45fc3f22e",
+      "bytes": 62532
+    },
+    {
+      "id": "table-103-g1-1",
+      "pdf_sha256": "539a3f709361941fca5889726a0e92dc230736149e92b15f510f0b11ef244543",
+      "bytes": 61395
+    },
+    {
+      "id": "table-104-g1-1",
+      "pdf_sha256": "d3d36675d43907c7f93354072909532eb88b42a886f4b36d13f0f8b8309966fc",
+      "bytes": 56034
+    },
+    {
+      "id": "table-105-g1-1",
+      "pdf_sha256": "8de425712fc6f64d35b8478278bafa35dc5b5f4bcbaf5c705f9d1620659dabad",
+      "bytes": 58861
+    },
+    {
+      "id": "table-106-g1-1",
+      "pdf_sha256": "066c4d6c470e2c19784f9562ace3ffe91635217d678e83fbc97b89d579668f12",
+      "bytes": 56379
+    },
+    {
+      "id": "table-107-g1-1",
+      "pdf_sha256": "d334f318ed610765e201188a8aed7a7786c8b63efc87d8531e94f84cbdb254f7",
+      "bytes": 58906
+    },
+    {
+      "id": "table-108-g1-1",
+      "pdf_sha256": "6c4365c1a693653fe53e3a7048f04d421ea588ac46afd7e59760b7039aca5989",
+      "bytes": 56598
+    },
+    {
+      "id": "table-109-g1-1",
+      "pdf_sha256": "aa72780b1f9e897f8a3cb42b85bea450d2a6c3c8f1f5b493635e5f166cf23b43",
+      "bytes": 58856
+    },
+    {
+      "id": "table-110-g1-1",
+      "pdf_sha256": "f956ab41d55e8566b2bec459e233f8bcd1aa91be26a5967d21ed7f24e7bc943b",
+      "bytes": 57964
+    },
+    {
+      "id": "table-111-g1-1",
+      "pdf_sha256": "859a668dc9c1cba91c33bd94de435e0d51ee26735b7bda6fce9672698701f0d4",
+      "bytes": 58197
+    },
+    {
+      "id": "table-112-g1-1",
+      "pdf_sha256": "ddf2d86e503b74073225976fd98b15455aa24a20a1fbc0b5d94e6cfd28f1e33a",
+      "bytes": 58544
+    },
+    {
+      "id": "table-113-g1-1",
+      "pdf_sha256": "25c099d1500c6df4317e2bed26dd9fbf1a07d75c387bb8c0f07db355df8a4645",
+      "bytes": 61057
+    },
+    {
+      "id": "table-113-g1-2",
+      "pdf_sha256": "4a7c63702e70cc728577733d83e80a5f11ebaca1b1a1be03ab7db7dba125fe63",
+      "bytes": 60254
+    },
+    {
+      "id": "table-113-g2-1",
+      "pdf_sha256": "19c84a3f41066e307a1efa0bc9584fd8a2092845aeacdc94056ee953ac76a3d9",
+      "bytes": 74518
+    },
+    {
+      "id": "table-114-g1-1",
+      "pdf_sha256": "d9a198c7f9444920d91ed801b259f6a4a5364093cf6bebcf51623797f2cf92dc",
+      "bytes": 60478
+    },
+    {
+      "id": "table-114-g2-1",
+      "pdf_sha256": "e59a7da7b821176dea7787195c043576f131be118ed688f77f016d8c9124408d",
+      "bytes": 73642
+    },
+    {
+      "id": "table-115-g1-1",
+      "pdf_sha256": "9b705ce5c4216a7f3b8bb51fb724cbe04e439b72ff9afe1129c011db3b088d39",
+      "bytes": 59884
+    },
+    {
+      "id": "table-115-g2-1",
+      "pdf_sha256": "ad1e9519a2a7b050122787bf7f535bac99527015ff755e87c0b18fdffeea6da3",
+      "bytes": 59786
+    },
+    {
+      "id": "table-116-g1-1",
+      "pdf_sha256": "3d9dd377d5fd5b9e8f0b878a02bf6614d939bda38c2423c1bb72f85657ee0827",
+      "bytes": 61010
+    },
+    {
+      "id": "table-116-g2-1",
+      "pdf_sha256": "3f1f83c9a95c987e6f16937b4b36e77dbf6da4254e78cdc3c672a0b604ab7892",
+      "bytes": 73721
+    },
+    {
+      "id": "table-117-g1-1",
+      "pdf_sha256": "a156155c06ee7f57ff0dd9e52cc50ce7ab2c6d15da0ab06c6f1b4d4cb41dd75c",
+      "bytes": 61003
+    },
+    {
+      "id": "table-117-g2-1",
+      "pdf_sha256": "057264369a6a20aed0d142e6740f8fbe9f9df09a085c2ef74ead6ada87759b6f",
+      "bytes": 73258
+    },
+    {
+      "id": "table-118-g1-1",
+      "pdf_sha256": "3af7ff1c34f214b77d5a979fd52e32d1b93a2845276f3a444bf8d790923637c7",
+      "bytes": 60626
+    },
+    {
+      "id": "table-118-g2-1",
+      "pdf_sha256": "eba150decdaeb7f407f06761a8c42c866c768a91dd8aa4d0f1608fdb0debf715",
+      "bytes": 73543
+    },
+    {
+      "id": "table-119-g1-1",
+      "pdf_sha256": "1daae3eec801c79a03e2a93ea19e8e474f22170052bde29c6348144b885762b9",
+      "bytes": 60095
+    },
+    {
+      "id": "table-120-g1-1",
+      "pdf_sha256": "6b0e5bad456c2d1c2367df7c1724cc4bbf98807c66b3cd28b800c83d80b02f49",
+      "bytes": 53290
+    },
+    {
+      "id": "source-inventory-g1-1",
+      "pdf_sha256": "7da5c43ca697aec5554da9c5223d8b52906c2273047bb49a5ca3724198278fff",
+      "bytes": 64139
+    },
+    {
+      "id": "source-inventory-g1-2",
+      "pdf_sha256": "59485104d56736bf46fe1afeeb4eb7c362dcf584e0d5fa8d240ded05ae9a8fd5",
+      "bytes": 64906
+    },
+    {
+      "id": "source-inventory-g1-3",
+      "pdf_sha256": "af50dc710d0733c3ad11b6d966e3111b519b972524cc4e39d0fb1877d965ba6d",
+      "bytes": 62759
+    },
+    {
+      "id": "source-inventory-g1-4",
+      "pdf_sha256": "4e43875c686d3fc244e52110ba1aee5eb6460188e3910f45de701ef195cd2ffd",
+      "bytes": 62440
+    },
+    {
+      "id": "source-inventory-g1-5",
+      "pdf_sha256": "c302a5e6da4508396b7d4f07a8074aa982ac001e28895d9a11c8da2ad76c35bc",
+      "bytes": 62622
+    },
+    {
+      "id": "source-inventory-g1-6",
+      "pdf_sha256": "8468e0c0c8c69b8779ce863bfe4b82eac299328c418b4b1c678160d169400d43",
+      "bytes": 63340
+    },
+    {
+      "id": "source-inventory-g1-7",
+      "pdf_sha256": "ff071539b4e2f9ea33437f975f61e9a078d44352867064d2fdbeade09d40bcdb",
+      "bytes": 63580
+    },
+    {
+      "id": "source-inventory-g1-8",
+      "pdf_sha256": "9042477c9e4df37f0f37480ed492e132ce123faf0d8c2221a9c1112e751868ba",
+      "bytes": 63386
+    },
+    {
+      "id": "source-inventory-g1-9",
+      "pdf_sha256": "ce9446749e88a709b5e1c5e405ee93ad1bcbb2b6bdd2bcf6f347b5b016d83889",
+      "bytes": 63738
+    },
+    {
+      "id": "source-inventory-g1-10",
+      "pdf_sha256": "e611477df8e0169c5cb6726cf3b51591d9dfe636f9910f079272961d8d4e425a",
+      "bytes": 63158
+    },
+    {
+      "id": "source-inventory-g1-11",
+      "pdf_sha256": "7d473a1428e50e9ff8687ac8225c86b5d8f6b9b694b49e673336af1eb3ddcb57",
+      "bytes": 62394
+    },
+    {
+      "id": "source-inventory-g1-12",
+      "pdf_sha256": "3a91f2bcdeaccfb9b5727e1f7aced22ae79757fd571aaf535e3a215d650704e4",
+      "bytes": 64520
+    },
+    {
+      "id": "source-inventory-g1-13",
+      "pdf_sha256": "fbeabb1ae830538b1fbe019c23b42fe08f425833f4d31609e761b0ba1b399007",
+      "bytes": 63083
+    },
+    {
+      "id": "source-inventory-g1-14",
+      "pdf_sha256": "7b72b2321a9a19a671777bdc108b8379cf360d191e9ba18e1005fa5642c004f2",
+      "bytes": 63157
+    },
+    {
+      "id": "source-inventory-g1-15",
+      "pdf_sha256": "022906939dffda2173017adb41ef0300ea4a241f71c31161e2a88694b7dab71a",
+      "bytes": 62777
+    },
+    {
+      "id": "source-inventory-g1-16",
+      "pdf_sha256": "f71474d782d0944a9d503fc032f1c796ab3711a2ce227fab0e4c02f68b4401de",
+      "bytes": 63138
+    },
+    {
+      "id": "source-inventory-g1-17",
+      "pdf_sha256": "edbdfa97f9eb244707c6b0aa35c6fdf5b9f8556f7799067e5382083daa956a91",
+      "bytes": 63216
+    },
+    {
+      "id": "source-inventory-g1-18",
+      "pdf_sha256": "2a1f4e8a5db096a727127117e8038efbbe5cd4500e676f57825ae3b81f7b9e95",
+      "bytes": 62960
+    },
+    {
+      "id": "source-inventory-g1-19",
+      "pdf_sha256": "a5b8fa1be8fd8f915a2a6f36e4b15cea0c1ab7af4bcd4007d2458d9af3424ef6",
+      "bytes": 63766
+    },
+    {
+      "id": "source-inventory-g1-20",
+      "pdf_sha256": "33909a0bc75f277c9ca9e9b2bd0508f0160960d039a6147da345f122581a1858",
+      "bytes": 64119
+    },
+    {
+      "id": "workshop-evidence-g1-1",
+      "pdf_sha256": "947073ce37ea2f77b62c009c92423ddf38e08fa871e466906aa07b24ff55b446",
+      "bytes": 60789
+    },
+    {
+      "id": "edition-versions-g1-1",
+      "pdf_sha256": "dfbfd213c50d3e53fbfe3af5a930496a88b8b49fe9aa853659758bdedc26709c",
+      "bytes": 61092
+    }
+  ]
+}

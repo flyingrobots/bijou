@@ -1,0 +1,13 @@
+{
+  "status": "not_run",
+  "book_edition": null,
+  "companion_commit": null,
+  "participant_label": null,
+  "prior_bijou_experience": null,
+  "facilitator": null,
+  "environment": { "node": null, "npm": null, "os": null, "terminal": null, "viewport": null, "assistive_tool": null },
+  "observations": [],
+  "interactive_screen_reader_workflow": "not_implemented",
+  "corrections": [],
+  "notes": "Blank protocol template. No human observations or acceptance results have been recorded."
+}

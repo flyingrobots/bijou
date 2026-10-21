@@ -1,0 +1,55 @@
+\chapter{Build from a working stage}\label{teaching-build-along}
+
+\section{Start with an edition you can return to}
+\subsection{Install once, change the application in steps}
+
+The companion now contains five independent source snapshots. Each stage is a complete implementation of its declared behavior. It imports neither the finished \path{src/} application nor another stage. All stages share the root package lock and pinned toolchain, so installing five copies of the dependencies is unnecessary.
+
+\begin{CodeBlock}
+git clone --branch book-v2 --depth 1 https://github.com/flyingrobots/bijou-job-monitor.git
+cd bijou-job-monitor
+git switch -c my-monitor
+npm ci
+npm run stage -- 01
+npm run stage:check -- 01
+\end{CodeBlock}
+
+The version page gives the immutable commit behind the tag. A personal branch gives experiments a home without moving the published edition. The staged source lives under \path{stages/}; the final application remains under \path{src/}. The original \texttt{checkpoint} commands are still useful views of that final application. They are distinct from the progressive implementations.
+
+\input{diagrams/progressive-stages}
+
+\section{Read a real change before applying it}
+\subsection{Use adjacent source diffs}
+
+Run \texttt{npm run stage:diff -- 01 02}. The result is an actual unified diff of source modules. Added and removed lines show how a working earlier stage becomes the next one. The four patches cover 37, 123, 291 and 89 lines respectively, including context. The asynchronous step spans several small modules; its line count is not a promise that every step is equally easy.
+
+Read that larger step by responsibility: protocol, monitor, effect driver, App and host entrypoint, then presentation and fixtures. Each stage's tests live in its own \path{test/} directory. The source patches deliberately exclude tests and guide changes; inspect those files alongside the implementation.
+
+\subsection{Keep the old stage runnable}
+
+Use a learning copy to type a change or compare it with the next snapshot. Run the previous stage's checks before leaving it, then the next stage's checks. If an experiment stops working, return to its unchanged snapshot rather than silently importing a later module to make an earlier program pass. Independent snapshots are deliberate duplication here: they preserve a useful teaching boundary at a fixed edition.
+
+\section{Know exactly what each stage adds}
+\subsection{Stages 01 and 02: facts and presentations}
+
+Stage 01 prints three queued jobs with stable identities and zero progress. It validates impossible progress and duplicate IDs. Stage 02 adds a shared completed/running/failed fixture and four formatters. All four outputs print once and exit. Its interactive output is a content specimen; keyboard input arrives in stage 03. Completion means the status, progress and failure explanation survive every promised presentation, with four fields in each TSV row.
+
+\subsection{Stage 03: synchronous interaction}
+
+Run \texttt{npm run stage -- 03} in a real terminal. Up and Down select; Enter marks a job running; C opens confirmation; Enter confirms; Escape leaves it running. Q and Ctrl+C quit globally. There is no scheduler, log loader or filter yet. A running job stays running until cancelled or the application closes. The stage's \texttt{update} returns a new Monitor directly.
+
+The simple view supports 80 by 24 cells. Below that it displays a resize instruction while retaining global quit. That is an explicit supported boundary, not the completed compact-layout implementation. The input tests establish modal ownership independently of the picture.
+
+\subsection{Stage 04: work has identity and a lifetime}
+
+Stage 04 adds simulated progress, failure, log requests and filtering. Its transition now returns a model and effect descriptions. The driver owns scheduled work; run IDs and view epochs reject stale results. Its simple view targets 80 by 32 cells and provides a resize recovery prompt below that boundary. Start with \texttt{npm run stage -- 04}, then \texttt{npm run stage:check -- 04}.
+
+A deterministic scheduler makes completion, cancellation and disposal observable without sleeping. The previous synchronous program remains valid on its own terms; adding asynchronous work introduces new obligations rather than retroactively proving it had them.
+
+\subsection{Stage 05: the task survives a smaller presentation}
+
+Stage 05 adds compact records, grapheme-aware wrapping, scrolling and selected-item visibility. Resize it to 24 by 8 cells and inspect what remains reachable. Its eight application modules match the final \path{src/} implementation byte for byte. One-cell tests establish bounds; they do not establish that a human can complete the whole task at one cell.
+
+\section{Use hints without losing the diagnosis}
+
+Attempt the broken exercises before opening \hyperref[exercise-answers]{the answer key}. Each answer gives a hint, diagnosis, repair, a tempting failed alternative and an observable completion criterion. \hyperref[reader-walkthrough]{The walkthrough appendix} supplies prompts for an unfamiliar reader. Automated reproduction of a clean installation is evidence about installation; it is not a substitute for that person's comprehension.

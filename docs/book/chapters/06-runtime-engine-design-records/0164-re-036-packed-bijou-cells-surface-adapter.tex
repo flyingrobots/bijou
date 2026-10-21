@@ -1,0 +1,551 @@
+\chapter{RE-036 Packed Bijou Cells Surface Adapter}\label{record-164}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-036-packed-bijou-cells-surface-adapter.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-036 Packed Bijou Cells Surface Adapter
+legend: RE
+lane: release
+priority: high
+github_issue: 459
+parent_issue: 457
+status: complete
+keywords:
+  - runtime-engine
+  - visor
+  - packed-cells
+  - surface
+  - receipts
+  - validation
+  - v8.0.0
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE - Runtime Engine}
+
+\section{Linked Work}\label{record-164-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  User story: \href{https://github.com/flyingrobots/bijou/issues/459}{\#459}
+\item
+  V8 tracker: \href{https://github.com/flyingrobots/bijou/issues/457}{\#457}
+\item
+  Broad source lineage: \href{https://github.com/flyingrobots/bijou/issues/302}{\#302}
+\item
+  Landed artifact-bundle proof: \href{https://github.com/flyingrobots/bijou/issues/458}{\#458}
+\item
+  V8 contract design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-048-v8-runtime-graph-scene-ir-contract.md}{DX-048 V8 Runtime Graph And Scene IR Contract}
+\item
+  Artifact-bundle design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-049-visor-artifact-bundle-proof.md}{DX-049 VISOR Artifact Bundle Proof}
+\item
+  VISOR coordination tracker: \href{https://github.com/flyingrobots/visor/issues/1}{flyingrobots/visor\#1}
+\end{itemize}
+
+\section{Decision Summary}\label{record-164-decision-summary}
+
+Bijou will define \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} as a JSON-shaped terminal receipt whose cell bytes use Bijou's existing ten-byte little-endian packed-cell format, identified as \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}u\allowbreak{}8\allowbreak{}x\allowbreak{}1\allowbreak{}0\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}1}. Glyphs use the \texttt{u\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}1} policy. The receipt carries exact dimensions, bytes, grapheme side-table entries, scene-node provenance, focus facts, and chroma policy facts. A public validator rejects malformed or non-canonical receipts before any \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} constructor or renderer can sanitize them.
+
+The adapter validates first, creates a packed Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, copies the validated bytes and side table without re-encoding cells, and marks the resulting surface dirty. A successful adaptation therefore preserves the receipt's byte sequence and side-table order exactly. It does not reinterpret the receipt through \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} objects.
+
+\section{Current Truth}\label{record-164-current-truth}
+
+Bijou already owns a packed terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}:
+
+\begin{itemize}
+\tightlist
+\item
+  every cell occupies \texttt{1\allowbreak{}0} bytes
+\item
+  character identity is a little-endian unsigned 16-bit value
+\item
+  direct character values below \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} represent BMP code points
+\item
+  values at or above \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} index a grapheme side table
+\item
+  foreground and background colors occupy three unsigned 8-bit channels each
+\item
+  the flags byte records modifiers and the empty-cell bit
+\item
+  the alpha byte records six-bit opacity plus foreground/background presence bits
+\end{itemize}
+
+The internal \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} boundary sanitizes dimensions. The internal \texttt{d\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} boundary substitutes a space when a side-table reference is missing. Those behaviors are appropriate defensive fallbacks inside the renderer, but they are not valid receipt verification. RE-036 must reject the input before either fallback can hide a malformed external artifact.
+
+DX-048 requires packed cells to map back to scene nodes. \#459 also requires focus and chroma metadata to be validated. The existing packed buffer does not carry those facts, so the receipt must carry them beside the byte payload.
+
+\section{Sponsor Human}\label{record-164-sponsor-human}
+
+A maintainer wants to inspect one portable terminal receipt, see the exact scene, cell, glyph, color, focus, and provenance facts it claims, and adapt it into a Bijou \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} without wondering whether the adapter repaired the input.
+
+\section{Sponsor Agent}\label{record-164-sponsor-agent}
+
+An agent wants deterministic typed diagnostics for every invalid receipt path and a byte-exact success path it can verify without rendering a live terminal, scraping text, or depending on process-local state.
+
+\section{Hill}\label{record-164-hill}
+
+Given a checked-in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} fixture, Bijou can fail closed on invalid shape, dimensions, bytes, glyphs, colors, scene provenance, focus, or chroma metadata, then adapt a valid receipt into a packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} whose dimensions, buffer bytes, side-table order, decoded cells, and scene ownership remain inspectable and deterministic.
+
+\section{Playback Questions}\label{record-164-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Which exact packed-cell version and cell format does the receipt use?
+\item
+  How many cells and bytes does the receipt claim?
+\item
+  Which scene and scene nodes own each packed cell?
+\item
+  Which side-table entry supplies each non-direct glyph?
+\item
+  Which node is focused, and which nodes are focusable?
+\item
+  Which color space, channel encoding, alpha encoding, and terminal-default policy govern the bytes?
+\item
+  Can malformed dimensions, colors, glyph references, focus facts, or scene mappings reach \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}?
+\item
+  Does adaptation preserve every byte and side-table entry without normalization?
+\end{itemize}
+
+\section{Scope}\label{record-164-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Define the public \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} receipt type and version constants.
+\item
+  Define a typed deterministic validation error with stable code and path.
+\item
+  Validate the receipt's exact object shape and nested metadata shapes.
+\item
+  Validate dimensions, cell count, stride, byte count, and byte values.
+\item
+  Validate direct glyph values and side-table references.
+\item
+  Validate canonical side-table entries and reference coverage.
+\item
+  Validate foreground/background presence-bit color semantics.
+\item
+  Validate scene-node provenance for every cell.
+\item
+  Validate focus and chroma metadata.
+\item
+  Adapt a valid receipt into Bijou's existing packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Prove byte-exact and side-table-exact adaptation with a checked-in fixture.
+\item
+  Export the contract, validator, error, and adapter through the public Bijou package surface.
+\end{itemize}
+
+\section{Non-Goals}\label{record-164-non-goals}
+
+This cycle does not:
+
+\begin{itemize}
+\tightlist
+\item
+  change Bijou's existing packed-cell byte format
+\item
+  make Geordi a Bijou dependency
+\item
+  implement a Geordi packed-cell renderer
+\item
+  implement terminal frame capture, replay, streaming, or compression
+\item
+  define VISOR storage or indexing behavior
+\item
+  add browser, WebGPU, image, shader, raster, or native-render targets
+\item
+  normalize invalid receipts into accepted ones
+\item
+  infer scene ownership from geometry after receipt creation
+\item
+  validate an entire \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} artifact against the declared scene hash
+\item
+  redesign \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l}, or terminal diff rendering
+\item
+  expand \#459 into the remaining \#302 or \#457 tracker scope
+\end{itemize}
+
+\section{Receipt Contract}\label{record-164-receipt-contract}
+
+The public receipt shape is:
+
+\begin{CodeBlock}
+interface PackedBijouCellsReceipt {
+  readonly receiptVersion: 'packed-bijou-cells/1';
+  readonly widthCells: number;
+  readonly heightCells: number;
+  readonly cellFormatId: 'bijou-packed-cell-u8x10-le/1';
+  readonly glyphPolicyId: 'unicode-grapheme-side-table/1';
+  readonly bytes: readonly number[];
+  readonly sideTable: readonly string[];
+  readonly scene: {
+    readonly sceneVersion: 'ui-scene-ir/1';
+    readonly sceneHash: string;
+    readonly nodeIds: readonly string[];
+    readonly cellNodeIds: readonly string[];
+  };
+  readonly focus: {
+    readonly focusedNodeId: string | null;
+    readonly focusableNodeIds: readonly string[];
+  };
+  readonly chroma: {
+    readonly colorSpace: 'srgb';
+    readonly channelEncoding: 'uint8';
+    readonly alphaEncoding: 'uint6';
+    readonly terminalDefaultEncoding: 'presence-bits';
+  };
+}
+\end{CodeBlock}
+
+The receipt is JSON-shaped. It does not carry \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y}, \texttt{S\allowbreak{}e\allowbreak{}t}, \texttt{M\allowbreak{}a\allowbreak{}p}, functions, symbols, absolute paths, timestamps, process identifiers, terminal handles, or mutable renderer objects.
+
+\section{Dimension And Byte Laws}\label{record-164-dimension-and-byte-laws}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} and \texttt{h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} are positive safe integers.
+\item
+  neither dimension exceeds the renderer's \texttt{9\allowbreak{},\allowbreak{}9\allowbreak{}9\allowbreak{}9}-cell cursor-coordinate limit.
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}*\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} is a safe integer.
+\item
+  the receipt contains at most \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} cells.
+\item
+  \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}*\allowbreak{} \allowbreak{}1\allowbreak{}0} is a safe integer.
+\item
+  \texttt{b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h} equals \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}*\allowbreak{} \allowbreak{}1\allowbreak{}0}.
+\item
+  every byte is a canonical integer in the inclusive range \texttt{0} through \texttt{2\allowbreak{}5\allowbreak{}5}; negative zero is rejected
+\item
+  \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}I\allowbreak{}d} fixes the stride at \texttt{1\allowbreak{}0}; no receipt-defined stride exists
+\end{itemize}
+
+The validator checks those laws before calling \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}. Zero, negative, fractional, infinite, \texttt{N\allowbreak{}a\allowbreak{}N}, unsafe, overflowing, excessive, or byte-length-mismatched dimensions fail.
+
+\section{Glyph Laws}\label{record-164-glyph-laws}
+
+\begin{itemize}
+\tightlist
+\item
+  the character value is decoded from byte offsets \texttt{0} and \texttt{1} as unsigned 16-bit little-endian
+\item
+  direct value \texttt{0} is rejected; an empty cell uses a space glyph plus the empty-cell flag
+\item
+  direct values below \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} must not be UTF-16 surrogate code points
+\item
+  direct values are terminal-control safe graphemes of width \texttt{1}
+\item
+  values at or above \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} must reference an existing side-table entry
+\item
+  every side-table entry is non-empty, terminal-control safe, and exactly one grapheme with terminal width \texttt{1}
+\item
+  format-control, mark-only, and default-ignorable-only graphemes are rejected
+\item
+  every side-table entry contains at most \texttt{2\allowbreak{}5\allowbreak{}6} UTF-16 code units and \texttt{3\allowbreak{}2} UTF-8 bytes
+\item
+  directly encodable values below \texttt{0\allowbreak{}x\allowbreak{}F\allowbreak{}0\allowbreak{}0\allowbreak{}0} are not valid side-table entries
+\item
+  side-table entries are unique
+\item
+  every side-table entry is referenced by at least one cell
+\item
+  side-table order is authoritative and is never sorted, deduplicated, or reconstructed by the adapter
+\end{itemize}
+
+Rejecting unreferenced entries makes the receipt canonical and prevents multiple byte-equivalent receipts from carrying arbitrary unused glyph data.
+
+\section{Color And Modifier Laws}\label{record-164-color-and-modifier-laws}
+
+The six color-channel bytes are always unsigned 8-bit values by the byte law. The alpha byte's low six bits encode opacity. Bit \texttt{6} records foreground presence and bit \texttt{7} records background presence.
+
+\begin{itemize}
+\tightlist
+\item
+  when the foreground presence bit is unset, all three foreground channels are \texttt{0}
+\item
+  when the background presence bit is unset, all three background channels are \texttt{0}
+\item
+  an absent color means terminal default; it does not mean black
+\item
+  the dashed modifier flag is valid only with the dotted/dashed underline value
+\item
+  all other modifier and empty-cell bits retain their existing Bijou meaning
+\end{itemize}
+
+The adapter copies those bytes. It does not synthesize terminal defaults, resolve theme tokens, quantize colors, or reconstruct modifier lists.
+
+\section{Scene And Focus Laws}\label{record-164-scene-and-focus-laws}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}V\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n} is exactly \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}a\allowbreak{}s\allowbreak{}h} is a lowercase 64-character SHA-256 hexadecimal digest
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s} is non-empty, unique, and contains canonical non-empty ids
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h} equals the cell count
+\item
+  every cell node id occurs in \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}
+\item
+  \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s} is unique
+\item
+  every focusable node id occurs in \texttt{s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}
+\item
+  \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d} is either \texttt{n\allowbreak{}u\allowbreak{}l\allowbreak{}l} or occurs in \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}
+\end{itemize}
+
+Every cell has an owning scene node. Background, empty, or padding cells must name the scene node that intentionally emitted them; \texttt{n\allowbreak{}u\allowbreak{}l\allowbreak{}l} ownership is not accepted.
+
+\section{Chroma Laws}\label{record-164-chroma-laws}
+
+The first receipt version supports one explicit chroma profile:
+
+\begin{CodeBlock}
+colorSpace: srgb
+channelEncoding: uint8
+alphaEncoding: uint6
+terminalDefaultEncoding: presence-bits
+\end{CodeBlock}
+
+All four fields are mandatory and exact. Supporting another color space, channel width, alpha encoding, or terminal-default policy requires a new declared receipt or cell-format version. The validator does not silently convert unsupported metadata.
+
+\section{Validation Error Contract}\label{record-164-validation-error-contract}
+
+Invalid input throws \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} with:
+
+\begin{CodeBlock}
+interface PackedBijouCellsValidationErrorShape {
+  readonly code: PackedBijouCellsValidationCode;
+  readonly path: string;
+  readonly detail: string;
+}
+\end{CodeBlock}
+
+The message format is deterministic:
+
+\begin{CodeBlock}
+packed-bijou-cells/1 <code> at <path>: <detail>
+\end{CodeBlock}
+
+Codes distinguish invalid shape, unknown field, wrong literal, invalid dimension, invalid byte, byte-length mismatch, invalid glyph, invalid color, invalid modifier, invalid scene mapping, invalid focus, and invalid chroma. Paths use JSON-compatible segments such as \texttt{\$\allowbreak{}.\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}[\allowbreak{}1\allowbreak{}7\allowbreak{}]} and \texttt{\$\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d}. Control and default-ignorable characters are escaped as Unicode escape sequences before entering a diagnostic path.
+
+Validation returns a fresh receipt value only after the entire object passes. No partial receipt or partially created \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} escapes a failure.
+
+\section{Surface Adapter Contract}\label{record-164-surface-adapter-contract}
+
+\texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{})} performs this sequence:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Parse and validate the unknown input.
+\item
+  Create a packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} with the validated positive dimensions.
+\item
+  Copy the validated bytes into \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}.
+\item
+  Copy side-table entries in their declared order.
+\item
+  Mark all cells dirty for the first terminal render.
+\item
+  Return the packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\end{enumerate}
+
+The following round-trip assertions are mandatory:
+
+\begin{CodeBlock}
+surface.width === receipt.widthCells
+surface.height === receipt.heightCells
+Array.from(surface.buffer) deep-equals receipt.bytes
+surface.sideTable deep-equals receipt.sideTable
+\end{CodeBlock}
+
+Decoded cells may be inspected as secondary evidence. Re-encoding decoded \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} objects is not the adaptation mechanism.
+
+\section{Accessibility And Assistive Posture}\label{record-164-accessibility-and-assistive-posture}
+
+Packed cells are visual terminal output, not an accessibility tree. The receipt preserves scene-node and focus identity so a later inspector can link the visual proof back to semantic roles and accessible names in \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}. This cycle makes no claim that packed bytes alone provide a screen-reader representation.
+
+The adapter must not erase focus identity or imply that terminal color is the only carrier of meaning. Semantic accessibility remains owned by the source artifact and scene contract.
+
+\section{Localization And Directionality Posture}\label{record-164-localization-and-directionality-posture}
+
+Side-table validation is Unicode-aware and accepts one terminal-width grapheme per entry. This cycle does not implement bidirectional reordering, wide-cell layout, locale-aware shaping, or grapheme fallback. A producer must lower those concerns before emitting this one-cell-per-glyph receipt.
+
+Rejecting control-bearing, multi-grapheme, or non-unit-width entries prevents the adapter from creating a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} whose geometry disagrees with the receipt dimensions.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-164-agent-inspectability-and-explainability-posture}
+
+An agent can inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  exact version and policy literals
+\item
+  dimensions and derived cell count
+\item
+  exact byte payload
+\item
+  glyph side table and cell references
+\item
+  scene hash and node inventory
+\item
+  per-cell scene ownership
+\item
+  focus inventory and active focus
+\item
+  exact chroma profile
+\item
+  a stable validation code and path for failures
+\end{itemize}
+
+No live terminal, component tree, renderer loop, hidden registry, or host state is required to explain success or failure.
+
+\section{Linked Invariants}\label{record-164-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}: the receipt is portable data and the adapter preserves its packed facts.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}: malformed receipts fail with stable code and path.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: executable fixtures define the accepted receipt and failure behavior.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/host-apis-stay-behind-adapters.md}{Host APIs Stay Behind Adapters}: validation and adaptation require no host, filesystem, process, or network capability.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-164-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Synchronize \texttt{R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} with the landed \#468 proof and active \#459 lane.
+\item
+  Add this design packet and a design-policy regression test.
+\item
+  Add a checked-in valid receipt fixture and focused tests that fail because the public validator and adapter do not exist.
+\item
+  Implement constants, public types, typed errors, exact-shape validation, and canonical field validation.
+\item
+  Implement glyph, color, scene, focus, and chroma validation.
+\item
+  Implement the byte-copying packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} adapter.
+\item
+  Export the public contract through \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  Update reference documentation, changelog, roadmap evidence, and this design's closeout.
+\item
+  Run focused tests, package typecheck, lint, Code Dojo gates, docs gates, generators, the full suite, and pre-push verification.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-164-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  A checked-in valid fixture fails to import through the missing public API.
+\item
+  The valid fixture adapts with exact dimensions, bytes, and side-table order.
+\item
+  Unknown top-level and nested fields fail.
+\item
+  Wrong version and policy literals fail.
+\item
+  Zero, negative, fractional, unsafe, overflowing, and above-\texttt{9\allowbreak{},\allowbreak{}9\allowbreak{}9\allowbreak{}9} dimensions fail.
+\item
+  Byte-length mismatch and non-byte values fail.
+\item
+  Missing side-table references fail instead of decoding as spaces.
+\item
+  Surrogate direct glyph values fail.
+\item
+  Empty, control-bearing, multi-grapheme, duplicate, wide, and unreferenced side-table entries fail.
+\item
+  Nonzero RGB channels with an absent color presence bit fail.
+\item
+  Invalid dashed-modifier combinations fail.
+\item
+  Duplicate or empty scene-node ids fail.
+\item
+  Missing and unknown per-cell scene ownership fails.
+\item
+  Unknown, duplicate, or inconsistent focus ids fail.
+\item
+  Unsupported chroma values fail without conversion.
+\item
+  Adaptation never calls a renderer and never re-encodes cells through \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} or \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})}.
+\end{itemize}
+
+\section{Validation Plan}\label{record-164-validation-plan}
+
+Focused proof:
+
+\begin{CodeBlock}
+npx vitest run tests/cycles/RE-036
+\end{CodeBlock}
+
+Package and static proof:
+
+\begin{CodeBlock}
+npm run typecheck
+npm run lint
+npm run code-dojo:verify
+npm run docs:inventory
+git diff --check
+\end{CodeBlock}
+
+Full repository proof:
+
+\begin{CodeBlock}
+npm run code-dojo:ci
+\end{CodeBlock}
+
+If repository script names differ, use the documented owning commands and record the exact successful commands in closeout.
+
+\section{Acceptance Criteria}\label{record-164-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} is a public documented receipt contract.
+\item
+  The public validator rejects malformed shape, dimensions, bytes, glyphs, colors, scene mappings, focus facts, and chroma facts deterministically.
+\item
+  A checked-in fixture adapts into a packed terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Adapted dimensions, bytes, and side-table order exactly match the fixture.
+\item
+  Every receipt cell maps to a declared \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} node.
+\item
+  Invalid side-table references never fall through to a replacement space.
+\item
+  Invalid dimensions never reach dimension sanitation.
+\item
+  No Geordi, VISOR, host, filesystem, network, or live-terminal dependency is introduced.
+\item
+  Public types, errors, constants, validator, and adapter are exported.
+\item
+  Focused and full repository gates pass.
+\end{itemize}
+
+\section{Closeout Notes}\label{record-164-closeout-notes}
+
+RE-036 exports \texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. The validator rejects non-plain or inexact JSON shapes, unsafe or excessive dimensions, non-byte payloads, non-canonical glyphs, terminal-default color drift, invalid modifier combinations, incomplete scene ownership, inconsistent focus, and unsupported chroma before surface allocation.
+
+The checked \texttt{2} by \texttt{2} fixture preserves all \texttt{4\allowbreak{}0} bytes and both side-table entries through adaptation. It includes direct, combining, and private-use glyph evidence; explicit and terminal-default colors; per-cell scene ownership; and focus metadata. The adapter copies the payload directly into a packed \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, preserves side-table order, and marks every cell dirty without calling \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} or \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})}.
+
+Focused RE-036 verification passes \texttt{1\allowbreak{}6} tests across \texttt{5} suites. Full \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}i} verification passes \texttt{4\allowbreak{},\allowbreak{}0\allowbreak{}3\allowbreak{}1} tests across \texttt{8\allowbreak{}9\allowbreak{}1} test files. Code Dojo holds its \texttt{6\allowbreak{}2}-violation aggregate baseline: \texttt{3\allowbreak{}7} file/context, \texttt{2\allowbreak{}5} code-size, \texttt{0} mock-ban, and \texttt{0} ESLint. \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, targeted Markdown lint, and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} pass.
+
+Contract shaping is commit \texttt{b\allowbreak{}1\allowbreak{}d\allowbreak{}5\allowbreak{}7\allowbreak{}e\allowbreak{}9\allowbreak{}5}; implementation and public documentation are commit \texttt{6\allowbreak{}6\allowbreak{}9\allowbreak{}d\allowbreak{}1\allowbreak{}0\allowbreak{}c\allowbreak{}7}. Remove \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} from \href{https://github.com/flyingrobots/bijou/issues/459}{\#459} only after review, CI, merge, and issue closeout complete.
+

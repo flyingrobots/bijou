@@ -1,0 +1,66 @@
+\chapter{WF-007 --- Align Local Validation With CI typecheck:test Gate}\label{record-405}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/bad-code/WF-007-align-local-validation-with-ci-typecheck-test-gate.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Idea}\label{record-405-idea}
+
+The repo's local validation story is still slightly less strict than the GitHub Actions story.
+
+This PR hit a real example:
+
+\begin{itemize}
+\tightlist
+\item
+  local branch work looked green enough to push
+\item
+  GitHub Actions failed in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}(\allowbreak{}2\allowbreak{}2\allowbreak{})} during \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  the failure was a test-only typing drift in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+That means the repo can still teach a false lesson:
+
+\begin{itemize}
+\tightlist
+\item
+  ``looks good locally'' is not yet the same thing as ``will clear the CI gate''
+\end{itemize}
+
+\section{Why}\label{record-405-why}
+
+This is workflow debt, not a product blocker.
+
+The codebase already has a real \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} gate and it caught a legitimate bug. The problem is that the local branch-validation path did not catch it early enough.
+
+\section{Hill}\label{record-405-hill}
+
+A maintainer or agent can run the normal local validation path before pushing and trust that test-only TypeScript drift will be caught before GitHub Actions does.
+
+\section{Likely scope}\label{record-405-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  inspect which local guardrail should own \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    pre-push hook
+  \item
+    an explicit branch-readiness script
+  \item
+    both
+  \end{itemize}
+\item
+  make the local witness match the remote CI expectation
+\item
+  document the intended local gate clearly
+\end{itemize}
+
+\section{Status}\label{record-405-status}
+
+Backlog spawned by PR \#59 feedback processing after GitHub Actions failed on \texttt{t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} and the fix landed in commit \texttt{a\allowbreak{}e\allowbreak{}c\allowbreak{}3\allowbreak{}0\allowbreak{}6\allowbreak{}f}.
+

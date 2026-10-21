@@ -1,0 +1,3726 @@
+\chapter{Component Families}\label{record-019}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/component-families.md}\par}\smallskip
+
+This document is the working semantic map for the shipped Bijou component families.
+
+The goal is to stop thinking in terms of ``every export is its own component.''
+
+\section{How to read this}\label{record-019-how-to-read-this}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Family} means one semantic job.
+\item
+  \textbf{Variants} may be semantic, interaction-layer, or render-path variants.
+\item
+  \textbf{Core} means it belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  \textbf{TUI} means it belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\end{itemize}
+
+\section{Documentation completeness status}\label{record-019-documentation-completeness-status}
+
+This page is a living component-family reference.
+
+The stated design-system standard requires each mature family doc to include:
+
+\begin{itemize}
+\tightlist
+\item
+  what it is
+\item
+  variations
+\item
+  when to use
+\item
+  when not to use
+\item
+  content guidance
+\item
+  interaction ownership
+\item
+  graceful lowering across \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\item
+  related families
+\item
+  closest Carbon analogue
+\end{itemize}
+
+This page now meets the structural documentation standard for shipped families: every family below includes variants, usage guidance, content guidance, ownership, graceful lowering, related families, and a Carbon analogue. The remaining work is about depth and sharper examples, not missing required sections.
+
+\section{Component slice checklist}\label{record-019-component-slice-checklist}
+
+When a component family is changed in code, the matching family docs should be checked in the same slice.
+
+Minimum verification:
+
+\begin{itemize}
+\tightlist
+\item
+  the family is present in this guide
+\item
+  the listed variants still match reality
+\item
+  \texttt{U\allowbreak{}s\allowbreak{}e\allowbreak{} \allowbreak{}w\allowbreak{}h\allowbreak{}e\allowbreak{}n} and \texttt{A\allowbreak{}v\allowbreak{}o\allowbreak{}i\allowbreak{}d\allowbreak{} \allowbreak{}w\allowbreak{}h\allowbreak{}e\allowbreak{}n} still match the implementation and examples
+\item
+  graceful lowering still matches the runtime behavior
+\item
+  related families still make sense after the code change
+\end{itemize}
+
+If those checks fail, the component work is not doctrinally complete yet.
+
+\section{Status and feedback families}\label{record-019-status-and-feedback-families}
+
+\subsection{Inline status}\label{record-019-inline-status}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    semantic/status variants
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    status is compact and local to another object
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    message must stand alone or explain itself
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keep badge labels terse, stable, and noun-like or state-like
+  \item
+    avoid embedding full sentences or multi-step guidance in badges
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: keep compact label styling inline with nearby content
+  \item
+    pipe: lower to plain inline text label without relying on color
+  \item
+    accessible: speak the status in plain words next to the owning object
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tag
+  \end{itemize}
+\end{itemize}
+
+\subsection{In-flow status block}\label{record-019-in-flow-status-block}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    semantic tones
+  \item
+    render-path companion: \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    status should remain part of the page/document
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    lifecycle/history/stacking is required
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    include the state, cause, and next useful action in the body when possible
+  \item
+    keep the headline short and let supporting text carry detail
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: remain a boxed or otherwise clearly separated in-flow message
+  \item
+    pipe: lower to emphasized plain text that stays in document order
+  \item
+    accessible: keep message text and severity explicit, with no dependence on borders or color
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    inline notification
+  \end{itemize}
+\end{itemize}
+
+\subsection{Low-level transient overlay}\label{record-019-low-level-transient-overlay}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    status variants
+  \item
+    anchor/placement
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app needs a one-off transient overlay and is composing overlays directly
+  \item
+    placement matters, but lifecycle/history does not
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    stacking, routing, actions, or recall matter
+  \item
+    the content should remain in page flow
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keep the message short enough to scan without stopping the task
+  \item
+    avoid multiline operational detail that really belongs in notifications or a drawer
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: anchored transient overlay with placement and timing
+  \item
+    static: lower to visible in-flow status or last-frame summary rather than hidden motion
+  \item
+    pipe: lower to one plain event line or app-owned log entry
+  \item
+    accessible: prefer explicit announcement text over spatial anchoring
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    toast notification primitive
+  \end{itemize}
+\end{itemize}
+
+\subsection{Transient app notifications}\label{record-019-transient-app-notifications}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: notification system
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{T\allowbreak{}O\allowbreak{}A\allowbreak{}S\allowbreak{}T}
+  \item
+    \texttt{I\allowbreak{}N\allowbreak{}L\allowbreak{}I\allowbreak{}N\allowbreak{}E}
+  \item
+    \texttt{A\allowbreak{}C\allowbreak{}T\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}A\allowbreak{}B\allowbreak{}L\allowbreak{}E}
+  \item
+    tones
+  \item
+    placements
+  \item
+    history/archive view
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app owns transient messaging and may need stacking, routing, actions, or recall
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content is primary page content
+  \item
+    one local overlay is enough and app-wide lifecycle is unnecessary
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    titles should summarize the event, while body text should explain consequence or next step
+  \item
+    actionable notifications should expose one clear primary action instead of a menu of choices
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: stacked overlays with placement, action buttons, animation, and archive/history
+  \item
+    static: visible notices plus accessible history review surface
+  \item
+    pipe: lower to ordered event lines and routed warnings/errors
+  \item
+    accessible: simplify to explicit chronological reviewable notices with actions described in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    toast notification, actionable notification, notification panel/center
+  \end{itemize}
+\end{itemize}
+
+\subsection{Activity stream}\label{record-019-activity-stream}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    log levels
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    order and accumulation matter
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the message should interrupt instead of accumulate
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    log lines should remain chronological, specific, and attributable
+  \item
+    avoid decorative phrasing that makes scanning and filtering harder
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: retain ordered styled lines with level cues
+  \item
+    pipe: already natural plain sequential output
+  \item
+    accessible: keep timestamps/levels explicit and avoid decorative formatting
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    notification system
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    activity log / event stream pattern
+  \end{itemize}
+\end{itemize}
+
+\subsection{Loading placeholders}\label{record-019-loading-placeholders}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    single-line, multiline, and region-shaped placeholders
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the expected content shape is known but the content is not available yet
+  \item
+    a short-lived loading interval would otherwise cause distracting layout pop
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    honest partial content can already be shown
+  \item
+    the delay is long enough that a clearer loading state, progress indicator, or retry path is needed
+  \item
+    the placeholder would outlive the user's trust and start to look like fake content
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    skeletons should roughly match the final information density instead of becoming ornamental gray bars everywhere
+  \item
+    use them for short-lived uncertainty, then yield to partial or explicit loading states as soon as real content exists
+  \item
+    keep labels or surrounding context explicit so the user knows what is loading
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve the placeholder shape while loading is genuinely transient
+  \item
+    pipe: lower to explicit loading text or field labels instead of decorative placeholder bars
+  \item
+    accessible: announce loading state and the affected region explicitly rather than relying on visual shimmer or shape
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    skeleton state
+  \end{itemize}
+\end{itemize}
+
+\subsection{Inline shortcut cues}\label{record-019-inline-shortcut-cues}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{k\allowbreak{}b\allowbreak{}d\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    single key, chord, and adjacent grouped key cues
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a local action or instruction needs an inline shortcut hint
+  \item
+    the shortcut belongs next to the thing it affects
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user needs a broader command reference or grouped shortcut map
+  \item
+    the chip would become the primary content instead of a supporting cue
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    show only the keys the user actually needs at that moment
+  \item
+    keep shortcut chips close to the related action label instead of collecting them into decorative clutter
+  \item
+    use shell help views for broader keybinding discovery; keep \texttt{k\allowbreak{}b\allowbreak{}d\allowbreak{}(\allowbreak{})} for inline, local hints
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve compact key-chip treatment inline with related content
+  \item
+    pipe: lower to explicit key names in plain text without decorative framing being the only cue
+  \item
+    accessible: speak the shortcut and related action in one readable phrase
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keyboard key / shortcut hint
+  \end{itemize}
+\end{itemize}
+
+\subsection{Progress indicators}\label{record-019-progress-indicators}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}A\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    determinate bar
+  \item
+    indeterminate spinner
+  \item
+    live controller helpers
+  \item
+    animated progress interpolation
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user needs honest feedback that work is ongoing
+  \item
+    determinate versus indeterminate progress is actually known
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    loading is so brief that the indicator would flicker more than it helps
+  \item
+    the state should be explained as a durable message or result instead of transient activity
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} when completion can be estimated honestly
+  \item
+    use \texttt{s\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} when activity is real but percent-complete is not
+  \item
+    switch from placeholder to progress indicator only when process feedback matters more than preserving layout shape
+  \item
+    pair progress indicators with clear labels so users know what is happening, not just that something is moving
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve determinate or indeterminate activity cues honestly
+  \item
+    pipe: lower to explicit text progress or repeated status lines without fake animation semantics
+  \item
+    accessible: announce task state, progress, and completion explicitly in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    progress bar / loading spinner
+  \end{itemize}
+\end{itemize}
+
+\section{Structural families}\label{record-019-structural-families}
+
+\subsection{Framed grouping}\label{record-019-framed-grouping}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    titled via \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    render-path companions via \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    grouping, containment, or local region identity matter
+  \item
+    peer panels need to read as separate working areas
+  \item
+    a compact title plus detail helps orient a panel without consuming a full heading block
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    urgency or interruption is the primary job
+  \item
+    every subsection would get its own border purely for decoration
+  \item
+    a separator, heading, or whitespace would communicate structure more honestly
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} for grouped content and \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} when the region needs a clear title plus compact secondary detail
+  \item
+    titles should describe the region's job, not restate surrounding context
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} detail text should carry terse metadata such as environment, path, version, or scope rather than a second sentence
+  \item
+    nested boxes should be rare and should explain real hierarchy or comparison, not just add more chrome
+  \item
+    keep dense prose out of narrow boxes unless wrapping materially helps comprehension
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: keep bordered or titled containment when space allows
+  \item
+    pipe: lower to plain grouped text with spacing and optional title
+  \item
+    accessible: preserve title and content order without decorative framing
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tile / contained section
+  \end{itemize}
+\end{itemize}
+
+\subsection{Explainability walkthroughs}\label{record-019-explainability-walkthroughs}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    visible provenance label
+  \item
+    rationale, evidence, next-action, and governance sections
+  \item
+    confidence and source metadata
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    AI-mediated or machine-assisted output needs explicit explanation instead of decorative summary
+  \item
+    the user needs one calm guided-flow surface that separates recommendation from supporting evidence
+  \item
+    the next action matters more than conversational prose
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content is just a generic status or note with no recommendation/evidence structure
+  \item
+    the app needs a non-AI guided flow or a full multi-step wizard instead of one explainability surface; prefer \texttt{g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}(\allowbreak{})} for the calmer general case
+  \item
+    the app is hiding service latency or speculative output behind an authoritative-looking card
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keep the title as the recommendation or explanation itself, not a vague marketing headline
+  \item
+    make \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} or equivalent provenance visible
+  \item
+    separate rationale, evidence, and next action into distinct sections instead of mixing them together
+  \item
+    governance text should clarify review posture without becoming the dominant content
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve section rhythm and explicit provenance inside one calm grouped surface
+  \item
+    pipe: lower to labeled plain-text sections with one obvious next action
+  \item
+    accessible: linearize the same fields explicitly with no dependence on borders, color, or layout
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    no exact analogue; closest to an explainability panel or guided recommendation card
+  \end{itemize}
+\end{itemize}
+
+\subsection{Inspector panels}\label{record-019-inspector-panels}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    current-selection emphasis
+  \item
+    compact titled sections
+  \item
+    muted supporting-copy sections
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a side panel needs to summarize the currently selected thing without taking over the primary task
+  \item
+    supporting context should stay structured and calmer than the main content
+  \item
+    the panel needs one obvious current value plus compact supporting sections
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content is a full guided recommendation with evidence and next-action structure; prefer \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}
+  \item
+    the surface is really just an alert, note, or one-line status
+  \item
+    the panel needs its own complex navigation or multistep interaction model
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    make the current selection more obvious than supporting copy
+  \item
+    keep section titles short and concrete
+  \item
+    let supporting details look supporting; do not let descriptions overpower the active value
+  \item
+    stack explicit sections before inventing another decorative box inside the panel
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve titled containment, current-selection emphasis, and compact section rhythm
+  \item
+    pipe: lower to explicit field labels with one obvious current selection
+  \item
+    accessible: linearize the same fields in plain language without borders or color
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    side panel / contextual detail panel
+  \end{itemize}
+\end{itemize}
+
+\subsection{Formatted documents and prose}\label{record-019-formatted-documents-and-prose}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    headings, emphasis, lists, blockquotes, links, GFM-style pipe tables, code fences, and other supported markdown structures with mode-aware lowering
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    help, reference, release notes, readme-like content, or bounded prose needs lightweight structure
+  \item
+    the same content should remain honest across rich, pipe, and accessible output modes
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content needs deep document navigation rather than one rendered block
+  \item
+    the app is really composing interface layout, forms, or command surfaces rather than prose
+  \item
+    browser-grade markdown fidelity or arbitrary user-authored rich documents are expected
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    headings should break the content into scannable chunks instead of reproducing the entire document hierarchy from another medium
+  \item
+    keep fenced code blocks and quotes short enough that the surrounding task still matters more than ornamental formatting
+  \item
+    links should remain explicit and self-describing, since terminals vary in clickable-link support
+  \item
+    use markdown for documents and reference prose, not as a substitute layout engine for application chrome
+  \item
+    when markdown appears in overlays or panes, keep the scope intentionally bounded and move to pager or navigation patterns if the content becomes a document-reading task
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve supported markdown structure and emphasis honestly within terminal constraints
+  \item
+    pipe: lower to plain text with heading/list/code semantics still understandable without styling
+  \item
+    accessible: linearize headings, lists, links, and code cues explicitly in reading order
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    structured text / markdown content block
+  \end{itemize}
+\end{itemize}
+
+\subsection{Linked destinations}\label{record-019-linked-destinations}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    OSC 8 clickable link
+  \item
+    explicit fallback text or URL modes
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the destination matters and should remain part of the rendered output
+  \item
+    terminals with hyperlink support should get a direct clickable affordance without hiding the actual destination semantics
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the destination is untrusted, ambiguous, or should not be activated casually
+  \item
+    link text is the only place where critical meaning or safety context appears
+  \item
+    the user needs an app-owned action rather than an external destination
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    link labels should describe the destination or resource, not generic phrases like ``click here''
+  \item
+    when trust matters, keep the host or destination obvious in the surrounding text or fallback behavior
+  \item
+    use fallback modes intentionally so non-supporting terminals still preserve the destination honestly
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: use OSC 8 when supported while keeping meaningful visible link text
+  \item
+    pipe: lower to explicit text plus destination URL when needed
+  \item
+    accessible: preserve label and destination clearly in reading order without assuming clickability
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    link
+  \end{itemize}
+\end{itemize}
+
+\subsection{Dividers}\label{record-019-dividers}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    labeled, unlabeled
+  \item
+    render-path companion: \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a section boundary is needed without full containment
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content needs its own grouped region
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    labels should name the next section or state, not repeat a page title
+  \item
+    use dividers sparingly so they mark real boundaries rather than visual noise
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: render as visual divider or labeled rule
+  \item
+    pipe: lower to simple text divider or heading-like label
+  \item
+    accessible: preserve section naming without decorative characters being the only cue
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    divider
+  \end{itemize}
+\end{itemize}
+
+\section{Choice and form families}\label{record-019-choice-and-form-families}
+
+\subsection{Text entry}\label{record-019-text-entry}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    short-form versus long-form entry
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user is providing text rather than choosing from a fixed set
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    choices are already known and enumerable
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    prompts should describe the expected input shape and any critical constraints
+  \item
+    placeholders and defaults should clarify intent, not substitute for the label
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: interactive field/editor treatment with validation feedback
+  \item
+    static: render current value or prompt snapshot honestly
+  \item
+    pipe: fall back to line-buffered prompt/input flow
+  \item
+    accessible: keep prompt, validation, and submitted value explicit in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    text input / text area
+  \end{itemize}
+\end{itemize}
+
+\subsection{Single choice}\label{record-019-single-choice}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    regular choice
+  \item
+    searchable choice
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the result is stored value state
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    selecting should trigger an app command rather than persist a value
+  \item
+    the option set is large enough that search, ranking, or narrowing is the real task
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    option labels should be distinct, parallel, and easy to scan
+  \item
+    searchable choice should use concise matching text, not long descriptive paragraphs
+  \item
+    if search is the real job, prefer \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} semantics over stuffing too many options into plain \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: keyboard choice list with focus and optional search narrowing
+  \item
+    static: show current selection or available options snapshot
+  \item
+    pipe: lower to numbered or searchable textual selection flow
+  \item
+    accessible: keep option labels, current selection, and prompt semantics explicit
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    dropdown / combo box
+  \end{itemize}
+\end{itemize}
+
+\subsection{Multiple choice}\label{record-019-multiple-choice}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    default selections, checkbox set behavior
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user is building a set
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the choice is singular or immediate action-oriented
+  \item
+    the user is really firing commands rather than collecting lasting state
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    options should read like members of one set, not unrelated commands
+  \item
+    summary text should make selection state obvious without requiring visual checkboxes
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: checkbox-style set selection with keyboard toggling
+  \item
+    static: show selected values snapshot honestly
+  \item
+    pipe: lower to comma-separated or numbered textual selection flow
+  \item
+    accessible: describe the current set in plain text rather than relying on checkmarks alone
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    multi-select / checkbox group
+  \end{itemize}
+\end{itemize}
+
+\subsection{Binary decision}\label{record-019-binary-decision}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    default yes/no orientation
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the decision is genuinely binary
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    nuance, comparison, or explanation is needed
+  \item
+    the prompt is really a multi-option choice disguised as yes/no
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    questions should be explicit about the consequence of yes versus no
+  \item
+    destructive confirmations should name the thing being changed or removed
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: yes/no confirmation prompt or focused confirm surface
+  \item
+    static: show the confirmation question and current default honestly
+  \item
+    pipe: lower naturally to textual yes/no input
+  \item
+    accessible: preserve the binary choice and default state explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    confirmation dialog pattern
+  \end{itemize}
+\end{itemize}
+
+\subsection{Multi-field and staged forms}\label{record-019-multi-field-and-staged-forms}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    single-step grouped form
+  \item
+    staged or branching flow
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user is progressing through related inputs
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the fields are unrelated or the result is a command
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    each step or group should have a clear goal and avoid mixing unrelated concepts
+  \item
+    summaries and progress text should orient the user without duplicating every field label
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: grouped or staged prompts with progress and validation
+  \item
+    static: show the current step/group snapshot honestly
+  \item
+    pipe: lower to sequential prompts while preserving branching meaning
+  \item
+    accessible: keep step names, requirements, and progress explicit in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    form group / multi-step flow
+  \end{itemize}
+\end{itemize}
+
+\section{Content organization families}\label{record-019-content-organization-families}
+
+\subsection{Peer navigation}\label{record-019-peer-navigation}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tab labels, badges, active state
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    views are peers and only one is active
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    order or hierarchy is the main idea
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tab labels should be short destination names, not action phrases
+  \item
+    unread counts or compact status belong in secondary adornments, not the core label
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: keep one active peer view visibly selected
+  \item
+    pipe: lower to labeled current section plus sibling list if needed
+  \item
+    accessible: preserve peer destinations and active state explicitly in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tabs
+  \end{itemize}
+\end{itemize}
+
+\subsection{Progressive disclosure}\label{record-019-progressive-disclosure}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    static disclosure
+  \item
+    keyboard-owned TUI inspection
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    detail is secondary to summary
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sections are peers that deserve first-class navigation
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    section headers should summarize the concealed content well enough to support scanning
+  \item
+    disclosed content should stay tightly related to its summary row
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core plus TUI interaction layer
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: collapsible sections with optional keyboard-owned inspection
+  \item
+    static: show expanded/collapsed state honestly without requiring motion
+  \item
+    pipe: lower to section headings with visible disclosed content
+  \item
+    accessible: keep section labels and disclosure state explicit in text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    accordion
+  \end{itemize}
+\end{itemize}
+
+\subsection{Path and progress}\label{record-019-path-and-progress}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    location, process progress, page count
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the UI needs wayfinding or progress communication
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tabs or lists express the job more clearly
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    path and progress labels should emphasize where the user is, not every possible destination
+  \item
+    step titles should be stable and action-oriented enough to support review and recovery
+  \item
+    use \texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})} when path context helps orient the current location, not as a decorative header flourish
+  \item
+    use \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} when compact position-in-sequence feedback is enough and the user does not need a richer navigation control
+  \item
+    use \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} when the current stage and remaining path matter more than peer switching
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: retain location, step, or page state with simple styling
+  \item
+    pipe: lower to plain path/progress/page summaries
+  \item
+    accessible: preserve order and active/current state explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    breadcrumb / progress indicator / pagination
+  \end{itemize}
+\end{itemize}
+
+\subsection{Motion and shader effects}\label{record-019-motion-and-shader-effects}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    transition shaders
+  \item
+    \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    decorative visual field
+  \item
+    transition reinforcement
+  \item
+    motion choreography
+  \item
+    custom shader override
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    motion or shader output clarifies state change, transition, or atmosphere
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the effect is only decorative noise
+  \item
+    readability, scanning, or task focus would be harmed
+  \item
+    the same meaning would be clearer as stable content or a simpler status cue
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} should be reserved for deliberate visual moments such as splash surfaces, atmospheric backgrounds, or specialized visual regions, not routine productivity chrome
+  \item
+    transition shaders should reinforce page or workspace change, not compete with the content being changed
+  \item
+    animation timing should support comprehension and must have an honest reduced-motion or non-interactive fallback
+  \item
+    shader overrides should preserve semantic content where possible and avoid turning ordinary task flows into spectacle
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: preserve the motion or visual effect when it materially helps
+  \item
+    static: lower to truthful final-state snapshots without pretending the transition still exists
+  \item
+    pipe: drop decorative effects and keep only the meaning-bearing content
+  \item
+    accessible: preserve state change meaning explicitly without requiring visual motion
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    no exact analogue; closest to expressive motion and illustration guidance rather than one component family
+  \end{itemize}
+\end{itemize}
+
+\subsection{Expressive branding and decorative emphasis}\label{record-019-expressive-branding-and-decorative-emphasis}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}o\allowbreak{}m\allowbreak{}L\allowbreak{}o\allowbreak{}g\allowbreak{}o\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ASCII logo sizes
+  \item
+    single-line or multiline gradient emphasis
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the interface needs a deliberate branded or celebratory moment
+  \item
+    splash surfaces, docs, demos, and launch moments benefit from expressive treatment
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    routine application chrome or task-critical labels need to stay plain and scannable
+  \item
+    color, decoration, or branding would compete with the actual work
+  \item
+    the same text must remain equally legible in constrained or no-color environments
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    treat logos and gradients as rare emphasis, not the default voice of the interface
+  \item
+    never make critical state, instructions, or navigation depend on gradient color alone
+  \item
+    use expressive branding to open, celebrate, or orient, then get out of the user's way
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: preserve expressive branding where it adds real atmosphere without obscuring content
+  \item
+    pipe: lower to plain ASCII/text without pretending the gradient or brand treatment still carries meaning
+  \item
+    accessible: keep the textual content explicit and avoid decorative output that adds noise to the reading order
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    closest to illustration, expressive color, and brand guidance rather than one component family
+  \end{itemize}
+\end{itemize}
+
+\section{Authoring families}\label{record-019-authoring-families}
+
+\subsection{Mode-aware custom primitives}\label{record-019-mode-aware-custom-primitives}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}y\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    interactive/rich branch
+  \item
+    pipe branch
+  \item
+    accessible branch
+  \item
+    app-specific authored primitive
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app needs a domain-specific primitive that does not belong in the shared component library
+  \item
+    the same semantic thing must render honestly across multiple output modes
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    an existing Bijou family already matches the job
+  \item
+    the branching only exists to chase cosmetics rather than preserve semantic truth
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    author one semantic primitive first, then define how it lowers by mode
+  \item
+    keep all branches truthful to the same underlying meaning instead of inventing different features per mode
+  \item
+    prefer app-owned names and domain language over generic helper wrappers
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core authoring helper for app-defined primitives
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich/static: use the richest honest rendering for the environment
+  \item
+    pipe: lower to plain, explicit text without hidden styling assumptions
+  \item
+    accessible: preserve the same semantic meaning in a reading-order-friendly form
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    closest to an internal component authoring pattern rather than a shipped Carbon family
+  \end{itemize}
+\end{itemize}
+
+\section{Data and browsing families}\label{record-019-data-and-browsing-families}
+
+\subsection{Dense comparison}\label{record-019-dense-comparison}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for passive comparison in core string output
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}b\allowbreak{}o\allowbreak{}x\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for the default Unicode boxed table
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for borderless report output with a heavy header rule and light row separators
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for compact reports with only a header separator
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for quiet space-aligned columns
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for portable \texttt{+\allowbreak{}-\allowbreak{}-\allowbreak{}-\allowbreak{}+} output
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for GitHub-flavored Markdown table text
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for field/value reports
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}"\allowbreak{} \allowbreak{}\}\allowbreak{})} for psql-style record inspection
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for passive comparison in V3 surface-first output
+  \item
+    \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for keyboard-owned inspection in the TUI layer
+  \item
+    \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for keyboard-owned inspection on the structured surface path
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    row/column comparison is the main task
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    hierarchy or dependency structure dominates
+  \item
+    items are primarily one-dimensional and should read as a list instead
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    column headers should describe comparable attributes, not narrative explanations
+  \item
+    cell text should stay compact enough that wrapping does not obscure the comparison task
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} fits human output to the available terminal width by default; use \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} when content-sized output is explicitly needed
+  \item
+    keep pipe/data serialization explicit with \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t}; TSV remains the default pipe lowering, while CSV, Markdown, and ASCII grid are opt-in
+  \item
+    use \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the table lives inside a rich TUI surface and the row-aware inspection model should remain structured
+  \item
+    unlike list/picker/palette families, navigable tables should keep row-aware scrolling semantics rather than generic line clipping whenever wrapped rows materially affect comparison
+  \item
+    if rows wrap so heavily that column comparison is no longer readable, the table should usually collapse to a summary row plus a focused drill-down region instead of pretending dense comparison still works
+  \item
+    choose \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} only when keyboard traversal is actually part of the job; otherwise keep the table passive
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core plus TUI interaction layer
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: passive table or focused navigable inspection depending on variant
+  \item
+    static: retain tabular comparison when width allows, otherwise favor honest wrapped rows
+  \item
+    pipe: lower to textual row/column output without hidden clipping
+  \item
+    accessible: preserve headers, row labels, and comparison semantics explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    data table
+  \end{itemize}
+\end{itemize}
+
+\subsection{Hierarchy}\label{record-019-hierarchy}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    static hierarchy
+  \item
+    interactive filesystem browser
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    parent/child nesting is the mental model
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    multiple parents or graph dependencies matter
+  \item
+    the interaction is really filesystem traversal, where \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} are more honest
+  \item
+    dense comparison matters more than nesting
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    labels should make nesting meaningful even when indentation is flattened or linearized
+  \item
+    path context should be explicit when many siblings have similar names
+  \item
+    use \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the picker lives inside a rich TUI pane and should inherit shared viewport masking semantics; keep \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} as the explicit text-lowering path
+  \item
+    directories should remain visually distinct from files, and moving to a parent or child path should be explicit rather than hidden behind overloaded actions
+  \item
+    \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} should stay focused on passive hierarchy display; if arbitrary hierarchy needs keyboard-owned non-filesystem inspection later, that should become an explicit interactive tree family instead of overloading \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} itself
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core plus TUI interaction layer
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: render hierarchy with optional interactive file/navigation layer
+  \item
+    static: keep visible nesting and path structure honestly
+  \item
+    pipe: lower naturally to textual indented hierarchy/path lists
+  \item
+    accessible: preserve parent/child relationships in linear text
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tree view / file browser pattern
+  \end{itemize}
+\end{itemize}
+
+\subsection{Lists for exploration}\label{record-019-lists-for-exploration}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    passive list
+  \item
+    interactive browsable list
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    one-dimensional items are being scanned or explored
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    columns or hierarchy carry the meaning
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    list rows should begin with the most distinguishing label or identifier
+  \item
+    descriptions should help the scan task, not turn each row into a paragraph
+  \item
+    use \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the list belongs inside a rich TUI region and should share viewport masking semantics with pagers and focus panes; keep \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} as the explicit text-lowering path
+  \item
+    if the next user action is ``run a command'' rather than ``inspect a record,'' move up to \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} instead of making the list pretend to be an action launcher
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core plus TUI interaction layer
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: passive or keyboard-browsable list with optional descriptions
+  \item
+    static: keep readable ordered list snapshot
+  \item
+    pipe: lower naturally to plain item list text
+  \item
+    accessible: preserve item ordering, active selection, and descriptions explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ordered/unordered list / selectable list
+  \end{itemize}
+\end{itemize}
+
+\subsection{Temporal or dependency views}\label{record-019-temporal-or-dependency-views}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    chronological
+  \item
+    dependency graph
+  \item
+    focused fragment
+  \item
+    metrics
+  \item
+    interactive graph inspection
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    time or dependency is the actual structure
+  \item
+    readers need to answer ``what happened next?'' or ``what depends on this?''
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a plain table or tree is enough
+  \item
+    the graph is mostly decorative architecture wallpaper
+  \item
+    a summary metric or local fragment would answer the question more honestly than the whole structure
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    events and nodes should expose the causal or temporal relationship, not just labels
+  \item
+    annotations should stay lightweight enough that the structure remains legible
+  \item
+    use \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when chronology is the actual reading path, not as a decorative status list
+  \item
+    if timeline rows become so dense that the user is comparing attributes instead of following sequence, collapse to summary milestones plus drill-down or move to a table/log view
+  \item
+    use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when causality, dependency, or multi-parent structure matters more than order
+  \item
+    use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} when graph inspection is an active task and keyboard-owned navigation, focus, and scrolling are part of the job; keep plain \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} for passive explanation
+  \item
+    use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the honest scope is a neighborhood, ancestor chain, or descendant chain and the full graph would exceed the reader's cognitive budget
+  \item
+    use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})} when graph health, breadth, depth, or duplication risk matters more than visual shape
+  \item
+    if most nodes have only one parent and the reader still consumes them in sequence, \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} is usually clearer than a DAG
+  \item
+    audit-trail timelines should preserve event ordering and consequence clearly, but avoid stuffing each row with enough metadata that the temporal story disappears
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    core plus TUI interaction layer
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: preserve chronology or graph shape with optional focused inspection
+  \item
+    static: keep time/dependency order honestly even if the spatial rendering simplifies
+  \item
+    pipe: lower to ordered event lists or textual dependency traces
+  \item
+    accessible: linearize the structure while preserving temporal/dependency meaning explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    timeline has a close analogue; DAG does not and should be treated as a specialized Bijou family
+  \end{itemize}
+\end{itemize}
+
+\subsection{Viewport masking and scrollable inspection panes}\label{record-019-viewport-masking-and-scrollable-inspection-panes}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    pure scroll mask
+  \item
+    linear pager
+  \item
+    focused pane with gutter
+  \item
+    text-lowering path
+  \item
+    surface-native path
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a bounded pane is for reading, reviewing, or scrolling through content rather than navigating a richer table, tree, or graph structure
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content needs row/column comparison, hierarchy, or domain-specific navigation semantics
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} as the base masking primitive when any existing \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or layout-backed region simply needs bounded overflow scrolling
+  \item
+    keep \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} as the explicit text-lowering path for string-first output, not the default teaching path for rich TUI composition
+  \item
+    use \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for long linear text where the status line and current line position matter
+  \item
+    use \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})} / \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the pane participates in a larger workspace and needs explicit focus ownership
+  \item
+    prefer the surface-native path when the pane body is already composed from \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} content; keep the string path as explicit lowering, not the default teaching path
+  \item
+    gutter chrome should communicate focus and workspace ownership, not carry primary content meaning
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} now converge on viewport semantics; \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} remains the row-aware holdout because wrapped-row comparison still needs a more specialized scroll model
+  \item
+    viewport masking is the wrong abstraction when the user thinks in semantic rows rather than rendered lines; in that case keep row-aware scroll ownership local to the domain-specific component
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: scrollable pane with honest status/focus chrome and bounded viewport behavior
+  \item
+    static: visible excerpt or current window with enough status context to explain where the user is
+  \item
+    pipe: lower to sequential text without pretending the hidden region is still interactively present
+  \item
+    accessible: linearize the pane content while preserving scroll position or focus context explicitly
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    closest to a scrollable content region or code viewer; not a direct Carbon family
+  \end{itemize}
+\end{itemize}
+
+\section{Overlay and shell families}\label{record-019-overlay-and-shell-families}
+
+\subsection{Overlay primitives}\label{record-019-overlay-primitives}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    explanatory
+  \item
+    supplemental
+  \item
+    blocking
+  \item
+    transient
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app needs layered interaction surfaces
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the content should just live in the document or shell
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})} content should be short, local, and explanatory, not actionable or scrollable
+  \item
+    \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} content should support supplemental work, inspection, or side-by-side context without stealing the whole task
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} content should justify blocking the user and should end in a clear decision, confirmation, or review step
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} content should be short-lived and self-contained, not a surrogate notification center
+  \item
+    if the user may need recall, stacking, or routing, stop composing ad hoc \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} overlays and move up to the notification system
+  \item
+    if the user still needs the main task visible and interactive, prefer \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} over \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \item
+    when rich TUI structure matters, overlays should accept or compose structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} content instead of flattening component content into strings first
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: layered overlay surfaces with blocking or non-blocking behavior depending on variant
+  \item
+    static: lower to visible in-flow or shell-level snapshots rather than hidden z-order
+  \item
+    pipe: lower to plain text event or prompt surfaces appropriate to interruption level
+  \item
+    accessible: linearize overlay content with explicit relationship to the blocked or supplemented context
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    notification system
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    tooltip / side panel / modal / toast notification
+  \end{itemize}
+\end{itemize}
+
+\subsection{Notification system}\label{record-019-notification-system}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}u\allowbreak{}s\allowbreak{}h\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    framed runtime notification routing
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{A\allowbreak{}C\allowbreak{}T\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}A\allowbreak{}B\allowbreak{}L\allowbreak{}E}
+  \item
+    \texttt{I\allowbreak{}N\allowbreak{}L\allowbreak{}I\allowbreak{}N\allowbreak{}E}
+  \item
+    \texttt{T\allowbreak{}O\allowbreak{}A\allowbreak{}S\allowbreak{}T}
+  \item
+    info, success, warning, error tone variants
+  \item
+    per-notification placement and duration
+  \item
+    history/archive view
+  \item
+    frame-routed runtime notifications
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app owns transient messaging as a system instead of rendering one ad hoc overlay at a time
+  \item
+    stacking, placement, routing, or history matter
+  \item
+    warnings and errors should be reviewable after the moment they first appear
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the message should remain in normal page flow as part of the document
+  \item
+    a single local transient overlay is enough
+  \item
+    the user must stop and decide before continuing
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use notifications for events and follow-up prompts, not durable documents or long-form explanation
+  \item
+    actionable notifications should expose one obvious next step, not a miniature workflow or form
+  \item
+    if users may need to revisit prior notices, the archive/history surface is part of the feature, not an optional add-on
+  \item
+    route app-owned warnings and errors here when recall matters, while still keeping stderr/log output honest where appropriate
+  \item
+    use placement and duration to control interruption level, not to smuggle unrelated importance into every message
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: stacked notifications with actions, placement, history, and explicit dismissal
+  \item
+    static: visible current notifications or a truthful archived summary without pretending transient timing still exists
+  \item
+    pipe: lower to sequential event text or explicit warning/error records
+  \item
+    accessible: linearize current and archived notices with tone, action, and dismissal state made explicit
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    notification / toast notification center pattern
+  \end{itemize}
+\end{itemize}
+
+\subsection{App shell}\label{record-019-app-shell}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    shell container, status rail, action discovery
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app has multiple views, overlays, navigation, and shell chrome
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app is really one screen or one prompt
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the shell should frame destinations and workspace state, not become a dumping ground for unrelated metadata
+  \item
+    use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when shell chrome already lives on the structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path; keep \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} for explicit text output or lowering
+  \item
+    use \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the palette lives inside a rich TUI shell or overlay and should share viewport masking semantics with other panes; keep \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} for explicit text output or lowering
+  \item
+    status lines should carry concise global context, not replace in-page guidance
+  \item
+    command palette entries should prefer actions, navigation targets, and recent destinations over field-style data entry
+  \item
+    group palette items by user intent when possible, and avoid turning the palette into a browseable record list
+  \item
+    tabs should represent peer destinations or work areas, not disguised command buttons
+  \item
+    use notifications for events and follow-up, not the status rail
+  \item
+    use help hints for shortcut discovery and shell scope, not for action execution or event messaging
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: full shell chrome with tabs, palette, overlays, notifications, and workspace regions
+  \item
+    static: retain the active page and essential shell context without pretending background interactivity exists
+  \item
+    pipe: lower to current page content plus minimal status/context framing
+  \item
+    accessible: linearize active shell state, navigation context, and current overlays into one readable flow
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    notification system
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    shell, header/footer, command palette
+  \end{itemize}
+\end{itemize}
+
+\subsection{Keybinding help and shell hints}\label{record-019-keybinding-help-and-shell-hints}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    grouped reference, single-line hint, filtered subset, explicit text output, structured-surface output
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the app is keyboard-owned and the user needs discoverable shortcuts or a grouped command reference
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the controls are already obvious from context and the help text would just restate visible labels
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for shell hints that should stay on the structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path; keep \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} for explicit text output or lowering
+  \item
+    use \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the full keybinding reference is embedded inside a rich TUI surface; keep \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} for plain text and pipe-oriented help
+  \item
+    group names should describe jobs (\texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}) rather than raw input mechanics
+  \item
+    help text should clarify behavior and scope, not repeat page prose or become a substitute command palette
+  \item
+    use the command palette for discoverable actions and navigation, and keep help focused on shortcut explanation
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: concise shell hints plus an optional grouped help view or modal
+  \item
+    static: retain the active hint and the relevant grouped reference without pretending background input is live
+  \item
+    pipe: lower to plain text shortcut summaries and grouped help blocks
+  \item
+    accessible: linearize help content into readable sections with explicit scope and action labels
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    keyboard shortcuts help, command reference, hotkey cheat sheet
+  \end{itemize}
+\end{itemize}
+
+\subsection{Workspace layout}\label{record-019-workspace-layout}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}l\allowbreak{}e\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    user-resizable, named-area, compositional layout primitives with structured-surface and explicit text-lowering paths
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    spatial arrangement materially helps the task
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a sequential flow would be simpler and more legible
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TUI
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the user benefits from explicit primary-versus-secondary context and the panes are already rich TUI surfaces; keep \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} for explicit text composition or lowering
+  \item
+    use \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when multiple stable regions deserve simultaneous visibility and the regions are already rich TUI surfaces; keep \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})} for explicit text composition or lowering
+  \item
+    use \texttt{f\allowbreak{}l\allowbreak{}e\allowbreak{}x\allowbreak{}(\allowbreak{})} / \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} to keep rich TUI composition structured; keep \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} / \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for explicit text composition or lowering
+  \item
+    region titles and borders should explain job and hierarchy, not merely expose geometry
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: keep spatial relationships and resizable or placed regions where they materially help
+  \item
+    static: retain simplified spatial grouping when possible without fake interactivity
+  \item
+    pipe: lower to sensible sequential content order
+  \item
+    accessible: linearize regions in a predictable reading order with section labels
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    layout grid / split layout / stack primitives
+  \end{itemize}
+\end{itemize}
+
+\subsection{Data visualization}\label{record-019-data-visualization}
+
+\begin{itemize}
+\tightlist
+\item
+  Family:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Variants:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    inline trend (sparkline string), high-density area chart (braille Surface), labeled metric panel (boxed key-value Surface), prebuilt performance dashboard (composed Surface)
+  \end{itemize}
+\item
+  Use when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the user needs to see numeric trends at a glance without leaving the terminal
+  \item
+    a time-series or rolling metric is the primary decision input
+  \item
+    you need a compact performance or status dashboard overlay
+  \end{itemize}
+\item
+  Avoid when:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    exact numeric precision matters more than shape --- use \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} instead
+  \item
+    the data is categorical rather than continuous --- use \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    the visualization would be decorative rather than informative
+  \end{itemize}
+\item
+  Ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Core
+  \end{itemize}
+\item
+  Content guidance:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} for inline trend hints next to a label; keep it short (8--20 chars)
+  \item
+    use \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the data deserves area-chart density and sub-pixel smoothness
+  \item
+    use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when multiple labeled metrics belong in one titled panel
+  \item
+    use \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} as the ready-made FPS + memory overlay; prefer it over assembling stats + chart manually
+  \item
+    always supply \texttt{m\allowbreak{}i\allowbreak{}n}/\texttt{m\allowbreak{}a\allowbreak{}x} when comparing across views so axes stay stable
+  \end{itemize}
+\item
+  Graceful lowering:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    rich: Unicode block or Braille glyphs with semantic color tokens
+  \item
+    static: same glyph rendering without animation
+  \item
+    pipe: numeric summary (min/max/mean) or CSV-style output
+  \item
+    accessible: spoken trend summary (e.g.~``rising from 2 to 8 over 10 samples'')
+  \end{itemize}
+\item
+  Related families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}
+  \item
+    \texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+  \end{itemize}
+\item
+  Carbon analogue:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sparkline / area chart / metric card
+  \end{itemize}
+\end{itemize}
+
+\section{Families that still need stronger doctrine}\label{record-019-families-that-still-need-stronger-doctrine}
+
+These are shipped, but the guidance is still thinner than it should be:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} label discipline in dense shells and long documents
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})} overflow/truncation policy when peer destinations outgrow the available width
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} / \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})} content architecture for long, interruptible setup flows
+\end{itemize}
+

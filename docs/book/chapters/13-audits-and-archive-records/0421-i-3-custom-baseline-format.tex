@@ -1,0 +1,34 @@
+\chapter{I-3 --- Custom baseline JSON format + compare tool (buried 2026-04-09)}\label{record-421}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/graveyard/I-3-custom-baseline-format.md}\par}\smallskip
+
+\textbf{Original scope:} define a new JSON schema for renderer bench reports, add a \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}e} CLI that diffs two reports, and wire up baseline-saving workflow.
+
+\textbf{Why buried:} the RE-017 audit scrapped the entire old \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} harness and rebuilt the bench from scratch as the \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/} top-level workspace package. bench v2 (commit \texttt{4\allowbreak{}b\allowbreak{}5\allowbreak{}6\allowbreak{}3\allowbreak{}c\allowbreak{}f}) ships with:
+
+\begin{itemize}
+\tightlist
+\item
+  Its own report schema (\texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}.\allowbreak{}v\allowbreak{}2} kind, \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}w\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}).
+\item
+  Its own comparison tool (\texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}w\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}).
+\item
+  Its own baseline saving via \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}o\allowbreak{}u\allowbreak{}t} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}:\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}.
+\end{itemize}
+
+Everything this task was going to build already exists in the new package. There is no standalone ``baseline format'' to design anymore --- the format is the \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t} type in \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} and the compare is \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s} in \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+
+\textbf{What lives on:} if we later decide we want a cross-cycle historical baseline archive (e.g., one commit-tagged JSON per merge to main), that is a separate future concern handled by \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/} conventions, not by reviving this task.
+
+\textbf{Cross-references:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- current bench design and usage.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- the RE-017 cycle where this was deleted.
+\item
+  Commit \texttt{4\allowbreak{}b\allowbreak{}5\allowbreak{}6\allowbreak{}3\allowbreak{}c\allowbreak{}f} --- bench v2 initial build.
+\end{itemize}
+

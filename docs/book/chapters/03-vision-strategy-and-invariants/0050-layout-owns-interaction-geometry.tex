@@ -1,0 +1,30 @@
+\chapter{Layout Owns Interaction Geometry}\label{record-050}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/layout-owns-interaction-geometry.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-050-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+\end{itemize}
+
+The authoritative geometry for interaction comes from retained layout, not from ad hoc handler registration or render-time guessing.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  hit testing should use layout rects
+\item
+  scroll ownership should align with layout-owned viewport geometry
+\item
+  when layout changes, interaction geometry changes with it
+\item
+  components should not keep stale global registrations after moving, resizing, hiding, or disabling
+\end{itemize}
+

@@ -1,0 +1,11 @@
+\begin{center}
+\begin{tikzpicture}[n/.style={draw=BookHeading,fill=BookPanel,align=center,text width=42mm,inner sep=5pt,font=\small},e/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.7pt}]
+\node[n] (view) at (-3,0) {Current log view};\node[n] (worker) at (3,0) {Effect adapter};
+\draw[dashed,BookMuted] (-3,-.8)--(-3,-8.3);\draw[dashed,BookMuted] (3,-.8)--(3,-8.3);
+\draw[e] (-3,-1.7)--node[above,font=\small]{load compile / epoch 1}(3,-1.7);
+\node[font=\footnotesize,align=center,text width=43mm,fill=BookPanel] at (-3,-3) {Select test; epoch becomes 2};
+\draw[e] (-3,-4.3)--node[above,font=\small]{load test / epoch 2}(3,-4.3);
+\draw[e,dashed] (3,-5.6)--node[above,font=\small]{compile / epoch 1: reject}(-3,-5.6);
+\draw[e,dashed] (3,-7.1)--node[above,font=\small]{test / epoch 2: accept}(-3,-7.1);
+\end{tikzpicture}
+\end{center}

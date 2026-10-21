@@ -1,0 +1,41 @@
+\chapter{DX-017 --- One-Call Node Host Entry Point}\label{record-325}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/up-next/DX-017-one-call-node-host-entry-point.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-325-problem}
+
+Simple interactive apps currently have to compose multiple setup steps by hand:
+
+\begin{itemize}
+\tightlist
+\item
+  initialize a default context
+\item
+  choose the Node host adapter package
+\item
+  run the TEA app
+\item
+  restore terminal state and shut down cleanly
+\end{itemize}
+
+The pieces exist, but there is no obvious ``first real app'' entry point in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}. The 2026-04-11 code-quality audit called this out directly as a time-to-value gap.
+
+\section{Desired outcome}\label{record-325-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})}-style entry point in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}.
+\item
+  Let it own context initialization, runtime startup, and graceful shutdown by default while preserving lower-level escape hatches.
+\item
+  Update first-app docs to use this path so the hosted Node story is explicit instead of implied.
+\end{enumerate}
+
+\section{Effort}\label{record-325-effort}
+
+Medium --- public host API design plus docs and example updates.
+

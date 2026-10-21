@@ -1,0 +1,45 @@
+\chapter{RE-012 --- Pipeline Observability Hooks}\label{record-398}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE_012-pipeline-observability-hooks.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-012 — Pipeline Observability Hooks
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-398-disposition}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0}. The programmable render pipeline now exposes \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} observers, records per-stage timing samples in \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a}, and ships \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{})} as the typed read path for middleware and apps. Stage timings are emitted in global stage order, include empty stages as zero-duration samples, and are visible both through the observer callback and the shared per-frame metadata bag.
+
+\section{Original Proposal}\label{record-398-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-398-idea}
+
+Expose per-stage timing hooks in the render pipeline so apps and middleware can measure Layout, Paint, PostProcess, Diff, and Output phases individually.
+
+\begin{CodeBlock}
+run(app, {
+  configurePipeline(pipeline) {
+    pipeline.onStageComplete((stage, durationMs) => {
+      perfOverlay.recordPhase(stage, durationMs);
+    });
+  },
+});
+\end{CodeBlock}
+
+\section{Why}\label{record-398-why}
+
+The perf-gradient demo proved that 92\% of frame time is spent in the pipeline (diff + ANSI encode + stdout.write), but we could not measure the breakdown from the app side. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} can only append middleware after the default stages --- it cannot wrap them for timing.
+
+This blocks: - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/retro/DX_006-debug-performance-overlay-component.md}{DX-006} from showing a full phase breakdown - Any app from diagnosing whether their bottleneck is layout, paint, or diff
+
+\section{Shape}\label{record-398-shape}
+
+Either: 1. A callback-based hook (\texttt{o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e}) on the pipeline 2. Timing metadata added to \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} by the pipeline itself 3. A \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}f\allowbreak{}n\allowbreak{})} API that lets middleware run before AND after a stage's default middleware
+
+Option 3 is the most general but also the most complex.
+

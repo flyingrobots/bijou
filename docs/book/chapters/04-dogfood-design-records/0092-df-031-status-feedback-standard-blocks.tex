@@ -1,0 +1,278 @@
+\chapter{DF-031 Status and feedback standard Blocks}\label{record-092}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-031-status-feedback-standard-blocks.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-031 Status and feedback standard Blocks
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - blocks
+  - component-audit
+  - dogfood
+  - lowerings
+  - status-feedback
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-092-framing}
+
+The v6 block floor already proved \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l}, \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l}. The next useful slice is the product feedback layer: inline state, in-flow notices, transient overlays, activity history, shortcut cues, and progress.
+
+This cycle turns issues \#220 through \#225 into first-party standard Blocks in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. The work uses the current typed Blocks API: \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, validated metadata, view data contracts, command intents, story ids, deterministic render output, and stable lowering facts. It does not introduce a new YAML or JSON runtime IR. Declarative YAML/JSON can become an adapter later, but it should compile into the typed contract this slice proves.
+
+\section{Sponsored Users}\label{record-092-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors who need reusable status and feedback semantics instead of bespoke strings inside pages.
+\item
+  DOGFOOD maintainers who need status surfaces to lower truthfully across interactive, static, pipe, and accessible modes.
+\item
+  Tooling authors who want block metadata, data contracts, command intents, and stories to describe feedback surfaces before rendering them.
+\item
+  Future IR authors who need a typed target for YAML/JSON block declarations.
+\end{itemize}
+
+\section{Hills}\label{record-092-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can import one of the standard feedback Blocks and immediately inspect its metadata, data requirements, command intents, and ready story.
+\item
+  A reader can move between rich, static, pipe, and accessible profiles and still get the same feedback meaning, even when visual chrome disappears.
+\item
+  A maintainer can run one focused cycle test that proves the status and feedback slice is catalogued, rendered, and lowering-stable.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-092-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Which feedback surfaces are common enough to become first-party Blocks now?
+\item
+  Do these Blocks declare data contracts and command intents without taking on provider subscriptions or command dispatch?
+\item
+  Do visual modes render as surfaces while pipe and accessible modes preserve meaning as text?
+\item
+  Do lowerings carry stable facts so tests and tools do not parse terminal drawings?
+\item
+  Does this slice make room for a future YAML/JSON declaration format without inventing a second runtime contract?
+\end{itemize}
+
+\section{Block Set}\label{record-092-block-set}
+
+\input{tables/table-023}
+
+\section{TUI Mockups}\label{record-092-tui-mockups}
+
+Inline status:
+
+\begin{CodeBlock}
++-- InlineStatusBlock ----------------------+
+| label: docs                               |
+| status: ok                                |
+| message: synced                           |
++-------------------------------------------+
+\end{CodeBlock}
+
+In-flow notice:
+
+\begin{CodeBlock}
++-- InFlowStatusBlock ----------------------+
+| severity: warning                         |
+| source: docs                              |
+| message: inventory stale                  |
+| action: run docs:inventory                |
++-------------------------------------------+
+\end{CodeBlock}
+
+Transient overlay:
+
+\begin{CodeBlock}
++-- TransientOverlayBlock ------------------+
+| priority: normal                          |
+| message: Saved DOGFOOD route              |
+| dismiss: Esc dismisses                    |
++-------------------------------------------+
+\end{CodeBlock}
+
+Activity stream:
+
+\begin{CodeBlock}
++-- ActivityStreamBlock --------------------+
+| events: 10:41 tests passed                |
+|         10:42 PR opened                   |
+| selected: 10:41 tests passed              |
++-------------------------------------------+
+\end{CodeBlock}
+
+Shortcut cues:
+
+\begin{CodeBlock}
++-- ShortcutCueBlock -----------------------+
+| shortcuts: / Search                       |
+|            ? Help                         |
+|            Esc Close                      |
+| scope: page                               |
++-------------------------------------------+
+\end{CodeBlock}
+
+Progress:
+
+\begin{CodeBlock}
++-- ProgressIndicatorBlock -----------------+
+| label: Install packages                   |
+| value: 3                                  |
+| total: 5                                  |
+| percent: 60%                              |
++-------------------------------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-092-lower-modes}
+
+Static mode preserves the same surface structure as interactive mode while remaining deterministic and render-only.
+
+Pipe mode lowers every Block to a compact record:
+
+\begin{CodeBlock}
+InlineStatusBlock | label=docs | status=ok | message=synced
+\end{CodeBlock}
+
+Accessible mode lowers every Block to a readable sentence list:
+
+\begin{CodeBlock}
+InlineStatusBlock
+- label: docs
+- status: ok
+- message: synced
+\end{CodeBlock}
+
+The lower-mode invariant is semantic parity, not visual parity. Pipe and accessible consumers should not need box drawing, row positions, or color to understand status.
+
+\section{Requirements}\label{record-092-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Export all six Blocks from the package barrel and standard catalog.
+\item
+  Include all six Blocks in \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t}.
+\item
+  Give each Block valid metadata across interactive, static, pipe, and accessible modes.
+\item
+  Give each Block at least one ready story id.
+\item
+  Attach view data contracts so tooling can inspect required slot data without provider handles.
+\item
+  Attach schema adapters and schema-bound block exports so callers can validate plain input before binding render slots.
+\item
+  Attach command intents for selecting the block, copying facts, and opening a story, without command callbacks.
+\item
+  Render interactive/static output as surfaces and pipe/accessible output as text.
+\item
+  Preserve \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}d}, \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y}, \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t}, \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e}, selected identity, and \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{}.\allowbreak{}*} facts across modes.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-092-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}1\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the six Blocks publish through the standard catalog and package manifest.
+\item
+  The cycle test validates metadata and command intent shape for every Block.
+\item
+  The cycle test validates schema-bound input for every Block and rejects accessor-backed boundary objects before invoking getters.
+\item
+  The cycle test renders every Block in every canonical mode.
+\item
+  The cycle test verifies lowerings remain fact-stable and expose family, variant, selected, mode, and semantic-value facts.
+\item
+  Existing DX-031 standard block tests expand their catalog expectations from three Blocks to nine Blocks.
+\item
+  Repo docs stop describing this catalog expansion as future v7 work.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-092-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a RED cycle test for issues \#220 through \#225.
+\item
+  Extend \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}e} to support the product scales needed by this slice: \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}.
+\item
+  Add six standard Block definitions in \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Register their stories, metadata, data contracts, schema adapters, command intents, and package manifest entries.
+\item
+  Reuse the existing section renderer pattern so visual and lower modes stay deterministic.
+\item
+  Update BEARING, ROADMAP, CHANGELOG, v6 backlog evidence, design-system docs, and package docs.
+\end{enumerate}
+
+\section{Future Declarative Shape}\label{record-092-future-declarative-shape}
+
+The old Bijou IR idea still fits, but this slice keeps it as a declaration format over the typed API:
+
+\begin{CodeBlock}
+block: InlineStatusBlock
+package: "@flyingrobots/bijou"
+story: inline-status.ready
+modes:
+  - interactive
+  - static
+  - pipe
+  - accessible
+data:
+  inlineStatus.label: docs
+  inlineStatus.status: ok
+  inlineStatus.message: synced
+commands:
+  - inlineStatus.select
+  - inlineStatus.copyFacts
+  - inlineStatus.openStory
+facts:
+  block: InlineStatusBlock
+  block.family: status
+  block.variant: ready
+  semanticValue.label: docs
+\end{CodeBlock}
+
+A future declaration adapter can parse this shape, route it through \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and build typed \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} input or story fixtures. The runtime source of truth remains the typed Block contract.
+
+\section{Drift Check}\label{record-092-drift-check}
+
+The original DX-031 release floor was correct to limit itself to the first three Blocks. Drift appeared later when issues \#220 through \#225 became clear v6 candidates but ROADMAP and BEARING still left them in the v7 queue. This cycle corrects the tracker mirror and makes the expansion explicit, issue-backed v6 work.
+
+No new follow-on debt is deferred by this slice. Broader component-family audits remain separate issues after \#225.
+
+\section{Playback}\label{record-092-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the status/feedback cycle test imported six standard Blocks that did not exist yet and failed at module load.
+\item
+  RED: the review follow-up required schema-bound feedback exports and stronger lowering facts; the cycle test failed before those symbols and facts existed.
+\item
+  GREEN: \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} now exports lower-camel block identifiers \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{i\allowbreak{}n\allowbreak{}F\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, \texttt{s\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}C\allowbreak{}u\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, and \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, plus matching \texttt{*\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r} and \texttt{*\allowbreak{}S\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} exports.
+\item
+  The six Blocks are in \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s}, and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t}.
+\item
+  Interactive/static modes produce surfaces; pipe/accessibility modes produce semantic text.
+\item
+  Stable lowering facts are present across all modes, including family, variant, selected identity where applicable, concrete mode, and semantic-value facts.
+\end{itemize}
+
+\section{Retrospective}\label{record-092-retrospective}
+
+The useful move was not to invent a new IR under pressure. The useful move was to land the feedback vocabulary as typed, tested Blocks, then leave YAML/JSON as a future authoring adapter. That keeps the v6 release boundary concrete: geometry and Blocks continue to be inspectable package truth, not untyped story prose.
+

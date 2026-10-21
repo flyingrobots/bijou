@@ -1,0 +1,22 @@
+\chapter{DX-011 --- Key Collision Warnings at Registration Time}\label{record-316}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-011-key-collision-warnings.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-316-idea}
+
+When \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} is called with pages that have keybindings which collide with the frame's built-in bindings (help \texttt{?}, settings \texttt{c\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{},}, quit \texttt{e\allowbreak{}s\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}e}, etc.), emit a warning through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} at app initialization time --- not at key-press time.
+
+\begin{CodeBlock}
+[Framework warning] Page "editor" binds "?" but frame-first key
+priority means the frame's help toggle will consume it. Use
+keyPriority: 'page-first' or choose a different key.
+\end{CodeBlock}
+
+\section{Why}\label{record-316-why}
+
+Currently, a developer binds \texttt{?} to ``show info'' in their page, runs the app, presses \texttt{?}, and sees the help overlay instead of their handler. There is no diagnostic --- the key is silently consumed. The developer has to read the frame-first/page-first docs to understand what happened.
+
+A warning at registration time catches this immediately.
+

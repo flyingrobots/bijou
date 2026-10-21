@@ -1,0 +1,29 @@
+\chapter{CI-002 --- Deterministic Time-Travel Debugger}\label{record-286}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/CI-002-deterministic-time-travel-debugger.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-286-idea}
+
+The TUI runtime loop in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} is deterministic. It takes a message, a model, and returns a new model and commands. This means we can record every \texttt{M\allowbreak{}s\allowbreak{}g} that flows through the system.
+
+Add a ``Replay'' mode to the runtime and the \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} shell. When enabled, it records all inputs and allows the user (or an agent) to pause the app, scrub backwards through frames, and step forward one message at a time. The current model and view output can be inspected for every step.
+
+\section{Why}\label{record-286-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Bug Repro}: A user can send a ``repro log'' that a builder can load and scrub through.
+\item
+  \textbf{Determinism Proof}: It proves the ``Runtime Truth Wins'' invariant by showing that the app's state is a pure function of its history.
+\item
+  \textbf{Agent Synergy}: AI agents can ``debug'' a TUI by replaying the messages that led to an error state.
+\end{enumerate}
+
+\section{Effort}\label{record-286-effort}
+
+Medium-Large --- requires an event-logger and a way to re-drive the \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} function from a log.
+

@@ -1,0 +1,64 @@
+\chapter{LX-010 --- Built-in i18n Catalog Loader}\label{record-357}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v4.5.0/LX-010-built-in-i18n-catalog-loader.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Problem}\label{record-357-problem}
+
+\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} requires users to manually load and pass in \texttt{I\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g} objects. The \texttt{l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{})} method on the runtime accepts pre-constructed catalog data, but there is no built-in way to give bijou a path, URL, or dynamic import spec and have it resolve, load, and register catalogs automatically.
+
+The filesystem loading utilities (\texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}i\allowbreak{}l\allowbreak{}e}, \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, etc.) exist in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}, but they are opt-in tool-tier helpers, not a runtime-integrated loading seam. Users must orchestrate the entire load-parse-register pipeline themselves.
+
+\section{Why this matters}\label{record-357-why-this-matters}
+
+\begin{itemize}
+\tightlist
+\item
+  New users expect \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}I\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}f\allowbreak{}r\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} or equivalent to just work
+\item
+  The current design forces boilerplate that every localized app repeats
+\item
+  Without a built-in loader, lazy/dynamic catalog loading (load on locale switch) requires users to invent their own async orchestration
+\item
+  The gap is more visible now that the i18n tools packages ship production-grade exchange adapters
+\end{itemize}
+
+\section{Desired outcome}\label{record-357-desired-outcome}
+
+A user can create an i18n runtime with a loader strategy that handles catalog resolution, loading, and registration without manually wiring the tools pipeline. The loader should support:
+
+\begin{itemize}
+\tightlist
+\item
+  synchronous pre-loaded catalogs (current behavior, still supported)
+\item
+  asynchronous file-based loading (Node.js)
+\item
+  asynchronous dynamic import loading (bundler-friendly)
+\item
+  lazy per-locale loading on locale switch
+\end{itemize}
+
+\section{Non-goals}\label{record-357-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Replacing the tools-tier adapters --- those remain for batch processing, exchange workflows, and CLI tooling
+\item
+  HTTP/fetch-based loading in core --- that belongs in a platform adapter
+\item
+  Automatic locale detection --- that stays in the runtime adapter layer
+\end{itemize}
+
+\section{Risks}\label{record-357-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  The loader abstraction must not pull Node.js APIs into the core \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} package --- the loader contract should be a port, with platform-specific adapters in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} or similar
+\item
+  Lazy loading introduces async state into a currently synchronous runtime --- needs clear fallback/pending semantics
+\end{itemize}
+

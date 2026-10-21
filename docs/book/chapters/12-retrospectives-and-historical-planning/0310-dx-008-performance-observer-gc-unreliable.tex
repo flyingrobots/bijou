@@ -1,0 +1,72 @@
+\chapter{DX-008 --- PerformanceObserver(\textquotesingle gc\textquotesingle) Is Unreliable For Our Measurement Needs}\label{record-310}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-008-performance-observer-gc-unreliable.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-008 — `PerformanceObserver('gc')` Is Unreliable For Our Measurement Needs
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-310-disposition}
+
+Retired on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0} in commit \texttt{6\allowbreak{}9\allowbreak{}2\allowbreak{}9\allowbreak{}1\allowbreak{}f\allowbreak{}a}. We are no longer treating \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}'\allowbreak{}g\allowbreak{}c\allowbreak{}'\allowbreak{})} as a trusted bench signal; the repo now ships a dedicated \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}:\allowbreak{}g\allowbreak{}c\allowbreak{}-\allowbreak{}o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}r\allowbreak{}o} diagnostic and documents the limitation explicitly in \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, so the remaining work is operational guidance rather than an open product/runtime bug.
+
+\section{Original Proposal}\label{record-310-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-310-problem}
+
+During the RE-017 audit (2026-04-09), I tried to use \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}[\allowbreak{}'\allowbreak{}g\allowbreak{}c\allowbreak{}'\allowbreak{}]\allowbreak{} \allowbreak{}\}\allowbreak{})} in the renderer bench to filter out samples where V8 GC fired during the timed loop. The idea was to set up the observer, run the sync measurement loop, call \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} afterwards, and count any captured GC events as ``sample was affected, discard the heap delta.''
+
+The result: \textbf{zero GC events reported across 1,000 samples}, even for scenarios that clearly allocated 50+ MiB per sample and must have triggered multiple young-gen collections. Yet the \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}U\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}U\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e} delta for those same samples was frequently negative (heap shrank by 90+ MiB), which is only possible if GC ran.
+
+The observer silently failed to report events that the heap delta clearly said happened.
+
+\section{Reproducer}\label{record-310-reproducer}
+
+See the git history of \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}.\allowbreak{}t\allowbreak{}s} around the RE-017 audit (the file is scheduled for deletion; the fix attempt used \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}[\allowbreak{}'\allowbreak{}g\allowbreak{}c\allowbreak{}'\allowbreak{}]\allowbreak{} \allowbreak{}\}\allowbreak{})} with either a no-op callback + \texttt{t\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} or with a collecting callback via the \texttt{l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}(\allowbreak{})} form). Environment: macOS 25.3 on Apple M1 Pro, Node v25.8.1, \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}c}.
+
+\section{Why This Matters}\label{record-310-why-this-matters}
+
+GC-event observability is the standard recommendation for distinguishing ``this sample's heap delta is meaningful'' from ``this sample's heap delta is polluted by GC''. If the API doesn't work reliably, we either:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can't filter samples → heap metrics are bimodal and uninterpretable.
+\item
+  Have to use an alternative mechanism: heap snapshots (expensive), \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}s\allowbreak{}(\allowbreak{})} deltas over longer windows, \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}c} parsing, or not measuring heap at all.
+\end{enumerate}
+
+For RE-017 we chose option 4: the new bench v2 under \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/} does not measure heap at all. Wall time only. Memory analysis is a separate, deliberate exercise with its own tool.
+
+\section{What Needs To Happen}\label{record-310-what-needs-to-happen}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Reproduce in isolation.} Build a minimal repro: an observer, a loop that allocates 10 MiB, a call to \texttt{t\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})}. Confirm the observer sees GC events when it should.
+\item
+  \textbf{If the repro also fails:} file a Node.js bug.
+\item
+  \textbf{If the repro works:} figure out what was different in the RE-017 bench use case. Possible causes: observer observing before V8 starts emitting events, the ``no-op callback'' pattern interfering with buffering, an interaction with \texttt{t\allowbreak{}s\allowbreak{}x} or \texttt{-\allowbreak{}-\allowbreak{}i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t}, or \texttt{g\allowbreak{}l\allowbreak{}o\allowbreak{}b\allowbreak{}a\allowbreak{}l\allowbreak{}.\allowbreak{}g\allowbreak{}c\allowbreak{}(\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{})} somehow clearing the buffer.
+\item
+  \textbf{Document the working pattern in \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}} so future harnesses can use it correctly.
+\end{enumerate}
+
+Until one of the above is done: \textbf{do not use \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}'\allowbreak{}g\allowbreak{}c\allowbreak{}'\allowbreak{})} as a measurement filter in bijou benches}. Treat the observer as diagnostic-only, not load-bearing.
+
+\section{Related}\label{record-310-related}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} has the full log entry describing the failed measurement, the bimodal data it produced, and the decision to scrap the old bench entirely.
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} explains the ``measure what you can trust'' principle that came out of this.
+\end{itemize}
+

@@ -1,0 +1,38 @@
+{
+  "destination_repository": "https://github.com/flyingrobots/bijou-job-monitor",
+  "destination_path": "book/",
+  "source_commit": "195f11f5",
+  "frozen_complete_edition_snapshot": "history/complete-edition-2026-10-20/",
+  "historical_source_records": 426,
+  "historical_record_bodies_modified": false,
+  "archive_and_complete_pdfs_unchanged": true,
+  "original_teaching_source_sha256": {
+    "teaching/04-layout.tex": "941870d28d8299ce4fb6d72e6a74fb067d694b91c2fc77a25ae11f200dbde985",
+    "teaching/05-troubleshooting.tex": "5634631f90eed6f6b67024190510dcc4badcf5bb29cf52be70e900e6072088ee",
+    "teaching/01-meaning.tex": "935ed5b99f41f5fce3a74d01d1de31b0fe2fde1d90773747e7b8fb51397d7fb7",
+    "teaching/introduction-why.tex": "08bee9a770173d15a2313d4ec876d72151ffe214b64fe2fe4b99b020058d5b6d",
+    "teaching/07-build-along.tex": "bc477a0e2dfd64f4e6c5e8650ca4a47d4a1c6e8c28b6f81245b1d7acc5638df0",
+    "teaching/introduction-maintain.tex": "52e379573fed3e064173b678c8487d17832148f72417ca08bb184367347dd67e",
+    "teaching/03-boundaries.tex": "37c4e76a9d77a37f73f566a70a5f73a927e3d597d56f085a56990ab371933adb",
+    "teaching/contents.tex": "864e43b7ec9c06169c499cef2e5927b170ff4ed38bb82a988e3807ba0ad7578d",
+    "teaching/02-fit.tex": "ffa403e4a857f28ca48b009f07ffa4158c14171fed931454afce27f51fab5be7",
+    "teaching/introduction-build.tex": "0b18ffc570dc0bd3a190c98f116d0dcfde5093e2a08e704b0b8b05b1c295c797",
+    "teaching/introduction-machinery.tex": "492fbbbfaf13a6e6c89bc26850a2689ce97620eb2ceef65c3813bb08583f5110",
+    "teaching/introduction-dependable.tex": "5d526cc6fab49a352ebc3a0f0f672dd904c86b21d8426ef1e52aa85b5c9ded66",
+    "teaching/06-maintenance.tex": "5c19e60a09356ca1bdef4cd680d78145a306f339be1291ddffb0b3892cb7ce8a",
+    "workshops/05-constraints.tex": "7d95f6b0d22f6bcc7312894317a7749a107a1ccb559356b3118c6cfdc24b4eea",
+    "workshops/01-model.tex": "94829794f3d8a0956ebd9b9872ae94f585659b2694163c2fadfa8473807df3c2",
+    "workshops/02-modes.tex": "491d3e2030cf8bad2bebc54eb8123b8f7f4c1d5502135ae4ed7c6fe52fe193d1",
+    "workshops/07-reproduce.tex": "125640c19288f91baeec54eda580eea5fe3bebf2c476b20a0c91b80107304085",
+    "workshops/06-evidence.tex": "f0eb5b106ff79c659c756df10914a0e2b65e127a9ebc1753ce854760b9a1485a",
+    "workshops/03-interaction.tex": "f758ae40684cb3a60d490d2cb37592e05fb484286a659273ad4c3810d8056c0a",
+    "workshops/04-async.tex": "6689fa68d601ac1be6e563929ad6c056dc1ac23c08833366e042e801516adfaf"
+  },
+  "verification": {
+    "complete_pages": 1933,
+    "complete_pages_with_changed_text": [],
+    "historical_records_verified_unchanged": 426,
+    "corpus_unchanged": true,
+    "archive_and_complete_checked_in_pdfs_unchanged": true
+  }
+}

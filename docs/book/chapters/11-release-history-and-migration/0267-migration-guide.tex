@@ -1,0 +1,46 @@
+\chapter{Migrating to Bijou 4.4.0}\label{record-267}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.4.0/migration-guide.md}\par}\smallskip
+
+\section{No Breaking Changes}\label{record-267-no-breaking-changes}
+
+Bijou 4.4.0 is a backwards-compatible minor release. All existing \texttt{4\allowbreak{}.\allowbreak{}3\allowbreak{}.\allowbreak{}0} code continues to work without changes.
+
+\section{New Exports}\label{record-267-new-exports}
+
+The following are new exports from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})} --- returns a \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} --- returns a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} --- returns a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})} --- returns a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\end{itemize}
+
+Along with their option/entry types:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{S\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\item
+  \texttt{B\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\item
+  \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}E\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\end{itemize}
+
+\section{Bench Scenario API Change (Internal)}\label{record-267-bench-scenario-api-change-internal}
+
+If you have custom benchmark scenarios, the \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})} function signature now accepts optional \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} and \texttt{r\allowbreak{}o\allowbreak{}w\allowbreak{}s} positional arguments after \texttt{c\allowbreak{}t\allowbreak{}x}: \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{}?\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}?\allowbreak{})}. Existing scenarios that ignore these arguments continue to work unchanged.
+

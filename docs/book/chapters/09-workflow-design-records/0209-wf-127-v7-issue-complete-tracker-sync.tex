@@ -1,0 +1,135 @@
+\chapter{WF-127 V7 Issue-Complete Tracker Sync}\label{record-209}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-127-v7-issue-complete-tracker-sync.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-127 V7 issue-complete tracker sync
+legend: WF
+lane: bad-code
+priority: medium
+issue: https://github.com/flyingrobots/bijou/issues/285
+keywords:
+  - tracker
+  - roadmap
+  - bearing
+  - v7
+  - release-readiness
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-209-framing}
+
+GitHub is the live tracker for Bijou work. After the V7 Product Truth closeout, the post-merge Codex review follow-up, and this tracker-sync cleanup, the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} milestone should be issue-complete: zero open milestone items and twenty-seven closed milestone items.
+
+The repository mirrors did not fully follow that state. \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and the WF-126 regression still describe the pre-merge V7 closeout with \#245, \#246, and \#281 as open work. That creates the exact tracker/docs drift the Method calls out as bad code.
+
+\section{Sponsored Users}\label{record-209-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  A release maintainer needs BEARING and ROADMAP to match GitHub before running release-readiness validation.
+\item
+  A review agent needs the tracker-sync regression to encode the issue-complete state, not the old closeout state.
+\item
+  A contributor scanning the repo needs to see release-readiness as the next action instead of chasing already-closed V7 issues.
+\end{itemize}
+
+\section{Hill}\label{record-209-hill}
+
+A maintainer preparing V7 can read BEARING, ROADMAP, and the WF-126 regression and see the same truth as the GitHub milestone after this PR closes \#285: V7 has no open milestone items, has twenty-seven closed milestone items, and should move to release-readiness validation.
+
+\section{Current Truth}\label{record-209-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub milestone \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} before this cleanup issue: \texttt{1} open / \texttt{2\allowbreak{}6} closed, because \#285 is now the only open V7 item.
+\item
+  GitHub milestone \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} after this cleanup issue closes: \texttt{0} open / \texttt{2\allowbreak{}7} closed. The milestone count includes milestone PRs as well as issues.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} still says the V7 current open count is three.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} still reports V7 as \texttt{3} open / \texttt{2\allowbreak{}0} closed.
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}6\allowbreak{}/\allowbreak{}v\allowbreak{}7\allowbreak{}-\allowbreak{}c\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}n\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} still expects \#245, \#246, and \#281 in the open-work area.
+\end{itemize}
+
+\section{Product Shape}\label{record-209-product-shape}
+
+\subsection{BEARING}\label{record-209-bearing}
+
+\begin{CodeBlock}
+Active Gravity
+  v7.0.0 is issue-complete
+  next action: release-readiness validation
+\end{CodeBlock}
+
+\subsection{ROADMAP}\label{record-209-roadmap}
+
+\begin{CodeBlock}
+| v7.0.0 | 0 open | 27 closed | Issue-complete V7 Product Truth |
+
+Open Work
+  No open v7 tracker issues remain as of 2026-06-03.
+\end{CodeBlock}
+
+\subsection{Regression}\label{record-209-regression}
+
+\begin{CodeBlock}
+WF-126
+  expect roadmap v7 row to contain | 0 | 27 |
+  expect closed issue lineage to include #245, #246, #281, #283, #285
+  expect no open-work rows for #245/#246/#281
+\end{CodeBlock}
+
+\section{Runtime And API Contract}\label{record-209-runtime-and-api-contract}
+
+This is a documentation and workflow-proof cycle. It does not change runtime APIs, package exports, or user-facing DOGFOOD behavior.
+
+\section{Lower Modes}\label{record-209-lower-modes}
+
+No lower-mode product output changes are intended.
+
+\section{Tests To Write First}\label{record-209-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Update \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}6\allowbreak{}/\allowbreak{}v\allowbreak{}7\allowbreak{}-\allowbreak{}c\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}n\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} so it fails against the current stale BEARING and ROADMAP state.
+\item
+  Keep the test scoped to local repo evidence. The GitHub query remains the operator's source of truth; the regression prevents the checked-in mirror from drifting again.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-209-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#285 is closed by the PR.
+\item
+  BEARING no longer lists \#245, \#246, or \#281 as open V7 work.
+\item
+  ROADMAP reports \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as \texttt{0} open and \texttt{2\allowbreak{}7} closed.
+\item
+  ROADMAP lists \#245, \#246, \#281, \#283, and \#285 in V7 completed lineage.
+\item
+  WF-126 passes.
+\item
+  CHANGELOG records the bad-code tracker sync fix.
+\end{itemize}
+
+\section{Risks And Guardrails}\label{record-209-risks-and-guardrails}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not cut, tag, or publish V7 in this cycle.
+\item
+  Do not implement the broader tracker-sync sentinel from \#268 here.
+\item
+  Do not move Beyond issues into V7 as part of this cleanup.
+\item
+  Do not make BEARING or ROADMAP the source of truth. They mirror GitHub.
+\end{itemize}
+

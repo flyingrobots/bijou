@@ -1,0 +1,39 @@
+{
+  "id": "87d5bfaf-36bc-4c63-bf47-1905b07cf98c",
+  "status": "awaiting_filing",
+  "integrity": "intact",
+  "fingerprint": "4051d26a38dc86062e1e6e50c7d73c8eb3c996107887fadd7d788d7b0606d488",
+  "document_path": "/Users/j/git/reader/inbox/87d5bfaf-36bc-4c63-bf47-1905b07cf98c/bijou-progressive-build-edition.md",
+  "received_at": "2026-10-20T23:51:11.789082+00:00",
+  "supersedes": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
+  "editions": {
+    "teaching": {
+      "pdf": "bijou-book.pdf",
+      "physical_pages": 106,
+      "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
+      "bytes": 14793930
+    },
+    "archive": {
+      "pdf": "bijou-archive.pdf",
+      "physical_pages": 1872,
+      "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
+      "bytes": 20333134
+    },
+    "complete": {
+      "pdf": "bijou-designs.pdf",
+      "physical_pages": 1933,
+      "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
+      "bytes": 22710082
+    }
+  },
+  "evidence_files": [
+    "evidence/Apache-2.0.txt",
+    "evidence/NOTICE.txt",
+    "evidence/archive-record-hashes.json",
+    "evidence/edition-manifest.json",
+    "evidence/historical-record-bodies.zip",
+    "evidence/learning-material-verification.json",
+    "evidence/source-corpus.json",
+    "evidence/source-manifest.json"
+  ]
+}

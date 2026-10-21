@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { resolve } from 'node:path';
 import { stripAnsi, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';

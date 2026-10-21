@@ -1,0 +1,31 @@
+\chapter{Workshop 7: Ship a reproducible example}\label{workshop-07}
+
+\section{Pin the thing a reader can actually run}
+
+The companion lives in its own public repository: \url{https://github.com/flyingrobots/bijou-job-monitor}. This edition uses tag \texttt{book-v2} and the exact commit recorded on the version page. The package lock pins published Bijou 7.2.0 and the supporting toolchain. The records in the companion archive discuss several versions and aspirations; they are not the dependency manifest for this application.
+
+\subsection{Reproduce a build stage}
+
+Clone the repository, check out the recorded commit or edition tag, and run \texttt{npm ci}. Run the build stage for the workshop, then its stage check. Five independent snapshots cover the model, four presentations, input, asynchronous ownership and constrained geometry. Each directory owns its modules and shares the root dependency lock. The adjacent patches are actual source diffs. The original checkpoint commands separately inspect selected behaviors of the finished modules.
+
+The published \texttt{book-v2} tag fixes the whole route to the recorded commit. The prior \texttt{book-v1} remains available. When making an incompatible change, publish another edition reference; a reader must be able to recover the source that produced the explanation. The answer key and walkthrough protocol ship with the source. The blank participant form remains unfilled until an actual session occurs.
+
+\subsection{Verify the distributed source}
+
+Run \texttt{npm pack --dry-run} and inspect the listed files. The code package includes the full Apache 2.0 license, its NOTICE, source-file copyright statements, checkpoints and exercises. Git checkout also retains the package lock. Dependencies retain their own applicable notices if they are redistributed with a package. The copyright page in the book does not replace these files.
+
+\section{Keep claims attached to their environment}
+
+\subsection{An environment record has limits}
+
+The version page identifies Node, npm, the companion commit, the published Bijou release and the locally tested host. The companion's \path{VERIFICATION.json} records 44 passing tests and the pseudo-terminal observations. GitHub Actions runs the pinned checks on Linux; its current result belongs to that run and should be read from the repository. No human screen-reader session or broad terminal-emulator matrix was performed for this edition. Those are open acceptance questions rather than implied guarantees.
+
+\subsection{Make corrections findable}
+
+Use the companion's issue tracker for book-example errata. Include the workshop, edition commit, command, environment, expected result and observed result. A correction becomes more useful when another reader can reproduce it. Keep the original edition available while a later edition explains the repair and its compatibility effect.
+
+\section{Let the book be a working specimen}
+
+The monitor already lets readers start jobs, switch to logs, change selection, filter failures and resize the view. The explicit CLI modes let them inspect the same fixture as static text, TSV or accessible prose. Its tests expose state and cells without requiring an image. The printed explanations remain complete; the running application supplies another way to examine their claims.
+
+A future inspector could make model snapshots and layout rectangles visible inside the application. That capability is not implemented in this checkpoint. It should be added when it answers a concrete learning question and arrives with its own evidence. The useful flourish is the connection between the explanation and a working surface, not an unverified menu promising every debugging feature.

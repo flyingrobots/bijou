@@ -1,0 +1,149 @@
+\chapter{WF-133 - Esbuild Security Patch}\label{record-215}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-133-esbuild-security-patch.md}\par}\smallskip
+
+\section{Status}\label{record-215-status}
+
+In progress for issue \href{https://github.com/flyingrobots/bijou/issues/357}{\#357}.
+
+\section{Linked Legend}\label{record-215-linked-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}w\allowbreak{}f} for release workflow readiness.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}i\allowbreak{}e\allowbreak{}s} for package-lock security posture.
+\end{itemize}
+
+\section{Sponsors}\label{record-215-sponsors}
+
+\begin{itemize}
+\tightlist
+\item
+  Human sponsor: James Ross.
+\item
+  Agent sponsor: Codex.
+\end{itemize}
+
+\section{Hill}\label{record-215-hill}
+
+Before \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} ships, Bijou's development dependency graph should resolve the patched \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1} release so GitHub and npm audit no longer report the known \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}0} security advisories.
+
+\section{Problem}\label{record-215-problem}
+
+\texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t} reports the lockfile-resolved \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}0} package against two GitHub advisories:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{G\allowbreak{}H\allowbreak{}S\allowbreak{}A\allowbreak{}-\allowbreak{}g\allowbreak{}v\allowbreak{}7\allowbreak{}w\allowbreak{}-\allowbreak{}r\allowbreak{}q\allowbreak{}v\allowbreak{}m\allowbreak{}-\allowbreak{}q\allowbreak{}j\allowbreak{}h\allowbreak{}r} (\texttt{h\allowbreak{}i\allowbreak{}g\allowbreak{}h}), patched in \texttt{0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1}.
+\item
+  \texttt{G\allowbreak{}H\allowbreak{}S\allowbreak{}A\allowbreak{}-\allowbreak{}g\allowbreak{}7\allowbreak{}r\allowbreak{}4\allowbreak{}-\allowbreak{}m\allowbreak{}6\allowbreak{}w\allowbreak{}7\allowbreak{}-\allowbreak{}q\allowbreak{}q\allowbreak{}q\allowbreak{}r} (\texttt{l\allowbreak{}o\allowbreak{}w}), patched in \texttt{0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1}.
+\end{itemize}
+
+The package is present through development tooling, not Bijou runtime API:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}s\allowbreak{}x\allowbreak{}@\allowbreak{}4\allowbreak{}.\allowbreak{}2\allowbreak{}2\allowbreak{}.\allowbreak{}4} accepts \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}\textasciitilde{}\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}0}.
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}@\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}8} pulls \texttt{v\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}@\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}1\allowbreak{}6}, whose optional peer accepts \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}\textasciicircum{}\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{} \allowbreak{}|\allowbreak{}|\allowbreak{} \allowbreak{}\textasciicircum{}\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}0}.
+\end{itemize}
+
+\section{Scope}\label{record-215-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Update the package lock so \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d} resolves to \texttt{0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1}.
+\item
+  Avoid broad package churn or unrelated runtime dependency changes.
+\item
+  Record the security patch in the unreleased changelog.
+\item
+  Keep \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} bounded: this is an urgent dependency-security repair, not a new feature slice.
+\end{itemize}
+
+\section{Non-Goals}\label{record-215-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not expand the v7.2.0 stabilization release into the broader V8/V9 work.
+\item
+  Do not change application code or public API contracts.
+\item
+  Do not revive the closed Dependabot PR \#326; supersede it with this issue-backed cycle.
+\end{itemize}
+
+\section{Agent Inspectability / Explainability Posture}\label{record-215-agent-inspectability-explainability-posture}
+
+The proof is intentionally mechanical:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l} shows the resolved version.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}l\allowbreak{}o\allowbreak{}w} reports zero vulnerabilities.
+\item
+  the package-lock diff is limited to the patched package metadata.
+\end{itemize}
+
+\section{Linked Invariants}\label{record-215-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Release Claims Need Proof.
+\item
+  Work Is Issue-Backed.
+\item
+  Security fixes should minimize unrelated dependency churn.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-215-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Shape \#357 and this design record.
+\item
+  Update the lockfile to resolve \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1}.
+\item
+  Add a changelog entry under \texttt{U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d}.
+\item
+  Run audit, lint, typecheck, tests, docs inventory, and diff checks.
+\item
+  Open a non-draft pull request against \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-215-tests-to-write-first}
+
+No code-level regression test is needed because this cycle changes package resolution only. The deterministic regression check is the package-manager audit itself:
+
+\begin{CodeBlock}
+npm audit --audit-level=low
+\end{CodeBlock}
+
+\section{Acceptance}\label{record-215-acceptance}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} resolves \texttt{e\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}@\allowbreak{}0\allowbreak{}.\allowbreak{}2\allowbreak{}8\allowbreak{}.\allowbreak{}1}.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}l\allowbreak{}o\allowbreak{}w} exits cleanly.
+\item
+  Relevant repo validation passes.
+\item
+  \#357 is closed by the pull request.
+\end{itemize}
+
+\section{Retrospective}\label{record-215-retrospective}
+
+To be completed when the PR lands.
+

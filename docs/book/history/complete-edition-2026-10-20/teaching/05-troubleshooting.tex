@@ -1,0 +1,56 @@
+\chapter{Troubleshoot from the symptom}\label{teaching-troubleshooting}
+
+\section{Keep a useful failure record}
+\subsection{Fix the environment before changing the explanation}
+
+Record the companion commit, Node and npm versions, command, presentation mode, viewport, relevant terminal settings, expected behavior and observed behavior. Save the raw output when possible. The reference commit and package lock make it possible to ask whether another person sees the same failure.
+
+First reproduce with the pinned edition and its existing checks. If a dependency upgrade is already involved, keep the old and candidate environments distinct. A repair that also replaces the runtime, lockfile and input fixture can hide which change mattered.
+
+\section{The job starts when a dialog is open}
+\subsection{Inspect routing and transition boundaries}
+
+Start a job, open its cancellation confirmation, and send movement or another start intention. Observe selection and effects before looking at the overlay. The production model refuses the blocked intentions. Enter inside confirmation is translated into a cancellation intention rather than an ordinary start.
+
+Use the modal exercise to reproduce a boundary violation. If the model is correct but actual keys still behave differently, inspect the App's translation of the framework key message. If the model accepts the wrong event from any source, repair the transition contract first. A stronger border or higher drawing layer cannot fix input ownership.
+
+\section{Logs show the wrong job}
+\subsection{Inspect identity and lifetime}
+
+Record the selected job, screen and epoch when requesting logs and when accepting them. Use checkpoint 04 to observe an old completion rejected after selection changes. A log response must match all three conditions: the log screen remains open, the job is selected, and the epoch matches.
+
+A response can arrive after its cancellation was requested. That makes cancellation alone insufficient as the correctness boundary. If the wrong result is accepted, compare its ownership fields before changing its delay. Increasing the delay only changes how often the race appears.
+
+\section{Rows wrap badly or disappear}
+\subsection{Separate bounds from visibility}
+
+Reproduce at a fixed width and height. Compare grapheme width with the intended allocation rather than string length. Use the controlled Unicode fixture. Next inspect whether selection is in the scrollable body and whether the footer remains available. A Surface with the right dimensions can still contain the wrong crop.
+
+If the controlled cells are correct but a particular emulator displays them differently, retain the exact text sequence, terminal version and font. That is a different reproduction from a layout calculation failure. The book's glyph projection does not reproduce every emulator's shaping and width convention.
+
+\section{A pipe contains unexpected text}
+\subsection{Inspect the producer before the serializer}
+
+Use \texttt{node --import tsx src/main.ts --mode=pipe > jobs.tsv} or the documented silent npm invocation. An npm script banner is output from the command launcher, not a field emitted by the monitor's serializer. Inspect exact tab-separated fields, including empty trailing error fields.
+
+The pipe contract has four columns: ID, textual status, numeric progress and error. It contains no interactive help or cursor control. If those facts fail, reduce the observation to the formatter with a fixed snapshot. A clean-looking terminal preview does not establish that tabs and empty fields survived redirection.
+
+\section{The terminal remains in an awkward state}
+\subsection{Follow shutdown through the owning process}
+
+Distinguish normal quit, Ctrl+C and an external SIGTERM. The host adapter subscribes shutdown signals, the App disposes its driver and returns the quit command, and the runtime closes its terminal session. The companion also disposes the driver in a finalization path. Its recorded pseudo-terminal checks verify restoration on the tested host.
+
+If a real child process is involved in an extension, add that process tree to the ownership investigation. The simulated driver's cleanup cannot establish anything about an operating-system child it never created. Preserve process exit status and terminal flags as separate observations.
+
+\section{Everything passes, but the application is hard to use}
+\subsection{Ask a human question with a human observation}
+
+Tests can show that a selected relationship is present in accessible text. They cannot tell whether a person hears it at a useful moment, finds the action or understands the error. Use keyboard-only and assistive-tool sessions with a concrete task. Record the tool and environment, what was attempted, what became confusing and what the person could complete.
+
+The companion has no recorded human screen-reader study. That is an evidence boundary to improve, not a result to infer from 44 passing tests. A useful follow-up names the missing observation and its acceptance criteria.
+
+\subsection{Run a bounded usability exercise}
+
+Ask a participant to identify the failed job and explain its failure from the accessible snapshot, then do the same with the color-free static output. Record the exact fixture, assistive tool, reading order and the participant’s answer. For interaction, separately ask someone using only the keyboard to start a job, inspect logs, open cancellation, dismiss it and quit. Observe where they hesitate and whether they can explain the final state. These are proposed reader exercises; no participant results are claimed for this edition.
+
+The accessible CLI snapshot exits after output, so it cannot establish an interactive screen-reader workflow. Such a workflow requires an implemented interaction contract and observation with the intended tool. Keeping those two exercises separate prevents a successful reading of a static report from becoming an unsupported claim about a live application.

@@ -1,0 +1,78 @@
+\chapter{Migrating to Bijou 7.1.0}\label{record-271}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/7.1.0/migration-guide.md}\par}\smallskip
+
+Bijou 7.1.0 is a minor release from 7.0.0. It is intended to be additive for applications using documented public APIs.
+
+\section{Recommended Upgrade}\label{record-271-recommended-upgrade}
+
+Update the runtime packages your app uses together:
+
+\begin{CodeBlock}
+npm install \
+  @flyingrobots/bijou@7.1.0 \
+  @flyingrobots/bijou-node@7.1.0 \
+  @flyingrobots/bijou-tui@7.1.0 \
+  @flyingrobots/bijou-tui-app@7.1.0
+\end{CodeBlock}
+
+If your app uses localization tooling, keep those packages in lock-step too:
+
+\begin{CodeBlock}
+npm install \
+  @flyingrobots/bijou-i18n@7.1.0 \
+  @flyingrobots/bijou-i18n-tools@7.1.0 \
+  @flyingrobots/bijou-i18n-tools-node@7.1.0 \
+  @flyingrobots/bijou-i18n-tools-xlsx@7.1.0
+\end{CodeBlock}
+
+If your app uses the Bijou MCP server, keep it lock-step too:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-mcp@7.1.0
+\end{CodeBlock}
+
+\section{Runtime Behavior}\label{record-271-runtime-behavior}
+
+No breaking runtime migration is expected.
+
+Applications may notice better behavior in these areas:
+
+\begin{itemize}
+\tightlist
+\item
+  full-screen TUIs repaint correctly after terminal resize, laptop sleep/wake, or external-display geometry changes
+\item
+  ANSI parsing correctly handles scoped foreground/background resets
+\item
+  DOGFOOD Blocks guide navigation can focus parent preview rows
+\item
+  quit confirmation copy is less redundant
+\end{itemize}
+
+If your app had local workarounds for stale cells after resize or manual ANSI reset cleanup, retest those paths against 7.1.0 and remove the workaround if Bijou now owns the behavior.
+
+\section{New Proof APIs}\label{record-271-new-proof-apis}
+
+The new \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and GraphQL block helpers are available for early proof work, but they are still the first slices of a larger Runtime Graph direction. Use them when you want deterministic receipts, source maps, lower modes, and agent-readable debug facts. Do not assume they are the final V8 product contract yet.
+
+\section{Theme Work}\label{record-271-theme-work}
+
+Theme-token APIs are more useful in 7.1.0, including first-party dark/light presets and safe-pair declarations. Existing raw-color code should keep working. New code should prefer semantic token refs when the color is part of a themeable product surface.
+
+\section{Release Tooling}\label{record-271-release-tooling}
+
+Maintainers preparing releases should use:
+
+\begin{CodeBlock}
+npm run release:readiness -- --milestone v7.1.0
+\end{CodeBlock}
+
+The milestone-aware mode blocks missing release evidence packets, open target issues, lingering \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} labels, stale release posture docs, and missing package-smoke coverage before the local gauntlet runs.
+
+DOGFOOD contributors should also expect \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} to scan new \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} modules by default. Tooling-only exclusions must be explicit.
+
+\section{Compatibility Stance}\label{record-271-compatibility-stance}
+
+Bijou 7.1.0 should be a straightforward upgrade from 7.0.0 for application code. The main migration work is optional cleanup: remove local resize/ANSI workarounds, adopt theme tokens where they clarify product intent, and use the new proof helpers only where deterministic UI evidence is valuable.
+

@@ -1,0 +1,31 @@
+Bijou Book and Design Archive
+Copyright 2026 James Ross.
+
+Code examples reproduced or adapted from Bijou retain the Apache License,
+Version 2.0. Original sources and exact source hashes are recorded in
+source-manifest.json and the book source inventory. The source-corpus.json
+archive preserves original source notices and examples without changes.
+
+Book presentation changes (2026): source chapters were regrouped into parts;
+editorial introductions and headings were added; conceptual arrow notation
+was illustrated in TikZ; tables were rendered with the Bijou table component;
+source code and terminal specimens received separate publication fonts.
+These presentation changes do not alter the archived source corpus.
+
+No tracked NOTICE file was present in the Bijou source checkout at 836878a8.
+The upstream project is https://github.com/flyingrobots/bijou.
+
+Font software is separately licensed. Jacquard 24, IBM Plex Mono, VT323 and
+Recursive are distributed under the SIL Open Font License; their original
+license files accompany the fonts. DejaVu Sans retains the Bitstream Vera
+and DejaVu notices in fonts/DejaVu-LICENSE.txt. Recursive Mono files are static
+instances of Recursive with MONO=1, CASL=0; weights 400/700, slant 0/-15.
+The instances are publication build assets, not a new font family.
+
+Teaching/archive restructuring (2026): a five-part teaching sequence,
+connecting explanations, practical reference and historical notices were
+added. All 426 existing typeset source record bodies remain unchanged.
+Companion app.ts, main.ts and job.ts listings are reproduced without changes
+from commit 92864e0f2512f59225b2f1f5b89a0678bd639e62 of
+https://github.com/flyingrobots/bijou-job-monitor. The full companion LICENSE
+and NOTICE accompany those excerpts in companion-snippets/.

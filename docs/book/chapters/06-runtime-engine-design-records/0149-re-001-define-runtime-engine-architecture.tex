@@ -1,0 +1,345 @@
+\chapter{RE-001 --- Define Runtime Engine Architecture}\label{record-149}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-001-define-runtime-engine-architecture.md}\par}\smallskip
+
+\emph{Cycle for formalizing Bijou's hexagonal runtime around state machines, view stacks, retained layouts, and buffered command/effect routing}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md}{HT-004 --- Promote Explicit Layer Objects and Richer Shell Introspection}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/DL-009-formalize-layout-and-viewport-rules.md}{DL-009 --- Formalize Layout and Viewport Rules}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-149-why-this-cycle-exists}
+
+Recent shell and DOGFOOD work exposed that Bijou still mixes several concerns together:
+
+\begin{itemize}
+\tightlist
+\item
+  stateful application logic
+\item
+  visible shell/view layering
+\item
+  layout ownership
+\item
+  input routing
+\item
+  side effects
+\end{itemize}
+
+That mixing was survivable while the framework was smaller, but it is now making the architecture harder to explain than it should be.
+
+This cycle exists to write down the intended engine model before the implementation drifts further:
+
+\begin{itemize}
+\tightlist
+\item
+  the application owns a state machine
+\item
+  the application owns a view stack
+\item
+  the runtime retains layouts for those views
+\item
+  input is routed through those retained layouts from the topmost view downward
+\item
+  components may emit commands and effects
+\item
+  commands and effects are buffered separately
+\item
+  terminal, clock, audio, filesystem, and other integrations stay outside the hexagon as adapters
+\end{itemize}
+
+\section{Human users / jobs / hills}\label{record-149-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-149-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers evolving the runtime
+\item
+  builders composing real applications with multiple overlapping surfaces
+\item
+  shell and DOGFOOD authors who need predictable interaction and layout rules
+\end{itemize}
+
+\subsection{Human jobs}\label{record-149-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Explain whether a behavior belongs to state, view stack, layout, routing, command handling, or an adapter.
+\item
+  Add a new modal, drawer, or workspace view without rewriting routing rules from scratch.
+\item
+  Resize the terminal or change a component's content without letting geometry and interaction ownership drift apart.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-149-human-hill}
+
+The runtime model is explicit enough that a human can describe how one input becomes zero-or-more commands and effects without hand-waving over shell-specific branch order.
+
+\section{Agent users / jobs / hills}\label{record-149-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-149-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents generating Bijou apps
+\item
+  agents inspecting runtime state during test/debug loops
+\item
+  agents validating whether routing and effects match the visible UI
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-149-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inspect state machine state separately from the current view stack.
+\item
+  Read retained layout ownership and predict which view/component should receive a pointer or key event.
+\item
+  Distinguish between commands that change state and effects that leave state alone.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-149-agent-hill}
+
+An agent can inspect the runtime model and answer what is visible, what is interactive, what blocks lower layers, and what commands/effects an input may emit without parsing ANSI output heuristically.
+
+\section{Human playback}\label{record-149-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user is in a workspace view with an active session state.
+\item
+  The app pushes a modal confirmation view onto the view stack without destroying the underlying workspace state.
+\item
+  The modal's retained layout is placed above the workspace layout and blocks lower interaction.
+\item
+  The user clicks the modal's confirm button.
+\item
+  The input system routes the click to the topmost view's layout.
+\item
+  The button emits:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a command to continue the operation
+  \item
+    an effect to play a click sound
+  \end{itemize}
+\item
+  The runtime buffers the command and effect separately.
+\item
+  The command updates app state and may pop or replace views.
+\item
+  The effect runs through an adapter without pretending it changed state.
+\end{enumerate}
+
+\section{Agent playback}\label{record-149-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects the runtime while a search palette sits above a workspace view.
+\item
+  The runtime exposes:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    current application state
+  \item
+    ordered view stack
+  \item
+    retained layouts for each active view
+  \end{itemize}
+\item
+  The agent can see that the search view blocks lower interaction.
+\item
+  A key input enters the runtime.
+\item
+  The runtime routes it through the search view's input path first.
+\item
+  The search view emits one command to select a result and one effect to announce the match count.
+\item
+  The workspace view never receives the key because the upper view handled it and blocks lower layers.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-149-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Implementation outline}\label{record-149-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Formalize core runtime nouns:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+  \item
+    \texttt{V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+  \item
+    \texttt{V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}
+  \item
+    \texttt{R\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e}
+  \item
+    \texttt{I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}E\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+  \item
+    \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d}
+  \item
+    \texttt{E\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}c\allowbreak{}t}
+  \end{itemize}
+\item
+  Promote the view stack into first-class runtime state instead of deriving it from booleans and shell-specific branches.
+\item
+  Move layout ownership to retained runtime objects that are invalidated on:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    terminal resize
+  \item
+    view push/pop
+  \item
+    content-size changes
+  \item
+    visibility/enablement changes
+  \item
+    scrollbar/overflow changes
+  \end{itemize}
+\item
+  Route input against retained layouts, topmost view first, with explicit block/pass-through semantics.
+\item
+  Let components contribute interaction behavior through layout-owned nodes instead of global registration churn.
+\item
+  Buffer emitted commands separately from emitted effects.
+\item
+  Migrate existing framed-shell behavior onto those seams once the contracts are explicit.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-149-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving the legend, invariants, active design doc, and follow-on backlog items all describe the same runtime model
+\item
+  future runtime unit tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    one input may emit multiple commands
+  \item
+    one input may emit multiple effects
+  \item
+    commands and effects stay distinct
+  \item
+    topmost blocking views prevent lower layouts from seeing the same input
+  \item
+    retained layouts update interaction geometry when invalidated
+  \end{itemize}
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-149-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  Bijou's current TEA-style update flow may need a transitional compatibility layer while commands/effects become buffered first-class runtime outputs.
+\item
+  Existing framed-shell code still derives layers from booleans instead of owning a first-class view stack.
+\item
+  Layout invalidation boundaries may need careful tuning so the retained model is simpler than per-render recomputation rather than more confusing.
+\item
+  Some existing components may not yet have explicit enough layout contracts to participate cleanly in layout-driven routing.
+\end{itemize}
+
+\section{Retrospective}\label{record-149-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  a new \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine} legend
+\item
+  explicit invariants for state/view separation, layout-owned interaction geometry, and command/effect separation
+\item
+  this cycle doc capturing the runtime model as the design source of truth
+\item
+  a decomposition backlog for implementation slices
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no runtime code changes yet
+\item
+  no new engine objects yet
+\item
+  no shell migration yet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}{RE-002 --- Promote First-Class State Machine and View Stack}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}{RE-003 --- Retain Layout Trees and Layout Invalidation}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}{RE-004 --- Route Input Through Layouts and Layer Bubbling}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006 --- Formalize Component Layout and Interaction Contracts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}
+\end{itemize}
+

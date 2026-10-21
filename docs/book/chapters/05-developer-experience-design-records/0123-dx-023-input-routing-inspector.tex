@@ -1,0 +1,142 @@
+\chapter{DX-023 Input Routing Inspector}\label{record-123}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-023-input-routing-inspector.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-023 Input Routing Inspector
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-123-framing}
+
+Key swallowing and priority mistakes are hard to diagnose from outside the runtime. Frame/page binding warnings already proved this seam needs stronger observability; developers should not have to infer routing truth from visible state changes alone.
+
+DX-023 adds a first-party input-routing inspector. The first slice is a pure history and report helper around existing \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t} facts. Shell integration can feed it live records later without changing the core router.
+
+\section{Sponsored Users}\label{record-123-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  App authors debugging key priority, shell/page routing, and swallowed input.
+\item
+  Maintainers investigating runtime routing regressions.
+\item
+  Agent workflows that need text output for recent input-routing facts.
+\end{itemize}
+
+\section{Hills}\label{record-123-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A developer can append routing records to a bounded history and inspect the last N events.
+\item
+  A maintainer can read a text report that shows event kind, visited views, handler owner, hit target, commands, effects, swallowed input, and no-op handlers.
+\item
+  A test can render the same report as a surface for docs or debug panes.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-123-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the helper retain only the configured number of events?
+\item
+  Does the text report distinguish key and pointer events?
+\item
+  Does the report expose visited views, handled/stopped owner, and hit target?
+\item
+  Does the report flag swallowed input when routing stops unhandled?
+\item
+  Does the report flag no-op handlers when an event is handled without commands or effects?
+\item
+  Does \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} export the inspector API from the source barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-123-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{}h\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})}.
+\item
+  Add \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}h\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{})}.
+\item
+  Add \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}h\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})}.
+\item
+  Accept existing runtime \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}E\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t} and \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t} objects; do not duplicate router logic.
+\item
+  Keep the first slice pure and shell-agnostic.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-123-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused RED tests fail before implementation and pass after.
+\item
+  Bounded history behavior is deterministic.
+\item
+  Text reports include routing facts, swallowed status, and no-op status.
+\item
+  Surface reports render the same text into a bounded \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Docs and changelog describe the helper.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-123-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep command/effect labeling explicit: callers can pass labels, otherwise the report shows counts instead of guessing object meaning.
+\end{itemize}
+
+\section{Drift Check}\label{record-123-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed on a pure inspector helper. The runtime router and frame shell are unchanged.
+\item
+  Command and effect meaning remains caller-owned. The helper accepts optional labels and otherwise reports counts instead of guessing object semantics.
+\item
+  Live shell integration remains follow-on work; the first slice provides the data model, bounded history, text report, and surface rendering.
+\end{itemize}
+
+\section{Playback}\label{record-123-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} keeps a deterministic bounded history.
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} distinguishes key and pointer events and shows raw input when provided.
+\item
+  Reports include visited views, handled owner, stopped owner, hit target, command/effect labels or counts, swallowed input, and no-op handlers.
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} renders the same report into a bounded \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} exports the new API from the source barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-123-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  This complements the layout inspector without coupling to it. Layout explains geometry; input routing explains priority and ownership.
+\item
+  Keeping labels explicit prevents the inspector from turning command objects into misleading strings.
+\end{itemize}
+

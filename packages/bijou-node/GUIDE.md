@@ -227,7 +227,7 @@ console.log(result.outputPath, result.frames);
 | `BIJOU_FPS=60` | Overrides the detected terminal refresh rate. |
 
 For the full custom-theme contract, starter JSON, and token-family guidance,
-read [Theme Authoring Guide](../../docs/design-system/theme-authoring.md).
+read [Theme Authoring Guide](../../docs/book/bijou-designs.pdf#page=429).
 
 ---
 **The Node package bridges the pure TypeScript foundation to the physical terminal and the host OS.**

@@ -1,0 +1,79 @@
+\pdfvariable minorversion=7
+% Generated source compilation; compile with LuaLaTeX. Assets are relative to this file.
+\documentclass[10pt,a4paper,oneside,openany]{book}
+\usepackage[margin=23mm,headheight=14pt,headsep=9mm,footskip=12mm]{geometry}
+\usepackage{fontspec}
+\directlua{luaotfload.add_fallback("bookfallback", {"DejaVu Sans:mode=node;"})}
+\defaultfontfeatures{Renderer=Node,Ligatures=TeX}
+\setmainfont{IBMPlexMono-Regular.ttf}[Path=fonts/,BoldFont=IBMPlexMono-Bold.ttf,ItalicFont=IBMPlexMono-Italic.ttf,BoldItalicFont=IBMPlexMono-BoldItalic.ttf,RawFeature={fallback=bookfallback}]
+\setmonofont{IBMPlexMono-Regular.ttf}[Path=fonts/,BoldFont=IBMPlexMono-Bold.ttf,ItalicFont=IBMPlexMono-Italic.ttf,BoldItalicFont=IBMPlexMono-BoldItalic.ttf,RawFeature={fallback=bookfallback}]
+\newfontfamily\headingfont{Jacquard24-Regular.ttf}[Path=fonts/,RawFeature={fallback=bookfallback}]
+\newfontfamily\sourcecodefont{VT323-Regular.ttf}[Path=fonts/,RawFeature={fallback=bookfallback}]
+\usepackage{xcolor,graphicx,tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\definecolor{BookCoral}{HTML}{F7685F}
+\definecolor{BookInk}{HTML}{2D2726}
+\definecolor{BookHeading}{HTML}{83312C}
+\definecolor{BookMuted}{HTML}{645452}
+\definecolor{BookPanel}{HTML}{FFEDEB}
+\newsavebox{\BookDiagramBox}
+\newcommand{\BookDiagram}[2][\linewidth]{%
+  \sbox{\BookDiagramBox}{#2}%
+  \ifdim\wd\BookDiagramBox>#1\relax
+    \sbox{\BookDiagramBox}{\resizebox{#1}{!}{\usebox{\BookDiagramBox}}}%
+  \fi
+  \ifdim\dimexpr\ht\BookDiagramBox+\dp\BookDiagramBox\relax>.85\textheight
+    \resizebox*{!}{.85\textheight}{\usebox{\BookDiagramBox}}%
+  \else\usebox{\BookDiagramBox}\fi}
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\usepackage{amsmath,amssymb,longtable,booktabs,array,calc}
+\usepackage{fvextra,enumitem,titlesec,fancyhdr,xurl,hyperref,bookmark}
+\newif\ifBookTeaching
+\newif\ifBookArchive
+\newif\ifArchiveRecord
+\providecommand{\BookTitle}{The Bijou Book}
+\providecommand{\BookSubtitle}{Build, understand, test and maintain terminal applications}
+\providecommand{\BookRunningTitle}{The Bijou Book}
+\hypersetup{colorlinks=true,linkcolor=BookHeading,urlcolor=BookHeading,citecolor=BookHeading,pdftitle={\BookTitle},pdfauthor={James Ross},pdfsubject={Application teaching and a separately identified historical archive}}
+\urlstyle{tt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\linespread{1.16}
+\setlength{\emergencystretch}{3em}
+\raggedbottom
+\widowpenalty=10000\clubpenalty=10000
+\setlist{nosep,leftmargin=1.6em,topsep=4pt}
+\setlistdepth{12}
+\renewlist{itemize}{itemize}{12}
+\setlist[itemize]{label=\textbullet}
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{0}
+\makeatletter
+\renewcommand{\@pnumwidth}{3em}
+\renewcommand{\@tocrmarg}{4em}
+\patchcmd{\l@chapter}{1.5em}{3.4em}{}{\PackageError{bijou-book}{Cannot widen contents chapter numbers}{Check the book class contents definition.}}
+\patchcmd{\l@chapter}{\rightskip \@pnumwidth}{\rightskip \@pnumwidth plus 1fil}{}{\PackageError{bijou-book}{Cannot set ragged contents entries}{Check the book class contents definition.}}
+\makeatother
+\titleformat{\part}[display]{\headingfont\Huge\color{BookHeading}}{\fontsize{64}{70}\selectfont\thepart}{12pt}{}
+\newcommand{\BookRecordNotice}{\ifArchiveRecord\vspace{6pt}{\normalfont\footnotesize\color{BookMuted}Historical source record. Original claims and status retained; implementation status has not been reassessed for this edition.\par}\fi}
+\titleformat{\chapter}[display]{\headingfont\Huge\color{BookHeading}}{\fontsize{48}{52}\selectfont\thechapter}{10pt}{}[\BookRecordNotice]
+\titlespacing*{\chapter}{0pt}{0pt}{22pt}
+\titleformat{\section}{\headingfont\LARGE\color{BookHeading}}{}{0pt}{}
+\titleformat{\subsection}{\headingfont\Large\color{BookHeading}}{}{0pt}{}
+\titleformat{\subsubsection}{\headingfont\large\color{BookHeading}}{}{0pt}{}
+\titlespacing*{\section}{0pt}{18pt}{7pt}
+\titlespacing*{\subsection}{0pt}{14pt}{5pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+\DefineVerbatimEnvironment{CodeBlock}{Verbatim}{breaklines,breakanywhere,formatcom=\sourcecodefont,fontsize=\fontsize{12}{13}\selectfont,baselinestretch=1,frame=leftline,rulecolor=\color{BookCoral},framesep=5pt,xleftmargin=7pt}
+\DefineVerbatimEnvironment{LicenseText}{Verbatim}{breaklines,breakanywhere=false,fontsize=\footnotesize,baselinestretch=1,fontfamily=tt}
+\DefineVerbatimEnvironment{RecordMeta}{Verbatim}{breaklines,breakanywhere,fontsize=\scriptsize,baselinestretch=1,formatcom=\color{BookMuted}}
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{1pt}}
+\providecommand{\passthrough}[1]{#1}
+\providecommand{\pandocbounded}[1]{#1}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\footnotesize\color{BookMuted}Bijou / \BookRunningTitle}
+\fancyhead[R]{\footnotesize\color{BookMuted}Source edition · 2026-10-20}
+\fancyfoot[C]{{\headingfont\large\color{BookHeading}\thepage}}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{{\headingfont\large\color{BookHeading}\thepage}}\renewcommand{\headrulewidth}{0pt}}

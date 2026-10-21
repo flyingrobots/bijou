@@ -1,0 +1,310 @@
+\chapter{DF-046 Choice and navigation standard Blocks}\label{record-096}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-046-choice-navigation-standard-blocks.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-046 Choice and navigation standard Blocks
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - blocks
+  - choice
+  - component-audit
+  - design-thinking
+  - dogfood
+  - navigation
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-096-framing}
+
+The first component-family six-pack moved grouping, prose, links, dividers, and text entry into typed standard Blocks. This follow-on six-pack turns choice, decision, peer navigation, progressive disclosure, and path progress audits into reusable Block contracts with schema-bound input and lower-mode facts.
+
+This cycle closes issues \#232 through \#237:
+
+\input{tables/table-026}
+
+The work follows a Design Thinking loop:
+
+\begin{itemize}
+\tightlist
+\item
+  observe DOGFOOD choice and navigation surfaces as product semantics, not visual widgets
+\item
+  frame each family as a named Block contract with explicit state and facts
+\item
+  prototype TUI and lower-mode shapes before treating implementation as landed
+\item
+  prove catalog, schema, render, command, story, and lowering behavior in tests
+\end{itemize}
+
+\section{Sponsored Users}\label{record-096-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI authors who need reusable semantics for choices, decisions, peer navigation, disclosure state, and path progress.
+\item
+  DOGFOOD maintainers who need the Blocks preview page to show the next real component-family slice.
+\item
+  Tooling authors who need to inspect selection, current-step, checked-state, and disclosure facts without scraping terminal chrome.
+\item
+  Future declaration authors who need YAML or JSON IR targets over typed Block APIs rather than a second runtime.
+\end{itemize}
+
+\section{Hills}\label{record-096-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can import all six Blocks and inspect metadata, data requirements, command intents, schema descriptions, and ready story ids from the public barrel.
+\item
+  A reader can compare interactive/static output with pipe/accessibility lowerings and recover option identity, selected state, current route, disclosure state, and current step.
+\item
+  A maintainer can run one DF-046 cycle test that proves the six-pack is catalogued, schema-bound, rendered, documented, and lowering-stable.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-096-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does each choice/navigation family have a named Block contract instead of a broad audit note?
+\item
+  Are required and optional fields concrete enough for DOGFOOD previews and small enough for reuse?
+\item
+  Do lower modes expose stable facts for block identity, family, variant, mode, selected value, and semantic values?
+\item
+  Does the DOGFOOD Blocks page have sample slots for every new definition?
+\item
+  Does this preserve future YAML/JSON IR as an adapter over typed APIs?
+\end{itemize}
+
+\section{Block Contracts}\label{record-096-block-contracts}
+
+\input{tables/table-027}
+
+Each Block gets the same first-party command contract:
+
+\begin{CodeBlock}
+<blockPrefix>.select
+<blockPrefix>.copyFacts
+<blockPrefix>.openStory
+\end{CodeBlock}
+
+\section{TUI Mockups}\label{record-096-tui-mockups}
+
+Single choice:
+
+\begin{CodeBlock}
++-- SingleChoiceBlock -------------------------------+
+| Label                                              |
+|   Output mode                                      |
+| Options                                            |
+|   interactive; pipe; accessible                    |
+| Selected                                           |
+|   pipe                                             |
+| Mode                                               |
+|   radio                                            |
++----------------------------------------------------+
+\end{CodeBlock}
+
+Multiple choice:
+
+\begin{CodeBlock}
++-- MultipleChoiceBlock -----------------------------+
+| Label                                              |
+|   Release proof                                    |
+| Checked                                            |
+|   lint; tests                                      |
+| Unchecked                                          |
+|   screenshots                                      |
+| Validation                                         |
+|   2 of 3 complete                                  |
++----------------------------------------------------+
+\end{CodeBlock}
+
+Binary decision:
+
+\begin{CodeBlock}
++-- BinaryDecisionBlock -----------------------------+
+| Label                                              |
+|   Merge gate                                       |
+| Selected                                           |
+|   yes                                              |
+| Consequence                                        |
+|   admin merge                                      |
+| Confirmation                                       |
+|   CI green                                         |
++----------------------------------------------------+
+\end{CodeBlock}
+
+Peer navigation:
+
+\begin{CodeBlock}
++-- PeerNavigationBlock -----------------------------+
+| Previous                                           |
+|   Architecture                                     |
+| Current                                            |
+|   Blocks                                           |
+| Next                                               |
+|   Method                                           |
+| Route                                              |
+|   docs/blocks                                      |
++----------------------------------------------------+
+\end{CodeBlock}
+
+Progressive disclosure:
+
+\begin{CodeBlock}
++-- ProgressiveDisclosureBlock ----------------------+
+| Label                                              |
+|   Advanced options                                 |
+| State                                              |
+|   closed                                           |
+| Hidden count                                       |
+|   6                                                |
+| Summary                                            |
+|   6 options hidden                                 |
++----------------------------------------------------+
+\end{CodeBlock}
+
+Path progress:
+
+\begin{CodeBlock}
++-- PathProgressBlock -------------------------------+
+| Path                                               |
+|   Setup; Blocks; Preview                           |
+| Current                                            |
+|   Blocks                                           |
+| Step                                               |
+|   2                                                |
+| Total                                              |
+|   3                                                |
++----------------------------------------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-096-lower-modes}
+
+Static mode keeps the same section structure as interactive mode and stays render-only.
+
+Pipe mode lowers every Block to compact records:
+
+\begin{CodeBlock}
+SingleChoiceBlock
+label: Output mode
+options: interactive; pipe; accessible
+selected: pipe
+mode: radio
+\end{CodeBlock}
+
+\begin{CodeBlock}
+PathProgressBlock
+path: Setup; Blocks; Preview
+current: Blocks
+step: 2
+total: 3
+status: current
+\end{CodeBlock}
+
+Accessible mode lowers every Block to label-first prose:
+
+\begin{CodeBlock}
+SingleChoiceBlock
+Label: Output mode
+Options: interactive; pipe; accessible
+Selected: pipe
+Mode: radio
+\end{CodeBlock}
+
+\begin{CodeBlock}
+PathProgressBlock
+Path: Setup; Blocks; Preview
+Current: Blocks
+Step: 2
+Total: 3
+Status: current
+\end{CodeBlock}
+
+Every lower mode carries inspectable facts:
+
+\begin{CodeBlock}
+block = SingleChoiceBlock
+block.rendered = true
+block.family = input
+block.variant = ready
+block.mode = pipe
+block.selected = pipe
+semanticValue.label = Output mode
+\end{CodeBlock}
+
+\section{Accessibility And Directionality}\label{record-096-accessibility-and-directionality}
+
+The first slice does not add bespoke focus handling. The Blocks expose labels and section values so accessible output preserves choice state, current route, hidden-count state, and current-step state when visual affordances are removed. Text is stored as plain strings or string arrays, leaving locale and bidirectional rendering concerns to callers and localization adapters.
+
+\section{Agent Inspectability}\label{record-096-agent-inspectability}
+
+Agents and tests should inspect metadata, data contracts, schema descriptions, command intent ids, ready story ids, and lowering facts. They should not infer selected state, checked state, or current step from visual markers.
+
+\section{Declarative IR Note}\label{record-096-declarative-ir-note}
+
+The Bijou IR idea remains an adapter layer over this typed API. This cycle does not introduce a new YAML or JSON runtime, but it gives future IR work concrete targets:
+
+\begin{CodeBlock}
+block: SingleChoiceBlock
+package: "@flyingrobots/bijou"
+story: single-choice.ready
+data:
+  label: Output mode
+  options:
+    - interactive
+    - pipe
+    - accessible
+  selected: pipe
+  mode: radio
+commands:
+  - singleChoice.select
+  - singleChoice.copyFacts
+  - singleChoice.openStory
+facts:
+  block.family: input
+  block.variant: ready
+  semanticValue.label: Output mode
+\end{CodeBlock}
+
+\section{Tests}\label{record-096-tests}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}4\allowbreak{}6\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}o\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves all six Blocks publish through the standard catalog and package manifest.
+\item
+  The cycle test validates metadata, command intent shape, schema binding, accessor rejection, visual rendering, lower-mode rendering, semantic facts, and Method documentation.
+\item
+  DX-031 catalog tests prove the public barrel, first-party manifest, story ids, and rendered lowering checks include the expanded standard block set.
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves that new DOGFOOD localization keys and changed source strings require current rows for every supported locale before pre-push or CI can pass.
+\end{itemize}
+
+\section{Closeout}\label{record-096-closeout}
+
+The six-pack is landed when:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports all six Block definitions, schema adapters, and schema-bound block definitions
+\item
+  DOGFOOD Blocks preview has concrete sample slots for all six names
+\item
+  DOGFOOD preview strings have current \texttt{e\allowbreak{}n}, \texttt{f\allowbreak{}r}, \texttt{e\allowbreak{}s}, and \texttt{d\allowbreak{}e} translations, and the completeness policy is enforced by pre-push and CI
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s}, and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t} include the six names
+\item
+  CHANGELOG, BEARING, and ROADMAP record the v7 component-family slice
+\item
+  PR text closes \#232, \#233, \#234, \#235, \#236, and \#237
+\end{itemize}
+

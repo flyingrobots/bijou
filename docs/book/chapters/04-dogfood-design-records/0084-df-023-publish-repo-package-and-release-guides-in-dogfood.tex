@@ -1,0 +1,168 @@
+\chapter{DF-023 --- Publish Repo, Package, And Release Guides In DOGFOOD}\label{record-084}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-021-shape-dogfood-as-terminal-docs-system.md}{DF-021 --- Shape DOGFOOD As Terminal Docs System}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md}{DF-022 --- Build Prose Docs Reader And Top-Level DOGFOOD Nav}
+\end{itemize}
+
+\section{Sponsor human}\label{record-084-sponsor-human}
+
+A builder or evaluator who expects DOGFOOD to explain the Bijou repo, its published packages, and the current release line without sending them back out into scattered repo files.
+
+\section{Sponsor agent}\label{record-084-sponsor-agent}
+
+An agent that must answer:
+
+\begin{itemize}
+\tightlist
+\item
+  what packages ship in the workspace and what each one is for
+\item
+  where the repo says to start reading
+\item
+  what changed in \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  how a \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} user should approach the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} upgrade
+\end{itemize}
+
+\section{Hill}\label{record-084-hill}
+
+DOGFOOD stops treating \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} and \texttt{R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} as placeholder tabs and starts acting like a real terminal docs product for those topics. A user can reach repo orientation, package explainers, and \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release/migration material from inside the app.
+
+\section{Why this cycle exists}\label{record-084-why-this-cycle-exists}
+
+\texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}2} gave DOGFOOD the shell shape of a docs site, but it still only proved the shape. The newly visible \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} and \texttt{R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} sections were honest placeholders, not the actual corpus.
+
+That was good enough to clarify the next blocker, but not good enough to ship \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} honestly.
+
+If DOGFOOD is the canonical docs surface for this release, it cannot keep outsourcing repo/package/release understanding to filesystem spelunking.
+
+\section{Playback questions}\label{record-084-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a user open a repo-orientation page inside \texttt{G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s}?
+\item
+  Does \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} now expose explainer pages for the shipped workspace packages instead of only an overview placeholder?
+\item
+  Does \texttt{R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} now expose the actual \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} long-form \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w} and migration guidance inside the docs app?
+\item
+  Do the signposts and blocker lane stop pretending \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}3} is still open?
+\item
+  Is the remaining \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} DOGFOOD blocker work now narrower: philosophy/doctrine corpus plus the examples/smoke posture shift?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-084-accessibility-assistive-reading-posture}
+
+The newly published corpus must remain keyboard-first, scrollable, and text-legible inside the existing three-pane reader. No screenshot-only or color-only explanation is allowed.
+
+\section{Localization / directionality posture}\label{record-084-localization-directionality-posture}
+
+This cycle does not translate the new prose corpus, but it must keep the reader on the same localizable shell and section model established in \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}2}.
+
+\section{Agent inspectability / explainability posture}\label{record-084-agent-inspectability-explainability-posture}
+
+An agent should be able to prove closure by inspecting:
+
+\begin{itemize}
+\tightlist
+\item
+  the DOGFOOD app corpus declarations
+\item
+  the new cycle doc
+\item
+  the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane
+\item
+  the release signposts
+\item
+  the cycle tests
+\end{itemize}
+
+\section{Non-goals}\label{record-084-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  closing the philosophy/architecture/doctrine blocker (\texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}4})
+\item
+  replacing the package READMEs or release docs as their own repo-owned sources
+\item
+  finishing the examples-to-DOGFOOD posture shift
+\item
+  changing the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} version decision
+\end{itemize}
+
+\section{Decision}\label{record-084-decision}
+
+For \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, DOGFOOD should publish the existing repo/package/release corpus through the prose-doc reader instead of keeping those sections as stubs.
+
+The source of truth remains the repo-owned docs and package READMEs. DOGFOOD is the canonical human-facing reading surface for them.
+
+\section{Implementation outline}\label{record-084-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a repo-orientation page under \texttt{G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s}.
+\item
+  Publish package explainer pages for the shipped workspace packages in \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s}.
+\item
+  Publish the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} long-form \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w} and migration guides in \texttt{R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e}.
+\item
+  Update the starter overview pages so they no longer claim that the package and release corpus is missing.
+\item
+  Move \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}3} from the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the signposts/tests.
+\end{enumerate}
+
+\section{Evidence}\label{record-084-evidence}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD now exposes a \texttt{D\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}M\allowbreak{}a\allowbreak{}p} guide
+\item
+  the \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} section contains per-package explainer pages
+\item
+  the \texttt{R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e} section contains \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} and \texttt{M\allowbreak{}i\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  the active \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker lane no longer lists \texttt{D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}3}
+\end{itemize}
+
+\section{Retrospective}\label{record-084-retrospective}
+
+The important correction is not just ``more text exists.'' The correction is that DOGFOOD now behaves more like a real docs product:
+
+\begin{itemize}
+\tightlist
+\item
+  repo orientation lives inside the app
+\item
+  package understanding lives inside the app
+\item
+  release understanding lives inside the app
+\end{itemize}
+
+That leaves the remaining blocker work more honest and more focused:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md}{DF-024 --- Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-026-demote-examples-to-secondary-reference-status.md}{DF-026 --- Demote Examples To Secondary Reference Status}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}{WF-003 --- Replace \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} With \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}}
+\end{itemize}
+

@@ -1,0 +1,5167 @@
+{
+  "source_base_revision": "836878a8",
+  "figures": [
+    {
+      "id": "flow-001",
+      "latex_path": "chapters/05-developer-experience-design-records/0147-dx-052-no-color-is-not-a-capability.tex",
+      "kind": "block-0",
+      "original_notation": "BIJOU_ACCESSIBLE=1    -> 'accessible'\nNO_COLOR / TERM=dumb  -> 'pipe'\n!stdout.isTTY         -> 'pipe'\nCI                    -> 'static'\nstdout.isTTY          -> 'interactive'",
+      "original_sha256": "6c3c825e86d5d122e6b3e7cf01947394d8894cfe4bb6b1ad4a37636977c2fecf",
+      "graphs": [
+        {
+          "labels": [
+            "BIJOU_ACCESSIBLE=1",
+            "'accessible'",
+            "NO_COLOR / TERM=dumb",
+            "'pipe'",
+            "!stdout.isTTY",
+            "'pipe'",
+            "CI",
+            "'static'",
+            "stdout.isTTY",
+            "'interactive'"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              -3,
+              -2
+            ],
+            [
+              3,
+              -2
+            ],
+            [
+              -3,
+              -4
+            ],
+            [
+              3,
+              -4
+            ],
+            [
+              -3,
+              -6
+            ],
+            [
+              3,
+              -6
+            ],
+            [
+              -3,
+              -8
+            ],
+            [
+              3,
+              -8
+            ]
+          ],
+          "width": 48
+        }
+      ]
+    },
+    {
+      "id": "flow-002",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-2",
+      "original_notation": "business state / adapters\n  -> providers\n  -> immutable binding snapshots\n  -> active view hierarchy\n  -> render\n  -> user input\n  -> Commands expressing intent\n  -> business logic\n  -> next state / provider inputs",
+      "original_sha256": "97889421119c24db1149330a95f9b6c734374131ef18aa9a13f350587adb90db",
+      "graphs": [
+        {
+          "labels": [
+            "business state / adapters",
+            "providers",
+            "immutable binding snapshots",
+            "active view hierarchy",
+            "render",
+            "user input",
+            "Commands expressing intent",
+            "business logic",
+            "next state / provider inputs"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ],
+            [
+              0,
+              -10.85
+            ],
+            [
+              0,
+              -12.4
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-003",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-4",
+      "original_notation": "provider publishes snapshot\n  -> runtime records binding invalidation\n  -> runtime assembles next BindingFrame\n  -> active view renders the next frame",
+      "original_sha256": "bb98a6cc70db5d0da9bf9da490167fea22c87225b51dc89ab08930d02903e799",
+      "graphs": [
+        {
+          "labels": [
+            "provider publishes snapshot",
+            "runtime records binding invalidation",
+            "runtime assembles next BindingFrame",
+            "active view renders the next frame"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-004",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-5",
+      "original_notation": "active -> suspended\nactive -> disposed\nsuspended -> active\nsuspended -> disposed\nactive -> active by invalidation only\nsuspended -> suspended by invalidation only",
+      "original_sha256": "33a88423727ffbde08e1cffcdcbd1fd83e4b1756b5fd8056747b72b9f6aa7fb2",
+      "graphs": [
+        {
+          "labels": [
+            "active",
+            "suspended",
+            "disposed"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              "by invalidation only"
+            ],
+            [
+              1,
+              1,
+              "by invalidation only"
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              6,
+              0
+            ],
+            [
+              3,
+              -4
+            ]
+          ],
+          "width": 36
+        }
+      ]
+    },
+    {
+      "id": "flow-005",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-6",
+      "original_notation": "provider publishes snapshot\n  -> runtime creates BindingInvalidation\n  -> runtime later assembles next BindingFrame",
+      "original_sha256": "a9cfd5730f2678556174c9f26b5afa150c6aabe8ff1ac33f35f65e34f39deada",
+      "graphs": [
+        {
+          "labels": [
+            "provider publishes snapshot",
+            "runtime creates BindingInvalidation",
+            "runtime later assembles next BindingFrame"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-006",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-7",
+      "original_notation": "provider publishes snapshot\n  -> binding lifecycle records receive invalidation facts\n  -> runtime assembles next immutable BindingFrame\n  -> views later render the new frame",
+      "original_sha256": "e5510aa05e985a4ba9d31a6dbfe5ba08ea4be3fba14a2e0ac2a889da0e8667a0",
+      "graphs": [
+        {
+          "labels": [
+            "provider publishes snapshot",
+            "binding lifecycle records receive invalidation facts",
+            "runtime assembles next immutable BindingFrame",
+            "views later render the new frame"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-007",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-8",
+      "original_notation": "view emits command intent\n  -> runtime maps intent to a command\n  -> command buffer records the command\n  -> business logic applies the command later",
+      "original_sha256": "819382562a67e48f434529fe223d394538fed818230cf1d323bd0bb83e2772d8",
+      "graphs": [
+        {
+          "labels": [
+            "view emits command intent",
+            "runtime maps intent to a command",
+            "command buffer records the command",
+            "business logic applies the command later"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-008",
+      "latex_path": "chapters/05-developer-experience-design-records/0132-dx-034-declarative-view-data-binding.tex",
+      "kind": "block-9",
+      "original_notation": "provider snapshot\n  -> schema adapter validates data\n  -> immutable binding frame\n  -> block render",
+      "original_sha256": "83716c840dcb2224115653b13ca6671cf9cc6d8ccfdc5103a4193da6f5152b5b",
+      "graphs": [
+        {
+          "labels": [
+            "provider snapshot",
+            "schema adapter validates data",
+            "immutable binding frame",
+            "block render"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-009",
+      "latex_path": "chapters/05-developer-experience-design-records/0138-dx-042-shared-ui-scene-ir-and-bijou-render-target.tex",
+      "kind": "block-10",
+      "original_notation": "GraphQL SDL / authored source\n  -> Wesley semantic graph and domain law\n    -> ui-scene-ir/1\n      -> bijou-layout/1\n        -> Bijou Surface\n          -> terminal cells\n\n      -> geordi-ir/1\n        -> Geordi renderer\n          -> pixels and render receipts",
+      "original_sha256": "1606b4eabf2f4a04e7565480d6e72cd1909a214cc3cbde988bfdfd1e9b11a1ca",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL / authored source",
+            "Wesley semantic graph and domain law",
+            "ui-scene-ir/1",
+            "bijou-layout/1",
+            "Bijou Surface",
+            "terminal cells",
+            "geordi-ir/1",
+            "Geordi renderer",
+            "pixels and render receipts"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              -1.6
+            ],
+            [
+              0,
+              -3.2
+            ],
+            [
+              -3,
+              -4.8
+            ],
+            [
+              -3,
+              -6.4
+            ],
+            [
+              -3,
+              -8
+            ],
+            [
+              3,
+              -4.8
+            ],
+            [
+              3,
+              -6.4
+            ],
+            [
+              3,
+              -8
+            ]
+          ],
+          "width": 45
+        }
+      ]
+    },
+    {
+      "id": "flow-010",
+      "latex_path": "chapters/05-developer-experience-design-records/0138-dx-042-shared-ui-scene-ir-and-bijou-render-target.tex",
+      "kind": "block-11",
+      "original_notation": "ui-scene-ir/1\n  -> bijou-layout/1\n    -> Surface\n      -> terminal",
+      "original_sha256": "7d0fa44f8c0a681416d8d7ff41897be7b9c1b73c1d185ea8b47aad7c530d0f62",
+      "graphs": [
+        {
+          "labels": [
+            "ui-scene-ir/1",
+            "bijou-layout/1",
+            "Surface",
+            "terminal"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-011",
+      "latex_path": "chapters/05-developer-experience-design-records/0138-dx-042-shared-ui-scene-ir-and-bijou-render-target.tex",
+      "kind": "block-12",
+      "original_notation": "ui-scene-ir/1\n  -> geordi-ir/1\n    -> browser/native renderer\n      -> pixel buffer\n      -> receipt",
+      "original_sha256": "cc762e5150db4bab700c602b31df76f77f6c64cce3049851710a5f7fd593bb71",
+      "graphs": [
+        {
+          "labels": [
+            "ui-scene-ir/1",
+            "geordi-ir/1",
+            "browser/native renderer",
+            "pixel buffer",
+            "receipt"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-012",
+      "latex_path": "chapters/05-developer-experience-design-records/0144-dx-048-v8-runtime-graph-scene-ir-contract.tex",
+      "kind": "block-13",
+      "original_notation": "graphql-source/1\n  -> bijou-block/1\n    -> ui-scene-ir/1\n      -> packed-bijou-cells/1\n        -> terminal-surface-proof/1",
+      "original_sha256": "35fa40e1d0e3a2937549d6b0f12b9675dd9a469717d1b0efaafa6af988336faa",
+      "graphs": [
+        {
+          "labels": [
+            "graphql-source/1",
+            "bijou-block/1",
+            "ui-scene-ir/1",
+            "packed-bijou-cells/1",
+            "terminal-surface-proof/1"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-013",
+      "latex_path": "chapters/05-developer-experience-design-records/0145-dx-049-visor-artifact-bundle-proof.tex",
+      "kind": "block-14",
+      "original_notation": "GraphQL fixture\n  -> visor-artifact-bundle/1.fixture\n  -> visor-artifact-bundle/1.artifacts.bijouBlock\n  -> visor-artifact-bundle/1.artifacts.uiScene\n  -> visor-artifact-bundle/1.artifacts.debugSummary\n  -> visor-artifact-bundle/1.visual\n  -> visor-artifact-bundle/1.replay\n  -> visor-artifact-bundle/1.hashes",
+      "original_sha256": "f78d593f1d8e308c9178f4b89acee47165d3613482ccd3b57bdab594557cbdea",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL fixture",
+            "visor-artifact-bundle/1.fixture",
+            "visor-artifact-bundle/1.artifacts.bijouBlock",
+            "visor-artifact-bundle/1.artifacts.uiScene",
+            "visor-artifact-bundle/1.artifacts.debugSummary",
+            "visor-artifact-bundle/1.visual",
+            "visor-artifact-bundle/1.replay",
+            "visor-artifact-bundle/1.hashes"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ],
+            [
+              0,
+              -10.85
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-014",
+      "latex_path": "chapters/05-developer-experience-design-records/0141-dx-045-graphql-block-groups-and-debug-facts.tex",
+      "kind": "block-15",
+      "original_notation": "GraphQL SDL\n  -> bijou-block/1\n    -> ui-scene-ir/1\n      -> terminal Surface proof",
+      "original_sha256": "70ec16a79fafe6f241bc7c8a0926c7a703ddc7b7f3a2db58760b8cc3b7a9aa2e",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL",
+            "bijou-block/1",
+            "ui-scene-ir/1",
+            "terminal Surface proof"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-015",
+      "latex_path": "chapters/05-developer-experience-design-records/0141-dx-045-graphql-block-groups-and-debug-facts.tex",
+      "kind": "block-16",
+      "original_notation": "GraphQL SDL fixture\n  -> bijou-block/1 artifact with groups[]\n    -> ui-scene-ir/1 group/text node tree\n      -> terminal Surface proof\n        -> debug summary facts\n          -> ui-scene-receipt/1",
+      "original_sha256": "a372d4d21903db4e0b761ec445b574944780f39368ce4d39cb2fbd8366f8d362",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL fixture",
+            "bijou-block/1 artifact with groups[]",
+            "ui-scene-ir/1 group/text node tree",
+            "terminal Surface proof",
+            "debug summary facts",
+            "ui-scene-receipt/1"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-016",
+      "latex_path": "chapters/05-developer-experience-design-records/0141-dx-045-graphql-block-groups-and-debug-facts.tex",
+      "kind": "block-17",
+      "original_notation": "SDL type directive / field directive\n  -> bijou-block/1 group / field\n    -> ui-scene-ir/1 group / text node\n      -> terminal cell source map\n        -> debug summary\n          -> receipt",
+      "original_sha256": "5caa27597e29d7d23701278597c0838a9cd53eae19c0f7b753093735ed027c9f",
+      "graphs": [
+        {
+          "labels": [
+            "SDL type directive / field directive",
+            "bijou-block/1 group / field",
+            "ui-scene-ir/1 group / text node",
+            "terminal cell source map",
+            "debug summary",
+            "receipt"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-017",
+      "latex_path": "chapters/05-developer-experience-design-records/0128-dx-031-standard-bijou-blocks.tex",
+      "kind": "block-21",
+      "original_notation": "GraphQL schema / operations\n  -> semantic model\n  -> TypeScript types\n  -> Zod or schema adapter\n  -> block metadata\n  -> schema-bound block package\n  -> stories, captures, docs, and tests",
+      "original_sha256": "1e54022afee6ec388c891671d435ec97b4dd83622eee90f051d33ee980e9d253",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL schema / operations",
+            "semantic model",
+            "TypeScript types",
+            "Zod or schema adapter",
+            "block metadata",
+            "schema-bound block package",
+            "stories, captures, docs, and tests"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-018",
+      "latex_path": "chapters/05-developer-experience-design-records/0140-dx-044-graphql-authored-bijou-block-ir-proof.tex",
+      "kind": "block-22",
+      "original_notation": "GraphQL SDL fixture\n  -> bijou-block/1 artifact\n    -> ui-scene-ir/1\n      -> Bijou terminal Surface proof\n        -> ui-scene-receipt/1",
+      "original_sha256": "35cc6c3b705deed932e5b78f1af8b2097fb82dcaa807494fe3b7f428f6191d35",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL fixture",
+            "bijou-block/1 artifact",
+            "ui-scene-ir/1",
+            "Bijou terminal Surface proof",
+            "ui-scene-receipt/1"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-019",
+      "latex_path": "chapters/05-developer-experience-design-records/0140-dx-044-graphql-authored-bijou-block-ir-proof.tex",
+      "kind": "block-23",
+      "original_notation": "SDL field -> bijou-block/1 field -> ui-scene-ir/1 node -> Surface cell -> receipt",
+      "original_sha256": "d1334b241b491d51a04ba9b2a775abe2b9df535ecddd4d44ff29c201f2478be9",
+      "graphs": [
+        {
+          "labels": [
+            "SDL field",
+            "bijou-block/1 field",
+            "ui-scene-ir/1 node",
+            "Surface cell",
+            "receipt"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-020",
+      "latex_path": "chapters/05-developer-experience-design-records/0140-dx-044-graphql-authored-bijou-block-ir-proof.tex",
+      "kind": "block-24",
+      "original_notation": "bijou-block/1\n  -> ui-scene-ir/1\n    -> Geordi endpoint profile\n      -> browser/image/packed-cell witness",
+      "original_sha256": "f45cb46d4a944773a145f0cc759a70d006f8088cbc1efcff01947eeb6711e75b",
+      "graphs": [
+        {
+          "labels": [
+            "bijou-block/1",
+            "ui-scene-ir/1",
+            "Geordi endpoint profile",
+            "browser/image/packed-cell witness"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-021",
+      "latex_path": "chapters/05-developer-experience-design-records/0142-dx-046-graphql-authored-dogfood-block-fixture.tex",
+      "kind": "block-25",
+      "original_notation": "NavigationListBlock GraphQL SDL fixture\n  -> bijou-block/1 grouped artifact\n    -> ui-scene-ir/1\n      -> terminal Surface proof\n        -> graphql-bijou-block-debug/1 facts\n          -> DOGFOOD product facts",
+      "original_sha256": "02b9f3508e46522cc43508855af4e5e542a95cdbb34662d4933a344fe919c63f",
+      "graphs": [
+        {
+          "labels": [
+            "NavigationListBlock GraphQL SDL fixture",
+            "bijou-block/1 grouped artifact",
+            "ui-scene-ir/1",
+            "terminal Surface proof",
+            "graphql-bijou-block-debug/1 facts",
+            "DOGFOOD product facts"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-022",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-26",
+      "original_notation": "Bijou Blocks + Components GraphQL\n  -> Wesley validation and generated DTOs\n    -> ui-scene-ir/1\n      -> Bijou terminal endpoint\n      -> Geordi browser/WebGL/WebGPU endpoint\n      -> Geordi image or video witness endpoint\n      -> Geordi packed Bijou cell endpoint\n      -> future engine endpoints such as GeordiUnityGameEngine",
+      "original_sha256": "e5ca7bfa057e9c25dab0ccf840adc7b379ffeea4f4207ffd29eefe47df7bafe0",
+      "graphs": [
+        {
+          "labels": [
+            "Bijou Blocks + Components GraphQL",
+            "Wesley validation and generated DTOs",
+            "ui-scene-ir/1",
+            "Bijou terminal endpoint",
+            "Geordi browser/WebGL/WebGPU endpoint",
+            "Geordi image or video witness endpoint",
+            "Geordi packed Bijou cell endpoint",
+            "future engine endpoints such as GeordiUnityGameEngine"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              4,
+              -3.1
+            ],
+            [
+              4,
+              -4.9
+            ],
+            [
+              4,
+              -6.7
+            ],
+            [
+              4,
+              -8.5
+            ],
+            [
+              4,
+              -10.3
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-023",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-27",
+      "original_notation": "Figma or other external design source\n  -> Geordi IR or compatible scene IR\n    -> BijouPackedCellRenderer\n      -> PackedBijouCells\n        -> Bijou Surface\n          -> terminal cells",
+      "original_sha256": "8e0b8817d58e0e7da5ed367d5079fb09b42655bb791d46f7670259f194654cec",
+      "graphs": [
+        {
+          "labels": [
+            "Figma or other external design source",
+            "Geordi IR or compatible scene IR",
+            "BijouPackedCellRenderer",
+            "PackedBijouCells",
+            "Bijou Surface",
+            "terminal cells"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-024",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-28",
+      "original_notation": "Bijou Blocks -> IR -> GeordiWebGL\nBijou Blocks -> IR -> GeordiWebGPU\nBijou Blocks -> IR -> GeordiImage\nBijou Blocks -> IR -> GeordiUnityGameEngine",
+      "original_sha256": "a99aadba5797e494517550fed3c5578c171a35bbaa920a1a085a2dddf5e07e14",
+      "graphs": [
+        {
+          "labels": [
+            "Bijou Blocks",
+            "IR",
+            "GeordiWebGL",
+            "GeordiWebGPU",
+            "GeordiImage",
+            "GeordiUnityGameEngine"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              4,
+              -1.55
+            ],
+            [
+              4,
+              -3.35
+            ],
+            [
+              4,
+              -5.15
+            ],
+            [
+              4,
+              -6.95
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-025",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-29",
+      "original_notation": "Figma -> Geordi IR -> BijouPackedCellRenderer -> terminal",
+      "original_sha256": "187d1a9850c38c75eef1f8c006ef7b368419406b145a8c80d5ec5716f9131741",
+      "graphs": [
+        {
+          "labels": [
+            "Figma",
+            "Geordi IR",
+            "BijouPackedCellRenderer",
+            "terminal"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-026",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-30",
+      "original_notation": "ui-scene-ir/1\n  -> bijou-layout/1\n    -> Surface\n      -> terminal cells",
+      "original_sha256": "a84254b09177258c928c120b56db36fedce004d11397f13f03297204e912c09a",
+      "graphs": [
+        {
+          "labels": [
+            "ui-scene-ir/1",
+            "bijou-layout/1",
+            "Surface",
+            "terminal cells"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-027",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-31",
+      "original_notation": "ui-scene-ir/1 or geordi endpoint IR\n  -> Geordi packed-cell renderer\n    -> PackedBijouCells\n      -> Bijou Surface adapter\n        -> terminal cells",
+      "original_sha256": "73af6d7e2ab227695741357f6b3eaa52fd0dbfeb88c6efaefade0b0ef9a92761",
+      "graphs": [
+        {
+          "labels": [
+            "ui-scene-ir/1 or geordi endpoint IR",
+            "Geordi packed-cell renderer",
+            "PackedBijouCells",
+            "Bijou Surface adapter",
+            "terminal cells"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-028",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-32",
+      "original_notation": "Dogfood source\n  -> Dogfood IR\n    -> Dogfood in the terminal\n    -> Dogfood in the browser\n    -> structural receipts proving semantic parity",
+      "original_sha256": "b0ef693b5fbe8228572816d94dd6a570a271378eea6d2d1f243cdfd3c03682f5",
+      "graphs": [
+        {
+          "labels": [
+            "Dogfood source",
+            "Dogfood IR",
+            "Dogfood in the terminal",
+            "Dogfood in the browser",
+            "structural receipts proving semantic parity"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              4,
+              -1.55
+            ],
+            [
+              4,
+              -3.35
+            ],
+            [
+              4,
+              -5.15
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-029",
+      "latex_path": "chapters/05-developer-experience-design-records/0139-dx-043-portable-bijou-blocks-and-multi-endpoint-ir.tex",
+      "kind": "block-33",
+      "original_notation": "one Dogfood nav or content pane\n  -> portable source fixture\n    -> ui-scene-ir/1\n      -> Bijou Surface\n      -> browser/Geordi endpoint receipt\n      -> structural parity receipt",
+      "original_sha256": "5a6da9721011eae99e83749643e078970cc0f97a64952a5c2c6c406ffe4fa29c",
+      "graphs": [
+        {
+          "labels": [
+            "one Dogfood nav or content pane",
+            "portable source fixture",
+            "ui-scene-ir/1",
+            "Bijou Surface",
+            "browser/Geordi endpoint receipt",
+            "structural parity receipt"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              4,
+              -3.1
+            ],
+            [
+              4,
+              -4.9
+            ],
+            [
+              4,
+              -6.7
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-030",
+      "latex_path": "chapters/09-workflow-design-records/0248-wf-166-v8-dependency-security-closeout.tex",
+      "kind": "block-34",
+      "original_notation": "@flyingrobots/bijou-mcp\n  -> @modelcontextprotocol/sdk@1.30.0\n    -> @hono/node-server@2.0.12 -> hono@4.13.2\n    -> ajv@8.18.0 -> fast-uri@3.1.5\n    -> express-rate-limit@8.5.2 -> ip-address@10.5.0\n    -> express@5.2.1 -> body-parser@2.3.0\n    -> hono@4.13.2\neslint@10.5.0 -> minimatch@10.2.5 -> brace-expansion@5.0.9\nvitest@4.1.8 -> vite@8.0.16 -> postcss@8.5.25 -> nanoid@3.3.18",
+      "original_sha256": "d1ff60154e2e11b7483412250251455b3dbb66241600a902bfd8fa36754bf914",
+      "graphs": [
+        {
+          "labels": [
+            "@flyingrobots/bijou-mcp",
+            "@modelcontextprotocol/sdk@1.30.0",
+            "@hono/node-server@2.0.12",
+            "ajv@8.18.0",
+            "express-rate-limit@8.5.2",
+            "express@5.2.1",
+            "hono@4.13.2",
+            "hono@4.13.2",
+            "fast-uri@3.1.5",
+            "ip-address@10.5.0",
+            "body-parser@2.3.0"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              9
+            ],
+            [
+              5,
+              10
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              4,
+              -1.55
+            ],
+            [
+              4,
+              -3.35
+            ],
+            [
+              4,
+              -5.15
+            ],
+            [
+              4,
+              -6.95
+            ],
+            [
+              4,
+              -8.75
+            ],
+            [
+              10,
+              -1.55
+            ],
+            [
+              10,
+              -3.35
+            ],
+            [
+              10,
+              -5.15
+            ],
+            [
+              10,
+              -6.95
+            ]
+          ],
+          "width": 47
+        },
+        {
+          "labels": [
+            "eslint@10.5.0",
+            "minimatch@10.2.5",
+            "brace-expansion@5.0.9"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        },
+        {
+          "labels": [
+            "vitest@4.1.8",
+            "vite@8.0.16",
+            "postcss@8.5.25",
+            "nanoid@3.3.18"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-031",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0372-re-021-frame-owns-the-pump.tex",
+      "kind": "block-35",
+      "original_notation": "runtime (owns loop, surfaces, differ, IO)\n  → App.update(msg, model)    ← frame returns [model, cmds]\n  → App.view(model)           ← frame returns Surface\n  → renderDiff(current, target, io, style)",
+      "original_sha256": "041faf393a4630c57bd28521f146b132b034f2440913e8613b592382a150bb1c",
+      "graphs": [
+        {
+          "labels": [
+            "Runtime: owns loop, surfaces, differ, IO",
+            "App / frame"
+          ],
+          "edges": [],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "width": 48,
+          "sequence": [
+            [
+              "App.update(msg, model)",
+              "frame returns [model, cmds]"
+            ],
+            [
+              "App.view(model)",
+              "frame returns Surface"
+            ],
+            [
+              "renderDiff(current, target, io, style)",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flow-032",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0372-re-021-frame-owns-the-pump.tex",
+      "kind": "block-36",
+      "original_notation": "FramedApp (owns loop, timing, perf stats, frame budget)\n  → acquires input from IO\n  → page.update(msg, model)\n  → measures view() wall time\n  → renderDiff with timing\n  → perf overlay reads its own bookkeeping\n  → frame budget: skip non-essential overlays if overrunning",
+      "original_sha256": "99f6bfa545e69f0804e193d1011052c5f8316da5f327ab73b23f7ba3d2308b36",
+      "graphs": [
+        {
+          "labels": [
+            "FramedApp (owns loop, timing, perf stats, frame budget)",
+            "acquires input from IO",
+            "page.update(msg, model)",
+            "measures view() wall time",
+            "renderDiff with timing",
+            "perf overlay reads its own bookkeeping",
+            "frame budget: skip non-essential overlays if overrunning"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-033",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0373-re-021-frame-owns-the-pump.tex",
+      "kind": "block-38",
+      "original_notation": "runtime (owns loop, surfaces, differ, IO)\n  → App.update(msg, model)    ← frame returns [model, cmds]\n  → App.view(model)           ← frame returns Surface\n  → renderDiff(current, target, io, style)",
+      "original_sha256": "041faf393a4630c57bd28521f146b132b034f2440913e8613b592382a150bb1c",
+      "graphs": [
+        {
+          "labels": [
+            "Runtime: owns loop, surfaces, differ, IO",
+            "App / frame"
+          ],
+          "edges": [],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "width": 48,
+          "sequence": [
+            [
+              "App.update(msg, model)",
+              "frame returns [model, cmds]"
+            ],
+            [
+              "App.view(model)",
+              "frame returns Surface"
+            ],
+            [
+              "renderDiff(current, target, io, style)",
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flow-034",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0373-re-021-frame-owns-the-pump.tex",
+      "kind": "block-39",
+      "original_notation": "FramedApp (owns loop, timing, perf stats, frame budget)\n  → acquires input from IO\n  → page.update(msg, model)\n  → measures view() wall time\n  → renderDiff with timing\n  → perf overlay reads its own bookkeeping\n  → frame budget: skip non-essential overlays if overrunning",
+      "original_sha256": "99f6bfa545e69f0804e193d1011052c5f8316da5f327ab73b23f7ba3d2308b36",
+      "graphs": [
+        {
+          "labels": [
+            "FramedApp (owns loop, timing, perf stats, frame budget)",
+            "acquires input from IO",
+            "page.update(msg, model)",
+            "measures view() wall time",
+            "renderDiff with timing",
+            "perf overlay reads its own bookkeeping",
+            "frame budget: skip non-essential overlays if overrunning"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-035",
+      "latex_path": "chapters/02-design-system-and-reference/0027-theme-rule-recipes.tex",
+      "kind": "block-44",
+      "original_notation": "primitive colors\n  -> selector rules\n    -> TokenGraph\n      -> ThemeAccessors\n        -> terminal rendering",
+      "original_sha256": "c822cbd5b682647531182b73566f4e387aefce723fe36dd8d566f6068eef9a48",
+      "graphs": [
+        {
+          "labels": [
+            "primitive colors",
+            "selector rules",
+            "TokenGraph",
+            "ThemeAccessors",
+            "terminal rendering"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-036",
+      "latex_path": "chapters/04-dogfood-design-records/0118-df-078-dogfood-release-story-surfaces.tex",
+      "kind": "block-45",
+      "original_notation": "GraphQL SDL fixture\n  -> bijou-block/1 artifact\n    -> ui-scene-ir/1 scene\n      -> terminal Surface proof\n        -> graphql-bijou-block-debug/1 facts",
+      "original_sha256": "6e3aaab488608495ed5d8e7afcb8d27d555e947e56d1a2c808c5ddd19ffd2591",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL fixture",
+            "bijou-block/1 artifact",
+            "ui-scene-ir/1 scene",
+            "terminal Surface proof",
+            "graphql-bijou-block-debug/1 facts"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-037",
+      "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
+      "kind": "block-46",
+      "original_notation": "Fluid Title Scene Spec\n  -> deterministic field state\n    -> Bijou CPU glyph renderer\n      -> Bijou Surface\n        -> terminal\n\nFluid Title Scene Spec\n  -> Geordi fluid/shader endpoint\n    -> PackedBijouCells or image witness\n      -> Bijou Surface or browser/image output",
+      "original_sha256": "f55e0a5afd2e6159d17ca3175b0903ed5ff6a708575a43e51f0c38aa03da9b1b",
+      "graphs": [
+        {
+          "labels": [
+            "Fluid Title Scene Spec",
+            "deterministic field state",
+            "Bijou CPU glyph renderer",
+            "Bijou Surface",
+            "terminal",
+            "Geordi fluid/shader endpoint",
+            "PackedBijouCells or image witness",
+            "Bijou Surface or browser/image output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              0,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -1.7
+            ],
+            [
+              -3,
+              -3.4
+            ],
+            [
+              -3,
+              -5.1
+            ],
+            [
+              -3,
+              -6.8
+            ],
+            [
+              3,
+              -1.7
+            ],
+            [
+              3,
+              -3.4
+            ],
+            [
+              3,
+              -5.1
+            ]
+          ],
+          "width": 45
+        }
+      ]
+    },
+    {
+      "id": "flow-038",
+      "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
+      "kind": "block-47",
+      "original_notation": "FluidTitleSceneSpec + frame index\n  -> FluidTitleFrame\n    -> Surface\n    -> FluidTitleReceipt",
+      "original_sha256": "8d97f810ca00a61b39c6de1bb0e19148b0bd5a9080a23cc5cbad0c5a1e864d9a",
+      "graphs": [
+        {
+          "labels": [
+            "FluidTitleSceneSpec + frame index",
+            "FluidTitleFrame",
+            "Surface",
+            "FluidTitleReceipt"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              4,
+              -1.55
+            ],
+            [
+              4,
+              -3.35
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-039",
+      "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
+      "kind": "block-48",
+      "original_notation": "FluidTitleSceneSpec\n  -> Geordi fluid/shader endpoint\n    -> rgba image target\n    -> PackedBijouCells target\n    -> frame witness",
+      "original_sha256": "44935494e11443814a50e1588fc4c37db177a708d1253aa491cbb729e78e9c74",
+      "graphs": [
+        {
+          "labels": [
+            "FluidTitleSceneSpec",
+            "Geordi fluid/shader endpoint",
+            "rgba image target",
+            "PackedBijouCells target",
+            "frame witness"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              4,
+              -1.55
+            ],
+            [
+              4,
+              -3.35
+            ],
+            [
+              4,
+              -5.15
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-040",
+      "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
+      "kind": "block-49",
+      "original_notation": "seeded density wave\n  -> glyph ramp\n    -> token colors\n      -> Surface",
+      "original_sha256": "6a04b341c9b80bf612a2f0a0f0ea2b6e00f4d97315fb6032d7dcf53a1b4e420c",
+      "graphs": [
+        {
+          "labels": [
+            "seeded density wave",
+            "glyph ramp",
+            "token colors",
+            "Surface"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-041",
+      "latex_path": "chapters/04-dogfood-design-records/0114-df-074-fluid-triangle-title-screen.tex",
+      "kind": "block-50",
+      "original_notation": "density -> glyph\ndensity -> token/color",
+      "original_sha256": "b27a6b9252a664cb3234cba55f3bbf9c0d97dbf6e4d329875e1919f749d2b438",
+      "graphs": [
+        {
+          "labels": [
+            "density",
+            "glyph",
+            "token/color"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              4,
+              0.0
+            ],
+            [
+              4,
+              -1.8
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-042",
+      "latex_path": "chapters/04-dogfood-design-records/0109-df-069-block-authored-dogfood.tex",
+      "kind": "block-51",
+      "original_notation": "DOGFOOD app\n  -> AppFrame / AppShell composition\n    -> page and region Blocks\n      -> components\n        -> surfaces",
+      "original_sha256": "de9007abf7aa57e172d1ae3810e40ffa7958886d3275714f86ec911a3bdaaf56",
+      "graphs": [
+        {
+          "labels": [
+            "DOGFOOD app",
+            "AppFrame / AppShell composition",
+            "page and region Blocks",
+            "components",
+            "surfaces"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-043",
+      "latex_path": "chapters/04-dogfood-design-records/0109-df-069-block-authored-dogfood.tex",
+      "kind": "block-52",
+      "original_notation": "business logic / providers\n  -> immutable snapshots\n  -> binding frames\n  -> blocks and views render\n  -> command intents\n  -> business logic owns the next state",
+      "original_sha256": "572de34d34b42eb608f3716cdf6f8a5fc899f040f8b5a6427171bc58c51089c5",
+      "graphs": [
+        {
+          "labels": [
+            "business logic / providers",
+            "immutable snapshots",
+            "binding frames",
+            "blocks and views render",
+            "command intents",
+            "business logic owns the next state"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-044",
+      "latex_path": "chapters/04-dogfood-design-records/0113-df-073-raster-to-glyph-title-art.tex",
+      "kind": "block-53",
+      "original_notation": "RgbaFrame\n  -> fit source pixels into target cell grid\n  -> sample brightness/alpha/color per cell or sub-cell\n  -> choose renderer:\n       charset: density ramp from custom characters\n       braille: 2x4 dot mask\n       quad:    2x2 quadrant mask\n  -> emit Bijou Surface",
+      "original_sha256": "d30e763f7ff342cbf3c8c2044a83c09aa0e925c71e542664aa5260f2165cc0e5",
+      "graphs": [
+        {
+          "labels": [
+            "RgbaFrame",
+            "fit source pixels into target cell grid",
+            "sample brightness/alpha/color per cell or sub-cell",
+            "choose renderer",
+            "charset: density ramp from custom characters",
+            "braille: 2x4 dot mask",
+            "quad: 2x2 quadrant mask",
+            "emit Bijou Surface"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              -1.8
+            ],
+            [
+              0,
+              -3.6
+            ],
+            [
+              0,
+              -5.4
+            ],
+            [
+              -5,
+              -7.5
+            ],
+            [
+              0,
+              -7.5
+            ],
+            [
+              5,
+              -7.5
+            ],
+            [
+              0,
+              -9.8
+            ]
+          ],
+          "width": 39
+        }
+      ]
+    },
+    {
+      "id": "flow-045",
+      "latex_path": "chapters/07-design-language-design-records/0185-dl-020-dogfood-rule-authored-first-party-themes.tex",
+      "kind": "block-54",
+      "original_notation": "rule-authored preset definitions\n  -> TokenGraph\n    -> concrete Theme\n      -> ResolvedTheme\n        -> terminal rendering, DTCG interop, and inspectors",
+      "original_sha256": "cffb8624167bfc32a4bcb6e72b17254fece45d8f05ab53b487e79912f1cafada",
+      "graphs": [
+        {
+          "labels": [
+            "rule-authored preset definitions",
+            "TokenGraph",
+            "concrete Theme",
+            "ResolvedTheme",
+            "terminal rendering, DTCG interop, and inspectors"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-046",
+      "latex_path": "chapters/07-design-language-design-records/0187-dl-022-theme-lab-editor-graph-ux.tex",
+      "kind": "block-55",
+      "original_notation": "active DOGFOOD shell theme\n  -> editable DOGFOOD-local draft\n    -> selected editable color slot\n      -> derived theme token rows\n        -> live token relationship graph",
+      "original_sha256": "97ce64eb6e8385ba95f55ceaa6205848af890ff4308028876f2a6f3af6c60135",
+      "graphs": [
+        {
+          "labels": [
+            "active DOGFOOD shell theme",
+            "editable DOGFOOD-local draft",
+            "selected editable color slot",
+            "derived theme token rows",
+            "live token relationship graph"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-047",
+      "latex_path": "chapters/07-design-language-design-records/0187-dl-022-theme-lab-editor-graph-ux.tex",
+      "kind": "block-56",
+      "original_notation": "semantic.accent #7aa7e8 *\n  -> border.secondary\n  -> ui.cursor\n  -> ui.focusGutter\nsurface.primary.bg #171827\n  -> surface.primary\n  -> ui.focusGutter.bg",
+      "original_sha256": "d02e8c498082d8559428aec535c18085025057f908750917710c5cc0b6b623bd",
+      "graphs": [
+        {
+          "labels": [
+            "semantic.accent #7aa7e8 *",
+            "border.secondary",
+            "ui.cursor",
+            "ui.focusGutter",
+            "surface.primary.bg #171827",
+            "surface.primary",
+            "ui.focusGutter.bg"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              -1.6
+            ],
+            [
+              3,
+              -3.2
+            ],
+            [
+              -3,
+              -5
+            ],
+            [
+              3,
+              -5
+            ],
+            [
+              3,
+              -6.6
+            ]
+          ],
+          "width": 48
+        }
+      ]
+    },
+    {
+      "id": "flow-048",
+      "latex_path": "chapters/07-design-language-design-records/0186-dl-021-dogfood-theme-token-usage-proof.tex",
+      "kind": "block-57",
+      "original_notation": "active docs shell theme\n  -> docs visual theme\n    -> docs chrome tokens\n      -> terminal cells and Theme Inspector usage proof",
+      "original_sha256": "5843661fdeafdca93860baa939cdadf51c25415af77bde0f0531d2b7a9ceef80",
+      "graphs": [
+        {
+          "labels": [
+            "active docs shell theme",
+            "docs visual theme",
+            "docs chrome tokens",
+            "terminal cells and Theme Inspector usage proof"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-049",
+      "latex_path": "chapters/07-design-language-design-records/0181-dl-016-mode-aware-runtime-theme-adapter.tex",
+      "kind": "block-58",
+      "original_notation": "FrameShellThemeFamily\n  id: \"dogfood\"\n  modes:\n    dark  -> Theme(\"dogfood-dark\")\n    light -> Theme(\"dogfood-light\")",
+      "original_sha256": "5c7b524a6c9ac133c4fdf8898917492cb6770fc08c5bd1f284a6f4e9fc2e74f4",
+      "graphs": [
+        {
+          "labels": [
+            "FrameShellThemeFamily, id: \"dogfood\"",
+            "dark: Theme(\"dogfood-dark\")",
+            "light: Theme(\"dogfood-light\")"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              4,
+              0.0
+            ],
+            [
+              4,
+              -1.8
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-050",
+      "latex_path": "chapters/07-design-language-design-records/0181-dl-016-mode-aware-runtime-theme-adapter.tex",
+      "kind": "block-59",
+      "original_notation": "DOGFOOD / Dark -> DOGFOOD / Light -> Cabinet of Curiosities -> ...",
+      "original_sha256": "4a562518de5fefc35f4ac0b614ef70d1dc0a4a2df2478a220c5e397112bcb1b2",
+      "graphs": [
+        {
+          "labels": [
+            "DOGFOOD / Dark",
+            "DOGFOOD / Light",
+            "Cabinet of Curiosities",
+            "..."
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-051",
+      "latex_path": "chapters/07-design-language-design-records/0184-dl-019-theme-rule-selection-and-inspection.tex",
+      "kind": "block-60",
+      "original_notation": "Theme\n  -> ResolvedTheme\n    -> TokenGraph\n      -> ThemeAccessors\n        -> terminal cells, lower modes, and DTCG interop",
+      "original_sha256": "b46b78103e5e0f14ea072d1c38570085d0a18e22962ab38191fa170003bf0819",
+      "graphs": [
+        {
+          "labels": [
+            "Theme",
+            "ResolvedTheme",
+            "TokenGraph",
+            "ThemeAccessors",
+            "terminal cells, lower modes, and DTCG interop"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-052",
+      "latex_path": "chapters/07-design-language-design-records/0178-dl-013-design-token-theme-builder-api.tex",
+      "kind": "block-63",
+      "original_notation": "+------------------+\n              | Theme            |\n              | id, label        |\n              +--------+---------+\n                       |\n              owns mode maps\n                       |\n          +------------+------------+\n          |                         |\n+---------v---------+     +---------v---------+\n| Mode: dark        |     | Mode: light       |\n| token -> color    |     | token -> color    |\n+---------+---------+     +---------+---------+\n          |                         |\n          +------------+------------+\n                       |\n                 resolves refs\n                       |\n              +--------v---------+\n              | Style            |\n              | fg: tokenRef(...)|\n              | bg: tokenRef(...)|\n              | layout rules     |\n              +--------+---------+\n                       |\n                 render context\n                       |\n              +--------v---------+\n              | Surface cells    |\n              | concrete colors  |\n              +------------------+",
+      "original_sha256": "d8497e90814b825a1169847f102f53e36d48ba27bb3ba84bd3f2bd57441707f9",
+      "graphs": [
+        {
+          "labels": [
+            "Theme: id, label",
+            "Mode: dark / token to color",
+            "Mode: light / token to color",
+            "Style: fg tokenRef(...), bg tokenRef(...), layout rules",
+            "Surface cells: concrete colors"
+          ],
+          "edges": [
+            [
+              0,
+              1,
+              "owns mode maps"
+            ],
+            [
+              0,
+              2,
+              "owns mode maps"
+            ],
+            [
+              1,
+              3,
+              "resolves refs"
+            ],
+            [
+              2,
+              3,
+              "resolves refs"
+            ],
+            [
+              3,
+              4,
+              "render context"
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -2.5
+            ],
+            [
+              3,
+              -2.5
+            ],
+            [
+              0,
+              -5
+            ],
+            [
+              0,
+              -7.5
+            ]
+          ],
+          "width": 49
+        }
+      ]
+    },
+    {
+      "id": "flow-053",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "block-67",
+      "original_notation": "DagSource          dagSlice()              dag()\n(your graph,  →  (BFS bounded walk,  →  (Sugiyama on the\n unbounded)       ghost boundaries)       bounded result)",
+      "original_sha256": "6ddc970d5dc95c507898adb27030e6da605b44e12c8e61dda8d104bf4ef427bf",
+      "graphs": [
+        {
+          "labels": [
+            "DagSource: your graph, unbounded",
+            "dagSlice(): BFS bounded walk, ghost boundaries",
+            "dag(): Sugiyama on the bounded result"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-054",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "block-71",
+      "original_notation": "Theme bridge -> Static renderers, TEA app shell\nStatic renderers -> RoadmapView, LineageView\nTEA app shell -> RoadmapView, LineageView, Input system, graph.watch()\nRoadmapView -> Cleanup\nLineageView -> Cleanup\nInput system -> Cleanup\ngraph.watch() -> Cleanup",
+      "original_sha256": "ba213f1c6e500a04de9b70f121a5c66e2ee3a719b7f066d3de30e62efced655c",
+      "graphs": [
+        {
+          "labels": [
+            "Theme bridge",
+            "Static renderers",
+            "TEA app shell",
+            "RoadmapView",
+            "LineageView",
+            "Input system",
+            "graph.watch()",
+            "Cleanup"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -2
+            ],
+            [
+              3,
+              -2
+            ],
+            [
+              -5,
+              -5
+            ],
+            [
+              -1.7,
+              -5
+            ],
+            [
+              1.7,
+              -5
+            ],
+            [
+              5,
+              -5
+            ],
+            [
+              0,
+              -8
+            ]
+          ],
+          "width": 28
+        }
+      ]
+    },
+    {
+      "id": "flow-055",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "block-72",
+      "original_notation": "Graph: 8 nodes, 10 edges\n\nLayer 1:\n  Theme bridge (2h) -> Static renderers, TEA app shell\n\nLayer 2:\n  Static renderers -> RoadmapView, LineageView\n  TEA app shell -> RoadmapView, LineageView, Input system, graph.watch()\n\nLayer 3:\n  RoadmapView -> Cleanup\n  LineageView -> Cleanup\n  Input system -> Cleanup\n  graph.watch() -> Cleanup\n\nLayer 4:\n  Cleanup (end)",
+      "original_sha256": "ff0ae07079de959d140b36fc97c4a461ebc759e867b4122058af03e3560b4b3a",
+      "graphs": [
+        {
+          "labels": [
+            "Layer 1: Theme bridge (2h)",
+            "Layer 2: Static renderers",
+            "Layer 2: TEA app shell",
+            "RoadmapView",
+            "LineageView",
+            "Input system",
+            "graph.watch()",
+            "Layer 4: Cleanup (end)"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -2
+            ],
+            [
+              3,
+              -2
+            ],
+            [
+              -5,
+              -5
+            ],
+            [
+              -1.7,
+              -5
+            ],
+            [
+              1.7,
+              -5
+            ],
+            [
+              5,
+              -5
+            ],
+            [
+              0,
+              -8
+            ]
+          ],
+          "width": 28
+        }
+      ]
+    },
+    {
+      "id": "flow-056",
+      "latex_path": "chapters/08-localization-design-records/0195-lx-019-localization-port-contract.tex",
+      "kind": "block-76",
+      "original_notation": "CSV source string table\n  -> generated per-locale JSON catalogs\n  -> selected-locale catalog loader adapter\n  -> I18nRuntime\n  -> LocalizationPort\n  -> LocalizedObject\n  -> DOGFOOD / Blocks / shell surfaces",
+      "original_sha256": "f20b8b1238cc35ae84a11d73c560124e96d816d1e1be1e1e7a1e2f7b83253f43",
+      "graphs": [
+        {
+          "labels": [
+            "CSV source string table",
+            "generated per-locale JSON catalogs",
+            "selected-locale catalog loader adapter",
+            "I18nRuntime",
+            "LocalizationPort",
+            "LocalizedObject",
+            "DOGFOOD / Blocks / shell surfaces"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-057",
+      "latex_path": "chapters/08-localization-design-records/0195-lx-019-localization-port-contract.tex",
+      "kind": "block-77",
+      "original_notation": "production:\n  selected locale value\n  -> English fallback catalog\n\nnon-production:\n  selected locale value\n  -> loud missing-localization object\n  -> English fallback only when missing markers are disabled",
+      "original_sha256": "9b8796f54cf63ec488bd28d077b8650ada95f55b1cc57f3505d32f58ea222d74",
+      "graphs": [
+        {
+          "labels": [
+            "production",
+            "selected locale value",
+            "English fallback catalog",
+            "non-production",
+            "selected locale value",
+            "loud missing-localization object",
+            "English fallback only when missing markers are disabled"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              -3,
+              -1.8
+            ],
+            [
+              -3,
+              -3.6
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              -1.8
+            ],
+            [
+              3,
+              -3.6
+            ],
+            [
+              3,
+              -5.4
+            ]
+          ],
+          "width": 48
+        }
+      ]
+    },
+    {
+      "id": "flow-058",
+      "latex_path": "chapters/01-user-and-developer-guides/0015-terminal-scenarios.tex",
+      "kind": "block-81",
+      "original_notation": "business logic/providers\n  -> immutable snapshots\n  -> render frame\n  -> views/blocks render\n  -> command intents leave as user intent\n  -> business logic owns change",
+      "original_sha256": "d6a448e0308ba1d6cb0f25a1343d8c01f08e47b9ffe2fc8abd61ee56f978a0dd",
+      "graphs": [
+        {
+          "labels": [
+            "business logic/providers",
+            "immutable snapshots",
+            "render frame",
+            "views/blocks render",
+            "command intents leave as user intent",
+            "business logic owns change"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-059",
+      "latex_path": "chapters/11-release-history-and-migration/0263-readme.tex",
+      "kind": "block-86",
+      "original_notation": "docs/releases/next/\n  -> docs/releases/X.Y.Z/",
+      "original_sha256": "2289c99d90017ccfb765836d156cca3cfc3157aff9ec2a11f91a3513b1a282bc",
+      "graphs": [
+        {
+          "labels": [
+            "docs/releases/next/",
+            "docs/releases/X.Y.Z/"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-060",
+      "latex_path": "chapters/11-release-history-and-migration/0283-whats-new.tex",
+      "kind": "block-87",
+      "original_notation": "GraphQL Blocks -> Bijou Blocks IR -> Geordi render targets -> TUI | Browser | Native UI",
+      "original_sha256": "d7fd9dcd45c75743897db6472a06d659470cd6bfd42d49dda27b4ed554266e9e",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL Blocks",
+            "Bijou Blocks IR",
+            "Geordi render targets",
+            "TUI",
+            "Browser",
+            "Native UI"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              4,
+              -3.1
+            ],
+            [
+              4,
+              -4.9
+            ],
+            [
+              4,
+              -6.7
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-061",
+      "latex_path": "chapters/11-release-history-and-migration/0273-migration-guide.tex",
+      "kind": "block-88",
+      "original_notation": "BIJOU_ACCESSIBLE=1  -> 'accessible'\nTERM=dumb           -> 'pipe'\n!stdout.isTTY       -> 'pipe'\nCI                  -> 'static'\nstdout.isTTY        -> 'interactive'",
+      "original_sha256": "142ec08aa193ccaf799b4e95e1b58cc0368ab4b69c6fef5b32890cec1bd20978",
+      "graphs": [
+        {
+          "labels": [
+            "BIJOU_ACCESSIBLE=1",
+            "'accessible'",
+            "TERM=dumb",
+            "'pipe'",
+            "!stdout.isTTY",
+            "'pipe'",
+            "CI",
+            "'static'",
+            "stdout.isTTY",
+            "'interactive'"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              8,
+              9
+            ]
+          ],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              -3,
+              -2
+            ],
+            [
+              3,
+              -2
+            ],
+            [
+              -3,
+              -4
+            ],
+            [
+              3,
+              -4
+            ],
+            [
+              -3,
+              -6
+            ],
+            [
+              3,
+              -6
+            ],
+            [
+              -3,
+              -8
+            ],
+            [
+              3,
+              -8
+            ]
+          ],
+          "width": 48
+        }
+      ]
+    },
+    {
+      "id": "flow-062",
+      "latex_path": "chapters/11-release-history-and-migration/0282-whats-new.tex",
+      "kind": "block-90",
+      "original_notation": "GraphQL SDL\n  -> bijou-block/1\n    -> ui-scene-ir/1\n      -> terminal Surface proof\n      -> graphql-bijou-block-debug/1 facts",
+      "original_sha256": "c9984d342f4d7798cdd62b06b1c6b39c747db939c8e5dab65f2d5b7dccc4da8f",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL",
+            "bijou-block/1",
+            "ui-scene-ir/1",
+            "terminal Surface proof",
+            "graphql-bijou-block-debug/1 facts"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              4,
+              -3.1
+            ],
+            [
+              4,
+              -4.9
+            ]
+          ],
+          "width": 58
+        }
+      ]
+    },
+    {
+      "id": "flow-063",
+      "latex_path": "chapters/01-user-and-developer-guides/0003-architecture.tex",
+      "kind": "inline-code",
+      "original_notation": "data -> core component -> mode-aware render -> string/surface result -> stdout",
+      "original_sha256": "43eb64a8732e9dbe1950711b45cd9a27e1077e1ad1dcffba9499056a746c5c4a",
+      "graphs": [
+        {
+          "labels": [
+            "data",
+            "core component",
+            "mode-aware render",
+            "string/surface result",
+            "stdout"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-064",
+      "latex_path": "chapters/01-user-and-developer-guides/0003-architecture.tex",
+      "kind": "inline-code",
+      "original_notation": "input -> TEA update -> view() -> Surface | LayoutNode -> localize root -> paint -> Diff -> terminal",
+      "original_sha256": "09427d2f68f1b88659cdac0fc417d73f00b4681f11d4e47c9ec06f5a8b141648",
+      "graphs": [
+        {
+          "labels": [
+            "input",
+            "TEA update",
+            "view()",
+            "Surface | LayoutNode",
+            "localize root",
+            "paint",
+            "Diff",
+            "terminal"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ],
+            [
+              0,
+              -7.75
+            ],
+            [
+              0,
+              -9.3
+            ],
+            [
+              0,
+              -10.85
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-065",
+      "latex_path": "chapters/04-dogfood-design-records/0118-df-078-dogfood-release-story-surfaces.tex",
+      "kind": "inline-code",
+      "original_notation": "GraphQL SDL -> bijou-block/1 -> ui-scene-ir/1 -> terminal proof -> debug facts",
+      "original_sha256": "fb64e21a7bde33b1cd3814bc0a41367cdc57ea3d7c595a2e1c674ee3bed41eab",
+      "graphs": [
+        {
+          "labels": [
+            "GraphQL SDL",
+            "bijou-block/1",
+            "ui-scene-ir/1",
+            "terminal proof",
+            "debug facts"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-066",
+      "latex_path": "chapters/10-other-design-records/0255-ht-003-implement-layer-stack-and-input-map-routing.tex",
+      "kind": "inline-code",
+      "original_notation": "workspace -> settings -> search",
+      "original_sha256": "a3bbd51f78be765a63d22e0b05e2c07918a367cb8d247699daee2636d3e42169",
+      "graphs": [
+        {
+          "labels": [
+            "workspace",
+            "settings",
+            "search"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-067",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0289-dag-layer-skipping-edges-occluded.tex",
+      "kind": "inline-code",
+      "original_notation": "A → B, A → C, B → D, C → D",
+      "original_sha256": "2198ee67090f594bb23b700a2c66ca82c7a0edcf6774ed2c08ddb94d56161478",
+      "graphs": [
+        {
+          "labels": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -2
+            ],
+            [
+              3,
+              -2
+            ],
+            [
+              0,
+              -4
+            ]
+          ],
+          "width": 36
+        }
+      ]
+    },
+    {
+      "id": "flow-068",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0289-dag-layer-skipping-edges-occluded.tex",
+      "kind": "inline-code",
+      "original_notation": "A → B → C",
+      "original_sha256": "c3968b8d938f5db4b8b34fd5f24287fe83cf168f410f2ceb9cfba91ecec7909d",
+      "graphs": [
+        {
+          "labels": [
+            "A",
+            "B",
+            "C",
+            "D (layer 2)"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              0,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              -3,
+              -2.3
+            ],
+            [
+              -3,
+              -4.6
+            ],
+            [
+              3,
+              -4.6
+            ]
+          ],
+          "width": 39
+        }
+      ]
+    },
+    {
+      "id": "flow-069",
+      "latex_path": "chapters/13-audits-and-archive-records/0411-2026-04-05-codebase-health-assessment.tex",
+      "kind": "inline-code",
+      "original_notation": "Layout → Paint → PostProcess → Diff → Output",
+      "original_sha256": "bc8b6c3c7668a1a2ae9217080666fb4cff6decd28a4a8a26d067d2463f1ec18e",
+      "graphs": [
+        {
+          "labels": [
+            "Layout",
+            "Paint",
+            "PostProcess",
+            "Diff",
+            "Output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-070",
+      "latex_path": "chapters/13-audits-and-archive-records/0412-2026-04-05-documentation-audit.tex",
+      "kind": "inline-code",
+      "original_notation": "Layout → Paint → PostProcess → Diff → Output",
+      "original_sha256": "bc8b6c3c7668a1a2ae9217080666fb4cff6decd28a4a8a26d067d2463f1ec18e",
+      "graphs": [
+        {
+          "labels": [
+            "Layout",
+            "Paint",
+            "PostProcess",
+            "Diff",
+            "Output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-071",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "prose-33",
+      "original_notation": "The flow: Source → Slice → Render",
+      "original_sha256": "c325e628bee775a182be8b32ead2bd787d235d7fabca054076b6af152bded17c",
+      "graphs": [
+        {
+          "labels": [
+            "Source",
+            "Slice",
+            "Render"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-072",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "prose-35",
+      "original_notation": "vertical exit → horizontal turn → vertical entry",
+      "original_sha256": "84fb426015466c64ebb68a4d17b8db6f10b6007efaed23bb6c6b91336b8dfebd",
+      "graphs": [
+        {
+          "labels": [
+            "vertical exit",
+            "horizontal turn",
+            "vertical entry"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-073",
+      "latex_path": "chapters/13-audits-and-archive-records/0426-dag-exploration.tex",
+      "kind": "prose-36",
+      "original_notation": "Terminal width overflow → label truncation → gap reduction → vertical fallback",
+      "original_sha256": "b79fbacb2426e6865a269dcfe40721912f2ad03dcfc47bc0ce2680bc0d97669d",
+      "graphs": [
+        {
+          "labels": [
+            "Terminal width overflow",
+            "label truncation",
+            "gap reduction",
+            "vertical fallback"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-074",
+      "latex_path": "chapters/07-design-language-design-records/0183-dl-018-first-party-theme-variant-coverage.tex",
+      "kind": "prose-51",
+      "original_notation": "dark -\\textgreater{} light -\\textgreater{} dark.",
+      "original_sha256": "1498223fff2e1a87713f1aa92d02c57d15c6d59d08be3fb8c887474ca7ad9fcf",
+      "graphs": [
+        {
+          "labels": [
+            "dark",
+            "light",
+            "dark"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-075",
+      "latex_path": "chapters/07-design-language-design-records/0184-dl-019-theme-rule-selection-and-inspection.tex",
+      "kind": "prose-52",
+      "original_notation": "primitive -\\textgreater{} semantic rule -\\textgreater{} UI token",
+      "original_sha256": "479ec31dcd97e79b5fb971233453b1fdd04cf7ba60ba7d5bb466fd41739bf2a1",
+      "graphs": [
+        {
+          "labels": [
+            "primitive",
+            "semantic rule",
+            "UI token"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-076",
+      "latex_path": "chapters/06-runtime-engine-design-records/0156-re-008-perf-findings.tex",
+      "kind": "prose-79",
+      "original_notation": "Layout → Paint → PostProcess → Diff → Output",
+      "original_sha256": "bc8b6c3c7668a1a2ae9217080666fb4cff6decd28a4a8a26d067d2463f1ec18e",
+      "graphs": [
+        {
+          "labels": [
+            "Layout",
+            "Paint",
+            "PostProcess",
+            "Diff",
+            "Output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-077",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0311-dx-008-render-pipeline-guide.tex",
+      "kind": "prose-108",
+      "original_notation": "Layout → Paint → PostProcess → Diff → Output",
+      "original_sha256": "bc8b6c3c7668a1a2ae9217080666fb4cff6decd28a4a8a26d067d2463f1ec18e",
+      "graphs": [
+        {
+          "labels": [
+            "Layout",
+            "Paint",
+            "PostProcess",
+            "Diff",
+            "Output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-078",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0324-dx-017-agent-first-bench-output-format.tex",
+      "kind": "prose-119",
+      "original_notation": "scenario → samples → stats.",
+      "original_sha256": "19d5682b49d201a8cf5b21e716270fe62b0e9b6dafdc4602159fec5aa261ccb1",
+      "graphs": [
+        {
+          "labels": [
+            "scenario",
+            "samples",
+            "stats"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-079",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0340-dx-008-render-pipeline-guide.tex",
+      "kind": "prose-120",
+      "original_notation": "Layout → Paint → PostProcess → Diff → Output",
+      "original_sha256": "bc8b6c3c7668a1a2ae9217080666fb4cff6decd28a4a8a26d067d2463f1ec18e",
+      "graphs": [
+        {
+          "labels": [
+            "Layout",
+            "Paint",
+            "PostProcess",
+            "Diff",
+            "Output"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ],
+            [
+              0,
+              -4.65
+            ],
+            [
+              0,
+              -6.2
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    },
+    {
+      "id": "flow-080",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0401-re-016-dag-cycle-graceful-handling.tex",
+      "kind": "prose-127",
+      "original_notation": "alice → bob → carol → dave → alice",
+      "original_sha256": "ac714457da5df14664ef12f589862be908e88d608a3d255079fb443e554b7bef",
+      "graphs": [
+        {
+          "labels": [
+            "alice",
+            "bob",
+            "carol",
+            "dave"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              -3
+            ],
+            [
+              0,
+              -3
+            ]
+          ],
+          "width": 36
+        }
+      ]
+    },
+    {
+      "id": "flow-081",
+      "latex_path": "chapters/12-retrospectives-and-historical-planning/0289-dag-layer-skipping-edges-occluded.tex",
+      "kind": "dependency-list",
+      "original_notation": "A→B, A→C, B→C",
+      "original_sha256": "742e5187aef0f61f75df4ae3fcc51ce9c3383b49b829a8970f29fc8e34154047",
+      "graphs": [
+        {
+          "labels": [
+            "A",
+            "B",
+            "C"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              -3,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              0,
+              -3
+            ]
+          ],
+          "width": 36
+        }
+      ]
+    },
+    {
+      "id": "flow-082",
+      "latex_path": "chapters/13-audits-and-archive-records/0422-re-017-byte-pipeline.tex",
+      "kind": "call-path",
+      "original_notation": "set() → encodeCellIntoBuf → inlineHexRGB + encodeChar + encodeModifiers",
+      "original_sha256": "9e7fe80e49a62993b56d5eb59ba79b8509d79734c23b39ede508a1c931e15ed8",
+      "graphs": [
+        {
+          "labels": [
+            "set({char, fg, bg}) / packages/bijou/src/ports/surface.ts:532",
+            "encodeCellIntoBuf (line 300)",
+            "inlineHexRGB (line 288)",
+            "encodeChar",
+            "encodeModifiers"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              4
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              -1.8
+            ],
+            [
+              -4.6,
+              -4
+            ],
+            [
+              0,
+              -4
+            ],
+            [
+              4.6,
+              -4
+            ]
+          ],
+          "width": 37
+        }
+      ]
+    },
+    {
+      "id": "flow-083",
+      "latex_path": "chapters/13-audits-and-archive-records/0422-re-017-byte-pipeline.tex",
+      "kind": "table-call-path",
+      "original_notation": "set({char, fg, bg}) → encodeCellIntoBuf → 2× inlineHexRGB",
+      "original_sha256": "7780b8da8efaa316eeab64c30a7191e8036b5a2bf74b130849f76e127b25f731",
+      "graphs": [
+        {
+          "labels": [
+            "set({char, fg, bg})",
+            "encodeCellIntoBuf",
+            "2× inlineHexRGB"
+          ],
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "positions": [
+            [
+              0,
+              0.0
+            ],
+            [
+              0,
+              -1.55
+            ],
+            [
+              0,
+              -3.1
+            ]
+          ],
+          "width": 96
+        }
+      ]
+    }
+  ],
+  "policy": "Conceptual arrow notation becomes TikZ; executable code, type signatures and numeric before/after comparisons retain source notation."
+}

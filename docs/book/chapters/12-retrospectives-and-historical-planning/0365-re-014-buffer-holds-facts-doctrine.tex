@@ -1,0 +1,26 @@
+\chapter{RE-014 ---  Design Doctrine}\label{record-365}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/RE-014-buffer-holds-facts-doctrine.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-365-idea}
+
+During the RE-007 buffer migration, James articulated a principle:
+
+\begin{quote}
+``Keep buffered shell commands as plain discriminated data and interpret them explicitly. Use a handler table if you want to avoid a giant switch. The buffer should hold facts, not code.''
+\end{quote}
+
+This is a design doctrine that should be captured in the runtime engine's architectural documentation. It applies beyond shell commands --- any buffer, queue, or event channel in the system should carry data (what happened) not behavior (how to respond).
+
+\section{Why}\label{record-365-why}
+
+The initial design proposed classes with \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}(\allowbreak{})} methods --- each command knowing how to execute itself. The correction was: commands are facts about intent. Interpretation is separate. Facts are serializable, testable, inspectable, replayable. Behavior is contextual.
+
+This principle: - Enables command logging and replay for debugging - Keeps the handler table as the single place to audit all side effects - Makes the command vocabulary inspectable without executing anything - Aligns with event-sourcing and CQRS patterns
+
+\section{Shape}\label{record-365-shape}
+
+Add a section to \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}A\allowbreak{}R\allowbreak{}C\allowbreak{}H\allowbreak{}I\allowbreak{}T\allowbreak{}E\allowbreak{}C\allowbreak{}T\allowbreak{}U\allowbreak{}R\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} or a dedicated \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}h\allowbreak{}o\allowbreak{}l\allowbreak{}d\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} that states the principle and explains when it applies (command buffers, event channels, message queues) and when it doesn't (hot-path render loops where indirection costs matter).
+

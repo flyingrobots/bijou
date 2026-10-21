@@ -1,0 +1,98 @@
+\chapter{RE-019 --- Pre-Parse Theme Token Colors Into Bytes}\label{record-369}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-019-theme-token-color-cache.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-019 — Pre-Parse Theme Token Colors Into Bytes
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-369-disposition}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0}. Theme resolution now preserves and caches pre-parsed \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} / \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} bytes through the live \texttt{T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} path instead of dropping them after \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})}. Accessor-returned tokens from \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{})}, and \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}u\allowbreak{}i\allowbreak{}(\allowbreak{})} now carry reusable RGB bytes, live \texttt{t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} updates repopulate those bytes, and repeated token reads reuse cached per-hex and per-token resolution instead of reparsing the same theme colors in hot render paths.
+
+\section{Original Proposal}\label{record-369-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-369-idea}
+
+When a theme is loaded, walk all its token values and pre-parse every hex color (\texttt{'\allowbreak{}\#\allowbreak{}r\allowbreak{}r\allowbreak{}g\allowbreak{}g\allowbreak{}b\allowbreak{}b\allowbreak{}'}) into a reusable 3-byte representation. Expose a resolved theme where each token's color is a \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y} of length 3 (R, G, B), not a string.
+
+Then:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}f\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}f\allowbreak{}g\allowbreak{},\allowbreak{} \allowbreak{}b\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{} \allowbreak{}\}\allowbreak{})} --- if the color value is already bytes, skip \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}R\allowbreak{}G\allowbreak{}B} entirely and write straight to the packed buffer.
+\item
+  Components that need RGB values for other reasons (gradient interpolation, contrast checks) get them for free without parsing.
+\end{itemize}
+
+The theme stays user-authored as hex strings (human-friendly, DTCG-interop-friendly), but at runtime the system works in bytes.
+
+\section{Why}\label{record-369-why}
+
+Per the related bad-code entry \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}8\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}f\allowbreak{}g\allowbreak{}-\allowbreak{}b\allowbreak{}g\allowbreak{}.\allowbreak{}m\allowbreak{}d}, every \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}f\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}\#\allowbreak{}x\allowbreak{}x\allowbreak{}x\allowbreak{}x\allowbreak{}x\allowbreak{}x\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} currently hex-parses the string inline. In a paint-heavy frame, that's thousands of redundant parses --- the same theme colors get parsed over and over. The theme token set is bounded and small (\textasciitilde15-50 unique colors); parsing them once at theme load time and reusing the bytes eliminates the hot-path parse cost for all theme-driven paints.
+
+\section{Scope / Shape}\label{record-369-scope-shape}
+
+\begin{CodeBlock}
+// core/theme/resolve.ts additions
+
+interface ResolvedToken {
+  // existing fields...
+  fgBytes?: Uint8Array;  // pre-parsed, 3 bytes [R, G, B]
+  bgBytes?: Uint8Array;
+}
+
+function resolveTheme(theme: Theme): ResolvedTheme {
+  // walk tokens, call parseHex once per unique color, store bytes
+}
+\end{CodeBlock}
+
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} gains a fast path: if the \texttt{f\allowbreak{}g} field is a \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y}, skip \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}R\allowbreak{}G\allowbreak{}B} and copy directly. Similarly for \texttt{b\allowbreak{}g}. Type union: \texttt{f\allowbreak{}g\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y}.
+
+Optional next step: bake a \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} branded type over the bytes so the API doesn't expose raw \texttt{U\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}8\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y} to users. See the related cool idea \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}0\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+
+\section{Why This Is Cool}\label{record-369-why-this-is-cool}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Zero risk to the public API.} Hex strings still work. This is purely an optimization under the hood.
+\item
+  \textbf{Self-healing.} Any code that already uses theme tokens benefits automatically; no caller rewrites.
+\item
+  \textbf{Measurable.} The RE-017 bench has a \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e} scenario designed exactly to measure this. We can land the change and see the impact in a single bench run.
+\item
+  \textbf{Composable with RE-017's byte-pipeline work.} This removes hex parsing from the paint path; II-4 removes string work from the diff path. Together they close the loop on ``zero string allocation during rendering''.
+\end{enumerate}
+
+\section{Prior Questions}\label{record-369-prior-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the resolver need to know about gradients? (DTCG gradient tokens have arrays of stops --- each stop needs byte-resolving.)
+\item
+  Should the cache be per-theme or global? (Per-theme is safer since theme reload should invalidate.)
+\item
+  Should we export the byte form publicly, or keep it internal? (Start internal; promote later if users want it.)
+\end{itemize}
+
+\section{Related}\label{record-369-related}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}8} (bad-code) --- the hex string parsing smell this fixes.
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7} / \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- the cycle where this would be measured and landed.
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}0} (cool idea) --- \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} typed representation, a follow-on that bakes this into the public API.
+\end{itemize}
+

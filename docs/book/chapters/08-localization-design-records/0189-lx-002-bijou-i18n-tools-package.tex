@@ -1,0 +1,375 @@
+\chapter{LX-002 --- bijou-i18n Tools Package}\label{record-189}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-002-bijou-i18n-tools-package.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Why this cycle exists}\label{record-189-why-this-cycle-exists}
+
+LX-001 deliberately shipped only the runtime half of localization:
+
+\begin{itemize}
+\tightlist
+\item
+  in-memory catalogs
+\item
+  locale and direction
+\item
+  message/resource lookup
+\item
+  runtime-safe references
+\end{itemize}
+
+That was the right first move, but a real localization system also needs workflow tooling.
+
+This cycle exists to build the first real \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s} package.
+
+It should give Bijou a provider-neutral authoring and translation workflow surface without dragging spreadsheets or files into the runtime package.
+
+\section{Scope of this cycle}\label{record-189-scope-of-this-cycle}
+
+This first tooling slice intentionally narrows scope to:
+
+\begin{itemize}
+\tightlist
+\item
+  authoring catalog types
+\item
+  source hashing
+\item
+  stale translation detection
+\item
+  provider-neutral tabular export/import rows
+\item
+  reference validation and normalization
+\item
+  compilation into runtime catalogs
+\item
+  pseudo-localization helper
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  Google Sheets integration
+\item
+  Excel integration
+\item
+  CSV file parsing
+\item
+  filesystem adapters
+\item
+  remote catalog publishing
+\end{itemize}
+
+Those can come later if justified.
+
+\section{Human users}\label{record-189-human-users}
+
+\subsection{Primary human user}\label{record-189-primary-human-user}
+
+A builder or localization maintainer who needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  track changed source strings
+\item
+  export only missing/stale work
+\item
+  import translated rows cleanly
+\item
+  validate references before runtime
+\item
+  compile authoring catalogs into runtime catalogs
+\end{itemize}
+
+\subsection{Human hill}\label{record-189-human-hill}
+
+A builder can manage localization workflow data entirely in memory through one clean tooling package, without having to invent stale detection or spreadsheet row formats from scratch.
+
+\section{Agent users}\label{record-189-agent-users}
+
+\subsection{Primary agent user}\label{record-189-primary-agent-user}
+
+An agent helping maintain localization catalogs and workflow data.
+
+They need to:
+
+\begin{itemize}
+\tightlist
+\item
+  detect stale translations
+\item
+  understand which rows need work
+\item
+  import reviewed rows safely
+\item
+  validate references before shipping
+\item
+  generate pseudo-localized stress content for layout review
+\end{itemize}
+
+\subsection{Agent hill}\label{record-189-agent-hill}
+
+An agent can reason about localization workflow state explicitly through authoring catalogs and tabular rows, instead of diffing arbitrary JSON blobs or hidden spreadsheets.
+
+\section{Human playback}\label{record-189-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder has authoring catalogs in memory.
+\item
+  They change an English source string.
+\item
+  The tooling marks affected translations stale automatically.
+\item
+  They export only missing/stale rows into a generic tabular shape.
+\item
+  They import completed rows back in.
+\item
+  They compile the result into runtime catalogs.
+\item
+  They load those runtime catalogs into \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}.
+\end{enumerate}
+
+\section{Agent playback}\label{record-189-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent reads authoring catalogs.
+\item
+  It identifies stale or missing translations by source hash.
+\item
+  It exports review rows for a target locale.
+\item
+  It imports updated rows.
+\item
+  It validates references and catches broken/cyclic ones before runtime.
+\item
+  It generates pseudo-localized output to stress UI copy.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-189-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-189-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  tooling must stay separate from the runtime package
+\item
+  tabular workflow support must be provider-neutral
+\item
+  stale detection must be automatic, not manual bookkeeping
+\item
+  reference-heavy catalogs must fail clearly before runtime
+\item
+  pseudo-localization is a tooling concern, not a runtime concern
+\end{itemize}
+
+\section{Deliverable}\label{record-189-deliverable}
+
+Introduce a new package:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}
+\end{itemize}
+
+With the first workflow surface for:
+
+\begin{itemize}
+\tightlist
+\item
+  authoring catalogs
+\item
+  translation rows
+\item
+  stale detection
+\item
+  import/export
+\item
+  compilation
+\item
+  pseudo-localization
+\end{itemize}
+
+\section{Proposed API direction}\label{record-189-proposed-api-direction}
+
+The first slice should be close to:
+
+\begin{CodeBlock}
+interface AuthoringCatalog { ... }
+interface AuthoringCatalogEntry { ... }
+interface TranslationRow { ... }
+
+function hashSourceValue(value: unknown): string;
+function markStaleTranslations(catalogs: readonly AuthoringCatalog[]): readonly AuthoringCatalog[];
+function exportTranslationRows(catalogs: readonly AuthoringCatalog[], locale: string): readonly TranslationRow[];
+function importTranslationRows(catalogs: readonly AuthoringCatalog[], rows: readonly TranslationRow[]): readonly AuthoringCatalog[];
+function compileCatalogs(catalogs: readonly AuthoringCatalog[]): readonly I18nCatalog[];
+function pseudoLocalize(value: string): string;
+\end{CodeBlock}
+
+Exact names can still move, but the responsibilities should not.
+
+\section{Tests to write first}\label{record-189-tests-to-write-first}
+
+\subsection{Cycle-owned playback tests}\label{record-189-cycle-owned-playback-tests}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  package exists and can be imported
+\item
+  changed source strings mark existing translations stale
+\item
+  export returns only missing/stale rows for a locale
+\item
+  imported rows merge back and compile into runtime catalogs consumable by \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+\item
+  pseudolocalization visibly lengthens text for layout stress
+\end{itemize}
+
+\subsection{Package-local unit tests}\label{record-189-package-local-unit-tests}
+
+Under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  stable source hashing
+\item
+  broken references fail clearly
+\item
+  cyclic references fail clearly
+\item
+  compilation emits runtime catalogs with runtime-safe reference shapes
+\end{itemize}
+
+\section{Risks}\label{record-189-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  overcommitting to a spreadsheet provider too early
+\item
+  making the tabular format too weak to support real workflows
+\item
+  leaking UI/layout policy into tooling
+\item
+  treating references as optional even though real localization workflows need them
+\end{itemize}
+
+\section{Out of scope}\label{record-189-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  actual file readers/writers
+\item
+  actual CSV/XLSX parsers
+\item
+  Google Sheets or Excel adapters
+\item
+  shell integration beyond proving compiled catalogs load into the runtime package
+\end{itemize}
+
+\section{Retrospective}\label{record-189-retrospective}
+
+\subsection{What landed}\label{record-189-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new package:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}
+  \end{itemize}
+\item
+  new cycle-owned playback tests:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  new package-local unit tests:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  first tooling surface for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    authoring catalogs
+  \item
+    stable source hashing
+  \item
+    automatic stale-translation detection
+  \item
+    provider-neutral translation rows
+  \item
+    import/export of translated rows
+  \item
+    reference validation during compilation
+  \item
+    compilation into \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} runtime catalogs
+  \item
+    pseudo-localization for layout stress
+  \end{itemize}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-189-drift-from-ideal}
+
+No material drift in scope.
+
+One intentional boundary held:
+
+\begin{itemize}
+\tightlist
+\item
+  spreadsheet, CSV, XLSX, Google Sheets, and filesystem adapters remain out of scope
+\end{itemize}
+
+That is a feature, not a miss. The cycle stayed focused on the pure tooling core instead of smuggling provider assumptions into the first package.
+
+\subsection{Debt spawned}\label{record-189-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md}{LX-003 --- Spreadsheet Adapters and Catalog Exchange Workflows}
+\end{itemize}
+

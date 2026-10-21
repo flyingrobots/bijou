@@ -1,0 +1,446 @@
+{
+  "source_files": 44,
+  "verified_links": 48,
+  "new_duplicate_issues": 0,
+  "receipts": [
+    {
+      "issue": 199,
+      "url": "https://github.com/flyingrobots/bijou/issues/199",
+      "source": "docs/method/backlog/asap/LX-013-dogfood-locale-preference-persistence.md",
+      "state": "closed",
+      "body_sha256": "b4930a59c9414219ed2d7444e3b3e5ef8e9e6cb4d5c15e7e9b4a643fe73e444a",
+      "verified": true,
+      "action": "already preserved"
+    },
+    {
+      "issue": 200,
+      "url": "https://github.com/flyingrobots/bijou/issues/200",
+      "source": "docs/method/backlog/asap/LX-014-expand-dogfood-catalog-coverage.md",
+      "state": "closed",
+      "body_sha256": "e2ca6d9b953a17aa0b490519a5c7ae3dab0ea6e2f7e9cc3a3faac938cb2f3c2b",
+      "verified": true,
+      "action": "already preserved"
+    },
+    {
+      "issue": 201,
+      "url": "https://github.com/flyingrobots/bijou/issues/201",
+      "source": "docs/method/backlog/badcode/asap/mcp-dag-type-error.md",
+      "state": "closed",
+      "body_sha256": "add7b3978269b3c841780915eb0908a1cc3e30bd35ee006b96600b75f9e397d9",
+      "verified": true,
+      "action": "already preserved"
+    },
+    {
+      "issue": 202,
+      "url": "https://github.com/flyingrobots/bijou/issues/202",
+      "source": "docs/method/backlog/cool-ideas/CI-001-mermaid-surface-component.md",
+      "state": "open",
+      "body_sha256": "ee70d6f31f5b8f16936ab4a1604f112a8f1aa935f6e7d9996ba30896fe231fd1",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 203,
+      "url": "https://github.com/flyingrobots/bijou/issues/203",
+      "source": "docs/method/backlog/cool-ideas/CI-002-deterministic-time-travel-debugger.md",
+      "state": "open",
+      "body_sha256": "f98cb7de4d3a4168998cd3fdbb36c80a41bbd2c08fdac6fc2de75db200ad6f3f",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 204,
+      "url": "https://github.com/flyingrobots/bijou/issues/204",
+      "source": "docs/method/backlog/cool-ideas/DX-027-choose-your-lane-starter-for-readme-and-dogfood.md",
+      "state": "open",
+      "body_sha256": "ad2aed5ea3eac6d7d78c5998ea44b98a561214a8a5b8c55a10d86daf6ed23755",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 205,
+      "url": "https://github.com/flyingrobots/bijou/issues/205",
+      "source": "docs/method/backlog/cool-ideas/HT-009-file-explorer-surface.md",
+      "state": "open",
+      "body_sha256": "2501dc39c333198db21df8c74062d9dfed7eb70d73619401f5b4ee777555e365",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 206,
+      "url": "https://github.com/flyingrobots/bijou/issues/206",
+      "source": "docs/method/backlog/cool-ideas/LX-015-dogfood-localization-burndown-dashboard.md",
+      "state": "open",
+      "body_sha256": "7a8ab120be658f9c0464a3346aefbe250200776a097bca7f73dc9711e9388aa4",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 207,
+      "url": "https://github.com/flyingrobots/bijou/issues/207",
+      "source": "docs/method/backlog/cool-ideas/LX-016-portable-locale-preferences-across-hosts.md",
+      "state": "open",
+      "body_sha256": "cc37d1968f71d6603c8800b10d94a40893e8b69d3318133074f2bc12b7770bfa",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 208,
+      "url": "https://github.com/flyingrobots/bijou/issues/208",
+      "source": "docs/method/backlog/cool-ideas/LX-017-multilingual-dogfood-translation-workbench.md",
+      "state": "open",
+      "body_sha256": "4358e9b5903dd0a98fbe8760b51b11196c29df665dccda5be798bd2766b53f24",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 209,
+      "url": "https://github.com/flyingrobots/bijou/issues/209",
+      "source": "docs/method/backlog/cool-ideas/RE-025-dag-path-emphasis.md",
+      "state": "open",
+      "body_sha256": "7ba28b19f49e35846a91068774c564d731de755a372463c4071b064528630429",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 210,
+      "url": "https://github.com/flyingrobots/bijou/issues/210",
+      "source": "docs/method/backlog/cool-ideas/RE-026-dag-edge-labels.md",
+      "state": "open",
+      "body_sha256": "e88dd5f91b6d41c063123825551d59823386c654eadd95d9d9b2fdfa666c6533",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 211,
+      "url": "https://github.com/flyingrobots/bijou/issues/211",
+      "source": "docs/method/backlog/cool-ideas/RE-027-dag-compact-legend-mode.md",
+      "state": "open",
+      "body_sha256": "54c7f98e522d7e44da3df3e793ee3707fda1ec7b9384e8341e57ed46709bb2f4",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 212,
+      "url": "https://github.com/flyingrobots/bijou/issues/212",
+      "source": "docs/method/backlog/cool-ideas/RE-028-dag-edge-semantics-and-metadata.md",
+      "state": "open",
+      "body_sha256": "24fd9d3d3dbb509e4e227db00cbc0ed14f63788cfdfe49b8b91941c2f4ad0f7f",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 213,
+      "url": "https://github.com/flyingrobots/bijou/issues/213",
+      "source": "docs/method/backlog/cool-ideas/RE-029-dag-adaptive-density-and-lowering.md",
+      "state": "open",
+      "body_sha256": "b9b70ae3e3394c4f3d40e3ac080365c1d235b52372fff4d939c92aa3a733ad27",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 214,
+      "url": "https://github.com/flyingrobots/bijou/issues/214",
+      "source": "docs/method/backlog/cool-ideas/cool-ideas.md",
+      "state": "open",
+      "body_sha256": "7a95c26c10a6fa69620cebe6f1db4b622f1119b1d892dde790e249082da0145e",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 215,
+      "url": "https://github.com/flyingrobots/bijou/issues/215",
+      "source": "docs/method/backlog/cool-ideas/cool-ideas.md",
+      "state": "open",
+      "body_sha256": "7ed943e95410f989e6c5f7546e79ef57d9bda42e7589d89e9187c56bb9670c89",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 216,
+      "url": "https://github.com/flyingrobots/bijou/issues/216",
+      "source": "docs/method/backlog/cool-ideas/cool-ideas.md",
+      "state": "open",
+      "body_sha256": "b7245f6b5f72f367e66ff3263ac764ad580f225e3a67ec02526ed57772817753",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 217,
+      "url": "https://github.com/flyingrobots/bijou/issues/217",
+      "source": "docs/method/backlog/cool-ideas/cool-ideas.md",
+      "state": "open",
+      "body_sha256": "c3597dccc12c363719f5d20dc3c023e9c3823f452f7a8f20cc5ac77471f0377b",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 218,
+      "url": "https://github.com/flyingrobots/bijou/issues/218",
+      "source": "docs/method/backlog/cool-ideas/cool-ideas.md",
+      "state": "open",
+      "body_sha256": "9ab3eabe5d3572c745ffcc4c61c0e0e5fed7d893e6a82a71af70c900a20fa1b7",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 219,
+      "url": "https://github.com/flyingrobots/bijou/issues/219",
+      "source": "docs/method/backlog/inbox/RE_re-027-generalize-crash-mode-auto-exit-beyond-tty-detection.md",
+      "state": "open",
+      "body_sha256": "f26991e57e973d3b26182f0d7321498a65d470158612ee978234aaf67b5a28b4",
+      "verified": true,
+      "action": "already preserved"
+    },
+    {
+      "issue": 220,
+      "url": "https://github.com/flyingrobots/bijou/issues/220",
+      "source": "docs/method/backlog/up-next/DF-031-audit-inline-status-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "7ce3b5fd63cee7e77b39394b0b00426fec4427e15b1268dfbb2c4d298c4c5d7f",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 221,
+      "url": "https://github.com/flyingrobots/bijou/issues/221",
+      "source": "docs/method/backlog/up-next/DF-032-audit-in-flow-status-block-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "f5409a6810e22eaad86cc57c99d78e030ec7388ee7152ce8a1efa18c6a95b8cd",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 222,
+      "url": "https://github.com/flyingrobots/bijou/issues/222",
+      "source": "docs/method/backlog/up-next/DF-033-audit-low-level-transient-overlay-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "d8d001481d736bd2a4f4d74550f3c1ddd976bbf59a10179403c62810a1a72d72",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 223,
+      "url": "https://github.com/flyingrobots/bijou/issues/223",
+      "source": "docs/method/backlog/up-next/DF-035-audit-activity-stream-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "87cfca145993efb48acceb04b2309bb17eb4cfa025bcd9ecc77cc780ae391d4f",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 224,
+      "url": "https://github.com/flyingrobots/bijou/issues/224",
+      "source": "docs/method/backlog/up-next/DF-037-audit-inline-shortcut-cues-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "540a6edee5a3cde9ef17b4206fbb7de8e455d4fd32ac6e27baa3158f31a47c5c",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 225,
+      "url": "https://github.com/flyingrobots/bijou/issues/225",
+      "source": "docs/method/backlog/up-next/DF-038-audit-progress-indicators-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "ef750f8e6914772aade85ab62a36087c2cf026b80359420b1b1fcf02ae3fa409",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 226,
+      "url": "https://github.com/flyingrobots/bijou/issues/226",
+      "source": "docs/method/backlog/up-next/DF-039-audit-framed-grouping-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "36af75b7520f4f6b71e00d2762b3d9fcaa4c874b493929101284c55e9c958f93",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 227,
+      "url": "https://github.com/flyingrobots/bijou/issues/227",
+      "source": "docs/method/backlog/up-next/DF-040-audit-explainability-walkthroughs-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "b8ece4f1a82791d8b04b231c59523fe54a812666ad73bc1a101a8e8ae7fd196b",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 228,
+      "url": "https://github.com/flyingrobots/bijou/issues/228",
+      "source": "docs/method/backlog/up-next/DF-042-audit-formatted-documents-and-prose-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "c5076336e064ea2a6f2eafe5c93d25f299be4d611319ba0a793db87d4b78c8c6",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 229,
+      "url": "https://github.com/flyingrobots/bijou/issues/229",
+      "source": "docs/method/backlog/up-next/DF-043-audit-linked-destinations-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "5451c5433ee4acda93bc2a9049e95ba0278bee2b6e155bf923a8647acaefaea9",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 230,
+      "url": "https://github.com/flyingrobots/bijou/issues/230",
+      "source": "docs/method/backlog/up-next/DF-044-audit-dividers-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "74f0ce40010abb44429bed7ab3db2c51d1d0e9176deb1b36ed829d0477ad447e",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 231,
+      "url": "https://github.com/flyingrobots/bijou/issues/231",
+      "source": "docs/method/backlog/up-next/DF-045-audit-text-entry-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "8b71070bb6804efa9424cdc8a372b3c2be2e316157d3fec0f2b8ecc905c00e60",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 232,
+      "url": "https://github.com/flyingrobots/bijou/issues/232",
+      "source": "docs/method/backlog/up-next/DF-046-audit-single-choice-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "5bb349523a3f57cff914192f5a653c6cdf2463a697153f6c37a1b2671954447e",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 233,
+      "url": "https://github.com/flyingrobots/bijou/issues/233",
+      "source": "docs/method/backlog/up-next/DF-047-audit-multiple-choice-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "c9d0d189d94361b8a5940a975267c45dcd649f8feb3628bf56a429fb71e2c979",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 234,
+      "url": "https://github.com/flyingrobots/bijou/issues/234",
+      "source": "docs/method/backlog/up-next/DF-048-audit-binary-decision-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "271553454d8b37dcfd9fbc0618e082e4ccbbaa3409deb76191a487cdf8b4143c",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 235,
+      "url": "https://github.com/flyingrobots/bijou/issues/235",
+      "source": "docs/method/backlog/up-next/DF-050-audit-peer-navigation-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "4cb8f8fae7284bacd4f6171d8ee2176214c02f7fb7864e7ecb4389969921a9b0",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 236,
+      "url": "https://github.com/flyingrobots/bijou/issues/236",
+      "source": "docs/method/backlog/up-next/DF-051-audit-progressive-disclosure-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "e1923c65b83e0cc67cc9adc4e65cb39af0de456d74e63b5b24428d779cfb63cd",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 237,
+      "url": "https://github.com/flyingrobots/bijou/issues/237",
+      "source": "docs/method/backlog/up-next/DF-052-audit-path-and-progress-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "2126ca6b4d1b41ea9528f274acca399f4d81eb0c38e04d1fb386aefdb025fbdc",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 238,
+      "url": "https://github.com/flyingrobots/bijou/issues/238",
+      "source": "docs/method/backlog/up-next/DF-054-audit-expressive-branding-and-decorative-emphasis-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "9a2b53d0311144e8dcc44a83299a8bbf670de0d56027c408ed208ab9c77972b1",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 239,
+      "url": "https://github.com/flyingrobots/bijou/issues/239",
+      "source": "docs/method/backlog/up-next/DF-055-audit-mode-aware-custom-primitives-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "c0b70bbe1ff55aa03248a6641e4b6708823432d16341987a00d19ab3f4240eea",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 240,
+      "url": "https://github.com/flyingrobots/bijou/issues/240",
+      "source": "docs/method/backlog/up-next/DF-056-audit-dense-comparison-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "3ed5599356d3b3d2a852561564340dcda01dc11fac9a03e97a38afc0562331aa",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 241,
+      "url": "https://github.com/flyingrobots/bijou/issues/241",
+      "source": "docs/method/backlog/up-next/DF-057-audit-hierarchy-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "8382457fe8d8b31c96d00be7899c5c58a37b39b889a52d24c2ec4214e41ddbbe",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 242,
+      "url": "https://github.com/flyingrobots/bijou/issues/242",
+      "source": "docs/method/backlog/up-next/DF-058-audit-lists-for-exploration-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "5ea331153b24c61f512b9974c44172198a84a78e59884ff318961a7dc2bcdd3f",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 243,
+      "url": "https://github.com/flyingrobots/bijou/issues/243",
+      "source": "docs/method/backlog/up-next/DF-059-audit-temporal-or-dependency-views-family-across-real-surfaces.md",
+      "state": "closed",
+      "body_sha256": "ebd2ad1c2b388761a4b73fb79ec801049240a31ed9d39972e37ae9559e1ec17d",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 244,
+      "url": "https://github.com/flyingrobots/bijou/issues/244",
+      "source": "docs/method/backlog/up-next/DF_df-030-make-dogfood-the-canonical-docs-surface.md",
+      "state": "closed",
+      "body_sha256": "66e48a32581fa26d8160a5a3a23d7dd0fef67d0fd3bd1c81f58d297d2d6350c2",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 245,
+      "url": "https://github.com/flyingrobots/bijou/issues/245",
+      "source": "docs/method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md",
+      "state": "closed",
+      "body_sha256": "db70c44b4c661c47741eb6731272d5e03d988f06a9a0c23750fb1c96261e2cab",
+      "verified": true,
+      "action": "preserve source in existing issue"
+    },
+    {
+      "issue": 246,
+      "url": "https://github.com/flyingrobots/bijou/issues/246",
+      "source": "docs/method/backlog/up-next/DX_dx-029-document-scopednodeio-realpath-and-symlink-semantics.md",
+      "state": "closed",
+      "body_sha256": "4b2f85fda0b15b81714ca1000af2ea51c81371a8e66fcbd6539203ec1601225b",
+      "verified": true,
+      "action": "already preserved"
+    }
+  ],
+  "mcp_defect": {
+    "issue": 201,
+    "state": "closed",
+    "check": "npm run lint --workspace @flyingrobots/bijou-mcp",
+    "result": "pass",
+    "disposition": "historical overload failure already fixed; obsolete note retired"
+  }
+}

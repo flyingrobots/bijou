@@ -1,0 +1,28 @@
+\chapter{Host APIs Stay Behind Adapters}\label{record-046}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/host-apis-stay-behind-adapters.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-046-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Node, browser, worker, filesystem, terminal, and environment specifics belong behind explicit adapter seams.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  core packages should not reach directly for \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, or filesystem APIs
+\item
+  host integration code should stay in adapter packages and modules
+\item
+  tests should be able to swap host behavior through ports and mocks
+\item
+  portability claims are stronger when the core does not know the host
+\end{itemize}
+

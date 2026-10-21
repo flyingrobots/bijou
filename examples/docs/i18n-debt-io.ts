@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { documentationFileExists as existsSync, readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
 import { releaseLineOf } from './app-release-line.js';
 import type {
   DogfoodI18nDebtInventory,

@@ -1,0 +1,4 @@
+id	status	progress	error
+compile	succeeded	100	
+test	failed	60	Fixture failure: assertion did not pass
+publish	running	40	

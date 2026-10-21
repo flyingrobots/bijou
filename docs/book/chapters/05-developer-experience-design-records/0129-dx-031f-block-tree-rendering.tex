@@ -1,0 +1,223 @@
+\chapter{DX-031F Block Tree Rendering}\label{record-129}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-031F-block-tree-rendering.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-031F Block Tree Rendering
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\emph{Design checkpoint for explicitly rendering nested block declarations without turning every block into an implicit runtime manager}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-031-standard-bijou-blocks.md}{DX-031 - Standard Bijou Blocks}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-034-declarative-view-data-binding.md}{DX-034 - Declarative View Data Binding}
+\end{itemize}
+
+\section{Why This Cycle Exists}\label{record-129-why-this-cycle-exists}
+
+Bijou blocks now have three separate capabilities:
+
+\begin{itemize}
+\tightlist
+\item
+  metadata and contract declaration
+\item
+  structural composition of nested block declarations
+\item
+  local block rendering
+\end{itemize}
+
+Those capabilities are deliberately separate. \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} can inspect nested blocks without rendering them, and \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} renders only that block's local input. That kept discovery safe, but DOGFOOD exposed the next missing seam: an AppShell preview that nests \texttt{R\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and \texttt{I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l} needs a renderer that explicitly walks that block tree.
+
+Without a named block-tree renderer, AppShell has two bad options:
+
+\begin{itemize}
+\tightlist
+\item
+  print nested block names and pretend that is rendering
+\item
+  make \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} recursively render arbitrary children as a hidden side effect
+\end{itemize}
+
+Both are wrong. Recursive rendering is useful, but it must be explicit.
+
+\section{Core Rule}\label{record-129-core-rule}
+
+Block tree rendering is explicit.
+
+\begin{CodeBlock}
+BlockDefinition.render(input)
+  renders one block only
+
+AppShellComposition
+  inspects declarations only
+
+renderBlockTree(blockRenderNode(...))
+  recursively renders a declared block tree
+\end{CodeBlock}
+
+This preserves the boundary:
+
+\begin{itemize}
+\tightlist
+\item
+  composition can inspect nested blocks without executing render
+\item
+  local block rendering stays predictable
+\item
+  nested previews can render real child output
+\item
+  provider lifecycle and command dispatch remain out of scope
+\end{itemize}
+
+\section{Vocabulary}\label{record-129-vocabulary}
+
+\subsection{Block Render Node}\label{record-129-block-render-node}
+
+A branded runtime value that pairs a \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} with the input used when that block participates in an explicit render tree.
+
+It is not a provider handle, subscription, cache entry, command dispatcher, or view lifecycle owner.
+
+The node snapshots caller-provided plain data at construction time. Mutating the original slot/config objects after \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})} returns must not alter later render output. Renderable runtime values such as nested block nodes, block definitions, and surfaces remain identity values; the renderer must not strip their brands or cell data while normalizing inert records.
+
+\subsection{Block Tree Renderer}\label{record-129-block-tree-renderer}
+
+A pure renderer that starts from a \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} or \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, recursively renders nested block slot values, and passes rendered child output into parent slots.
+
+The renderer may aggregate lowering facts. It must not resolve providers, subscribe, refresh, dispatch Commands, mutate frames, or traverse the active TUI view hierarchy.
+
+\section{Behavior}\label{record-129-behavior}
+
+When \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} receives a node:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Validate the target is a real \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} or branded \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}.
+\item
+  Resolve the effective mode from node input, inherited parent mode, or render options.
+\item
+  Walk own data properties of the slot record without invoking accessors.
+\item
+  Render nested \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} and \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} slot values.
+\item
+  Replace each nested slot declaration with that child's rendered output.
+\item
+  Call the current block's local \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} with the resolved input.
+\item
+  Return frozen output metadata with current and child lowering facts.
+\end{enumerate}
+
+The parent block still owns how it displays a slot. The tree renderer only makes sure the slot value is rendered child output rather than an unrendered declaration.
+
+For visual modes, rendered child \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} values stay surfaces. Parent blocks may frame, clip, stack, or blit them, but they must not convert them to text and then recreate new surfaces because that loses cell-level styling and makes nested blocks look like printed lowering output. Text extraction remains appropriate for pipe and accessible lowering.
+
+\section{Non-Goals}\label{record-129-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  no provider subscriptions
+\item
+  no provider refresh
+\item
+  no active view hierarchy traversal
+\item
+  no command dispatch
+\item
+  no cache retention policy
+\item
+  no schema binding changes
+\item
+  no DOGFOOD-specific renderer branch
+\item
+  no implicit recursive behavior inside ordinary \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+\section{DOGFOOD Posture}\label{record-129-dogfood-posture}
+
+DOGFOOD block previews should use \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} when they show nested standard blocks.
+
+That lets the Blocks section show:
+
+\begin{itemize}
+\tightlist
+\item
+  AppShell as a real shell surface
+\item
+  ReaderSurface rendered inside AppShell content
+\item
+  InspectorPanel rendered inside AppShell inspection
+\item
+  pipe and accessible lowering that includes child block text and facts
+\end{itemize}
+
+DOGFOOD should not call composition introspection to render visuals. It should use composition for declaration inspection and block-tree rendering for rendered preview output.
+
+The Blocks preview may also host non-shipping fixture blocks. Fixture blocks must be clearly labeled as DOGFOOD examples and may prove interaction and lowering behavior that is not part of the first-party shipping block catalog. They still need to follow the same rendering boundary: visible controls emit inspectable Command intent records, state changes happen in the DOGFOOD model, and lower modes expose deterministic text or JSON summaries without provider handles, subscriptions, or runtime dispatch hidden in the block.
+
+The preview surface is still product UI, not a debug dump. The overview page may index available blocks and stories, but selected block pages should keep the live example first, summarize lower-mode output without clipped nested mini-surfaces, and present concise human documentation instead of raw compact metadata strings, source-path dumps, or full lowering fact payloads.
+
+The Blocks navigation is also a preview picker, not only a document outline. When focus moves onto a standard block row, the selected preview should move to that block so the side navigation, guide info pane, and live preview always describe the same block. This keeps the DOGFOOD Blocks page aligned with the Components gallery posture: browse a named item, see that item. The \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} parent row is a preview-group entry; opening it should land on the first concrete block preview rather than a prose inventory page.
+
+\section{Acceptance Criteria}\label{record-129-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Nested block previews render child output, not only child block names.
+\item
+  \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} remains a local single-block render contract.
+\item
+  \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} continues to inspect declarations without calling render.
+\item
+  Render tree inputs are runtime-branded rather than loose \texttt{\{\allowbreak{} \allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{},\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{} \allowbreak{}\}} shapes.
+\item
+  Render tree nodes snapshot plain slot/config records at construction time.
+\item
+  Render tree node construction rejects cyclic plain slot/config records with deterministic contract errors instead of recursing until stack overflow.
+\item
+  Accessor properties in slot records are not invoked during slot resolution.
+\item
+  Child mode inherits from the parent unless a child explicitly sets its own mode.
+\item
+  Nested visual child surfaces preserve cell styling when rendered through parent block surfaces.
+\item
+  Oversized nested visual child surfaces are fitted to their parent section instead of overrunning the parent block layout.
+\item
+  DOGFOOD selected block pages do not expose raw contract-summary or source-path debug text as the live documentation surface.
+\item
+  DOGFOOD block rows in the side navigation select their corresponding preview when focused.
+\item
+  DOGFOOD's \texttt{B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} group entry opens the first concrete standard block preview instead of a prose overview.
+\item
+  DOGFOOD lower-mode previews summarize output and facts without rendering clipped nested mini-surfaces in the main preview page.
+\item
+  DOGFOOD fixture block previews render as selected block pages with live controls, command-intent state transitions, and deterministic static, pipe, accessible, and JSON lowering summaries.
+\item
+  Recursive render depth is bounded and fails deterministically.
+\item
+  Lowering facts from nested blocks remain inspectable.
+\end{itemize}
+
+\section{Retrospective}\label{record-129-retrospective}
+
+Landed as the explicit block-tree rendering slice. The renderer stays separate from \texttt{b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} and \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, which keeps declaration inspection, local rendering, and recursive preview rendering as distinct contracts.
+

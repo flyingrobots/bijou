@@ -1,0 +1,16 @@
+% Presentation of original arrow notation. See flow-manifest.json.
+\begin{center}
+\begin{tikzpicture}[book flow node/.style={draw=BookHeading,line width=.65pt,fill=BookPanel,rounded corners=1.5pt,align=center,inner sep=5pt,minimum height=10mm,font=\fontsize{9}{11}\selectfont,execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},book flow edge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.7pt}]
+\node[book flow node,text width=96mm] (n0) at (0,0.0) {Graph\allowbreak{}QL SDL fixture};
+\node[book flow node,text width=96mm] (n1) at (0,-1.55) {bijou-block/\allowbreak{}1 artifact with groups[]};
+\node[book flow node,text width=96mm] (n2) at (0,-3.1) {ui-scene-ir/\allowbreak{}1 group/\allowbreak{}text node tree};
+\node[book flow node,text width=96mm] (n3) at (0,-4.65) {terminal Surface proof};
+\node[book flow node,text width=96mm] (n4) at (0,-6.2) {debug summary facts};
+\node[book flow node,text width=96mm] (n5) at (0,-7.75) {ui-scene-receipt/\allowbreak{}1};
+\draw[book flow edge] (n0) -- (n1);
+\draw[book flow edge] (n1) -- (n2);
+\draw[book flow edge] (n2) -- (n3);
+\draw[book flow edge] (n3) -- (n4);
+\draw[book flow edge] (n4) -- (n5);
+\end{tikzpicture}
+\end{center}

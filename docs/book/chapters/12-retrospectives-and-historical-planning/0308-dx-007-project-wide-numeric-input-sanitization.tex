@@ -1,0 +1,33 @@
+\chapter{DX-007 --- Project-Wide Numeric Input Sanitization}\label{record-308}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v4.5.0/DX-007-project-wide-numeric-input-sanitization.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-308-idea}
+
+Audit all public API functions that accept numeric parameters and ensure they guard against \texttt{N\allowbreak{}a\allowbreak{}N}, \texttt{I\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y}, \texttt{-\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y}, and fractional values where integers are expected.
+
+The v4.4.0 data-viz review found several places where non-finite user input propagated silently into rendering logic. The fixes were targeted (sparkline, braille-chart, stats-panel), but the same class of bug likely exists in other components.
+
+\section{Approach}\label{record-308-approach}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Grep for all exported functions with \texttt{n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r} parameters
+\item
+  Classify: which accept user-supplied values vs internal-only
+\item
+  Add \texttt{N\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}i\allowbreak{}s\allowbreak{}F\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}e} guards or \texttt{M\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{}.\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}r} clamping at boundaries
+\item
+  Consider a shared \texttt{s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}N\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}n\allowbreak{},\allowbreak{} \allowbreak{}f\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{})} utility
+\item
+  Add edge-case tests for each affected function
+\end{enumerate}
+
+\section{Why}\label{record-308-why}
+
+Three separate review passes (2 self-reviews + CodeRabbit) all found NaN/Infinity bugs. This is a systemic gap, not a one-off.
+

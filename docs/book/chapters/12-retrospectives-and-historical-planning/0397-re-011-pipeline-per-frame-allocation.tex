@@ -1,0 +1,31 @@
+\chapter{RE-011 --- Eliminate Per-Frame Allocation in Render Pipeline}\label{record-397}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE_011-pipeline-per-frame-allocation.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-011 — Eliminate Per-Frame Allocation in Render Pipeline
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-397-disposition}
+
+Implemented on release/v4.5.0 by caching the flattened render middleware chain inside createPipeline(), marking it dirty only when use() mutates the stage registry, and covering cache reuse plus invalidation in pipeline tests. The per-frame chain allocation is no longer live backlog work.
+
+\section{Original Proposal}\label{record-397-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-397-problem}
+
+\texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}x\allowbreak{}e\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} allocates a new \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}[\allowbreak{}]} array every frame by spreading all stage middleware into a flat list. At 60fps this is 60 array allocations per second with no reuse.
+
+\section{Fix}\label{record-397-fix}
+
+Cache the flattened chain array and only rebuild when middleware is added (track a dirty flag on \texttt{u\allowbreak{}s\allowbreak{}e\allowbreak{}(\allowbreak{})}). The chain is static after app initialization in most apps.
+
+\section{Effort}\label{record-397-effort}
+
+Small --- add a dirty flag and cached array.
+

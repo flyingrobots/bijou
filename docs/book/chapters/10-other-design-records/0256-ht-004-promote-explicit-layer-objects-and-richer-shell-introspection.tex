@@ -1,0 +1,259 @@
+\chapter{HT-004 --- Promote Explicit Layer Objects and Richer Shell Introspection}\label{record-256}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md}\par}\smallskip
+
+\emph{Cycle for turning the shell layer stack into richer explicit layer objects that own more than just branch order}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md}{HT-003 --- Implement Layer Stack and Input Map Routing}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-256-why-this-cycle-exists}
+
+HT-003 made the shell stack real enough for routing, dismissal, and truthful footer hints.
+
+But the layer model was still intentionally thin:
+
+\begin{itemize}
+\tightlist
+\item
+  most layer objects were inferred from booleans
+\item
+  layer titles still lived in overlay render helpers
+\item
+  footer hints still came from separate shell branches
+\item
+  help overlay content still special-cased underlying layer kinds instead of consuming richer layer metadata
+\end{itemize}
+
+This cycle exists to make the layer object itself a better unit of truth for humans, agents, and shared shell code.
+
+\section{Human users / jobs / hills}\label{record-256-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-256-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framed-app operators moving between workspace, settings, help, notification review, palette search, and quit confirm
+\item
+  DOGFOOD users relying on the shell to explain what is active
+\item
+  builders expecting shell overlays to feel coherent instead of pieced together
+\end{itemize}
+
+\subsection{Human jobs}\label{record-256-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Trust a shell layer to own its own title and controls instead of seeing mismatched chrome.
+\item
+  Open help and get the controls for the layer beneath it without stale workspace leakage.
+\item
+  Move between shell layers without the footer and overlay titles feeling like they come from different systems.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-256-human-hill}
+
+Each shell layer feels like a real object with its own identity and controls, not a boolean plus a pile of helper branches.
+
+\section{Agent users / jobs / hills}\label{record-256-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-256-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents inspecting framed-app model state
+\item
+  agents generating deterministic playbacks for shell layers
+\item
+  agents that need to know which controls belong to the active or underlying layer
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-256-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inspect the active and underlying layer objects directly instead of reverse-engineering footer/help logic.
+\item
+  Read a layer title and control ownership from the same place the shell uses.
+\item
+  Determine whether a layer has its own help source, hint source, and dismissal semantics.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-256-agent-hill}
+
+An agent can inspect a frame model and obtain richer explicit layer objects with enough metadata to reason about titles, controls, and help ownership without parsing rendered chrome heuristically.
+
+\section{Human playback}\label{record-256-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user opens settings in a framed app.
+\item
+  The shell creates a settings layer object with the settings title, footer hint, and help bindings.
+\item
+  The user opens help from within settings.
+\item
+  Help becomes the active layer, but the underlying settings layer still carries the controls help needs to show.
+\item
+  The help overlay lists settings controls instead of falling back to stale workspace bindings.
+\item
+  The user dismisses help and returns to settings.
+\item
+  The settings drawer title and footer still agree because both come from the same explicit layer model.
+\end{enumerate}
+
+\section{Agent playback}\label{record-256-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects a framed app with settings open and a search layer above it.
+\item
+  The stack exposes explicit layer objects:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    workspace
+  \item
+    settings
+  \item
+    search
+  \end{itemize}
+\item
+  The search layer object includes its title and hint source.
+\item
+  The underlying settings layer object includes its help source.
+\item
+  The agent can predict both the visible footer controls and the help overlay content from those layer objects.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-256-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\end{itemize}
+
+\section{Implementation outline}\label{record-256-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Promote the public layer descriptor into a richer explicit layer object with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    stable id
+  \item
+    title
+  \item
+    hint source
+  \item
+    help source
+  \end{itemize}
+\item
+  Let \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} accept metadata overrides for individual layers.
+\item
+  Export richer active/underlying layer helpers for shell introspection.
+\item
+  Drive shell footer hints from the active layer object instead of a separate footer-branch helper.
+\item
+  Drive help-overlay content from the underlying layer object's help source instead of hard-coded kind branching.
+\item
+  Route shell overlay titles through the same layer metadata where feasible.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-256-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle doc regression for HT-004 and its follow-on backlog item
+\item
+  unit regression proving \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} returns richer layer metadata when supplied
+\item
+  regression proving active/underlying layer helpers expose that richer metadata
+\item
+  shell regression proving help opened over settings renders settings controls, not stale workspace controls
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-256-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  page-owned layers are still limited to the existing \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p} seam rather than a full page-provided layer registry
+\item
+  shell overlay bodies may still have some layout-specific logic even after titles and control metadata move onto layer objects
+\item
+  the first explicit layer object model may still be derived rather than literally pushed/popped as runtime objects
+\end{itemize}
+
+\section{Retrospective}\label{record-256-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  richer explicit layer objects with title, hint-source, and help-source metadata
+\item
+  exported active/underlying layer helpers for shell introspection
+\item
+  footer and help resolution driven from layer metadata instead of ad hoc branching
+\item
+  overlay titles routed through explicit layer objects where the shell owns the surface
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  a full page-provided layer registry beyond \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+\item
+  a literal pushed/popped runtime collection of first-class layer instances stored on the frame model
+\item
+  agent-facing control projection beyond the richer exported layer helpers
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md}{HT-005 --- Promote Page-Provided Layer Registry and Shell Control Projection}
+\end{itemize}
+

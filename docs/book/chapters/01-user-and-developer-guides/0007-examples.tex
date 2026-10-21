@@ -1,0 +1,115 @@
+\chapter{Secondary Example Map}\label{record-007}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/EXAMPLES.md}\par}\smallskip
+
+This file is no longer a giant per-example status ledger.
+
+It is a maintainer-facing and agent-facing reference map, not a public docs hub.
+
+DOGFOOD is the primary living-docs and proving surface. In v4.4.0, 31 examples were retired because DOGFOOD now covers their component families directly. The remaining examples exist for runtime seam references, shell proving, and leaf API demos that DOGFOOD does not yet teach.
+
+If you are trying to learn Bijou, start with \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOGFOOD.md}{DOGFOOD}, not this file.
+
+For the full secondary/internal inventory, use \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/README.md}{../examples/README.md}.
+
+\section{Keep}\label{record-007-keep}
+
+These examples still have clear secondary/reference value.
+
+\subsection{Runtime References}\label{record-007-runtime-references}
+
+Keep these as the main runtime reference set for the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} line:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}m\allowbreak{}o}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}c\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}a\allowbreak{}p\allowbreak{}p}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+\end{itemize}
+
+They keep the historical \texttt{v\allowbreak{}3\allowbreak{}-\allowbreak{}*} names, but they remain the clearest runtime seam references on this branch.
+
+\subsection{DOGFOOD And Shell Proving Surfaces}\label{record-007-dogfood-and-shell-proving-surfaces}
+
+Keep these because they prove product-level behavior rather than isolated leaf rendering:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the living docs app and current proving surface
+  \end{itemize}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    canonical multi-view control-room shell
+  \end{itemize}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    notification stack, routing, history, and shell review behavior
+  \end{itemize}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    framed shell reference
+  \end{itemize}
+\end{itemize}
+
+\subsection{Remaining Leaf Examples}\label{record-007-remaining-leaf-examples}
+
+Keep leaf examples when they are the clearest isolated explanation of a family or API seam not yet covered by DOGFOOD stories. The remaining set in this file is the current reference for example retirements that still depend on deeper DOGFOOD teaching. The historical depth follow-on is \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/DF-020-deepen-dogfood-story-depth-and-variant-quality.md}{DF-020}.
+
+\section{Cut Later}\label{record-007-cut-later}
+
+An example becomes a retirement candidate only when all of the following are true:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  DOGFOOD or another canonical scenario now teaches the same decision clearly.
+\item
+  No migration guide or package README still points to the example.
+\item
+  It is not carrying unique smoke or regression value.
+\item
+  It is not the clearest isolated proof of a public API seam.
+\end{enumerate}
+
+\section{Relationship To Release Smoke}\label{record-007-relationship-to-release-smoke}
+
+Release smoke now runs through \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}.
+
+Tracked closure:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}{WF-003 --- Replace \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}:\allowbreak{}*} With \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}}
+\end{itemize}
+
+That means examples are no longer the release-facing smoke contract even if some internal reference tooling around example scenarios still exists.
+

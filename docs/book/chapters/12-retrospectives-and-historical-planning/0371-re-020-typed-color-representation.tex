@@ -1,0 +1,72 @@
+\chapter{RE-020 --- Typed Color Representation (ColorRef Branded Type)}\label{record-371}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-020-typed-color-representation.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-020 — Typed Color Representation (`ColorRef` Branded Type)
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-371-disposition}
+
+Implemented on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as a compatibility-first \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} landing. \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}.\allowbreak{}f\allowbreak{}g} / \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}.\allowbreak{}b\allowbreak{}g} now accept \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f}, the runtime exports \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{t\allowbreak{}r\allowbreak{}y\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}(\allowbreak{})}, and \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}g\allowbreak{}b\allowbreak{}(\allowbreak{})}, and packed surface writes can consume either user-authored hex strings or eager resolved color objects without reparsing on the hot path. Theme-token byte caching from RE-019 remains the automatic fast path, while components and adapters can now thread typed resolved colors through paint and output code explicitly.
+
+\section{Original Proposal}\label{record-371-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-371-idea}
+
+Replace raw \texttt{f\allowbreak{}g\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} / \texttt{b\allowbreak{}g\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} in \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} (and everywhere downstream) with a branded \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} type that can be either a string (for user code) or a pre-parsed byte representation (for internal hot paths):
+
+\begin{CodeBlock}
+/**
+ * Opaque color reference. Either a user-written hex string
+ * (lazy; parsed on first use) or a pre-resolved bytes object
+ * (eager; zero parse cost on the hot path).
+ */
+export type ColorRef = string & { readonly __color: unique symbol }
+                     | ResolvedColor;
+
+export interface ResolvedColor {
+  readonly __color: unique symbol;
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
+}
+
+export function color(hex: string): ColorRef {
+  return hex as ColorRef;  // lazy
+}
+
+export function resolveColor(ref: ColorRef): ResolvedColor {
+  if (typeof ref === 'string') {
+    const [r, g, b] = parseHex(ref)!;
+    return { __color: undefined as never, r, g, b };
+  }
+  return ref;
+}
+\end{CodeBlock}
+
+Cell becomes:
+
+\begin{CodeBlock}
+interface Cell {
+  fg?: ColorRef;
+  bg?: ColorRef;
+  // ...
+}
+\end{CodeBlock}
+
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} handles both branches: if the color is a \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, write bytes directly; if it's a string, parse inline (same as today).
+
+Theme resolution pre-produces \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} objects for every token color (see related idea \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}), so hot-path components automatically get the fast path by virtue of pulling from the theme.
+
+\section{Why}\label{record-371-why}
+
+Hex strings are a \textbf{user input format} --- great for humans typing \texttt{\#\allowbreak{}f\allowbreak{}f\allowbreak{}8\allowbreak{}8\allowbreak{}0\allowbreak{}0} into a theme JSON or calling a styling API ad-hoc. But they're a terrible internal representation because they force a parse on every use. Today, \texttt{f\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}\#\allowbreak{}r\allowbreak{}r\allowbreak{}g\allowbreak{}g\allowbreak{}b\allowbreak{}b\allowbreak{}'} in Cell forces that parse to happen per-cell, per-frame, in the hottest loop in the system.
+
+\texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} lets us keep hex strings for ergonomic user code while threading a parsed representation through the hot path. The type system makes it clear which layer you're at.
+

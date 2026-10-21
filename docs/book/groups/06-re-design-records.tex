@@ -1,0 +1,24 @@
+\chapter*{Runtime engine design records}
+\addcontentsline{toc}{chapter}{Runtime engine design records}
+
+These records concern the machinery behind a frame: state and effects, surfaces and packed cells, layout, input routing, host boundaries, rendering stages and scheduling. Trace a proposed optimization through the invariants it must preserve. A measured gain is most useful when the record also identifies its workload, revision and correctness checks.
+
+\input{chapters/06-runtime-engine-design-records/0149-re-001-define-runtime-engine-architecture}%
+\input{chapters/06-runtime-engine-design-records/0150-re-002-promote-first-class-state-machine-and-view-stack}%
+\input{chapters/06-runtime-engine-design-records/0151-re-003-retain-layout-trees-and-layout-invalidation}%
+\input{chapters/06-runtime-engine-design-records/0152-re-004-route-input-through-layouts-and-layer-bubbling}%
+\input{chapters/06-runtime-engine-design-records/0153-re-005-buffer-commands-and-effects-separately}%
+\input{chapters/06-runtime-engine-design-records/0154-re-006-formalize-component-layout-and-interaction-contracts}%
+\input{chapters/06-runtime-engine-design-records/0155-re-007-migrate-framed-shell-onto-runtime-engine-seams}%
+\input{chapters/06-runtime-engine-design-records/0156-re-008-perf-findings}%
+\input{chapters/06-runtime-engine-design-records/0157-re-024-surface-budget-warnings}%
+\input{chapters/06-runtime-engine-design-records/0158-re-030-average-high-resolution-canvas-colors}%
+\input{chapters/06-runtime-engine-design-records/0159-re-031-raytrace-shader-kernel}%
+\input{chapters/06-runtime-engine-design-records/0160-re-032-fit-cell-glyphs-from-coverage}%
+\input{chapters/06-runtime-engine-design-records/0161-re-033-stable-spring-pulse-integration}%
+\input{chapters/06-runtime-engine-design-records/0162-re-034-glyph-fit-canvas-resolution}%
+\input{chapters/06-runtime-engine-design-records/0163-re-035-mandatory-layout-envelope-and-constraint-negotiation}%
+\input{chapters/06-runtime-engine-design-records/0164-re-036-packed-bijou-cells-surface-adapter}%
+\input{chapters/06-runtime-engine-design-records/0165-re-041-v72-framework-input-stabilization}%
+\input{chapters/06-runtime-engine-design-records/0166-re-127-command-and-render-runtime-guardrails}%
+\input{chapters/06-runtime-engine-design-records/0167-re-142-node-bootstrap-failure-contract}%

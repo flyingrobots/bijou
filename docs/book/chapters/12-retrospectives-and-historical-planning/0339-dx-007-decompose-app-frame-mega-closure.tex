@@ -1,0 +1,49 @@
+\chapter{DX-007 --- Decompose app-frame.ts Mega-Closure}\label{record-339}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v5.0.0/DX_007-decompose-app-frame-mega-closure.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-339-problem}
+
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is 2,679 lines with 9 responsibilities, 90+ internal functions, 38 imports, and a mega-closure that prevents unit testing any individual function.
+
+\section{Evidence}\label{record-339-evidence}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Modularity}: routing, rendering, state, command dispatch, settings, notifications, help, overlays, and transitions all live in one file
+\item
+  \textbf{Coupling}: circular import with app-frame-types.ts (FrameModel)
+\item
+  \textbf{Testability}: every internal function captures closure state; none can be imported or tested independently
+\item
+  \textbf{Growth}: each RE cycle (001-007) added more logic without decomposing
+\end{itemize}
+
+\section{Target}\label{record-339-target}
+
+Decompose into focused domain modules:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- settings drawer state, focus, scroll, row activation, resolveSettingsLayout
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- notification center state, scroll, filter, resolveNotificationCenterLayout
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- help overlay rendering, scroll computation
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- shellCommandHandlers table, FrameShellCommand apply logic, drainShellCommandBuffer
+\item
+  Move FrameModel to app-frame-types.ts to break circular import
+\end{enumerate}
+
+Each module independently importable and unit-testable with deps injection. Target: app-frame.ts under 800 lines.
+
+\section{Effort}\label{record-339-effort}
+
+Large --- touches the highest-traffic file in the repo. Must be done incrementally with tests at each step.
+

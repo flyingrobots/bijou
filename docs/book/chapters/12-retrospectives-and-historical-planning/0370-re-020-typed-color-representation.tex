@@ -1,0 +1,106 @@
+\chapter{RE-020 --- Typed Color Representation (ColorRef Branded Type)}\label{record-370}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v5.0.0/RE-020-typed-color-representation.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-370-idea}
+
+Replace raw \texttt{f\allowbreak{}g\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} / \texttt{b\allowbreak{}g\allowbreak{}?\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} in \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l} (and everywhere downstream) with a branded \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} type that can be either a string (for user code) or a pre-parsed byte representation (for internal hot paths):
+
+\begin{CodeBlock}
+/**
+ * Opaque color reference. Either a user-written hex string
+ * (lazy; parsed on first use) or a pre-resolved bytes object
+ * (eager; zero parse cost on the hot path).
+ */
+export type ColorRef = string & { readonly __color: unique symbol }
+                     | ResolvedColor;
+
+export interface ResolvedColor {
+  readonly __color: unique symbol;
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
+}
+
+export function color(hex: string): ColorRef {
+  return hex as ColorRef;  // lazy
+}
+
+export function resolveColor(ref: ColorRef): ResolvedColor {
+  if (typeof ref === 'string') {
+    const [r, g, b] = parseHex(ref)!;
+    return { __color: undefined as never, r, g, b };
+  }
+  return ref;
+}
+\end{CodeBlock}
+
+Cell becomes:
+
+\begin{CodeBlock}
+interface Cell {
+  fg?: ColorRef;
+  bg?: ColorRef;
+  // ...
+}
+\end{CodeBlock}
+
+\texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} handles both branches: if the color is a \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, write bytes directly; if it's a string, parse inline (same as today).
+
+Theme resolution pre-produces \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} objects for every token color (see related idea \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}), so hot-path components automatically get the fast path by virtue of pulling from the theme.
+
+\section{Why}\label{record-370-why}
+
+Hex strings are a \textbf{user input format} --- great for humans typing \texttt{\#\allowbreak{}f\allowbreak{}f\allowbreak{}8\allowbreak{}8\allowbreak{}0\allowbreak{}0} into a theme JSON or calling a styling API ad-hoc. But they're a terrible internal representation because they force a parse on every use. Today, \texttt{f\allowbreak{}g\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}\#\allowbreak{}r\allowbreak{}r\allowbreak{}g\allowbreak{}g\allowbreak{}b\allowbreak{}b\allowbreak{}'} in Cell forces that parse to happen per-cell, per-frame, in the hottest loop in the system.
+
+\texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} lets us keep hex strings for ergonomic user code while threading a parsed representation through the hot path. The type system makes it clear which layer you're at.
+
+\section{Migration Path}\label{record-370-migration-path}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Land \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} first --- that's the cheap no-breaking-changes version.
+\item
+  Add \texttt{C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}f} as a type alias that's currently just \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g}, update Cell to use it. This is a rename, no runtime change.
+\item
+  Add a \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} case to the union. Update \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}e\allowbreak{}t} to handle it.
+\item
+  Update theme resolver to produce \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} objects.
+\item
+  Components that build cells directly (not via theme tokens) can opt in by calling \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{})} once at setup time and reusing the result.
+\item
+  Eventually, \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} is still valid for user code but components use \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} internally.
+\end{enumerate}
+
+No breaking changes at any step.
+
+\section{Why This Is Cool}\label{record-370-why-this-is-cool}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ergonomic at the edge, fast at the core.} The right abstraction at the right layer.
+\item
+  \textbf{Type-directed optimization.} The type system tells you when you're on the slow path vs the fast path.
+\item
+  \textbf{Composable with other optimizations.} Gradients can store \texttt{R\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r} stops, animations can interpolate in byte space without string conversions.
+\item
+  \textbf{Pairs with the RE-017 byte pipeline.} The byte pipeline eliminates string work from the diff path; this eliminates string work from the paint path. Together they close the loop.
+\end{itemize}
+
+\section{Related}\label{record-370-related}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}8} (bad-code) --- the hex string smell.
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9} (cool idea) --- the simpler precursor: theme-token byte cache without exposing a new type.
+\item
+  DTCG interop at \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}t\allowbreak{}c\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- this must continue to round-trip to hex strings for export.
+\end{itemize}
+
