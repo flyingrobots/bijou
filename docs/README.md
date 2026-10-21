@@ -1,6 +1,6 @@
 # Bijou documentation
 
-[Read the teaching book](./book/bijou-book.pdf), use the
+[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf), use the
 [Design Archive](./book/bijou-archive.pdf), or
 [Read the complete book](./book/bijou-designs.pdf).
 See [LaTeX sources and edition details](./book/README.md).
@@ -12,7 +12,9 @@ and maintaining it. It includes practical reference material and the component a
 The archive preserves 426 guides, principles, design records,
 release notes, audits and retrospectives as historical appendices. Their original
 claims and status have not been reclassified as current implementation guarantees.
-The complete edition combines both. Individual source Markdown files remain removed;
+The complete edition preserves the combined 20 October 2026 publication. The live
+teaching book and its LaTeX sources now belong to the job-monitor repository.
+Individual source Markdown files remain removed;
 their exact text and hashes survive in the frozen corpus for DOGFOOD and checks.
 
 For a bounded source excerpt, run from the repository root:

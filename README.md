@@ -1,6 +1,6 @@
 # Bijou
 
-[Read the teaching book](docs/book/bijou-book.pdf) ·
+[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) ·
 [Design Archive](docs/book/bijou-archive.pdf) ·
 [Read the complete Bijou documentation book](docs/book/bijou-designs.pdf).
 The teaching book builds a reproducible job monitor; historical source documents

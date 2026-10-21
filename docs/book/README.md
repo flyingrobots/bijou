@@ -1,15 +1,21 @@
 # The Bijou Book and Design Archive
 
-[The teaching book](./bijou-book.pdf) · [Design Archive](./bijou-archive.pdf) · [Complete edition](./bijou-designs.pdf)
+[The teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) · [Design Archive](./bijou-archive.pdf) · [Complete edition](./bijou-designs.pdf)
 
-The publication has three PDFs assembled from one modular LaTeX source tree.
+The live teaching book and its build sources now live in
+[flyingrobots/bijou-job-monitor](https://github.com/flyingrobots/bijou-job-monitor/tree/main/book).
+Bijou retains the Design Archive and the frozen complete edition. Their PDFs
+remain unchanged, preserving existing physical-page links. The complete edition
+uses a frozen teaching snapshot under `history/complete-edition-2026-10-20/`.
+
+The 20 October 2026 publication originally had three PDFs from one source tree.
 The teaching book is the main reading path. The archive preserves the project's
 working history. The complete edition combines the teaching book with historical
 appendices and keeps the existing filename used by repository links.
 
-This build produces:
+The retained PDFs are:
 
-- Teaching: 106 physical pages, 14,793,930 bytes.
+- Teaching: now maintained and distributed in the job-monitor repository.
 - Archive: 1,872 physical pages, 20,333,134 bytes.
 - Complete: 1,933 physical pages, 22,710,082 bytes.
 
@@ -84,12 +90,12 @@ redrawn by eye. See the capture manifests and `tools/README.md` for reproduction
 
 ## Source layout and builds
 
-- `bijou-book.tex`: teaching book; `bijou-archive.tex`: historical volume;
+- `bijou-archive.tex`: historical volume;
   `bijou-designs.tex`: complete edition.
 - `preamble.tex`, `frontmatter.tex`, `copyright.tex`, `reproducibility.tex`,
   `preface.tex`, `edition-notes.tex`: shared publication setup and edition-aware front matter.
-- `teaching/`: the five-Part route, introductions and seven connecting chapters.
-- `workshops/`: seven shared teaching chapters with stable workshop labels.
+- `history/complete-edition-2026-10-20/{teaching,workshops}/`: frozen teaching
+  snapshot used only to reproduce the complete historical edition.
 - `archive/`, `parts/`, `introductions/`, `groups/`: historical assembly and guidance.
 - `chapters/`: 426 unchanged typeset source records.
 - `reference/`, `appendices/`, `specimens/`: practical reference, provenance and licenses.
@@ -103,7 +109,7 @@ one owned `/tmp` output directory to resolve contents and cross-references:
 
 ```sh
 mkdir -p /tmp/bijou-design-book/teaching/build
-for name in bijou-book bijou-archive bijou-designs; do
+for name in bijou-archive bijou-designs; do
   for pass in 1 2 3; do
     lualatex --no-shell-escape --interaction=nonstopmode --halt-on-error \
       --output-directory=/tmp/bijou-design-book/teaching/build "$name.tex"
@@ -128,7 +134,9 @@ The three copied companion files are byte-identical to the pinned source and
 retain their copyright statements; companion-snippets includes LICENSE and NOTICE.
 
 `build-report.json`, `editorial-verification.json` and `edition-manifest.json`
-record current output verification. Source-corpus checks and archive-body identity
+record the preceding combined edition verification. `teaching-migration.json`
+records the source move; the current teaching PDF build evidence lives with the
+companion book. Source-corpus checks and archive-body identity
 are distinct: the corpus preserves original Markdown; the unchanged TeX records
 retain the preceding edition's presentation edits. Historical tracker links and
 source-retirement manifests remain intact. The companion's 44 tests and six PTY cases were executed for book-v2 and its hosted CI passed at the pinned commit.
