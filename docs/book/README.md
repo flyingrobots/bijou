@@ -119,7 +119,8 @@ done
 
 On this shared workstation reuse `bijou-design-book-worker`, its existing TeX
 image and bounded runner. Acquire `host/docker/bijou-design-book-worker/` and
-`host/heavy-work` together in `/Users/Shared/git-locks/workstation.git`. Outputs
+`host/heavy-work` together in the workstation lock store named by local agent
+instructions. Outputs
 belong in `/tmp`; the image and repository mount are read-only. The worker uses
 2 CPUs, 4 GiB RAM, bounded temporary storage and logs. Record the active guard,
 timeout, usage and free space before launch. Do not create another worker to
