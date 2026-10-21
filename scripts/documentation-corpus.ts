@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,7 +20,7 @@ function archive(): ReadonlyMap<string, string> {
       || !('sha256' in record) || typeof record.sha256 !== 'string') {
       throw new Error('Invalid book corpus entry');
     }
-    if (relative(ROOT, resolve(ROOT, record.path)) !== record.path
+    if (archiveKey(resolve(ROOT, record.path)) !== record.path
       || entries.has(record.path)
       || createHash('sha256').update(record.text).digest('hex') !== record.sha256) {
       throw new Error(`Invalid book corpus path or checksum: ${record.path}`);
@@ -33,7 +33,7 @@ function archive(): ReadonlyMap<string, string> {
 
 function archiveKey(path: string | URL): string {
   const absolute = path instanceof URL ? fileURLToPath(path) : resolve(path);
-  return relative(ROOT, absolute).split('\\').join('/');
+  return relative(ROOT, absolute).split(sep).join('/');
 }
 
 /** Read a live file first, then an exact source retained in the compiled book. */
