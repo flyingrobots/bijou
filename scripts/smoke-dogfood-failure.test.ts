@@ -13,6 +13,7 @@ afterEach(() => {
 async function runCapture(source: string) {
   const root = mkdtempSync(join(tmpdir(), 'bijou-smoke-failure-'));
   roots.push(root);
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
   mkdirSync(join(root, 'examples/docs'), { recursive: true });
   symlinkSync(resolve(import.meta.dirname, '../node_modules'), join(root, 'node_modules'), 'junction');
   writeFileSync(join(root, 'examples/docs/capture-main.ts'), source);

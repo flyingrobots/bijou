@@ -18,7 +18,7 @@
   "tripwires": [],
   "validation": {
     "red": "Real capture-process startup error and large-output diagnostic tests failed against the original runner; five other cases passed.",
-    "focused": "21 tests across four files passed before adding separate many-short-lines and empty-tail cases; normal checks follow.",
+    "focused": "23 tests across four files passed, including real process captures, separate character/line bounds, empty tails, quiet success, and release-line agreement. Capture fixtures explicitly declare ESM like the repository.",
     "scope": "Actual process captures, normalized failure tail capped by characters and lines, quiet success, real filesystem agreement between DOGFOOD release-line derivation and readiness packet lookup.",
     "documentation": "Clarified the current rule in the live docs map; historical corpus remains unchanged."
   }
