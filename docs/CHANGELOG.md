@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- DOGFOOD's Current Release Story now shows the running version and release line
+  in English, German, Spanish and French. The live reader explains preview and
+  evidence boundaries while the original V7.2 text remains archived unchanged.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

@@ -2237,7 +2237,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Le parcours de version v7.2 à travers Nouveautés, preuve et historique du changelog."
+        "fr": "Le parcours de version v{releaseLine} à travers Nouveautés, preuve et historique du changelog."
       }
     },
     {
