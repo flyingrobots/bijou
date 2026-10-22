@@ -6,6 +6,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Raised the fast-uri workspace floor to 3.1.9 and added regressions for
+  encoded hostname normalization and scheme rejection (PR #530).
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and
