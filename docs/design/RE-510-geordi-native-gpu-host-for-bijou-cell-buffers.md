@@ -1,6 +1,5 @@
 ---
 title: RE-510 Geordi Native GPU Host For Bijou Cell Buffers
-legend: RE
 lane: cool-ideas
 priority: medium
 github_issue: 510
@@ -20,26 +19,26 @@ keywords:
 
 # RE-510 Geordi Native GPU Host For Bijou Cell Buffers
 
-Legend: [RE - Runtime Engine](../legends/RE-runtime-engine.md)
+Design context: renderer and host integration.
 
 ## Linked Work
 
 - Design story:
   [#510](https://github.com/flyingrobots/bijou/issues/510)
 - Landed packed-cell contract:
-  [RE-036 Packed Bijou Cells Surface Adapter](./RE-036-packed-bijou-cells-surface-adapter.md)
+  [RE-036 Packed Bijou Cells Surface Adapter](https://github.com/flyingrobots/bijou/blob/4412ec6db/docs/design/RE-036-packed-bijou-cells-surface-adapter.md)
   and [#459](https://github.com/flyingrobots/bijou/issues/459)
 - Portable Bijou endpoint direction:
-  [DX-043 Portable Bijou Blocks And Multi-Endpoint IR](./DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md)
+  [DX-043 Portable Bijou Blocks And Multi-Endpoint IR](https://github.com/flyingrobots/bijou/blob/4412ec6db/docs/design/DX-043-portable-bijou-blocks-and-multi-endpoint-ir.md)
 - Shared scene and renderer ownership:
-  [DX-042 Shared UI Scene IR And Bijou Render Target](./DX-042-shared-ui-scene-ir-and-bijou-render-target.md)
+  [DX-042 Shared UI Scene IR And Bijou Render Target](https://github.com/flyingrobots/bijou/blob/4412ec6db/docs/design/DX-042-shared-ui-scene-ir-and-bijou-render-target.md)
 - Geordi-backed title-screen candidate:
   [#321](https://github.com/flyingrobots/bijou/issues/321) and
-  [DF-074 Fluid Triangle Title Screen](./DF-074-fluid-triangle-title-screen.md)
+  [DF-074 Fluid Triangle Title Screen](https://github.com/flyingrobots/bijou/blob/4412ec6db/docs/design/DF-074-fluid-triangle-title-screen.md)
 - Mutable raster precursor:
   [#346](https://github.com/flyingrobots/bijou/issues/346)
 - V10 renderer and host boundary:
-  [Roadmap](../ROADMAP.md#v100-renderer-and-host-systems-integration)
+  [v10.0.0 milestone](https://github.com/flyingrobots/bijou/milestone/10)
 
 ## Decision Summary
 
@@ -129,7 +128,9 @@ This design was requested after comparing Bijou, Geordi, the project blog, and
 
 ### Bijou: Implemented Cell And Terminal Boundaries
 
-Current Bijou `origin/main` at `4412ec6db` provides the strongest evidence:
+The historical Bijou source snapshot `4412ec6db` provides the source evidence
+below. Its design records are now archived; these links pin the original text
+rather than resurrecting retired planning documents:
 
 - `DX-043` already describes
   `ui-scene-ir/1 -> Geordi packed-cell renderer -> PackedBijouCells -> Bijou
@@ -1031,12 +1032,31 @@ implementation detail.
 
 ## Validation Plan
 
-This design-only cycle validates documentation and repository state:
+Run installation and a fresh build in the bounded Docker worker before the
+documentation and repository gates. Keep the checkout copied into the worker;
+do not mount the host Git repository writable. The full gate includes lint,
+type checking, standards checks and tests, even for this design-only change:
 
 ```bash
+npm ci --no-audit --no-fund
+npm run build -- --force
 npm run docs:inventory
+npm run docs:design-system:preflight
+npm run code-dojo:ci
+npm run dogfood:i18n:check
+npm run dogfood:i18n:complete
+npm run dogfood:i18n:debt
+npm run verify:interactive-examples
 git diff --check
 ```
+
+There is no general Markdown link checker or formatter script in the current
+package scripts. Check this document's relative Markdown links explicitly and
+inspect the diff for formatting, fenced-code balance and heading structure;
+`docs:inventory` does not establish link validity. For the pinned historical
+GitHub links, verify each `4412ec6db:path` object with `git cat-file -e` and
+confirm issue/milestone destinations with `gh`. Record which links were checked;
+do not report an HTTP sweep or Markdown linter that was not run.
 
 The later cross-repository implementation should add commands equivalent to:
 
@@ -1142,9 +1162,9 @@ no-color, and accessible lowerings to remain complete.
 
 ## Open Questions
 
-1. Should the first Geordi consumer validate the JSON receipt independently in
-   Rust, consume a generated cross-language DTO, or accept a smaller binary
-   fixture plus the canonical receipt?
+1. Should Rust's semantic validator be handwritten or generated with explicit
+   custom validators? Either choice must meet the pinned cross-language glyph
+   profile and shared valid/invalid corpus; a DTO alone cannot satisfy intake.
 2. Should prepared GPU records reference a glyph run, a glyph-instance range,
    or a bounded single-glyph atlas entry in version `1`?
 3. Which additional modifiers should follow the required checked-fixture
