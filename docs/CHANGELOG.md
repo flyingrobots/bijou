@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- PR review reporting recognizes CodeRabbit quota notices even when its status
+  check succeeds. Only later review-completion evidence supersedes a notice;
+  edited notices use their updated timestamp, and active limits keep merge
+  readiness pending without changing the human-review requirement.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

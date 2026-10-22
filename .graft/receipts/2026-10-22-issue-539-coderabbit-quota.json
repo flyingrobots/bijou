@@ -1,0 +1,53 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Issue #539: distinguish active CodeRabbit quota skips from completed review",
+  "bytesConsumed": 549159,
+  "filesRead": [
+    "AGENTS.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "scripts/pr-review-status-coderabbit.ts",
+    "scripts/pr-review-status-contract.ts",
+    "scripts/pr-review-status-readiness.ts",
+    "scripts/pr-review-status-authors.ts",
+    "scripts/pr-review-status-queries.ts",
+    "scripts/pr-review-status-parse.ts",
+    "scripts/pr-review-status-cli.ts",
+    "scripts/pr-review-status-github.ts",
+    "scripts/pr-review-status.part03.test.ts",
+    "scripts/pr-review-status.part04.test.ts",
+    "scripts/pr-review-status.part05.test.ts",
+    "scripts/pr-review-status.part06.test.ts",
+    "scripts/pr-review-status.part07.test.ts",
+    "scripts/pr-review-status.part08.test.ts",
+    "scripts/pr-review-status-parse.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "scripts/pr-review-status-coderabbit.ts",
+    "scripts/pr-review-status-contract.ts",
+    "scripts/pr-review-status-queries.ts",
+    "scripts/pr-review-status-parse.ts",
+    "scripts/pr-review-status-quota.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Long-running Graft session reports tool-call tripwire; active user goal authorizes continued issue work and meaningful commentary updates."
+  ],
+  "validation": {
+    "red": "8 of 9 new quota regressions failed on unchanged main after clean install/build.",
+    "focused": "All 30 review-status tests across 10 files passed; typecheck and ESLint passed.",
+    "live": "Actual GitHub data for #535: status output now reports CodeRabbit: rate-limited; status-mode exit remains 0, merge-ready exit remains 1 for missing 2 human reviews.",
+    "readiness": "Regression with two completed human approvals retains pending rate-limited signal and exit 8.",
+    "scope": "Old/new quota wording and structured marker; only a later explicit completion comment or submitted review supersedes a notice. Updated comment timestamps preserve edited active notices.",
+    "policy": "Human-review minimums, checks policy, and normal status-mode exit semantics unchanged."
+  },
+  "resource_policy": {
+    "worker": "Reused host Node/npm toolchain; no Docker",
+    "guard": "/tmp/bijou-issue-guard.py",
+    "build_budget_gib": 20,
+    "data_budget_gib": 4,
+    "logs_budget_mib": 128
+  }
+}

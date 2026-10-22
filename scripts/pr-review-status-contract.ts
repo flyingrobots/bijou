@@ -27,6 +27,7 @@ export interface PullRequestComment {
   } | null;
   readonly body: string;
   readonly createdAt: string;
+  readonly updatedAt?: string;
 }
 
 export interface PullRequestReview {

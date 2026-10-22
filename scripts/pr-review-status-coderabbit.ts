@@ -21,15 +21,13 @@ export function summarizeCodeRabbitStatus(
 ): CodeRabbitStatus {
   const events = collectCodeRabbitEvents(comments, reviews);
   const latestEvent = events[0] ?? null;
-  const latestNonRateLimitAt =
-    events.find((event) => event.kind !== 'rate_limit')?.at ?? null;
-  const hasPassingCheck = codeRabbitCheck?.bucket === 'pass';
+  const latestCompletionAt = events.find((event) =>
+    event.kind === 'clean' || event.kind === 'actionable' ||
+    (event.submitted && event.kind !== 'rate_limit'),
+  )?.at ?? null;
   const staleRateLimitCount = events.filter((event) => {
     if (event.kind !== 'rate_limit') return false;
-    return (
-      hasPassingCheck ||
-      (latestNonRateLimitAt != null && event.at < latestNonRateLimitAt)
-    );
+    return latestCompletionAt != null && event.at < latestCompletionAt;
   }).length;
   const activeRateLimitCount =
     events.filter((event) => event.kind === 'rate_limit').length -
@@ -40,7 +38,7 @@ export function summarizeCodeRabbitStatus(
     activeRateLimitCount,
   };
 
-  if (codeRabbitCheck?.bucket === 'pass') {
+  if (codeRabbitCheck?.bucket === 'pass' && activeRateLimitCount === 0) {
     return {
       state: 'pass',
       detail:
@@ -106,12 +104,17 @@ export function summarizeCodeRabbitStatus(
 function collectCodeRabbitEvents(
   comments: readonly PullRequestComment[],
   reviews: readonly PullRequestReview[],
-): readonly { readonly at: string; readonly kind: CodeRabbitEventKind }[] {
+): readonly {
+  readonly at: string;
+  readonly kind: CodeRabbitEventKind;
+  readonly submitted: boolean;
+}[] {
   const commentEvents = comments
     .filter((comment) => isCodeRabbitAuthor(comment.author?.login))
     .map((comment) => ({
-      at: comment.createdAt,
+      at: comment.updatedAt ?? comment.createdAt,
       kind: classifyCodeRabbitBody(comment.body),
+      submitted: false,
     }));
   const reviewEvents = reviews
     .filter(isSubmittedReview)
@@ -119,6 +122,7 @@ function collectCodeRabbitEvents(
     .map((review) => ({
       at: review.submittedAt,
       kind: classifyCodeRabbitBody(review.body),
+      submitted: true,
     }));
   return [...commentEvents, ...reviewEvents].sort((left, right) =>
     right.at.localeCompare(left.at),
@@ -127,7 +131,10 @@ function collectCodeRabbitEvents(
 
 function classifyCodeRabbitBody(body: string): CodeRabbitEventKind {
   const normalized = body.toLowerCase();
-  if (normalized.includes('rate limit exceeded')) return 'rate_limit';
+  if (normalized.includes('rate limit exceeded') ||
+    normalized.includes('review limit reached') ||
+    normalized.includes('<!-- this is an auto-generated comment: rate limited by coderabbit.ai -->'))
+    return 'rate_limit';
   if (
     normalized.includes(
       'no actionable comments were generated in the recent review',
