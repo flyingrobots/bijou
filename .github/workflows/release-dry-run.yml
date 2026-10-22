@@ -33,6 +33,22 @@ jobs:
             --notes-tag-run-id "${{ github.run_id }}" \
             --github-output "$GITHUB_OUTPUT"
 
+      - name: Validate dry-run metadata
+        env:
+          BIJOU_RELEASE_VERSION: ${{ steps.meta.outputs.version }}
+          BIJOU_RELEASE_NOTES_TAG: ${{ steps.meta.outputs.notes_tag }}
+        run: |
+          version="${BIJOU_RELEASE_VERSION:-}"
+          notes_tag="${BIJOU_RELEASE_NOTES_TAG:-}"
+          if [[ -z "${version//[[:space:]]/}" ]]; then
+            echo "::error::Release metadata output version is empty"
+            exit 1
+          fi
+          if [[ -z "${notes_tag//[[:space:]]/}" ]]; then
+            echo "::error::Release metadata output notes_tag is empty"
+            exit 1
+          fi
+
       - name: Build
         run: npm run build
 
