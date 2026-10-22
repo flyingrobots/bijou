@@ -902,10 +902,42 @@ This cycle does not:
 
 1. Copy one byte-identical `packed-bijou-cells/1` fixture into the Geordi
    conformance corpus with the originating Bijou revision and digests.
-2. Implement a strict Rust boundary validator or generated DTO that rejects
-   unsupported versions and malformed relationships.
+2. Implement a strict Rust boundary validator that rejects unsupported versions
+   and malformed relationships. A generated DTO can describe shape, but cannot
+   substitute for the semantic validation described below.
 3. Emit `geordi-bijou-cells-validation/1` before any renderer exists; its closed
    claim is validation only and it has no preparation or GPU fields.
+
+#### Cross-Language Glyph Conformance
+
+The intake profile `bijou-re036-glyph-validation/1` must pin a Bijou source
+revision, hashes of the complete glyph-validation dependency closure, exact
+Node/ICU/Unicode versions used for the reference `Intl.Segmenter`, and the
+content hashes of width and Unicode-property data used by the Rust consumer.
+Commit this manifest with the shared corpus; no moving runtime or library
+default may silently redefine the profile. A change to those semantics needs a
+new profile and regenerated, reviewed reference results.
+
+Match `isSafeUnitGlyph` and `isCanonicalSideTableGlyph`, not just JSON types:
+UTF-16 code-unit and UTF-8 byte limits, terminal sanitization and control
+refusal, permitted format characters, a visible base, exactly one grapheme,
+width exactly one, direct/side-table canonical choice, duplicate and unused
+entries, surrogate refusal, and side-table index bounds. Rust string length is
+not JavaScript UTF-16 length. Generic Unicode-width or segmentation crates are
+not evidence of equivalent behavior without the pinned profile and parity
+results.
+
+Both validators must consume the same committed valid/invalid corpus derived
+from the RE-036 tests, including combining-only marks, wide emoji, C0/C1 and
+escape sequences, bidi/format controls, joiners, lone surrogates at JSON intake,
+overlong glyphs, duplicate/unreferenced entries, and malformed cell references.
+Record acceptance or the expected validation code and path for each case,
+plus exact JCS input bytes/digests for accepted receipts. CI must compare both
+implementations against every reference result; an unexplained disagreement
+blocks Slice 0. A passing finite corpus is conformance evidence for its named
+coverage, not proof for every possible Unicode string. The implementation must
+also document the algorithm/table mapping; corpus agreement alone cannot hide
+known semantic differences.
 
 ### Slice 1: CPU Preparation Reference
 
