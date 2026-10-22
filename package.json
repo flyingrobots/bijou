@@ -78,8 +78,11 @@
     "version": "node scripts/version.mjs"
   },
   "overrides": {
-    "hono": "^4.13.0",
+    "hono": "^4.13.11",
+    "ip-address": "^10.7.1",
     "picomatch": "^4.0.4",
+    "proxy-addr": "^2.0.8",
+    "qs": "^6.16.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {

@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Raised the MCP SDK and affected runtime dependency floors, refreshed the
+  lockfile, and added a real stdio client/server compatibility check (#536).
+  Fast-uri security cleanup remains tracked by dependency PR #530.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and
