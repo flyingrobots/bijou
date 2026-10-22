@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,6 +45,31 @@ function invoke(root: string, env: NodeJS.ProcessEnv, args: readonly string[] = 
 }
 
 describe('release product witness CLI failures', () => {
+  it('recognizes the repository root through a directory alias', () => {
+    withCheckout((root, env) => {
+      const container = mkdtempSync(resolve(tmpdir(), 'bijou-witness-alias-'));
+      try {
+        const alias = resolve(container, 'checkout');
+        symlinkSync(root, alias, 'junction');
+        const result = invoke(alias, env);
+        expect(result.status).toBe(1);
+        expect(result.stdout).toBe('');
+        expect(result.stderr).toContain('Witness failed: fresh-build');
+      } finally {
+        rmSync(container, { recursive: true, force: true });
+      }
+    });
+  });
+
+  it('still rejects a genuine repository subdirectory', () => {
+    withCheckout((root, env) => {
+      const result = invoke(resolve(root, 'fixtures'), env);
+      expect(result.status).toBe(1);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain('Run the witness replay from the repository root.');
+    });
+  });
+
   it('preserves all pinned bytes through an actual CRLF-configured checkout', () => {
     withCheckout((root, env) => {
       const git = (args: readonly string[]): void => {
