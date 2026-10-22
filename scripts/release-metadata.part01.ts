@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 type DependencyMap = Record<string, string>;
 
-type DependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies';
+type DependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies';
 
 const INTERNAL_PACKAGE_PREFIX = '@flyingrobots/bijou';
 
@@ -12,6 +12,7 @@ export interface PackageManifest {
   readonly dependencies?: DependencyMap;
   readonly devDependencies?: DependencyMap;
   readonly peerDependencies?: DependencyMap;
+  readonly optionalDependencies?: DependencyMap;
 }
 
 export interface WorkspacePackage {
@@ -53,7 +54,7 @@ const TAG_PATTERN = new RegExp(
   `^v(?<version>${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT})(?:-(?<channel>rc|beta|alpha)\\.(?<serial>${SEMVER_INT}))?$`,
 );
 
-const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies'];
+const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -93,12 +94,14 @@ function readPackageManifest(filepath: string): PackageManifest {
   const dependencies = readDependencyMap(manifest['dependencies'], `${filepath} dependencies`);
   const devDependencies = readDependencyMap(manifest['devDependencies'], `${filepath} devDependencies`);
   const peerDependencies = readDependencyMap(manifest['peerDependencies'], `${filepath} peerDependencies`);
+  const optionalDependencies = readDependencyMap(manifest['optionalDependencies'], `${filepath} optionalDependencies`);
   return {
     name,
     version,
     ...(dependencies === undefined ? {} : { dependencies }),
     ...(devDependencies === undefined ? {} : { devDependencies }),
     ...(peerDependencies === undefined ? {} : { peerDependencies }),
+    ...(optionalDependencies === undefined ? {} : { optionalDependencies }),
   };
 }
 

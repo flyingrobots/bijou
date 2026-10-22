@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Release version bumps update workspace manifests and lock metadata together,
+  refresh npm's cached workspace metadata, and restore the original manifests
+  and lock if regeneration fails. Pre-commit and release preflight now reject
+  stale or missing workspace lock versions and internal dependency pins,
+  including peer, dev and optional dependencies (#526).
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

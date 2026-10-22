@@ -174,6 +174,8 @@ jobs:
           scripts/docs-preview-search.part02.test.ts
           scripts/docs-preview-search.part03.test.ts
           scripts/docs-preview-theme.part01.test.ts
+          scripts/workspace-lock.test.ts
+          scripts/workspace-version-cli.test.ts
           scripts/docs-preview-theme.part02.test.ts
           scripts/docs-preview-theme.part03.test.ts
           scripts/docs-preview-theme.part04.test.ts
