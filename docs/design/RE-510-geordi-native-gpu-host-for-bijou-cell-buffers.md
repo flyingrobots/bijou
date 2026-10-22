@@ -381,6 +381,22 @@ presence bits remain authoritative for terminal-default colors; packed zero
 channels must not silently become black. Modifier and opacity interpretation
 must be profile-bound.
 
+For `/1`, a committed `terminal-default-srgb-u8/1` profile supplies explicit
+three-channel uint8 sRGB foreground and background defaults. It is a portable
+fixture asset, never a query of the current terminal, OS theme, or environment.
+Keep presence bits in the canonical input; only preparation substitutes the
+declared default when a channel is absent. The cell's uint6 opacity remains
+authoritative under the endpoint's declared compositing policy.
+
+Bind the profile's version and SHA-256 of its RFC 8785 canonical JSON in
+`terminalDefaultProfileId` and `terminalDefaultProfileHash`. Font/preparation
+and probe manifests reference the same identity. Changing either default must
+change preparation identity and its expected probes even when cell bytes are
+unchanged. Missing, unknown, or mismatched default profiles are refusals before
+allocation. The implementation must commit actual RGB values and expected
+prepared colors for the checked fixture before Slice 1 can pass; this design
+does not invent or claim tested color values.
+
 This 16-byte layout is endpoint preparation, not a new Bijou cell semantic
 format. Its hash, version, and producer identity belong in the Geordi receipt.
 
@@ -1072,8 +1088,9 @@ no-color, and accessible lowerings to remain complete.
    or a bounded single-glyph atlas entry in version `1`?
 3. Which modifiers belong in the first render profile: bold, dim, underline,
    inverse, strikethrough, or only foreground/background/glyph?
-4. Should the native host rasterize terminal-default colors from an explicit
-   host theme, and how is that theme identity bound into the receipt?
+4. Which explicit RGB values should the committed terminal-default profile
+   use? The versioned asset and its receipt binding above are required; ambient
+   host-theme lookup is not an alternative.
 5. Which offscreen `wgpu` adapter posture can run reliably in hosted CI without
    turning software fallback into an accidental GPU claim?
 6. Does the eventual live adapter belong in Bijou, Geordi, a small bridge
