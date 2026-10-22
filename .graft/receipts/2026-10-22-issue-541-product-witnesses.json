@@ -56,7 +56,9 @@
     "checkout_green": "After scoped -text attributes: all 10 replay-tool regressions across 2 files passed; typecheck and ESLint passed. Both files added to Ubuntu/Windows focused CI.",
     "full_initial": "Normal pre-push gates and all four interactive smokes passed on the initial helper commit. Final updated candidate validation follows separately.",
     "windows_red": "Hosted Windows Node 22 job 119995709611 failed three existing CLI regressions before their intended checks because lexical repository-root comparison rejected the temporary checkout root. Full job log preserved under bounded task scratch.",
-    "path_green": "Resolve both paths through the filesystem and compare with platform-aware relative(). All 12 replay-tool tests across 2 files passed locally, including an actual directory alias and rejection of a genuine subdirectory; typecheck and ESLint passed. New hosted Windows validation remains pending."
+    "path_green": "Resolve both paths through the filesystem and compare with platform-aware relative(). All 12 replay-tool tests across 2 files passed locally, including an actual directory alias and rejection of a genuine subdirectory; typecheck and ESLint passed. New hosted Windows validation remains pending.",
+    "windows_path_rerun": "Windows job 119999786451 still failed the lexical-root rejection boundary after Node filesystem path normalization. All local tests passed, so that local result was not treated as Windows proof.",
+    "git_prefix_root": "Use Git rev-parse --show-prefix directly: empty for a repository root, nonempty for a subdirectory. Same 12 local replay regressions, typecheck and ESLint passed; hosted Windows proof remains pending."
   },
   "resource_policy": {
     "worker": "Existing host Node/npm toolchain; same isolated worktree and bounded cache",

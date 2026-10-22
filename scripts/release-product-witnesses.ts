@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync, realpathSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   verifyReleaseWitnessFiles, witnessFileHash, type ReleaseProductWitnessReceipt,
@@ -23,8 +23,8 @@ const STEPS: readonly { readonly label: string; readonly args: readonly string[]
 ];
 
 export function replayReleaseProductWitnesses(root: string): ReleaseProductWitnessReceipt {
-  const repositoryRoot = realpathSync(git(root, ['rev-parse', '--show-toplevel']));
-  if (relative(repositoryRoot, realpathSync(root)) !== '') {
+  // Git owns worktree-root identity; host path spellings can differ on Windows.
+  if (git(root, ['rev-parse', '--show-prefix']) !== '') {
     throw new Error('Run the witness replay from the repository root.');
   }
   assertClean(root);
