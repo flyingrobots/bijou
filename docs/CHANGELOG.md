@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- Added `release:witnesses` to replay the inherited V8 product witness families
+  with pinned inputs, byte-exact generated artifacts, and a commit-bound receipt.
+  Dirty checkouts, fixture drift, or failed checks prevent a success receipt;
+  final stable-release acceptance remains tracked separately.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

@@ -31,6 +31,7 @@
     "soak": "node --import tsx bench/src/soak-runner.ts",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
+    "release:witnesses": "tsx scripts/release-product-witnesses.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",
     "generate:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts",
     "check:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts --check",
