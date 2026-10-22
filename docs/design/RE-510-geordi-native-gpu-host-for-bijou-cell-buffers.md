@@ -419,10 +419,20 @@ A single grapheme may require more than one positioned glyph. The prepared cell
 record should therefore reference a glyph run rather than assuming one Unicode
 value equals one atlas tile.
 
-The first proof should use a deliberately small fixture and one committed font
-pack. It may support only a bounded ASCII or single-glyph subset if unsupported
-graphemes fail before GPU submission. It must not use host font fallback and
-then claim deterministic output.
+The first positive proof must consume the byte-identical
+`tests/fixtures/RE-036/packed-bijou-cells.v1.json` fixture. Its two-by-two grid
+contains `A`, the decomposed grapheme `e` + U+0301, the private-use grapheme
+U+F000, and an empty space cell. The committed font pack must include explicit
+assets for all visible runs, including a declared U+F000 mapping; the combined
+acute must remain one cell and may use multiple positioned glyphs. The profile
+must support the fixture's bold, solid underline, dashed underline, empty-cell,
+presence-bit, and opacity semantics. All four prepared instances and the exact
+side-table order must be inspected before drawing.
+
+An ASCII-only renderer or one that refuses this fixture does not complete the
+first proof. Unsupported-input refusals are separate negative tests. Keep the
+fixture bytes unchanged, do not replace a combining sequence or private-use
+glyph with a convenient ASCII character, and never use host font fallback.
 
 The native host's pixels are not expected to equal pixels from the user's
 configured terminal font. The portable claim is cell identity and prepared
@@ -1086,8 +1096,9 @@ no-color, and accessible lowerings to remain complete.
    fixture plus the canonical receipt?
 2. Should prepared GPU records reference a glyph run, a glyph-instance range,
    or a bounded single-glyph atlas entry in version `1`?
-3. Which modifiers belong in the first render profile: bold, dim, underline,
-   inverse, strikethrough, or only foreground/background/glyph?
+3. Which additional modifiers should follow the required checked-fixture
+   profile? Bold and solid/dashed underline are already required for `/1`;
+   other valid but unsupported modifiers require a typed refusal.
 4. Which explicit RGB values should the committed terminal-default profile
    use? The versioned asset and its receipt binding above are required; ambient
    host-theme lookup is not an alternative.
