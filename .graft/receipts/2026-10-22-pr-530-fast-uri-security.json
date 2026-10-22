@@ -1,0 +1,54 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "PR #530: refresh fast-uri to the current patched 3.x line without rewriting published history",
+  "bytesConsumed": 443732,
+  "filesRead": [
+    "AGENTS.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "package.json",
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "filesModified": [
+    "package.json",
+    "package-lock.json",
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "history": "Regular merge retains original Dependabot head 98e4b027d9e93851220f8e6b1632f7fd60e806eb and current main 0d03651c6adf4215e7bcceeae8328b1c0472049e; no rebase, amend or force push.",
+    "red": "Clean-installed the original 3.1.7 lock; hostname normalization returned A.com instead of a.com, and the new version/override guardrails failed (three failures, one pass).",
+    "upstream": "The current 3.1.9 security release fixes additional advisories beyond 3.1.8; both minimum and locked resolution are now 3.1.9.",
+    "green": "Clean installation and build passed; six focused tests passed, covering the minimum, root override, hostname case normalization and both encoded-scheme forms.",
+    "stdio": "Actual current-main SDK/stdio executable initialized, listed tools, rendered text and data, rejected invalid arguments, and served subsequent requests. Bounded standalone probe retained as 530-stdio-probe.mjs with 530-stdio-green.log.",
+    "resolution_scope": "Programmatic comparison against main found only node_modules/fast-uri changed. SDK and workspace versions remain unchanged.",
+    "production_audit": {
+      "fast_uri_findings": 0,
+      "remaining_packages": [
+        "@modelcontextprotocol/sdk",
+        "hono",
+        "ip-address",
+        "proxy-addr",
+        "qs"
+      ],
+      "remaining_owner": "PR #538",
+      "critical": 1,
+      "high": 1,
+      "moderate": 3,
+      "artifact": "530-audit-current.json",
+      "limitation": "The standalone branch does not include PR #538; no claim of a zero-finding combined audit before integration."
+    },
+    "portable_ci": "Security-floor and semantic regression file added to the Windows/Ubuntu focused suite."
+  },
+  "resource_policy": {
+    "build_budget_gib": 20,
+    "data_budget_gib": 4,
+    "logs_budget_mib": 128,
+    "guard": "Reused worktree, host Node/npm and project cache; process-group timeout and disk/RSS/log/free-space monitor. No new Docker worker or parallel validation."
+  }
+}
