@@ -572,7 +572,31 @@ success receipt.
 
 ## Receipt Contract
 
-An illustrative endpoint receipt is:
+Slice 0 uses a separate validation-only receipt:
+
+```typescript
+interface GeordiBijouCellsValidationReceipt {
+  readonly receiptVersion: 'geordi-bijou-cells-validation/1';
+  readonly packedReceiptHash: string;
+  readonly canonicalizationId: 'jcs-rfc8785-sha256/1';
+  readonly validatorProfileId: string;
+  readonly validatorArtifactHash: string;
+  readonly conformanceCorpusHash: string;
+  readonly result: 'valid';
+  readonly claim: 'packed-input-validated/1';
+}
+```
+
+This success type proves input validation only. Invalid input produces a typed
+refusal, never this receipt. The closed schema rejects preparation, renderer,
+adapter, output, and GPU-claim fields; it cannot be upgraded to render evidence
+by adding strings. `packed-input-validated/1` is not an endpoint claim ID. The
+validator artifact and shared conformance corpus must be retrievable and match
+their digests; the complete input digest uses the rule below. No font pack,
+shader bundle, GPU device, pixels, or renderer need exist in Slice 0.
+
+Slices 2 and 3 instead emit the following illustrative endpoint receipt. A
+validation-only receipt cannot satisfy an endpoint's render-proof requirement:
 
 ```typescript
 interface GeordiNativeBijouCellsReceipt {
@@ -854,7 +878,8 @@ This cycle does not:
    conformance corpus with the originating Bijou revision and digests.
 2. Implement a strict Rust boundary validator or generated DTO that rejects
    unsupported versions and malformed relationships.
-3. Emit an input-validation receipt before any renderer exists.
+3. Emit `geordi-bijou-cells-validation/1` before any renderer exists; its closed
+   claim is validation only and it has no preparation or GPU fields.
 
 ### Slice 1: CPU Preparation Reference
 
