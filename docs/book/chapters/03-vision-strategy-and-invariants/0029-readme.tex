@@ -1,0 +1,50 @@
+\chapter{Invariants}\label{record-029}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/README.md}\par}\smallskip
+
+These are project-wide truths that design and implementation should treat as non-negotiable unless deliberately changed.
+
+When a design doc or legend references an invariant, it should link to the specific invariant file.
+
+Every invariant should also name at least one legend that protects it. If an invariant has no protecting legend, the repo has a governance gap.
+
+Current invariants:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/host-apis-stay-behind-adapters.md}{Host APIs Stay Behind Adapters}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/codecs-are-not-domain-models.md}{Codecs Are Not Domain Models}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\end{itemize}
+
+\section{Protection Map}\label{record-029-protection-map}
+
+\input{tables/table-003}
+

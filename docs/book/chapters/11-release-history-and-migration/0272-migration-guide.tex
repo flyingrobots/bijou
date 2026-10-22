@@ -1,0 +1,75 @@
+\chapter{Migrating to Bijou 7.2.0}\label{record-272}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/7.2.0/migration-guide.md}\par}\smallskip
+
+Bijou 7.2.0 is a minor release from 7.1.0. It is intended to be additive for applications using documented public APIs.
+
+The public tag was created from the verified 2026-07-05 \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} release commit. These instructions are the versioned migration guide for the 7.2.0 package set.
+
+\section{Recommended Upgrade}\label{record-272-recommended-upgrade}
+
+Update the runtime packages your app uses together:
+
+\begin{CodeBlock}
+npm install \
+  @flyingrobots/bijou@7.2.0 \
+  @flyingrobots/bijou-node@7.2.0 \
+  @flyingrobots/bijou-tui@7.2.0 \
+  @flyingrobots/bijou-tui-app@7.2.0
+\end{CodeBlock}
+
+If your app uses localization tooling, keep those packages in lock-step too:
+
+\begin{CodeBlock}
+npm install \
+  @flyingrobots/bijou-i18n@7.2.0 \
+  @flyingrobots/bijou-i18n-tools@7.2.0 \
+  @flyingrobots/bijou-i18n-tools-node@7.2.0 \
+  @flyingrobots/bijou-i18n-tools-xlsx@7.2.0
+\end{CodeBlock}
+
+If your app uses the Bijou MCP server, keep it lock-step too:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-mcp@7.2.0
+\end{CodeBlock}
+
+\section{Runtime Behavior}\label{record-272-runtime-behavior}
+
+No breaking runtime migration is expected.
+
+Applications may notice better behavior in these areas:
+
+\begin{itemize}
+\tightlist
+\item
+  page-scoped TUI frame helpers are exported from the public TUI package root
+\item
+  scripted driver helpers can replay mouse movement, press, release, wheel, and raw SGR mouse sequences deterministically
+\item
+  DOGFOOD light-theme and locale-fallback examples provide clearer evidence for release review and demos
+\item
+  Blocks app-binding documentation now includes concrete copyable snippets
+\end{itemize}
+
+If your app had local test helpers for mouse replay or frame helper imports, prefer the package exports after upgrading.
+
+\section{DOGFOOD And Documentation}\label{record-272-dogfood-and-documentation}
+
+The DOGFOOD release pages for 7.2.0 depend on the versioned docs in this directory. Keep \texttt{w\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}e\allowbreak{}w\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{m\allowbreak{}i\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} together when preparing or validating a release branch.
+
+\section{Release Tooling}\label{record-272-release-tooling}
+
+Maintainers replaying or auditing the release should use both release-readiness modes:
+
+\begin{CodeBlock}
+npm run release:readiness
+npm run release:readiness -- --milestone v7.2.0
+\end{CodeBlock}
+
+The plain command validates local release evidence without live milestone checks. The milestone-aware command is the release gate that passed from the merged \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} release commit after the target milestone had zero open tracker items and no tracked work carried a \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} label.
+
+\section{Compatibility Stance}\label{record-272-compatibility-stance}
+
+Bijou 7.2.0 should be a straightforward upgrade from 7.1.0 for application code. The main migration work is optional cleanup: remove local mouse replay fixtures that duplicate the public driver helpers, update imports to use the public TUI package root where possible, and treat the improved DOGFOOD release pages as review evidence rather than an application contract.
+

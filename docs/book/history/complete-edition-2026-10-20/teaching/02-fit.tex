@@ -1,0 +1,42 @@
+\chapter{Choose Bijou deliberately}\label{teaching-fit}
+
+\section{When a terminal application earns its complexity}
+\subsection{A changing task with useful interaction}
+
+The job monitor benefits from a persistent view because an operator can start work, inspect detail and cancel a selected run while other information changes. A terminal application can keep that work close to a command-line workflow and remain usable over a remote session. Bijou's state, effect and Surface contracts give us a structured way to build it.
+
+The structure is useful when the application has enough concurrent concerns to need explicit ownership. A dialog changes input policy. A log request has a lifetime. A resize changes geometry. A pipe invocation needs another output contract. Those concerns exist whether a framework names them or application code handles them informally.
+
+\subsection{When plain output is sufficient}
+
+A command that computes one answer and exits may be served well by a few lines of ordinary output. A stable machine-readable report may need a serializer and useful exit statuses more than an interactive loop. Start there if it fulfills the task. Choosing Bijou should buy a useful application contract, not merely a decorative border.
+
+Our example deliberately supports simple outputs alongside interaction. Their presence is part of serving different consumers. It also creates maintenance obligations: fields, textual states and error explanations must keep their meaning as the rich presentation evolves.
+
+\section{Understand what you are taking on}
+\subsection{Terminal cells and input conventions}
+
+The application works in cells whose width is constrained by terminal conventions. Wide and combining characters complicate measurement. Shortcuts need a focus policy. Raw input and terminal restoration have lifecycle consequences. Remote sessions and CI streams may provide a different environment from a local interactive terminal.
+
+Bijou makes some of those mechanics reusable. The application still chooses its useful minimum geometry, communicates its actions and verifies the environments it claims to support. Tests against controlled cells cannot establish every emulator's treatment of every Unicode sequence.
+
+\subsection{Dependencies and version boundaries}
+
+The book teaches published Bijou 7.2.0 through an exact companion commit. Its component atlas was captured from an 8.0.0-rc.1 checkout. The renderer demonstrations use 7.1.0. These artifacts answer different questions: how the teaching application behaves, what the captured component surfaces look like, and what particular renderer experiments produced.
+
+Do not copy an unfamiliar API from a historical design or an atlas caption and assume it belongs to 7.2.0. Check the installed package's exports and types. A proposed architecture can be useful reasoning while naming a contract that changed before publication.
+
+\section{Keep the first application bounded}
+\subsection{Why the jobs are simulated}
+
+Launching and controlling real processes introduces its own domain: output buffering, signals, process trees, partial results, credentials and exit status. The companion substitutes scheduled work so that progress, failure and cancellation are deterministic teaching material. It never invokes a compiler or publishes a package.
+
+A real process adapter is a reasonable later project. It deserves an explicit contract and its own acceptance evidence. The ability to cancel a scheduled callback does not demonstrate that a child process and all its descendants were stopped.
+
+\subsection{Define an exit condition for the learning exercise}
+
+By the end of the book, you should be able to reproduce the edition, trace input and results, explain each presentation, diagnose the broken exercises and identify the boundaries of the tests. That is a complete learning outcome. A process supervisor, full translation catalog and integrated state inspector remain possible extensions with separate scope.
+
+\section{Before you start}
+
+Use the version page to obtain the companion commit. Read its README and verification record. Run \texttt{npm ci} and \texttt{npm run verify}. If reproduction fails, record the environment and exact command before changing the dependencies. Preserving the failing reference is more useful than silently replacing the edition with whatever a package manager resolves today.

@@ -1,0 +1,56 @@
+\chapter{DX-004 --- Smooth Surface and String Composition Seams}\label{record-303}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/DX-004-smooth-surface-and-string-composition-seams.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-303-idea}
+
+Reduce confusion at the boundary between string-oriented composition and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}/layout-oriented composition.
+
+\section{Why}\label{record-303-why}
+
+Bijou currently exposes a real conceptual seam here, but the ergonomics are easy to trip over:
+
+\begin{itemize}
+\tightlist
+\item
+  some helpers return \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  some stack/layout helpers still expect strings
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} requires \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}, not string
+\item
+  migration from older string-first patterns is easy to misunderstand
+\end{itemize}
+
+The issue is not only documentation. Some composition helpers may need better bridging or clearer contracts.
+
+\section{Captured feedback}\label{record-303-captured-feedback}
+
+From \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}p\allowbreak{}-\allowbreak{}t\allowbreak{}t\allowbreak{}d} TUI development:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} returning \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} made \texttt{v\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} composition awkward
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} was required in some places but forbidden in \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}
+\item
+  the \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} return constraint is understandable but still easy to trip over during migration
+\end{itemize}
+
+\section{Likely scope}\label{record-303-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  audit string-land vs surface-land composition boundaries
+\item
+  decide where bridging helpers should exist and where they should not
+\item
+  improve the composition story for small surface-returning primitives
+\item
+  tighten docs or error guidance where the seam is intentionally strict
+\end{itemize}
+

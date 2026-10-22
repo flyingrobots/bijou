@@ -1,0 +1,37 @@
+\chapter{DX-014 --- Fix Root README Interactive Example}\label{record-346}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX_014-readme-interactive-example-fix.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-014 — Fix Root README Interactive Example
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-346-disposition}
+
+Stale note. The root README interactive example already imports initDefaultContext() from @flyingrobots/bijou-node, calls it before run(app), and the surrounding docs now also teach startApp() as the preferred hosted Node bootstrap path.
+
+\section{Original Proposal}\label{record-346-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-346-idea}
+
+The interactive runtime example in the root README doesn't show the mandatory \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} call. A developer copying the example into a new file gets:
+
+\begin{CodeBlock}
+Error: No default BijouContext has been set.
+\end{CodeBlock}
+
+Add \texttt{i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{} \allowbreak{}\}\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{} \allowbreak{}'\allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}'} and \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} to the example so it's copy-pasteable without hidden prerequisites.
+
+\section{Why}\label{record-346-why}
+
+This is the \#1 TTV barrier from the documentation audit. The scaffolded path handles it automatically, but anyone integrating into an existing project hits this wall on their first attempt.
+
+\section{Effort}\label{record-346-effort}
+
+Tiny --- two lines added to the README example.
+

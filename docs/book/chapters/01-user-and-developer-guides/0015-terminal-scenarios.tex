@@ -1,0 +1,716 @@
+\chapter{End-To-End Terminal Scenarios}\label{record-015}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/guides/terminal-scenarios.md}\par}\smallskip
+
+This guide walks through Bijou from small one-shot terminal output to full-screen TUI apps and shader-driven visual renderers. It is scenario-first: pick the thing you want to build, then follow the package boundary and control flow that fits the job.
+
+Use this guide when you are asking one of these questions:
+
+\begin{itemize}
+\tightlist
+\item
+  I want to print some colors.
+\item
+  I want to make an interactive form.
+\item
+  I want to make a basic TUI app.
+\item
+  I want to make a Braille ray trace renderer.
+\end{itemize}
+
+For a live tour of the repository product surface, run:
+
+\begin{CodeBlock}
+npm run dogfood
+\end{CodeBlock}
+
+For focused component and preview work, run:
+
+\begin{CodeBlock}
+npm run blocklab
+\end{CodeBlock}
+
+\section{Package Stack}\label{record-015-package-stack}
+
+Bijou is intentionally layered. Core rendering and contracts are portable; interactive runtime behavior lives in the TUI package; host I/O lives behind Node adapters.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (App) at (0.0,0.0) {Your app code};
+\node[box] (Core) at (-5.0,-2.6) {@flyingrobots/bijou / components, surfaces, forms, blocks, themes};
+\node[box] (Tui) at (0.0,-2.6) {@flyingrobots/bijou-tui / TEA runtime, input, layout, canvas};
+\node[box] (Node) at (5.0,-2.6) {@flyingrobots/bijou-node / terminal IO, style adapter, host runner};
+\node[box] (Terminal) at (2.5,-5.2) {Terminal stdin/stdout};
+\node[box] (Surface) at (-2.5,-5.2) {Surface or string output};
+\draw[edge,] (App) to (Core);
+\draw[edge,] (App) to (Tui);
+\draw[edge,] (App) to (Node);
+\draw[edge,bend left=15] (Tui) to (Core);
+\draw[edge,bend left=15] (Node) to (Core);
+\draw[edge,] (Node) to (Terminal);
+\draw[edge,] (Core) to (Surface);
+\draw[edge,] (Tui) to (Surface);
+\draw[edge,] (Surface) to (Node);
+\end{tikzpicture}}
+\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (BijouContext) at (-5.0,0) {\textbf{Bijou\allowbreak{}Context}\\\rule{\linewidth}{.3pt}\\+runtime\\+io\\+style\\+theme\\+semantic(name)\\+status(name)\\+border(name)};
+\node[box] (Surface) at (0.0,0) {\textbf{Surface}\\\rule{\linewidth}{.3pt}\\+width\\+height\\+get(x, y)\\+set(x, y, cell)};
+\node[box] (App) at (5.0,0) {\textbf{App}\\\rule{\linewidth}{.3pt}\\+init()\\+update(msg, model)\\+view(model)};
+\node[box] (Cmd) at (-2.5,-4) {\textbf{Cmd}\\\rule{\linewidth}{.3pt}\\+execute(emit, caps)};
+\node[box] (NodeHost) at (2.5,-4) {\textbf{Node\allowbreak{}Host}\\\rule{\linewidth}{.3pt}\\+start\allowbreak{}App(app, options)\\+create\allowbreak{}Node\allowbreak{}Context()};
+\draw[edge,bend left=15] (BijouContext) to (Surface);
+\draw[edge,bend left=15] (App) to (Surface);
+\draw[edge,] (App) to (Cmd);
+\draw[edge,] (NodeHost) to (App);
+\draw[edge,] (NodeHost) to (BijouContext);
+\end{tikzpicture}}
+\end{center}
+
+\section{Choose A Scenario}\label{record-015-choose-a-scenario}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Start) at (0.0,0.0) {What are you building?};
+\node[box] (Colors) at (-7.5,-2.6) {One-shot colored CLI output};
+\node[box] (Form) at (-2.5,-2.6) {Prompt or form flow};
+\node[box] (TUI) at (2.5,-2.6) {Full-screen TUI};
+\node[box] (Visual) at (7.5,-2.6) {Procedural visual renderer};
+\node[box] (Core) at (-2.5,-5.2) {@flyingrobots/bijou + @flyingrobots/bijou-node};
+\node[box] (Runtime) at (2.5,-5.2) {@flyingrobots/bijou-tui + @flyingrobots/bijou-node};
+\draw[edge,] (Start) to (Colors);
+\draw[edge,] (Start) to (Form);
+\draw[edge,] (Start) to (TUI);
+\draw[edge,] (Start) to (Visual);
+\draw[edge,] (Colors) to (Core);
+\draw[edge,] (Form) to (Core);
+\draw[edge,] (TUI) to (Runtime);
+\draw[edge,] (Visual) to (Runtime);
+\end{tikzpicture}}
+\end{center}
+
+\input{tables/table-005}
+
+\section{Scenario 1: Print Some Colors}\label{record-015-scenario-1-print-some-colors}
+
+Use core components and a Node context when the program writes a result and exits. This is the right lane for CLIs, scripts, release notes, status output, and other non-full-screen tools.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\node[actor] (Script) at (0.0,0) {Script};
+\draw[dashed,BookMuted] (Script.south) -- (0.0,-7.3999999999999995);
+\node[actor] (Node) at (4.5,0) {Node adapter};
+\draw[dashed,BookMuted] (Node.south) -- (4.5,-7.3999999999999995);
+\node[actor] (Core) at (9.0,0) {Bijou core};
+\draw[dashed,BookMuted] (Core.south) -- (9.0,-7.3999999999999995);
+\node[actor] (T) at (13.5,0) {Terminal};
+\draw[dashed,BookMuted] (T.south) -- (13.5,-7.3999999999999995);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-1.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {create\allowbreak{}Node\allowbreak{}Context()} (4.5,-1.7);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-3.4) -- node[above,fill=white,align=center,text width=8.1cm,font=\footnotesize] {separator(), progress\allowbreak{}Bar(), gradient\allowbreak{}Text()} (9.0,-3.4);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-5.1) -- node[above,fill=white,align=center,text width=8.1cm,font=\footnotesize] {styled strings} (0.0,-5.1);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-6.8) -- node[above,fill=white,align=center,text width=12.15cm,font=\footnotesize] {console.log(...)} (13.5,-6.8);
+\end{tikzpicture}}\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (SCRIPT) at (0.0,0.0) {SCRIPT};
+\node[box] (BIJOU_CONTEXT) at (0.0,-2.6) {BIJOU\_CONTEXT};
+\node[box] (STYLE_PORT) at (-2.5,-5.2) {STYLE\_PORT};
+\node[box] (THEME) at (2.5,-5.2) {THEME};
+\node[box] (TOKEN) at (2.5,-7.800000000000001) {TOKEN};
+\node[box] (ANSI_STRING) at (-2.5,-7.800000000000001) {ANSI\_STRING};
+\draw[edge,] (SCRIPT) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {creates / one : one} (BIJOU_CONTEXT);
+\draw[edge,] (BIJOU_CONTEXT) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {owns / one : one} (STYLE_PORT);
+\draw[edge,] (BIJOU_CONTEXT) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {owns / one : one} (THEME);
+\draw[edge,] (THEME) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {resolves / one : zero or more} (TOKEN);
+\draw[edge,] (STYLE_PORT) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {emits / one : zero or more} (ANSI_STRING);
+\end{tikzpicture}}
+\end{center}
+
+\subsection{Code}\label{record-015-code}
+
+\begin{CodeBlock}
+import {
+  alert,
+  box,
+  gradientText,
+  progressBar,
+  separator,
+} from '@flyingrobots/bijou';
+import { createNodeContext } from '@flyingrobots/bijou-node';
+
+const ctx = createNodeContext();
+const brandGradient = ctx.theme.theme.gradient.brand;
+
+console.log(separator({ label: 'deploy', width: 64, ctx }));
+console.log(ctx.style.styled(ctx.status('success'), 'OK'));
+console.log(gradientText('Bijou terminal output', brandGradient, {
+  style: ctx.style,
+  noColor: ctx.theme.noColor,
+}));
+console.log(progressBar(72, { width: 32, showPercent: true, ctx }));
+console.log(alert('Production deploy is ready.', { variant: 'success', ctx }));
+console.log(box('Use core components for one-shot terminal output.', { ctx }));
+\end{CodeBlock}
+
+\subsection{Rule Of Thumb}\label{record-015-rule-of-thumb}
+
+Use string-returning components for command output. Do not start the TUI runtime unless you need retained state, input routing, animation, or full-screen redraw.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Need) at (0.0,0.0) {Need terminal output};
+\node[box] (Input) at (0.0,-2.6) {Need ongoing input?};
+\node[box] (Core) at (-2.5,-5.2) {Use core components and Node context};
+\node[box] (Fullscreen) at (2.5,-5.2) {Need full-screen retained UI?};
+\node[box] (Forms) at (-2.5,-7.800000000000001) {Use prompt/form helpers};
+\node[box] (TUI) at (2.5,-7.800000000000001) {Use App + start\allowbreak{}App};
+\draw[edge,] (Need) to (Input);
+\draw[edge,] (Input) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {no} (Core);
+\draw[edge,] (Input) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {yes} (Fullscreen);
+\draw[edge,] (Fullscreen) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {no} (Forms);
+\draw[edge,] (Fullscreen) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {yes} (TUI);
+\end{tikzpicture}}
+\end{center}
+
+\section{Scenario 2: Make An Interactive Form}\label{record-015-scenario-2-make-an-interactive-form}
+
+Use forms when the program should ask a bounded sequence of questions and then return to normal terminal output. Forms write through the context I/O port and return structured values.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\node[actor] (User) at (0.0,0) {User};
+\draw[dashed,BookMuted] (User.south) -- (0.0,-12.5);
+\node[actor] (Form) at (4.5,0) {Form};
+\draw[dashed,BookMuted] (Form.south) -- (4.5,-12.5);
+\node[actor] (Core) at (9.0,0) {Bijou forms};
+\draw[dashed,BookMuted] (Core.south) -- (9.0,-12.5);
+\node[actor] (Host) at (13.5,0) {Node context};
+\draw[dashed,BookMuted] (Host.south) -- (13.5,-12.5);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-1.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {run setup flow} (4.5,-1.7);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-3.4) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {group(fields)} (9.0,-3.4);
+\draw[-{Latex[length=2mm]},BookHeading] (9.0,-5.1) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {write prompts} (13.5,-5.1);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (0.0,-6.8) -- node[above,fill=white,align=center,text width=12.15cm,font=\footnotesize] {keyboard input} (13.5,-6.8);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (13.5,-8.5) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {answers} (9.0,-8.5);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-10.2) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {\{ cancelled, values \}} (4.5,-10.2);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-11.9) -- node[above,fill=white,align=center,text width=8.1cm,font=\footnotesize] {print summary} (13.5,-11.9);
+\end{tikzpicture}}\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (GroupResult) at (-5.0,0) {\textbf{Group\allowbreak{}Result}\\\rule{\linewidth}{.3pt}\\+cancelled\\+values};
+\node[box] (Field) at (0.0,0) {\textbf{Field}\\\rule{\linewidth}{.3pt}\\+title\\+placeholder\\+required\\+ctx};
+\node[box] (FormHelpers) at (5.0,0) {\textbf{Form\allowbreak{}Helpers}\\\rule{\linewidth}{.3pt}\\+input(options)\\+select(options)\\+multiselect(options)\\+confirm(options)\\+group(fields)};
+\draw[edge,bend left=15] (FormHelpers) to (Field);
+\draw[edge,bend left=15] (FormHelpers) to (GroupResult);
+\end{tikzpicture}}
+\end{center}
+
+\subsection{Code}\label{record-015-code-1}
+
+\begin{CodeBlock}
+import { box, confirm, group, input, multiselect, select } from '@flyingrobots/bijou';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+
+const ctx = initDefaultContext();
+
+const result = await group({
+  name: () => input({
+    title: 'Project name:',
+    placeholder: 'my-app',
+    required: true,
+    ctx,
+  }),
+  framework: () => select({
+    title: 'Framework:',
+    options: [
+      { label: 'Express', value: 'express' },
+      { label: 'Fastify', value: 'fastify' },
+      { label: 'Hono', value: 'hono' },
+      { label: 'None', value: 'none' },
+    ],
+    ctx,
+  }),
+  features: () => multiselect({
+    title: 'Features:',
+    options: [
+      { label: 'TypeScript', value: 'typescript' },
+      { label: 'ESLint', value: 'eslint' },
+      { label: 'Docker', value: 'docker' },
+    ],
+    ctx,
+  }),
+  deploy: () => confirm({
+    title: 'Set up deployment?',
+    defaultValue: true,
+    ctx,
+  }),
+});
+
+if (result.cancelled) {
+  console.log('Setup cancelled.');
+} else {
+  console.log(box([
+    `Name: ${result.values.name}`,
+    `Framework: ${result.values.framework}`,
+    `Features: ${result.values.features.join(', ') || 'none'}`,
+    `Deploy: ${result.values.deploy ? 'yes' : 'no'}`,
+  ].join('\n'), { ctx }));
+}
+\end{CodeBlock}
+
+\subsection{Data Shape}\label{record-015-data-shape}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (FORM_FLOW) at (0.0,0) {FORM\_FLOW};
+\node[box] (FIELD) at (-2.5,-4) {\textbf{FIELD}\\\rule{\linewidth}{.3pt}\\string name\\string title\\string kind};
+\node[box] (FIELD_RESULT) at (-2.5,-8) {FIELD\_RESULT};
+\node[box] (GROUP_RESULT) at (2.5,-4) {\textbf{GROUP\_RESULT}\\\rule{\linewidth}{.3pt}\\boolean cancelled\\object values};
+\node[box] (VALUE) at (2.5,-8) {VALUE};
+\draw[edge,] (FORM_FLOW) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {contains / one : zero or more} (FIELD);
+\draw[edge,] (FIELD) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {returns / one : one} (FIELD_RESULT);
+\draw[edge,] (FORM_FLOW) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {aggregates / one : one} (GROUP_RESULT);
+\draw[edge,] (GROUP_RESULT) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {includes / one : zero or more} (VALUE);
+\end{tikzpicture}}
+\end{center}
+
+\section{Scenario 3: Make A Basic TUI App}\label{record-015-scenario-3-make-a-basic-tui-app}
+
+Use the TEA runtime when the app needs a retained model, input handling, commands, animation, or repeated frames.
+
+The loop is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{})} creates the first model and commands.
+\item
+  Runtime delivers messages.
+\item
+  \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} returns a new model and commands.
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} lowers the model to a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  The host writes the minimal terminal diff.
+\end{enumerate}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Init) at (0.0,0.0) {init};
+\node[box] (Model) at (-2.5,-2.6) {Model};
+\node[box] (Cmds) at (2.5,-2.6) {Commands};
+\node[box] (Runtime) at (2.5,-10.4) {Runtime};
+\node[box] (Msg) at (2.5,-13.0) {Message};
+\node[box] (Update) at (0.0,-5.2) {update(msg, model)};
+\node[box] (NewModel) at (-2.5,-7.800000000000001) {New model};
+\node[box] (NewCmds) at (2.5,-7.800000000000001) {New commands};
+\node[box] (View) at (-2.5,-10.4) {view(model)};
+\node[box] (Surface) at (-2.5,-13.0) {Surface};
+\node[box] (Diff) at (0.0,-15.600000000000001) {ANSI diff};
+\node[box] (Terminal) at (0.0,-18.2) {Terminal};
+\draw[edge,] (Init) to (Model);
+\draw[edge,] (Init) to (Cmds);
+\draw[edge,] (Runtime) to (Msg);
+\draw[edge,] (Msg) to (Update);
+\draw[edge,] (Model) to (Update);
+\draw[edge,] (Update) to (NewModel);
+\draw[edge,] (Update) to (NewCmds);
+\draw[edge,] (NewModel) to (View);
+\draw[edge,] (View) to (Surface);
+\draw[edge,] (Surface) to (Diff);
+\draw[edge,] (Diff) to (Terminal);
+\draw[edge,] (NewCmds) to (Runtime);
+\end{tikzpicture}}
+\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\node[actor] (Terminal) at (0.0,0) {Terminal};
+\draw[dashed,BookMuted] (Terminal.south) -- (0.0,-19.3);
+\node[actor] (Runtime) at (4.5,0) {Runtime};
+\draw[dashed,BookMuted] (Runtime.south) -- (4.5,-19.3);
+\node[actor] (App) at (9.0,0) {App};
+\draw[dashed,BookMuted] (App.south) -- (9.0,-19.3);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-1.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {init()} (9.0,-1.7);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-3.4) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {[model, commands]} (4.5,-3.4);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-5.1) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {view(model)} (9.0,-5.1);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-6.8) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {Surface} (4.5,-6.8);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-8.5) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {paint frame} (0.0,-8.5);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (0.0,-10.2) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {key "+} (4.5,-10.2);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-11.9) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {update(key, model)} (9.0,-11.9);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-13.6) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {[new\allowbreak{}Model, commands]} (4.5,-13.6);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-15.299999999999999) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {view(new\allowbreak{}Model)} (9.0,-15.299999999999999);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-17.0) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {Surface} (4.5,-17.0);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-18.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {paint diff} (0.0,-18.7);
+\end{tikzpicture}}\end{center}
+
+\subsection{Code}\label{record-015-code-2}
+
+\begin{CodeBlock}
+import { box, kbd, stringToSurface } from '@flyingrobots/bijou';
+import { startApp } from '@flyingrobots/bijou-node';
+import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
+
+interface Model {
+  readonly count: number;
+}
+
+type Msg = { type: 'increment' } | { type: 'decrement' } | { type: 'quit' };
+
+const app: App<Model, Msg> = {
+  init: () => [{ count: 0 }, []],
+
+  update: (msg, model) => {
+    if (isKeyMsg(msg)) {
+      if (msg.key === '+' || msg.key === 'up') {
+        return [{ count: model.count + 1 }, []];
+      }
+      if (msg.key === '-' || msg.key === 'down') {
+        return [{ count: model.count - 1 }, []];
+      }
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
+        return [model, [quit()]];
+      }
+    }
+
+    return [model, []];
+  },
+
+  view: (model) => {
+    const text = [
+      box(`Count: ${model.count}`),
+      '',
+      `${kbd('+')} increment`,
+      `${kbd('-')} decrement`,
+      `${kbd('q')} quit`,
+    ].join('\n');
+
+    return stringToSurface(text, 32, 8);
+  },
+};
+
+await startApp(app);
+\end{CodeBlock}
+
+\subsection{Ownership Boundaries}\label{record-015-ownership-boundaries}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Model) at (-5.0,0) {\textbf{Model}\\\rule{\linewidth}{.3pt}\\+count};
+\node[box] (Msg) at (0.0,0) {\textbf{Msg}\\\rule{\linewidth}{.3pt}\\+key\\+type};
+\node[box] (Update) at (5.0,0) {\textbf{Update}\\\rule{\linewidth}{.3pt}\\+update(msg, model)};
+\node[box] (View) at (-2.5,-4) {\textbf{View}\\\rule{\linewidth}{.3pt}\\+view(model)};
+\node[box] (Surface) at (2.5,-4) {\textbf{Surface}\\\rule{\linewidth}{.3pt}\\+cells};
+\draw[edge,bend left=15] (Msg) to (Update);
+\draw[edge,bend left=15] (Model) to (Update);
+\draw[edge,bend left=15] (Update) to (Model);
+\draw[edge,] (Model) to (View);
+\draw[edge,bend left=15] (View) to (Surface);
+\end{tikzpicture}}
+\end{center}
+
+Do not mutate the model from inside \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}. Views render. Updates own state change. Commands express runtime effects such as quit or delayed messages.
+
+\section{Scenario 4: Make A Braille Ray Trace Renderer}\label{record-015-scenario-4-make-a-braille-ray-trace-renderer}
+
+Use the TUI \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} renderer when you want procedural character graphics. The Braille resolution samples each terminal cell as a 2 by 4 sub-pixel grid, so a small terminal surface can carry more visual detail than one character per cell.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Model) at (0.0,0.0) {Model: time and camera};
+\node[box] (View) at (0.0,-2.6) {View};
+\node[box] (Canvas) at (0.0,-5.2) {canvas(cols, rows, shader, resolution=braille)};
+\node[box] (Samples) at (0.0,-7.800000000000001) {2x4 sub-pixel samples per cell};
+\node[box] (Shader) at (0.0,-10.4) {Ray shader};
+\node[box] (Cell) at (0.0,-13.0) {Cell color and on/off coverage};
+\node[box] (Surface) at (0.0,-15.600000000000001) {Surface};
+\node[box] (Terminal) at (0.0,-18.2) {Terminal};
+\draw[edge,] (Model) to (View);
+\draw[edge,] (View) to (Canvas);
+\draw[edge,] (Canvas) to (Samples);
+\draw[edge,] (Samples) to (Shader);
+\draw[edge,] (Shader) to (Cell);
+\draw[edge,] (Cell) to (Surface);
+\draw[edge,] (Surface) to (Terminal);
+\end{tikzpicture}}
+\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\node[actor] (Runtime) at (0.0,0) {Runtime};
+\draw[dashed,BookMuted] (Runtime.south) -- (0.0,-14.2);
+\node[actor] (App) at (4.5,0) {App};
+\draw[dashed,BookMuted] (App.south) -- (4.5,-14.2);
+\node[actor] (Canvas) at (9.0,0) {Canvas};
+\draw[dashed,BookMuted] (Canvas.south) -- (9.0,-14.2);
+\node[actor] (Shader) at (13.5,0) {Shader};
+\draw[dashed,BookMuted] (Shader.south) -- (13.5,-14.2);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-1.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {tick message} (4.5,-1.7);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (4.5,-3.4) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {model with next time} (0.0,-3.4);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-5.1) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {view(model)} (4.5,-5.1);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-6.8) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {canvas(width, height, shader, braille)} (9.0,-6.8);
+\draw[-{Latex[length=2mm]},BookHeading] (9.0,-8.5) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {\{ u, v, time, uniforms \}} (13.5,-8.5);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (13.5,-10.2) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {cell or string} (9.0,-10.2);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (9.0,-11.9) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {Surface} (4.5,-11.9);
+\draw[dashed,-{Latex[length=2mm]},BookHeading] (4.5,-13.6) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {Surface} (0.0,-13.6);
+\draw[dotted,BookHeading] (-.4,-7.6) rectangle (13.9,-10.5);
+\node[anchor=west,font=\scriptsize,fill=white] at (-.3,-7.6) {Loop: each sub-pixel};
+\end{tikzpicture}}\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (ShaderParams) at (-5.0,0) {\textbf{Shader\allowbreak{}Params}\\\rule{\linewidth}{.3pt}\\+u\\+v\\+time\\+uniforms};
+\node[box] (ShaderCell) at (0.0,0) {\textbf{Shader\allowbreak{}Cell}\\\rule{\linewidth}{.3pt}\\+char\\+fg\allowbreak{}RGB\\+bg\allowbreak{}RGB};
+\node[box] (ShaderFn) at (5.0,0) {\textbf{Shader\allowbreak{}Fn}\\\rule{\linewidth}{.3pt}\\+call(params)};
+\node[box] (CanvasOptions) at (0.0,-4) {\textbf{Canvas\allowbreak{}Options}\\\rule{\linewidth}{.3pt}\\+resolution\\+time\\+uniforms};
+\draw[edge,bend left=15] (ShaderFn) to (ShaderParams);
+\draw[edge,bend left=15] (ShaderFn) to (ShaderCell);
+\draw[edge,] (CanvasOptions) to (ShaderFn);
+\end{tikzpicture}}
+\end{center}
+
+\subsection{Code}\label{record-015-code-3}
+
+\begin{CodeBlock}
+import { startApp } from '@flyingrobots/bijou-node';
+import {
+  canvas,
+  isKeyMsg,
+  quit,
+  tick,
+  type App,
+  type ShaderFn,
+} from '@flyingrobots/bijou-tui';
+
+interface Model {
+  readonly time: number;
+}
+
+type Msg = { type: 'tick' };
+
+function sphereDepth(x: number, y: number, radius: number): number | null {
+  const d2 = x * x + y * y;
+  if (d2 > radius * radius) return null;
+  return Math.sqrt(radius * radius - d2);
+}
+
+const shader: ShaderFn = ({ u, v, time }) => {
+  const x = (u - 0.5) * 2.4;
+  const y = (v - 0.5) * 1.8;
+  const z = sphereDepth(x, y, 0.82);
+
+  if (z === null) {
+    return { char: ' ', bgRGB: [8, 10, 22] };
+  }
+
+  const lightX = Math.cos(time * 0.8) * 0.55;
+  const lightY = -0.35;
+  const lightZ = 0.9;
+  const lightLength = Math.hypot(lightX, lightY, lightZ);
+  const shade = Math.max(0, (x * lightX + y * lightY + z * lightZ) / lightLength);
+  const rim = Math.max(0, 1 - z);
+
+  return {
+    char: shade + rim * 0.2 > 0.28 ? 'x' : ' ',
+    fgRGB: [
+      Math.round(80 + shade * 150),
+      Math.round(110 + shade * 120),
+      Math.round(180 + shade * 60),
+    ],
+    bgRGB: [8, 10, 22],
+  };
+};
+
+const app: App<Model, Msg> = {
+  init: () => [{ time: 0 }, [tick(33, { type: 'tick' })]],
+
+  update: (msg, model) => {
+    if (isKeyMsg(msg) && (msg.key === 'q' || (msg.ctrl && msg.key === 'c'))) {
+      return [model, [quit()]];
+    }
+
+    if ('type' in msg && msg.type === 'tick') {
+      return [{ time: model.time + 0.033 }, [tick(33, { type: 'tick' })]];
+    }
+
+    return [model, []];
+  },
+
+  view: (model) =>
+    canvas(72, 28, shader, {
+      resolution: 'braille',
+      time: model.time,
+    }),
+};
+
+await startApp(app);
+\end{CodeBlock}
+
+\subsection{Renderer Data Flow}\label{record-015-renderer-data-flow}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (MODEL) at (-2.5,0.0) {MODEL};
+\node[box] (VIEW) at (-2.5,-2.6) {VIEW};
+\node[box] (CANVAS_CALL) at (0.0,-5.2) {CANVAS\_CALL};
+\node[box] (SHADER_SAMPLE) at (0.0,-7.800000000000001) {SHADER\_SAMPLE};
+\node[box] (SHADER_CELL) at (0.0,-10.4) {SHADER\_CELL};
+\node[box] (SURFACE_CELL) at (2.5,-2.6) {SURFACE\_CELL};
+\node[box] (SURFACE) at (2.5,0.0) {SURFACE};
+\draw[edge,] (MODEL) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {drives / one : one} (VIEW);
+\draw[edge,] (VIEW) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {creates / one : one} (CANVAS_CALL);
+\draw[edge,] (CANVAS_CALL) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {emits / one : zero or more} (SHADER_SAMPLE);
+\draw[edge,] (SHADER_SAMPLE) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {returns / one : one} (SHADER_CELL);
+\draw[edge,] (SHADER_CELL) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {accumulates\_into / zero or more : one} (SURFACE_CELL);
+\draw[edge,] (SURFACE) to node[midway,fill=white,font=\scriptsize,text=BookMuted,align=center,text width=27mm] {contains / one : zero or more} (SURFACE_CELL);
+\end{tikzpicture}}
+\end{center}
+
+\subsection{Performance Notes}\label{record-015-performance-notes}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep shader math deterministic and bounded.
+\item
+  Keep allocations out of the inner shader path.
+\item
+  Use \texttt{u\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}s} for static scene values instead of closing over mutable runtime objects.
+\item
+  Prefer \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}'} for high-density binary coverage and \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}g\allowbreak{}l\allowbreak{}y\allowbreak{}p\allowbreak{}h\allowbreak{}'} when you want glyph fitting from coverage.
+\item
+  Use \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}o\allowbreak{}a\allowbreak{}k} when changing renderer internals.
+\end{itemize}
+
+\section{Mode Lowering}\label{record-015-mode-lowering}
+
+Bijou components should degrade intentionally when output is not an interactive terminal.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Component) at (0.0,0.0) {Component or Block};
+\node[box] (Interactive) at (-7.5,-2.6) {interactive: rich terminal UI};
+\node[box] (Static) at (-2.5,-2.6) {static: fixed visual output};
+\node[box] (Pipe) at (2.5,-2.6) {pipe: plain text};
+\node[box] (Accessible) at (7.5,-2.6) {accessible: screen-reader text};
+\node[box] (Facts) at (0.0,-5.2) {semantic facts};
+\draw[edge,] (Component) to (Interactive);
+\draw[edge,] (Component) to (Static);
+\draw[edge,] (Component) to (Pipe);
+\draw[edge,] (Component) to (Accessible);
+\draw[edge,] (Interactive) to (Facts);
+\draw[edge,] (Static) to (Facts);
+\draw[edge,] (Pipe) to (Facts);
+\draw[edge,] (Accessible) to (Facts);
+\end{tikzpicture}}
+\end{center}
+
+Use this rule:
+
+\begin{itemize}
+\tightlist
+\item
+  Interactive and static modes may draw boxes, colors, charts, or Braille surfaces.
+\item
+  Pipe mode should emit useful plain text.
+\item
+  Accessible mode should prioritize meaningful spoken order.
+\item
+  Semantic facts should survive lowering when tooling or agents need to inspect the output.
+\end{itemize}
+
+\section{Blocks And Data Binding}\label{record-015-blocks-and-data-binding}
+
+For reusable application surfaces, use Blocks. Blocks declare metadata, variants, slots, data requirements, command intents, and mode-lowering posture. They do not pull mutable state directly.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Provider) at (0.0,0.0) {Provider publishes immutable snapshot};
+\node[box] (Snapshot) at (0.0,-2.6) {Binding\allowbreak{}Snapshot};
+\node[box] (Frame) at (0.0,-5.2) {Binding\allowbreak{}Frame};
+\node[box] (Block) at (0.0,-7.800000000000001) {Block render};
+\node[box] (Surface) at (-2.5,-10.4) {Surface or lowered output};
+\node[box] (Intent) at (2.5,-10.4) {Command\allowbreak{}Intent};
+\node[box] (Business) at (0.0,-13.0) {Business logic};
+\draw[edge,] (Provider) to (Snapshot);
+\draw[edge,] (Snapshot) to (Frame);
+\draw[edge,] (Frame) to (Block);
+\draw[edge,] (Block) to (Surface);
+\draw[edge,] (Block) to (Intent);
+\draw[edge,] (Intent) to (Business);
+\draw[edge,] (Business) to (Provider);
+\end{tikzpicture}}
+\end{center}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (DataRequirement) at (-5.0,0) {\textbf{Data\allowbreak{}Requirement}\\\rule{\linewidth}{.3pt}\\+id\\+resource};
+\node[box] (BindingSnapshot) at (0.0,0) {\textbf{Binding\allowbreak{}Snapshot}\\\rule{\linewidth}{.3pt}\\+provider\allowbreak{}Id\\+requirement\allowbreak{}Id\\+version\\+status\\+data};
+\node[box] (BindingFrame) at (5.0,0) {\textbf{Binding\allowbreak{}Frame}\\\rule{\linewidth}{.3pt}\\+require(id)\\+get(id)\\+status(id)\\+issues(id)};
+\node[box] (CommandIntent) at (-2.5,-4) {\textbf{Command\allowbreak{}Intent}\\\rule{\linewidth}{.3pt}\\+id\\+name};
+\node[box] (BlockDefinition) at (2.5,-4) {\textbf{Block\allowbreak{}Definition}\\\rule{\linewidth}{.3pt}\\+metadata\\+render(input)};
+\draw[edge,bend left=15] (DataRequirement) to (BindingSnapshot);
+\draw[edge,bend left=15] (BindingSnapshot) to (BindingFrame);
+\draw[edge,] (BindingFrame) to (BlockDefinition);
+\draw[edge,bend left=15] (BlockDefinition) to (CommandIntent);
+\end{tikzpicture}}
+\end{center}
+
+That loop is unidirectional:
+
+\input{diagrams/flows/flow-058}
+
+\section{Common Mistakes}\label{record-015-common-mistakes}
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,rounded corners=1pt,text width=38mm,inner sep=5pt,align=left,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (Bad1) at (-10.0,0.0) {Render reads files or process.env};
+\node[box] (Fix1) at (-10.0,-2.6) {Move host access behind adapter};
+\node[box] (Bad2) at (-5.0,0.0) {View mutates model};
+\node[box] (Fix2) at (-5.0,-2.6) {Return new model from update};
+\node[box] (Bad3) at (0.0,0.0) {Block pulls provider directly};
+\node[box] (Fix3) at (0.0,-2.6) {Use snapshots and Binding\allowbreak{}Frame};
+\node[box] (Bad4) at (5.0,0.0) {Canvas allocates per sample};
+\node[box] (Fix4) at (5.0,-2.6) {Precompute uniforms};
+\node[box] (Bad5) at (10.0,0.0) {CLI starts full-screen runtime for one line};
+\node[box] (Fix5) at (10.0,-2.6) {Use core components};
+\draw[edge,] (Bad1) to (Fix1);
+\draw[edge,] (Bad2) to (Fix2);
+\draw[edge,] (Bad3) to (Fix3);
+\draw[edge,] (Bad4) to (Fix4);
+\draw[edge,] (Bad5) to (Fix5);
+\end{tikzpicture}}
+\end{center}
+
+\input{tables/table-006}
+
+\section{Validation Checklist}\label{record-015-validation-checklist}
+
+Before shipping a terminal scenario, run the narrow command for the surface you changed, then the shared gates:
+
+\begin{CodeBlock}
+npm run lint
+npm run typecheck:test
+npm test
+npm run docs:inventory
+npm run verify:interactive-examples
+\end{CodeBlock}
+
+For user-facing product proof:
+
+\begin{CodeBlock}
+npm run dogfood
+npm run blocklab
+\end{CodeBlock}
+
+For rendering or long-running runtime changes:
+
+\begin{CodeBlock}
+npm run bench
+npm run soak
+\end{CodeBlock}
+

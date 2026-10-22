@@ -1,0 +1,12 @@
+Job monitor
+
+Filter: all jobs
+
+  compile: succeeded 100%
+  test: failed 60%
+  Fixture failure: assertion did not pass
+> publish: running 40%
+
+Up/Down: select · Enter: start · c: cancel · l: logs · f: failures · q: quit
+
+test: Fixture failure: assertion did not pass

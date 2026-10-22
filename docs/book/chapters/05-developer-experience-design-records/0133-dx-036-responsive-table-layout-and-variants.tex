@@ -1,0 +1,449 @@
+\chapter{DX-036 Responsive Table Layout and Variants}\label{record-133}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-036-responsive-table-layout-and-variants.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-036 Responsive table layout and variants
+legend: DX
+lane: design
+priority: medium
+keywords:
+  - table
+  - layout
+  - responsive
+  - lowering
+  - developer-experience
+
+\end{RecordMeta}
+
+Make \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} behave more like builders expect from a table: it should fit the available width by default, wrap cell content intelligently, and expose named style variants without forcing users to choose a separate component.
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+\end{itemize}
+
+\section{Sponsor Human}\label{record-133-sponsor-human}
+
+App builders using \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for command output, reports, diagnostics, and docs snippets should get readable tabular output without hand-calculating column widths for every terminal size.
+
+\section{Sponsor Agent}\label{record-133-sponsor-agent}
+
+Agents generating Bijou CLI output should be able to choose a table variant and pipe format declaratively, while trusting the component to fit the viewport, wrap cells, preserve data in machine modes, and remain inspectable through tests.
+
+\section{Hill}\label{record-133-hill}
+
+A builder can render dense comparison data with \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} and get responsive, word-aware, aligned output by default, while choosing explicit visual variants and explicit pipe/data formats without switching components.
+
+\section{Playback Questions}\label{record-133-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does a default human-mode \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} fit \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} when content would otherwise exceed the terminal?
+\item
+  Does \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} preserve today's content-sized behavior?
+\item
+  Do wrapped rows keep continuation lines aligned under the correct columns?
+\item
+  Can callers choose \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} as table variants?
+\item
+  Does \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} mode still default to TSV?
+\item
+  Can callers explicitly request CSV, Markdown, TSV, or ASCII grid pipe output?
+\item
+  Are ANSI styles, OSC 8 links, emoji, CJK, and combining graphemes measured by visible terminal width rather than string length?
+\item
+  Does \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} mode keep row/header/value semantics independent of the visual variant?
+\end{itemize}
+
+\section{Accessibility / Assistive Posture}\label{record-133-accessibility-assistive-posture}
+
+Visual variants must not change the accessible reading contract. Accessible mode should keep a row-oriented header/value narration that is stable even when human output wraps, uses rules, or serializes differently for pipes.
+
+\section{Localization / Directionality Posture}\label{record-133-localization-directionality-posture}
+
+The first cycle is not a full bidirectional table layout project. It should keep the existing left-to-right table assumption, but all measurement and wrapping should remain grapheme-aware so localized strings, combining marks, CJK, and emoji do not break alignment.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-133-agent-inspectability-explainability-posture}
+
+The layout engine should produce a shared fitted table model before rendering. Tests should be able to inspect or prove the resolved widths, wrapped lines, variant renderer output, and pipe serialization independently enough that an agent can explain why a column wrapped or shrank.
+
+\section{Linked Invariants}\label{record-133-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}
+\end{itemize}
+
+\section{Current Truth}\label{record-133-current-truth}
+
+\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} currently renders an intrinsic-width Unicode boxed table in human modes:
+
+\begin{itemize}
+\tightlist
+\item
+  columns without explicit \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} grow to the widest header or cell
+\item
+  the renderer does not consult \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s}
+\item
+  cells wrap only when a column has an explicit \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}
+\item
+  wrapping is grapheme-aware but hard-wraps; it does not prefer word boundaries
+\item
+  \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}"} clips text without adding an ellipsis
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} mode lowers to TSV
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} mode lowers to \texttt{R\allowbreak{}o\allowbreak{}w\allowbreak{} \allowbreak{}N\allowbreak{}:\allowbreak{} \allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}=\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e}
+\end{itemize}
+
+\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} has the same intrinsic sizing posture: it creates a surface large enough for the table instead of fitting a parent width.
+
+\section{Product Decision}\label{record-133-product-decision}
+
+This should remain a \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} feature, not become a separate \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} component.
+
+Add table variants as one API axis, and keep machine/data serialization as a separate axis:
+
+\begin{CodeBlock}
+table({
+  columns,
+  rows,
+  layout: 'auto',
+  variant: 'ruled',
+  pipeFormat: 'tsv',
+});
+\end{CodeBlock}
+
+Recommended defaults:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}"} for human modes
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{}:\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} for string rendering when no explicit width is provided
+\item
+  \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}"} for human modes
+\item
+  \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}"} so wrapping prefers whitespace boundaries
+\item
+  hard-wrap unbreakable tokens rather than losing data
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}t\allowbreak{}s\allowbreak{}v\allowbreak{}"} for \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} mode
+\end{itemize}
+
+Keep an escape hatch:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} preserves today's content-sized behavior
+\item
+  explicit \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} / \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} can override the runtime width
+\item
+  \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}"} and a future \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}i\allowbreak{}p\allowbreak{}s\allowbreak{}i\allowbreak{}s\allowbreak{}"} can support dense compact output where data loss is acceptable
+\end{itemize}
+
+\section{Layout Requirements}\label{record-133-layout-requirements}
+
+Build a shared fitted table model before rendering variants:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Measure headers and cells by visible terminal width, ignoring ANSI and OSC 8 escapes and respecting grapheme widths.
+\item
+  Compute preferred column widths from content.
+\item
+  If the preferred table fits the available width, render at natural width.
+\item
+  If it does not fit, shrink flexible columns toward minimum widths.
+\item
+  Prefer wrapping cell text at word boundaries.
+\item
+  Hard-wrap a long unbreakable token only when it cannot fit.
+\item
+  Preserve alignment for continuation lines by leaving earlier columns blank and padding every column by visible width.
+\item
+  Recompute from the current width whenever a live TUI rerenders after a terminal resize.
+\end{enumerate}
+
+Column options should grow beyond today's fixed \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}:
+
+\begin{CodeBlock}
+type TableColumn = {
+  header: string;
+  width?: number;
+  minWidth?: number;
+  maxWidth?: number;
+  weight?: number;
+  align?: 'left' | 'right' | 'center';
+};
+\end{CodeBlock}
+
+For \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, the first practical step is explicit \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} / \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} support. Parent-surface auto-fit can arrive once parent layout code has a stable way to pass available width down to child surfaces.
+
+\section{Variants To Support}\label{record-133-variants-to-support}
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}b\allowbreak{}o\allowbreak{}x\allowbreak{}"}}{}}\label{record-133-variant-box}
+
+The current Unicode boxed table. Keep this as the compatibility visual style, but route it through the fitted table model.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"}}{}}\label{record-133-variant-ascii-grid}
+
+Portable boxed ASCII table:
+
+\begin{CodeBlock}
++----------+---------+-------+
+| Name     | State   | Score |
++----------+---------+-------+
+| Alice    | active  | 95    |
+| Bob      | pending | 72    |
++----------+---------+-------+
+\end{CodeBlock}
+
+This should be available explicitly as a visual variant and as an explicit pipe format, but it should not replace TSV as the default \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} lowering.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}"}}{}}\label{record-133-variant-ruled}
+
+The desired report style: no outer border, no vertical dividers, heavy header rule, and light row separators.
+
+\begin{CodeBlock}
+Name       State     Score
+━━━━━━━━━  ━━━━━━━━  ━━━━━
+Alice      active    95
+─────────  ────────  ─────
+Bob        pending   72
+\end{CodeBlock}
+
+This variant must support wrapped cells and continuation-line alignment from the first implementation.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}"}}{}}\label{record-133-variant-header-rule}
+
+Compact report style with only a header separator:
+
+\begin{CodeBlock}
+Name       State     Score
+---------  --------  -----
+Alice      active    95
+Bob        pending   72
+\end{CodeBlock}
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}"}}{}}\label{record-133-variant-plain}
+
+Borderless aligned columns:
+
+\begin{CodeBlock}
+Name       State     Score
+Alice      active    95
+Bob        pending   72
+\end{CodeBlock}
+
+Use spaces for visual alignment, not tabs. Tabs belong to TSV serialization; space padding is the only reliable way to align ANSI-styled and wide-character terminal content.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"}}{}}\label{record-133-variant-markdown}
+
+GitHub-flavored Markdown pipe table:
+
+\begin{CodeBlock}
+| Name  | State   | Score |
+|-------|---------|------:|
+| Alice | active  |    95 |
+| Bob   | pending |    72 |
+\end{CodeBlock}
+
+This is useful both as a human/static variant and as \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"} when the destination is a README, issue, PR, or docs file. Escape \texttt{|}, backslashes, and multiline cells deliberately.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}"}}{}}\label{record-133-variant-definition}
+
+Two-column field/value output:
+
+\begin{CodeBlock}
+Field          Value
+━━━━━━━━━━━━━  ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PR             https://github.com/flyingrobots/bijou/pull/120
+State          MERGED
+Merged at      2026-05-31T21:30:02Z
+\end{CodeBlock}
+
+This can be implemented as a table variant with inferred \texttt{F\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d} and \texttt{V\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e} columns for two-column rows.
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}"}}{}}\label{record-133-variant-expanded}
+
+psql-style record inspection:
+
+\begin{CodeBlock}
+-[ RECORD 1 ]-------------------------
+name   | Alice
+state  | active
+score  | 95
+-[ RECORD 2 ]-------------------------
+name   | Bob
+state  | pending
+score  | 72
+\end{CodeBlock}
+
+This is valuable for narrow terminals and many-column records, but it changes the reading mode from row comparison to record inspection. It can follow after the fitted table model and primary variants are stable.
+
+\section{Formats To Support}\label{record-133-formats-to-support}
+
+Keep serializations separate from visual variants:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}t\allowbreak{}s\allowbreak{}v\allowbreak{}"}: default lowest lowering for machine use
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}c\allowbreak{}s\allowbreak{}v\allowbreak{}"}: RFC-style escaped CSV for spreadsheet and shell export
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"}: docs-friendly pipe table
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"}: explicit human-readable pipe output
+\end{itemize}
+
+TSV should remain the default pipe lowering because \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} usually means tools, scripts, and data transfer. ASCII grid and Markdown are useful, but they are human presentation formats and should be opt-in.
+
+CSV must quote fields containing comma, quote, CR, LF, or other ambiguous content according to a documented policy. TSV also needs a deliberate escaping or preservation policy for tabs and newlines instead of accidental raw joins.
+
+\section{Implementation Outline}\label{record-133-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extract or replace the current table-private width/wrap helpers with a shared fitted table model that can serve all string variants.
+\item
+  Extend \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n} with optional \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{w\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, and \texttt{a\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}n}.
+\item
+  Add \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}, \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} / \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t}, and word-wrapping options to \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}.
+\item
+  Make human modes default to width-aware \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}"} and use \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} when no width is provided.
+\item
+  Preserve today's content-sized rendering behind \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"}.
+\item
+  Render \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} from the fitted model.
+\item
+  Keep TSV as the default pipe lowering, then add explicit CSV, Markdown, and ASCII grid pipe formats with escaping tests.
+\item
+  Bring \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} to parity for explicit \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} / \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h} once the string model is stable.
+\item
+  Update DOGFOOD or design-system docs with examples for the human-facing variants.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-133-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  A regression proving current intrinsic tables can exceed narrow runtime width, then the new default fits that width.
+\item
+  A compatibility test proving \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} retains old content-sized output.
+\item
+  Fitted-width tests for fixed, min, max, weighted, and aligned columns.
+\item
+  Word-boundary wrapping and hard-wrap fallback tests.
+\item
+  Continuation-line alignment tests for multiline rows.
+\item
+  ANSI, OSC 8, emoji, CJK, and combining-grapheme alignment tests.
+\item
+  Snapshot-style tests for \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}.
+\item
+  Pipe-format tests for TSV default, CSV escaping, Markdown escaping, and ASCII grid opt-in lowering.
+\item
+  Accessible-mode tests proving visual variants do not change semantic row/header/value reading order.
+\end{itemize}
+
+\section{Explicit Non-Goals}\label{record-133-explicit-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not add \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} as a separate public component.
+\item
+  Do not support Org-mode / Emacs table syntax in the first pass.
+\item
+  Do not make ASCII grid the default \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} lowering.
+\item
+  Do not silently truncate data by default.
+\item
+  Do not redesign \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} before the passive \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} model is stable.
+\end{itemize}
+
+\section{Acceptance Bar}\label{record-133-acceptance-bar}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} defaults to width-aware layout in human modes.
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} preserves old content-sized behavior.
+\item
+  Fixed, minimum, maximum, weighted, and aligned columns are covered by tests.
+\item
+  Word-boundary wrapping uses shared text wrapping behavior where possible.
+\item
+  ANSI, OSC 8 links, emoji, CJK, and combining graphemes stay aligned.
+\item
+  Wrapped rows keep continuation lines under the correct columns.
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} variants have snapshot-style tests.
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}t\allowbreak{}s\allowbreak{}v\allowbreak{}"}, \texttt{"\allowbreak{}c\allowbreak{}s\allowbreak{}v\allowbreak{}"}, \texttt{"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"}, and \texttt{"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"} are covered with escaping tests.
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} mode preserves semantic row/header/value reading order.
+\item
+  DOGFOOD or design-system docs show at least \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, and \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n} examples.
+\item
+  Follow-on work is filed for \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d} if it is not implemented in the first cycle.
+\end{itemize}
+
+\section{Retrospective}\label{record-133-retrospective}
+
+Closed by adding a shared fitted string-table model behind \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+
+Shipped behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  human-mode \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} now defaults to width-aware \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}"}
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}c\allowbreak{}"} preserves the old content-sized behavior
+\item
+  constrained cells wrap at word boundaries by default and hard-wrap only when needed
+\item
+  \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n} supports \texttt{m\allowbreak{}i\allowbreak{}n\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{w\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, and \texttt{a\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}n}
+\item
+  visual variants now include \texttt{b\allowbreak{}o\allowbreak{}x}, \texttt{a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d}, \texttt{r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e}, \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, and \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} still defaults to TSV, with explicit CSV, Markdown, and ASCII grid formats
+\item
+  accessible output remains row/header/value oriented instead of inheriting a visual variant
+\item
+  DOGFOOD's \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} story now demonstrates every visual table variant and every explicit pipe serialization
+\end{itemize}
+
+Deferred debt:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} still uses its older intrinsic surface sizing path. Follow-up work is tracked in \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md}{DX-037} so surface width negotiation can be designed deliberately instead of copied from the string renderer.
+\end{itemize}
+

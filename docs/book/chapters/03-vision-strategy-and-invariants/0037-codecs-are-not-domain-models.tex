@@ -1,0 +1,30 @@
+\chapter{Codecs Are Not Domain Models}\label{record-037}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/codecs-are-not-domain-models.md}\par}\smallskip
+
+\section{Protected by legends}\label{record-037-protected-by-legends}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+\end{itemize}
+
+Serialization formats and decoded payload objects are not the same thing as trusted domain values.
+
+Implications:
+
+\begin{itemize}
+\tightlist
+\item
+  wire shapes should stay separate from runtime meaning
+\item
+  encode/decode code should live in codecs, not be smeared across domain types
+\item
+  decoded bytes or JSON should be turned into runtime-backed values before business logic trusts them
+\item
+  a stable wire format does not excuse weak domain modeling
+\end{itemize}
+

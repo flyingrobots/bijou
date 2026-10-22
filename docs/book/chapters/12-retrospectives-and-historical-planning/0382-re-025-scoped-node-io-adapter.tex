@@ -1,0 +1,31 @@
+\chapter{RE-025 --- Scoped Node IO Adapter}\label{record-382}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/asap/RE-025-scoped-node-io-adapter.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-382-problem}
+
+\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} exposes broad host IO capabilities, but the repo does not yet provide a first-class way to scope filesystem access to a rooted sandbox for app-level use.
+
+The 2026-04-11 ship-readiness audit called out this gap directly: a component handed raw \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}O} can read arbitrary system paths unless the host wraps and constrains it manually.
+
+\section{Desired outcome}\label{record-382-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a scoped IO adapter in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}.
+\item
+  Let hosts define a root boundary that constrains reads, writes, and directory traversal.
+\item
+  Return clear errors when a requested path escapes the allowed root.
+\item
+  Document when apps should prefer scoped IO over raw host IO.
+\end{enumerate}
+
+\section{Effort}\label{record-382-effort}
+
+Medium --- adapter design, path-normalization rules, and host tests.
+

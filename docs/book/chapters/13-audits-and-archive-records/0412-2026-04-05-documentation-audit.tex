@@ -1,0 +1,116 @@
+\chapter{Documentation \& README Audit --- 2026-04-05}\label{record-412}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/audits/2026-04-05-documentation-audit.md}\par}\smallskip
+
+\emph{Comprehensive audit of bijou's documentation surfaces, measuring accuracy against the codebase, completeness against community standards, and effectiveness for new developer onboarding.}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{1. Accuracy \& Effectiveness}\label{record-412-accuracy-effectiveness}
+
+\subsection{1.1. Core Mismatch}\label{record-412-core-mismatch}
+
+Five package READMEs contain section headings that say ``Package Role in v4.0.0'' when the current shipped version is 4.1.0. The content beneath the headings is accurate for 4.1.0 --- only the headings are stale.
+
+Files affected: - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}7} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}7} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}7} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}5} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}5}
+
+This is cosmetic but sends mixed signals about whether the docs are current.
+
+\subsection{1.2. Audience \& Goal Alignment}\label{record-412-audience-goal-alignment}
+
+\textbf{Primary audience:} Developers building terminal applications in TypeScript/Node.js --- both new users evaluating bijou and experienced users extending it.
+
+\textbf{Top 3 questions and coverage:}
+
+\input{tables/table-087}
+
+The first two are handled better than most open-source projects. The third is completely missing.
+
+\subsection{1.3. Time-to-Value Barrier}\label{record-412-time-to-value-barrier}
+
+The interactive runtime example in the root README (lines \textasciitilde120-150) does not show the mandatory \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} call. A developer copying that example into a new file will get:
+
+\begin{CodeBlock}
+Error: No default BijouContext has been set.
+\end{CodeBlock}
+
+The scaffolded path (\texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{} \allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}@\allowbreak{}l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}) handles this automatically, but anyone integrating into an existing project hits this wall. The error message doesn't explain how to fix it.
+
+\textbf{Backlog:} \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md}{DX-009}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{2. Required Updates \& Completeness}\label{record-412-required-updates-completeness}
+
+\subsection{2.1. README.md Priority Fixes}\label{record-412-readme.md-priority-fixes}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Fix ``v4.0.0'' headings across 5 package READMEs.} Change to ``Package Role'' (unversioned) or ``Package Role in v4'' since the role hasn't changed between 4.0.0 and 4.1.0.
+\item
+  \textbf{Add \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} to the interactive runtime example} in the root README. The example should be copy-pasteable without hidden prerequisites.
+\item
+  \textbf{Add a ``Contributing'' section} to the root README that either provides inline guidance or links to a \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\end{enumerate}
+
+\subsection{2.2. Missing Standard Documentation}\label{record-412-missing-standard-documentation}
+
+The following community-standard files are \textbf{missing entirely}:
+
+\input{tables/table-088}
+
+These are \textbf{baseline expectations} for any public open-source project. Their absence doesn't reflect the actual quality of the repo --- the engineering culture is clearly strong --- but it does create friction for outsiders.
+
+\subsection{2.3. Undocumented Complex Area}\label{record-412-undocumented-complex-area}
+
+The \textbf{render pipeline} (the illustrated sequence below) is the most architecturally important subsystem that has zero developer-facing documentation. It is configurable via \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} but there is no guide explaining:
+
+\input{diagrams/flows/flow-070}
+
+\begin{itemize}
+\tightlist
+\item
+  What each stage does
+\item
+  How to write custom middleware
+\item
+  What \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e} fields are available
+\item
+  How stages interact with each other
+\item
+  Limitations (sync-only, no stage wrapping, no timing hooks)
+\end{itemize}
+
+The perf-gradient demo proved this gap --- we could not instrument the pipeline from outside because the documentation didn't explain the boundaries.
+
+\textbf{Backlog:} \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md}{DX-008}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{3. Final Action Plan}\label{record-412-final-action-plan}
+
+\subsection{3.1. Recommendation: A (Incremental Updates)}\label{record-412-recommendation-a-incremental-updates}
+
+The documentation foundation is strong. The governance model (\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} as audit entrypoint) is excellent. The design- system docs are better than most commercial projects. This is not a rewrite situation --- it's a gap-filling exercise.
+
+\subsection{3.2. Specific Actions}\label{record-412-specific-actions}
+
+\textbf{Immediate (this session):} 1. Fix ``v4.0.0'' headings in 5 package READMEs 2. Create CONTRIBUTING.md 3. Create CODE\_OF\_CONDUCT.md 4. Create SECURITY.md 5. Create GitHub issue and PR templates 6. Fix the root README interactive example to include context init
+
+\textbf{Backlog (future cycles):} - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md}{DX-008} --- render pipeline guide - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md}{DX-009} --- context auto-init and error messages
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Documentation Scorecard}\label{record-412-documentation-scorecard}
+
+\input{tables/table-089}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Personal Note}\label{record-412-personal-note}
+
+The documentation governance in this repo is genuinely impressive. \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} explicitly saying ``do not audit by walking the filesystem --- start here'' is a pattern I wish more projects adopted. The design-system-first approach (teaching \emph{when} to use a component, not just \emph{how}) is best-in-class.
+
+The gap is entirely in community surface: CONTRIBUTING, CODE OF CONDUCT, SECURITY, and GitHub templates. These are table stakes for open source and their absence is surprising given how polished everything else is. Filing them is an hour of work that permanently removes a class of contributor friction.
+

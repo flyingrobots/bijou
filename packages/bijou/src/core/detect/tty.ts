@@ -3,10 +3,20 @@
  *
  * Detection order (first match wins):
  *   BIJOU_ACCESSIBLE=1    -> 'accessible'  (screen-reader-friendly plain prompts)
- *   NO_COLOR / TERM=dumb  -> 'pipe'        (no ANSI escapes)
+ *   TERM=dumb             -> 'pipe'        (no cursor addressing available)
  *   !stdout.isTTY         -> 'pipe'        (piped/redirected)
  *   CI=true               -> 'static'      (single-frame rendering)
- *   stdout.isTTY          -> 'interactive'  (full experience)
+ *   stdout.isTTY          -> 'interactive' (full experience)
+ *
+ * `NO_COLOR` is deliberately absent. It is a statement about colour — see
+ * no-color.org, "prevents the addition of ANSI color" — and says nothing about
+ * cursor addressing or interactivity. Treating it as a capability signal took a
+ * real terminal out of interactive mode, so a user who exports `NO_COLOR=1` in a
+ * shell profile got no TUI rather than a monochrome one.
+ *
+ * Colour suppression does not depend on this function. `NO_COLOR` is read
+ * independently by `factory.ts`, `bijou-node`'s `createNodeContext`, and
+ * `isNoColor()` in `core/theme/resolve.ts`, none of which consult the mode.
  */
 
 import type { RuntimePort } from '../../ports/runtime.js';
@@ -17,7 +27,7 @@ import { createEnvAccessor, createTTYAccessor } from '../../ports/env.js';
  *
  * - `'interactive'` — full TUI experience with cursor movement and animation.
  * - `'static'` — single-frame rendering (e.g. CI environments).
- * - `'pipe'` — plain text, no ANSI escapes (piped stdout, `NO_COLOR`, `TERM=dumb`).
+ * - `'pipe'` — plain text, no cursor addressing (piped stdout, `TERM=dumb`).
  * - `'accessible'` — screen-reader-friendly plain prompts (`BIJOU_ACCESSIBLE=1`).
  */
 export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
@@ -37,7 +47,6 @@ export function detectOutputMode(runtime: RuntimePort): OutputMode {
 
   if (env('BIJOU_ACCESSIBLE') === '1') return 'accessible';
 
-  if (env('NO_COLOR') !== undefined) return 'pipe';
   if (env('TERM') === 'dumb') return 'pipe';
 
   if (!stdoutIsTTY) return 'pipe';

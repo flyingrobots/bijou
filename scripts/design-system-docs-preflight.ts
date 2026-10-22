@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
+import { readDocumentationFile as readFileSync } from './documentation-corpus.js';
 
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateComponentFamilyDocs } from './design-system-docs-rules.js';

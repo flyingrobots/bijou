@@ -1,0 +1,563 @@
+\chapter{Settings Belong to the Shell}\label{record-057}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/settings-belong-to-the-shell.md}\par}\smallskip
+
+\emph{Design note for a frame-owned settings drawer in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+\section{Why this exists}\label{record-057-why-this-exists}
+
+The DOGFOOD docs app exposed a product gap that is larger than the docs app itself:
+
+\begin{itemize}
+\tightlist
+\item
+  users want global preferences quickly
+\item
+  they expect to reach them from the shell, not by navigating into a one-off page
+\item
+  those preferences often affect the whole surface, not just the current page
+\end{itemize}
+
+Examples:
+
+\begin{itemize}
+\tightlist
+\item
+  theme selection
+\item
+  animation or reduced-motion preferences
+\item
+  input hints and help visibility
+\item
+  output/profile defaults for a docs or workbench surface
+\end{itemize}
+
+If each framed app invents its own settings overlay, the result will drift:
+
+\begin{itemize}
+\tightlist
+\item
+  different entry points
+\item
+  different keyboard behavior
+\item
+  different scroll behavior
+\item
+  different focus and dismissal rules
+\item
+  different mouse expectations
+\end{itemize}
+
+That is exactly the kind of shell concern the standard app frame should own.
+
+\section{Design-thinking frame}\label{record-057-design-thinking-frame}
+
+\subsection{Primary user}\label{record-057-primary-user}
+
+The primary user is the \textbf{workspace user}:
+
+\begin{itemize}
+\tightlist
+\item
+  they are already inside a framed app
+\item
+  they want to adjust preferences without leaving their place
+\item
+  they expect settings to feel global, stable, and discoverable
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Where do I change app-wide preferences?''
+\item
+  ``Can I do that without leaving the current page?''
+\item
+  ``Will the shell behave the same way in every framed app?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-057-secondary-user}
+
+The secondary user is the \textbf{workspace builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  a developer using \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  someone who wants settings UX without re-implementing drawers, key routing, or scrolling preferences
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Can the frame give me a standard settings surface?''
+\item
+  ``Can I declare preferences, sections, and actions instead of rebuilding infrastructure?''
+\item
+  ``Will this stay coherent with help, palette, and modal routing?''
+\end{itemize}
+
+\subsection{Jobs to be done}\label{record-057-jobs-to-be-done}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Help me adjust global preferences in place.} I want to change shell- or app-level behavior without leaving the screen I am on.
+\item
+  \textbf{Help me trust the shell.} Settings should feel like a first-class shell affordance, not a special page pretending to be one.
+\item
+  \textbf{Help me keep settings readable and tappable.} Preferences should be easy to scan, scroll, and toggle in a narrow drawer.
+\item
+  \textbf{Help me implement preferences once.} App authors should declare settings data and effects, not rebuild list rendering, drawer motion, and input plumbing.
+\end{enumerate}
+
+\section{Hills}\label{record-057-hills}
+
+\subsection{Hill 1 --- Settings feel shell-owned}\label{record-057-hill-1-settings-feel-shell-owned}
+
+In a framed app, settings open from the shell and behave like the shell. They do not feel like a page hack or a random modal.
+
+\subsection{Hill 2 --- Preferences are readable in a narrow lane}\label{record-057-hill-2-preferences-are-readable-in-a-narrow-lane}
+
+The drawer should support a vertically scrolling, sectioned preference list that works in compact widths and still feels deliberate.
+
+\subsection{Hill 3 --- Input remains honest}\label{record-057-hill-3-input-remains-honest}
+
+When the settings drawer is open, it owns local input. The underlying page does not keep reacting as if the drawer were not there. Mouse, keyboard, and help should all tell the same truth.
+
+\section{Product direction}\label{record-057-product-direction}
+
+The shell should provide a \textbf{left-edge settings drawer} with a structured, scrollable preference list.
+
+The mental model is:
+
+\begin{quote}
+settings are a shell-owned sidecar, not a page transition.
+\end{quote}
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  the current page remains visible behind it
+\item
+  the drawer opens from the left edge
+\item
+  the drawer can scroll independently
+\item
+  the drawer owns input while open
+\item
+  the rest of the shell remains visible but non-interactive underneath
+\end{itemize}
+
+\section{The visual model}\label{record-057-the-visual-model}
+
+The intended feel is closer to an iOS-style settings list than to a long markdown help page.
+
+Rough structure:
+
+\begin{CodeBlock}
++------------------------------------------+
+| Settings                            [info]   |
++------------------------------------------+
+| Appearance                               |
+|  Theme                            Paper  |
+|  Motion                              On  |
+|------------------------------------------|
+| Docs                                     |
+|  Landing animation                     On |
+|  Profile default                  Static |
+|------------------------------------------|
+| Shell                                    |
+|  Show hints                            On |
+|  Mouse support                         On |
++------------------------------------------+
+\end{CodeBlock}
+
+Important properties:
+
+\begin{itemize}
+\tightlist
+\item
+  section headings
+\item
+  rows that read like preferences, not generic commands
+\item
+  a compact trailing value or toggle affordance
+\item
+  enough spacing to scan quickly
+\item
+  scroll support when the list exceeds the drawer height
+\end{itemize}
+
+\section{Principles}\label{record-057-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Settings are shell state first} The frame should own open/close, focus, scroll, and entry affordances.
+\item
+  \textbf{Page content stays visible} This is a drawer, not a full route transition.
+\item
+  \textbf{Preferences should be declarative} App authors should define sections and rows, not low-level drawer plumbing.
+\item
+  \textbf{Mouse and keyboard should agree} Click, wheel, arrow keys, Enter, and Escape should all follow the same ownership model.
+\item
+  \textbf{Tests are the spec} The next implementation step should be failing shell tests, not one-off docs hacks.
+\end{enumerate}
+
+\section{Proposed v0 API shape}\label{record-057-proposed-v0-api-shape}
+
+The first public step should keep the shell responsible for the container while apps declare the content model.
+
+\begin{CodeBlock}
+interface FrameSettingRow<PageModel, Msg> {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly valueLabel?: string;
+  readonly action?: Msg;
+  readonly kind?: 'action' | 'toggle' | 'choice' | 'info';
+  readonly enabled?: boolean;
+}
+
+interface FrameSettingSection<PageModel, Msg> {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly FrameSettingRow<PageModel, Msg>[];
+}
+
+interface FrameSettings<PageModel, Msg> {
+  readonly title?: string;
+  readonly sections: readonly FrameSettingSection<PageModel, Msg>[];
+}
+
+interface CreateFramedAppOptions<PageModel, Msg> {
+  // existing fields...
+  readonly settings?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly pageModel: PageModel;
+  }) => FrameSettings<PageModel, Msg> | undefined;
+}
+\end{CodeBlock}
+
+Why this shape:
+
+\begin{itemize}
+\tightlist
+\item
+  the shell still owns layout, drawer chrome, and interaction rules
+\item
+  the app only supplies structured preference content
+\item
+  rows can dispatch messages back into the page/app model without exposing shell internals
+\item
+  the model leaves room for future persistence without forcing it in v0
+\end{itemize}
+
+As the first proving surface matured, the row treatment itself proved valuable enough to deserve promotion into canonical Bijou componentry. That follow-on direction is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/preference-lists-belong-to-bijou.md}{Preference Lists Belong to Bijou} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/specs/preference-list-surface.spec.json}{Preference List Surface}.
+
+\section{Standard shell behavior}\label{record-057-standard-shell-behavior}
+
+\subsection{Entry}\label{record-057-entry}
+
+The shell should expose a standard way to open settings:
+
+\begin{itemize}
+\tightlist
+\item
+  a frame action and binding such as \texttt{c\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{},}
+\item
+  a command-palette entry like \texttt{O\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}
+\end{itemize}
+
+This should be part of the shell, not left to every app.
+
+\subsection{Drawer placement}\label{record-057-drawer-placement}
+
+\begin{itemize}
+\tightlist
+\item
+  anchored to the left edge
+\item
+  consistent width policy, likely a bounded percentage of screen width
+\item
+  standard header row with title and optional lightweight info glyph
+\end{itemize}
+
+\subsection{Scroll behavior}\label{record-057-scroll-behavior}
+
+\begin{itemize}
+\tightlist
+\item
+  the settings list scrolls independently
+\item
+  wheel scrolling over the drawer scrolls the drawer
+\item
+  arrow keys, \texttt{j\allowbreak{}/\allowbreak{}k}, \texttt{d\allowbreak{}/\allowbreak{}u}, \texttt{g\allowbreak{}/\allowbreak{}G} can scroll the list when it is focused/open
+\item
+  the underlying page does not scroll while the drawer is active
+\end{itemize}
+
+\subsection{Selection behavior}\label{record-057-selection-behavior}
+
+For v0, the simplest honest behavior is:
+
+\begin{itemize}
+\tightlist
+\item
+  one active row
+\item
+  arrow keys move between rows
+\item
+  Enter triggers the row action
+\item
+  Space can toggle boolean rows
+\item
+  mouse click activates a row
+\end{itemize}
+
+The shell should provide enough behavior that the list feels native even before richer controls exist.
+
+\subsection{Dismissal}\label{record-057-dismissal}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} closes the drawer
+\item
+  shell help and command palette remain able to preempt it if intentionally opened
+\item
+  clicking outside the drawer should close it only if we decide the shell uses outside-click dismissal consistently; otherwise v0 should avoid surprise dismissal
+\end{itemize}
+
+\section{Input layering}\label{record-057-input-layering}
+
+This feature depends on the Focus Owns Input direction.
+
+Conceptually, the order should be:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  shell modal layers
+\item
+  settings drawer layer
+\item
+  page modal layer
+\item
+  frame shell layer
+\item
+  focused pane layer
+\item
+  page/global fallback
+\end{enumerate}
+
+The important behavior is:
+
+\begin{itemize}
+\tightlist
+\item
+  when settings are open, the settings drawer owns local navigation and scroll
+\item
+  the underlying page does not continue responding
+\item
+  the shell can still intentionally open help or palette above settings
+\end{itemize}
+
+This is why settings should be built into the frame, not bolted onto one page.
+
+\section{Mouse model}\label{record-057-mouse-model}
+
+Mouse should be first-class here.
+
+\subsection{v0 expectations}\label{record-057-v0-expectations}
+
+\begin{itemize}
+\tightlist
+\item
+  click inside a row focuses and activates/selects it
+\item
+  wheel scroll inside the drawer scrolls the settings list
+\item
+  click inside the drawer does not leak through to the page
+\item
+  click in shell chrome still hits shell chrome if it is intentionally above the drawer layer
+\end{itemize}
+
+If we do not build mouse support into this, the drawer will feel unfinished immediately.
+
+\section{Help model}\label{record-057-help-model}
+
+When settings are open:
+
+\begin{itemize}
+\tightlist
+\item
+  the short help strip should mention settings navigation and dismissal
+\item
+  the full help view should reflect the settings layer rather than only the current page
+\end{itemize}
+
+That keeps the shell honest and discoverable.
+
+\section{Scope}\label{record-057-scope}
+
+\subsection{In scope for v0}\label{record-057-in-scope-for-v0}
+
+\begin{itemize}
+\tightlist
+\item
+  shell-owned settings drawer in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  declarative settings sections and rows
+\item
+  scrollable settings list
+\item
+  keyboard navigation and selection
+\item
+  mouse click and wheel support
+\item
+  command-palette entry to open settings
+\item
+  docs app as a proving surface
+\end{itemize}
+
+\subsection{Out of scope for v0}\label{record-057-out-of-scope-for-v0}
+
+\begin{itemize}
+\tightlist
+\item
+  settings persistence across sessions
+\item
+  arbitrarily rich embedded controls inside rows
+\item
+  editable text fields inside settings
+\item
+  page-specific custom drawer layouts
+\item
+  a full generalized preferences framework for every component in the repo
+\end{itemize}
+
+\section{Tests are the spec}\label{record-057-tests-are-the-spec}
+
+The next implementation loop should start with failing tests in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+
+\subsection{Minimum acceptance tests}\label{record-057-minimum-acceptance-tests}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{The frame can open a standard settings drawer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    A standard shell action opens settings without the page building a one-off overlay.
+  \end{itemize}
+\item
+  \textbf{The settings drawer owns input while open}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Arrow keys and scroll actions move within settings instead of mutating the underlying page.
+  \end{itemize}
+\item
+  \textbf{Mouse input does not leak through the settings drawer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Clicks and wheel events inside the drawer are consumed by settings behavior.
+  \end{itemize}
+\item
+  \textbf{The settings list scrolls when content exceeds drawer height}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Long preference lists remain usable in compact terminals.
+  \end{itemize}
+\item
+  \textbf{The command palette can open settings}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The shell exposes settings as a discoverable shell command, not just a hidden keybinding.
+  \end{itemize}
+\item
+  \textbf{The docs app can expose preferences without custom drawer plumbing}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    DOGFOOD becomes a proving surface, not a special-case shell fork.
+  \end{itemize}
+\end{enumerate}
+
+\section{Recommended first proving surface}\label{record-057-recommended-first-proving-surface}
+
+The DOGFOOD docs app is the right v0 proving surface because it already has obvious shell-level preferences:
+
+\begin{itemize}
+\tightlist
+\item
+  landing theme preset
+\item
+  default profile
+\item
+  animation on/off
+\item
+  hint visibility
+\end{itemize}
+
+That is enough to validate:
+
+\begin{itemize}
+\tightlist
+\item
+  drawer layout
+\item
+  shell input ownership
+\item
+  mouse routing
+\item
+  command-palette entry
+\item
+  scrollable settings sections
+\end{itemize}
+
+without overdesigning persistence or form controls too early.
+
+\section{Recommended next implementation loop}\label{record-057-recommended-next-implementation-loop}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write failing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} tests for opening, scrolling, and owning input.
+\item
+  Add a failing docs-preview test that opens settings and changes one visible preference.
+\item
+  Implement the shell-owned drawer and basic settings list renderer.
+\item
+  Prove the docs app can adopt it with minimal custom code.
+\end{enumerate}
+
+The key discipline is the same as the rest of the post-v4 work:
+
+\begin{quote}
+design first, tests second, implementation third.
+\end{quote}
+

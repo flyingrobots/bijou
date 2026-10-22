@@ -1,0 +1,42 @@
+\chapter{DL-009 --- Strictly Typed App Interface Examples}\label{record-298}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/DL-009-strictly-typed-app-examples.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "DL-009 — Strictly Typed App Interface Examples"
+legend: DL
+lane: graveyard
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-298-disposition}
+
+Superseded by \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/DL-010-strictly-typed-app-examples.md}{DL-010 --- Strictly Typed App Interface Examples}. The work shipped, but this legacy pre-METHOD note used the \texttt{D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}9} identifier before that id was later reused for \texttt{D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}9\allowbreak{} \allowbreak{}—\allowbreak{} \allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{} \allowbreak{}R\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}s}. Keep this file only as name/lineage preservation for the older backlog tree.
+
+\section{Original Proposal}\label{record-298-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Idea}\label{record-298-idea}
+
+Many code examples in the repository's READMEs and GUIDEs currently use \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{}>} or \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y}. While concise, this masks the core TypeScript safety guarantees that make Bijou an ``industrial-grade'' engine.
+
+Refactor all top-level documentation examples to use concrete \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l} and \texttt{M\allowbreak{}s\allowbreak{}g} types. Ensure that the \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t}, \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e}, and \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w} functions are shown with their full generic context.
+
+\section{Why}\label{record-298-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Safety}: Demonstrates the TEA loop's state-machine guarantees immediately to new users.
+\item
+  \textbf{Clarity}: Makes it clear how messages and models flow through the update cycle.
+\item
+  \textbf{Consistency}: Aligns the documentation with the ``Tests are the Spec'' and ``Runtime Truth Wins'' invariants.
+\end{enumerate}
+
+\section{Effort}\label{record-298-effort}
+
+Small --- surgical updates to README.md and GUIDE.md files.
+

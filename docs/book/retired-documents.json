@@ -1,0 +1,294 @@
+[
+  {
+    "path": "docs/legends/DF-dogfood-field-guide.md",
+    "sha256": "22f61257357b1aa1d6cc431f478028256674f9676c4756b497cb482e0c114153"
+  },
+  {
+    "path": "docs/legends/DL-design-language.md",
+    "sha256": "068a0fad796423c48012b1ab4ea2a090b892785bd4dc050d524b8384242e9e20"
+  },
+  {
+    "path": "docs/legends/DX-developer-experience.md",
+    "sha256": "ce5faac438801def2fbdd5b30b1b0140266be9a439e406cec4c684b61999ebeb"
+  },
+  {
+    "path": "docs/legends/HT-humane-terminal.md",
+    "sha256": "7f43fd505f3c0d409356f66168bf136651287655595f38aa3c2a8529bf433c3e"
+  },
+  {
+    "path": "docs/legends/LX-localization-and-bidirectionality.md",
+    "sha256": "e9ff10a4ae86d9db7476dbcfcd51fc43c73b3e45da52830c23a5dcf4b969aa14"
+  },
+  {
+    "path": "docs/legends/RE-runtime-engine.md",
+    "sha256": "7c1d1cb3d22c276eb0daa1dba6a70671726c177339399e81a5c0f28bae8aea66"
+  },
+  {
+    "path": "docs/legends/README.md",
+    "sha256": "ae7d9306b2f948e4280478e0ffd6cc4f6a39bb49638b4f5cb5420ce2343b84d4"
+  },
+  {
+    "path": "docs/legends/WF-workflow-and-delivery.md",
+    "sha256": "bf93e5adba6e04aabad17fe704fa6062192cb1bc29d25788d1c580adba57b1d7"
+  },
+  {
+    "path": "docs/method/backlog/README.md",
+    "sha256": "e43f79ff25d6d2b0b9174677a1501c073dcc997aaef9e3d22d3f01fd6e998202"
+  },
+  {
+    "path": "docs/method/backlog/asap/LX-013-dogfood-locale-preference-persistence.md",
+    "sha256": "659ac1e9754f062984446115cce562ff8726fdb3196fc44022e4b6aa508f99e9"
+  },
+  {
+    "path": "docs/method/backlog/asap/LX-014-expand-dogfood-catalog-coverage.md",
+    "sha256": "749e48d717e9093f5ca44fd1d8b55765b23bbdfff5c298aa8733580772a104e5"
+  },
+  {
+    "path": "docs/method/backlog/asap/README.md",
+    "sha256": "70d91cea2ae247b76e282417bd2df7ef430d5b5565c91bdeeb6d0ac19acf17e9"
+  },
+  {
+    "path": "docs/method/backlog/bad-code/README.md",
+    "sha256": "7a94a0699309b76a30727949ab33416ed3eafa555e03cbcbeead2a4cecf29ab1"
+  },
+  {
+    "path": "docs/method/backlog/badcode/asap/mcp-dag-type-error.md",
+    "sha256": "8633073933c28c31700cc08b3cac68f5cf28be170e5bc01d537480507f13c5fa"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/CI-001-mermaid-surface-component.md",
+    "sha256": "f857fd606d23f2b3a73ea5abf8aab7029265e6997323c435f88ac5ba68a9fe03"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/CI-002-deterministic-time-travel-debugger.md",
+    "sha256": "91c073bfc82b2bb7f087d1a146fec53155fc001a0cb64831335b0ab9c92045b1"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/DX-027-choose-your-lane-starter-for-readme-and-dogfood.md",
+    "sha256": "cbd26b0b4c5b1f2bf781ee821beed127b69838e00ba4510e1f6ae1b9e3b5db9b"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/HT-009-file-explorer-surface.md",
+    "sha256": "f66f7f7ca0b905578d46dd236bbad849a10299f263977f326497eba692198bda"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/LX-015-dogfood-localization-burndown-dashboard.md",
+    "sha256": "6bccf19d67cf0ff46a6cc6de72ceb9485132f764108ef055598209930bbdace9"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/LX-016-portable-locale-preferences-across-hosts.md",
+    "sha256": "f3a7cd699468fa5354a97100583421f3d6ac91331877686013b519b17998fad6"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/LX-017-multilingual-dogfood-translation-workbench.md",
+    "sha256": "9f9d796468aff78079eb21fee445897fedc1341dc85d76643e2d41297c03c97b"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/RE-025-dag-path-emphasis.md",
+    "sha256": "77ac5dc5f4ca0d6454fc074024533fdca0eb614b0467e86b6508b288230934d5"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/RE-026-dag-edge-labels.md",
+    "sha256": "b2c5a69c7fb8ddf511e1bdb4cb557d8744ec05d8a677e706235ed61f2fdf38c5"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/RE-027-dag-compact-legend-mode.md",
+    "sha256": "ae1b2f7ff2ee59412bfadc4d5e05acf3790172316379843e3d5f626bbcaa5096"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/RE-028-dag-edge-semantics-and-metadata.md",
+    "sha256": "5e0404c14728a7ab229fe67040f2050be4c726eee24e29bbb7fc5bfe838193f7"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/RE-029-dag-adaptive-density-and-lowering.md",
+    "sha256": "5e8a59ddc4beb336d1e38d4f3c5ed12c1caa78f9e6318447e57edb46680399d2"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/README.md",
+    "sha256": "5882668b6b448b102bab6b2884e3335ed42b3f325963c084f37a42992f084029"
+  },
+  {
+    "path": "docs/method/backlog/cool-ideas/cool-ideas.md",
+    "sha256": "04b3f636715d7bdbf90c44f96282c25e04fdc3b07c648c22921e2d3dde51992d"
+  },
+  {
+    "path": "docs/method/backlog/inbox/README.md",
+    "sha256": "4db223bc1480852f1770fc36fbbda5928a0b496cb7c6d1c5970f486d2098abea"
+  },
+  {
+    "path": "docs/method/backlog/inbox/RE_re-027-generalize-crash-mode-auto-exit-beyond-tty-detection.md",
+    "sha256": "913974cb8fd98cd93e981c1ed4bc05908016b908b5fc5512e478e54302b6cd37"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-031-audit-inline-status-family-across-real-surfaces.md",
+    "sha256": "cdf86e435d33edd03433a8275db1fd93baf8d9842744b031f7771060141825bb"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-032-audit-in-flow-status-block-family-across-real-surfaces.md",
+    "sha256": "a74a7da966ca8771dea440664047e457f1d086a6fedffa5b75ea5d7dd610570d"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-033-audit-low-level-transient-overlay-family-across-real-surfaces.md",
+    "sha256": "f80b66404fb6d2069462fa9ec67ee60b7bfb62eb0c62aa92d97accebde7e7e8c"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-035-audit-activity-stream-family-across-real-surfaces.md",
+    "sha256": "b31a9cc968daa427bbe9339093de3f148e5efbb532a161af882a26e2cc5a4c98"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-037-audit-inline-shortcut-cues-family-across-real-surfaces.md",
+    "sha256": "c6ab4cf3c4cc18e561555431dce49c7dd4b51e720eaa996410f6dbfb0d29ffa1"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-038-audit-progress-indicators-family-across-real-surfaces.md",
+    "sha256": "9344dd3d55977f7574db2bf9ce3cac1ec1369abd573a178fb56382aa9f6a3dfc"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-039-audit-framed-grouping-family-across-real-surfaces.md",
+    "sha256": "85c692f4e712ff6ffc03e4ec161883dc5342c8023770e6983e4259b5649a5d73"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-040-audit-explainability-walkthroughs-family-across-real-surfaces.md",
+    "sha256": "e99422152397c285278141736422301a48302b5cfd40e2c4f567ec900a9931e6"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-042-audit-formatted-documents-and-prose-family-across-real-surfaces.md",
+    "sha256": "63615ad200e4372252f9a99358fddcda98a86299c426916b9cbf8adebbb6b082"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-043-audit-linked-destinations-family-across-real-surfaces.md",
+    "sha256": "068bf80e473eae4d3556c918f50634c08322bee753065c58882ac40b910c1220"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-044-audit-dividers-family-across-real-surfaces.md",
+    "sha256": "3fb043362eca4547ee52a48bfb48d7e8bf0b19e14c2461d347bb8d3dfe208e9a"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-045-audit-text-entry-family-across-real-surfaces.md",
+    "sha256": "97ed8b68d40017d10abdb8ba905201ec566a5b70b540a1f7900309ca53c63ea7"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-046-audit-single-choice-family-across-real-surfaces.md",
+    "sha256": "ec205dccadbf0d884f25f7d2c57746682253d4455f63893ff2845b4575a4ef99"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-047-audit-multiple-choice-family-across-real-surfaces.md",
+    "sha256": "9cb27d82fdf87adf30994f0e3d2a60bc2bad29e4b09b0f77cb21385efb196a34"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-048-audit-binary-decision-family-across-real-surfaces.md",
+    "sha256": "09c60be8b0b895737f0005409489689ab7d3e7650ab3ab903d636b1e638fa6d8"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-050-audit-peer-navigation-family-across-real-surfaces.md",
+    "sha256": "7b29d4b71e947efa77924f607cdd7f24e94c68ce453a7b4e5531b22c77f63ee1"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-051-audit-progressive-disclosure-family-across-real-surfaces.md",
+    "sha256": "155b6a0fe56b2bbfe20c0ccc6dfd99f4b67c862c2cc1b2c416b56b2af41bfd6e"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-052-audit-path-and-progress-family-across-real-surfaces.md",
+    "sha256": "c5e838b90026dac27f55abcb2bddea2d7821f7933cef340d641a1f2a356f9d43"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-054-audit-expressive-branding-and-decorative-emphasis-family-across-real-surfaces.md",
+    "sha256": "b72da3febce7fdb90df7c67b113ff48caf45afbe6736d1f674014d65211cfa98"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-055-audit-mode-aware-custom-primitives-family-across-real-surfaces.md",
+    "sha256": "3fca5dab1e70bb9767985394ac21aebf34933c7747f28351b048f6fb71d20a1a"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-056-audit-dense-comparison-family-across-real-surfaces.md",
+    "sha256": "c04a9f4e5f684d6180e37139863dce5504dde03f2b3cfc226fb9476d9697c9b8"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-057-audit-hierarchy-family-across-real-surfaces.md",
+    "sha256": "3e419612c573edc3710f29009caa9f8dd74d3179576580bd06bc2827430cd8e2"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-058-audit-lists-for-exploration-family-across-real-surfaces.md",
+    "sha256": "adbc5cd7ff00bf24b7368d1e77873beddb40d854874f1a997dcd936db0387ea6"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF-059-audit-temporal-or-dependency-views-family-across-real-surfaces.md",
+    "sha256": "4946f2c59f55d44474b2f47f1010a1435ca59f6f9cbd6b7ae9bd76021f5907bd"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DF_df-030-make-dogfood-the-canonical-docs-surface.md",
+    "sha256": "71890bd0f12e0596f5b04ee229efdc3fdd62f57066c176aeb85b039162f01c19"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DX-037-table-surface-responsive-width-parity.md",
+    "sha256": "3e6165acfa9364a8ec964dd17dfaf8331b6cb10ae5971988142bdccf65b7aa86"
+  },
+  {
+    "path": "docs/method/backlog/up-next/DX_dx-029-document-scopednodeio-realpath-and-symlink-semantics.md",
+    "sha256": "0100d17b92a9c55a109393dd67d4f2f0aee213b536881684663f1d1b04ae4880"
+  },
+  {
+    "path": "docs/method/backlog/up-next/README.md",
+    "sha256": "3ea48b7642d38e0bf619744aef43509eb130f91f4fdf93438e7a74b8ad01f6ac"
+  },
+  {
+    "path": "docs/method/backlog/v5.0.0/README.md",
+    "sha256": "c54cd73959c1f65082b9258b262aab3d8d0b1a4b9b1102a374f1757e50ab5b6e"
+  },
+  {
+    "path": "docs/method/backlog/v6.0.0/README.md",
+    "sha256": "62fbab571e6a3125793f64d90daea63eae2d23f34a56ad611c568271e922ee07"
+  },
+  {
+    "path": "docs/method/legends/DF-dogfood-field-guide.md",
+    "sha256": "f9c272267a899ad67256eb0ca77549bef749e616a059f25db6f237fa5f3489cc"
+  },
+  {
+    "path": "docs/method/legends/DL-design-language.md",
+    "sha256": "93bc7618c1a5bca9eb726b6153f549add8712be54d095a33cf012d86c2252993"
+  },
+  {
+    "path": "docs/method/legends/DX-developer-experience.md",
+    "sha256": "14aab7d82b14bc6c5f182660cf0e59c1f27e3aa993f94c612d1853bd9d7ecb33"
+  },
+  {
+    "path": "docs/method/legends/HT-humane-terminal.md",
+    "sha256": "ac150f9383bab7ca6f402076425bbe8aa656f8956bcb0fe32345d5bf049e722d"
+  },
+  {
+    "path": "docs/method/legends/LX-localization-and-bidirectionality.md",
+    "sha256": "6f3d1460fc4d7118abece27999adf42ea33b831d786f4476e62a229c6297aced"
+  },
+  {
+    "path": "docs/method/legends/RE-runtime-engine.md",
+    "sha256": "5be896a4d700553f67a16e2a253e39c05ee7e40c21daf6bbcbad00823c659951"
+  },
+  {
+    "path": "docs/method/legends/WF-workflow-and-delivery.md",
+    "sha256": "0c93082d0a2aa7a7af58155e3d781003e598f2f39a01f897eb6a1869b425c4b6"
+  },
+  {
+    "path": "docs/method/releases/README.md",
+    "sha256": "a8dfdd5402ed87523d0d44bdc618b43464cce0c2d8edf1a31ac3bd07833b1fa9"
+  },
+  {
+    "path": "docs/method/process.md",
+    "sha256": "c75884e5733a4ab4caa14ec6fcaeb4370a0722dbbc599c055dfe0ee625fc13a8"
+  },
+  {
+    "path": "docs/method/release.md",
+    "sha256": "ff1e866069dc1666055729aec32f061ed2da705fc79e51d23d83fd4de9656fea"
+  },
+  {
+    "path": "docs/method/release-runbook.md",
+    "sha256": "614d997bf8cc4c4c6c718e36ce06e9f5fc2d8af9a21e74244a6125ef6694d892"
+  },
+  {
+    "path": "docs/TECHNICAL_TEARDOWN.md",
+    "sha256": "5ceec4929a4b038f4b9010a0d059737c63cbb7f77608130183de30051587c065"
+  },
+  {
+    "path": "docs/COMPLETED.md",
+    "sha256": "ea8c834f96bcb066c4e1f3d2c3f9c707975e789da8cb5f588ad51ce8b906fca2"
+  }
+]

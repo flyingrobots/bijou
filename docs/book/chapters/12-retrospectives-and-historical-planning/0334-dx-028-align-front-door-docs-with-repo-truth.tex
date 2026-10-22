@@ -1,0 +1,56 @@
+\chapter{DX-028 --- Align front-door docs with repo truth}\label{record-334}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-028-align-front-door-docs-with-repo-truth.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-028 — Align front-door docs with repo truth
+legend: DX
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-334-disposition}
+
+Completed on 2026-04-14 via README, CONTRIBUTING, and SECURITY updates that align the front door with the shipped package surface, preferred startApp() bootstrap path, npm workspace workflow, and current supported release line. Validation included docs inventory, lint, and full release-readiness.
+
+\section{Original Proposal}\label{record-334-original-proposal}
+
+The package-level docs are mostly coherent now, but the front door and operator docs still lag the repo's actual runtime and release posture.
+
+\section{Problem}\label{record-334-problem}
+
+The 2026-04-14 documentation audit found a small set of high-friction drifts: - \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} under-represents the shipped package surface - the root interactive example still teaches \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})} while package docs prefer \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} - \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} still says \texttt{p\allowbreak{}n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l} even though the repo is npm-workspace based - \texttt{S\allowbreak{}E\allowbreak{}C\allowbreak{}U\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}.\allowbreak{}m\allowbreak{}d} still has a stale supported-version table
+
+None of these are architecture problems, but together they make the first contact with the repo less truthful than the package docs and release tooling.
+
+\section{Desired outcome}\label{record-334-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Update \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} so the package map reflects the current published surface.
+\item
+  Make the root quick start use the preferred Node-host bootstrap path.
+\item
+  Fix \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} to match the repo's actual install and validation workflow.
+\item
+  Refresh \texttt{S\allowbreak{}E\allowbreak{}C\allowbreak{}U\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}.\allowbreak{}m\allowbreak{}d} so its supported-version language matches current repo truth.
+\item
+  Add a short ``choose your lane'' front-door path for CLI vs TUI vs MCP vs i18n.
+\end{enumerate}
+
+\section{Why ASAP}\label{record-334-why-asap}
+
+\begin{itemize}
+\tightlist
+\item
+  This is the highest-signal docs debt still visible to every new user.
+\item
+  The repo now has strong release proof; the front door should stop lagging behind it.
+\end{itemize}
+
+\section{Hill}\label{record-334-hill}
+
+The first five minutes in the repo point users at the same package/runtime truth that the implementation and release tooling already enforce.
+

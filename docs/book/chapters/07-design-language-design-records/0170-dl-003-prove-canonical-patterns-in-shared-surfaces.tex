@@ -1,0 +1,253 @@
+\chapter{DL-003 --- Prove Canonical Patterns in Shared Surfaces}\label{record-170}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Why this cycle exists}\label{record-170-why-this-cycle-exists}
+
+DL-002 makes the pattern and block language explicit.
+
+The next step should prove that those patterns are not just prose by applying them to more shared surfaces.
+
+This cycle intentionally picks the smallest meaningful proving slice:
+
+\begin{itemize}
+\tightlist
+\item
+  shared collection rows outside preference lists
+\item
+  canonical full-row selection treatment
+\item
+  one-cell inset rhythm in rich TUI surfaces
+\end{itemize}
+
+The best first candidates are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+Both already represent canonical shared collection behavior. Both currently still lean too much on a glyph-only focus cue in the rich surface path.
+
+\section{Scope of this cycle}\label{record-170-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  proving canonical selected-row background treatment in shared TUI surfaces
+\item
+  proving one-cell inset rhythm in those same rich surfaces
+\item
+  doing that in \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  notification-center polish
+\item
+  drawer rhythm and inspector surfaces
+\item
+  a general block runtime
+\item
+  changing the lowering-friendly string paths just to match rich TUI ornament
+\end{itemize}
+
+\section{Human users}\label{record-170-human-users}
+
+\subsection{Primary human user}\label{record-170-primary-human-user}
+
+A builder using Bijou collection surfaces in a rich TUI shell.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  focused rows to read as clearly selected
+\item
+  collection surfaces to feel consistent with the now-canonical settings language
+\item
+  more than a tiny leading glyph to understand current selection in dense shells
+\end{itemize}
+
+\subsection{Human hill}\label{record-170-human-hill}
+
+A builder can place a browsable list or command palette in a shell and get canonical selected-row treatment without hand-adding shell-local styling.
+
+\section{Agent users}\label{record-170-agent-users}
+
+\subsection{Primary agent user}\label{record-170-primary-agent-user}
+
+An agent reviewing or generating collection-style TUI surfaces.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit evidence that shared surfaces follow the documented selected-row treatment
+\item
+  a reliable distinction between selected rows and active regions
+\item
+  the ability to point at concrete shared-surface proof, not just doctrine prose
+\end{itemize}
+
+\subsection{Agent hill}\label{record-170-agent-hill}
+
+An agent can verify that shared list-like surfaces now honor the design-language rules for selection and spacing instead of guessing from one-off shell examples.
+
+\section{Human playback}\label{record-170-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder renders a browsable list in a rich TUI.
+\item
+  The focused row reads as a full selected row, not just a glyph.
+\item
+  The same builder renders a command palette.
+\item
+  The palette uses the same selection logic and inset rhythm, so the shell feels related instead of custom per surface.
+\end{enumerate}
+
+\section{Agent playback}\label{record-170-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DL-003 cycle doc.
+\item
+  It can identify the proving surfaces for the canonical selection pattern.
+\item
+  It can run cycle tests and see concrete row-background and inset assertions for those surfaces.
+\item
+  It can point to the next backlog item for continuing the proof into drawer/notices territory.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-170-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-170-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  selected rows in rich TUI surfaces should use background fill, not only a glyph
+\item
+  active-region treatment remains distinct from selected-row treatment
+\item
+  one-cell inset rhythm should improve readability without obscuring core content
+\item
+  lowering-friendly string paths should remain simpler unless the semantic contract requires more
+\end{itemize}
+
+\section{Implementation outline}\label{record-170-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DL-003 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests that prove selected-row background fill and inset rhythm in shared surfaces.
+\item
+  Update \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} to honor the canonical selected-row pattern.
+\item
+  Add package-local regression coverage.
+\item
+  Close the cycle with the next backlog item for drawer/notices follow-through.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-170-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} uses a full selected-row background and one-cell inset
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} uses a full selected-row background and one-cell inset
+\item
+  the next design-language backlog item exists
+\end{itemize}
+
+\section{Risks}\label{record-170-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  changing the lowering-friendly text path when only the surface path needs the richer treatment
+\item
+  conflating active-region styling with selected-row styling
+\item
+  introducing bespoke helper logic that is harder to reuse than the surfaces it is meant to unify
+\end{itemize}
+
+\section{Out of scope}\label{record-170-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  drawer and inspector rhythm
+\item
+  notification rows
+\item
+  future block promotion
+\end{itemize}
+
+\section{Retrospective}\label{record-170-retrospective}
+
+\subsection{What landed}\label{record-170-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} now uses canonical full-row selected-row background treatment and one-cell inset rhythm in the rich surface path
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} now uses the same selected-row and inset treatment for its search line and result rows
+\item
+  package-local regressions now lock those behaviors in alongside the cycle-owned playback test
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-170-drift-from-ideal}
+
+No material drift.
+
+This cycle intentionally proved the pattern language in two shared collection surfaces without trying to generalize the entire shell or create a new public collection-row component family yet.
+
+\subsection{Debt spawned}\label{record-170-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DL-004-prove-drawer-rhythm-and-notice-rows.md}{DL-004 --- Prove Drawer Rhythm and Notice Rows}
+\end{itemize}
+

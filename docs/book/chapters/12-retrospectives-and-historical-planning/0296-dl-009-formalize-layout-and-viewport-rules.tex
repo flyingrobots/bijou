@@ -1,0 +1,56 @@
+\chapter{DL-009 --- Formalize Layout and Viewport Rules}\label{record-296}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Idea}\label{record-296-idea}
+
+Bijou has accumulated strong local layout instincts, but the rules are still implicit and scattered:
+
+\begin{itemize}
+\tightlist
+\item
+  how children fill or center within a parent rect
+\item
+  when parents vs children own whitespace
+\item
+  how panes stretch and shrink on terminal resize
+\item
+  when overflow should wrap, clip, or move into a viewport
+\item
+  how viewport ownership should align keyboard focus, mouse hit-testing, and scrollbars
+\end{itemize}
+
+This cycle should turn those instincts into one formal layout-language pass instead of leaving them as bug fixes and scattered notes.
+
+\section{Why}\label{record-296-why}
+
+Recent DOGFOOD issues exposed that layout bugs are often really ownership bugs:
+
+\begin{itemize}
+\tightlist
+\item
+  a pane can render as if it has one height while navigation thinks it has another
+\item
+  a child surface can leave accidental slack because no rule says whether it should fill or be placed
+\item
+  overflow can look scrollable without actually behaving like a viewport
+\end{itemize}
+
+If Bijou is going to be a serious TUI framework, layout rules need to be a first-class part of the design language.
+
+\section{Likely scope}\label{record-296-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  capture canonical resize/stretch/shrink rules
+\item
+  define parent-owned anchoring and whitespace rules
+\item
+  define viewport as the canonical overflow ownership seam
+\item
+  identify which existing components should adopt the formal rules first
+\end{itemize}
+

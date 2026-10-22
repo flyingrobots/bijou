@@ -1,0 +1,111 @@
+\chapter{Migrating to Bijou 5.0.0}\label{record-269}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/5.0.0/migration-guide.md}\par}\smallskip
+
+Bijou 5.0.0 does not require a wholesale rewrite for most 4.4.x apps. The main migration story is that the preferred hosted and theme-selection paths are now simpler and more explicit than the lower-level wiring that earlier releases required.
+
+\section{Framed Apps: Prefer The Self-Running Entry Points}\label{record-269-framed-apps-prefer-the-self-running-entry-points}
+
+If you currently do this:
+
+\begin{CodeBlock}
+const app = createFramedApp(options);
+await run(app, { ctx });
+\end{CodeBlock}
+
+prefer one of these in 5.0.0:
+
+\begin{CodeBlock}
+const app = createFramedApp(options);
+await app.run({ ctx });
+\end{CodeBlock}
+
+or:
+
+\begin{CodeBlock}
+await runFramedApp(options, { ctx });
+\end{CodeBlock}
+
+Why move:
+
+\begin{itemize}
+\tightlist
+\item
+  the framed shell now owns its hosted runner directly
+\item
+  the run-time \texttt{c\allowbreak{}t\allowbreak{}x} is applied to shell-owned rendering
+\item
+  frame timing and budget telemetry are wired back into \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})} now delegates to this path automatically when the app is a self-running framed shell
+\end{itemize}
+
+Existing \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})\allowbreak{})} code may still work, but it is no longer the preferred entrypoint.
+
+\section{Theme Selection: Move It Up To The Host Layer}\label{record-269-theme-selection-move-it-up-to-the-host-layer}
+
+If you previously built a custom Node context just to apply a theme, prefer the host-owned APIs:
+
+\begin{CodeBlock}
+await startApp(app, { theme: MY_THEME });
+\end{CodeBlock}
+
+For paired dark/light themes, use a theme set:
+
+\begin{CodeBlock}
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+  themeOverride: savedThemeId,
+});
+\end{CodeBlock}
+
+The same selection model is also available through:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}\}\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}\}\allowbreak{})}
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}\}\allowbreak{})}
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}\}\allowbreak{})}
+\end{itemize}
+
+If you pass both \texttt{c\allowbreak{}t\allowbreak{}x} and \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e}, the explicit \texttt{c\allowbreak{}t\allowbreak{}x} still wins.
+
+\section{Interactive Smoke: Use The Dedicated Verification Lane}\label{record-269-interactive-smoke-use-the-dedicated-verification-lane}
+
+If you maintain custom CI or local proof commands around the interactive examples, prefer:
+
+\begin{CodeBlock}
+npm run verify:interactive-examples
+\end{CodeBlock}
+
+The old scripted-example path now lives in that dedicated integration lane so the main unit suite can stay deterministic. The real examples still run; they just no longer masquerade as cheap unit tests.
+
+\section{No Manual Migration Needed For These Fixes}\label{record-269-no-manual-migration-needed-for-these-fixes}
+
+These changes land automatically once you upgrade:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} now renders bounded pipe tables through Bijou's real table surface
+\item
+  fatal crash mode no longer hangs forever when \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}i\allowbreak{}n} is not a TTY
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}o\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}O\allowbreak{}(\allowbreak{})} rejects symlink escapes across the declared root boundary
+\item
+  focused browsable rows can marquee overflowing labels in shared list surfaces such as DOGFOOD navigation
+\end{itemize}
+
+\section{Compatibility Stance}\label{record-269-compatibility-stance}
+
+Bijou 5.0.0 is a major line because the framework is drawing harder boundaries around hosted runtime ownership, theme selection, and release proof, not because most apps are expected to break. If your app already stays on the public APIs, the practical migration should usually be small and mostly about adopting the cleaner host entrypoints.
+

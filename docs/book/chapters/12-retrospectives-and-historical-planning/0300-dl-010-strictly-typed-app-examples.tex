@@ -1,0 +1,23 @@
+\chapter{DL-010 --- Strictly Typed App Interface Examples}\label{record-300}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DL-010-strictly-typed-app-examples.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DL-010 — Strictly Typed App Interface Examples
+lane: retro
+legend: DL
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-300-disposition}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}. The remaining public doc example that still used \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}>} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} is now typed with an explicit \texttt{P\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}, and a repo search over root/package READMEs plus GUIDE surfaces no longer finds \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{}>}, \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}>}, or \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y} examples in the top-level documentation path.
+
+\section{Original Proposal}\label{record-300-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DL-design-language.md}{DL --- Design Language}
+
+Many code examples in the repository's READMEs and GUIDEs currently use \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{}>} or \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y}. While concise, this masks the core TypeScript safety guarantees that make Bijou an ``industrial-grade'' engine.
+
+Refactor all top-level documentation examples to use concrete \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l} and \texttt{M\allowbreak{}s\allowbreak{}g} types. Ensure that the \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t}, \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e}, and \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w} functions are shown with their full generic context.
+

@@ -1,0 +1,140 @@
+\chapter{DX-024 Surface Diff Viewer}\label{record-124}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-024-surface-diff-viewer.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-024 Surface Diff Viewer
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-124-framing}
+
+Render debugging still depends on ad hoc inspection and text dumps. That is especially painful when a frame regression changes only a few cells, or when the character looks correct but a style changed underneath it.
+
+Bijou already has a strong \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} truth object. DX-024 makes that truth inspectable with a first-party diff model and viewer surface.
+
+\section{Sponsored Users}\label{record-124-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintainers investigating visual regression failures in frame tests.
+\item
+  App authors debugging composed surfaces where nested layout masks or overlays changed a small region.
+\item
+  Agent workflows that need a compact, plain-text rendering of surface truth without manually dumping raw cells.
+\end{itemize}
+
+\section{Hills}\label{record-124-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer can diff two surfaces and immediately see changed cell counts, style-only changes, and the smallest changed bounds.
+\item
+  An app author can render the same diff side-by-side or as an overlay surface without writing custom inspection code.
+\item
+  A test can print a plain-text diff summary that preserves the same changed cell facts when rich terminal rendering is unavailable.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-124-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the diff distinguish char changes from style-only changes?
+\item
+  Does the diff include cells added by width or height differences?
+\item
+  Does the viewer produce both side-by-side and overlay renderings?
+\item
+  Does the plain-text rendering include counts and per-cell coordinates?
+\item
+  Does the package export the diff model and viewer from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}?
+\end{itemize}
+
+\section{Requirements}\label{record-124-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a pure \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}(\allowbreak{}b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{})} model.
+\item
+  Add \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} for rich viewer output.
+\item
+  Add \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}b\allowbreak{}e\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}f\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})} for test and pipe output.
+\item
+  Support \texttt{s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} modes.
+\item
+  Count changed cells, character deltas, and style-only deltas separately.
+\item
+  Include a changed bounds rectangle when any cell differs.
+\item
+  Avoid changing existing surface or differ semantics.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-124-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} tests fail before implementation and pass after.
+\item
+  Cycle tests confirm the design doc sections and root package export.
+\item
+  Docs and changelog describe the new viewer.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-124-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the diff model and renderers in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export the new API from the \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} source barrel.
+\item
+  Keep rendering intentionally plain: labels, counts, and simple ASCII markers are more useful in failure output than decorative chrome.
+\end{itemize}
+
+\section{Drift Check}\label{record-124-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  The implementation stayed in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} because the model is useful for tests, but the viewer is a TUI authoring/debug component.
+\item
+  No existing surface or differ semantics changed; DX-024 only reads \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} cells and builds a separate report/view.
+\item
+  The side-by-side renderer intentionally keeps output plain and copyable for failure logs. Overlay mode applies simple highlight styles for rich surfaces.
+\end{itemize}
+
+\section{Playback}\label{record-124-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: focused tests failed on the missing \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} module and missing source-barrel exports.
+\item
+  GREEN: \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}(\allowbreak{})} now reports changed counts, char deltas, style-only deltas, changed bounds, and per-cell coordinates.
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} renders both \texttt{s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}-\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e} and \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} views.
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} renders a plain coordinate report for pipe/test output.
+\end{itemize}
+
+\section{Retrospective}\label{record-124-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  The useful split was model first, viewer second. That keeps tests and future tooling from needing to parse the visual surface.
+\item
+  Style-only changes are first-class because they are a common terminal UI regression and invisible in simple text snapshots.
+\item
+  A future follow-on could wire this into frame-regression failure output, but the reusable primitive is now available.
+\end{itemize}
+

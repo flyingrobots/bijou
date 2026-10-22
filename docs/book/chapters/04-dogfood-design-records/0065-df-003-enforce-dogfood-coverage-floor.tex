@@ -1,0 +1,247 @@
+\chapter{DF-003 --- Enforce DOGFOOD Coverage Floor}\label{record-065}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-003-enforce-dogfood-coverage-floor.md}\par}\smallskip
+
+\emph{Cycle for turning DOGFOOD coverage honesty into a CI-enforced release gate instead of a passive progress display}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-001-show-dogfood-coverage-progress.md}{DF-001 --- Show DOGFOOD Coverage Progress}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-065-why-this-cycle-exists}
+
+DF-001 made DOGFOOD honest about how incomplete it currently is.
+
+That honesty should not remain a purely visual promise. The repo should also enforce a minimum documentation floor so DOGFOOD cannot quietly regress or ship while pretending its progress bar means something.
+
+This cycle exists to:
+
+\begin{itemize}
+\tightlist
+\item
+  make the minimum acceptable DOGFOOD coverage explicit
+\item
+  enforce that minimum in CI and release-readiness flows
+\item
+  document the ratchet policy for future DF cycles
+\end{itemize}
+
+\section{Human users / jobs / hills}\label{record-065-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-065-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  maintainers shipping Bijou releases
+\item
+  contributors expanding or touching DOGFOOD docs coverage
+\item
+  reviewers deciding whether a cycle improved or regressed documentation completeness
+\end{itemize}
+
+\subsection{Human jobs}\label{record-065-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Ship Bijou without accidentally letting DOGFOOD coverage slip below the current honest bar.
+\item
+  See the current floor and next expected target without reverse-engineering old commits.
+\item
+  Treat docs completeness as a real quality gate, not a vague aspiration.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-065-human-hill}
+
+DOGFOOD coverage progress is not just displayed in the app; it is enforced in the repo and raised deliberately over time.
+
+\section{Agent users / jobs / hills}\label{record-065-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-065-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents expanding DOGFOOD stories
+\item
+  agents preparing release candidates
+\item
+  agents auditing whether documentation completeness is meeting the current floor
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-065-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Compute the current DOGFOOD family-coverage ratio from source data.
+\item
+  Compare that ratio against an explicit floor.
+\item
+  Fail deterministically when the floor is not met.
+\item
+  Surface the next required target so future cycles know the next ratchet point.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-065-agent-hill}
+
+An agent can determine from source-controlled policy whether the current DOGFOOD story set is acceptable for CI and release without heuristics or manual judgment.
+
+\section{Human playback}\label{record-065-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer opens the repo after a coverage-expansion cycle.
+\item
+  The DOGFOOD coverage floor is explicit in source control.
+\item
+  CI checks the current real story coverage against that floor.
+\item
+  If coverage drops below the floor, CI fails before merge or release.
+\item
+  The maintainer can also see the next target to raise by in the next dedicated DOGFOOD coverage cycle.
+\end{enumerate}
+
+\section{Agent playback}\label{record-065-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent computes DOGFOOD coverage from \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} and the canonical component-family reference.
+\item
+  The agent reads the explicit floor and next target from the shared policy module.
+\item
+  The agent runs the coverage gate script.
+\item
+  If coverage is below the floor, the script fails with the measured percent, floor, and next target.
+\item
+  If coverage meets the floor, CI proceeds and the next ratchet remains visible for future cycles.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-065-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Implementation outline}\label{record-065-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a shared DOGFOOD coverage-policy module with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    explicit floor percent
+  \item
+    explicit +5-point ratchet increment
+  \item
+    explicit next target
+  \item
+    helpers for evaluating/asserting the floor
+  \end{itemize}
+\item
+  Add a \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}:\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}e} script that computes real coverage and fails when the floor is not met.
+\item
+  Add focused tests for the policy and gate behavior.
+\item
+  Wire the gate into CI and release-readiness flows.
+\item
+  Update DF legend/changelog and spawn the next backlog item for actually raising the floor.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-065-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle doc regression for DF-003 and its follow-on backlog item
+\item
+  policy/gate tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    current coverage meets the current floor
+  \item
+    the next target is exactly floor + 5
+  \item
+    the gate fails when the floor is set above current coverage
+  \end{itemize}
+\item
+  release-readiness regression proving the new gate runs as part of the plan
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-065-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  CI can enforce the current floor, but it cannot infer from git history whether maintainers actually raised the floor every time they should have
+\item
+  the initial floor needs to be set to the current honest value, not an aspirational one that would immediately fail the repo
+\item
+  the meaningful follow-on is expanding DOGFOOD coverage itself, not only adding more policy
+\end{itemize}
+
+\section{Retrospective}\label{record-065-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  explicit DOGFOOD coverage floor policy in source control
+\item
+  a reusable coverage gate script
+\item
+  CI/release hooks enforcing the current floor
+\item
+  an explicit next target to make the next +5-point ratchet visible
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  actual new DOGFOOD component-family stories
+\item
+  automatic historical enforcement of ``every cycle raised by 5'' beyond the explicit next-target ratchet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DF-004-raise-dogfood-coverage-floor-to-next-target.md}{DF-004 --- Raise DOGFOOD Coverage Floor to the Next 5-Point Target}
+\end{itemize}
+

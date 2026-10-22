@@ -1,0 +1,36 @@
+\chapter{RE-022 --- Public PackedSurface Type Guard}\label{record-374}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v4.5.0/RE-022-public-packed-surface-type-guard.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-374-idea}
+
+Export a canonical \texttt{i\allowbreak{}s\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{})\allowbreak{}:\allowbreak{} \allowbreak{}s\allowbreak{} \allowbreak{}i\allowbreak{}s\allowbreak{} \allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} type guard from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} so consumers and internal code stop using ad-hoc \texttt{'\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}'\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}s} duck-typing.
+
+Currently the guard exists as a private function in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} and is duplicated (with slight variations) in:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}s\allowbreak{}/\allowbreak{}\_\allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}s\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}/\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+A single exported guard would:
+
+\begin{itemize}
+\tightlist
+\item
+  Eliminate duck-typing fragility (false positives if other objects have a \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} property)
+\item
+  Give TypeScript narrowing to \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} in one check
+\item
+  Let downstream consumers (like git-warp) detect packed surfaces without casting
+\end{itemize}
+

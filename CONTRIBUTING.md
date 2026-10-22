@@ -14,28 +14,16 @@ covers the workflow, expectations, and resources for contributors.
 
 ## Development Workflow
 
-Bijou uses [METHOD](docs/METHOD.md) for work tracking. The key
-points for contributors:
+Use GitHub issues and milestones for roadmap and release scope. Linear is the
+chosen execution tracker; the connection and workspace/team migration are still
+pending. Existing GitHub issues remain live until verified Linear links exist.
+See [the workflow](docs/book/bijou-designs.pdf#page=1467) for the current process.
 
-- **Start with a GitHub Issue**: New work intake lives in GitHub Issues, not
-  in a new local backlog file. Use the issue forms so the card captures a hill,
-  sponsored human/agent perspectives, scope, acceptance criteria, expected
-  evidence, and Method artifacts.
-- **Labels are tracker state**: Maintainers and agents apply `lane:*`,
-  `type:*`, `priority:*`, and `legend:*` labels. Do not treat historical repo
-  files as the source of live queue state.
-- **Branch naming**: `cycle/<cycle-name>` for cycle work, or a
-  descriptive branch name for smaller changes.
-- **Open a non-draft PR at cycle start**: After syncing the merge target, branch,
-  create or update the GitHub Issue, and commit the design artifact, push the
-  branch and open a non-draft PR against `main`. Link the issue, design doc,
-  and PR, then request final review only after validation and self-review pass.
-- **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
-  (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
-- **Tests first**: Write failing tests before implementing. Never
-  modify a test to make it pass — fix the code instead.
-- **Zero tolerance**: Lint must pass cleanly. All tests must pass.
-  No warnings.
+- Name one observable outcome, its scope, acceptance checks, and prerequisites.
+- Use a descriptive branch and one coherent PR per outcome.
+- Link the work item and PR; request review after validation and self-review.
+- Use Conventional Commits and meaningful regression checks.
+- Preserve design and release evidence without maintaining a second backlog.
 
 Common validation commands:
 
@@ -61,7 +49,7 @@ wrappers, or registry workflow behavior.
 
 ## Pull Requests
 
-- Open non-draft PRs against `main` at cycle start for visibility.
+- Open focused PRs against `main` and link the work item.
 - Request final review only after local validation and self-review pass.
 - Use `--body-file` for Markdown-heavy GitHub comments. Inline `--body "..."`
   is only safe for short literal comments that do not contain backticks,
@@ -82,40 +70,18 @@ wrappers, or registry workflow behavior.
 - **Performance**: The `examples/perf-gradient` demo is a proving
   surface. Benchmarks welcome.
 
-## How the Backlog Works
+## Work Tracking
 
-Contributions are tracked in GitHub Issues first. Open an issue before starting
-work unless a maintainer has already linked one. The issue is the live card; the
-repository stores durable evidence created while the work proceeds.
+The [GitHub issue tracker](https://github.com/flyingrobots/bijou/issues) and
+[milestones](https://github.com/flyingrobots/bijou/milestones) replace repository
+roadmap files. During the Linear migration, preserve source issue links and
+verify imported scope, acceptance criteria, status, and dependencies before
+changing ownership. Do not close source issues just because they were exported.
 
-### Lane Labels
-
-| Label | Meaning |
-| :--- | :--- |
-| `lane:inbox` | Raw intake. The work exists but has not been shaped for a cycle. |
-| `lane:asap` | Imminent work. Maintainers expect this to be pulled next. |
-| `lane:bad-code` | Known technical debt or cleanup that should not be normalized. |
-| `lane:cool-ideas` | Interesting but uncommitted exploration. |
-| `lane:release` | Release-boundary shaping or blockers. |
-
-Use `work-in-progress` only when a branch or PR is actively carrying the issue.
-Use `blocked` when progress depends on a decision or external state. Use
-`needs-design`, `needs-witness`, and `needs-retro` when the evidence ledger is
-missing a required artifact.
-
-The repo still contains `docs/method/backlog/`, `docs/design/`,
-`docs/method/retro/`, and `docs/method/graveyard/` because those files preserve
-history and evidence. They are not the first intake path for new contributors.
-
-For one-off fixes, open a GitHub issue with:
-
-1. A minimal summary of the user-facing issue.
-2. Reproduction steps or current repo evidence.
-3. Clear success criteria.
-4. Expected tests, playback, docs, and closeout evidence.
-
-Implementation work should link the issue from the PR and update
-`docs/CHANGELOG.md` when behavior or user-facing documentation changes.
+The [documentation book](docs/book/bijou-designs.pdf) preserves historical
+design, METHOD, and release evidence. Record new technical decisions and release
+proof in the linked issue or pull request; do not recreate repository planning
+cards. The book corpus remains available to DOGFOOD and historical checks.
 
 ## Code Style
 

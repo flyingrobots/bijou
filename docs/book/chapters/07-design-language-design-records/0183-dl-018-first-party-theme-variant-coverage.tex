@@ -1,0 +1,230 @@
+\chapter{DL-018 - First-Party Theme Variant Coverage}\label{record-183}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-018-first-party-theme-variant-coverage.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DL-018
+title: First-Party Theme Variant Coverage
+status: active
+lane: asap
+priority: medium
+github_issue: 343
+legend: DL
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-183-decision-summary}
+
+DOGFOOD now has a real AppShell theme-mode toggle, but the theme list still mixes one paired shell family with several landing-art shell presets that do not have light/dark siblings. For \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, the bounded repair is:
+
+\begin{itemize}
+\tightlist
+\item
+  inventory every first-party DOGFOOD shell theme as paired or single-mode through deterministic shell-spec coverage
+\item
+  keep \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}D\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}L\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} as the paired release-demo path
+\item
+  classify landing-art shell presets as explicit single-mode choices instead of implying that they support a dark/light toggle
+\item
+  make unsupported theme-mode toggles visible through shell feedback
+\item
+  prove dark-to-light and light-to-dark toggles deterministically
+\end{itemize}
+
+This cycle is about honest mode coverage, not a broad Theme Lab or palette redesign.
+
+\section{Sponsored Human}\label{record-183-sponsored-human}
+
+A DOGFOOD user wants to switch between dark and light modes during a demo and understand why some gallery themes do not toggle. Pressing the inherited AppShell shortcut should either switch the active paired theme or clearly say that the selected theme has no alternate mode.
+
+\section{Sponsored Agent}\label{record-183-sponsored-agent}
+
+An agent needs machine-readable evidence for first-party theme coverage. It should be able to inspect the DOGFOOD shell theme list, classify each choice, and assert that unsupported mode switches do not silently no-op.
+
+\section{Hill}\label{record-183-hill}
+
+After this cycle, DOGFOOD's theme path tells the truth: paired themes have dark/light behavior, single-mode themes are classified as single-mode in deterministic shell-spec coverage, and the AppShell mode toggle gives deterministic feedback in both supported and unsupported paths.
+
+\section{Problem}\label{record-183-problem}
+
+Issue \#343 came from the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release-video rehearsal. DOGFOOD exposed theme and mode concepts, then listed several first-party themes without a coherent mode story. That made \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} look unreliable: it works for the mode-aware DOGFOOD family, but single concrete themes cannot toggle and the user receives no explanation.
+
+The current implementation already has an AppShell-level \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} command for mode-aware shell theme families. The gap is coverage and honesty around the full DOGFOOD theme inventory.
+
+\section{Scope}\label{record-183-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add first-party shell theme coverage that distinguishes paired families from single-mode concrete themes.
+\item
+  Do not touch the DOGFOOD app rendering file for visible Theme Lab inventory until its existing raw-string debt is cleaned under the touched-file localization policy.
+\item
+  Keep the DOGFOOD family as the paired first-party dark/light shell path.
+\item
+  Keep landing-art shell presets single-mode unless a real light/dark pair is intentionally designed for a given preset.
+\item
+  Make \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} on a single-mode theme publish an explicit shell notification instead of silently doing nothing.
+\item
+  Add deterministic AppShell tests for supported dark-to-light and light-to-dark switching and for unsupported single-mode feedback.
+\item
+  Add DOGFOOD tests that prove the shell-spec inventory lists paired and single-mode coverage.
+\end{itemize}
+
+\section{Non-Goals}\label{record-183-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not redesign Theme Lab or Theme Inspector.
+\item
+  Do not create speculative light variants for landing-art palettes.
+\item
+  Do not change the release-title/landing-art rendering palette.
+\item
+  Do not add a global theme registry outside the existing AppShell shellThemes contract.
+\item
+  Do not move Theme Lab provenance, pointer inspection, or full operator surfaces out of the \texttt{v\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} horizon.
+\end{itemize}
+
+\section{User Experience Contract}\label{record-183-user-experience-contract}
+
+\texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} is inherited by apps that expose mode-aware shell themes. When the active shell choice belongs to a family with multiple modes, \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} switches to a sibling mode and posts the existing ``Shell theme set to \ldots{}'' feedback.
+
+When the active shell choice is a concrete single-mode theme, \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} posts a short settings notification that names the active theme and says it has no alternate mode. The active theme remains unchanged.
+
+The shell spec and settings surfaces must prove:
+
+\begin{itemize}
+\tightlist
+\item
+  the active default dark and light presets
+\item
+  a shell inventory where each first-party choice is classified as \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d} or \texttt{s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+\item
+  enough concrete labels that users can tell which entries respond to \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T}
+\end{itemize}
+
+\section{Lower Modes}\label{record-183-lower-modes}
+
+\subsection{Static Mode}\label{record-183-static-mode}
+
+Static tests should assert the same inventory classification from shell specs without requiring screenshot or ANSI scraping.
+
+\subsection{Pipe Mode}\label{record-183-pipe-mode}
+
+No new pipe contract is introduced. The shell theme inventory is diagnostic copy, not an exported data format.
+
+\subsection{Accessible Mode}\label{record-183-accessible-mode}
+
+Mode support must be textual. The user should not need color, swatches, or visual grouping alone to understand whether a theme supports the mode toggle.
+
+\section{Localization / Directionality Posture}\label{record-183-localization-directionality-posture}
+
+New user-facing strings should use the existing DOGFOOD or AppShell i18n ports. The tests may assert English source copy, but the source strings must be catalog-discoverable so the localization gates can track them.
+
+Directionality is unchanged. Future visible inventory copy should flow through the current shell layout after the touched DOGFOOD app file is localization clean.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-183-agent-inspectability-explainability-posture}
+
+Agents should be able to inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  raw DOGFOOD shell theme specs and their mode support
+\item
+  resolved AppShell theme choices and their \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}d} facts
+\item
+  shell-spec classification for paired and single-mode choices
+\item
+  runtime notifications after supported and unsupported \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} paths
+\end{itemize}
+
+The proof should not require screenshots or terminal color sampling.
+
+\section{Linked Invariants}\label{record-183-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Visible controls are a promise: a mode toggle must either work or explain why it cannot.
+\item
+  Docs are the demo: once the DOGFOOD app rendering file is localization-clean, Theme Lab should explain the actual first-party theme inventory users can select.
+\item
+  Shell owns shell concerns: mode switching remains AppShell behavior inherited by DOGFOOD and other apps through \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p}.
+\item
+  Tests are the spec: paired and unsupported paths need deterministic coverage.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-183-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add first-party shell theme support coverage for tests.
+\item
+  Keep visible Theme Lab inventory out of this cycle until the touched DOGFOOD app file is localization-clean.
+\item
+  Add AppShell feedback for unsupported mode toggles on single-mode concrete themes.
+\item
+  Add tests that fail before the implementation:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    DOGFOOD shell specs list \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} as paired dark/light.
+  \item
+    DOGFOOD shell specs list landing-art shell presets as single-mode.
+  \item
+    AppShell toggles paired themes through the illustrated sequence below
+  \item
+    AppShell \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} on a single-mode theme leaves the id unchanged and posts explicit feedback.
+  \end{itemize}
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, run focused tests, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}.
+\end{enumerate}
+
+\input{diagrams/flows/flow-074}
+
+\section{Tests To Write First}\label{record-183-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}8\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}y\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} for DOGFOOD shell inventory.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} coverage for supported dark-to-light and light-to-dark \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} switching.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} coverage for unsupported single-mode \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} feedback.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} coverage for the command-palette theme-mode action.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-183-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Every DOGFOOD first-party shell theme is classified as paired or single-mode.
+\item
+  DOGFOOD shell-spec coverage proves the first-party theme inventory with mode-support labels.
+\item
+  \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} toggles the paired DOGFOOD family in both directions.
+\item
+  \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}T} on a single-mode theme posts explicit feedback instead of silently doing nothing.
+\item
+  Deterministic coverage proves at least one dark-to-light and one light-to-dark switch path.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the theme variant coverage repair.
+\item
+  Issue \#343 is closed by the implementation PR.
+\end{itemize}
+
+\section{Retrospective}\label{record-183-retrospective}
+
+To be completed when the PR lands.
+

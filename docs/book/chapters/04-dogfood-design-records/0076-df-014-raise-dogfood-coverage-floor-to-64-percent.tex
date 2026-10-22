@@ -1,0 +1,179 @@
+\chapter{DF-014 --- Raise DOGFOOD Coverage Floor to 64\%}\label{record-076}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-014-raise-dogfood-coverage-floor-to-64-percent.md}\par}\smallskip
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-013-raise-dogfood-coverage-floor-to-59-percent.md}{DF-013 --- Raise DOGFOOD Coverage Floor to 59\%}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-076-why-this-cycle-exists}
+
+DF-013 proved that DOGFOOD could teach shell help and the notification system honestly.
+
+The next promised step was to keep the ratchet moving by documenting the shell frame itself instead of only shell-adjacent surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} / \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for \textbf{App shell}
+\item
+  \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for \textbf{Workspace layout}
+\end{itemize}
+
+\section{Scope of this cycle}\label{record-076-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  adding the app-shell family to DOGFOOD
+\item
+  adding the workspace-layout family to DOGFOOD
+\item
+  moving the field guide from \texttt{2\allowbreak{}3\allowbreak{}/\allowbreak{}3\allowbreak{}5} families to at least \texttt{2\allowbreak{}5\allowbreak{}/\allowbreak{}3\allowbreak{}5}
+\item
+  clearing the declared \texttt{6\allowbreak{}4\allowbreak{}\%} floor
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  progressive disclosure or path/progress teaching
+\item
+  data-browsing families
+\item
+  final DOGFOOD completion
+\end{itemize}
+
+\section{Human users}\label{record-076-human-users}
+
+\subsection{Primary human user}\label{record-076-primary-human-user}
+
+A builder deciding whether Bijou can teach whole application framing and spatial composition, not only individual widgets.
+
+\subsection{Human hill}\label{record-076-human-hill}
+
+A user can open DOGFOOD and understand when to use shell chrome versus page content, and when split/grid layout is honest instead of decorative geometry.
+
+\section{Agent users}\label{record-076-agent-users}
+
+\subsection{Primary agent user}\label{record-076-primary-agent-user}
+
+An agent continuing the coverage ratchet without padding the numerator with cosmetic stories.
+
+\subsection{Agent hill}\label{record-076-agent-hill}
+
+An agent can only satisfy DF-014 by adding real app-shell and workspace-layout stories and by proving the floor moved because those families are now actually present.
+
+\section{Human playback}\label{record-076-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user opens a new shell story and sees framed app chrome plus command discovery.
+\item
+  They open a workspace-layout story and see split and grid composition with clearly named regions.
+\item
+  The DOGFOOD coverage card rises because those two families are now real.
+\end{enumerate}
+
+\section{Agent playback}\label{record-076-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent reads DF-014 and sees the target pair: app shell plus workspace layout.
+\item
+  It adds real stories using the shipped shell and layout APIs.
+\item
+  The coverage tests confirm that DOGFOOD now clears the 64\% floor.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-076-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Implementation outline}\label{record-076-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DF-014 into the active cycle area.
+\item
+  Add real app-shell and workspace-layout stories.
+\item
+  Raise the ratchet only after those families exist.
+\item
+  Spawn the next DOGFOOD cycle.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-076-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}4\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the cycle doc has the required workflow sections
+\item
+  DOGFOOD preserves app-shell and workspace-layout coverage
+\item
+  the floor is at least 64 with the next target at least 69
+\item
+  the next DOGFOOD cycle exists
+\end{itemize}
+
+\section{Retrospective}\label{record-076-retrospective}
+
+\subsection{What landed}\label{record-076-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD now teaches \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} / \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} under the \textbf{App shell} family
+\item
+  DOGFOOD now teaches \texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} under the \textbf{Workspace layout} family
+\item
+  later cycles pushed the floor higher, but this slice remains one honest ratchet step in that larger climb
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-076-drift-from-ideal}
+
+No material drift.
+
+\subsection{Debt spawned}\label{record-076-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-015-raise-dogfood-coverage-floor-to-69-percent.md}{DF-015 --- Raise DOGFOOD Coverage Floor to 69\%}
+\end{itemize}
+

@@ -1,0 +1,29 @@
+\chapter{RE-024 --- Terminal Content Sanitization Boundary}\label{record-380}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/asap/RE-024-terminal-content-sanitization-boundary.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-380-problem}
+
+Bijou has strong low-level ANSI handling, but it does not yet define a clear safety boundary for untrusted or user-provided content. The 2026-04-11 ship-readiness audit flagged this as both a terminal injection risk and a correctness risk for render/diff bookkeeping when destructive escape sequences slip through ordinary content paths.
+
+Right now the repo has helpers for stripping ANSI, but not a clear runtime contract for when content must be sanitized or how trusted vs untrusted strings should be modeled.
+
+\section{Desired outcome}\label{record-380-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define where content sanitization belongs in the runtime/render path.
+\item
+  Decide whether the answer is a sanitize stage, a \texttt{S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} component, explicit trusted/untrusted content types, or a narrower boundary helper.
+\item
+  Add regression coverage for destructive escape-sequence payloads.
+\end{enumerate}
+
+\section{Effort}\label{record-380-effort}
+
+Medium --- contract design, implementation, and tests.
+

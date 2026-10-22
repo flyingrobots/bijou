@@ -1,0 +1,6 @@
+# Frozen publication evidence must retain exact bytes on every checkout.
+docs/book/source-corpus.json -text
+docs/book/build-report.json -text
+docs/book/reader-delivery.json -text
+docs/book/history/2026-10-20-before-progressive-build-report.json -text
+docs/book/history/2026-10-20-before-progressive-reader-delivery.json -text

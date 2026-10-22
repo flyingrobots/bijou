@@ -1,0 +1,154 @@
+\chapter{DF-067 Prove Responsive DOGFOOD Layout Variants}\label{record-108}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-067-prove-responsive-dogfood-layout-variants.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-067 Prove Responsive DOGFOOD Layout Variants
+legend: DF
+lane: design
+priority: high
+keywords:
+  - dogfood
+  - responsive
+  - layout
+  - variants
+  - resize
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-108-framing}
+
+DOGFOOD already responds mechanically to terminal resize events: the runtime updates viewport dimensions, the framed shell recomputes body geometry, and the current grid primitives solve new integer rectangles.
+
+That is not enough.
+
+The current docs shell keeps fixed sidebars and asks the middle track to absorb whatever space remains. That is valid geometry, but below useful widths it turns the app into a technically present three-column surface whose content is no longer the primary thing.
+
+This cycle keeps the work DOGFOOD-scoped. It does not wait for the full RE-035 layout envelope runtime. It proves the editorial layer first: resize handling is mechanical, responsive layout is editorial.
+
+\section{Sponsored Users}\label{record-108-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Readers opening DOGFOOD in small terminals.
+\item
+  Maintainers validating layout doctrine against a real product surface.
+\item
+  Agents checking whether DOGFOOD remains useful at constrained sizes instead of merely nonblank.
+\end{itemize}
+
+\section{Hills}\label{record-108-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  At wide sizes, a reader sees navigation, content, and metadata/variant context together.
+\item
+  At standard sizes, a reader keeps navigation and content while secondary metadata folds away.
+\item
+  At narrow sizes, content becomes primary while navigation remains reachable.
+\item
+  At tiny sizes, DOGFOOD becomes a single useful pane instead of a crushed multi-column layout.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-108-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD classify terminal size into explicit layout variants?
+\item
+  Does \texttt{1\allowbreak{}4\allowbreak{}0\allowbreak{}x\allowbreak{}4\allowbreak{}0} keep the wide three-region docs/product shape?
+\item
+  Does \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{}x\allowbreak{}3\allowbreak{}0} fold metadata while preserving navigation and content?
+\item
+  Does \texttt{7\allowbreak{}2\allowbreak{}x\allowbreak{}2\allowbreak{}0} keep content primary and navigation reachable?
+\item
+  Does \texttt{5\allowbreak{}0\allowbreak{}x\allowbreak{}1\allowbreak{}4} render a single useful pane with no fake sidebars?
+\item
+  Do the guide pages and component explorer both obey the same variant policy?
+\item
+  Does resize update the variant and viewport state without requiring a restart?
+\end{itemize}
+
+\section{Requirements}\label{record-108-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a pure \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}V\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{})} helper returning: \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d}, \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w}, or \texttt{t\allowbreak{}i\allowbreak{}n\allowbreak{}y}.
+\item
+  Store the current layout variant in DOGFOOD page models so framed page layout functions can select a layout tree without depending on render-time hacks.
+\item
+  Keep current wide layouts intact.
+\item
+  Fold guide metadata and component variants out of \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d} and \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w} layouts.
+\item
+  Use a smaller navigation track in \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w}.
+\item
+  Use one content pane in \texttt{t\allowbreak{}i\allowbreak{}n\allowbreak{}y}.
+\item
+  Keep resize synchronization responsible for the page model's variant and viewport heights.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-108-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}7\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test proves the variant resolver thresholds.
+\item
+  The test renders guide pages at \texttt{1\allowbreak{}4\allowbreak{}0\allowbreak{}x\allowbreak{}4\allowbreak{}0}, \texttt{1\allowbreak{}0\allowbreak{}0\allowbreak{}x\allowbreak{}3\allowbreak{}0}, \texttt{7\allowbreak{}2\allowbreak{}x\allowbreak{}2\allowbreak{}0}, and \texttt{5\allowbreak{}0\allowbreak{}x\allowbreak{}1\allowbreak{}4}.
+\item
+  The test renders the component explorer at \texttt{1\allowbreak{}4\allowbreak{}0\allowbreak{}x\allowbreak{}4\allowbreak{}0}, \texttt{7\allowbreak{}2\allowbreak{}x\allowbreak{}2\allowbreak{}0}, and \texttt{5\allowbreak{}0\allowbreak{}x\allowbreak{}1\allowbreak{}4}.
+\item
+  The test proves a live resize from wide to tiny updates the model and output.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-108-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add the DOGFOOD layout variant type and resolver.
+\item
+  Add \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}V\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t} to \texttt{D\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}E\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l}.
+\item
+  Update DOGFOOD sync to recompute the variant from \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} and \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s}.
+\item
+  Split guide and component page layout construction by variant.
+\item
+  Update DOGFOOD docs/legend notes with the responsive posture.
+\end{enumerate}
+
+\section{Drift Check}\label{record-108-drift-check}
+
+This is not a replacement for RE-035.
+
+DF-067 deliberately uses the current framed shell, grid, pane, and viewport primitives. The goal is to create product pressure and executable evidence for later runtime-engine responsive doctrine without expanding the runtime API prematurely.
+
+\section{Playback}\label{record-108-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: DOGFOOD redrew on resize but kept fixed sidebars even when the terminal could no longer support them.
+\item
+  GREEN: DOGFOOD selects explicit layout variants and preserves useful content at wide, standard, narrow, and tiny sizes.
+\item
+  Guide pages now render nav/content/meta at \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}e}, nav/content at \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d} and \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w}, and content-only at \texttt{t\allowbreak{}i\allowbreak{}n\allowbreak{}y}.
+\item
+  The component explorer now renders family/story/variants at \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}e}, family/story at \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d} and \texttt{n\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w}, and story content only at \texttt{t\allowbreak{}i\allowbreak{}n\allowbreak{}y}.
+\item
+  Resize synchronization updates each page model's variant, visible pane focus, pane scroll map, and list viewport height.
+\end{itemize}
+
+\section{Retrospective}\label{record-108-retrospective}
+
+This closes the immediate product gap without expanding the runtime layout API. The current grid/frame primitives are enough to prove the editorial rule: constrained layouts should choose a useful surface, not preserve a wider shape until it becomes unreadable.
+

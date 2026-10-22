@@ -27,15 +27,15 @@ describe('DF-025 make DOGFOOD the only human-facing docs surface', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
   });
 
-  it('updates front-door and release docs to reflect the DOGFOOD-only posture', () => {
+  it('links the book from current entrypoints and preserves DOGFOOD release evidence', () => {
     const root = readRepoFile('README.md');
     const docs = readRepoFile('docs/README.md');
     const release = readRepoFile('docs/release.md');
     const examples = readRepoFile('examples/README.md');
 
-    expect(root).toContain('[DOGFOOD](./docs/DOGFOOD.md)');
+    expect(root).toContain('[Read the complete Bijou documentation book](docs/book/bijou-designs.pdf)');
     expect(root).toContain('examples/` tree is');
-    expect(docs).toContain('[DOGFOOD](./DOGFOOD.md)');
+    expect(docs).toContain('[Read the complete book](./book/bijou-designs.pdf)');
     expect(release).toContain('smoke:dogfood');
     expect(examples).toContain('secondary/internal inventory');
   });

@@ -1,14 +1,7 @@
-import { existsSync } from 'node:fs';
+import { documentationFileExists as existsSync } from '../../../scripts/documentation-corpus.js';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import {
-  expectClaims,
-  normalized,
-  read,
-  requireRecord,
-  ROOT,
-  sectionBetween,
-} from './roadmap-goalpost-policy.test-support.js';
+import { expectClaims, read, requireRecord, ROOT, sectionBetween } from './roadmap-goalpost-policy.test-support.js';
 
 describe('WF-130 roadmap documentation contracts', () => {
   it('disables Markdown line-length linting for project docs', () => {
@@ -36,13 +29,6 @@ describe('WF-130 roadmap documentation contracts', () => {
     const path = 'docs/design/DX-049-visor-artifact-bundle-proof.md';
     const source = read(path);
     expect(existsSync(resolve(ROOT, path))).toBe(true);
-    expectClaims(normalized('docs/ROADMAP.md'), [
-      '[`DX-049`](./design/DX-049-visor-artifact-bundle-proof.md)',
-      '`visor-artifact-bundle/1` proof',
-    ]);
-    expectClaims(normalized('docs/BEARING.md'), [
-      'Their cycle designs remain [DX-049](./design/DX-049-visor-artifact-bundle-proof.md)',
-    ]);
     expectClaims(normalizeSource(source), [
       'User story: [#458](https://github.com/flyingrobots/bijou/issues/458)',
       'V8 tracker: [#457](https://github.com/flyingrobots/bijou/issues/457)',

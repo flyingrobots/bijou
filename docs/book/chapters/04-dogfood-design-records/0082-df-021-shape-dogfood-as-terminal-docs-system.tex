@@ -1,0 +1,374 @@
+\chapter{DF-021 --- Shape DOGFOOD As Terminal Docs System}\label{record-082}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-021-shape-dogfood-as-terminal-docs-system.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md}{DF-019 --- Raise DOGFOOD Coverage Floor to 100\%}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-004-shape-the-next-release.md}{WF-004 --- Shape The Next Release}
+\end{itemize}
+
+\section{Sponsor human}\label{record-082-sponsor-human}
+
+A builder or maintainer who expects DOGFOOD to behave like Bijou's terminal-native documentation site, not only a component-story browser.
+
+\section{Sponsor agent}\label{record-082-sponsor-agent}
+
+An agent that must answer, from repo artifacts alone:
+
+\begin{itemize}
+\tightlist
+\item
+  what DOGFOOD is supposed to document
+\item
+  which parts of the repo must be reachable inside DOGFOOD before \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} ships
+\item
+  which missing docs surfaces are now release blockers
+\end{itemize}
+
+\section{Hill}\label{record-082-hill}
+
+DOGFOOD is shaped as a terminal documentation system for Bijou, with the current component-library explorer treated as one important section inside a broader docs site rather than the whole product.
+
+\section{Why this cycle exists}\label{record-082-why-this-cycle-exists}
+
+DOGFOOD has crossed an important threshold:
+
+\begin{itemize}
+\tightlist
+\item
+  all \texttt{3\allowbreak{}5\allowbreak{}/\allowbreak{}3\allowbreak{}5} canonical component families are now represented
+\item
+  the shell and landing surfaces are strong enough to feel like a real product
+\item
+  the docs app is already the proving surface for Bijou's shell, design-language, and component work
+\end{itemize}
+
+But the scope is still too narrow for what the repo now claims DOGFOOD to be.
+
+Today, DOGFOOD is still mostly a \textbf{components docs view}:
+
+\begin{itemize}
+\tightlist
+\item
+  it has a landing screen
+\item
+  it has a component-family explorer
+\item
+  it can show component story docs and variants
+\item
+  it does \textbf{not} yet act like a terminal-native documentation site for the repo as a whole
+\end{itemize}
+
+That gap is now release-shaping:
+
+\begin{itemize}
+\tightlist
+\item
+  there is no real viewer for prose docs from \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}
+\item
+  there is no DOGFOOD section for repo/package documentation
+\item
+  there is no DOGFOOD section for Bijou's philosophy, architecture, and doctrine docs
+\item
+  the current shell structure still assumes ``components'' is the whole docs product
+\end{itemize}
+
+If \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} ships while DOGFOOD remains component-only, Bijou will still have a strong component field guide, but it will not yet have the terminal docs surface that the repo increasingly implies exists.
+
+\section{Human users}\label{record-082-human-users}
+
+\subsection{Primary human user}\label{record-082-primary-human-user}
+
+A builder evaluating Bijou as a framework, not just as a pile of widgets.
+
+\subsection{Human hill}\label{record-082-human-hill}
+
+A user can open DOGFOOD and browse:
+
+\begin{itemize}
+\tightlist
+\item
+  what Bijou is
+\item
+  how it is organized
+\item
+  what each package is for
+\item
+  how the component library works
+\item
+  what philosophical and architectural ideas shape the repo
+\end{itemize}
+
+without leaving the terminal to read the main docs corpus.
+
+\section{Agent users}\label{record-082-agent-users}
+
+\subsection{Primary agent user}\label{record-082-primary-agent-user}
+
+An agent tasked with extending DOGFOOD, importing docs, or explaining Bijou's public surface to users.
+
+\subsection{Agent hill}\label{record-082-agent-hill}
+
+An agent can recover the expected DOGFOOD information architecture from repo docs and can see exactly which missing docs surfaces block \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+
+\section{Playback questions}\label{record-082-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If a user asks ``where do I read real Bijou docs in the terminal?'', does DOGFOOD have a clear answer beyond component stories?
+\item
+  Can a user browse both the component library and the non-component docs corpus without the app pretending they are the same thing?
+\item
+  Can a user find package-level explanations for \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}, the i18n packages, and the app template?
+\item
+  Can a user read Bijou's philosophy, architecture, and doctrine docs from inside DOGFOOD?
+\item
+  Can an agent point to explicit \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker items for those gaps?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-082-accessibility-assistive-reading-posture}
+
+This cycle is prose-heavy. The docs shell must preserve legible reading in plain text, keyboard navigation, and scrollable surfaces that do not depend on screenshots, pointer-only interaction, or color alone to communicate structure.
+
+\section{Localization / directionality posture}\label{record-082-localization-directionality-posture}
+
+The docs shell should stay localization-ready, but this cycle does not block \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} on translating the entire imported prose corpus. The important requirement is that section metadata and reader structure do not hard-code LTR-only assumptions.
+
+\section{Agent inspectability / explainability posture}\label{record-082-agent-inspectability-explainability-posture}
+
+The DOGFOOD docs-site shape must be explicit in repo artifacts:
+
+\begin{itemize}
+\tightlist
+\item
+  this cycle doc
+\item
+  release blocker backlog files in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  signposts such as \texttt{P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+Agents should not have to infer from chat memory that DOGFOOD is supposed to grow beyond the component explorer.
+
+\section{Non-goals}\label{record-082-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  importing every markdown file in the repo into DOGFOOD for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  full website parity with static docs tools
+\item
+  full-text search across every prose page
+\item
+  a general GSAP-like text-effects API for the entire framework
+\item
+  eliminating every piece of bespoke DOGFOOD chrome before \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\end{itemize}
+
+The immediate requirement is a real docs-site shape and a non-embarrassing minimum corpus, not infinite scope growth.
+
+\section{Evidence}\label{record-082-evidence}
+
+\subsection{Current DOGFOOD shape}\label{record-082-current-dogfood-shape}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD already has a strong landing screen and framed docs shell
+\item
+  the current explorer is fundamentally centered on component families, component docs, and variants
+\item
+  the existing app still treats that component explorer as the main docs product
+\end{itemize}
+
+\subsection{Current repo docs shape}\label{record-082-current-repo-docs-shape}
+
+Bijou's actual docs corpus already exists outside DOGFOOD:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}A\allowbreak{}R\allowbreak{}C\allowbreak{}H\allowbreak{}I\allowbreak{}T\allowbreak{}E\allowbreak{}C\allowbreak{}T\allowbreak{}U\allowbreak{}R\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}j\allowbreak{}a\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}V\allowbreak{}I\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  package READMEs and repo-facing top-level docs
+\end{itemize}
+
+So the missing work is not ``write every thought from scratch.'' The missing work is exposing the right corpus and navigation structure inside DOGFOOD itself.
+
+\section{Decision}\label{record-082-decision}
+
+\subsection{\texorpdfstring{DOGFOOD's \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} role}{DOGFOOD's  role}}\label{record-082-dogfoods-4.1.0-role}
+
+For \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, DOGFOOD should be treated as a \textbf{terminal documentation site for Bijou}, not only a component gallery.
+
+\subsection{Expected top-level sections}\label{record-082-expected-top-level-sections}
+
+At minimum, DOGFOOD should visibly distinguish these sections:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Start Here / Guides}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    what Bijou is
+  \item
+    how to get oriented
+  \item
+    how to start building
+  \end{itemize}
+\item
+  \textbf{Components}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the current family/story/variant explorer
+  \end{itemize}
+\item
+  \textbf{Packages}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    what each shipped package is for
+  \item
+    when to reach for each one
+  \end{itemize}
+\item
+  \textbf{Philosophy / Architecture}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    design doctrine, architecture, and repo philosophy
+  \end{itemize}
+\item
+  \textbf{Release / Migration}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    what changed in the current line
+  \item
+    how to move between major versions
+  \end{itemize}
+\end{itemize}
+
+The current components view remains important, but it becomes one section of the docs system instead of the whole app.
+
+\subsection{\texorpdfstring{\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker stance}{ blocker stance}}\label{record-082-blocker-stance}
+
+These gaps are now \textbf{release blockers} for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}:
+
+\begin{itemize}
+\tightlist
+\item
+  no prose-doc reader plus top-level docs navigation
+\item
+  no repo/package docs inside DOGFOOD
+\item
+  no philosophy/architecture/doctrine docs inside DOGFOOD
+\end{itemize}
+
+If those remain absent, the release would still ship a strong component field guide, but not the terminal docs system Bijou increasingly claims to have.
+
+\section{Deliverables from this shaping cycle}\label{record-082-deliverables-from-this-shaping-cycle}
+
+This cycle should spawn three explicit \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blockers:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md}{DF-022 --- Build Prose Docs Reader And Top-Level DOGFOOD Nav}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md}{DF-023 --- Publish Repo, Package, And Release Guides In DOGFOOD}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md}{DF-024 --- Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD}
+\end{itemize}
+
+\section{Implementation outline}\label{record-082-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Shape a top-level DOGFOOD docs-site IA instead of treating ``components'' as the only section.
+\item
+  Add a prose-doc reader path so markdown- and guide-like pages can be read inside the app.
+\item
+  Expose a minimum set of repo/package/release pages in that reader.
+\item
+  Expose a minimum set of philosophy/architecture/doctrine pages in that reader.
+\item
+  Keep component stories as the ``Components'' section rather than letting them keep masquerading as the whole docs product.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-082-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}1\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the cycle doc exists and names the missing docs-site sections
+\item
+  a \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} lane exists
+\item
+  the three blocker items exist in that lane
+\item
+  \texttt{P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} acknowledge reopened \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blockers around DOGFOOD scope
+\end{itemize}
+
+\section{Risks}\label{record-082-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  treating DOGFOOD's component explorer as ``good enough docs'' and shipping a narrower product than the repo's own story implies
+\item
+  reopening the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} boundary without making the new blockers explicit in METHOD signposts
+\item
+  trying to solve search, docs import, architecture writing, and motion APIs all at once instead of defining a credible minimum docs-site contract
+\end{itemize}
+
+\section{Retrospective}\label{record-082-retrospective}
+
+\subsection{What landed}\label{record-082-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD's next shape is now explicit: terminal docs system, not only component gallery
+\item
+  the missing \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} docs-site surfaces are named as concrete blockers
+\item
+  the release boundary is narrowed around a more honest docs promise
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-082-debt-spawned}
+
+Follow-on work such as generalized text-motion APIs, richer search, and deeper bespoke-chrome cleanup may still matter, but they should not hide the more important docs-site gaps that now block \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+

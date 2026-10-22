@@ -1,0 +1,111 @@
+\chapter{What's New in Bijou 5.0.0}\label{record-280}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/5.0.0/whats-new.md}\par}\smallskip
+
+Bijou 5.0.0 promotes the hosted shell, Node host bootstrapping, and release-proof surface into a cleaner first-class product line. Most existing 4.4.x apps continue to work, but the preferred paths are now simpler, more explicit, and more honest about what the framework owns.
+
+\section{Framed Apps Own Their Hosted Runner}\label{record-280-framed-apps-own-their-hosted-runner}
+
+\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} now returns a self-running framed shell:
+
+\begin{CodeBlock}
+const app = createFramedApp(options);
+await app.run({ ctx });
+\end{CodeBlock}
+
+There is also a one-call hosted helper:
+
+\begin{CodeBlock}
+await runFramedApp(options, { ctx });
+\end{CodeBlock}
+
+What changed:
+
+\begin{itemize}
+\tightlist
+\item
+  framed apps now own their hosted runtime path through \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} instead of forcing callers to remember a separate \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} wrapper
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})} detects and delegates to that self-running path automatically
+\item
+  the framed runner uses the run-time \texttt{c\allowbreak{}t\allowbreak{}x} as the shell-owned rendering context for the duration of the run
+\item
+  committed pipeline timings are folded back into \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l} so shell-owned UI can read \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}, \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}, \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}s}, \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}M\allowbreak{}s}, and \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t}
+\end{itemize}
+
+This is the biggest posture change in the release: the frame now owns its hosted shell surface more honestly instead of pretending it is just another raw TEA app.
+
+\section{Node Hosts Get Easy Theme Selection}\label{record-280-node-hosts-get-easy-theme-selection}
+
+Node-hosted apps can now opt into a custom theme without assembling a raw \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t} by hand:
+
+\begin{CodeBlock}
+await startApp(app, { theme: MY_THEME });
+\end{CodeBlock}
+
+The host also supports theme sets with automatic light/dark selection and explicit user override:
+
+\begin{CodeBlock}
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+  themeOverride: savedThemeId,
+});
+\end{CodeBlock}
+
+Selection order is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e}
+\item
+  \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E}
+\item
+  \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}'} terminal color-scheme detection
+\item
+  first theme-set entry fallback
+\end{enumerate}
+
+This makes dark/light mode and persisted user choice a host concern instead of boilerplate that every app has to reinvent.
+
+\section{The Proof Surface Is More Honest}\label{record-280-the-proof-surface-is-more-honest}
+
+Several repo-facing and operator-facing surfaces were tightened up in this release:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})} now renders bounded pipe tables through the real table component instead of leaking raw Markdown separators into DOGFOOD and other prose views
+\item
+  the root workspace now exposes \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f} as a first-class visual performance demo entrypoint
+\item
+  the scripted interactive smoke path is deterministic and isolated in \texttt{v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s} instead of depending on Vitest's default timeout or global \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}*} monkeypatching
+\item
+  focused rows in browsable lists can now marquee overflowing labels, which DOGFOOD uses in its constrained navigation lanes
+\end{itemize}
+
+The release-proof story is still centered on DOGFOOD, but the harness and the docs surface are both less accidental than they were in 4.4.x.
+
+\section{Runtime And Filesystem Hardening}\label{record-280-runtime-and-filesystem-hardening}
+
+Bijou 5.0.0 also closes two high-value hardening gaps:
+
+\begin{itemize}
+\tightlist
+\item
+  fatal crash mode now exits automatically after rendering the crash surface when \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}i\allowbreak{}n} is not a TTY, so CI and scripted hosts no longer hang waiting for an Enter key they can never send
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}o\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}O\allowbreak{}(\allowbreak{})} now resolves symlinked prefixes before enforcing the root boundary, rejecting reads and writes that tunnel outside the declared root through symlinked files or directories
+\end{itemize}
+
+The workspace also pins \texttt{h\allowbreak{}o\allowbreak{}n\allowbreak{}o} to \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}2\allowbreak{}.\allowbreak{}1\allowbreak{}4} through root \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s}, closing the MCP server's transitive exposure to \texttt{G\allowbreak{}H\allowbreak{}S\allowbreak{}A\allowbreak{}-\allowbreak{}4\allowbreak{}5\allowbreak{}8\allowbreak{}j\allowbreak{}-\allowbreak{}x\allowbreak{}x\allowbreak{}4\allowbreak{}x\allowbreak{}-\allowbreak{}4\allowbreak{}3\allowbreak{}7\allowbreak{}5}.
+
+\section{Compatibility}\label{record-280-compatibility}
+
+Bijou 5.0.0 is a major release because it resets the hosted/app-shell line around clearer ownership and release-proof contracts, not because everyday apps need a wholesale rewrite. Most 4.4.x code will continue to run, but framed apps and Node hosts now have better default paths than the lower-level wiring that earlier releases required.
+

@@ -1,0 +1,27 @@
+\chapter{DX-009 --- Auto-Init Context and Actionable Error Messages}\label{record-314}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-314-problem}
+
+Every bijou app must call \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} before \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})}. If forgotten, the error is ``No default BijouContext has been set'' --- which tells you what's wrong but not how to fix it.
+
+Also, \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y} defaults to \texttt{'\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}'}, meaning shell keybindings silently win over page keybindings. A developer binding \texttt{?} to their own action won't see it fire because help consumes it.
+
+\section{Desired outcome}\label{record-314-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} auto-initializes context if no \texttt{c\allowbreak{}t\allowbreak{}x} is provided and no default exists. Error message on failure includes fix instructions and a docs link.
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} emits a runtime warning via \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} when a page keyMap binding collides with a frameKeys binding under \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t} priority.
+\end{enumerate}
+
+\section{Effort}\label{record-314-effort}
+
+Small --- two localized changes.
+

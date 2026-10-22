@@ -1,0 +1,50 @@
+\chapter{Migrating to Bijou 4.2.0}\label{record-265}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.2.0/migration-guide.md}\par}\smallskip
+
+\section{From 4.1.0}\label{record-265-from-4.1.0}
+
+\subsection{New package: @flyingrobots/bijou-mcp}\label{record-265-new-package-flyingrobotsbijou-mcp}
+
+\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p} is a new addition to the workspace. It has no effect on existing code --- it is an MCP stdio server that wraps existing Bijou components for use in AI chat contexts.
+
+If you use it, install it alongside the core package:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou @flyingrobots/bijou-mcp
+\end{CodeBlock}
+
+\subsection{Runtime engine changes (RE-007)}\label{record-265-runtime-engine-changes-re-007}
+
+If your app uses \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}, the following internal functions were removed:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{i\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}K\allowbreak{}e\allowbreak{}y}
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}H\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+These were internal to the framed shell and not part of the public API. If you were importing them directly, replace with the runtime engine's routing infrastructure (\texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t}, \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t}, \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}).
+
+\subsection{Inspector fix}\label{record-265-inspector-fix}
+
+\texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} now renders \texttt{s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}L\allowbreak{}a\allowbreak{}b\allowbreak{}e\allowbreak{}l} in interactive mode. If you were working around its absence (e.g.~embedding the label in \texttt{s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t} manually), you can remove the workaround.
+
+\subsection{No breaking changes}\label{record-265-no-breaking-changes}
+
+This is an additive minor release. All existing public APIs remain unchanged.
+

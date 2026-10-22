@@ -1,0 +1,36 @@
+\chapter{ARCHITECTURE}\label{record-002}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/ARCHITECTURE.md}\par}\smallskip
+
+This is the short architecture signpost for the docs surface.
+
+Bijou is a nine-package monorepo for terminal software in TypeScript. The root \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/ARCHITECTURE.md}{ARCHITECTURE.md} is the main entrypoint, but DOGFOOD and the docs lane still need a repo-owned summary here.
+
+\section{Structure}\label{record-002-structure}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} owns the pure core: prompts, themes, components, and surfaces
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} owns the fullscreen runtime, layout, motion, overlays, and framed shell
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} owns the terminal/process boundary, worker runtime, and recorder
+\item
+  the i18n packages own runtime catalogs plus localization authoring/exchange workflows
+\end{itemize}
+
+\section{Read Next}\label{record-002-read-next}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/ARCHITECTURE.md}{root architecture signpost}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ARCHITECTURE.md}{runtime architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/ARCHITECTURE.md}{node architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/ARCHITECTURE.md}{core architecture}
+\end{itemize}
+

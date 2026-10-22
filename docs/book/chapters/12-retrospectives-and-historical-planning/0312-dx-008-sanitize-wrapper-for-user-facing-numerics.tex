@@ -1,0 +1,32 @@
+\chapter{DX-008 --- Sanitize Wrapper for User-Facing Numeric Inputs}\label{record-312}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/v4.5.0/DX-008-sanitize-wrapper-for-user-facing-numerics.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-312-idea}
+
+Create a small shared utility for clamping and validating user-supplied numeric values at component boundaries:
+
+\begin{CodeBlock}
+function safeInt(n: number | undefined, fallback: number): number {
+  if (n == null || !Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.floor(n));
+}
+
+function safeFloat(n: number | undefined, fallback: number): number {
+  if (n == null || !Number.isFinite(n)) return fallback;
+  return n;
+}
+\end{CodeBlock}
+
+Every component that accepts \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}, \texttt{h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, \texttt{m\allowbreak{}i\allowbreak{}n}, \texttt{m\allowbreak{}a\allowbreak{}x}, \texttt{c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t}, etc. from user options would call this instead of raw \texttt{?\allowbreak{}?} fallbacks.
+
+\section{Why}\label{record-312-why}
+
+The current pattern --- \texttt{o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}?\allowbreak{}?\allowbreak{} \allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h} --- does not filter \texttt{N\allowbreak{}a\allowbreak{}N} (which is not nullish). This was the root cause of multiple v4.4.0 review findings. A shared wrapper makes the correct pattern easy and the wrong pattern harder.
+
+\section{Relationship}\label{record-312-relationship}
+
+Complements DX-007 (the audit). DX-007 identifies the gaps; this provides the tool to close them systematically.
+

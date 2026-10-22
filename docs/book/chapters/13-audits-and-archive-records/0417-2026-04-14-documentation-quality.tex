@@ -1,0 +1,146 @@
+\chapter{Documentation Quality Audit}\label{record-417}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/audit/2026-04-14_documentation-quality.md}\par}\smallskip
+
+\begin{RecordMeta}
+report_id: "AUD-2026-04-14-DQ-V01"
+title: "Differential Documentation Audit: README and Operator Surfaces"
+status: "Final"
+audit:
+  date_started: 2026-04-14
+  date_completed: 2026-04-14
+  type: "Differential"
+  scope: "README.md, GUIDE.md, docs/README.md, CONTRIBUTING.md, SECURITY.md, package READMEs and GUIDEs"
+  compliance_frameworks: []
+target:
+  repository: "github.com/flyingrobots/bijou"
+  branch: "release/v5.0.0"
+  commit_hash: "73160b9"
+  language_stack: ["TypeScript 5.9.3", "Node.js >=18", "Vitest 4.0.18", "npm workspaces"]
+  environment: "Local workspace with docs inventory and release-readiness evidence"
+methodology:
+  automated_tools: ["npm run docs:inventory", "npm run release:readiness", "rg"]
+  manual_review_hours: 3
+  false_positive_rate: "Low (<10%)"
+summary:
+  total_findings: 7
+  severity_count:
+    critical: 0
+    high: 2
+    medium: 4
+    low: 1
+  remediation_status: "Pending"
+related_reports:
+  previous_audit: "docs/audit/2026-04-11_documentation-quality.md"
+  tracking_ticket: "DX-027"
+
+\end{RecordMeta}
+
+This pass focuses on accuracy, completeness, and onboarding flow. The documentation structure is still a strength: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, DOGFOOD, the design-system docs, and the release docs make the repo navigable without filesystem wandering. The biggest remaining problems are front-door completeness and onboarding consistency, not a total breakdown of the docs system.
+
+\section{1. Accuracy \& Effectiveness Assessment}\label{record-417-accuracy-effectiveness-assessment}
+
+\subsection{1.1. Core Mismatch}\label{record-417-core-mismatch}
+
+The most critical mismatch in the root \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} is the incomplete package map. The \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} table in \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}1\allowbreak{}0\allowbreak{}5\allowbreak{}-\allowbreak{}1\allowbreak{}1\allowbreak{}2} lists only four packages, but the repo also ships and documents additional public surfaces such as \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p} (\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}C\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}), \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}x\allowbreak{}l\allowbreak{}s\allowbreak{}x}, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}, and \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} (confirmed by \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, and the package READMEs). That makes the README inaccurate as a package-selection guide.
+
+\subsection{1.2. Audience \& Goal Alignment}\label{record-417-audience-goal-alignment}
+
+\textbf{Primary audience:} TypeScript engineers deciding whether to use Bijou for a CLI, a full-screen TUI, an MCP rendering server, or internal localization/doc tooling.
+
+\textbf{Does the documentation answer the top 3 audience questions?}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{``How do I start?''} Partially. The package guides answer this well, but the root front door still teaches a lower-level interactive bootstrap than the preferred current API.
+\item
+  \textbf{``Which package should I choose?''} Partially. \texttt{G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} helps, but the root README package table under-represents the shipped surface area, especially MCP and the i18n tools.
+\item
+  \textbf{``How do I go deeper after hello-world?''} Yes. DOGFOOD, the documentation map, the design-system docs, and release guides are all strong.
+\end{enumerate}
+
+\subsection{1.3. Time-to-Value (TTV) Barrier}\label{record-417-time-to-value-ttv-barrier}
+
+The biggest onboarding bottleneck is path fragmentation across the front door and supporting docs:
+
+\begin{itemize}
+\tightlist
+\item
+  the root README teaches \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} + \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})} for interactive usage (\texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}7\allowbreak{}2\allowbreak{}-\allowbreak{}9\allowbreak{}5})
+\item
+  package docs prefer \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} (\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}3\allowbreak{}5}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}2\allowbreak{}1\allowbreak{}-\allowbreak{}4\allowbreak{}1})
+\item
+  contributor setup still says \texttt{p\allowbreak{}n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l} even though the repo's scripts, lockfile, and release flow are npm-based (\texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}8\allowbreak{}-\allowbreak{}1\allowbreak{}2}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{}9\allowbreak{}-\allowbreak{}4\allowbreak{}1}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n})
+\end{itemize}
+
+That means a new developer does not see one canonical ``clone the repo and get to a first frame'' story.
+
+\section{2. Required Updates \& Completeness Check}\label{record-417-required-updates-completeness-check}
+
+\subsection{2.1. README.md Priority Fixes}\label{record-417-readme.md-priority-fixes}
+
+\begin{itemize}
+\tightlist
+\item
+  Expand the root \texttt{P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s} table so it covers the real shipped surface, especially \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}, the i18n tooling packages, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}, and \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}.
+\item
+  Replace the root interactive quick start with the preferred \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}-based path, and explicitly explain when someone should still drop down to \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{} \allowbreak{}\}\allowbreak{})}.
+\item
+  Add a short ``Choose Your Lane'' selector directly in the root README for CLI vs TUI vs MCP vs i18n so the first click lands on the right package guide.
+\end{itemize}
+
+\subsection{2.2. Missing Standard Documentation}\label{record-417-missing-standard-documentation}
+
+At least two standard repository documentation surfaces are still missing for a library/project of this type:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\texttt{S\allowbreak{}U\allowbreak{}P\allowbreak{}P\allowbreak{}O\allowbreak{}R\allowbreak{}T\allowbreak{}.\allowbreak{}m\allowbreak{}d}}: There is a \texttt{S\allowbreak{}E\allowbreak{}C\allowbreak{}U\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}.\allowbreak{}m\allowbreak{}d}, but there is no canonical support/escalation surface for normal user questions, bug-routing, and maintainer expectations.
+\item
+  \textbf{Generated API reference coverage}: There is no first-class repo-level API reference surface (TypeDoc or equivalent) for exported functions/types across the published packages. For a multi-package TypeScript library, that is a standard expectation.
+\end{enumerate}
+
+\subsection{2.3. Supplementary Documentation (Docs)}\label{record-417-supplementary-documentation-docs}
+
+The most under-documented complex area is the \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} extension model. The implementation is spread across \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}, while the user-facing explanation is split across package docs and strategy notes. The repo needs one dedicated guide that explains shell-owned layers, page routing, notifications/settings ownership, and pane/layout behavior in one place.
+
+\section{3. Final Action Plan}\label{record-417-final-action-plan}
+
+\subsection{3.1. Recommendation Type}\label{record-417-recommendation-type}
+
+\textbf{A. Recommend incremental updates to the existing README and documentation.}
+
+The documentation system is structurally strong. This is not a rewrite problem. It is a front-door accuracy and onboarding consistency problem.
+
+\subsection{3.2. Deliverable (Prompt Generation)}\label{record-417-deliverable-prompt-generation}
+
+Update the root README so it reflects the full shipped package surface and the current preferred bootstrap path, correct supporting-doc drift in \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{S\allowbreak{}E\allowbreak{}C\allowbreak{}U\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}.\allowbreak{}m\allowbreak{}d}, create \texttt{S\allowbreak{}U\allowbreak{}P\allowbreak{}P\allowbreak{}O\allowbreak{}R\allowbreak{}T\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and add a dedicated framed-app extension guide plus an API reference plan/surface.
+
+\subsection{3.3. Mitigation Prompt}\label{record-417-mitigation-prompt}
+
+\begin{CodeBlock}
+Apply an incremental documentation repair pass across Bijou's front door and operator docs.
+
+1. Update `README.md`:
+   - replace the interactive quick start with a `startApp()` example
+   - expand the package table to include MCP, i18n tooling, `bijou-tui-app`, and `create-bijou-tui-app`
+   - add a short "Choose Your Lane" section pointing users to CLI, TUI, MCP, and i18n entrypoints
+
+2. Update supporting docs:
+   - change `CONTRIBUTING.md` from `pnpm install` to the repo's actual npm workflow
+   - refresh `SECURITY.md` so the supported-version table matches the current release reality instead of stopping at `4.1.x`
+
+3. Create missing standard docs:
+   - add `SUPPORT.md` with issue-routing, discussion/support expectations, and maintainer contact guidance
+   - add an API-reference plan or generated surface (for example `docs/api/README.md` or TypeDoc output instructions) for the exported package APIs
+
+4. Add one new advanced guide:
+   - create a dedicated `createFramedApp()` extension guide explaining shell-owned notifications/settings, page routing, pane behavior, and when to use page commands vs shell commands
+
+Keep the existing documentation structure intact. This is a precision update, not a rewrite.
+\end{CodeBlock}
+

@@ -1,0 +1,107 @@
+{
+  "edition": "2026-10-20 teaching book and historical archive",
+  "source_base_commit": "003da8d4eb76674fc67cf44a5886e39702a0da4f",
+  "shared_latex_tree_sha256": "cbf3024396dba5dbdf38c390c38ef0c2d1d4fe47f4694cf40680317af30539e7",
+  "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
+  "archive_records": {
+    "count": 426,
+    "source_markdown_bytes_preserved": true,
+    "tex_bodies_byte_identical_to_previous_edition": true,
+    "status": "Original claims and status retained; implementation status not reassessed."
+  },
+  "main_text": {
+    "parts": 5,
+    "numbered_chapters": 13,
+    "workshops": 7,
+    "connecting_chapters": 6,
+    "historical_records": 0
+  },
+  "updated_link_files": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/CHANGELOG.md",
+    "examples/README.md",
+    "examples/docs/README.md",
+    "fixtures/profunctor-page/project-keep/README.md",
+    "packages/bijou-node/ADVANCED_GUIDE.md",
+    "packages/bijou-node/GUIDE.md",
+    "packages/bijou-tui-app/README.md",
+    "packages/bijou-tui/ADVANCED_GUIDE.md",
+    "packages/bijou-tui/ARCHITECTURE.md",
+    "packages/bijou-tui/README.md",
+    "packages/bijou/ADVANCED_GUIDE.md",
+    "packages/bijou/ARCHITECTURE.md",
+    "packages/bijou/GUIDE.md",
+    "packages/bijou/README.md",
+    "packages/create-bijou-tui-app/README.md"
+  ],
+  "preserved_unrelated_files": [
+    "docs/guides/framed-app-tutorial.md",
+    "bun.lock"
+  ],
+  "verification_limits": [
+    "Companion verification is prior evidence at the unchanged pinned commit.",
+    "Historical source assertions were not individually reclassified against current runtime.",
+    "No human screen-reader study or broad emulator matrix performed.",
+    "Unrelated dirty framed-app tutorial retains its pre-existing page links."
+  ],
+  "editions": {
+    "teaching": {
+      "entrypoint": "bijou-book.tex",
+      "pdf": "bijou-book.pdf",
+      "physical_pages": 95,
+      "bytes": 14787647,
+      "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
+      "copyright_page": 2,
+      "source_records": 0,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.11386,
+      "full_apache_paragraphs_verified": 32
+    },
+    "archive": {
+      "entrypoint": "bijou-archive.tex",
+      "pdf": "bijou-archive.pdf",
+      "physical_pages": 1872,
+      "bytes": 20332307,
+      "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
+      "copyright_page": 2,
+      "source_records": 426,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.69456,
+      "full_apache_paragraphs_verified": 32
+    },
+    "complete": {
+      "entrypoint": "bijou-designs.tex",
+      "pdf": "bijou-designs.pdf",
+      "physical_pages": 1922,
+      "bytes": 22679362,
+      "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
+      "copyright_page": 2,
+      "source_records": 426,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.69456,
+      "full_apache_paragraphs_verified": 32
+    }
+  },
+  "documentation_checks": {
+    "npm_run_lint": "passed across all workspaces",
+    "focused_contracts": {
+      "files": 3,
+      "passed": 12
+    },
+    "npm_run_docs_inventory": "passed"
+  },
+  "visual_review": [
+    "coral title page",
+    "teaching chapter typography and new boundary diagram",
+    "historical notice and source path",
+    "final contents: one Reference entry",
+    "complete host entrypoint listing"
+  ]
+}

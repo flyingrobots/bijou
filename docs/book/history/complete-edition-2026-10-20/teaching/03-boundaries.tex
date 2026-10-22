@@ -1,0 +1,64 @@
+\chapter{Find the application boundaries}\label{teaching-boundaries}
+
+\section{Read the running system in layers}
+\subsection{The model answers what is true}
+
+The companion has two useful levels of state. \texttt{Monitor} owns jobs, selection, filters, confirmation, the current detail screen and its request epoch. \texttt{AppModel} adds viewport dimensions and scroll offset. The first level expresses the task; the second connects it to a terminal application.
+
+A domain transition returns a model and effect descriptions. Starting a job records a running state and a new run identity, then requests work for that run. The view can represent the new state before completion arrives. No test has to inspect a spinner to decide whether the transition happened.
+
+\subsection{The adapter answers what should happen outside the model}
+
+The effect driver turns descriptions into scheduled operations. Its scheduler port supplies a cancellation function. A deterministic scheduler in the tests can advance those operations without sleeping; the host adapter uses timers. This is the practical purpose of the port: application decisions can be tested without making host timing part of every assertion.
+
+An effect description is not evidence that work completed. It names an instruction to the adapter. A later message reports an outcome, and the model checks whether that outcome still belongs to the relevant run or view.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,text width=43mm,align=left,inner sep=6pt,font=\small},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (input) at (0,0) {\textbf{App adapter}\\Keys and resize\\Application intentions};
+\node[box] (model) at (5.4,0) {\textbf{Monitor}\\Facts and ownership\\New model and effects};
+\node[box] (view) at (0,-3.2) {\textbf{Presentation}\\Reads the snapshot\\Returns a Surface};
+\node[box] (effect) at (5.4,-3.2) {\textbf{Effect driver}\\Owns scheduled work\\Emits later messages};
+\draw[edge] (input)--(model);
+\draw[edge] (model)--node[right,font=\scriptsize]{effects}(effect);
+\draw[edge] (model.south west)--node[above,sloped,font=\scriptsize]{snapshot}(view.north east);
+\draw[edge] (effect.east)--++(.6,0)|-node[pos=.7,above,font=\scriptsize]{results}(model.north);
+\end{tikzpicture}}
+\end{center}
+
+\section{Inspect the actual adapter}
+\subsection{An App connects framework messages to intentions}
+
+The following complete file is reproduced from the pinned companion. \texttt{init}, \texttt{update} and \texttt{view} form the App contract used here. Keyboard messages are translated into monitor events. Resize updates the viewport. Later domain messages return through the same update boundary.
+
+\VerbatimInput[formatcom=\sourcecodefont,fontsize=\fontsize{12}{13}\selectfont,breaklines,breakanywhere]{companion-snippets/app.ts.txt}
+
+\subsection{Read policy where it is implemented}
+
+Notice the global quit route and the different Enter intention while confirmation is open. The model also guards the confirmation boundary against movement, filtering and new starts. That policy is reinforced at two meaningful seams: the adapter translates input, and the model protects its transition contract when events originate elsewhere.
+
+Scroll offset is presentation state. A job's run identity is task state. Mixing them would make a terminal resize capable of changing the identity of ongoing work. Keeping them separate helps a test make the right observation at the right level.
+
+\section{The host chooses presentation and shutdown}
+\subsection{Make the delivery contract visible}
+
+The complete entrypoint below shows the application policy at the process boundary. It selects a mode, validates an explicit choice, writes one noninteractive snapshot or starts the interactive runtime, and connects process signals to shutdown. The surrounding context supplies host services; the Monitor remains independent of the process environment.
+
+\VerbatimInput[formatcom=\sourcecodefont,fontsize=\fontsize{12}{13}\selectfont,breaklines,breakanywhere]{companion-snippets/main.ts.txt}
+
+\subsection{Read the finalization path}
+
+The outer finalization disposes the effect driver even when the runtime exits through an error. The shutdown subscription returns a function that removes its listeners. These paths are part of the ownership explanation. They do not establish that any hypothetical subprocess extension has been stopped; that adapter is outside the example.
+
+\section{Follow a result without confusing its owners}
+\subsection{A job run and a log view have different lifetimes}
+
+A job can continue while its detail is closed. A log request belongs to a selected job and a view epoch. Cancelling the latter should not destroy the former. The next workshop demonstrates that distinction with a deliberately late response.
+
+\subsection{An owner must have a closing path}
+
+An effect driver that schedules work must be disposed when the application quits. A host subscription must remove its listeners. A view request must become invalid when the view changes. When reviewing a new asynchronous feature, identify creation, use, invalidation and disposal together. If only the creation path is easy to find, the implementation is not yet easy to trust.
+
+\section{A boundary exercise}
+
+Read \path{src/app.ts}, \path{src/monitor.ts} and \path{src/effects.ts} in the companion. For each, write one question its tests can answer without launching a terminal and one question they cannot. Then trace the Enter route from Workshop 3 across the diagram above. You should be able to name every change of representation without inventing a direct dependency from a painted cell back into a timer.

@@ -1,0 +1,137 @@
+\chapter{ASAP-001 --- Fix MCP DAG Type Error}\label{record-251}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/ASAP-001-fix-mcp-dag-type-error.md}\par}\smallskip
+
+\emph{Cycle for fixing the broken overload in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}'s DAG tool and aligning with the core \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} signature.}
+
+Legend: - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/legends/RE-runtime-engine.md}{RE --- Runtime Engine} - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+
+\section{Why this cycle exists}\label{record-251-why-this-cycle-exists}
+
+The \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p} package is currently broken because the \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} tool call in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s} does not match the available overloads in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. This blocks CI and local pre-commit hooks, and prevents agents (like BigBro) from using the DAG visualization tool for cycle tracking.
+
+\section{Human users / jobs / hills}\label{record-251-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-251-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers
+\item
+  developers using the MCP server
+\end{itemize}
+
+\subsection{Human jobs}\label{record-251-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Visualize graph structures (like the current work cycle) using the MCP tool.
+\item
+  Maintain a green build state.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-251-human-hill}
+
+A user can invoke the \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}\_\allowbreak{}d\allowbreak{}a\allowbreak{}g} MCP tool and receive a correctly rendered box-drawn graph without encountering type errors during build.
+
+\section{Agent users / jobs / hills}\label{record-251-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-251-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  EXPERT Bijou BigBro (mentorship and auditing)
+\item
+  any agent using the MCP server for visualization
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-251-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Programmatically generate cycle visualizations to communicate progress.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-251-agent-hill}
+
+An agent can use the \texttt{d\allowbreak{}a\allowbreak{}g} component through the MCP interface to provide structured, high-signal progress reports.
+
+\section{Linked invariants}\label{record-251-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/invariants/schemas-live-at-boundaries.md}{Schemas Live At Boundaries}
+\end{itemize}
+
+\section{Test Plan}\label{record-251-test-plan}
+
+\subsection{Golden Path}\label{record-251-golden-path}
+
+\begin{itemize}
+\tightlist
+\item
+  Fix the type error in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} and ensure it passes for \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}.
+\item
+  Verify the \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} call correctly passes an array of \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} and valid \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}.
+\end{itemize}
+
+\subsection{Edge Cases}\label{record-251-edge-cases}
+
+\begin{itemize}
+\tightlist
+\item
+  Pass a \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} to verify the second overload works.
+\item
+  Ensure \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e} is correctly recognized or removed if it was a hallucination in the MCP tool. (Research shows \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e} exists in \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} in core).
+\end{itemize}
+
+\subsection{Known Failure Modes}\label{record-251-known-failure-modes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e} might be missing if the \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p} package is linked to an older version of core or if there's a name collision.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-251-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Research the exact signature of \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Inspect \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s} to identify the mismatched call.
+\item
+  Fix the call site:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Ensure the input is a valid \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}[\allowbreak{}]} or \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e}.
+  \item
+    Ensure \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} only contains valid properties.
+  \end{itemize}
+\item
+  Verify via \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}.
+\end{enumerate}
+
+\section{Retrospective}\label{record-251-retrospective}
+
+What landed: - (TBD)
+
+What did not land: - (TBD)
+
+Follow-on: - (TBD)
+

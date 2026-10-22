@@ -1,0 +1,235 @@
+\chapter{WF-131 Roadmap Forward-Looking Refresh}\label{record-213}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-131-roadmap-current-reality-refresh.md}\par}\smallskip
+
+\section{Linked Legend}\label{record-213-linked-legend}
+
+WF - Workflow and Delivery
+
+\section{Decision Summary}\label{record-213-decision-summary}
+
+Refresh \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} so they describe the forward post-\texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release horizon instead of implying the complete \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} and \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} milestone lanes still need release-readiness work before tagging. The refresh now also selects the forward train: \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} next, no planned feature \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} for the Runtime Graph and Scene IR product contract, and \texttt{v\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} for Product Workbench and operator surfaces.
+
+\section{Sponsor Human}\label{record-213-sponsor-human}
+
+A maintainer noticed that the roadmap felt significantly outdated and asked for it to reflect current reality.
+
+\section{Sponsor Agent}\label{record-213-sponsor-agent}
+
+An agent needs the roadmap to distinguish live tracker truth from historical release lineage so it can select the next slice without treating already complete zero-open release lanes as active release targets.
+
+\section{Hill}\label{record-213-hill}
+
+By the end of this cycle, the roadmap names \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as the latest shipped public release, records that \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} was skipped as a public package release, treats complete milestone lanes as lineage, selects \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} as the next public release target, says there is no planned \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} feature train, organizes \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} and \texttt{v\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, surfaces unmilestoned triage and open pull requests, and preserves deterministic tests for the GitHub-backed counts.
+
+\section{Current Truth}\label{record-213-current-truth}
+
+Verified against GitHub on 2026-06-13.
+
+\begin{itemize}
+\tightlist
+\item
+  Latest public release tag: \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+\item
+  \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} was skipped as a public package release; its zero-open milestone lane is complete tracker lineage.
+\item
+  GitHub milestone \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}: 0 open, 30 closed milestone items.
+\item
+  GitHub milestone \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}: 0 open, 27 closed milestone items.
+\item
+  GitHub milestone \texttt{B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d}: 33 open, 4 closed milestone items.
+\item
+  Open unmilestoned issues: \#321, \#317, \#316, \#306, and \#249.
+\item
+  Open pull requests: dependency PR \#326, unmilestoned.
+\item
+  Active implementation gravity: DX-046, a real GraphQL-authored DOGFOOD block fixture for \#302.
+\item
+  Selected next public release target: \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+\item
+  Planned feature train after \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}: \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, not \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}.
+\end{itemize}
+
+\section{Problem}\label{record-213-problem}
+
+The roadmap's numerical snapshot was recently synced, but the surrounding release narrative still read as if V7 had not shipped and as if v6/v7 release-readiness validation remained the next release-facing action. It also spent too much space on past milestone inventory when the useful work now is choosing the next release candidate from \texttt{B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d}. That contradicts \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}, which already names \texttt{7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} as the latest shipped release and says the older v6/v7 milestones are retained as lineage.
+
+\section{Scope}\label{record-213-scope}
+
+This cycle includes:
+
+\begin{itemize}
+\tightlist
+\item
+  rewriting the roadmap around the shipped \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} boundary and forward release train
+\item
+  recording that \texttt{v\allowbreak{}6\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} was skipped as a public package release
+\item
+  replacing pending-tag wording in v6/v7 sections with complete-lineage wording
+\item
+  selecting \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} as the next public release target
+\item
+  declaring that there is no planned \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} feature train
+\item
+  organizing \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} around Runtime Graph and Scene IR
+\item
+  organizing \texttt{v\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} around Product Workbench and operator surfaces
+\item
+  making the post-v7 active pull explicit
+\item
+  adding explicit decision points for how \texttt{B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d} work becomes V8/V9 release work
+\item
+  preserving open Beyond issue accounting
+\item
+  adding current unmilestoned issue triage and the open dependency PR
+\item
+  aligning BEARING with the same release posture
+\item
+  aligning \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} with the selected \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} posture
+\item
+  updating WF-130 roadmap checks so stale release-readiness wording does not return
+\end{itemize}
+
+\section{Non-Goals}\label{record-213-non-goals}
+
+This cycle does not:
+
+\begin{itemize}
+\tightlist
+\item
+  move any GitHub issues between milestones
+\item
+  create a new versioned release milestone
+\item
+  implement the tracker-sync sentinel from \#268
+\item
+  implement DX-046 or any product feature
+\end{itemize}
+
+\section{User Experience / Product Shape}\label{record-213-user-experience-product-shape}
+
+This is documentation and workflow truth work. There is no runtime or TUI surface change.
+
+The reviewer-facing shape is:
+
+\begin{CodeBlock}
+docs/ROADMAP.md
+  Current Release State
+  Release Train Decision
+  Next Pull
+  Forward Goalposts
+  Decision Points
+  Open Beyond Issues
+  Open Unmilestoned Triage
+  Open Pull Requests Outside Release Horizons
+  Closed Lineage
+
+docs/release.md
+  Next Release Posture
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-213-lower-modes}
+
+\subsection{Static Mode}\label{record-213-static-mode}
+
+Markdown remains readable in plain text and in DOGFOOD's docs reader.
+
+\subsection{Pipe Mode}\label{record-213-pipe-mode}
+
+The proof is deterministic CLI output from GitHub and local tests.
+
+\subsection{Accessible Mode}\label{record-213-accessible-mode}
+
+Tables keep explicit headers and avoid relying on prose-only counts.
+
+\section{Runtime / API Contract}\label{record-213-runtime-api-contract}
+
+No runtime API changes.
+
+\section{Data / State Model}\label{record-213-data-state-model}
+
+GitHub milestones, issue labels, and PR state remain live tracker truth. \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} mirrors that state for humans and records the sync date.
+
+\section{Accessibility Posture}\label{record-213-accessibility-posture}
+
+No interactive controls are added. Markdown tables and short prose summaries keep the roadmap navigable for screen readers and terminal readers.
+
+\section{Localization / Directionality Posture}\label{record-213-localization-directionality-posture}
+
+No app-visible localized strings are added.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-213-agent-inspectability-explainability-posture}
+
+Agents can inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} for release horizon and candidate goalpost state
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} for active gravity
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} for shipped-release posture
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}3\allowbreak{}0\allowbreak{}/\allowbreak{}r\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}m\allowbreak{}a\allowbreak{}p\allowbreak{}-\allowbreak{}g\allowbreak{}o\allowbreak{}a\allowbreak{}l\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} for deterministic roadmap expectations
+\end{itemize}
+
+\section{Linked Invariants}\label{record-213-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Work Is Issue-Backed
+\item
+  Docs Are the Demo
+\item
+  Release Claims Need Proof
+\item
+  Runtime Truth Wins
+\end{itemize}
+
+\section{Implementation Outline}\label{record-213-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Capture live GitHub milestone, issue, and PR state.
+\item
+  Comment on \#268 to connect this manual refresh to the tracker-sync problem.
+\item
+  Refresh \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Align \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Select and record the post-V7 release train.
+\item
+  Update changelog and WF-130 regression expectations.
+\item
+  Run focused validation.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-213-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Update WF-130 expectations so stale text such as ``release-readiness validation before tagging'' fails if it returns to \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Assert that \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, no planned feature \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, and \texttt{v\allowbreak{}9\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} stay visible in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Keep the Beyond row count tied to the \texttt{O\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}B\allowbreak{}e\allowbreak{}y\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e\allowbreak{}s} table.
+\item
+  Assert the current unmilestoned triage and dependency PR are visible.
+\end{itemize}
+
+\section{Validation Plan}\label{record-213-validation-plan}
+
+\begin{CodeBlock}
+npm test -- --run tests/cycles/WF-130/roadmap-goalpost-policy.test.ts
+npm run docs:inventory
+npm run typecheck:test
+npm run lint
+git diff --check
+\end{CodeBlock}
+

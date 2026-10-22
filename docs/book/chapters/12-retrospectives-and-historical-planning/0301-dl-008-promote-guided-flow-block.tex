@@ -1,0 +1,49 @@
+\chapter{DL-008 --- Promote Guided Flow Block}\label{record-301}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DL_008-promote-guided-flow-block.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DL-008 — Promote Guided Flow Block
+lane: retro
+legend: DL
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-301-disposition}
+
+Implemented on release/v4.5.0 by adding the reusable guidedFlow() block in @flyingrobots/bijou, refactoring explainability() onto the same guided-flow rhythm, proving the block in DOGFOOD, and capturing the work in the DL-008 cycle doc. This is now completed design-language work, not live backlog.
+
+\section{Original Proposal}\label{record-301-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Idea}\label{record-301-idea}
+
+DL-007 promotes the inspector family into a real TUI block helper through \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}.
+
+The next natural follow-on is to do the same kind of promotion work for the guided-flow side of the design language.
+
+That likely means deciding whether \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} is still just a component seam, or whether Bijou is ready for a higher-level guided-flow block that standardizes:
+
+\begin{itemize}
+\tightlist
+\item
+  section rhythm
+\item
+  next-action treatment
+\item
+  shell/workflow ownership
+\item
+  calmer multi-step assistance patterns
+\end{itemize}
+
+\section{Why}\label{record-301-why}
+
+The design-system blocks guide treats \texttt{G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w} as one of the first credible block candidates.
+
+Inspector promotion should not strand guided-flow work one layer lower forever.
+
+\section{Status}\label{record-301-status}
+
+Backlog spawned by the retrospective for DL-007.
+

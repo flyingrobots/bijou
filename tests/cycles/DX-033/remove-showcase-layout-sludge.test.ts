@@ -41,15 +41,11 @@ describe('DX-033 remove showcase layout sludge', () => {
 
   it('records the secondary showcase posture in docs and the v6 lane', () => {
     const readme = readRepoFile('examples/showcase/README.md');
-    const lane = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const legend = readRepoFile('docs/legends/DX-developer-experience.md');
 
     expect(readme).toContain('secondary example surface');
     expect(readme).toContain('npm run dogfood');
     expect(readme).toContain('npm run blocklab');
     expect(readme).toContain('npm run blocklab:index');
     expect(readme).toContain('browsableListSurface()');
-    expect(lane).toContain('../../../design/DX-033-remove-showcase-layout-sludge.md');
-    expect(legend).toContain('DX-033 — Remove showcase layout sludge');
   });
 });

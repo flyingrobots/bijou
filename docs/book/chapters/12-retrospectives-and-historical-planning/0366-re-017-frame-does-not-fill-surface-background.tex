@@ -1,0 +1,61 @@
+\chapter{RE-017 --- Frame does not fill terminal background with surface.primary.bg}\label{record-366}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-017-frame-does-not-fill-surface-background.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-017 — Frame does not fill terminal background with surface.primary.bg
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-366-disposition}
+
+Fixed in the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}.\allowbreak{}1} release line and already shipped on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at tag \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}4\allowbreak{}.\allowbreak{}1}. The frame now fills the body and shell chrome with the active shell background, the stock \texttt{s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} path exercises that end to end, and the \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7} DOGFOOD cycle coverage plus the 4.4.1 release docs are the source of truth now.
+
+\section{Original Proposal}\label{record-366-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-366-problem}
+
+When a custom theme defines \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g} (e.g., \texttt{\#\allowbreak{}2\allowbreak{}d\allowbreak{}1\allowbreak{}9\allowbreak{}2\allowbreak{}2} for a dark plum background), the framed shell does not fill the terminal background with that color. Empty cells in pane content retain the terminal's default background instead of the theme's surface background.
+
+The frame correctly reads \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}'\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}'\allowbreak{})\allowbreak{}.\allowbreak{}b\allowbreak{}g} for header tab color derivation (in \texttt{d\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n}), but it does not fill the pane area's empty cells with the surface background. This means custom themes that rely on a non-default background color appear broken --- only styled text shows the theme colors while the rest of the screen shows the terminal's default dark background.
+
+\section{Expected behavior}\label{record-366-expected-behavior}
+
+The frame should fill all empty/unoccupied cells in the viewport with \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}'\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}'\allowbreak{})\allowbreak{}.\allowbreak{}b\allowbreak{}g} so that custom themes with non-default backgrounds render correctly across the entire terminal.
+
+\section{Reproduction}\label{record-366-reproduction}
+
+\begin{CodeBlock}
+import { createBijou, tv } from '@flyingrobots/bijou';
+import { createFramedApp, run } from '@flyingrobots/bijou-tui';
+
+const theme = {
+  name: 'custom',
+  // ... standard tokens ...
+  surface: {
+    primary: { hex: '#ffffff', bg: '#2d1922' },  // dark plum background
+    // ...
+  },
+};
+
+const ctx = createBijou({ runtime, io, style, theme });
+const app = createFramedApp({ pages: [...] });
+await run(app, { ctx });
+// Expected: entire terminal has #2d1922 background
+// Actual: only styled text areas show theme colors; empty areas show terminal default
+\end{CodeBlock}
+
+\section{Workaround}\label{record-366-workaround}
+
+Write the ANSI background escape code directly to stdout before \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} starts, and clear the screen:
+
+\begin{CodeBlock}
+process.stdout.write(`\x1b[48;2;45;25;34m\x1b[2J`);
+await run(app, { ctx });
+\end{CodeBlock}
+
+This survives bijou's alt screen enter but may flash briefly.
+

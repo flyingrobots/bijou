@@ -1,0 +1,40 @@
+\chapter{RE-024 --- Terminal Content Sanitization Boundary}\label{record-381}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE-024-terminal-content-sanitization-boundary.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "RE-024 — Terminal Content Sanitization Boundary"
+legend: RE
+lane: retro
+
+\end{RecordMeta}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}. Bijou now ships a first-class terminal text sanitization seam through \texttt{s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}, re-exports that helper publicly, and covers destructive escape payloads in \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}. The later surface-native hardening pass also routes \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} through that boundary so untrusted text no longer slips past the plain-text path by default.
+
+\section{Original Proposal}\label{record-381-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-381-problem}
+
+Bijou has strong low-level ANSI handling, but it does not yet define a clear safety boundary for untrusted or user-provided content. The 2026-04-11 ship-readiness audit flagged this as both a terminal injection risk and a correctness risk for render/diff bookkeeping when destructive escape sequences slip through ordinary content paths.
+
+Right now the repo has helpers for stripping ANSI, but not a clear runtime contract for when content must be sanitized or how trusted vs untrusted strings should be modeled.
+
+\section{Desired outcome}\label{record-381-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define where content sanitization belongs in the runtime/render path.
+\item
+  Decide whether the answer is a sanitize stage, a \texttt{S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} component, explicit trusted/untrusted content types, or a narrower boundary helper.
+\item
+  Add regression coverage for destructive escape-sequence payloads.
+\end{enumerate}
+
+\section{Effort}\label{record-381-effort}
+
+Medium --- contract design, implementation, and tests.
+

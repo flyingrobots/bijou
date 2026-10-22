@@ -1,0 +1,14 @@
+% Presentation of original arrow notation. See flow-manifest.json.
+\begin{center}
+\begin{tikzpicture}[book flow node/.style={draw=BookHeading,fill=BookPanel,align=center,text width=45mm,inner sep=5pt,font=\footnotesize},book flow edge/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.7pt}]
+\node[book flow node] (runtime) at (-3,0) {Runtime: owns loop, surfaces, differ, IO};
+\node[book flow node] (frame) at (3,0) {App / frame};
+\draw[dashed,BookMuted] (-3,-.8)--(-3,-8);
+\draw[dashed,BookMuted] (3,-.8)--(3,-8);
+\draw[book flow edge] (-3,-1.6) -- node[above,align=center,text width=95mm,font=\footnotesize] {App.\allowbreak{}update(msg, model)} (3,-1.6);
+\draw[book flow edge,dashed] (3,-2.7) -- node[above,fill=white,font=\footnotesize] {frame returns [model, cmds]} (-3,-2.7);
+\draw[book flow edge] (-3,-4.1) -- node[above,align=center,text width=95mm,font=\footnotesize] {App.\allowbreak{}view(model)} (3,-4.1);
+\draw[book flow edge,dashed] (3,-5.199999999999999) -- node[above,fill=white,font=\footnotesize] {frame returns Surface} (-3,-5.199999999999999);
+\draw[book flow edge] (-3,-6.6) -- node[above,align=center,text width=95mm,font=\footnotesize] {render\allowbreak{}Diff(current, target, io, style)} (3,-6.6);
+\end{tikzpicture}
+\end{center}

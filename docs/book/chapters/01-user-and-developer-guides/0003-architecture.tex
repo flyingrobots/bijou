@@ -1,0 +1,90 @@
+\chapter{ARCHITECTURE}\label{record-003}
+
+\noindent{\footnotesize\color{BookMuted}\path{ARCHITECTURE.md}\par}\smallskip
+
+Bijou is an industrial-grade TypeScript engine organized around a strict Hexagonal (Ports and Adapters) architecture.
+
+\section{Core Boundary}\label{record-003-core-boundary}
+
+The \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} core is pure TypeScript with zero runtime dependencies. All platform-specific concerns are isolated behind three primary ports:
+
+\input{tables/table-001}
+
+Adapters (e.g., \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e}, \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}O}, \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}l\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e}) live in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} or test-specific modules.
+
+\section{Package Stack}\label{record-003-package-stack}
+
+\subsection{\texorpdfstring{1. \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} (The Foundation)}{1.  (The Foundation)}}\label{record-003-flyingrobotsbijou-the-foundation}
+
+\begin{itemize}
+\tightlist
+\item
+  Zero-dependency primitives: \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}, and \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}.
+\item
+  Core component families and interactive prompts.
+\item
+  Output-mode detection and graceful lowering.
+\end{itemize}
+
+\subsection{\texorpdfstring{2. \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} (The Engine)}{2.  (The Engine)}}\label{record-003-flyingrobotsbijou-tui-the-engine}
+
+\begin{itemize}
+\tightlist
+\item
+  The Elm Architecture (TEA) runtime: \texttt{A\allowbreak{}p\allowbreak{}p}, \texttt{C\allowbreak{}m\allowbreak{}d}, and \texttt{M\allowbreak{}s\allowbreak{}g}.
+\item
+  High-fidelity rendering pipeline: layout, diffing, and ANSI emission.
+\item
+  Declarative motion (springs/tweens) and transition shaders.
+\item
+  Standardized shell chrome and overlay composition.
+\end{itemize}
+
+\subsection{\texorpdfstring{3. \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} (The Host)}{3.  (The Host)}}\label{record-003-flyingrobotsbijou-node-the-host}
+
+\begin{itemize}
+\tightlist
+\item
+  Official Node.js implementations of all core ports.
+\item
+  Worker-thread runtime for offloading heavy TEA logic.
+\item
+  Native surface recording for documentation and debugging.
+\end{itemize}
+
+\subsection{\texorpdfstring{4. \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} (The Voice)}{4.  (The Voice)}}\label{record-003-flyingrobotsbijou-i18n-the-voice}
+
+\begin{itemize}
+\tightlist
+\item
+  In-memory localization runtime.
+\item
+  Bidirectional support (LTR/RTL) and catalog management.
+\end{itemize}
+
+\section{Rendering Pipeline}\label{record-003-rendering-pipeline}
+
+\subsection{Static Path (CLI/Pipes)}\label{record-003-static-path-clipipes}
+
+\input{diagrams/flows/flow-063}
+
+\subsection{Interactive Path (TUI)}\label{record-003-interactive-path-tui}
+
+\input{diagrams/flows/flow-064}
+
+For the \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} branch specifically, the runtime rebases the tree into a local non-negative root before paint. The detailed ownership model is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{docs/strategy/layout-localization-pipeline.md}. The user-facing layout and overflow rules that sit on top of that pipeline are captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-and-viewport-rules.md}{docs/strategy/layout-and-viewport-rules.md}.
+
+\section{Buffered Protocols}\label{record-003-buffered-protocols}
+
+When Bijou buffers commands, events, or cross-boundary actions, those buffers should carry plain facts rather than executable behavior. The execution owner stays outside the buffer, which keeps queued state inspectable, replayable, and testable.
+
+Use \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts} as the canonical invariant for that rule.
+
+\section{Interaction Profiles}\label{record-003-interaction-profiles}
+
+Bijou adapts its rendering behavior based on the detected output mode: - \textbf{\texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}}: Full TEA loop, motion, and shell chrome. - \textbf{\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}}: Single-frame render (e.g., CI logs). - \textbf{\texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}}: Plain-text fallback; no colors or complex layout. - \textbf{\texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e}}: Linearized output for screen-readers.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{DOGFOOD} serves as the architectural pressure point, where all packages are verified in a unified, professional application surface.
+

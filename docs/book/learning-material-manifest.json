@@ -1,0 +1,18 @@
+[
+  {
+    "source_repository": "https://github.com/flyingrobots/bijou-job-monitor",
+    "source_commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+    "source_path": "answers/README.md",
+    "source_sha256": "65cfb3ffa948db29576f1edd71c681654ca79764cbf0aeaaba874abf30e322b0",
+    "latex_path": "appendices/exercise-answers.tex",
+    "presentation_changes": "Markdown headings and inline spans typeset as LaTeX; user-arranged participant status added to walkthrough."
+  },
+  {
+    "source_repository": "https://github.com/flyingrobots/bijou-job-monitor",
+    "source_commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+    "source_path": "walkthrough/README.md",
+    "source_sha256": "1bdb61b32cec149d33e2765d068d45ed7d39600c0de0cc6e44bb1abf04322dbf",
+    "latex_path": "appendices/reader-walkthrough.tex",
+    "presentation_changes": "Markdown headings and inline spans typeset as LaTeX; user-arranged participant status added to walkthrough."
+  }
+]

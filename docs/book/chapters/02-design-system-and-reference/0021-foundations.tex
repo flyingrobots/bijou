@@ -1,0 +1,518 @@
+\chapter{Foundations}\label{record-021}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/foundations.md}\par}\smallskip
+
+This document defines the shared design language behind Bijou.
+
+It is not an API document. It is the policy layer that should shape API design, examples, and component usage.
+
+\section{1. Color}\label{record-021-color}
+
+\subsection{Purpose}\label{record-021-purpose}
+
+Color in Bijou should communicate:
+
+\begin{itemize}
+\tightlist
+\item
+  status
+\item
+  hierarchy
+\item
+  separation
+\item
+  focus
+\item
+  interruption level
+\end{itemize}
+
+Color should not carry meaning alone. Every important state must still survive \texttt{n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} runs.
+
+\subsection{Color roles}\label{record-021-color-roles}
+
+Bijou should treat tokens as belonging to a small set of roles:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{foreground}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    primary text, secondary text, subdued text
+  \end{itemize}
+\item
+  \textbf{surface}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    canvas, elevated region, overlay, inset region
+  \end{itemize}
+\item
+  \textbf{status}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    success, warning, error, info, neutral
+  \end{itemize}
+\item
+  \textbf{accent}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    active/focused selection, primary affordance
+  \end{itemize}
+\item
+  \textbf{border/separator}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    grouping and structural division
+  \end{itemize}
+\end{itemize}
+
+The exact API-level mapping from these roles to Bijou's shipped token families is defined in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-tokens.md}{Theme Token Vocabulary}.
+
+\subsection{Color rules}\label{record-021-color-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Use status color to explain state, not to decorate.
+\item
+  Use accent color for focus and active affordances, not for arbitrary emphasis.
+\item
+  Use background fills sparingly and deliberately. A background should indicate containment, elevation, or interruption.
+\item
+  Avoid using more than one strong status tone in the same local region unless comparing states is the point.
+\item
+  In \texttt{n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, every state must still read correctly from words, symbols, order, or borders.
+\end{itemize}
+
+\subsection{Terminal-specific guidance}\label{record-021-terminal-specific-guidance}
+
+\begin{itemize}
+\tightlist
+\item
+  Strong color contrast is expensive in a dense terminal. Use saturated status tones for small focal areas, not for entire screens.
+\item
+  Large filled regions should be reserved for overlays, selected/focused states, or major grouping moves.
+\item
+  Bright foreground on dark background is the default mental model in many terminals, but docs should not assume dark mode semantics.
+\end{itemize}
+
+\section{2. Spacing and rhythm}\label{record-021-spacing-and-rhythm}
+
+Carbon uses a 2x grid. Bijou needs a terminal-first equivalent.
+
+\subsection{Bijou spacing model}\label{record-021-bijou-spacing-model}
+
+\begin{itemize}
+\tightlist
+\item
+  The atomic unit is \textbf{1 cell}.
+\item
+  The default rhythm unit is \textbf{2 cells}.
+\item
+  Dense internal padding can use 1-cell increments.
+\item
+  Structural gaps between sections, panes, and overlay edges should prefer the 2-cell rhythm.
+\end{itemize}
+
+\subsection{Default guidance}\label{record-021-default-guidance}
+
+\begin{itemize}
+\tightlist
+\item
+  inline gap: \texttt{1}
+\item
+  local group gap: \texttt{1} or \texttt{2}
+\item
+  section gap: \texttt{2}
+\item
+  pane or card padding: usually \texttt{1} vertically, \texttt{2} horizontally
+\item
+  modal margin from viewport edge: minimum \texttt{1}, preferred \texttt{2}
+\item
+  stacked transient gap: \texttt{1}
+\end{itemize}
+
+\subsection{Why this matters}\label{record-021-why-this-matters}
+
+Without a declared rhythm, terminal UIs become visually noisy very fast. Bijou should feel intentionally packed, not cramped.
+
+\section{3. Text hierarchy and emphasis}\label{record-021-text-hierarchy-and-emphasis}
+
+Terminal typography is mostly:
+
+\begin{itemize}
+\tightlist
+\item
+  placement
+\item
+  spacing
+\item
+  boldness
+\item
+  token choice
+\item
+  borders/dividers
+\item
+  line length
+\end{itemize}
+
+not font families or font sizes.
+
+\subsection{Hierarchy levels}\label{record-021-hierarchy-levels}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{page/shell title}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    strongest label in the local frame
+  \end{itemize}
+\item
+  \textbf{section title}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    container or region label
+  \end{itemize}
+\item
+  \textbf{body}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    default content
+  \end{itemize}
+\item
+  \textbf{supporting text}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    help text, metadata, timestamps, hints
+  \end{itemize}
+\end{itemize}
+
+\subsection{Emphasis rules}\label{record-021-emphasis-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Prefer structure before decoration.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    use spacing, grouping, and labeling first
+  \end{itemize}
+\item
+  Bold should mark titles, active labels, or short key facts.
+\item
+  Dim/subdued text should carry metadata, not primary instructions.
+\item
+  Avoid combining too many modifiers at once.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    bold + color + underline + inverse is usually design panic, not design clarity
+  \end{itemize}
+\end{itemize}
+
+\subsection{Content density}\label{record-021-content-density}
+
+\begin{itemize}
+\tightlist
+\item
+  Tight density is acceptable in terminals, but meaning must still scan.
+\item
+  Long prose should wrap and breathe.
+\item
+  Dense data views should prefer alignment and scanability over decorative framing.
+\end{itemize}
+
+\section{4. Overflow}\label{record-021-overflow}
+
+Bijou should default to \textbf{wrap for prose-like content} and \textbf{truncate or clip only where layout semantics demand it}.
+
+\subsection{Default policy}\label{record-021-default-policy}
+
+\begin{itemize}
+\tightlist
+\item
+  prose, supporting text, and descriptions: wrap
+\item
+  labels inside constrained shell chrome: clip or truncate
+\item
+  tabular cells: wrap when the row can grow, truncate when preserving scanability is more important
+\item
+  activity streams and logs: do not silently destroy ordering to preserve prettiness
+\end{itemize}
+
+\subsection{Why}\label{record-021-why}
+
+Truncation is often a hidden data-loss bug disguised as layout discipline.
+
+\subsection{Required controls}\label{record-021-required-controls}
+
+Families that render text in constrained spaces should expose overflow choices where practical:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p}
+\item
+  \texttt{t\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{c\allowbreak{}l\allowbreak{}i\allowbreak{}p}
+\end{itemize}
+
+Not every component needs every mode, but the library should speak one consistent overflow language.
+
+\section{5. Motion}\label{record-021-motion}
+
+Motion should clarify:
+
+\begin{itemize}
+\tightlist
+\item
+  entry
+\item
+  exit
+\item
+  relationship between before and after
+\item
+  focus shifts
+\item
+  interruption level
+\end{itemize}
+
+Motion should not exist just because the runtime can animate.
+
+\subsection{Motion rules}\label{record-021-motion-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Transient surfaces may animate in and out.
+\item
+  Page or pane transitions should reinforce spatial or logical movement.
+\item
+  Fast repetitive interactions should avoid theatrical motion.
+\item
+  Any animation must have a deterministic non-animated truth underneath it.
+\end{itemize}
+
+\subsection{Practical policy}\label{record-021-practical-policy}
+
+\begin{itemize}
+\tightlist
+\item
+  notifications: short edge-based slide or fade motion
+\item
+  shell/page transitions: modest, directional, and optional
+\item
+  loading states: subtle looping motion
+\item
+  structural resize: prefer stable layout over decorative flourish
+\end{itemize}
+
+\section{6. Elevation and interruption}\label{record-021-elevation-and-interruption}
+
+Terminals do not have shadows in the usual sense. Elevation must be conveyed through:
+
+\begin{itemize}
+\tightlist
+\item
+  border treatment
+\item
+  fill treatment
+\item
+  separation from background
+\item
+  reserved space
+\item
+  z-order and animation
+\end{itemize}
+
+\subsection{Interruption ladder}\label{record-021-interruption-ladder}
+
+From least interruptive to most interruptive:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  inline help or note
+\item
+  badge or subtle status
+\item
+  alert
+\item
+  toast / notification
+\item
+  drawer
+\item
+  modal
+\end{enumerate}
+
+This ladder should show up consistently in docs and examples.
+
+\section{7. Focus and active state}\label{record-021-focus-and-active-state}
+
+Bijou is keyboard-first.
+
+The user should always be able to tell:
+
+\begin{itemize}
+\tightlist
+\item
+  what is focused
+\item
+  what is active
+\item
+  what is selected
+\item
+  what is merely present
+\end{itemize}
+
+\subsection{Focus cues}\label{record-021-focus-cues}
+
+Use some combination of:
+
+\begin{itemize}
+\tightlist
+\item
+  accent color
+\item
+  border or gutter treatment
+\item
+  active label treatment
+\item
+  position within a structured list
+\end{itemize}
+
+\subsection{Rules}\label{record-021-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not rely on color alone for focus.
+\item
+  Focus cues should be local and unmistakable.
+\item
+  Shell-level focus and component-level focus should not compete visually at the same strength.
+\end{itemize}
+
+\section{8. Input modality policy}\label{record-021-input-modality-policy}
+
+\subsection{Keyboard first}\label{record-021-keyboard-first}
+
+Bijou should assume keyboard interaction is the baseline.
+
+Every important interactive flow should work without a mouse.
+
+\subsection{Mouse as enhancement}\label{record-021-mouse-as-enhancement}
+
+Mouse input is valuable, but it should be:
+
+\begin{itemize}
+\tightlist
+\item
+  additive
+\item
+  discoverable
+\item
+  consistent
+\item
+  never the only path
+\end{itemize}
+
+\subsection{Pointer policy}\label{record-021-pointer-policy}
+
+\begin{itemize}
+\tightlist
+\item
+  Click should usually mirror an existing keyboard action.
+\item
+  Hover-only meaning should be minimal.
+\item
+  Drag should be reserved for clearly spatial interactions, such as split dividers.
+\item
+  Overlays should consume mouse events before background content.
+\end{itemize}
+
+\section{9. Package ownership}\label{record-021-package-ownership}
+
+\subsection{\texorpdfstring{Core \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}}{Core }}\label{record-021-core-flyingrobotsbijou}
+
+Use core for semantics that survive graceful degradation:
+
+\begin{itemize}
+\tightlist
+\item
+  status and structural components
+\item
+  forms and prompts
+\item
+  prose and log output
+\item
+  data views that still make sense as text
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}}{}}\label{record-021-flyingrobotsbijou-tui}
+
+Use TUI for:
+
+\begin{itemize}
+\tightlist
+\item
+  shells
+\item
+  overlays
+\item
+  scrolling
+\item
+  focus-heavy inspection
+\item
+  animation
+\item
+  notification systems
+\item
+  pointer-heavy or lifecycle-heavy behavior
+\end{itemize}
+
+\section{10. What this means for future library work}\label{record-021-what-this-means-for-future-library-work}
+
+New component work should start by answering:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Which pattern is this serving?
+\item
+  Is it semantic, interaction-layer, or render-path variation?
+\item
+  Does it belong in core or TUI?
+\item
+  What is the default overflow behavior?
+\item
+  How does it lower through non-interactive modes?
+\item
+  What is the Carbon-style ``when to use / when not to use'' story?
+\end{enumerate}
+

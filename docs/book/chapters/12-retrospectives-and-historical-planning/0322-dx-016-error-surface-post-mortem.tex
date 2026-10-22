@@ -1,0 +1,29 @@
+\chapter{DX-016 --- Error Surface for Crash Post-Mortems}\label{record-322}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-016-error-surface-post-mortem.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-322-idea}
+
+When a TUI app crashes during \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} or \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})}, the \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} currently catches the error, writes the stack trace to stderr, and exits. If the app is in alt-screen mode, this stack trace is often lost or obscured by the terminal's screen restoration.
+
+Implement a dedicated ``Error Surface'' that is rendered using Bijou components \emph{before} the alt-screen is exited. This surface should display: - The error message and stack trace. - The last stable model snapshot (if serializable). - A prompt to ``Press Enter to exit.''
+
+\section{Why}\label{record-322-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Visibility}: Keeps critical crash data on-screen for the developer to inspect before the process dies.
+\item
+  \textbf{Professionalism}: Moves the app from a ``noisy CLI crash'' to a ``structured post-mortem.''
+\item
+  \textbf{Diagnostic Power}: Capturing the model state at the point of failure is an industrial-strength debugging aid.
+\end{enumerate}
+
+\section{Effort}\label{record-322-effort}
+
+Medium --- requires a special ``Crash Mode'' in the run loop that bypasses the normal TEA update and renders a static diagnostic surface.
+

@@ -1,0 +1,30 @@
+\chapter{DX-012 --- Document Render-Path Naming Convention}\label{record-317}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-012-render-path-naming-convention.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-317-idea}
+
+Document the implicit naming convention for string-output vs Surface-output component variants:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{})} → string (pipe-friendly)
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{})} → Surface (composable in TUI apps)
+\item
+  \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{})} → Surface only (no string variant)
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{})} → string (mixed-mode, pipe-aware)
+\end{itemize}
+
+The pattern exists but is never stated explicitly. A developer browsing the API doesn't know why some components have a \texttt{-\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} variant and others don't, or why \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} returns a Surface directly while \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} returns a string.
+
+\section{Why}\label{record-317-why}
+
+This came up in the DX audit as a minor POLA concern. The convention is sound (simpler output-only components are string-first; richer interactive components are Surface-native), but it reads as inconsistency when you're scanning exports without context.
+
+A one-paragraph note in the bijou README's component section would resolve the confusion.
+

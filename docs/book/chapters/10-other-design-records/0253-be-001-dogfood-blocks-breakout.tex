@@ -1,0 +1,376 @@
+\chapter{BE-001 Project Big Extraction: DOGFOOD Blocks Breakout}\label{record-253}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/BE-001-dogfood-blocks-breakout.md}\par}\smallskip
+
+\section{Status}\label{record-253-status}
+
+Implemented.
+
+\section{Tracker}\label{record-253-tracker}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/435}{\#435}
+\item
+  Pull Request: \href{https://github.com/flyingrobots/bijou/pull/436}{\#436}
+\end{itemize}
+
+\section{Legend}\label{record-253-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  Linked legend: WF, Workflow and Delivery
+\item
+  Sponsor human: James Ross
+\item
+  Sponsor agent: Codex
+\end{itemize}
+
+\section{Hill}\label{record-253-hill}
+
+Project Big Extraction starts by killing a hard-limit monolith instead of preserving legacy-large files as permanent habitat.
+
+\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} is currently a \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}3\allowbreak{}7} line / \texttt{9\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}2\allowbreak{}0} byte DOGFOOD block registry monolith with \texttt{1\allowbreak{}5\allowbreak{}1} exports. The cycle turns it into a small compatibility facade backed by focused modules, preserving existing consumers while removing the hard-limit file from the active monolith list.
+
+\section{Current Truth}\label{record-253-current-truth}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{b\allowbreak{}0\allowbreak{}5\allowbreak{}8\allowbreak{}b\allowbreak{}2\allowbreak{}c\allowbreak{}5}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{3\allowbreak{}6\allowbreak{}4}
+\item
+  file/context baseline: \texttt{3\allowbreak{}0\allowbreak{}9}
+\item
+  mock-ban baseline: \texttt{0}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  next aggregate target: \texttt{3\allowbreak{}1\allowbreak{}4} or lower
+\end{itemize}
+
+Current hard-limit files:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{4\allowbreak{},\allowbreak{}5\allowbreak{}5\allowbreak{}8} lines / \texttt{1\allowbreak{}6\allowbreak{}9\allowbreak{},\allowbreak{}9\allowbreak{}5\allowbreak{}4} bytes
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{3\allowbreak{},\allowbreak{}3\allowbreak{}0\allowbreak{}6} lines / \texttt{1\allowbreak{}1\allowbreak{}4\allowbreak{},\allowbreak{}9\allowbreak{}7\allowbreak{}2} bytes
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2\allowbreak{},\allowbreak{}8\allowbreak{}4\allowbreak{}7} lines / \texttt{1\allowbreak{}0\allowbreak{}9\allowbreak{},\allowbreak{}0\allowbreak{}4\allowbreak{}2} bytes
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}3\allowbreak{}7} lines / \texttt{9\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}2\allowbreak{}0} bytes
+\end{itemize}
+
+\texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} has low external fanout compared to the other hard-limit files, but high export surface. That makes it a good first Big Extraction target: keep \texttt{.\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}j\allowbreak{}s} as the public facade, move cohesive internals behind it, and avoid broad consumer churn.
+
+\section{Implementation Result}\label{record-253-implementation-result}
+
+BE-001 turns \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} into a \texttt{9\allowbreak{}7} line / \texttt{3\allowbreak{},\allowbreak{}7\allowbreak{}4\allowbreak{}0} byte facade and moves the registry, schema parsing, renderers, block definitions, and registry entries into focused modules. The largest extracted module is \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s} at \texttt{1\allowbreak{}4\allowbreak{}3} lines / \texttt{5\allowbreak{},\allowbreak{}5\allowbreak{}9\allowbreak{}7} bytes, so every new module stays below the Code Dojo file/context threshold.
+
+Live debt after the extraction:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{3\allowbreak{}6\allowbreak{}2}
+\item
+  file/context baseline: \texttt{3\allowbreak{}0\allowbreak{}8}
+\item
+  mock-ban baseline: \texttt{0}
+\item
+  code-size baseline: \texttt{5\allowbreak{}4}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}3\allowbreak{}6\allowbreak{}5}, down from the stored \texttt{2\allowbreak{},\allowbreak{}4\allowbreak{}1\allowbreak{}5} baseline
+\item
+  next aggregate target from the live count: \texttt{3\allowbreak{}1\allowbreak{}2} or lower
+\end{itemize}
+
+The extraction removes \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} from both debt ledgers but only removes two aggregate violations. It is an honest structural reduction, not a 50-violation goalpost by itself.
+
+The DOGFOOD raw-string baseline is also transferred from the old \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s} surface to the extracted module surfaces at exact measured counts, while stale slack in the docs, counter, and Storybook surfaces is removed.
+
+\section{Scope}\label{record-253-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Split DOGFOOD block registry, block definitions, renderers, schema helpers, and registry assembly out of \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Preserve the current public import path and named exports through the facade.
+\item
+  Keep every new module below Code Dojo file/context and code-size thresholds.
+\item
+  Do not add new file/context or code-size baseline entries.
+\item
+  Update the Code Dojo ledgers after live counts prove the monolith is gone.
+\item
+  Update changelog and exception documentation with the Big Extraction result.
+\end{itemize}
+
+\section{Non-Goals}\label{record-253-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No redesign of DOGFOOD blocks or rendered content.
+\item
+  No broad rewrite of \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  No extraction of \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} or \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} in this cycle.
+\item
+  No release-version work.
+\item
+  No rebase, amend, force push, or draft PR.
+\end{itemize}
+
+\section{Extraction Map}\label{record-253-extraction-map}
+
+Target module boundaries:
+
+\begin{itemize}
+\tightlist
+\item
+  Shared helpers:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}-\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}l\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  Registry assembly:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  Docs surface block:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  Rendered block families:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}u\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}u\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}h\allowbreak{}u\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  Public facade:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \item
+    public re-exports
+  \item
+    \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}s}
+  \item
+    \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y}
+  \end{itemize}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-253-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add focused safety tests for facade compatibility and registry assembly if existing tests do not pin the split boundary.
+\item
+  Extract schema utility helpers first because docs-surface parsing depends on them and they have no app-facing behavior.
+\item
+  Extract the registry class and entry helpers while preserving exported names.
+\item
+  Extract block families in cohesive groups: docs surface, preview/inspector, shell overlays, docs navigation, and workbench.
+\item
+  Reduce \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} to a facade plus registry assembly.
+\item
+  Recompute Code Dojo file/context and code-size ledgers and lower counts.
+\item
+  Update docs/code-dojo-exceptions, changelog, and this design doc with implementation notes and validation evidence.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-253-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Facade export compatibility test:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    importing from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}j\allowbreak{}s} exposes the expected default registry, required surface ids, and representative block exports.
+  \end{itemize}
+\item
+  Registry assembly test:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y} includes every \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}I\allowbreak{}d} after extraction.
+  \end{itemize}
+\end{itemize}
+
+Existing focused suites remain the behavioral net:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}0\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}9\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}7\allowbreak{}0\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}7\allowbreak{}1\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}4\allowbreak{}6\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+\section{Validation Plan}\label{record-253-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused Vitest suites listed above
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-253-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} is below Code Dojo file/context and code-size thresholds.
+\item
+  No extracted module exceeds Code Dojo file/context or code-size thresholds.
+\item
+  The hard-limit code-size count drops from \texttt{4} to \texttt{3}.
+\item
+  Aggregate Code Dojo debt does not increase, and BE-001 is not counted as a completed Respecting the Dojo goalpost unless a follow-on slice lowers the live aggregate count by the required 50 violations to \texttt{3\allowbreak{}1\allowbreak{}2} or lower.
+\item
+  Existing public imports from \texttt{.\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}j\allowbreak{}s} continue to work.
+\item
+  Focused DOGFOOD block tests and local dojo/type/lint gates pass.
+\end{itemize}
+
+\section{Playback Questions}\label{record-253-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} no longer a hard-limit file?
+\item
+  Did the facade preserve the public export surface used by consumers?
+\item
+  Did the split avoid claiming the 50-violation goalpost prematurely?
+\item
+  Are all new modules below file/context and code-size thresholds?
+\item
+  Did the DOGFOOD block behavior tests pass?
+\end{enumerate}
+
+\section{Linked Invariants}\label{record-253-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Work doctrine: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+

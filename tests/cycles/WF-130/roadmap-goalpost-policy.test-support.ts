@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect } from 'vitest';

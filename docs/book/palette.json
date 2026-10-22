@@ -1,0 +1,23 @@
+{
+  "anchor": "#F7685F",
+  "oklch": {
+    "L": 0.6939197993875663,
+    "C": 0.17741475778572632,
+    "h": 26.313354727817508
+  },
+  "colors": {
+    "coral": "#F7685F",
+    "paper": "#FFFFFF",
+    "ink": "#2D2726",
+    "heading": "#83312C",
+    "muted": "#645452",
+    "panel": "#FFEDEB"
+  },
+  "contrast": {
+    "coral_on_white": 2.96,
+    "ink_on_white": 14.69,
+    "heading_on_white": 8.6,
+    "muted_on_white": 7.16
+  },
+  "ink_on_coral": 4.97
+}

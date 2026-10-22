@@ -1,0 +1,313 @@
+\chapter{Layout Localization Pipeline}\label{record-049}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/layout-localization-pipeline.md}\par}\smallskip
+
+\emph{Strategy note for how Bijou turns \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} trees into local render roots}
+
+\section{Why this exists}\label{record-049-why-this-exists}
+
+The \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} path in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} is easy to use from the app side, but the runtime ownership model is easy to misunderstand.
+
+The important distinction is:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{layout localization} decides what coordinate space the tree owns
+\item
+  \textbf{paint} only blits already-positioned surfaces into a target surface
+\end{itemize}
+
+If those two stages get blurred together, it becomes difficult to reason about:
+
+\begin{itemize}
+\tightlist
+\item
+  negative coordinates and off-origin roots
+\item
+  where width and height are measured
+\item
+  when layout is recomputed
+\item
+  where retained-layout reuse should fit later
+\end{itemize}
+
+This note exists to make that path explicit.
+
+\section{The current runtime path}\label{record-049-the-current-runtime-path}
+
+For a TUI render driven by \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}, the flow is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})} returns either a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or a \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}.
+\item
+  \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}s\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} converts the view output into a runtime \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t}.
+\item
+  If the output was a \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e}, \texttt{l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} shifts the whole tree into a local non-negative coordinate space.
+\item
+  Layout-stage middleware such as motion and BCSS operate on that localized root.
+\item
+  The paint middleware blits \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} values into the target surface at the node's already-localized \texttt{r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}.\allowbreak{}x} / \texttt{r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}.\allowbreak{}y}.
+\item
+  Diff and output stages serialize the target surface to terminal bytes.
+\end{enumerate}
+
+The relevant seams today are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}m\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+\section{Coordinate spaces}\label{record-049-coordinate-spaces}
+
+There are three distinct coordinate spaces in play.
+
+\subsection{1. Author space}\label{record-049-author-space}
+
+This is the coordinate space returned by \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})}.
+
+In author space:
+
+\begin{itemize}
+\tightlist
+\item
+  a root node may start at negative \texttt{x} or \texttt{y}
+\item
+  siblings may be positioned relative to a parent origin that is not \texttt{(\allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{})}
+\item
+  the bounds of the full tree may extend outside the root node's own rect
+\end{itemize}
+
+That is legal input. The runtime does not require app authors to hand-normalize it.
+
+\subsection{2. Local root space}\label{record-049-local-root-space}
+
+This is the coordinate space owned by the runtime pipeline.
+
+\texttt{l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} recursively measures the tree bounds and computes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}x\allowbreak{}X\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}X}
+\item
+  \texttt{h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}x\allowbreak{}Y\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}Y}
+\item
+  \texttt{d\allowbreak{}x\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}X}
+\item
+  \texttt{d\allowbreak{}y\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}Y}
+\end{itemize}
+
+\texttt{l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} then translates the whole tree by \texttt{(\allowbreak{}d\allowbreak{}x\allowbreak{},\allowbreak{} \allowbreak{}d\allowbreak{}y\allowbreak{})} so the localized root and every descendant sit in a non-negative local coordinate space.
+
+The important rule is:
+
+\begin{quote}
+Paint should never have to rediscover where the root begins.
+\end{quote}
+
+By the time the pipeline reaches paint, the root already owns a local origin.
+
+\subsection{3. Target-surface space}\label{record-049-target-surface-space}
+
+This is the actual framebuffer for the current render.
+
+The target surface may be larger than the localized tree because the runtime normalizes to at least the current viewport size:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}x\allowbreak{}(\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{},\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{})}
+\item
+  \texttt{h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}x\allowbreak{}(\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{},\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}.\allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{})}
+\end{itemize}
+
+That means localization decides the tree's own bounds, while normalization decides the backing framebuffer size.
+
+\section{Localization is not paint}\label{record-049-localization-is-not-paint}
+
+Localization and paint are separate responsibilities.
+
+\subsection{Localization does:}\label{record-049-localization-does}
+
+\begin{itemize}
+\tightlist
+\item
+  recursive bounds measurement
+\item
+  ownership of root translation
+\item
+  conversion from author coordinates to local runtime coordinates
+\item
+  reporting the minimal localized width and height
+\end{itemize}
+
+\subsection{Paint does:}\label{record-049-paint-does}
+
+\begin{itemize}
+\tightlist
+\item
+  walk the already-localized tree
+\item
+  blit \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} into the target surface
+\item
+  trust the rects it is given
+\end{itemize}
+
+The paint middleware in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}m\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} is intentionally simple because localization already happened upstream.
+
+If paint ever needs to reason about negative roots, accumulated offsets, or tree rebasing, the ownership boundary has already been violated.
+
+\section{The recursion model}\label{record-049-the-recursion-model}
+
+\texttt{m\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}B\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} and \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}O\allowbreak{}f\allowbreak{}f\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} are both recursive, but they solve different problems.
+
+\subsection{Bounds recursion}\label{record-049-bounds-recursion}
+
+\texttt{m\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}B\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} walks the whole tree and accumulates:
+
+\begin{itemize}
+\tightlist
+\item
+  smallest \texttt{x}
+\item
+  smallest \texttt{y}
+\item
+  largest \texttt{x\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}
+\item
+  largest \texttt{y\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}
+\end{itemize}
+
+This is the phase that determines the translation and final localized size.
+
+\subsection{Paint recursion}\label{record-049-paint-recursion}
+
+\texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}O\allowbreak{}f\allowbreak{}f\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} or the paint middleware then walks the tree again and blits node surfaces into the already-sized target surface.
+
+That recursion is intentionally dumb:
+
+\begin{itemize}
+\tightlist
+\item
+  no geometry solving
+\item
+  no bounds discovery
+\item
+  no re-localization
+\end{itemize}
+
+It is only applying the results of earlier layout ownership.
+
+\section{When layout is recomputed today}\label{record-049-when-layout-is-recomputed-today}
+
+In the base \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} runtime, layout localization is recomputed on every render.
+
+That happens because the Layout stage does this every frame:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  call \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})}
+\item
+  call \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}s\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  store the result on \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t}
+\end{enumerate}
+
+So today there is no shared retained-layout cache inside the generic runtime render path.
+
+Other paths follow the same basic rule:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} recomputes localization when a scripted driver or test harness needs a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}A\allowbreak{}s\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} recomputes localization when the pipeline needs a runtime-owned root tree
+\end{itemize}
+
+That is correct today, but it is not the final word on performance.
+
+\section{Where retained layouts fit}\label{record-049-where-retained-layouts-fit}
+
+Bijou already has retained-layout primitives in \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}, and the framed shell uses retained trees for input routing and hit testing.
+
+The important current truth is:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{retained layouts exist}
+\item
+  \textbf{the generic render pipeline does not yet retain and reuse \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}o\allowbreak{}t}}
+\end{itemize}
+
+So retained layout work should not be described as if the base runtime already paints from a persistent layout cache.
+
+The likely future fit is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{})} produces a logical tree in author space
+\item
+  localization establishes a runtime-owned local root
+\item
+  that localized root becomes the retained artifact
+\item
+  invalidation determines when it must be rebuilt
+\item
+  paint and hit testing both consume the same retained localized tree
+\end{enumerate}
+
+The key design pressure is consistency. A future retained-layout system should not make paint use one coordinate contract while hit testing uses another.
+
+\section{Rule of thumb}\label{record-049-rule-of-thumb}
+
+If you are working in this area:
+
+\begin{itemize}
+\tightlist
+\item
+  treat localization as the handoff from author coordinates to runtime coordinates
+\item
+  keep paint dumb
+\item
+  keep target-surface sizing separate from tree localization
+\item
+  describe retained layouts as a future reuse seam unless you are explicitly in the shell/runtime-engine retained-layout code
+\end{itemize}
+
+\section{Read this with}\label{record-049-read-this-with}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}m\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}A\allowbreak{}R\allowbreak{}C\allowbreak{}H\allowbreak{}I\allowbreak{}T\allowbreak{}E\allowbreak{}C\allowbreak{}T\allowbreak{}U\allowbreak{}R\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}A\allowbreak{}D\allowbreak{}V\allowbreak{}A\allowbreak{}N\allowbreak{}C\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+

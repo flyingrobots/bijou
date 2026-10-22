@@ -1,0 +1,50 @@
+\chapter{DF-076 - BlockLab Demo Readiness Navigation}\label{record-116}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-076-blocklab-demo-readiness.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DF-076
+title: BlockLab Demo Readiness Navigation
+status: active
+lane: asap
+github_issue: 338
+legend: DF
+
+\end{RecordMeta}
+
+\section{Decision Summary}\label{record-116-decision-summary}
+
+BlockLab is a focused app/workbench surface. Its story navigation keys must win over generic framed-shell scroll bindings.
+
+\section{Problem}\label{record-116-problem}
+
+\texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b} runs through \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}. The frame shell defaults to \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}P\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{}"}, so story-navigation keys such as \texttt{u\allowbreak{}p}, \texttt{d\allowbreak{}o\allowbreak{}w\allowbreak{}n}, \texttt{j}, and \texttt{k} are consumed by generic frame scroll bindings before BlockLab sees them.
+
+That makes BlockLab unusable in the release-video path and contradicts the workbench contract: when the app advertises story navigation keys, those keys must move the selected story.
+
+\section{Scope}\label{record-116-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Configure the BlockLab framed app to prefer page-owned keys.
+\item
+  Add a regression that sends navigation keys through the framed-app runner path and asserts selected-story movement.
+\end{itemize}
+
+\section{Non-Goals}\label{record-116-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Change the default key priority for all framed apps.
+\item
+  Redesign BlockLab.
+\item
+  Add Theme Lab, localization, or GraphQL demo surfaces.
+\end{itemize}
+
+\section{Playback}\label{record-116-playback}
+
+Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}a\allowbreak{}b}, press \texttt{d\allowbreak{}o\allowbreak{}w\allowbreak{}n} or \texttt{j}, and verify the selected story moves from \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} to \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} without a frame key-shadowing warning.
+

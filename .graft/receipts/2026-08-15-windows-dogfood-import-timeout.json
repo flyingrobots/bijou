@@ -1,0 +1,18 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "8ed35d49-7be5-43f7-ad1f-86b1dc41501a",
+  "agent": "codex",
+  "task": "Keep the Windows DOGFOOD tsx import proof bounded without failing valid cold startup",
+  "bytesConsumed": 145549,
+  "filesRead": [
+    "scripts/docs-preview-entry.part01.test.ts"
+  ],
+  "filesModified": [
+    ".graft/receipts/2026-08-15-windows-dogfood-import-timeout.json",
+    "scripts/docs-preview-entry.part01.test.ts"
+  ],
+  "tripwires": [
+    "Hosted Windows cold tsx import completed in 16.147 seconds against a 15-second test timeout",
+    "The same test passed locally and on Ubuntu; product code and subprocess behavior were not changed"
+  ]
+}

@@ -68,12 +68,4 @@ describe('DX-030 boundary-aware pointer selection and copy contract', () => {
     expect(cycle).toContain('Terminal-native selection remains a host fallback');
     expect(cycle).toContain('selection should never steal a gesture');
   });
-
-  it('updates v6 lane and DX legend pointers', () => {
-    const lane = readRepoFile('docs/method/backlog/v6.0.0/README.md');
-    const legend = readRepoFile('docs/legends/DX-developer-experience.md');
-
-    expect(lane).toContain('[**DX-030**](../../../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md)');
-    expect(legend).toContain('[DX-030 — Add Boundary-Aware Pointer Selection And Copy](../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md)');
-  });
 });

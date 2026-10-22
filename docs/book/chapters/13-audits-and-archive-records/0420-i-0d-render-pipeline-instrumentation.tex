@@ -1,0 +1,32 @@
+\chapter{I-0d --- Per-stage render pipeline instrumentation (buried 2026-04-09)}\label{record-420}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/graveyard/I-0d-render-pipeline-instrumentation.md}\par}\smallskip
+
+\textbf{Original scope:} add per-stage timing + allocation counters to the render pipeline (Layout, Paint, Diff, Output), plus counters for suspected hot int↔string conversions (parseHex, String.fromCharCode, String.fromCodePoint, template-literal SGR, Map.get hits on sgrCache). Gated behind an env var (\texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}P\allowbreak{}E\allowbreak{}R\allowbreak{}F\allowbreak{}=\allowbreak{}1}) so normal runs pay no cost. The plan was to use this instrumentation to identify the specific hot paths behind the broad RE-008 regression.
+
+\textbf{Why buried:} task I-0e (investigate RE-008 broad slowdown) completed its investigation without needing general pipeline instrumentation. A targeted 3-scenario A/B/C bench comparison was enough to prove the hypothesis empirically:
+
+\begin{CodeBlock}
+paint-rgb-fixed   145 µs  (11.4 ns/cell) — setRGB, no hex parsing
+paint-ascii       231 µs  (18.1 ns/cell) — set({char}), no colors
+paint-set-hex-palette   624 µs  (48.9 ns/cell) — set({char, fg, bg}) with hex
+\end{CodeBlock}
+
+The delta between paint-set-hex-palette and paint-rgb-fixed is \textbf{482 µs per frame of pure hex parsing overhead} --- which is 77\% of paint-set-hex-palette's total frame time. That was sufficient to confirm the hypothesis (per-cell hex parsing in \texttt{i\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}x\allowbreak{}R\allowbreak{}G\allowbreak{}B}) and point directly at the fix (pre-parse theme token colors at theme load time, see \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}).
+
+General pipeline instrumentation would have been more work for less signal than the targeted scenario comparison, and the investigation is already closed.
+
+\textbf{What lives on:} if a future perf issue can't be isolated with targeted scenarios, pipeline instrumentation remains a valid tool. Exhume this task then. The idea isn't wrong --- it was just unnecessary for this particular investigation.
+
+\textbf{Cross-references:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- the RE-017 cycle log including the 2026-04-09 I-0e investigation result entry.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}8\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}a\allowbreak{}s\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}n\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}f\allowbreak{}g\allowbreak{}-\allowbreak{}b\allowbreak{}g\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- the root-cause smell the investigation confirmed.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} --- the fix direction.
+\end{itemize}
+

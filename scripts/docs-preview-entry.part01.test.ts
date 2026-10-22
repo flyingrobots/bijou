@@ -88,7 +88,7 @@ describe('docs preview app', () => {
         stdio: 'pipe',
       },
     );
-  }, 15_000);
+  }, 30_000);
 });
 
 describe('docs preview app', () => {

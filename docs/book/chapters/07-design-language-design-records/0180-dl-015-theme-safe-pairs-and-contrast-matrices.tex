@@ -1,0 +1,248 @@
+\chapter{DL-015 Theme safe pairs and contrast matrices}\label{record-180}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-015-theme-safe-pairs-and-contrast-matrices.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DL-015 Theme safe pairs and contrast matrices
+legend: DL
+lane: cool-ideas
+priority: medium
+github_issue: 314
+keywords:
+  - design-language
+  - themes
+  - tokens
+  - contrast
+  - accessibility
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-180-decision-summary}
+
+Theme contrast should be declared as a reusable design-system contract, not as one-off test loops.
+
+Safe pairs name which foreground token paths are expected to be readable on which background token paths. The contract feeds \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})}, DOGFOOD theme tests, future Theme Inspector swatches, and lower-mode accessibility reports.
+
+The first runtime shape is intentionally compact:
+
+\begin{CodeBlock}
+const pairs = defineThemeSafePairs()
+  .readable('semantic.primary', 'surface.primary.bg')
+  .status('status.error', 'surface.overlay.bg')
+  .chrome('ui.cursor', 'surface.secondary.bg')
+  .build();
+\end{CodeBlock}
+
+Safe-pair background paths may target a token foreground, such as \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}, or a token background slot, such as \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}.
+
+\section{Sponsored Human}\label{record-180-sponsored-human}
+
+A designer-engineer wants DogFood and first-party themes to prove readable foreground/background combinations so that theme retuning is a design exercise instead of a screenshot guessing game.
+
+\section{Sponsored Agent}\label{record-180-sponsored-agent}
+
+An agent auditing a theme wants a stable matrix of safe token pairs so it can identify whether a low-contrast failure is a broken theme value, a missing token, or an unsupported pair that should not have been used by the component.
+
+\section{Hill}\label{record-180-hill}
+
+Bijou can declare safe token pairs once, run the same contrast contract through \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})}, and reuse the resulting pair matrix in DOGFOOD and future Theme Inspector UX.
+
+\section{Playback Questions}\label{record-180-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a safe pair target \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}*\allowbreak{}.\allowbreak{}b\allowbreak{}g} instead of only token foregrounds?
+\item
+  Does the safe-pair builder reject duplicate foreground/background declarations?
+\item
+  Can \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} validate a safe-pair matrix without bespoke test code?
+\item
+  Does DogFood publish its readable/status/chrome pair matrix from the theme module rather than hiding it in tests?
+\item
+  Can Theme Inspector later display the same pair facts without inventing a second contrast registry?
+\end{enumerate}
+
+\section{Scope}\label{record-180-scope}
+
+This slice includes:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} as a fluent builder for safe-pair declarations
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e} pair classifications
+\item
+  support for \texttt{.\allowbreak{}b\allowbreak{}g} color-slot paths in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} contrast pairs
+\item
+  DOGFOOD dark/light shell pair contracts
+\item
+  focused tests proving the contract and DogFood usage
+\end{itemize}
+
+\section{Non-Goals}\label{record-180-non-goals}
+
+This slice does not implement the Theme Inspector drawer, retune the global default theme values, or replace the legacy single-mode \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} interface. Those are separate follow-on slices.
+
+\section{Safe-Pair Vocabulary}\label{record-180-safe-pair-vocabulary}
+
+\texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e} pairs are ordinary text and component foregrounds that must stay legible on a surface.
+
+\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} pairs are process, health, timeline, or object-state foregrounds that must stay legible when rendered on a surface.
+
+\texttt{c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e} pairs are shell/runtime affordances such as cursor and focus chrome that must remain recognizable on app surfaces.
+
+The kind is not decorative metadata. Future inspectors and reports can group failures by kind so a theme author can distinguish typography problems from status-color problems.
+
+\section{Runtime Contract}\label{record-180-runtime-contract}
+
+\texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} returns a pure builder. Chained calls accumulate immutable pair declarations. \texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}(\allowbreak{})} returns a frozen array of frozen pair objects compatible with \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r}.
+
+Duplicate foreground/background pairs are rejected because duplicate pair rows make reports and inspectors ambiguous.
+
+\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} resolves contrast pair paths through concrete token color slots:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} resolves to the token foreground color.
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} resolves to the surface token foreground color.
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g} resolves to the surface token background color.
+\end{itemize}
+
+Missing paths remain errors. Invalid colors remain invalid-color issues from the normal token scan.
+
+\section{DOGFOOD Matrix}\label{record-180-dogfood-matrix}
+
+DogFood declares its safe-pair matrix beside its shell themes.
+
+Readable foregrounds:
+
+\begin{CodeBlock}
+semantic.primary
+semantic.muted
+semantic.accent
+semantic.info
+semantic.success
+semantic.warning
+semantic.error
+\end{CodeBlock}
+
+Status foregrounds:
+
+\begin{CodeBlock}
+status.active
+status.pending
+\end{CodeBlock}
+
+Chrome foregrounds:
+
+\begin{CodeBlock}
+ui.cursor
+\end{CodeBlock}
+
+Background slots:
+
+\begin{CodeBlock}
+surface.primary.bg
+surface.secondary.bg
+surface.elevated.bg
+surface.overlay.bg
+surface.muted.bg
+\end{CodeBlock}
+
+That matrix intentionally proves the dense docs shell before broader component retokenization. Additional first-party pairs should be added only when a component needs them as a real contract.
+
+\section{Accessibility / Assistive Reading Posture}\label{record-180-accessibility-assistive-reading-posture}
+
+Safe-pair checks do not make color sufficient as the only meaning carrier. They prove that color, when present, remains readable. The same components still need text, symbols, structure, or state labels that survive no-color, pipe, and accessible output modes.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-180-agent-inspectability-explainability-posture}
+
+A future inspector can group safe-pair facts by pair kind:
+
+\begin{CodeBlock}
+readable semantic.primary on surface.primary.bg: pass 15.20
+status status.pending on surface.overlay.bg: pass 8.40
+chrome ui.cursor on surface.secondary.bg: pass 7.10
+\end{CodeBlock}
+
+If the renderer later preserves per-cell token provenance, an agent can compare the token pair actually used by a cell against the declared safe-pair matrix.
+
+\section{Localization / Directionality Posture}\label{record-180-localization-directionality-posture}
+
+No localized strings are introduced by this design. Token paths and pair kinds are stable developer identifiers and must not encode locale-specific prose or physical direction.
+
+\section{Linked Invariants}\label{record-180-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}: safe pairs are only useful when \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} proves them from concrete theme values.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: contrast is necessary, but color is not the only meaning carrier.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are The Spec}: the pair builder and DogFood matrix land through focused runtime tests.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are The Demo}: DOGFOOD consumes the same pair contract the docs describe.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-180-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} as a public builder that emits immutable \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{c\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}e} pair declarations.
+\item
+  Extend \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} so contrast pair paths can resolve token foreground colors and token background slots such as \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}.
+\item
+  Export DOGFOOD's dark/light safe-pair matrix beside its shell themes.
+\item
+  Move DOGFOOD contrast tests to consume the exported pair matrix.
+\item
+  Update design-system docs, roadmap tests, and release notes so future Theme Inspector work can reuse the same pair contract.
+\end{enumerate}
+
+\section{Acceptance Criteria}\label{record-180-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} builds immutable safe-pair declarations.
+\item
+  Duplicate foreground/background declarations fail deterministically.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} validates \texttt{.\allowbreak{}b\allowbreak{}g} color-slot paths in contrast pairs.
+\item
+  DOGFOOD exports \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E\allowbreak{}\_\allowbreak{}S\allowbreak{}A\allowbreak{}F\allowbreak{}E\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}I\allowbreak{}R\allowbreak{}S} from its shell theme module.
+\item
+  DOGFOOD dark/light tests validate themes through the exported safe-pair contract.
+\item
+  The roadmap links issue \#314 under Design Tokens And Theme Modes.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-180-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Core theme doctor test for \texttt{.\allowbreak{}b\allowbreak{}g} safe-pair validation.
+\item
+  Core safe-pair builder duplicate rejection test.
+\item
+  DOGFOOD preview test that calls \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} with \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E\allowbreak{}\_\allowbreak{}S\allowbreak{}A\allowbreak{}F\allowbreak{}E\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}I\allowbreak{}R\allowbreak{}S}.
+\item
+  Roadmap/spec regression that \#314 remains linked to DL-013 planning.
+\end{itemize}
+
+\section{Retrospective}\label{record-180-retrospective}
+
+The important shape is the reusable contract. DogFood's earlier contrast proof was correct, but the pair list was trapped inside tests. This slice turns those pairs into design-system data so the next retuning pass can change colors with objective proof.
+

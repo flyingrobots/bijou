@@ -77,6 +77,9 @@ export function runReleaseMetadata(argv: readonly string[], io: ReleaseCommandIO
   }
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+// Kept so this module stays directly runnable. `resolve()` matters: without it a
+// relative invocation such as `tsx ./scripts/release-metadata.part04.ts` compares
+// an absolute path against a relative one and silently does nothing.
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   process.exitCode = runReleaseMetadata(process.argv.slice(2));
 }

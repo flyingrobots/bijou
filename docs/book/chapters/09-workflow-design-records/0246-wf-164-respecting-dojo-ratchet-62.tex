@@ -1,0 +1,244 @@
+\chapter{WF-164 Respecting the Dojo Ratchet 62}\label{record-246}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-164-respecting-dojo-ratchet-62.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor Human}\label{record-246-sponsor-human}
+
+James Ross.
+
+\section{Sponsor Agent}\label{record-246-sponsor-agent}
+
+Codex.
+
+\section{Decision Summary}\label{record-246-decision-summary}
+
+Complete issue \href{https://github.com/flyingrobots/bijou/issues/477}{\#477} by removing the second \texttt{2\allowbreak{}5}-violation tranche from the \texttt{1\allowbreak{}1\allowbreak{}2} Code Dojo checkpoint and lowering the encoded aggregate ceiling to \texttt{6\allowbreak{}2}.
+
+This is the explicit structural prerequisite for the bounded Profunctor Page inspection story \href{https://github.com/flyingrobots/bijou/issues/468}{\#468}.
+
+\section{Hill}\label{record-246-hill}
+
+DX-050 tranche A lowered measured debt from \texttt{1\allowbreak{}1\allowbreak{}2} to \texttt{8\allowbreak{}7}, but the encoded ceiling deliberately remained at \texttt{1\allowbreak{}1\allowbreak{}2} because the repo goalpost policy requires one completed checkpoint to remove at least \texttt{5\allowbreak{}0} violations. Tranche B must remove \texttt{2\allowbreak{}5} additional counted violations without converting mechanical module boundaries into new import cycles, API drift, or top-level ordering bugs.
+
+Ledger edits are evidence after implementation. They are not the implementation.
+
+\section{Current Truth}\label{record-246-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt before tranche B: \texttt{8\allowbreak{}7}
+\item
+  File/context baseline before tranche B: \texttt{6\allowbreak{}1}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline before tranche B: \texttt{2\allowbreak{}6}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Required target: \texttt{6\allowbreak{}2} aggregate violations or lower
+\item
+  Tracker issue: \href{https://github.com/flyingrobots/bijou/issues/477}{\#477}
+\item
+  Downstream issue: \href{https://github.com/flyingrobots/bijou/issues/468}{\#468}
+\end{itemize}
+
+\section{Result}\label{record-246-result}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt: \texttt{6\allowbreak{}2}
+\item
+  File/context baseline: \texttt{3\allowbreak{}7}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline: \texttt{2\allowbreak{}5}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Removed tranche-B debt: \texttt{2\allowbreak{}5} of the required \texttt{2\allowbreak{}5} violations
+\item
+  Removed combined DX-050 debt: \texttt{5\allowbreak{}0} of the required \texttt{5\allowbreak{}0} violations
+\item
+  Next goalpost target: \texttt{1\allowbreak{}2} aggregate violations or lower
+\end{itemize}
+
+Twenty-four pre-existing oversized entrypoints are stable facades over focused modules. \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} leaves both the file/context and code-size ledgers, accounting for the twenty-fifth counted violation. No threshold, exception marker, public export, or runtime-cycle allowance changed.
+
+\section{Scope}\label{record-246-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Select \texttt{2\allowbreak{}4} pre-existing file/context offenders with bounded top-level responsibilities and existing regression coverage.
+\item
+  Preserve every selected public entrypoint as a compatibility facade.
+\item
+  Keep TypeScript overload families in one implementation module.
+\item
+  Reject extraction candidates whose mutable module state cannot cross a standard ECMAScript module boundary safely.
+\item
+  Remove \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} from the code-size baseline after its focused modules pass the live size gate.
+\item
+  Lower \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} \texttt{c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}x} to \texttt{6\allowbreak{}2}.
+\item
+  Update the exception ledger, changelog, roadmap, bearing, and current tests.
+\end{itemize}
+
+\section{Non-Goals}\label{record-246-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No public API redesign.
+\item
+  No product behavior change.
+\item
+  No Profunctor Page adapter implementation.
+\item
+  No release tag or publication.
+\item
+  No new standards exception or large-file marker.
+\item
+  No weakened threshold, skipped gate, or aspirational ledger edit.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-246-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Bind the exact tranche-B root set in a deterministic regression.
+\item
+  Split declarations along dependency-aware top-level boundaries.
+\item
+  Keep overload declarations and implementations co-located.
+\item
+  Preserve public import paths through typed re-export facades.
+\item
+  Run focused typecheck, lint, behavior, size, and runtime-cycle checks.
+\item
+  Remove ledger entries only after every extracted file satisfies the live thresholds.
+\item
+  Ratchet the package ceiling and documentation to the measured result.
+\item
+  Run the full repository gate before review.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-246-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Assert that the exact \texttt{2\allowbreak{}4} roots leave the file/context ledger.
+\item
+  Assert that \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} leaves the code-size ledger.
+\item
+  Assert that every extracted production module is at most \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Assert that no tranche-B module participates in a repository runtime import cycle.
+\item
+  Preserve focused behavioral tests for every touched public entrypoint.
+\end{itemize}
+
+\section{Validation Plan}\label{record-246-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}0\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}0\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}:\allowbreak{}r\allowbreak{}u\allowbreak{}n}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-246-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt is exactly \texttt{6\allowbreak{}2}.
+\item
+  File/context and code-size ledgers match measured live files.
+\item
+  Mock-ban and ESLint baselines remain \texttt{0}.
+\item
+  Every selected public entrypoint preserves its export names.
+\item
+  No extracted module participates in a runtime import cycle.
+\item
+  No newly created file exceeds \texttt{1\allowbreak{}5\allowbreak{}0} lines or \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Full local and GitHub validation gates pass.
+\item
+  Main at the resulting merge revision unblocks issue \#468.
+\end{itemize}
+
+\section{Playback Questions}\label{record-246-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did combined DX-050 work remove all \texttt{5\allowbreak{}0} required violations?
+\item
+  Does every removed ledger entry correspond to a measured file reduction?
+\item
+  Did every compatibility facade preserve its public export names?
+\item
+  Are all split families absent from runtime import cycles?
+\item
+  Is issue \#468 unblocked by merged evidence rather than a local claim?
+\end{enumerate}
+
+\section{Accessibility And Assistive Posture}\label{record-246-accessibility-and-assistive-posture}
+
+This is a structural standards cycle. Extracted modules preserve current text, focus, lower-mode, and assistive semantics. No visual or interaction redesign is in scope.
+
+\section{Localization And Directionality Posture}\label{record-246-localization-and-directionality-posture}
+
+Extracted modules preserve catalog keys, localized values, reading order, and direction-sensitive behavior. Split-source debt identity continues to resolve numbered parts to their canonical root.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-246-agent-inspectability-and-explainability-posture}
+
+The exact target roots, live threshold checks, runtime-cycle proof, aggregate ceiling, and current documentation agree. A successor can identify inherited facades and focused implementation parts without reconstructing the tranche from commit history.
+
+\section{Linked Invariants}\label{record-246-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/typescript-code-standards.editors-edition.md}{TypeScript Code Standards}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/code-dojo-exceptions.md}{Code Dojo Exceptions}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/METHOD.md}{Work Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOCUMENTATION_STANDARDS.md}{Documentation Standards}
+\item
+  Tracker issue: \href{https://github.com/flyingrobots/bijou/issues/477}{\#477}
+\end{itemize}
+
+\section{Retrospective And Closeout}\label{record-246-retrospective-and-closeout}
+
+The cycle removes exactly \texttt{2\allowbreak{}4} file/context entries and one code-size entry. Dependency-aware extraction rejected a Node entrypoint whose mutable initialization guard could not be assigned safely through an imported binding. TypeScript overload families were kept co-located after the first focused typecheck exposed their boundary requirement. The final \texttt{6\allowbreak{}2} count completes the \texttt{1\allowbreak{}1\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}6\allowbreak{}2} goalpost, keeps the review at \texttt{1\allowbreak{}3\allowbreak{}9} changed paths under the repository's \texttt{1\allowbreak{}4\allowbreak{}0}-path boundary, and makes \texttt{1\allowbreak{}2} the next policy target.
+

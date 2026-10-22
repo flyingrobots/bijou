@@ -6,8 +6,6 @@ export interface ReleaseReadinessStep {
   readonly args: readonly string[];
 }
 export interface ReleaseReadinessDocsSnapshot {
-  readonly roadmap: string;
-  readonly bearing: string;
   readonly changelog: string;
   readonly releaseGuide: string;
   readonly releasePacketExists: boolean;

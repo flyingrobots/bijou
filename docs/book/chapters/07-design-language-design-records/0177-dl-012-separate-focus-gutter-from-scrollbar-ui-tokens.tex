@@ -1,0 +1,120 @@
+\chapter{DL-012 Separate focus gutter chrome from scrollbar UI tokens}\label{record-177}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Date}\label{record-177-date}
+
+2026-05-16
+
+\section{Sponsor human}\label{record-177-sponsor-human}
+
+A Bijou app author tuning a framed shell theme who needs focused pane chrome to be themed separately from scrollbars and local accent affordances.
+
+\section{Sponsor agent}\label{record-177-sponsor-agent}
+
+An agent auditing theme usage in DOGFOOD and first-party frame components that must explain why a pane gutter, scrollbar thumb, and local active item are not all the same semantic token.
+
+\section{Hill}\label{record-177-hill}
+
+Focused pane gutters use a dedicated built-in \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} token, while scrollbars stay on \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b} / \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k} and component-local active emphasis stays on \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}.
+
+\section{Description}\label{record-177-description}
+
+DOGFOOD exposed a vocabulary gap in the built-in theme contract. Focused pane gutters are reusable shell chrome, but they were still effectively treated as accent-colored geometry. Scrollbars already had named \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b} and \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k} tokens, so focus chrome and scroll chrome could drift together visually without any explicit semantic separation.
+
+The fix belongs in the token system and first-party defaults, not in one-off app palette tweaks.
+
+\section{Decision}\label{record-177-decision}
+
+Add \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} to the built-in UI token vocabulary.
+
+The first-party defaults are:
+
+\begin{itemize}
+\tightlist
+\item
+  focused pane gutter: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}
+\item
+  unfocused pane gutter: \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  scrollbar thumb: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b}
+\item
+  scrollbar track: \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  local active/focused affordance inside a component: \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+\texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}T\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n} remains a per-pane escape hatch for deliberate shell variants, but the stock focus-area and framed-app path should not require it for ordinary focused pane chrome.
+
+\section{Playback questions}\label{record-177-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does \texttt{B\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}U\allowbreak{}i\allowbreak{}K\allowbreak{}e\allowbreak{}y} include \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}?
+\item
+  Do all built-in presets and shipped JSON themes define \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}?
+\item
+  Does \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})} use \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}u\allowbreak{}i\allowbreak{}(\allowbreak{}'\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}'\allowbreak{})} for the default focused gutter instead of \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}?
+\item
+  Do surface-rendered scrollbars use \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}u\allowbreak{}i\allowbreak{}(\allowbreak{}'\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}'\allowbreak{})} and \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}u\allowbreak{}i\allowbreak{}(\allowbreak{}'\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}'\allowbreak{})} by default?
+\item
+  Does DOGFOOD publish focus gutter color through its shell theme instead of only through pane-local ad hoc tokens?
+\item
+  Do theme authoring docs explain when to use \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} versus \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-177-accessibility-assistive-reading-posture}
+
+No new accessible output is added. The change improves semantic clarity in the theme graph so future accessible inspectors can name focused shell chrome as shell chrome rather than generic accent usage.
+
+\section{Localization / directionality posture}\label{record-177-localization-directionality-posture}
+
+No localized text or directionality behavior changes. The token name is logical and does not imply left/right placement.
+
+\section{Agent inspectability / explainability posture}\label{record-177-agent-inspectability-explainability-posture}
+
+Theme inspectors and future Storybook-like tooling can now report \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} as a first-class shell token. That makes pane focus chrome auditable without reverse-engineering whether a component happened to borrow \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}.
+
+\section{Implementation outline}\label{record-177-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} to the built-in \texttt{B\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}U\allowbreak{}i\allowbreak{}K\allowbreak{}e\allowbreak{}y} vocabulary.
+\item
+  Add the token to presets, DTCG conversion, shipped JSON themes, and test fixtures.
+\item
+  Update focus-area defaults for focused gutters and scrollbar cells.
+\item
+  Move DOGFOOD shell themes onto \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} for focused pane chrome.
+\item
+  Update theme authoring and token-vocabulary docs.
+\end{enumerate}
+
+\section{Tests / validation}\label{record-177-tests-validation}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}t\allowbreak{}c\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}t\allowbreak{}c\allowbreak{}g\allowbreak{}.\allowbreak{}f\allowbreak{}u\allowbreak{}z\allowbreak{}z\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+\section{Retrospective}\label{record-177-retrospective}
+
+Closed by adding \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r} to the built-in theme contract, updating first-party focus-area defaults to consume shell UI tokens, and moving DOGFOOD focused gutter styling into its shell theme vocabulary.
+

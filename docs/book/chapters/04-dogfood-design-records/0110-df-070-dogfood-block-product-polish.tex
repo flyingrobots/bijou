@@ -1,0 +1,107 @@
+\chapter{DF-070 - DOGFOOD Block Product Polish}\label{record-110}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-070-dogfood-block-product-polish.md}\par}\smallskip
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD Field Guide}
+
+\section{Sponsor Human}\label{record-110-sponsor-human}
+
+DOGFOOD should stop feeling like a contract debugger for Blocks and start feeling like a terminal product authored from Blocks.
+
+\section{Sponsor Agent}\label{record-110-sponsor-agent}
+
+An agent should be able to inspect DOGFOOD and see that semantic Blocks own the major product surfaces, while prose, navigation, preview, and settings behavior remain observable through tests instead of hand-audited screenshots.
+
+\section{Hill}\label{record-110-hill}
+
+DOGFOOD moves from ``Blocks are documented here'' toward ``DOGFOOD is materially built from Blocks.'' The first proof is product polish: word-aware prose wrapping, block-owned documentation and navigation surfaces, block-owned inspector/settings surfaces, and block/story preview parity without inventing new provider, lifecycle, localization, or callback rules.
+
+\section{Core Rule}\label{record-110-core-rule}
+
+Rendered DOGFOOD polish must consume existing contracts.
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  prose wrapping belongs at text/prose boundaries, not arbitrary surface clipping
+\item
+  Blocks own semantic product regions
+\item
+  components remain the leaf rendering vocabulary
+\item
+  localization goes through the localization port
+\item
+  data flow stays unidirectional
+\item
+  story and block previews should share the same shell assumptions
+\end{itemize}
+
+\section{Ten-Slice Plan}\label{record-110-ten-slice-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Refresh BEARING and cycle truth after DF-069 and DX-035 merged.
+\item
+  Add word-boundary prose wrapping behavior.
+\item
+  Route DOGFOOD prose surfaces through the word-aware wrapper.
+\item
+  Move \texttt{D\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} onto the real DOGFOOD article render path.
+\item
+  Move \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} onto the real DOGFOOD navigation render path.
+\item
+  Move \texttt{G\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} onto the real DOGFOOD inspector render path.
+\item
+  Move \texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}M\allowbreak{}e\allowbreak{}n\allowbreak{}u\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} onto the real DOGFOOD settings surface.
+\item
+  Persist DOGFOOD's selected locale behind the existing localization boundary.
+\item
+  Expand localization catalog coverage for the block-authored surfaces touched by this cycle.
+\item
+  Align DOGFOOD Blocks preview and Storybook preview posture so both expose rendered product examples without debug-only wrapper clutter.
+\end{enumerate}
+
+The cycle pauses after slice 5 for drift review before continuing.
+
+\section{Non-Goals}\label{record-110-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  no new provider lifecycle system
+\item
+  no hidden global block registry
+\item
+  no broad visual redesign
+\item
+  no conversion of every leaf component into a Block
+\item
+  no AppFrame rewrite
+\item
+  no localization runtime rewrite
+\item
+  no tests that assert prose documentation wording instead of rendered behavior
+\end{itemize}
+
+\section{Tests To Write First}\label{record-110-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  behavior tests proving prose wrapping breaks at word boundaries where possible
+\item
+  behavior tests proving DOGFOOD article/navigation surfaces use the same rendered output paths their Blocks publish
+\item
+  behavior tests proving block discovery and preview indexing do not execute unrelated render paths
+\item
+  behavior tests proving locale persistence and catalog coverage changes remain behind the localization port
+\end{itemize}
+
+\section{Retrospective}\label{record-110-retrospective}
+
+Not started.
+

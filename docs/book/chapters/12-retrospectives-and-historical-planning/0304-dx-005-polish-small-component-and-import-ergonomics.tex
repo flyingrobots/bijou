@@ -1,0 +1,50 @@
+\chapter{DX-005 --- Polish Small Component and Import Ergonomics}\label{record-304}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/DX-005-polish-small-component-and-import-ergonomics.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-304-idea}
+
+Sweep up the recurring small API papercuts that make Bijou feel fussier than it needs to.
+
+\section{Why}\label{record-304-why}
+
+None of these issues are individually existential, but together they create friction:
+
+\begin{itemize}
+\tightlist
+\item
+  box titles needing manual padding
+\item
+  imports for one conceptual feature split across too many packages
+\item
+  minor public-API rough edges that make common authoring flows feel less polished than the runtime really is
+\end{itemize}
+
+These are good backlog items precisely because users keep encountering them in real app work.
+
+\section{Captured feedback}\label{record-304-captured-feedback}
+
+From \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}p\allowbreak{}-\allowbreak{}t\allowbreak{}t\allowbreak{}d} TUI development:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} title padding required manual spaces
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s} / \texttt{S\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}F\allowbreak{}n} / \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} / \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t} required three imports across package boundaries for one shader function
+\end{itemize}
+
+\section{Likely scope}\label{record-304-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  make boxed-title padding calmer by default or easier to opt into
+\item
+  review re-export strategy for frequently paired shader/canvas types
+\item
+  capture any other low-risk public API polish work that falls out while fixing the above
+\end{itemize}
+

@@ -1,0 +1,141 @@
+\chapter{DF-063 Audit app shell family across real surfaces}\label{record-104}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-063-audit-app-shell-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-063 Audit app shell family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - shell
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-104-framing}
+
+The app shell is the place where page content, global status, command discovery, overlays, and shell-owned chrome meet. \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} owns the high-level shell, while \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} are the smaller seams that make shell state visible without pushing unrelated metadata into page content.
+
+This audit verifies the existing DOGFOOD \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} story against real story rendering, component-family doctrine, and mode-aware lowerings. It does not redesign the framed runtime; it turns current shell story truth into executable release proof.
+
+\section{Sponsored Users}\label{record-104-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors building multi-page framed applications with global status and command discovery.
+\item
+  Docs readers checking how a rich shell lowers when command palettes, status rails, and background interactivity are unavailable.
+\item
+  Maintainers who need one focused regression tying app-shell story metadata, variants, and component-family guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-104-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see the difference between framed page chrome and command-discovery overlay behavior.
+\item
+  A reader can switch both app-shell variants through interactive, static, pipe, and accessible profiles while preserving current page, status, and command-discovery facts.
+\item
+  A maintainer can run one cycle test that proves shell story metadata and design-system guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-104-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the family through the \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} story?
+\item
+  Do variants cover both framed-page status chrome and command-discovery overlay behavior?
+\item
+  Do rich/static previews keep header, footer, page content, and palette geometry visible?
+\item
+  Do pipe lowerings preserve minimal shell context without pretending hidden regions are still interactive?
+\item
+  Do accessible lowerings linearize page, status, and command-discovery facts in reading order?
+\item
+  Do component-family docs still separate shell chrome from page content, notification events, and command execution?
+\end{itemize}
+
+\section{Requirements}\label{record-104-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} story identity and \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} coverage family id.
+\item
+  Render every app-shell story variant in every canonical story profile.
+\item
+  Treat box drawing and status-rail fill characters as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings shell-context-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-104-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}3\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve shell title, current page, status, and command palette intent.
+\item
+  Component-family docs retain framed app, status bar, command palette, shell-state, pipe, and accessible guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-104-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-063 cycle test that renders the \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the app shell section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-104-drift-check}
+
+No runtime drift was found in this slice. The existing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l} story already distinguishes framed page chrome from command discovery, renders structured shell surfaces in interactive/static profiles, and lowers to minimal page/status/palette summaries in pipe/accessibility modes.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-104-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-063 playback test tied app shell behavior to every canonical profile.
+\item
+  GREEN: the new cycle test renders both \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e} and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}y} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve header, footer, page, and command-palette geometry.
+\item
+  Pipe previews preserve current page and shell status without box drawing.
+\item
+  Accessible previews linearize the same shell facts in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-104-retrospective}
+
+The app-shell story did not need runtime changes. The useful release work was proving that shell chrome is shared application truth, not incidental drawing inside a page renderer.
+
