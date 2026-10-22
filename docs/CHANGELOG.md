@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- DOGFOOD smoke failures include a normalized capture tail, limited to 40 lines
+  and 4096 characters, so startup errors show the failing path and stack (#523).
+  Documented the release-line path rule and cross-checked readiness against
+  DOGFOOD for alpha, beta, release-candidate, and stable versions.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

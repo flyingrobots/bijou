@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Issue #523: expose bounded DOGFOOD capture failures and guard release-line agreement",
+  "bytesConsumed": 229851,
+  "filesRead": [
+    "AGENTS.md", "docs/typescript-code-standards.editors-edition.md",
+    "docs/README.md", "docs/CHANGELOG.md", "scripts/smoke-dogfood-lib.part01.ts",
+    "scripts/smoke-dogfood-lib.part02.ts", "scripts/smoke-dogfood-lib.part03.ts",
+    "scripts/smoke-dogfood.test.ts", "scripts/release-readiness.part02.ts",
+    "scripts/release-readiness.part03.ts", "tests/cycles/DX-052/dogfood-release-line-docs.test.ts"
+  ],
+  "filesModified": [
+    "docs/README.md", "docs/CHANGELOG.md", "scripts/smoke-dogfood-lib.part03.ts",
+    "scripts/smoke-dogfood-failure.test.ts", "scripts/release-docs-agreement.test.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Real capture-process startup error and large-output diagnostic tests failed against the original runner; five other cases passed.",
+    "focused": "21 tests across four files passed before adding separate many-short-lines and empty-tail cases; normal checks follow.",
+    "scope": "Actual process captures, normalized failure tail capped by characters and lines, quiet success, real filesystem agreement between DOGFOOD release-line derivation and readiness packet lookup.",
+    "documentation": "Clarified the current rule in the live docs map; historical corpus remains unchanged."
+  }
+}

@@ -52,3 +52,10 @@ The glossary and topic finder support practical lookup.
 
 GitHub issues and milestones own current scope. Historical proposals in the book
 retain their original status. Linear migration still requires a connected team.
+
+Release document paths use the release line: `8.0.0-alpha.1`, `8.0.0-beta.12`,
+`8.0.0-rc.1`, and stable `8.0.0` share `docs/releases/8.0.0/`. The readiness
+milestone is `v8.0.0`; DOGFOOD uses the same directory for its release guides.
+Prereleases keep their exact version in document content, without duplicating
+the directory. Preserved historical documents remain accessible through the
+bounded reading command above.
