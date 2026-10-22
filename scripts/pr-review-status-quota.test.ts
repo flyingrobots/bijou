@@ -66,6 +66,19 @@ describe('quota-skipped CodeRabbit reviews', () => {
     expect(status.activeRateLimitCount).toBe(1);
   });
 
+  it.each([
+    'No actionable comments were generated in the recent review.',
+    '**Actionable comments posted: 2**',
+  ])('does not use edits to an old completion as a new review: %s', (body) => {
+    const oldCompletion = { ...comment(body), updatedAt: newest };
+    const status = summarizeCodeRabbitStatus(passing, [
+      oldCompletion, comment('Review limit reached', later),
+    ], []);
+    expect(status.state).toBe('rate_limited');
+    expect(status.staleRateLimitCount).toBe(0);
+    expect(status.activeRateLimitCount).toBe(1);
+  });
+
   it('preserves a failing check even when a quota notice is present', () => {
     const status = summarizeCodeRabbitStatus(
       { ...passing, bucket: 'fail', state: 'FAILURE' },

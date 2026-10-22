@@ -3,7 +3,7 @@
   "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
   "agent": "bijou-issue-remediation",
   "task": "Issue #539: distinguish active CodeRabbit quota skips from completed review",
-  "bytesConsumed": 549159,
+  "bytesConsumed": 676650,
   "filesRead": [
     "AGENTS.md",
     "docs/typescript-code-standards.editors-edition.md",
@@ -22,7 +22,8 @@
     "scripts/pr-review-status.part07.test.ts",
     "scripts/pr-review-status.part08.test.ts",
     "scripts/pr-review-status-parse.test.ts",
-    "docs/CHANGELOG.md"
+    "docs/CHANGELOG.md",
+    "scripts/pr-review-status-coderabbit-events.ts"
   ],
   "filesModified": [
     "scripts/pr-review-status-coderabbit.ts",
@@ -30,7 +31,8 @@
     "scripts/pr-review-status-queries.ts",
     "scripts/pr-review-status-parse.ts",
     "scripts/pr-review-status-quota.test.ts",
-    "docs/CHANGELOG.md"
+    "docs/CHANGELOG.md",
+    "scripts/pr-review-status-coderabbit-events.ts"
   ],
   "tripwires": [
     "Long-running Graft session reports tool-call tripwire; active user goal authorizes continued issue work and meaningful commentary updates."
@@ -41,7 +43,10 @@
     "live": "Actual GitHub data for #535: status output now reports CodeRabbit: rate-limited; status-mode exit remains 0, merge-ready exit remains 1 for missing 2 human reviews.",
     "readiness": "Regression with two completed human approvals retains pending rate-limited signal and exit 8.",
     "scope": "Old/new quota wording and structured marker; only a later explicit completion comment or submitted review supersedes a notice. Updated comment timestamps preserve edited active notices.",
-    "policy": "Human-review minimums, checks policy, and normal status-mode exit semantics unchanged."
+    "policy": "Human-review minimums, checks policy, and normal status-mode exit semantics unchanged.",
+    "review_red": "Confirmed CodeRabbit additional-comment finding: two regressions failed because editing an old clean/actionable comment incorrectly superseded a newer quota notice.",
+    "review_green": "All 32 review-status tests across 10 files passed with typecheck and ESLint. Completion comments retain createdAt; only quota notices use updatedAt; submitted reviews retain submittedAt.",
+    "module_scope": "Extract event collection/classification into a small module; keep touched files below the 150-line threshold without baseline growth."
   },
   "resource_policy": {
     "worker": "Reused host Node/npm toolchain; no Docker",
