@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The pre-commit version gate validates staged metadata, preserving partial
+  staging while rejecting stale index contents hidden by repaired working files
+  (#526).
+
 - Release version bumps update workspace manifests and lock metadata together,
   refresh npm's cached workspace metadata, and restore the original manifests
   and lock if regeneration fails. Pre-commit and release preflight now reject

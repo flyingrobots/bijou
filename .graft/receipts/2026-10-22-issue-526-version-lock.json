@@ -36,13 +36,16 @@
     "scripts/version-lockfile.mjs",
     "scripts/workspace-lock.test-support.ts",
     "scripts/workspace-lock.test.ts",
-    "scripts/workspace-version-cli.test.ts"
+    "scripts/workspace-version-cli.test.ts",
+    "scripts/check-staged-workspace.ts",
+    "scripts/staged-workspace.test.ts"
   ],
   "tripwires": [],
   "validation": {
     "red": "Five regressions failed on original code: stale lock accepted, malformed/missing lock accepted, release outputs emitted on stale lock, version CLI left stale lock, pre-commit lacked lock diagnostic.",
     "intermediate": "Real npm 11.19.1 retained old workspace versions on plain package-lock-only regeneration; targeted owned metadata refresh repairs this without discarding third-party resolutions.",
-    "green": "30 focused tests passed before adding explicit root-pin cases; full verification follows.",
+    "green": "Initial full pre-push passed 4114 tests across 931 files and all normal gates. Review follow-up passed 21 focused tests across three files; new full verification follows.",
+    "review_fix": "CodeRabbit identified that working-tree validation could miss a stale index. The hook now validates immutable staged metadata blobs in an owned temporary snapshot, preserves partial staging, honors GIT_INDEX_FILE, and cleans the snapshot. Real Git/process regressions cover repaired working copies, deleted indexed lock, manifest mismatch, unchanged index/worktree, and alternate index.",
     "full_workspace_rehearsal": {
       "packages": 11,
       "version": "8.0.0",

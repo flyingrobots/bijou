@@ -62,10 +62,23 @@ export function patchLockedPackage(root: string, key: string, patch: Record<stri
 export function prepareHook(root: string): string {
   mkdirSync(join(root, 'scripts'));
   for (const name of ['release-metadata', 'release-metadata.part01', 'release-metadata.part02',
-    'release-metadata.part03', 'release-metadata.part04', 'release-lockfile']) {
+    'release-metadata.part03', 'release-metadata.part04', 'release-lockfile', 'check-staged-workspace']) {
     const source = join(REPO, 'scripts', `${name}.ts`);
     if (existsSync(source)) copyFileSync(source, join(root, 'scripts', `${name}.ts`));
   }
   symlinkSync(join(REPO, 'node_modules'), join(root, 'node_modules'), 'junction');
+  fixtureGit(root, ['init', '--quiet']);
+  fixtureGit(root, ['add', '--', 'package.json', 'package-lock.json', 'packages', 'bench']);
   return join(REPO, 'scripts/hooks/pre-commit');
+}
+
+export function fixtureGit(root: string, args: readonly string[]): string {
+  const env = { ...process.env };
+  delete env['GIT_DIR'];
+  delete env['GIT_WORK_TREE'];
+  delete env['GIT_COMMON_DIR'];
+  delete env['GIT_INDEX_FILE'];
+  const result = spawnSync('git', ['-C', root, ...args], { env, encoding: 'utf8', timeout: 10_000 });
+  if (result.status !== 0) throw new Error(result.stderr || 'Fixture Git command failed');
+  return result.stdout;
 }
