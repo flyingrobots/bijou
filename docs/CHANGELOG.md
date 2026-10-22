@@ -6,6 +6,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- MCP hyperlinks now honor the selected plain-text fallback in text and
+  structured rendered output, preserving Unicode layout in other tools (#545).
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

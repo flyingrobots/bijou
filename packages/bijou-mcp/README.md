@@ -93,7 +93,7 @@ Or point directly at a local checkout:
 | Tool | What it renders |
 | --- | --- |
 | `bijou_kbd` | Keyboard key indicator |
-| `bijou_hyperlink` | Terminal hyperlink (OSC 8) |
+| `bijou_hyperlink` | Plain link text and URL, with configurable fallback |
 | `bijou_skeleton` | Placeholder loading block |
 | `bijou_docs` | Machine-readable docs for the MCP surface plus the full first-party component-family field guide |
 
@@ -156,6 +156,12 @@ renders correctly in any monospace context.
 
 Each tool accepts structured JSON input, renders via the corresponding
 Bijou component, and returns the result as a plain text string.
+
+`bijou_hyperlink` uses the component's plain-text fallback rather than OSC 8
+terminal controls: `both` (default) returns `text (url)`, `text` returns only
+the label, and `url` returns only the target. This also applies to the
+`structuredContent.rendered` field; the semantic payload keeps the original
+text and URL.
 
 All tools also accept an optional `output` field:
 

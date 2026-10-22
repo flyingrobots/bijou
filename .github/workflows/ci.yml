@@ -155,6 +155,8 @@ jobs:
           packages/bijou-node/src/index.part02.test.ts
           packages/bijou-node/src/index.part03.test.ts
           packages/bijou-node/src/index.part04.test.ts
+          packages/bijou-mcp/src/tools/hyperlink.test.ts
+          packages/bijou-mcp/src/hyperlink-stdio.test.ts
           scripts/check-node-version.test.ts
           scripts/docs-preview-components.part01.test.ts
           scripts/docs-preview-components.part02.test.ts
