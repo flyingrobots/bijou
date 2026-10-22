@@ -580,6 +580,8 @@ interface GeordiNativeBijouCellsReceipt {
   readonly input: {
     readonly packedReceiptVersion: 'packed-bijou-cells/1';
     readonly cellFormatId: 'bijou-packed-cell-u8x10-le/1';
+    readonly canonicalizationId: 'jcs-rfc8785-sha256/1';
+    readonly packedReceiptHash: string;
     readonly sceneHash: string;
     readonly cellBytesHash: string;
     readonly sideTableHash: string;
@@ -612,6 +614,28 @@ interface GeordiNativeBijouCellsReceipt {
   readonly nonclaims: readonly string[];
 }
 ```
+
+### Complete Input Identity
+
+`packedReceiptHash` is the lowercase SHA-256 digest of the UTF-8
+[RFC 8785 JCS](https://www.rfc-editor.org/rfc/rfc8785) serialization of the
+entire validated `PackedBijouCellsReceipt`. Preserve every array's order and
+every string's Unicode sequence; do not normalize graphemes. Reject duplicate
+JSON keys and invalid Unicode before hashing. This is a proposed Geordi intake
+identity rule, not a change to Bijou's existing receipt or validator.
+
+The hashed object includes `receiptVersion`, `widthCells`, `heightCells`,
+`cellFormatId`, `glyphPolicyId`, `bytes`, `sideTable`, all of `scene`
+(`sceneVersion`, `sceneHash`, `nodeIds`, `cellNodeIds`), all of `focus`
+(`focusedNodeId`, `focusableNodeIds`), and all of `chroma`. The separate hashes
+are diagnostic conveniences; `sceneHash` alone does not authenticate ownership
+or focus metadata. Consumers recompute the complete digest after validation.
+
+Conformance must mutate each field independently, including a valid change to
+cell ownership or focus with unchanged bytes and `sceneHash`: the complete
+digest must change. Reordering object keys must retain the digest. Both
+languages must agree on committed JCS bytes and digest vectors before intake
+can claim conformance.
 
 The exact GPU adapter and device description may be useful diagnostic facts but
 must not become a stable semantic identifier unless the target profile says so.
