@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { afterEach, describe, expect, it } from 'vitest';
 import { runReleaseMetadata, validateWorkspaceVersion } from './release-metadata.js';
 import { readJsonObject } from './release-metadata.part01.js';
-import { cleanupWorkspaces, makeLockedWorkspace, patchLockedPackage, prepareHook, writeJson } from './workspace-lock.test-support.js';
+import { cleanupWorkspaces, fixtureEnvironment, makeLockedWorkspace, patchLockedPackage, prepareHook, writeJson } from './workspace-lock.test-support.js';
 
 afterEach(cleanupWorkspaces);
 
@@ -73,7 +73,7 @@ describe('workspace lock-step contract', () => {
   it('fails the actual pre-commit hook with a lock-specific diagnostic', () => {
     const root = makeLockedWorkspace();
     writeJson(root, 'package-lock.json', { lockfileVersion: 3, packages: {} });
-    const result = spawnSync('bash', [prepareHook(root)], { cwd: root, encoding: 'utf8', timeout: 30_000 });
+    const result = spawnSync('bash', [prepareHook(root)], { cwd: root, env: fixtureEnvironment(), encoding: 'utf8', timeout: 30_000 });
     expect(result.status).not.toBe(0);
     expect(result.stdout + result.stderr).toContain('package-lock.json');
   });

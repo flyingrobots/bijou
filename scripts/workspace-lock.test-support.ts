@@ -73,12 +73,16 @@ export function prepareHook(root: string): string {
 }
 
 export function fixtureGit(root: string, args: readonly string[]): string {
+  const result = spawnSync('git', ['-C', root, ...args], { env: fixtureEnvironment(), encoding: 'utf8', timeout: 10_000 });
+  if (result.status !== 0) throw new Error(result.stderr || 'Fixture Git command failed');
+  return result.stdout;
+}
+
+export function fixtureEnvironment(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   const env = { ...process.env };
   delete env['GIT_DIR'];
   delete env['GIT_WORK_TREE'];
   delete env['GIT_COMMON_DIR'];
   delete env['GIT_INDEX_FILE'];
-  const result = spawnSync('git', ['-C', root, ...args], { env, encoding: 'utf8', timeout: 10_000 });
-  if (result.status !== 0) throw new Error(result.stderr || 'Fixture Git command failed');
-  return result.stdout;
+  return { ...env, ...overrides };
 }

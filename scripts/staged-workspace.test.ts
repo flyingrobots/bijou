@@ -2,14 +2,14 @@ import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanupWorkspaces, fixtureGit, makeLockedWorkspace, patchLockedPackage, prepareHook } from './workspace-lock.test-support.js';
+import { cleanupWorkspaces, fixtureEnvironment, fixtureGit, makeLockedWorkspace, patchLockedPackage, prepareHook } from './workspace-lock.test-support.js';
 
 afterEach(cleanupWorkspaces);
 
 function runCheck(root: string, script = 'check-staged-workspace.ts', env: NodeJS.ProcessEnv = {}) {
   return spawnSync(process.execPath, ['--import', 'tsx', `scripts/${script}`,
     ...(script === 'release-metadata.ts' ? ['--current-version'] : [])], {
-    cwd: root, encoding: 'utf8', timeout: 15_000, env: { ...process.env, ...env },
+    cwd: root, encoding: 'utf8', timeout: 15_000, env: fixtureEnvironment(env),
   });
 }
 
@@ -23,7 +23,7 @@ describe('pre-commit validates the index metadata', () => {
     writeFileSync(lock, good);
     const working = runCheck(root, 'release-metadata.ts');
     expect(working.status, working.stdout + working.stderr).toBe(0);
-    const result = spawnSync('bash', [hook], { cwd: root, encoding: 'utf8', timeout: 15_000 });
+    const result = spawnSync('bash', [hook], { cwd: root, env: fixtureEnvironment(), encoding: 'utf8', timeout: 15_000 });
     expect(result.status).not.toBe(0);
     expect(result.stdout + result.stderr).toContain('package-lock.json packages/core version (0.9.0)');
   });

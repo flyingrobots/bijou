@@ -46,6 +46,7 @@
     "intermediate": "Real npm 11.19.1 retained old workspace versions on plain package-lock-only regeneration; targeted owned metadata refresh repairs this without discarding third-party resolutions.",
     "green": "Initial full pre-push passed 4114 tests across 931 files and all normal gates. Review follow-up passed 21 focused tests across three files; new full verification follows.",
     "review_fix": "CodeRabbit identified that working-tree validation could miss a stale index. The hook now validates immutable staged metadata blobs in an owned temporary snapshot, preserves partial staging, honors GIT_INDEX_FILE, and cleans the snapshot. Real Git/process regressions cover repaired working copies, deleted indexed lock, manifest mismatch, unchanged index/worktree, and alternate index.",
+    "fixture_isolation": "Full pre-push exposed an inherited GIT_DIR in test child processes. Reproduced four failures with explicit parent GIT_DIR; 17 tests passed after isolating fixture environments. Production validation continues to honor the caller's Git context and alternate index.",
     "full_workspace_rehearsal": {
       "packages": 11,
       "version": "8.0.0",
