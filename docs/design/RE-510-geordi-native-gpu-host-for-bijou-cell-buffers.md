@@ -957,6 +957,25 @@ known semantic differences.
 4. Emit a native endpoint receipt.
 5. Run the proof in CI without a desktop window.
 
+#### Required Positive GPU Lane
+
+Slice 2 is not complete until a required `geordi-native-cells-gpu` CI lane
+passes on a provisioned hardware-GPU worker. Before implementation closeout,
+commit its OS/image, backend, driver and adapter identity policy, font/default-
+color/shader assets, fixture digests, expected probes and tolerances, and the
+command/receipt schema to the proof manifest. The lane must actually create
+the declared adapter, submit GPU work, read back the offscreen result, pass the
+probes, and verify the bound render receipt. Missing devices, changed profiles,
+fallback adapters, skipped tests, and typed capability refusals fail this
+positive lane. Required status must not be satisfied by a conditional skip.
+
+A separate negative capability lane deliberately removes or denies the device
+and checks deterministic refusal. It may pass on an ordinary headless worker,
+but contributes no GPU-rendering evidence. A software-backend diagnostic lane
+is likewise separate and cannot emit the hardware-GPU claims in this profile.
+If no suitable CI worker is provisioned, report Slice 2 as blocked, preserving
+any completed validation/preparation evidence; do not call the GPU proof done.
+
 ### Slice 3: Windowed Host Proof
 
 1. Present the same prepared artifacts through a `winit` swapchain.
@@ -1006,9 +1025,9 @@ implementation detail.
 11. No test calls host font lookup or platform text APIs in the compliant path.
 12. The Bijou ANSI render path and packed-cell adapter tests remain unchanged
    and green.
-13. A headless environment can run the validation and offscreen proof or emits
-   a typed capability obstruction rather than silently falling back to software
-   while retaining a GPU claim.
+13. The required pinned hardware-GPU lane completes the offscreen proof without
+   skips or refusals. A separate negative lane verifies typed capability
+   obstruction and cannot substitute for the positive receipt.
 
 ## Validation Plan
 
