@@ -156,6 +156,8 @@ jobs:
           packages/bijou-node/src/index.part03.test.ts
           packages/bijou-node/src/index.part04.test.ts
           scripts/check-node-version.test.ts
+          scripts/release-product-witness-files.test.ts
+          scripts/release-product-witnesses.test.ts
           scripts/docs-preview-components.part01.test.ts
           scripts/docs-preview-components.part02.test.ts
           scripts/docs-preview-components.part03.test.ts

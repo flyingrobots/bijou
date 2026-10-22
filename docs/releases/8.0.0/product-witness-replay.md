@@ -35,6 +35,7 @@ emitted. Use the shared host's resource guard when applicable.
 
 The fixture SHA-256 pins and returned file inventory live in
 [`release-product-witness-files.ts`](../../../scripts/release-product-witness-files.ts).
+Git attributes preserve these original bytes on CRLF-configured checkouts.
 The website provenance is retained in
 [`fixtures/profunctor-page/project-keep/README.md`](../../../fixtures/profunctor-page/project-keep/README.md).
 Expected product observations remain assertions in the existing tests; the replay

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { RELEASE_WITNESS_FILES } from './release-product-witness-files.js';
+import { RELEASE_WITNESS_FILES, verifyReleaseWitnessFiles } from './release-product-witness-files.js';
 
 const CLI = fileURLToPath(new URL('./release-product-witnesses.ts', import.meta.url));
 const LOADER = import.meta.resolve('tsx');
@@ -20,7 +20,7 @@ function withCheckout(run: (root: string, env: NodeJS.ProcessEnv) => void): void
     execFileSync('git', [...args], { cwd: root, env, timeout: 10_000, stdio: 'pipe' });
   };
   try {
-    for (const file of [...RELEASE_WITNESS_FILES, { path: 'package-lock.json' }]) {
+    for (const file of [...RELEASE_WITNESS_FILES, { path: 'package-lock.json' }, { path: '.gitattributes' }]) {
       const target = resolve(root, file.path);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, readFileSync(resolve(process.cwd(), file.path)));
@@ -45,6 +45,18 @@ function invoke(root: string, env: NodeJS.ProcessEnv, args: readonly string[] = 
 }
 
 describe('release product witness CLI failures', () => {
+  it('preserves all pinned bytes through an actual CRLF-configured checkout', () => {
+    withCheckout((root, env) => {
+      const git = (args: readonly string[]): void => {
+        execFileSync('git', [...args], { cwd: root, env, timeout: 10_000, stdio: 'pipe' });
+      };
+      git(['config', 'core.autocrlf', 'true']);
+      for (const file of RELEASE_WITNESS_FILES) rmSync(resolve(root, file.path));
+      git(['checkout', '--', ...RELEASE_WITNESS_FILES.map((file) => file.path)]);
+      expect(verifyReleaseWitnessFiles(root)).toHaveLength(9);
+    });
+  });
+
   it.each(['untracked.txt', 'package-lock.json'])('refuses dirty checkout %s without a receipt', (path) => {
     withCheckout((root, env) => {
       writeFileSync(resolve(root, path), 'dirty\n');

@@ -25,7 +25,9 @@
     "scripts/release-product-witness-files.ts",
     "scripts/release-product-witnesses.ts",
     "scripts/release-product-witnesses.test.ts",
-    "scripts/release-product-witness-files.test.ts"
+    "scripts/release-product-witness-files.test.ts",
+    ".gitattributes",
+    ".github/workflows/ci.yml"
   ],
   "filesModified": [
     "package.json",
@@ -35,7 +37,9 @@
     "scripts/release-product-witness-files.test.ts",
     "docs/releases/8.0.0/product-witness-replay.md",
     "docs/README.md",
-    "docs/CHANGELOG.md"
+    "docs/CHANGELOG.md",
+    ".gitattributes",
+    ".github/workflows/ci.yml"
   ],
   "tripwires": [
     "Archived source read through documented corpus helper; frozen historical packet is not rewritten.",
@@ -46,8 +50,11 @@
     "typecheck": "Passed.",
     "lint": "Initial ESLint run identified two unnecessary null checks; removed and targeted ESLint passed.",
     "failure_paths": "Actual filesystem byte changes and missing input; actual CLI rejects dirty tracked/untracked checkouts, rejects arguments, and withholds receipt after failed compiler process.",
-    "success_path": "Requires committed clean checkout; real success replay pending after this commit.",
-    "scope": "No final stable-tag, dependency-audit or documentation-review claim; #527 remains responsible for final release closeout."
+    "success_path": "Clean checkout 3faa62a1731aeb86ee545df049cee60c72e2d034: forced build, four generated artifacts and 63 product tests passed; receipt parsed and all nine hashes independently verified. Repeated replay emitted byte-identical JSON.",
+    "scope": "No final stable-tag, dependency-audit or documentation-review claim; #527 remains responsible for final release closeout.",
+    "checkout_red": "Actual Git core.autocrlf=true checkout changed all nine pins. New regression failed before attributes were added.",
+    "checkout_green": "After scoped -text attributes: all 10 replay-tool regressions across 2 files passed; typecheck and ESLint passed. Both files added to Ubuntu/Windows focused CI.",
+    "full_initial": "Normal pre-push gates and all four interactive smokes passed on the initial helper commit. Final updated candidate validation follows separately."
   },
   "resource_policy": {
     "worker": "Existing host Node/npm toolchain; same isolated worktree and bounded cache",
