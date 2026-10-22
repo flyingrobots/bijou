@@ -594,6 +594,8 @@ interface GeordiNativeBijouCellsReceipt {
     readonly glyphAtlasHash: string;
     readonly fontPackHash: string;
     readonly shaderBundleHash: string;
+    readonly terminalDefaultProfileId: string;
+    readonly terminalDefaultProfileHash: string;
   };
   readonly endpoint: {
     readonly profileId: 'geordi-native-bijou-cells/1';
@@ -610,10 +612,58 @@ interface GeordiNativeBijouCellsReceipt {
     readonly probeResultsHash: string;
     readonly frameHash?: string;
   };
-  readonly claims: readonly string[];
-  readonly nonclaims: readonly string[];
+  readonly evidence: readonly {
+    readonly id: string;
+    readonly kind: 'validation' | 'preparation' | 'probe' | 'presentation' | 'equivalence';
+    readonly artifactHash: string;
+  }[];
+  readonly claims: readonly {
+    readonly id: NativeCellClaimId;
+    readonly evidenceRefs: readonly string[];
+  }[];
+  readonly nonclaims: readonly NativeCellNonclaimId[];
 }
+
+type NativeCellClaimId =
+  | 'canonical-input-preserved/1'
+  | 'cpu-prepared-cells/1'
+  | 'offscreen-gpu-presented/1'
+  | 'native-window-gpu-presented/1'
+  | 'gpu-produced-cells/1';
+
+type NativeCellNonclaimId =
+  | 'generic-tty-gpu/1'
+  | 'terminal-font-pixel-parity/1'
+  | 'universal-backend-pixel-parity/1'
+  | 'assistive-access/1';
 ```
+
+### Claim Registry And Evidence Validation
+
+The versioned claim registry is closed. Reject unknown or duplicate IDs,
+unknown evidence kinds, missing references, duplicate evidence IDs, malformed
+SHA-256 digests, and mismatches between evidence and this receipt's bound input,
+preparation, endpoint, and output. A string naming an artifact is not evidence:
+the verifier must retrieve it, verify its digest and schema, and check its
+relationship to this invocation. Free-form diagnostic prose belongs outside
+canonical claims.
+
+| Claim ID | Required evidence and endpoint constraints |
+| :--- | :--- |
+| `canonical-input-preserved/1` | validation evidence binding the complete packed input digest |
+| `cpu-prepared-cells/1` | deterministic preparation evidence; `cellProduction: cpu-reference` |
+| `offscreen-gpu-presented/1` | successful probe and GPU submission evidence; `presentation: offscreen` and a validated hardware-GPU adapter profile |
+| `native-window-gpu-presented/1` | successful probe and window presentation evidence; `presentation: native-window` and a validated hardware-GPU adapter profile |
+| `gpu-produced-cells/1` | compute submission plus CPU-reference equivalence evidence under the declared precision policy; `cellProduction: gpu` |
+
+Reject offscreen/window claim contradictions, CPU-preparation/GPU-production
+contradictions, GPU claims on a software adapter or refused invocation, and any
+claim lacking its required evidence kinds. All render receipts require
+`canonical-input-preserved/1` plus the claim matching their presentation; CPU
+production also requires `cpu-prepared-cells/1`, GPU production requires
+`gpu-produced-cells/1`. All four listed nonclaims remain mandatory for this
+first render-only profile. Later profiles must introduce a new registry version
+before adding a claim or lifting a nonclaim; they cannot silently weaken `/1`.
 
 ### Complete Input Identity
 
