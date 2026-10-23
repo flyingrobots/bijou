@@ -155,6 +155,7 @@ jobs:
           packages/bijou-node/src/index.part02.test.ts
           packages/bijou-node/src/index.part03.test.ts
           packages/bijou-node/src/index.part04.test.ts
+          tests/cycles/WF-166/dependency-security-closeout.test.ts
           scripts/check-node-version.test.ts
           scripts/release-product-witness-files.test.ts
           scripts/release-product-witnesses.test.ts
