@@ -47,6 +47,7 @@ query($prNumber: Int!) {
         nodes {
           body
           createdAt
+          updatedAt
           author { login __typename }
         }
       }
