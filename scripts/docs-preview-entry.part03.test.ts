@@ -1,3 +1,4 @@
+import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import {
   afterEach,
   colorHex,
@@ -12,7 +13,6 @@ import {
   it,
   oppositeHexColor,
   runScript,
-  V7_DEFAULT_BACKGROUND,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
 
@@ -50,7 +50,7 @@ describe('docs preview app', () => {
         const targetX = logoX + x;
         const targetY = logoY + y;
         const bg = expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height);
-        if (bg !== V7_DEFAULT_BACKGROUND) {
+        if (bg !== BOOK_MODE_COLORS.dark.background) {
           wakeBackedLogoCell = { x: targetX, y: targetY };
         } else {
           backgroundBackedLogoCell = { x: targetX, y: targetY };
@@ -75,9 +75,9 @@ describe('docs preview app', () => {
     );
     expect(backgroundBackedLogoCell).toBeDefined();
     const backgroundCell = must(backgroundBackedLogoCell);
-    expect(colorHex(frame.get(backgroundCell.x, backgroundCell.y).bg)).toBe(V7_DEFAULT_BACKGROUND);
+    expect(colorHex(frame.get(backgroundCell.x, backgroundCell.y).bg)).toBe(BOOK_MODE_COLORS.dark.background);
     expect(colorHex(frame.get(backgroundCell.x, backgroundCell.y).fg)).toBe(
-      oppositeHexColor(V7_DEFAULT_BACKGROUND),
+      oppositeHexColor(BOOK_MODE_COLORS.dark.background),
     );
     expect(frame.get(logoX + transparentOffset, logoY).char).not.toBe(FLYING_ROBOTS_TRANSPARENT_CELL);
     expect(frame.get(logoX + transparentOffset, logoY).modifiers ?? []).not.toContain('bold');

@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { colorHex, themeContrastRatio } from '@flyingrobots/bijou';
+import { colorHex, doctorTheme, themeContrastRatio } from '@flyingrobots/bijou';
 import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { normalizeViewOutput } from '../scripts/docs-preview.test-support.js';
 import { createDocsApp } from '../examples/docs/app-root.js';
-import { DOGFOOD_SHELL_THEMES } from '../examples/docs/dogfood-shell-themes.js';
+import { DOGFOOD_SHELL_THEMES, DOGFOOD_THEME_SAFE_PAIRS } from '../examples/docs/dogfood-shell-themes.js';
 
 function bookTheme(mode: 'dark' | 'light') {
   const spec = DOGFOOD_SHELL_THEMES.find((entry) => entry.id === 'book');
@@ -26,6 +26,7 @@ describe('book theme pair', () => {
 
   it.each(['dark', 'light'] as const)('keeps essential text and chrome readable across %s surfaces', (mode) => {
     const theme = bookTheme(mode);
+    expect(doctorTheme(theme, { contrastPairs: DOGFOOD_THEME_SAFE_PAIRS }).issues).toEqual([]);
     for (const surface of Object.values(theme.surface)) {
       if (surface.bg === undefined) throw new Error('A book surface lost its background.');
       for (const token of Object.values(theme.semantic)) {

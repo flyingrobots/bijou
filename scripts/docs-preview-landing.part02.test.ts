@@ -1,3 +1,4 @@
+import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import {
   afterEach,
   colorHex,
@@ -16,7 +17,6 @@ import {
   serializeFrame,
   stackedWakeRowCount,
   titleBackgroundGlyphCount,
-  V7_DEFAULT_BACKGROUND,
   V7_RASTER_TITLE_GLYPHS,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
@@ -57,7 +57,7 @@ describe('docs preview app', () => {
         }
         const cell = initial.frames[0]?.get(x, y);
         if (!V7_RASTER_TITLE_GLYPHS.has(cell.char)) continue;
-        if (colorHex(cell.bg) === V7_DEFAULT_BACKGROUND) continue;
+        if (colorHex(cell.bg) === BOOK_MODE_COLORS.dark.background) continue;
         if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
         sameColorWakeCells++;
       }

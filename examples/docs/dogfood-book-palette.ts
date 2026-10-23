@@ -9,12 +9,12 @@ export const BOOK_MODE_COLORS = Object.freeze({
     background: '#1c1716', secondary: BOOK_COLORS.ink, elevated: '#332a28',
     overlay: '#151211', surfaceMuted: '#231c1b',
     text: BOOK_COLORS.panel, muted: '#c4ada9', accent: BOOK_COLORS.coral,
-    success: '#93cbb0', warning: '#e1b46b', error: '#ffa39a', info: '#c3b1e1', chrome: '#aa827a',
+    success: '#93cbb0', warning: '#e1b46b', error: '#ffa39a', info: '#c3b1e1', chrome: '#b68d85',
   }),
   light: Object.freeze({
     background: '#fff9f8', secondary: BOOK_COLORS.panel, elevated: '#ffffff',
     overlay: '#fff9f8', surfaceMuted: '#fbe6e3',
     text: BOOK_COLORS.ink, muted: BOOK_COLORS.muted, accent: BOOK_COLORS.heading,
-    success: '#256849', warning: '#79500f', error: '#aa2f2e', info: '#654a87', chrome: '#98746d',
+    success: '#256849', warning: '#79500f', error: '#aa2f2e', info: '#654a87', chrome: '#815e58',
   }),
 });
