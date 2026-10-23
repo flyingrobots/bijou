@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Raised the fast-uri workspace floor to 3.1.9 and added regressions for
+  encoded hostname normalization and scheme rejection (PR #530).
+
 - MCP hyperlinks now honor the selected plain-text fallback in text and
   structured rendered output, preserving Unicode layout in other tools (#545).
 

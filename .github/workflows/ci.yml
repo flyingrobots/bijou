@@ -157,6 +157,7 @@ jobs:
           packages/bijou-node/src/index.part04.test.ts
           packages/bijou-mcp/src/tools/hyperlink.test.ts
           packages/bijou-mcp/src/hyperlink-stdio.test.ts
+          tests/cycles/WF-166/dependency-security-closeout.test.ts
           scripts/check-node-version.test.ts
           scripts/docs-preview-components.part01.test.ts
           scripts/docs-preview-components.part02.test.ts
