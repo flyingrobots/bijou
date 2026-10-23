@@ -8,8 +8,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD smoke scenarios refuse captures above 1 MiB across stdout and stderr,
+  stop retaining output after settlement, and report the capture limit instead
+  of validating truncated output or collecting it without a bound (#523).
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
+
+- DOGFOOD smoke failures include a normalized capture tail, limited to 40 lines
+  and 4096 characters, so startup errors show the failing path and stack (#523).
+  Documented the release-line path rule and cross-checked readiness against
+  DOGFOOD for alpha, beta, release-candidate, and stable versions.
 
 ### Documentation book consolidation
 

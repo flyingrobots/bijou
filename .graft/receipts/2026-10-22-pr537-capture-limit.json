@@ -1,0 +1,26 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Bound DOGFOOD capture retention before failure-tail formatting",
+  "bytesConsumed": 354644,
+  "filesRead": [
+    "scripts/smoke-dogfood-lib.part02.ts",
+    "scripts/smoke-dogfood-lib.part03.ts",
+    "scripts/smoke-dogfood-failure.test.ts"
+  ],
+  "filesModified": [
+    "scripts/smoke-dogfood-lib.part02.ts",
+    "scripts/smoke-dogfood-failure.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "The real 2MiB child fixture initially passed the smoke despite exceeding the proposed 1MiB capture budget; all five existing failure-evidence tests stayed green",
+    "Retained Graft byte checkpoint is intentionally not presented as an exact later total; subsequent focused reads are explicitly listed",
+    "External Docker guard kills owned descendants; this change does not claim universal process-tree cleanup from killing the capture wrapper"
+  ],
+  "validation": {
+    "red": "One expected assertion failed: oversized successful capture returned status0 instead of controlled refusal; 5 other focused tests passed",
+    "green": "Capture byte accounting, settlement guard and explicit refusal; focused tests, both real DOGFOOD lanes, normal hooks and final complete push suite must pass before publication"
+  }
+}

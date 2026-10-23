@@ -7,6 +7,7 @@ import {
   type SmokeDogfoodResult,
   DOGFOOD_SCENARIOS,
   ROOT,
+  normalizeDogfoodOutput,
   selectDogfoodScenarios,
 } from './smoke-dogfood-lib.part01.js';
 import { runDogfoodScenario } from './smoke-dogfood-lib.part02.js';
@@ -41,6 +42,11 @@ export async function runSmokeDogfood(
     write('\nFailures:\n');
     for (const failure of failures) {
       write(`- dogfood:${failure.name} ${failure.reason ?? 'unknown'}\n`);
+      const tail = normalizeDogfoodOutput(failure.output ?? '').trimEnd()
+        .slice(-4096).split('\n').slice(-40).join('\n');
+      if (tail.trim() !== '') {
+        write(`  Captured output (at most 40 lines / 4096 characters):\n${tail}\n`);
+      }
     }
     return 1;
   }
