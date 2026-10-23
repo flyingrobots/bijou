@@ -2721,6 +2721,105 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "release.title.v8.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "V8 release closeout in progress"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Jacquard 12 glyphs roll around a cylinder; meaning survives without animation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Docs | Blocks | BlockLab | Release Notes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.lowerModes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "readable lower modes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "keyboard navigation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.offlineFont"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "offline font geometry"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "One application, every terminal."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "A rolling Jacquard 12 title with readable release facts in every presentation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "V8 / Jacquard 12"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "settings.landingQuality.description.auto"
       },
       "kind": "message",
