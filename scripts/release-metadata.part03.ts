@@ -2,6 +2,7 @@ import { appendFileSync } from 'node:fs';
 import { DEPENDENCY_TYPES, INTERNAL_PACKAGE_PREFIX } from './release-metadata.part01.js';
 import type { ReleaseCommandOutputs, WorkspacePackage } from './release-metadata.part01.js';
 import { readWorkspacePackages } from './release-metadata.part02.js';
+import { validateWorkspaceLock } from './release-lockfile.js';
 
 export function validateWorkspaceVersion(
   root: string,
@@ -38,6 +39,7 @@ export function validateWorkspaceVersion(
     }
   }
 
+  if (errors.length === 0) errors.push(...validateWorkspaceLock(root, packages, expectedVersion));
   return { packages, errors };
 }
 
