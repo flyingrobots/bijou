@@ -784,6 +784,49 @@ production also requires `cpu-prepared-cells/1`, GPU production requires
 first render-only profile. Later profiles must introduce a new registry version
 before adding a claim or lifting a nonclaim; they cannot silently weaken `/1`.
 
+### Digest Bytes And Artifact Retrieval
+
+Every digest introduced by this Geordi protocol is SHA-256 over the exact
+bytes specified below, encoded as 64 lowercase hexadecimal characters with no
+prefix. Hash bytes, not a hexadecimal rendering of those bytes. Structured
+artifacts use UTF-8 RFC 8785 JCS without a BOM or trailing newline; preserve
+array order, reject duplicate keys and invalid Unicode, and forbid non-finite
+numbers. No host paths or ambient timestamps enter these artifacts.
+
+| Field | Exact bytes hashed |
+| :--- | :--- |
+| `packedReceiptHash` | JCS of the complete validated packed receipt, as specified below |
+| `cellBytesHash` | Raw ordered octets in the packed receipt's `bytes` array |
+| `sideTableHash` | JCS of the complete ordered packed `sideTable` array |
+| `preparedBufferHash` | The exact CPU-reference prepared-buffer bytes under `preparedLayoutId`, including deterministically zeroed ABI padding; exclude transport-only GPU alignment padding |
+| `glyphRunHash` | JCS of the closed `geordi-glyph-runs/1` artifact: bound input digest, preparation profile/layout IDs and the ordered shaped runs; the pinned profile supplies the complete schema, coordinate units and rounding laws |
+| `glyphAtlasHash` | JCS of the closed `geordi-glyph-atlas/1` manifest binding dimensions, format, ordered glyph rectangles and each page's raw-byte SHA-256 digest; page format, row order and padding are fixed by the pinned profile |
+| `fontPackHash` | Exact bytes of the immutable distributed font-pack blob; do not hash a filesystem directory or a regenerated archive |
+| `shaderBundleHash` | JCS of the `geordi-shader-bundle/1` manifest, with unique relative POSIX paths sorted by UTF-8 bytes and each file's raw-byte SHA-256 digest |
+| `terminalDefaultProfileHash` | JCS of the complete immutable terminal-default profile, using the existing rule above |
+| `probePolicyHash` | JCS of the complete versioned probe policy, including coordinates, tolerances and channel interpretation |
+| `probeResultsHash` | JCS of ordered probe results, including the bound policy digest, sample values and verdicts |
+| `frameHash` | JCS of a `geordi-frame/1` manifest binding width/height, channel format, row order and the raw-byte SHA-256 digest of the tightly packed readback; its pinned output profile fixes channel encoding and alpha interpretation |
+| `validatorArtifactHash`, `conformanceCorpusHash` | Exact bytes of their immutable distributed artifact blobs |
+| `observedBytesHash`, `profileArtifactHash` | Exactly the observed input bytes or supplied profile-artifact bytes identified by the refusal envelope |
+| `artifactHash` | Exact retrieved artifact bytes; structured artifacts must already be the canonical JCS bytes specified by their versioned schema |
+
+The packed receipt's existing `sceneHash` is an opaque upstream identity,
+echoed byte-for-byte and covered by `packedReceiptHash`. This proposal does not
+reinterpret it as SHA-256 or invent a new upstream scene serialization. Only
+Geordi's newly defined digest fields obey the rule in this section.
+
+Each preparation/output profile must publish its complete, closed artifact
+schemas and exact binary layouts before implementation is accepted. An ID or
+prose description alone cannot substitute for those pinned definitions.
+Retrieval resolves a digest to immutable bytes; transport URLs and local cache
+paths remain outside canonical identity. A verifier must recursively retrieve
+and hash referenced pages/files, not merely trust their manifest entries.
+Missing artifacts, noncanonical structured bytes, malformed digests, and any
+byte/digest mismatch are controlled validation failures. Commit shared
+TypeScript/Rust byte-and-digest vectors for every row, including nested
+artifact corruption and padding/layout counterexamples.
+
 ### Complete Input Identity
 
 `packedReceiptHash` is the lowercase SHA-256 digest of the UTF-8
