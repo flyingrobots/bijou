@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The supported Node 20/22 CI matrix rejects dependency engine mismatches.
+  Dependency refreshes retain the Node-20-compatible Vitest 4 line rather than
+  silently accepting an unsupported test-runner upgrade (PR #548).
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
