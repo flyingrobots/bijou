@@ -78,6 +78,7 @@
     "version": "node scripts/version.mjs"
   },
   "overrides": {
+    "fast-uri": "^3.1.9",
     "hono": "^4.13.11",
     "ip-address": "^10.7.1",
     "picomatch": "^4.0.4",
