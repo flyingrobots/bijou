@@ -11,6 +11,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- DOGFOOD's Current Release Story now shows the running version and release line
+  in English, German, Spanish and French. The live reader explains preview and
+  evidence boundaries while the original V7.2 text remains archived unchanged.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and
