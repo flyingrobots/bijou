@@ -24,22 +24,24 @@ const DEFAULT_SEED: SapphirePaletteSeed = Object.freeze({
   lightSurfaceHue: 85,
 });
 
-function isSapphirePaletteSeedInput(value: unknown): value is Partial<SapphirePaletteSeed> {
+function isSapphirePaletteSeedInput(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hueSeed(value: unknown, fallback: number): number {
+  if (value === undefined) return fallback;
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Sapphire palette hue seeds must be finite numbers');
+  return value;
 }
 
 function resolveSeed(seed: unknown): SapphirePaletteSeed {
   if (!isSapphirePaletteSeedInput(seed)) {
     throw new Error('Sapphire palette seed must be an object');
   }
-  const resolved = {
-    brandHue: seed.brandHue ?? DEFAULT_SEED.brandHue,
-    lightSurfaceHue: seed.lightSurfaceHue ?? DEFAULT_SEED.lightSurfaceHue,
-  };
-  if (!Number.isFinite(resolved.brandHue) || !Number.isFinite(resolved.lightSurfaceHue)) {
-    throw new Error('Sapphire palette hue seeds must be finite numbers');
-  }
-  return Object.freeze(resolved);
+  return Object.freeze({
+    brandHue: hueSeed(seed['brandHue'], DEFAULT_SEED.brandHue),
+    lightSurfaceHue: hueSeed(seed['lightSurfaceHue'], DEFAULT_SEED.lightSurfaceHue),
+  });
 }
 
 function hex(lightness: number, relativeChroma: number, hue: number): string {

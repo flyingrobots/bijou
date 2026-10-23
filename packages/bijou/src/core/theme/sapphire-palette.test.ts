@@ -63,6 +63,18 @@ describe('Sapphire Noir reference palette', () => {
     }
   });
 
+  it.each(['brandHue', 'lightSurfaceHue'])('rejects a null %s seed field', (field) => {
+    expect(() => {
+      Reflect.apply(createSapphireReferencePalette, undefined, ['dark', { [field]: null }]);
+    }).toThrow('Sapphire palette hue seeds must be finite numbers');
+  });
+
+  it('retains defaults for omitted and undefined hue fields', () => {
+    const seed = { brandHue: undefined, lightSurfaceHue: undefined };
+    expect(Reflect.apply(createSapphireReferencePalette, undefined, ['dark', seed]))
+      .toEqual(createSapphireReferencePalette('dark'));
+  });
+
   it('rejects unsupported runtime modes instead of silently choosing light', () => {
     expect(() => { Reflect.apply(createSapphireReferencePalette, undefined, ['sepia']); })
       .toThrow('Unsupported Sapphire palette mode: sepia');
