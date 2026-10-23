@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Keep foreground and background dependencies separate during transitive theme
+  provenance traversal, so an unchanged field cannot create false propagation.
+
 - Dependency provenance retains direct and transitive consumers of background
   colors authored as `TokenValue` literals, while absent backgrounds remain
   unresolved (PR #516).

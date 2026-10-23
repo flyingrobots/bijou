@@ -1,4 +1,5 @@
 import { createTokenGraph, type ThemeMode } from './graph.js';
+import { collectFieldDependents } from './graph-field-dependents.js';
 import type { TokenDefinitions } from './graph-types.js';
 import { isNestedDefinitions, isTokenDefinition, isTokenValue } from './graph-guards.js';
 
@@ -80,10 +81,10 @@ export function collectTokenDependents(
  * Map each token path to every path it ultimately affects.
  *
  * Where {@link collectTokenDependents} reports only direct consumers, this
- * follows the chain: `status.success` feeds `semantic.success`, which feeds
- * `border.success`, so editing the first changes all three. That closure is
- * the honest answer to "what moves if I change this", which is the question a
- * theme editor is really asking.
+ * follows the chain of value and inspection inputs. Foreground and background
+ * fields are traversed independently: reaching a token's foreground does not
+ * imply that its background, or consumers of that background, changed.
+ * Virtual fields are projected back to their owning token in the result.
  *
  * Cycles are tolerated. A token is never reported as affecting itself, and a
  * reference loop terminates instead of recursing forever.
@@ -92,18 +93,20 @@ export function collectTransitiveTokenDependents(
   definitions: TokenDefinitions,
   mode: ThemeMode = 'dark',
 ): ReadonlyMap<string, readonly string[]> {
-  const direct = collectTokenDependents(definitions, mode);
+  const { dependents: direct, backgrounds } = collectFieldDependents(definitions, mode);
   const transitive = new Map<string, readonly string[]>();
 
   for (const path of direct.keys()) {
     const reached = new Set<string>();
+    const visited = new Set<string>();
     const queue = [...(direct.get(path) ?? [])];
     while (queue.length > 0) {
       const next = queue.shift();
-      if (next === undefined || next === path || reached.has(next)) continue;
-      reached.add(next);
+      if (next === undefined || next === path || visited.has(next)) continue;
+      visited.add(next);
+      const token = backgrounds.has(next) ? next.slice(0, -3) : next;
+      if (token !== path) reached.add(token);
       queue.push(...(direct.get(next) ?? []));
-      if (!next.endsWith('.bg')) queue.push(...(direct.get(`${next}.bg`) ?? []));
     }
     transitive.set(path, [...reached]);
   }
