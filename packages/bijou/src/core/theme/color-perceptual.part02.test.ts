@@ -11,6 +11,7 @@ describe('OKLCH sRGB gamut', () => {
   it('distinguishes in-gamut and impossible chroma requests', () => {
     expect(isOklchInSrgb({ l: 0.7, c: 0.08, h: 255 })).toBe(true);
     expect(isOklchInSrgb({ l: 0.7, c: 0.4, h: 255 })).toBe(false);
+    expect(isOklchInSrgb({ l: 0.5, c: Number.MAX_VALUE, h: 0 })).toBe(false);
   });
 
   it('maps by reducing chroma while holding lightness and hue', () => {

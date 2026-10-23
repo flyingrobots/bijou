@@ -17,6 +17,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Reject overflowing perceptual-to-RGB conversions while preserving ordinary finite gamut clipping.
 - Reject unsupported hue interpolation paths instead of silently selecting the shorter arc.
 - Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for

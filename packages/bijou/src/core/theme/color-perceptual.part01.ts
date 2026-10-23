@@ -94,6 +94,7 @@ export function oklabToLinearSrgb(color: Oklab): LinearSrgb {
 /** Convert OKLAB to a clipped 8-bit sRGB tuple. */
 export function oklabToRgb(color: Oklab): RGB {
   const linear = oklabToLinearSrgb(color);
+  assertFinite('Linear sRGB', linear);
   return [encode(linear[0]), encode(linear[1]), encode(linear[2])];
 }
 

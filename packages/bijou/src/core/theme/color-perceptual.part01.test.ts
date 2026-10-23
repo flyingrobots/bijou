@@ -12,6 +12,19 @@ function expectClose(actual: number, expected: number, precision = 6): void {
 }
 
 describe('OKLAB conversion', () => {
+  it.each([
+    { l: Number.MAX_VALUE, a: 0, b: 0 },
+    { l: 0.5, a: Number.MAX_VALUE, b: 0 },
+    { l: 0.5, a: 0, b: Number.MAX_VALUE },
+  ])('rejects finite coordinates whose RGB conversion overflows: %j', (color) => {
+    expect(() => oklabToRgb(color)).toThrow('Linear sRGB channels must be finite numbers');
+  });
+
+  it('still clips ordinary finite out-of-gamut coordinates', () => {
+    expect(oklabToRgb({ l: 2, a: 0, b: 0 })).toEqual([255, 255, 255]);
+    expect(oklabToRgb({ l: -1, a: 0, b: 0 })).toEqual([0, 0, 0]);
+  });
+
   it('matches the published sRGB red reference', () => {
     const red = rgbToOklab([255, 0, 0]);
     expectClose(red.l, 0.627955361);
