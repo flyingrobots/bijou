@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Raised the fast-uri workspace floor to 3.1.9 and added regressions for
+  encoded hostname normalization and scheme rejection (PR #530).
+
 - DOGFOOD smoke failures include a normalized capture tail, limited to 40 lines
   and 4096 characters, so startup errors show the failing path and stack (#523).
   Documented the release-line path rule and cross-checked readiness against
