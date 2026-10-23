@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Raised the fast-uri workspace floor to 3.1.9 and added regressions for
+  encoded hostname normalization and scheme rejection (PR #530).
+
 - PR review reporting recognizes CodeRabbit quota notices even when its status
   check succeeds. Only later review-completion evidence supersedes a notice;
   edited notices use their updated timestamp, and active limits keep merge
