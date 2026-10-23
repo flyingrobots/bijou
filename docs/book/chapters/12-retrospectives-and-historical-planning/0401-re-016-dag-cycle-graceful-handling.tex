@@ -1,0 +1,53 @@
+\chapter{RE-016: DAG renderer should handle cycles gracefully}\label{record-401}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE_016-dag-cycle-graceful-handling.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "RE-016: DAG renderer should handle cycles gracefully"
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-401-disposition}
+
+Rendered DAG graphs now tolerate cycles by stripping cycle-forming back-edges only for the layering pass while preserving the full original edge set in interactive and accessible output. dag() and dagLayout() no longer fail on cyclic graphs or self-loops, and focused regressions cover both paths.
+
+\section{Original Proposal}\label{record-401-original-proposal}
+
+\section{Problem}\label{record-401-problem}
+
+\texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} uses Kahn's topological sort (\texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}2\allowbreak{}2}) and throws \texttt{[\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}]\allowbreak{} \allowbreak{}d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})\allowbreak{}:\allowbreak{} \allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h} when any cycle exists. This makes \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} unusable for general directed graphs --- which are common in real-world use cases (dependency graphs with circular refs, social graphs, WARP materialized state, etc.).
+
+\section{Current behavior}\label{record-401-current-behavior}
+
+\texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} line 69:
+
+\begin{CodeBlock}
+if (topoOrder.length !== nodes.length) {
+  throw new Error('[bijou] dag(): cycle detected in graph');
+}
+\end{CodeBlock}
+
+\section{Proposed behavior}\label{record-401-proposed-behavior}
+
+Two possible approaches (not mutually exclusive):
+
+\subsection{Option A: Back-edge detection + reversal}\label{record-401-option-a-back-edge-detection-reversal}
+
+During Kahn's sort, identify edges that create cycles (back-edges). Temporarily reverse them to break cycles, assign layers on the resulting DAG, then render back-edges with a distinct visual treatment (dashed line, different arrowhead, annotation like ``↺'').
+
+\subsection{Option B: SCC collapse}\label{record-401-option-b-scc-collapse}
+
+Find strongly connected components (Tarjan's or Kosaraju's), collapse each SCC into a single composite node, render the condensation DAG. Composite nodes show their member labels.
+
+\subsection{Recommendation}\label{record-401-recommendation}
+
+Option A is simpler and preserves the full node set. Option B is more correct topologically but loses individual node identity within SCCs.
+
+\section{Context}\label{record-401-context}
+
+Discovered while using bijou-mcp \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} to visualize a WARP graph. WARP materialized state is a general directed graph (social: the illustrated sequence below). Had to manually strip back-edges to render.
+
+\input{diagrams/flows/flow-080}
+

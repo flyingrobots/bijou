@@ -1,0 +1,27 @@
+\chapter{CI-001 --- mermaidSurface() Component}\label{record-285}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/CI-001-mermaid-surface-component.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+
+\section{Idea}\label{record-285-idea}
+
+Since Bijou uses Mermaid for its documentation, wouldn't it be cool to render Mermaid diagrams directly in the TUI? This component would parse a (limited) subset of Mermaid (flowcharts and state diagrams) and render them to a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} using Bijou's box-drawing and graph primitives.
+
+\section{Why}\label{record-285-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Self-Documentation}: A TUI app can render its own architecture or cycle state without external tools.
+\item
+  \textbf{Data-Viz Maturity}: It pushes the ``geometric lawfulness'' of the terminal by showing that complex, logic-heavy graphs are native to the medium.
+\item
+  \textbf{Docs Synergy}: If DOGFOOD could render diagrams locally, it would complete the ``docs are the demo'' story.
+\end{enumerate}
+
+\section{Effort}\label{record-285-effort}
+
+Large --- requires a simplified Mermaid parser and a spatial-layout engine to map diagrams to terminal cells.
+

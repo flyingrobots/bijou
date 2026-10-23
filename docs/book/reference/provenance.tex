@@ -1,0 +1,13 @@
+\clearpage
+\setcounter{chapter}{0}
+\renewcommand{\thechapter}{P\arabic{chapter}}
+\renewcommand{\theHchapter}{provenance.\arabic{chapter}}
+\ifBookArchive
+\input{appendices/source-inventory}%
+\else
+\chapter{Sources and further reading}
+
+The historical source inventory belongs to the separate Design Archive and the complete edition. It accounts for 426 original paths and their hashes. This teaching volume uses the same frozen corpus and shared illustration assets without printing the historical records.
+
+The companion source is fixed to the commit and release recorded on the version page. Its \path{LICENSE}, \path{NOTICE}, \path{VERIFICATION.json}, checkpoints and exercises belong to that edition. Book source manifests identify the cell captures, tables, diagrams, fonts and archived documents. Use the archive when following the history of a design; use the pinned companion when reproducing a workshop.
+\fi

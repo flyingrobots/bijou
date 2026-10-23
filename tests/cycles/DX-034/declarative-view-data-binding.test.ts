@@ -38,14 +38,9 @@ describe('DX-034 declarative view data binding cycle', () => {
 
   it('links DX-034 from the block cycle and release lane', () => {
     const dx031 = readRepoFile('docs/design/DX-031-standard-bijou-blocks.md');
-    const legend = readRepoFile('docs/legends/DX-developer-experience.md');
-    const v6Lane = readRepoFile('docs/method/backlog/v6.0.0/README.md');
 
     expect(dx031).toContain('## Relationship To DX-034');
     expect(dx031).toContain('Declarative View Data Binding');
     expect(dx031).toContain('provider-bound view data requirements');
-    expect(legend).toContain('DX-034 — Declarative View Data Binding');
-    expect(v6Lane).toContain('DX-034');
-    expect(v6Lane).toContain('declarative view data binding');
   });
 });

@@ -1,0 +1,264 @@
+\chapter{DF-078 DOGFOOD Release Story Surfaces}\label{record-118}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-078-dogfood-release-story-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-078 DOGFOOD Release Story Surfaces
+legend: DF
+lane: asap
+priority: medium
+status: proposed
+github_issue: 335
+parent_issue: 354
+keywords:
+  - dogfood
+  - release
+  - changelog
+  - graphql
+  - demo-integrity
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD}
+
+\section{Linked Work}\label{record-118-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \#335
+\item
+  v7.2 umbrella: \#354
+\item
+  GraphQL fixture lineage: \#329
+\item
+  Blocks app-binding lineage: \#342
+\item
+  Current release docs: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/releases/7.1.0/README.md}{docs/releases/7.1.0}
+\end{itemize}
+
+This document shapes \#335 into a bounded v7.2 demo-integrity pull. It does not turn v7.2 into a broad release-story product, and it does not pull the V8 Runtime Graph product contract forward.
+
+\section{Decision Summary}\label{record-118-decision-summary}
+
+DOGFOOD already publishes release notes and migration docs in the Release section, but the app does not yet explain the post-v7.1 proof chain as a first-class product story. A presenter still has to narrate the important relationship manually:
+
+\input{diagrams/flows/flow-036}
+
+The v7.2 repair is to add release-story surfaces that make that chain visible inside DOGFOOD:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A concise release-story entry point from the DOGFOOD home or Release page.
+\item
+  A ``What's New'' path that foregrounds the current release story, not only a Markdown document.
+\item
+  A GraphQL proof walkthrough tied to the real \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}/\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l} fixture.
+\item
+  A CHANGELOG viewer that preserves version boundaries, headings, and keyboard navigation.
+\end{enumerate}
+
+\section{Sponsored Human}\label{record-118-sponsored-human}
+
+A release-video viewer needs DOGFOOD to show why Bijou's v7 proof matters without requiring a source-code tour. The presenter should be able to open one release-story path and walk from source SDL to rendered terminal proof.
+
+\section{Sponsored Agent}\label{record-118-sponsored-agent}
+
+An agent needs deterministic text and model witnesses for the release story: which version is being described, which GraphQL fixture carries the proof, which artifact and scene facts are inspectable, and which changelog section bounds the claim.
+
+\section{Hill}\label{record-118-hill}
+
+After this cycle, DOGFOOD can tell the current release story from inside the app: current ``What's New'' copy is discoverable, the real GraphQL block proof is inspectable step by step, and the changelog can be navigated by version without losing Markdown heading structure.
+
+\section{Scope}\label{record-118-scope}
+
+\subsection{Release Story Entry Point}\label{record-118-release-story-entry-point}
+
+Add a compact entry point that is visible from normal DOGFOOD navigation. The entry should name the current release story and point to deeper pages rather than becoming another long landing section.
+
+Acceptable first placement:
+
+\begin{itemize}
+\tightlist
+\item
+  a Release page overview card, or
+\item
+  a concise home-page section that links into Release.
+\end{itemize}
+
+The implementation should not add a first-run takeover until there is a clear version-memory port and deterministic dismissal state.
+
+\subsection{What's New Surface}\label{record-118-whats-new-surface}
+
+The current Release section already reads \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}\$\allowbreak{}\{\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}\}\allowbreak{}/\allowbreak{}w\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}e\allowbreak{}w\allowbreak{}.\allowbreak{}m\allowbreak{}d}. This cycle should make the surface easier to present by adding a short release-story summary before the long Markdown body or by adding a sibling guide that routes directly to the current ``What's New'' page.
+
+The source of truth remains the versioned release document. DOGFOOD should not fork release claims into a second hand-maintained copy.
+
+\subsection{GraphQL Proof Walkthrough}\label{record-118-graphql-proof-walkthrough}
+
+Add a DOGFOOD guide that explicitly walks the checked-in fixture through the proof chain:
+
+\begin{itemize}
+\tightlist
+\item
+  source fixture path: \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}/\allowbreak{}n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l}
+\item
+  compiled artifact kind: \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}
+\item
+  lowered scene kind: \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}
+\item
+  terminal proof surface
+\item
+  debug fact kind: \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1}
+\end{itemize}
+
+The guide must link the proof to the real \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} fixture and to the DOGFOOD navigation surface instead of describing a synthetic example.
+
+\subsection{CHANGELOG Viewer}\label{record-118-changelog-viewer}
+
+Add a first-class DOGFOOD path for \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} that preserves:
+
+\begin{itemize}
+\tightlist
+\item
+  version boundaries
+\item
+  Markdown headings
+\item
+  keyboard navigation through sections
+\item
+  readable current and historical release claims
+\end{itemize}
+
+The first slice may reuse the existing Markdown reader. A custom changelog index is acceptable only if it does not duplicate changelog content or invent a second release-history source of truth.
+
+\section{Out Of Scope}\label{record-118-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  First-run modal or full-screen takeover with persisted dismissal state.
+\item
+  Runtime storage, host preferences, or cross-session version memory.
+\item
+  Rewriting the release docs pipeline.
+\item
+  Moving the broad \#302 Runtime Graph tracker into v7.2.
+\item
+  Migrating more DOGFOOD blocks to GraphQL.
+\item
+  Building a source-code browser or full artifact inspector.
+\end{itemize}
+
+\section{Playback Questions}\label{record-118-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a presenter reach the current release story from DOGFOOD without knowing a source file path?
+\item
+  Can the presenter open a GraphQL proof walkthrough and point to the real \texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} SDL fixture?
+\item
+  Can a viewer see the sequence the illustrated sequence below inside DOGFOOD?
+\item
+  Can a viewer open the changelog and move between version boundaries without losing headings?
+\item
+  Can tests prove these routes from model state and rendered text rather than screenshots?
+\end{enumerate}
+
+\input{diagrams/flows/flow-065}
+
+\section{Accessibility And Assistive Posture}\label{record-118-accessibility-and-assistive-posture}
+
+The release story must work as text. Color may support hierarchy, but the proof chain, version names, fixture path, artifact kinds, and changelog boundaries must be visible in plain text and preserved in accessible lower modes where applicable.
+
+\section{Localization And Directionality Posture}\label{record-118-localization-and-directionality-posture}
+
+The first implementation may use English-source Markdown, matching the existing Release section behavior. If new DOGFOOD chrome labels are added, they must use catalog keys and keep all supported locale rows current. The design introduces no new right-to-left layout behavior.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-118-agent-inspectability-and-explainability-posture}
+
+Agents should be able to inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  the Release navigation guide ids
+\item
+  the rendered release-story text
+\item
+  the GraphQL fixture path and proof-chain labels
+\item
+  the changelog guide id and version-boundary headings
+\item
+  the tests that pin the routes
+\end{itemize}
+
+The proof must not depend on screenshots, timestamps, process ids, or local absolute paths.
+
+\section{Linked Invariants}\label{record-118-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}: the release story must remain meaningful as text, not only styled terminal layout.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}: the GraphQL proof route should expose inspectable artifact and debug-fact labels.
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}: the release-story route is not complete until scripted DOGFOOD tests prove navigation and text witnesses.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-118-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a focused DOGFOOD release-story guide under the Release page.
+\item
+  Add a GraphQL proof walkthrough that references the real NavigationListBlock SDL fixture and proof-chain labels.
+\item
+  Add a CHANGELOG guide or changelog subsection that reads from \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Add scripted DOGFOOD tests for the Release route, GraphQL proof text, and changelog version-boundary headings.
+\item
+  Add any new DOGFOOD localization keys needed for navigation chrome.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} with the landed v7.2 release-story status.
+\end{enumerate}
+
+\section{Test Plan}\label{record-118-test-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Add or extend \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}2\allowbreak{}3\allowbreak{}/\allowbreak{}p\allowbreak{}u\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} or a new DF-078 test file for the Release route.
+\item
+  Add a text assertion for the GraphQL proof chain and fixture path.
+\item
+  Add a text assertion for at least \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} and \texttt{[\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}]} changelog boundaries.
+\item
+  Run focused DOGFOOD release tests, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, DOGFOOD i18n gates if chrome labels change, \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}, and the normal pre-push gate before review.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-118-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD has a visible release-story entry point.
+\item
+  DOGFOOD can show the current ``What's New'' release story from the Release section.
+\item
+  DOGFOOD can show a GraphQL proof walkthrough tied to the real NavigationListBlock SDL fixture.
+\item
+  DOGFOOD can show changelog content with version boundaries intact.
+\item
+  First-run modal behavior is deliberately deferred unless a deterministic version-memory port is added in the same cycle.
+\item
+  \#335 has enough scoped design detail to leave \texttt{n\allowbreak{}e\allowbreak{}e\allowbreak{}d\allowbreak{}s\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n}.
+\end{itemize}
+

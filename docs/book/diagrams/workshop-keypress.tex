@@ -1,0 +1,11 @@
+\begin{center}
+\begin{tikzpicture}[n/.style={draw=BookHeading,fill=BookPanel,rounded corners=1.5pt,align=center,text width=95mm,inner sep=5pt,font=\small},e/.style={-{Latex[length=2mm]},draw=BookHeading,line width=.7pt}]
+\node[n] (a) at (0,0) {Input sequence decoded as KeyMsg};
+\node[n] (b) at (0,-1.5) {App routing: Enter becomes start intention};
+\node[n] (c) at (0,-3) {Monitor transition: new model and run effect};
+\node[n] (d) at (0,-4.5) {Cmd adapter schedules work; later messages carry job and run identities};
+\node[n] (f) at (0,-6.2) {App view reads the current model and returns Surface};
+\node[n] (g) at (0,-7.8) {Runtime layout, paint, diff and terminal output};
+\draw[e] (a)--(b);\draw[e] (b)--(c);\draw[e] (c)--(d);\draw[e] (d)--(f);\draw[e] (f)--(g);
+\end{tikzpicture}
+\end{center}

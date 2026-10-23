@@ -1,0 +1,333 @@
+\chapter{Ready-to-Ship Assessment}\label{record-418}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/audit/2026-04-14_ship-readiness.md}\par}\smallskip
+
+\begin{RecordMeta}
+report_id: "AUD-2026-04-14-SR-V01"
+title: "Differential Ship-Readiness Audit: Bijou Runtime and Release Surface"
+status: "Final"
+audit:
+  date_started: 2026-04-14
+  date_completed: 2026-04-14
+  type: "Differential"
+  scope: "runtime, frame shell, text rendering boundary, release-readiness gauntlet, docs/operator readiness"
+  compliance_frameworks: []
+target:
+  repository: "github.com/flyingrobots/bijou"
+  branch: "release/v5.0.0"
+  commit_hash: "73160b9"
+  language_stack: ["TypeScript 5.9.3", "Node.js >=18", "Vitest 4.0.18", "npm workspaces"]
+  environment: "Local workspace; full release-readiness run on 2026-04-14"
+methodology:
+  automated_tools: ["npm run release:readiness", "npm audit --json", "npm outdated --json", "npm run docs:inventory", "rg"]
+  manual_review_hours: 5
+  false_positive_rate: "Low (<10%)"
+summary:
+  total_findings: 14
+  severity_count:
+    critical: 1
+    high: 4
+    medium: 6
+    low: 3
+  remediation_status: "Pending"
+related_reports:
+  previous_audit: "docs/audit/2026-04-11_ship-readiness.md"
+  tracking_ticket: "HT-008"
+
+\end{RecordMeta}
+
+Release confidence is materially better than it was on 2026-04-11. On 2026-04-14, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} passed end to end: build, lint, typecheck, docs/design-system preflight, DOGFOOD coverage gate, workflow-shell preflight, release preflight, frame regressions, smoke canaries, smoke DOGFOOD, and the full test suite (\texttt{3\allowbreak{}0\allowbreak{}1\allowbreak{}7} tests passed, \texttt{1\allowbreak{}2} skipped). \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} also returned \texttt{0} vulnerabilities. This is no longer a ``red build'' repo. The remaining risk is concentrated in security-sensitive text handling and teardown semantics rather than broad delivery instability.
+
+\section{1. Quality \& Maintainability Assessment}\label{record-418-quality-maintainability-assessment}
+
+\subsection{1.1. Technical Debt Score (1-10)}\label{record-418-technical-debt-score-1-10}
+
+\textbf{Score:} \texttt{4\allowbreak{}/\allowbreak{}1\allowbreak{}0}
+
+\textbf{Justification:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Shell Monolith:} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is still a \texttt{2\allowbreak{}4\allowbreak{}4\allowbreak{}4}-line shell factory with dozens of local helpers and multiple responsibilities.
+\item
+  \textbf{Split Text Trust Boundary:} The repo sanitizes some text entry points, but not all public surface-native ones, which makes behavior harder to reason about and audit.
+\item
+  \textbf{Bootstrap/Operator Drift:} The package/docs truth for first-app bootstrap and contributor setup is still inconsistent, increasing handoff cost even though the code itself is mostly green.
+\end{enumerate}
+
+\subsection{1.2. Readability \& Consistency}\label{record-418-readability-consistency}
+
+\textbf{Issue 1:} \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} hides too much control flow in local helpers. \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}6\allowbreak{}4\allowbreak{}5\allowbreak{}-\allowbreak{}1\allowbreak{}6\allowbreak{}3\allowbreak{}1} mixes shell theme publication, retained-layout caching, pane geometry, settings, notifications, and mouse routing in one place, which slows onboarding for any engineer entering the shell code.
+
+\textbf{Mitigation Prompt 1:}
+
+\begin{CodeBlock}
+Improve `createFramedApp()` readability by extracting the largest closure-local helper groups into named modules: one for retained-layout caching, one for shell input routing, and one for shell-owned settings/notification behavior. Keep the public API unchanged, but make the file read like an orchestrator rather than a dump of private helper functions.
+\end{CodeBlock}
+
+\textbf{Issue 2:} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}2\allowbreak{}0\allowbreak{}-\allowbreak{}2\allowbreak{}4\allowbreak{},\allowbreak{}5\allowbreak{}5\allowbreak{}-\allowbreak{}6\allowbreak{}7\allowbreak{},\allowbreak{}8\allowbreak{}7\allowbreak{}-\allowbreak{}9\allowbreak{}7} uses \texttt{d\allowbreak{}x} / \texttt{d\allowbreak{}y} without documenting the coordinate-space meaning. For a new engineer, it is not obvious that these values are localization offsets from potentially negative tree coordinates into a non-negative paint surface.
+
+\textbf{Mitigation Prompt 2:}
+
+\begin{CodeBlock}
+Rename `dx` / `dy` in `layout-node-surface.ts` to `offsetX` / `offsetY`, add short JSDoc explaining the local-to-surface coordinate-space conversion, and update the callers in `view-output.ts` so localization intent is explicit wherever a tree is translated before paint.
+\end{CodeBlock}
+
+\textbf{Issue 3:} The onboarding docs disagree on the happy path. \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}7\allowbreak{}2\allowbreak{}-\allowbreak{}9\allowbreak{}5} teaches manual context wiring, while \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}2\allowbreak{}3\allowbreak{}-\allowbreak{}4\allowbreak{}1} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}1\allowbreak{}9\allowbreak{}-\allowbreak{}3\allowbreak{}5} teach \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}, and \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d\allowbreak{}:\allowbreak{}8\allowbreak{}-\allowbreak{}1\allowbreak{}2} still says \texttt{p\allowbreak{}n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l}. That inconsistency hurts engineering handoffs even if the runtime is correct.
+
+\textbf{Mitigation Prompt 3:}
+
+\begin{CodeBlock}
+Normalize the onboarding language across `README.md`, `packages/bijou-tui/GUIDE.md`, `packages/bijou-node/README.md`, and `CONTRIBUTING.md`. Make `startApp()` the default Node-host bootstrap path everywhere, and update the contributor install command to match the actual npm workspace workflow used by the repo.
+\end{CodeBlock}
+
+\subsection{1.3. Code Quality Violation}\label{record-418-code-quality-violation}
+
+\textbf{Violation 1:} \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}7\allowbreak{}6\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}0} mixes timestamp formatting, mode branching, badge rendering, and string assembly in one function.
+
+\textbf{Original Code Snippet:}
+
+\begin{CodeBlock}
+export function log(level: LogLevel, message: string, options?: LogOptions): string {
+  const ctx = resolveCtx(options?.ctx);
+  const showPrefix = options?.prefix !== false;
+  const showTimestamp = options?.timestamp === true;
+  const ts = showTimestamp ? formatTimestamp(ctx) : '';
+
+  if (!ctx) {
+    const parts: string[] = [];
+    if (ts) parts.push(`[${ts}]`);
+    if (showPrefix) parts.push(`[${LABELS[level]}]`);
+    parts.push(message);
+    return parts.join(' ');
+  }
+
+  return renderByMode(ctx.mode, {
+    pipe: () => { /* ... */ },
+    accessible: () => { /* ... */ },
+    interactive: () => { /* ... */ },
+  }, options ?? {});
+}
+\end{CodeBlock}
+
+\textbf{Simplified Rewrite 1:}
+
+\begin{CodeBlock}
+function buildLogParts(level: LogLevel, message: string, ts: string, showPrefix: boolean): string[] {
+  const parts: string[] = [];
+  if (ts) parts.push(ts);
+  if (showPrefix) parts.push(LABELS[level]);
+  parts.push(message);
+  return parts;
+}
+
+export function log(level: LogLevel, message: string, options?: LogOptions): string {
+  const ctx = resolveCtx(options?.ctx);
+  const ts = options?.timestamp ? formatTimestamp(ctx) : '';
+  const showPrefix = options?.prefix !== false;
+
+  if (!ctx) return buildLogParts(level, message, ts && `[${ts}]`, showPrefix).join(' ');
+
+  return renderByMode(ctx.mode, {
+    pipe: () => buildLogParts(level, message, ts && `[${ts}]`, showPrefix).join(' '),
+    accessible: () => buildLogParts(level, message, ts, showPrefix).join(' ').replace(LABELS[level], `${ACCESSIBLE_LABELS[level]}:`),
+    interactive: () => renderInteractiveLog(ctx, level, message, ts, showPrefix),
+  }, options ?? {});
+}
+\end{CodeBlock}
+
+\textbf{Mitigation Prompt 4:}
+
+\begin{CodeBlock}
+Refactor `packages/bijou/src/core/components/log.ts` so `log()` becomes a thin coordinator. Extract helper functions for building plain-text parts and for rendering the interactive badge/timestamp path, then keep the public `log()` API unchanged.
+\end{CodeBlock}
+
+\textbf{Violation 2:} \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}5\allowbreak{}-\allowbreak{}7\allowbreak{}4} combines type discrimination, error messaging, size normalization, localization, and painting in one block.
+
+\textbf{Original Code Snippet:}
+
+\begin{CodeBlock}
+export function normalizeViewOutputInto(output: ViewOutput, size: ViewportSize, scratch?: Surface): NormalizedViewOutput {
+  if (isSurfaceView(output)) {
+    // surface path
+  }
+
+  if (!isLayoutNodeView(output)) {
+    throw new Error('Bijou runtime views must return a Surface or LayoutNode...');
+  }
+
+  const localization = localizeLayout(output);
+  const width = Math.max(size.width, localization.width, 0);
+  const height = Math.max(size.height, localization.height, 0);
+  const surface = prepareNormalizedSurface(width, height, scratch);
+  paintLayoutNodeWithOffset(surface, output, localization.dx, localization.dy);
+  return { kind: 'layout', surface };
+}
+\end{CodeBlock}
+
+\textbf{Simplified Rewrite 2:}
+
+\begin{CodeBlock}
+function normalizeSurfaceOutput(output: Surface, size: ViewportSize, scratch?: Surface): NormalizedViewOutput {
+  if (scratch == null) return { kind: 'surface', surface: output };
+  const surface = prepareNormalizedSurface(Math.max(size.width, output.width, 0), Math.max(size.height, output.height, 0), scratch);
+  surface.blit(output, 0, 0);
+  return { kind: 'surface', surface };
+}
+
+function normalizeLayoutOutput(output: LayoutNode, size: ViewportSize, scratch?: Surface): NormalizedViewOutput {
+  const localization = localizeLayout(output);
+  const surface = prepareNormalizedSurface(Math.max(size.width, localization.width, 0), Math.max(size.height, localization.height, 0), scratch);
+  paintLayoutNodeWithOffset(surface, output, localization.dx, localization.dy);
+  return { kind: 'layout', surface };
+}
+\end{CodeBlock}
+
+\textbf{Mitigation Prompt 5:}
+
+\begin{CodeBlock}
+Split `normalizeViewOutputInto()` into explicit surface and layout normalization helpers. Preserve the current runtime error for invalid view outputs, but move discrimination and normalization into smaller functions so the hot path is easier to read and test.
+\end{CodeBlock}
+
+\textbf{Violation 3:} \texttt{s\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}d\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}1\allowbreak{}3\allowbreak{}-\allowbreak{}3\allowbreak{}6\allowbreak{}9} handles queueing, flush setup, frame execution, and recursive rescheduling in one nested closure.
+
+\textbf{Original Code Snippet:}
+
+\begin{CodeBlock}
+function scheduleRender(): void {
+  if (renderHandle != null || renderInFlight) return;
+
+  const scheduledHandle = clock.setTimeout(() => {
+    if (renderHandle === scheduledHandle) {
+      renderHandle = null;
+    }
+    scheduledHandle.dispose();
+    if (!renderQueued) return;
+    renderInFlight = true;
+    renderQueued = false;
+    try {
+      // build RenderState and execute pipeline
+    } finally {
+      renderInFlight = false;
+      if (renderQueued) scheduleRender();
+    }
+  }, 0);
+
+  renderHandle = scheduledHandle;
+}
+\end{CodeBlock}
+
+\textbf{Simplified Rewrite 3:}
+
+\begin{CodeBlock}
+function queueRender(): void {
+  renderQueued = true;
+  if (renderHandle != null || renderInFlight) return;
+  renderHandle = clock.setTimeout(flushRender, 0);
+}
+
+function flushRender(): void {
+  const handle = renderHandle;
+  renderHandle = null;
+  handle?.dispose();
+  if (!renderQueued) return;
+
+  renderQueued = false;
+  renderInFlight = true;
+  try {
+    executeRenderFrame();
+  } finally {
+    renderInFlight = false;
+    if (renderQueued) queueRender();
+  }
+}
+\end{CodeBlock}
+
+\textbf{Mitigation Prompt 6:}
+
+\begin{CodeBlock}
+Refactor render scheduling in `packages/bijou-tui/src/runtime.ts` so queuing and flushing are separate functions with one explicit `executeRenderFrame()` helper. Keep the runtime semantics unchanged, but remove the large nested timeout closure and make the shutdown path easier to reason about.
+\end{CodeBlock}
+
+\section{2. Production Readiness \& Risk Assessment}\label{record-418-production-readiness-risk-assessment}
+
+\subsection{2.1. Top 3 Immediate Ship-Stopping Risks (The ``Hard No'')}\label{record-418-top-3-immediate-ship-stopping-risks-the-hard-no}
+
+\textbf{Risk 1:} \textbf{Critical} \textbar{} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+
+Public surface-native text helpers still write raw user text into cells without passing through \texttt{s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})}. This is the largest remaining ship risk if any consuming app renders untrusted input in interactive or static modes.
+
+\textbf{Mitigation Prompt 7:}
+
+\begin{CodeBlock}
+Implement a shared text-sanitization boundary for all public surface-native text helpers. Update `badge()`, `createTextSurface()`, and `createSegmentSurface()` so untrusted text is sanitized or explicitly rejected before it becomes cells, and add regression tests proving that CSI/OSC/DCS payloads cannot reach the terminal output path.
+\end{CodeBlock}
+
+\textbf{Risk 2:} \textbf{High} \textbar{} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}3\allowbreak{}-\allowbreak{}3\allowbreak{}6}
+
+\texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} interpolates raw \texttt{u\allowbreak{}r\allowbreak{}l} and \texttt{t\allowbreak{}e\allowbreak{}x\allowbreak{}t} directly into OSC 8 control sequences. A malicious value can break out of the hyperlink payload and inject arbitrary terminal control behavior.
+
+\textbf{Mitigation Prompt 8:}
+
+\begin{CodeBlock}
+Harden `hyperlink()` by sanitizing or validating both `url` and `text` before building OSC 8 output. Reject embedded ESC/BEL terminators, preserve safe fallback formatting for pipe/accessible modes, and add tests that attempt OSC 8 breakout payloads in both the URL and display text.
+\end{CodeBlock}
+
+\textbf{Risk 3:} \textbf{High} \textbar{} \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}6\allowbreak{}9\allowbreak{}-\allowbreak{}4\allowbreak{}9\allowbreak{}1} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}4\allowbreak{}3\allowbreak{}0\allowbreak{}-\allowbreak{}4\allowbreak{}5\allowbreak{}8}
+
+The runtime quits without awaiting \texttt{b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}d\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{})}. Long-lived async commands can still be pending when the bus is disposed, which makes cleanup timing-dependent and increases the chance of dropped teardown or orphaned effects during shutdown.
+
+\textbf{Mitigation Prompt 9:}
+
+\begin{CodeBlock}
+Update the runtime shutdown path to await `bus.drain()` before final disposal, with a bounded timeout and test coverage for long-lived commands that register cleanups asynchronously. Preserve fast exits for already-idle apps, but make command teardown deterministic when work is still in flight.
+\end{CodeBlock}
+
+\subsection{2.2. Security Posture}\label{record-418-security-posture}
+
+\textbf{Vulnerability 1:} \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} OSC 8 interpolation can be broken by malicious \texttt{u\allowbreak{}r\allowbreak{}l} or \texttt{t\allowbreak{}e\allowbreak{}x\allowbreak{}t} values (\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}3\allowbreak{}-\allowbreak{}3\allowbreak{}6}).
+
+\textbf{Mitigation Prompt 10:}
+
+\begin{CodeBlock}
+Treat `hyperlink()` as a security boundary. Validate the URL and display text, strip or reject terminal control bytes, and centralize the escaping/validation logic in a reusable helper so other OSC/ANSI-producing components can share it.
+\end{CodeBlock}
+
+\textbf{Vulnerability 2:} Surface-native text builders such as \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} accept raw control characters and bypass the existing \texttt{s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} path (\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}3\allowbreak{}2\allowbreak{}-\allowbreak{}4\allowbreak{}0\allowbreak{},\allowbreak{}7\allowbreak{}9\allowbreak{}-\allowbreak{}8\allowbreak{}6}; \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}:\allowbreak{}7\allowbreak{}2\allowbreak{}-\allowbreak{}9\allowbreak{}9\allowbreak{},\allowbreak{}1\allowbreak{}0\allowbreak{}5\allowbreak{}-\allowbreak{}1\allowbreak{}3\allowbreak{}0}).
+
+\textbf{Mitigation Prompt 11:}
+
+\begin{CodeBlock}
+Introduce a trusted/untrusted text contract for surface-native rendering. All public APIs that accept arbitrary strings should default to untrusted mode and sanitize control sequences before cell writes, while an explicit trusted/styled path can preserve ANSI where that is intentional. Add a shared test matrix across badge, surface-text, and any component that delegates to them.
+\end{CodeBlock}
+
+\subsection{2.3. Operational Gaps}\label{record-418-operational-gaps}
+
+\textbf{Gap 1:} \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} does not currently run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t} or \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}; both had to be checked manually during this audit.
+
+\textbf{Gap 2:} There is no first-class trusted-text type, linter, or audit tool that forces public text-bearing APIs through the same terminal-safety boundary.
+
+\textbf{Gap 3:} Runtime shutdown does not emit structured telemetry or timeout diagnostics for pending commands/effects that are still alive during quit.
+
+\section{3. Final Recommendations \& Next Step}\label{record-418-final-recommendations-next-step}
+
+\subsection{3.1. Final Ship Recommendation}\label{record-418-final-ship-recommendation}
+
+\textbf{YES, BUT\ldots{}}
+
+Ship is reasonable for controlled or trusted input because the release gauntlet is green and the dependency audit is clean. Do not treat the current public text surface as safe for untrusted content until the remaining terminal-control-sequence boundary is unified.
+
+\subsection{3.2. Prioritized Action Plan}\label{record-418-prioritized-action-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Action 1 (High Urgency):} Close the surface-native control-sequence injection boundary across \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}, and \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})}.
+\item
+  \textbf{Action 2 (Medium Urgency):} Make runtime shutdown drain pending commands before disposal and instrument lingering cleanups.
+\item
+  \textbf{Action 3 (Low Urgency):} Continue decomposing \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} into explicit extension seams or, at minimum, publish one operator-facing extension guide that matches the code.
+\end{itemize}
+

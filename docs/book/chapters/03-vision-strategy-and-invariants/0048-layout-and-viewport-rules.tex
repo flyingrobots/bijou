@@ -1,0 +1,249 @@
+\chapter{Layout And Viewport Rules}\label{record-048}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/layout-and-viewport-rules.md}\par}\smallskip
+
+\emph{Strategy note for Bijou's canonical layout ownership and overflow behavior}
+
+\section{Why this exists}\label{record-048-why-this-exists}
+
+Bijou already has strong layout instincts, but too many of them have lived as local bug fixes or component folklore.
+
+This note turns those instincts into explicit rules:
+
+\begin{itemize}
+\tightlist
+\item
+  who owns whitespace
+\item
+  when a child fills versus centers within a parent
+\item
+  what resize is allowed to change
+\item
+  when overflow becomes a viewport instead of a paint trick
+\item
+  how scrollbars, focus, hit-testing, and scrolling must stay aligned
+\end{itemize}
+
+Read this alongside \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{layout localization pipeline}. That note explains how a \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} tree becomes a local paint root; this one explains the user-facing layout and overflow rules that tree should obey.
+
+\section{Rule 1: Parents own placement, children own content}\label{record-048-rule-1-parents-own-placement-children-own-content}
+
+A child surface or layout node owns its own content. A parent owns where that child sits inside available space.
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  children do not silently self-center inside a larger parent rect
+\item
+  children do not invent extra outer padding unless the component contract says they do
+\item
+  parents decide stack order, alignment, and unused slack
+\end{itemize}
+
+If a surface appears ``floating'' inside a larger region, that should be because the parent layout expressed that intention explicitly.
+
+\section{Rule 2: Slack is a layout decision, not an accident}\label{record-048-rule-2-slack-is-a-layout-decision-not-an-accident}
+
+Unused width or height must be explainable.
+
+Legitimate causes:
+
+\begin{itemize}
+\tightlist
+\item
+  the parent intentionally centers or aligns a child
+\item
+  the parent reserves gutter, rail, or chrome space
+\item
+  the child is intrinsically smaller and the parent deliberately does not fill
+\end{itemize}
+
+Illegitimate causes:
+
+\begin{itemize}
+\tightlist
+\item
+  a child paints less than the geometry routing thinks it owns
+\item
+  a container leaves dead area because no rule says who should fill it
+\item
+  a scrollbar or overlay rail steals width without owning that contraction
+\end{itemize}
+
+If there is visible slack, someone should clearly own it.
+
+\section{Rule 3: Resize changes geometry, not semantics}\label{record-048-rule-3-resize-changes-geometry-not-semantics}
+
+Terminal resize may change:
+
+\begin{itemize}
+\tightlist
+\item
+  split ratios translated into actual rect widths/heights
+\item
+  grid track sizes
+\item
+  wrapping points
+\item
+  viewport capacity
+\end{itemize}
+
+Resize must not silently change:
+
+\begin{itemize}
+\tightlist
+\item
+  focus ownership
+\item
+  which node conceptually owns a region
+\item
+  whether content is now ``different'' instead of merely reflowed
+\end{itemize}
+
+When a resize forces a more compact rendering, the semantic structure should stay the same even if line breaks, truncation, or viewport extent change.
+
+\section{Rule 4: Overflow belongs to a viewport}\label{record-048-rule-4-overflow-belongs-to-a-viewport}
+
+Overflow is not just ``paint past the edge and hope clipping works.''
+
+If content needs to move independently of its container, that region should be owned by a viewport or another explicit scroll-capable primitive.
+
+Use a viewport when:
+
+\begin{itemize}
+\tightlist
+\item
+  keyboard navigation needs a stable scroll state
+\item
+  mouse wheel input should move content
+\item
+  a scrollbar is shown
+\item
+  clipping and visible extent are part of the contract
+\end{itemize}
+
+Do not fake viewport behavior by:
+
+\begin{itemize}
+\tightlist
+\item
+  clipping a child while storing scroll state somewhere unrelated
+\item
+  painting a scrollbar for content that has no canonical scroll owner
+\item
+  letting hit-testing or focus believe content is visible when the viewport has clipped it away
+\end{itemize}
+
+\section{Rule 5: Scrollbars are promises, not decoration}\label{record-048-rule-5-scrollbars-are-promises-not-decoration}
+
+If a scrollbar is visible, it promises:
+
+\begin{itemize}
+\tightlist
+\item
+  there is a real scroll owner
+\item
+  the thumb reflects actual visible extent
+\item
+  keyboard and mouse scrolling target that same owner
+\item
+  hit-testing and focus use the same geometry the rail implies
+\end{itemize}
+
+A scrollbar must never be merely a painted affordance with separate hidden scroll truth elsewhere.
+
+\section{Rule 6: Layout geometry drives interaction geometry}\label{record-048-rule-6-layout-geometry-drives-interaction-geometry}
+
+Pointer hit-testing, wheel routing, focus movement, and scroll targeting should reuse the same retained geometry that layout/render already established.
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  input routing should not rebuild a different mental model of the workspace
+\item
+  scroll regions should not guess where panes are from visual pixels alone
+\item
+  retained layout caches are legitimate when they preserve layout truth
+\end{itemize}
+
+This rule is the bridge between the design-language posture here and the runtime invariant \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}.
+
+\section{Rule 7: Wrap, clip, and viewport are distinct choices}\label{record-048-rule-7-wrap-clip-and-viewport-are-distinct-choices}
+
+Overflow handling should be explicit:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{wrap} when the content should remain fully readable inside flowing text
+\item
+  \textbf{clip} when the content is intentionally bounded and off-edge detail is not currently navigable
+\item
+  \textbf{viewport} when the content remains conceptually larger than its visible window and users need to move through it
+\end{itemize}
+
+Do not blur these:
+
+\begin{itemize}
+\tightlist
+\item
+  clipping is not scrolling
+\item
+  wrapping is not resizing the model
+\item
+  viewporting is not just clipping plus a painted thumb
+\end{itemize}
+
+\section{Rule 8: Shell chrome must not lie about owned width}\label{record-048-rule-8-shell-chrome-must-not-lie-about-owned-width}
+
+Headers, footers, gutters, split dividers, notification rails, and scrollbar overlays all participate in layout ownership. They must either:
+
+\begin{itemize}
+\tightlist
+\item
+  consume width/height explicitly, or
+\item
+  overlay without changing the body's owned geometry
+\end{itemize}
+
+The body region should never be measured as if chrome were absent and then painted as if chrome had stolen width after the fact.
+
+\section{Practical consequences}\label{record-048-practical-consequences}
+
+When touching layout code, ask:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Who owns this whitespace?
+\item
+  If content overflows, where does scroll state live?
+\item
+  If a scrollbar is visible, which viewport does it speak for?
+\item
+  Does input routing use the same geometry that render used?
+\item
+  Would a resize reflow the same semantic layout, or accidentally change it?
+\end{enumerate}
+
+If those answers are not explicit, the layout contract is still too vague.
+
+\section{Read this with}\label{record-048-read-this-with}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/layout-localization-pipeline.md}{layout localization pipeline}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ARCHITECTURE.md}{packages/bijou-tui/ARCHITECTURE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/patterns.md}{docs/design-system/patterns.md}
+\end{itemize}
+

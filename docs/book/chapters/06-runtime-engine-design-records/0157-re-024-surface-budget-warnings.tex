@@ -1,0 +1,142 @@
+\chapter{RE-024 Surface Budget Warnings}\label{record-157}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-024-surface-budget-warnings.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: RE-024 Surface Budget Warnings
+legend: RE
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-157-framing}
+
+Many performance regressions are easier to catch during normal development than in a separate benchmark run. Bijou already measures render pipeline timings and owns the target \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} before diff/output, so the runtime can warn when an app crosses explicit surface or timing budgets.
+
+RE-024 adds opt-in, non-fatal budget diagnostics. The first slice keeps the policy simple: a pure evaluator returns warning objects, and the interactive runtime can route those warnings through the existing \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} app hook when \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{} \allowbreak{}\}\allowbreak{})} is configured.
+
+\section{Sponsored Users}\label{record-157-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  App authors who want early feedback when a render surface grows beyond an intended size.
+\item
+  Maintainers reviewing frame timing regressions during normal development.
+\item
+  Test authors who want deterministic budget warning objects without running a benchmark harness.
+\end{itemize}
+
+\section{Hills}\label{record-157-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A developer can evaluate a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} and render timings against configured budgets and get deterministic warning objects.
+\item
+  An interactive app can opt into runtime budget warnings without changing its TEA messages unless it chooses to route \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e}s.
+\item
+  A test can assert that area, styled-cell, frame-duration, and per-stage thresholds produce clear messages.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-157-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the pure evaluator stay deterministic and side-effect free?
+\item
+  Does a target surface over the configured area threshold produce a warning?
+\item
+  Does a styled-cell count over the configured threshold produce a warning?
+\item
+  Do frame-duration and stage-duration thresholds use pipeline timings?
+\item
+  Does \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{} \allowbreak{}\}\allowbreak{})} route warnings through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e} as \texttt{s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}'} and \texttt{l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}'}?
+\item
+  Does omitting \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t} keep the runtime silent?
+\end{itemize}
+
+\section{Requirements}\label{record-157-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{e\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\item
+  Support maximum width, height, area, styled cells, total frame duration, and per-stage duration thresholds.
+\item
+  Add \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t} to \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}.
+\item
+  Route runtime budget violations through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e}.
+\item
+  Keep warnings non-fatal by default.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-157-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused RED tests fail before implementation and pass after.
+\item
+  The evaluator returns stable \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}W\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g} records.
+\item
+  Runtime budget warnings use the existing runtime issue route.
+\item
+  No warning is emitted when no budget is configured.
+\item
+  Docs and changelog describe the opt-in feature.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-157-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement a pure \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} helper with threshold and warning types.
+\item
+  Export the helper and types from the \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} source barrel.
+\item
+  Call the helper after pipeline execution, before lifecycle playback, so the warning uses the same target surface and timings that will be committed.
+\end{itemize}
+
+\section{Drift Check}\label{record-157-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed on non-fatal warnings. The runtime does not fail frames or quit when a threshold is crossed.
+\item
+  The first slice measures the committed target surface and pipeline timings. Allocation count and output byte volume remain follow-on metrics because they need deeper differ/runtime counters to be accurate.
+\item
+  Runtime warnings are deduplicated by message to avoid warning/render loops when an app routes budget issues back into its own TEA update path.
+\end{itemize}
+
+\section{Playback}\label{record-157-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{e\allowbreak{}v\allowbreak{}a\allowbreak{}l\allowbreak{}u\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} returns deterministic warning records for width, height, area, styled-cell count, total frame duration, and per-stage duration.
+\item
+  \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{} \allowbreak{}\}\allowbreak{})} evaluates the target framebuffer after pipeline execution and routes violations through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}s\allowbreak{}s\allowbreak{}u\allowbreak{}e}.
+\item
+  Runtime warnings use \texttt{l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}'} and \texttt{s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}'}.
+\item
+  Omitting \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}t} leaves existing runtime behavior unchanged.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} exports the helper and budget types from the source barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-157-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  This is the right first runtime budget boundary: it gives app authors useful early warnings without pretending Bijou can enforce every performance budget from inside the render loop.
+\item
+  The target surface area is the framebuffer area, not the app view's intrinsic surface size after normalization. Tests pin the viewport when they need exact runtime budget numbers.
+\end{itemize}
+

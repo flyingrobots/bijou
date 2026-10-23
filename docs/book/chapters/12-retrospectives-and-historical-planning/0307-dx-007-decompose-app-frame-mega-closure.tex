@@ -1,0 +1,64 @@
+\chapter{DX-007 --- Decompose app-frame.ts Mega-Closure}\label{record-307}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-007-decompose-app-frame-mega-closure.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-007 — Decompose app-frame.ts Mega-Closure
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-307-disposition}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}0}. The remaining high-value closure debt in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is now materially decomposed: \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l} and \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l} live in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}, the circular import between \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} and \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} is gone, and the shell-theme/help/ settings/notification helper cluster now lives in the independently importable \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} module with direct unit coverage in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}. This work reduced \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} from 3,132 lines to 2,348 while preserving the earlier module splits across render, actions, palette, layers, and utils.
+
+The original ``under 800 lines'' target was an early umbrella goal from before those prior extractions landed. Repo truth now lives in the decomposed module boundaries and testability, not that stale numeric threshold.
+
+\section{Original Proposal}\label{record-307-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-307-problem}
+
+\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is 2,679 lines with 9 responsibilities, 90+ internal functions, 38 imports, and a mega-closure that prevents unit testing any individual function.
+
+\section{Evidence}\label{record-307-evidence}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Modularity}: routing, rendering, state, command dispatch, settings, notifications, help, overlays, and transitions all live in one file
+\item
+  \textbf{Coupling}: circular import with app-frame-types.ts (FrameModel)
+\item
+  \textbf{Testability}: every internal function captures closure state; none can be imported or tested independently
+\item
+  \textbf{Growth}: each RE cycle (001-007) added more logic without decomposing
+\end{itemize}
+
+\section{Target}\label{record-307-target}
+
+Decompose into focused domain modules:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- settings drawer state, focus, scroll, row activation, resolveSettingsLayout
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- notification center state, scroll, filter, resolveNotificationCenterLayout
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- help overlay rendering, scroll computation
+\item
+  \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- shellCommandHandlers table, FrameShellCommand apply logic, drainShellCommandBuffer
+\item
+  Move FrameModel to app-frame-types.ts to break circular import
+\end{enumerate}
+
+Each module independently importable and unit-testable with deps injection. Target: app-frame.ts under 800 lines.
+
+\section{Effort}\label{record-307-effort}
+
+Large --- touches the highest-traffic file in the repo. Must be done incrementally with tests at each step.
+

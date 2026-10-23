@@ -1,0 +1,166 @@
+\chapter{RE-030 --- Average High-Resolution Canvas Colors}\label{record-158}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-030-average-high-resolution-canvas-colors.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Sponsor Human}\label{record-158-sponsor-human}
+
+A terminal app builder using \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} canvas shaders for small procedural images, title screens, charts, and textured scene previews.
+
+\section{Sponsor Agent}\label{record-158-sponsor-agent}
+
+An implementation agent that must render high-density terminal art without repairing colors after the canvas has already collapsed subpixels into cells.
+
+\section{Hills}\label{record-158-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can return per-subpixel RGB values from a \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} shader and trust Bijou to collapse those colors the way image resampling normally does.
+\item
+  A builder can use \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} or \texttt{q\allowbreak{}u\allowbreak{}a\allowbreak{}d} resolution without losing color when the first lit subpixel is not representative of the whole terminal cell.
+\item
+  An agent can debug canvas color behavior from \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} itself rather than recommending app-local post-render \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B\allowbreak{}(\allowbreak{})} correction loops.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-158-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  In \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} mode, when eight subpixels return different foreground RGB values, does the resulting Braille cell use their arithmetic mean?
+\item
+  In \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e} mode, when all eight subpixels are visually off but still return background RGB values, does the collapsed cell preserve their average background style?
+\item
+  In \texttt{q\allowbreak{}u\allowbreak{}a\allowbreak{}d} mode, when four subpixels return different RGB values, does the resulting quadrant character use the arithmetic mean instead of the first lit subpixel's style?
+\item
+  Does the character coverage behavior stay unchanged while only style aggregation changes?
+\end{enumerate}
+
+\section{Requirements}\label{record-158-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} must sample all 2x4 subpixels for the output cell and average every available foreground RGB contribution.
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} must also average every available background RGB contribution, including cells whose shader character is a space.
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}q\allowbreak{}u\allowbreak{}a\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} must use the same color aggregation rule across its 2x2 subpixels.
+\item
+  Shader results that return \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} or \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B} must avoid unnecessary hex parsing.
+\item
+  Shader results that return parseable hex or resolved color references must still participate in the same averaging path.
+\item
+  Coverage remains boolean: non-space subpixels set Braille dots or quadrant bits, and space subpixels leave those dots or bits off.
+\item
+  Modifiers remain compatibility-oriented and come from the first lit styled subpixel.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-158-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Red tests prove Braille foreground averaging, Braille background averaging for an empty Braille cell, and Quad foreground averaging.
+\item
+  The implementation changes \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} instead of requiring app-local post-processing.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} passes.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passes.
+\end{itemize}
+
+\section{Accessibility / Assistive Reading Posture}\label{record-158-accessibility-assistive-reading-posture}
+
+This change preserves character semantics and only adjusts styling. Existing plain text and assistive interpretations of the character grid should remain unchanged.
+
+\section{Localization / Directionality Posture}\label{record-158-localization-directionality-posture}
+
+The feature is independent of prose localization and bidirectional text. It does not alter grapheme ordering or directional layout.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-158-agent-inspectability-explainability-posture}
+
+The color decision must live in named helper functions in \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}, with tests that make the sampling rule explicit. Agents should be able to explain that the high-resolution renderer computes coverage and style separately: coverage chooses the Braille or quadrant glyph, while style is averaged from sampled subpixel styles.
+
+\section{Linked Invariants}\label{record-158-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-158-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add failing tests for Braille foreground averaging, empty-cell background averaging, and Quad foreground averaging.
+\item
+  Introduce a small color accumulator in \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Resolve each sampled cell's foreground and background color from \texttt{f\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B}, \texttt{b\allowbreak{}g\allowbreak{}R\allowbreak{}G\allowbreak{}B}, resolved color refs, or parseable hex strings.
+\item
+  Average available foreground and background samples independently using rounded arithmetic means.
+\item
+  Apply the averaged style to the collapsed Braille or Quad cell while preserving existing coverage behavior.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-158-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y\allowbreak{} \allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s}
+\item
+  \texttt{a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}q\allowbreak{}u\allowbreak{}a\allowbreak{}d\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s}
+\end{itemize}
+
+\section{Drift Check}\label{record-158-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  RED observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} failed with three expected assertions: Braille foreground used \texttt{[\allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{}]}, empty Braille background was \texttt{u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d}, and Quad foreground used \texttt{[\allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{}]}.
+\item
+  GREEN observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passed with 9 tests.
+\item
+  Package lint observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} passed.
+\item
+  Root lint: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} reached the workspace sweep but failed on pre-existing uncommitted \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}m\allowbreak{}a\allowbreak{}p} work because \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}m\allowbreak{}a\allowbreak{}p} had no \texttt{l\allowbreak{}i\allowbreak{}n\allowbreak{}t} script. After the local heatmap workspace drift was repaired, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed.
+\item
+  Pre-commit lockfile gate: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l} still fails in the local install tree with extraneous and missing dependency reports unrelated to this canvas change, so the scoped commit used the recorded tests and lint results rather than treating local install drift as RE-030 scope.
+\item
+  Whitespace drift: \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passed.
+\end{itemize}
+
+\section{Playback}\label{record-158-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Braille foreground averaging is covered by \texttt{a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s}; the collapsed full Braille cell now carries \texttt{[\allowbreak{}2\allowbreak{}8\allowbreak{},\allowbreak{} \allowbreak{}5\allowbreak{}6\allowbreak{},\allowbreak{} \allowbreak{}8\allowbreak{}4\allowbreak{}]} from eight RGB samples.
+\item
+  Empty Braille background preservation is covered by \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}b\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}e\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y\allowbreak{} \allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s}; the blank Braille cell now carries \texttt{[\allowbreak{}2\allowbreak{}8\allowbreak{},\allowbreak{} \allowbreak{}3\allowbreak{}8\allowbreak{},\allowbreak{} \allowbreak{}4\allowbreak{}8\allowbreak{}]} even when no dot is lit.
+\item
+  Quad foreground averaging is covered by \texttt{a\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}q\allowbreak{}u\allowbreak{}a\allowbreak{}d\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}b\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}s}; the \texttt{▚} glyph now carries \texttt{[\allowbreak{}1\allowbreak{}5\allowbreak{},\allowbreak{} \allowbreak{}3\allowbreak{}0\allowbreak{},\allowbreak{} \allowbreak{}4\allowbreak{}5\allowbreak{}]} from all four samples.
+\item
+  Existing coverage tests for top-left Braille and diagonal Quad glyphs still pass, so glyph selection stayed stable while style aggregation changed.
+\end{enumerate}
+
+\section{Retrospective}\label{record-158-retrospective}
+
+The root issue was local to high-resolution canvas style aggregation. The renderer already sampled the right subpixels for coverage but treated style as a first-lit-subpixel property. Splitting coverage from style lets shader authors return material colors per sample and lets Bijou perform the terminal-cell resampling step itself. No app should need to walk the rendered surface after \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} just to recover colors.
+

@@ -1,10 +1,6 @@
 ---
 title: DL-024 Theme Lab Design Book Provenance
-legend: DL
-lane: roadmap
-priority: medium
 github_issue: 317
-status: active
 keywords:
   - design-language
   - theme-lab
@@ -13,14 +9,22 @@ keywords:
   - design-book
 ---
 
-Legend: [DL - Design Language](../legends/DL-design-language.md)
+# DL-024 Theme Lab Design Book Provenance
+
+This design record retains the campaign reasoning from pre-integration
+commit [`22378d7c`](https://github.com/flyingrobots/bijou/commit/22378d7cdc5024479188c5505262d22a5debd9b0).
+Its baseline descriptions, measurements and proposed phases are historical,
+not a live release report or a second backlog. GitHub issues and milestones
+track current work; the [package guide](../../packages/bijou/README.md#theme-authoring)
+documents the API delivered by this PR. The separate Bijou book and its frozen
+source corpus are unchanged.
 
 ## Linked Work
 
 - Colour campaign: [DL-023](./DL-023-sapphire-theme-system.md)
-- Prior Theme Lab cycles: [DL-019](./DL-019-theme-rule-selection-and-inspection.md),
-  [DL-021](./DL-021-dogfood-theme-token-usage-proof.md),
-  [DL-022](./DL-022-theme-lab-editor-graph-ux.md)
+- Prior Theme Lab cycles: [DL-019](https://github.com/flyingrobots/bijou/blob/22378d7cdc5024479188c5505262d22a5debd9b0/docs/design/DL-019-theme-rule-selection-and-inspection.md),
+  [DL-021](https://github.com/flyingrobots/bijou/blob/22378d7cdc5024479188c5505262d22a5debd9b0/docs/design/DL-021-dogfood-theme-token-usage-proof.md),
+  [DL-022](https://github.com/flyingrobots/bijou/blob/22378d7cdc5024479188c5505262d22a5debd9b0/docs/design/DL-022-theme-lab-editor-graph-ux.md)
 - Provenance probe story:
   [#317](https://github.com/flyingrobots/bijou/issues/317)
 - External model: [Design Book](https://github.com/meodai/design-book), used as
@@ -41,7 +45,7 @@ score and contrast each was ranked on.
 
 The Theme Lab used none of it. This cycle connects them.
 
-## Current Truth
+## Pre-Change Baseline
 
 Three defects, each a consequence of the one before it.
 
@@ -136,7 +140,11 @@ hides the metric cannot be used to fix the metric.
   by hand. Full rule-driven recomputation remains part of the DL-023 phase 4
   rebuild.
 
-## Successor Validation
+## Original Successor Validation
+
+The following numbers were recorded for the original pre-integration
+`22378d7c` candidate; they are not current-head validation or a fresh audit.
+
 
 The clean V9 successor was replayed from merged `origin/main`, excluding the
 mixed source branch's obsolete security, add-then-remove comparator, and stale

@@ -1,0 +1,144 @@
+\chapter{DF-029 Fixture-to-Docs Promotion Path}\label{record-090}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-029-fixture-to-docs-promotion-path.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-029 Fixture-to-Docs Promotion Path
+legend: DF
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-090-framing}
+
+Good Bijou examples often start as regression fixtures. Good docs examples often become the clearest regression fixtures. Today the promotion path between those surfaces is mostly manual, which means provenance, story ids, component metadata, and capture outputs drift.
+
+DF-029 adds a pure promotion record that links fixture, docs, story, example, or MCP artifacts. The first slice is not a file-writing CLI; it is the canonical record and text report that future commands can emit, review, and preserve.
+
+\section{Sponsored Users}\label{record-090-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintainers promoting stable fixtures into docs and DOGFOOD stories.
+\item
+  Docs authors linking examples back to executable regression coverage.
+\item
+  MCP/tooling authors reusing example provenance in agent-facing payloads.
+\item
+  Agents proposing docs updates from failing or useful fixtures.
+\end{itemize}
+
+\section{Hills}\label{record-090-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer can record a fixture-to-docs promotion with source artifact, target artifact, component metadata, story matrix, tags, and notes.
+\item
+  A docs author can reverse that record when a docs story should become a regression fixture.
+\item
+  A reviewer can read a deterministic report that preserves provenance without inspecting multiple files.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-090-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the record support fixture, docs, story, example, and MCP artifacts?
+\item
+  Does the helper preserve metadata and story capture matrix references?
+\item
+  Are tags normalized deterministically?
+\item
+  Can the promotion direction be reversed without losing provenance?
+\item
+  Does report text include id, source, target, component, matrix, tags, and notes?
+\item
+  Does \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} export the promotion API from the root barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-090-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})}.
+\item
+  Add \texttt{r\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}F\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})}.
+\item
+  Add \texttt{f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{})}.
+\item
+  Support artifact kinds \texttt{f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s}, \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e}, and \texttt{m\allowbreak{}c\allowbreak{}p}.
+\item
+  Support optional \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} and \texttt{S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}C\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x}.
+\item
+  Keep the first slice pure and deterministic; no filesystem writes.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-090-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  RED tests fail before implementation and pass after.
+\item
+  Promotion records keep source, target, metadata, matrix, tags, and notes.
+\item
+  Reverse promotion swaps source/target and preserves provenance.
+\item
+  Report text is stable and suitable for docs, review comments, and agent output.
+\item
+  Docs and changelog describe the helper.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-090-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep artifact paths as caller-owned strings; path validation belongs to a future CLI/adapter.
+\end{itemize}
+
+\section{Drift Check}\label{record-090-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed pure and provenance-focused. No files are written, no paths are resolved, and no docs are generated in this slice.
+\item
+  The record supports fixture, docs, story, example, and MCP artifacts and can carry DX-025 metadata plus DF-028 story matrices.
+\item
+  Tag normalization is deterministic: trimmed, de-duplicated, and sorted.
+\end{itemize}
+
+\section{Playback}\label{record-090-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} stores id, source artifact, target artifact, optional component metadata, optional story matrix, normalized tags, and notes.
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}F\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} swaps source and target while preserving metadata, matrix, tags, and notes.
+\item
+  \texttt{f\allowbreak{}i\allowbreak{}x\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} renders id, source, target, component, matrix, tags, and notes as deterministic text.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports the promotion API from the root barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-090-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  The promotion record is deliberately not a CLI. That keeps adapter concerns like path existence, markdown insertion, and baseline writing outside core.
+\item
+  Together with component metadata and story capture matrices, it gives future docs tooling a compact provenance spine instead of one-off comments.
+\end{itemize}
+

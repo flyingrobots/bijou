@@ -1,0 +1,246 @@
+\chapter{DX-050-profunctor-page-inspection}\label{record-146}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-050-profunctor-page-inspection.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-050 Profunctor Page Inspection
+legend: DX
+lane: release
+priority: high
+github_issue: 468
+status: complete
+keywords:
+  - developer-experience
+  - profunctor-page
+  - scene-ir
+  - target-inspection
+  - v10.0.0
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-146-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Bijou story: \href{https://github.com/flyingrobots/bijou/issues/468}{\#468}
+\item
+  Implementation pull request: \href{https://github.com/flyingrobots/bijou/pull/474}{\#474}
+\item
+  Website campaign: \href{https://github.com/flyingrobots/profunctor-optics-website/issues/14}{profunctor-optics-website\#14}
+\item
+  Canonical website specimen revision: \href{https://github.com/flyingrobots/profunctor-optics-website/commit/6a411d72c55edb6e4acc3b556d5cf96c303376f5}{\texttt{6\allowbreak{}a\allowbreak{}4\allowbreak{}1\allowbreak{}1\allowbreak{}d\allowbreak{}7}}
+\item
+  Sibling Geordi proof: \href{https://github.com/flyingrobots/geordi/issues/52}{geordi\#52} and \href{https://github.com/flyingrobots/geordi/pull/53}{geordi\#53}
+\item
+  Code Dojo prerequisite: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-163-respecting-dojo-ratchet-112.md}{WF-163}
+\end{itemize}
+
+\section{Decision Summary}\label{record-146-decision-summary}
+
+Bijou will consume byte-identical copies of the canonical Keep \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}/\allowbreak{}0}, source map, and build manifest. It will validate their versions, identities, references, and pinned digests before lowering the page through a Bijou-owned \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, layout, and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path.
+
+The website remains authoritative for page composition and source occurrences. Bijou owns terminal render identities, inspection facts, residuals, and its receipt. Geordi is sibling evidence, not a package dependency or authority.
+
+\section{Current Truth}\label{record-146-current-truth}
+
+Before DX-050, Bijou could lower Bijou-owned scenes and blocks to terminal surfaces, but it could not validate, inspect, or lower the website-owned \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}/\allowbreak{}0} family. The canonical ProjectPage specimen existed only in the website repository at revision \texttt{6\allowbreak{}a\allowbreak{}4\allowbreak{}1\allowbreak{}1\allowbreak{}d\allowbreak{}7}; Bijou had no pinned copy, page target profile, cross-artifact validation, source-to-render map, target receipt, or terminal witness for that family.
+
+\section{Acceptance Criteria}\label{record-146-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Pin byte-identical \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}/\allowbreak{}0}, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}p\allowbreak{}/\allowbreak{}0}, and \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}/\allowbreak{}0} inputs to website revision \texttt{6\allowbreak{}a\allowbreak{}4\allowbreak{}1\allowbreak{}1\allowbreak{}d\allowbreak{}7} with exact SHA-256 digests.
+\item
+  Validate versions, identities, references, dependency digests, root reachability, reading order, and target capabilities before lowering.
+\item
+  Reject visible unsupported blocks and obstructed or clipped output with a stable diagnostic and no target artifact.
+\item
+  Residualize only hidden unsupported blocks, with the unsupported block identity preserved in the target map.
+\item
+  Emit deterministic scene, target-map, receipt, and terminal-witness bytes through the existing layout and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} contracts.
+\item
+  Preserve page, template, source-occurrence, token, reading-order, landmark, and action facts across all supported inspection modes.
+\item
+  Hold the Code Dojo debt ceiling at \texttt{6\allowbreak{}2} aggregate violations or lower and pass the focused contract, generation, documentation, and full repository gates.
+\end{itemize}
+
+\section{Sponsor Human}\label{record-146-sponsor-human}
+
+James Ross.
+
+\section{Sponsor Agent}\label{record-146-sponsor-agent}
+
+Codex.
+
+\section{Hill}\label{record-146-hill}
+
+Given the canonical Keep specimen, Bijou emits deterministic terminal inspection evidence that preserves page, template, source-occurrence, token, reading-order, and link identities; assigns every supported visible node a Bijou render identity; residualizes hidden unsupported nodes; and rejects malformed, contradictory, or visibly unsupported inputs.
+
+\section{Playback Questions}\label{record-146-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Which exact website revision and input digests produced this proof?
+\item
+  Where does each page node appear in \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} output?
+\item
+  Which token, reading-order, source, and action facts remain inspectable?
+\item
+  Which upstream capabilities does Bijou refuse rather than inherit?
+\item
+  Does repeated lowering emit byte-identical artifacts and receipts?
+\end{enumerate}
+
+\section{Scope}\label{record-146-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Vendor the three canonical inputs with provenance and SHA-256 pins.
+\item
+  Parse and validate the version-zero artifact family fail closed.
+\item
+  Lower supported ProjectPage blocks to one deterministic \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}.
+\item
+  Adapt the scene through existing layout and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} contracts.
+\item
+  Emit a Bijou target map, receipt, and inspectable terminal witness.
+\item
+  Preserve source-map identities without mutating compiler-owned occurrences.
+\item
+  Reduce Code Dojo debt to \texttt{6\allowbreak{}2} aggregate violations or lower.
+\end{itemize}
+
+\section{Non-Goals}\label{record-146-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No website runtime or production GraphQL server.
+\item
+  No mutation of authored page, source-map, or build-manifest authority.
+\item
+  No Geordi dependency, pixel parity, browser semantics, or HTML claims.
+\item
+  No general page-family vocabulary or \texttt{/\allowbreak{}0} to \texttt{/\allowbreak{}1} promotion.
+\item
+  No unsupported-block approximation or silent capability inheritance.
+\item
+  No redesign of DOGFOOD, the website, or existing \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} behavior.
+\end{itemize}
+
+\section{Target Contract}\label{record-146-target-contract}
+
+The target accepts exact UTF-8 bytes for \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}/\allowbreak{}0}, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}p\allowbreak{}/\allowbreak{}0}, and \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}f\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}/\allowbreak{}0}. It returns Bijou-owned scene, target-map, receipt, and terminal-witness artifacts or one stable diagnostic with a code, input path, and detail.
+
+Supported visible page nodes receive injective render identities. Hidden unsupported nodes receive explicit residuals. Visible unsupported nodes fail closed without target artifacts. Target output records upstream claims as not inherited and binds every output digest to the exact input family.
+
+\section{Accessibility And Assistive Posture}\label{record-146-accessibility-and-assistive-posture}
+
+The terminal witness preserves text, semantic roles, reading order, link destinations, and residual explanations without relying on color alone. It does not claim browser landmarks, accessibility-tree parity, or native links.
+
+\section{Localization And Directionality Posture}\label{record-146-localization-and-directionality-posture}
+
+Input text and order are preserved exactly. Token roles remain references, not resolved theme guesses. No new translation authority or bidirectional layout claim is introduced; unsupported direction-sensitive behavior is residualized.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-146-agent-inspectability-and-explainability-posture}
+
+An agent can trace input digest to page node, template node, source occurrence, scene node, terminal region, token references, action destination, and receipt without scraping screenshots or executing the website.
+
+\section{Linked Invariants}\label{record-146-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Canonical bytes stay owned by the website at revision \texttt{6\allowbreak{}a\allowbreak{}4\allowbreak{}1\allowbreak{}1\allowbreak{}d\allowbreak{}7}.
+\item
+  Every supported visible page node maps to one target identity.
+\item
+  Every hidden unsupported page node maps to one explicit residual.
+\item
+  Every visible unsupported page node fails closed before output.
+\item
+  Render identities are injective and target-owned.
+\item
+  Reading order, tokens, actions, and source occurrences remain inspectable.
+\item
+  Unsupported versions, references, blocks, or claims fail closed.
+\item
+  Generated outputs are deterministic and inventory checked.
+\item
+  The Code Dojo ceiling falls from \texttt{1\allowbreak{}1\allowbreak{}2} to \texttt{6\allowbreak{}2} or lower.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-146-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Copy and pin the canonical three-file specimen.
+\item
+  Add contract types, parsers, and stable diagnostics.
+\item
+  Add target-profile validation and explicit residuals.
+\item
+  Lower supported nodes into \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}.
+\item
+  Render through layout and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} without host timing or paths.
+\item
+  Emit and verify target map, receipt, and witness bytes.
+\item
+  Remove at least 50 measured Code Dojo violations.
+\item
+  Update living docs, artifact inventory, and closeout evidence.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-146-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Reject malformed JSON, unsupported versions, digest drift, and identity drift.
+\item
+  Reject duplicate nodes, invalid slots, references, tokens, and actions.
+\item
+  Prove every supported visible node maps injectively.
+\item
+  Prove hidden unsupported nodes residualize and visible unsupported nodes fail closed.
+\item
+  Prove exact reading order, token, action, and source-occurrence preservation.
+\item
+  Prove repeated output and receipts are byte-identical.
+\item
+  Prove fixture inventory, website revision, and all three hashes are pinned.
+\item
+  Prove layout and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} output retain the declared inspection facts.
+\end{itemize}
+
+\section{Retrospective And Closeout}\label{record-146-retrospective-and-closeout}
+
+DX-050 emits \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}m\allowbreak{}a\allowbreak{}p\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, and \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}t\allowbreak{}x\allowbreak{}t}. The public failure boundary is the seven-code \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}G\allowbreak{}E\allowbreak{}\_\allowbreak{}*} diagnostic family documented in the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/reference/profunctor-page-inspection.md\#diagnostics}{inspection reference}.
+
+The canonical inputs remain pinned to website revision \texttt{6\allowbreak{}a\allowbreak{}4\allowbreak{}1\allowbreak{}1\allowbreak{}d\allowbreak{}7}:
+
+\begin{itemize}
+\tightlist
+\item
+  Page SHA-256: \texttt{1\allowbreak{}2\allowbreak{}b\allowbreak{}9\allowbreak{}0\allowbreak{}1\allowbreak{}8\allowbreak{}4\allowbreak{}b\allowbreak{}4\allowbreak{}e\allowbreak{}2\allowbreak{}3\allowbreak{}8\allowbreak{}b\allowbreak{}c\allowbreak{}6\allowbreak{}b\allowbreak{}d\allowbreak{}7\allowbreak{}d\allowbreak{}b\allowbreak{}9\allowbreak{}4\allowbreak{}4\allowbreak{}a\allowbreak{}f\allowbreak{}8\allowbreak{}6\allowbreak{}5\allowbreak{}1\allowbreak{}9\allowbreak{}0\allowbreak{}0\allowbreak{}b\allowbreak{}8\allowbreak{}3\allowbreak{}0\allowbreak{}e\allowbreak{}a\allowbreak{}7\allowbreak{}6\allowbreak{}b\allowbreak{}a\allowbreak{}7\allowbreak{}7\allowbreak{}5\allowbreak{}a\allowbreak{}b\allowbreak{}7\allowbreak{}c\allowbreak{}7\allowbreak{}e\allowbreak{}e\allowbreak{}2\allowbreak{}0\allowbreak{}b\allowbreak{}e\allowbreak{}0\allowbreak{}5\allowbreak{}1\allowbreak{}e\allowbreak{}7\allowbreak{}3}.
+\item
+  Source-map SHA-256: \texttt{a\allowbreak{}4\allowbreak{}0\allowbreak{}e\allowbreak{}9\allowbreak{}7\allowbreak{}f\allowbreak{}2\allowbreak{}f\allowbreak{}d\allowbreak{}5\allowbreak{}1\allowbreak{}3\allowbreak{}5\allowbreak{}1\allowbreak{}9\allowbreak{}0\allowbreak{}9\allowbreak{}2\allowbreak{}d\allowbreak{}2\allowbreak{}a\allowbreak{}1\allowbreak{}3\allowbreak{}1\allowbreak{}c\allowbreak{}0\allowbreak{}d\allowbreak{}7\allowbreak{}1\allowbreak{}0\allowbreak{}7\allowbreak{}5\allowbreak{}1\allowbreak{}7\allowbreak{}b\allowbreak{}9\allowbreak{}2\allowbreak{}b\allowbreak{}d\allowbreak{}7\allowbreak{}e\allowbreak{}9\allowbreak{}c\allowbreak{}f\allowbreak{}d\allowbreak{}5\allowbreak{}e\allowbreak{}7\allowbreak{}9\allowbreak{}d\allowbreak{}f\allowbreak{}7\allowbreak{}0\allowbreak{}a\allowbreak{}6\allowbreak{}5\allowbreak{}a\allowbreak{}3\allowbreak{}f\allowbreak{}e\allowbreak{}0\allowbreak{}4\allowbreak{}4}.
+\item
+  Build-manifest SHA-256: \texttt{9\allowbreak{}7\allowbreak{}5\allowbreak{}e\allowbreak{}f\allowbreak{}c\allowbreak{}9\allowbreak{}c\allowbreak{}7\allowbreak{}0\allowbreak{}1\allowbreak{}c\allowbreak{}b\allowbreak{}d\allowbreak{}7\allowbreak{}a\allowbreak{}6\allowbreak{}9\allowbreak{}8\allowbreak{}1\allowbreak{}7\allowbreak{}8\allowbreak{}7\allowbreak{}1\allowbreak{}5\allowbreak{}0\allowbreak{}7\allowbreak{}4\allowbreak{}8\allowbreak{}b\allowbreak{}7\allowbreak{}6\allowbreak{}d\allowbreak{}1\allowbreak{}e\allowbreak{}5\allowbreak{}3\allowbreak{}f\allowbreak{}d\allowbreak{}8\allowbreak{}3\allowbreak{}c\allowbreak{}d\allowbreak{}4\allowbreak{}2\allowbreak{}4\allowbreak{}1\allowbreak{}2\allowbreak{}8\allowbreak{}6\allowbreak{}6\allowbreak{}7\allowbreak{}b\allowbreak{}c\allowbreak{}8\allowbreak{}0\allowbreak{}1\allowbreak{}4\allowbreak{}6\allowbreak{}8\allowbreak{}7\allowbreak{}a\allowbreak{}b\allowbreak{}7}.
+\end{itemize}
+
+The bounded target supports the five ProjectPage block definitions. Hidden unsupported blocks become \texttt{h\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} residuals. Visible unsupported blocks, semantic-document sources, application islands, inherited semantic-HTML claims, and output that exceeds the fixed terminal profile fail closed or remain explicit target obstructions.
+
+Focused contract evidence passes \texttt{3\allowbreak{}8} tests across the five target suites, the generator suite, and this design contract. Full local verification passes \texttt{4\allowbreak{},\allowbreak{}0\allowbreak{}1\allowbreak{}5} tests. Code Dojo reports \texttt{6\allowbreak{}2} aggregate violations: \texttt{3\allowbreak{}7} file/context, \texttt{2\allowbreak{}5} code-size, \texttt{0} mock-ban, and \texttt{0} ESLint.
+
+The follow-on path remains the \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} Runtime Graph And Scene IR milestone, the website publication campaign in \href{https://github.com/flyingrobots/profunctor-optics-website/issues/14}{profunctor-optics-website\#14}, and the sibling Geordi proof in \href{https://github.com/flyingrobots/geordi/issues/52}{geordi\#52} and \href{https://github.com/flyingrobots/geordi/pull/53}{geordi\#53}.
+

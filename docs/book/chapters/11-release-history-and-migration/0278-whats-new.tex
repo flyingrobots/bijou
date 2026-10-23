@@ -1,0 +1,100 @@
+\chapter{What's New in Bijou 4.4.0}\label{record-278}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.4.0/whats-new.md}\par}\smallskip
+
+\section{Data Visualization Toolkit}\label{record-278-data-visualization-toolkit}
+
+Bijou now ships a data-visualization component family in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}:
+
+\subsection{sparkline()}\label{record-278-sparkline}
+
+Compact inline trend graph using Unicode block characters (▁▂▃▄▅▆▇█). Drop it next to a label or inside a table cell for instant trend context.
+
+\begin{CodeBlock}
+import { sparkline } from '@flyingrobots/bijou';
+
+sparkline([1, 5, 3, 8, 2, 7]);
+// → '▁▅▃█▂▆'
+
+sparkline([10, 20, 30, 40], { width: 8 });
+// → '▁▁▃▃▅▅▇▇'  (values interpolated to fit width)
+\end{CodeBlock}
+
+\subsection{brailleChartSurface()}\label{record-278-braillechartsurface}
+
+High-density filled area chart using Unicode Braille characters. Each terminal cell is a 2x4 sub-pixel grid, giving smooth curves in very tight space.
+
+\begin{CodeBlock}
+import { brailleChartSurface } from '@flyingrobots/bijou';
+
+const chart = brailleChartSurface(frameTimeHistory, {
+  width: 28,
+  height: 6,
+  ctx,
+});
+\end{CodeBlock}
+
+\subsection{statsPanelSurface()}\label{record-278-statspanelsurface}
+
+Titled bordered panel with aligned key-value metric rows. Each row can include an optional inline sparkline after the value.
+
+\begin{CodeBlock}
+import { statsPanelSurface } from '@flyingrobots/bijou';
+
+const panel = statsPanelSurface([
+  { label: 'FPS', value: '60', sparkline: fpsHistory },
+  { label: 'heap', value: '42.1 MB' },
+], { title: 'Runtime', width: 30, ctx });
+\end{CodeBlock}
+
+\subsection{perfOverlaySurface()}\label{record-278-perfoverlaysurface}
+
+Prebuilt FPS + memory dashboard composing statsPanelSurface and brailleChartSurface. Drop-in performance overlay for any app.
+
+\begin{CodeBlock}
+import { perfOverlaySurface } from '@flyingrobots/bijou';
+
+const overlay = perfOverlaySurface({
+  fps: 60,
+  frameTimeMs: 16.7,
+  frameTimeHistory: samples,
+  width: 120,
+  height: 40,
+  heapUsedMB: 42.1,
+}, { ctx });
+\end{CodeBlock}
+
+\section{Performance: Zero-Alloc Framed App Render Loop}\label{record-278-performance-zero-alloc-framed-app-render-loop}
+
+The framed app render loop now uses zero-allocation header and footer painting via \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}W\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}B\allowbreak{}C\allowbreak{}S\allowbreak{}S} repainting in-place. The pane scratch surface pool is scoped to the \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} closure instead of module-level state, resolving RE-010.
+
+\section{Bench: New Scenarios and Dynamic Sizing}\label{record-278-bench-new-scenarios-and-dynamic-sizing}
+
+The benchmark harness gains two new scenarios:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{flame} --- doom fire effect with full-screen palette interpolation (\textasciitilde2.6 ms/frame)
+\item
+  \textbf{component-app} --- realistic TUI using real bijou components (boxSurface, tableSurface, alertSurface, etc., \textasciitilde564 µs/frame)
+\end{itemize}
+
+All scenarios now support dynamic sizing via an optional \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s} / \texttt{r\allowbreak{}o\allowbreak{}w\allowbreak{}s} argument to \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})}. The soak runner has been rewritten on \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} with a perf overlay toggled by backtick.
+
+\section{DOGFOOD: Data Visualization Stories}\label{record-278-dogfood-data-visualization-stories}
+
+The DOGFOOD component gallery now covers the data-visualization family with stories for all four new components, bringing the component-family reference from 35 to 36 families at 100\% documented coverage.
+
+\section{Backlog Cleanup}\label{record-278-backlog-cleanup}
+
+\begin{itemize}
+\tightlist
+\item
+  Closed stale backlog items: RE-008, RE-007, RE-009, RE-010, RE-015 (code fixes shipped in earlier releases; trackers administratively closed)
+\item
+  Added: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md}{RE-021} (frame owns the pump --- cool idea for next major)
+\item
+  Removed: PLAN.md (redundant narrative wrapper)
+\end{itemize}
+

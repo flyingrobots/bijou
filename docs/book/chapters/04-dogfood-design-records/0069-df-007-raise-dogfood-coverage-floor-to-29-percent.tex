@@ -1,0 +1,291 @@
+\chapter{DF-007 --- Raise DOGFOOD Coverage Floor to 29\%}\label{record-069}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md}\par}\smallskip
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF --- DOGFOOD Field Guide}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md}{DF-006 --- Raise DOGFOOD Coverage Floor to 24\%}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-069-why-this-cycle-exists}
+
+DF-006 proved DOGFOOD can keep ratcheting upward without cheating and while still documenting real, important families.
+
+The next promised step is now explicit:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD currently documents 9 of 35 component families
+\item
+  the enforced floor is 24\%
+\item
+  the next declared target is 29\%
+\end{itemize}
+
+This cycle exists to earn that next target through real feedback-history coverage: one low-level transient overlay family and one activity-stream family.
+
+\section{Scope of this cycle}\label{record-069-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  adding enough real DOGFOOD component stories to move coverage from 9 to 11 families
+\item
+  documenting \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} as the low-level transient overlay primitive
+\item
+  documenting \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} as the canonical activity stream primitive
+\item
+  raising the enforced floor from 24\% to 29\%
+\item
+  raising the next declared target from 29\% to 34\%
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  notification-center redesign
+\item
+  shell-level history workflow changes
+\item
+  pretending DOGFOOD is now complete
+\item
+  changing the canonical component-family denominator
+\end{itemize}
+
+\section{Human users}\label{record-069-human-users}
+
+\subsection{Primary human user}\label{record-069-primary-human-user}
+
+A builder evaluating whether DOGFOOD now teaches transient feedback and chronological status output clearly enough to choose the right tool.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  one story that shows \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} as a low-level directly composed overlay rather than a full notification system
+\item
+  one story that shows \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} as an accumulating activity stream rather than a one-off status message
+\item
+  coverage progress that rises only because those families are now genuinely documented
+\end{itemize}
+
+\subsection{Human hill}\label{record-069-human-hill}
+
+A user can open DOGFOOD and understand the difference between \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} as real, documented families, and the coverage number rises because that guidance is actually present.
+
+\section{Agent users}\label{record-069-agent-users}
+
+\subsection{Primary agent user}\label{record-069-primary-agent-user}
+
+An agent tasked with continuing the DOGFOOD ratchet without inflating the number through thin or redundant stories.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  a clear smallest honest route from 24\% to 29\%
+\item
+  tests that prove which feedback/history families were added
+\item
+  integration checks that the new stories are reachable in the docs app
+\end{itemize}
+
+\subsection{Agent hill}\label{record-069-agent-hill}
+
+An agent can raise DOGFOOD to the 29\% floor only by adding real \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} stories, and the cycle tests prove both the coverage increase and the new floor policy.
+
+\section{Human playback}\label{record-069-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user enters DOGFOOD and opens the new toast story.
+\item
+  They can see that \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} is a directly composed transient overlay, not a full notification center.
+\item
+  They open the new log story and see chronological, accumulating event output with level cues.
+\item
+  The docs coverage card reports a higher percentage that corresponds to those real new stories.
+\end{enumerate}
+
+\section{Agent playback}\label{record-069-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DF-007 cycle doc.
+\item
+  It can see that the target floor is 29\%, which can be cleared by adding at least one more family, but the cycle intentionally documents two related families.
+\item
+  It adds real \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} stories.
+\item
+  It updates the floor policy only after those stories exist.
+\item
+  The cycle tests and gate confirm that coverage is now 31\%, which safely clears the 29\% floor, and the next target is recorded as 34\%.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-069-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-069-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  the floor must move only after real coverage moves
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} coverage must teach direct overlay composition and avoid pretending it is the notification center
+\item
+  \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} coverage must teach chronological accumulation rather than one-off status chrome
+\item
+  the new families must be backed by real stories in DOGFOOD itself
+\item
+  the denominator must still come from the canonical component-family reference
+\end{itemize}
+
+\section{Implementation outline}\label{record-069-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DF-007 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests that demand:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    11 of 35 documented families and 31\% real coverage
+  \item
+    coverage of \texttt{L\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} and \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m}
+  \item
+    an enforced floor of 29 with a next target of 34
+  \item
+    real \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} stories in DOGFOOD
+  \end{itemize}
+\item
+  Add the smallest honest DOGFOOD stories needed to hit the target.
+\item
+  Raise the floor policy and spawn the next ratchet backlog item.
+\item
+  Close the cycle with retrospective notes describing what actually landed.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-069-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  DOGFOOD coverage resolves to 11 of 35 families and 31\%
+\item
+  the story catalog now covers \texttt{L\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y} and \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}m}
+\item
+  the enforced floor is 29 and the next target is 34
+\item
+  the next DOGFOOD backlog item exists
+\end{itemize}
+
+And in the DOGFOOD preview integration bar:
+
+\begin{itemize}
+\tightlist
+\item
+  the new toast story is reachable in component search and renders recognizable transient-overlay content
+\end{itemize}
+
+\section{Risks}\label{record-069-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  making \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} look like a notification-center substitute instead of a low-level overlay primitive
+\item
+  making \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} feel like a decorative box rather than an activity stream
+\item
+  over-documenting shell notification behavior in a component-family cycle instead of keeping the scope narrow
+\end{itemize}
+
+\section{Out of scope}\label{record-069-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  notification-center polish cycles
+\item
+  localization follow-on work
+\item
+  new shell-layer behaviors
+\item
+  complete DOGFOOD coverage
+\end{itemize}
+
+\section{Retrospective}\label{record-069-retrospective}
+
+\subsection{What landed}\label{record-069-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new real \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} DOGFOOD story teaching low-level transient overlay composition
+\item
+  new real \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} DOGFOOD story teaching chronological activity-stream output
+\item
+  canonical family coverage increased from \texttt{9\allowbreak{}/\allowbreak{}3\allowbreak{}5} to \texttt{1\allowbreak{}1\allowbreak{}/\allowbreak{}3\allowbreak{}5}
+\item
+  DOGFOOD docs coverage now resolves to \texttt{3\allowbreak{}1\allowbreak{}\%}, which safely clears the \texttt{2\allowbreak{}9\allowbreak{}\%} floor
+\item
+  the enforced floor moved from \texttt{2\allowbreak{}4\allowbreak{}\%} to \texttt{2\allowbreak{}9\allowbreak{}\%}
+\item
+  the next declared target moved from \texttt{2\allowbreak{}9\allowbreak{}\%} to \texttt{3\allowbreak{}4\allowbreak{}\%}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-069-drift-from-ideal}
+
+No material drift.
+
+The cycle intentionally over-earned the floor by documenting two related families instead of stopping at the minimum one-family bump required by rounding. That makes the field guide stronger without changing the ratchet contract itself.
+
+\subsection{Debt spawned}\label{record-069-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md}{DF-008 --- Raise DOGFOOD Coverage Floor to 34\%}
+\end{itemize}
+

@@ -1,0 +1,20 @@
+\chapter{DX-013 --- Motion Key Lifecycle Warning}\label{record-318}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-013-motion-key-warning.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-318-idea}
+
+\texttt{m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}i\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{},\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} requires a stable key to track animation state across renders. If the key changes every render (e.g., using an index that shifts), the motion system silently creates new animations instead of interpolating. There is no warning.
+
+Emit a runtime warning when a motion key appears for the first time on a frame that also has a different key disappearing --- this is a strong signal that the developer is generating unstable keys.
+
+\section{Why}\label{record-318-why}
+
+The DX audit flagged this as a non-obvious behavior. The motion system works correctly when keys are stable, but the failure mode (new animation every render = no visible interpolation) looks like ``motion doesn't work'' rather than ``my key is wrong.''
+
+\section{Effort}\label{record-318-effort}
+
+Small --- track key birth/death across frames in the motion middleware.
+

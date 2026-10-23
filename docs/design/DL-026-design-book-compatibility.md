@@ -1,10 +1,6 @@
 ---
 title: DL-026 Design Book Compatibility
-legend: DL
-lane: roadmap
-priority: medium
 github_issue: 498
-status: shaping
 keywords:
   - design-language
   - design-book
@@ -13,7 +9,15 @@ keywords:
   - compatibility
 ---
 
-Legend: [DL - Design Language](../legends/DL-design-language.md)
+# DL-026 Design Book Compatibility
+
+This design record retains the campaign reasoning from pre-integration
+commit [`22378d7c`](https://github.com/flyingrobots/bijou/commit/22378d7cdc5024479188c5505262d22a5debd9b0).
+Its baseline descriptions, measurements and proposed phases are historical,
+not a live release report or a second backlog. GitHub issues and milestones
+track current work; the [package guide](../../packages/bijou/README.md#theme-authoring)
+documents the API delivered by this PR. The separate Bijou book and its frozen
+source corpus are unchanged.
 
 ## Purpose
 

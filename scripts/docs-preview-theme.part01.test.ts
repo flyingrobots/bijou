@@ -10,11 +10,12 @@ import {
   KEY_ENTER,
   keyMsg,
   normalizeViewOutput,
-  readFileSync,
   runScript,
   TOKEN_DOCTRINE_PATH,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
+
+import { readDocumentationFile } from './documentation-corpus.js';
 
 type DocsFrame = Parameters<typeof frameText>[0];
 
@@ -28,7 +29,7 @@ describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('documents every built-in token with usage guidance and dark/light UX posture', () => {
-    const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
+    const doctrine = readDocumentationFile(TOKEN_DOCTRINE_PATH, 'utf8');
     const requiredRows = [
       'semantic.primary',
       'semantic.muted',

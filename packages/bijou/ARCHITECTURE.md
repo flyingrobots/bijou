@@ -125,7 +125,7 @@ DTCG interop (`fromDTCG`/`toDTCG`) bridges external design token systems. Theme 
 
 The type system defines the token families; the intended first-party usage
 rules are documented in
-[`docs/design-system/theme-tokens.md`](../../docs/design-system/theme-tokens.md).
+[`docs/design-system/theme-tokens.md`](../../docs/book/bijou-designs.pdf#page=440).
 Third-party code that needs reactivity should observe a context with
 `observeTheme(ctx, handler)` rather than subscribing to `tokenGraph.on()`
 directly.
@@ -137,7 +137,7 @@ the core package, keep them as plain discriminated data and interpret them at
 the owning boundary. Do not hide meaning inside buffered closures or objects
 with embedded execution behavior.
 
-See [The Buffer Holds Facts](../../docs/invariants/buffer-holds-facts.md).
+See [The Buffer Holds Facts](../../docs/book/bijou-designs.pdf#page=163).
 
 ## Test Adapters
 

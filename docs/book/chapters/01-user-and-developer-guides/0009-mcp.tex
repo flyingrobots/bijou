@@ -1,0 +1,129 @@
+\chapter{MCP}\label{record-009}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/MCP.md}\par}\smallskip
+
+This signpost covers Bijou's current MCP surface.
+
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[actor/.style={draw=BookHeading,fill=BookPanel,text width=27mm,align=center,font=\small,inner sep=5pt}]
+\node[actor] (Client) at (0.0,0) {Client};
+\draw[dashed,BookMuted] (Client.south) -- (0.0,-7.3999999999999995);
+\node[actor] (MCPServer) at (4.5,0) {MCPServer};
+\draw[dashed,BookMuted] (MCPServer.south) -- (4.5,-7.3999999999999995);
+\node[actor] (BijouCore) at (9.0,0) {Bijou\allowbreak{}Core};
+\draw[dashed,BookMuted] (BijouCore.south) -- (9.0,-7.3999999999999995);
+\draw[-{Latex[length=2mm]},BookHeading] (0.0,-1.7) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {Render table\allowbreak{}Request(data)} (4.5,-1.7);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-3.4) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {render\allowbreak{}By\allowbreak{}Mode('pipe', data)} (9.0,-3.4);
+\draw[-{Latex[length=2mm]},BookHeading] (9.0,-5.1) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {string(ansi)} (4.5,-5.1);
+\draw[-{Latex[length=2mm]},BookHeading] (4.5,-6.8) -- node[above,fill=white,align=center,text width=4.05cm,font=\footnotesize] {formatted\allowbreak{}Output(string)} (0.0,-6.8);
+\end{tikzpicture}}\end{center}
+
+\section{What Ships Today}\label{record-009-what-ships-today}
+
+Bijou currently ships one MCP package:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-mcp/README.md}{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}}
+\end{itemize}
+
+It exposes Bijou terminal components as rendering tools over stdio so an MCP client can ask for structured terminal output without needing a live TTY.
+
+\section{What It Is Good For}\label{record-009-what-it-is-good-for}
+
+Use the MCP server when you want:
+
+\begin{itemize}
+\tightlist
+\item
+  box-drawn or structured terminal output inside a chat or agent context
+\item
+  Unicode-rich output without ANSI escape codes
+\item
+  component rendering as a tool surface rather than as a fullscreen runtime
+\end{itemize}
+
+\section{What It Is Not}\label{record-009-what-it-is-not}
+
+The MCP package is not the fullscreen app runtime.
+
+It does not own:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  shell behavior, pane focus, help, settings, notifications, or quit flow
+\item
+  animation, motion, diffed terminal rendering, or interactive input routing
+\end{itemize}
+
+For those, use the normal package/runtime docs instead:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/GUIDE.md}{packages/bijou-tui/GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/ADVANCED_GUIDE.md}{packages/bijou-tui/ADVANCED\_GUIDE.md}
+\end{itemize}
+
+\section{Configure It}\label{record-009-configure-it}
+
+Typical MCP config:
+
+\begin{CodeBlock}
+{
+  "mcpServers": {
+    "bijou": {
+      "command": "node",
+      "args": ["node_modules/@flyingrobots/bijou-mcp/bin/bijou-mcp.js"]
+    }
+  }
+}
+\end{CodeBlock}
+
+The package README has the fuller install/config reference:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-mcp/README.md}{packages/bijou-mcp/README.md}
+\end{itemize}
+
+\section{Tool Families}\label{record-009-tool-families}
+
+The current tool surface is grouped around:
+
+\begin{itemize}
+\tightlist
+\item
+  data and structure: tables, trees, DAGs, enumerated lists
+\item
+  containers and layout: boxes, header boxes, separators, constrain
+\item
+  feedback and status: alerts, progress, stepper, timeline, logs, badges
+\item
+  navigation: tabs, breadcrumb, paginator
+\item
+  rich panels: explainability, inspector, accordion
+\item
+  utility: keyboard indicators, hyperlinks, skeletons
+\end{itemize}
+
+For the exact tool list and examples, use the package README.
+
+\section{Read Next}\label{record-009-read-next}
+
+\begin{itemize}
+\tightlist
+\item
+  exact tool catalog and example output: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-mcp/README.md}{packages/bijou-mcp/README.md}
+\item
+  repo command surfaces: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/CLI.md}{docs/CLI.md}
+\item
+  architecture and boundaries: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/ARCHITECTURE.md}{ARCHITECTURE.md}
+\end{itemize}
+

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { documentationFileExists as existsSync, readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CODE_SIZE_BASELINE } from '../../../scripts/code-size-gate.js';

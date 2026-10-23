@@ -1,0 +1,34 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Reconcile Sapphire framework PR516 with tracker-authoritative planning and the retired documentation corpus",
+  "bytesConsumed": 308577,
+  "filesRead": [
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "packages/bijou/src/core/theme/graph-dependencies.ts",
+    "packages/bijou/src/core/theme/preset-authoring-freeze.ts",
+    "examples/docs/app-theme-lab-columns.ts",
+    "docs/design/DL-023-sapphire-theme-system.md",
+    "docs/design/DL-024-theme-lab-design-book-provenance.md",
+    "docs/design/DL-025-theme-lab-specimen-and-probe.md",
+    "docs/design/DL-026-design-book-compatibility.md",
+    "packages/bijou/README.md"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "packages/bijou/README.md",
+    "docs/design/DL-023-sapphire-theme-system.md",
+    "docs/design/DL-024-theme-lab-design-book-provenance.md",
+    "docs/design/DL-025-theme-lab-specimen-and-probe.md",
+    "docs/design/DL-026-design-book-compatibility.md"
+  ],
+  "tripwires": [
+    "Current-main planning deletions and corpus-aware tests prevail; newly introduced design records retain original source boundaries",
+    "One incorrect code-dojo/ci.mjs lookup returned NOT_FOUND; actual CI command was located in the root package manifest"
+  ],
+  "validation": {
+    "static": "Book subtree unchanged from main; retired planning/test paths remain deleted; dead historical links pinned to original Git objects",
+    "execution": "Docker focused tests and normal commit hooks must pass before commit; current-head full local gate is recorded in PR activity evidence"
+  }
+}

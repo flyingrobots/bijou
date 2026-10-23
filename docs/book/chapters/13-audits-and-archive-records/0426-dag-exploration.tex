@@ -1,0 +1,588 @@
+\chapter{dag() --- ASCII DAG Renderer for Bijou}\label{record-426}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/archive/dag-exploration.md}\par}\smallskip
+
+\section{Vision}\label{record-426-vision}
+
+A pure \texttt{(\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{})\allowbreak{} \allowbreak{}→\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g} component that renders directed acyclic graphs as box-and-arrow ASCII art in the terminal. Auto-layout, edge routing, Unicode box-drawing, theme-aware coloring, graceful degradation.
+
+\begin{CodeBlock}
+import { dag } from '@flyingrobots/bijou';
+
+dag([
+  { id: 'a', label: 'Theme bridge', edges: ['b', 'c'] },
+  { id: 'b', label: 'Static renderers', edges: ['d', 'e'] },
+  { id: 'c', label: 'TEA app shell', edges: ['d', 'e', 'f', 'g'] },
+  { id: 'd', label: 'RoadmapView', edges: ['h'] },
+  { id: 'e', label: 'LineageView', edges: ['h'] },
+  { id: 'f', label: 'Input system', edges: ['h'] },
+  { id: 'g', label: 'graph.watch()', edges: ['h'] },
+  { id: 'h', label: 'Cleanup' },
+]);
+\end{CodeBlock}
+
+Output:
+
+\begin{CodeBlock}
+╭────────────────────╮
+│ Theme bridge       │
+╰────────────────────╯
+          │
+          ├───────────────────────╮
+          ▼                       ▼
+╭────────────────────╮  ╭────────────────────╮
+│ Static renderers   │  │ TEA app shell      │
+╰────────────────────╯  ╰────────────────────╯
+          │                       │
+          ├───────────────────────┤
+          │           ┌───────────┼───────────┐
+          ▼           ▼           ▼           ▼
+╭──────────────╮╭──────────────╮╭──────────────╮╭──────────────╮
+│ RoadmapView  ││ LineageView  ││ Input system ││ graph.watch()│
+╰──────────────╯╰──────────────╯╰──────────────╯╰──────────────╯
+          │           │           │           │
+          └───────────┴─────┬─────┴───────────┘
+                            ▼
+                  ╭────────────────────╮
+                  │ Cleanup            │
+                  ╰────────────────────╯
+\end{CodeBlock}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{API Design}\label{record-426-api-design}
+
+\subsection{Data Types}\label{record-426-data-types}
+
+\begin{CodeBlock}
+export interface DagNode {
+  id: string;
+  label: string;
+  edges?: string[];           // IDs of nodes this node points to (children/dependents)
+  badge?: string;             // Optional short badge text (e.g., "4h", "DONE", "BLOCKED")
+  token?: TokenValue;         // Per-node color override (e.g., green for "ready", red for "blocked")
+}
+
+export interface DagOptions {
+  nodeToken?: TokenValue;     // Default node border/label color
+  edgeToken?: TokenValue;     // Edge/connector color
+  highlightPath?: string[];   // Node IDs to highlight (e.g., critical path) — renders with a distinct token
+  highlightToken?: TokenValue;// Token for highlighted path
+  selectedId?: string;        // Single node drawn with cursor-style highlighting
+  selectedToken?: TokenValue; // Override token for selectedId
+  nodeWidth?: number;         // Fixed node box width (default: auto from longest label)
+  maxWidth?: number;          // Terminal width constraint (default: ctx.runtime.columns)
+  direction?: 'down' | 'right'; // Layout direction (default: 'down')
+  ctx?: BijouContext;
+}
+
+// Accepts SlicedDagSource (adapter-driven) or DagNode[] (small graphs)
+export function dag(source: SlicedDagSource, options?: DagOptions): string;
+export function dag(nodes: DagNode[], options?: DagOptions): string;
+\end{CodeBlock}
+
+\subsection{DagSource Adapter (v0.5.0)}\label{record-426-dagsource-adapter-v0.5.0}
+
+Decouple DAG rendering from any specific in-memory representation. A \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} represents a potentially unbounded graph --- it has no enumeration method. Use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} to BFS-walk from a focus node and produce a bounded \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} that the renderer can consume.
+
+\begin{CodeBlock}
+// Unbounded graph adapter — can wrap a database, API, etc.
+export interface DagSource {
+  has(id: string): boolean;                   // existence check (not enumeration)
+  label(id: string): string;                  // display label
+  children(id: string): readonly string[];    // outgoing edges
+  parents?(id: string): readonly string[];    // incoming edges (required for ancestor traversal)
+  badge?(id: string): string | undefined;     // optional badge text
+  token?(id: string): TokenValue | undefined; // optional per-node color
+}
+
+// Bounded slice — extends DagSource with enumerable IDs
+export interface SlicedDagSource extends DagSource {
+  ids(): readonly string[];                   // all node IDs in the slice
+  ghost(id: string): boolean;                 // is this a boundary placeholder?
+  ghostLabel(id: string): string | undefined; // e.g., "... 3 ancestors"
+}
+\end{CodeBlock}
+
+\textbf{the illustrated sequence below}
+
+\input{diagrams/flows/flow-071}
+
+\input{diagrams/flows/flow-053}
+
+\begin{CodeBlock}
+// External graph (never fully loaded)
+const graph: DagSource = {
+  has: (id) => db.exists(id),
+  label: (id) => db.getTitle(id),
+  children: (id) => db.getDeps(id),
+  parents: (id) => db.getDependents(id),
+};
+
+// BFS touches ~20 nodes, not the whole graph
+const slice = dagSlice(graph, 'TASK-42', { depth: 2 });
+dag(slice, { ctx });
+
+// Composable: slice a slice
+const narrower = dagSlice(slice, 'TASK-42', { depth: 1, direction: 'descendants' });
+\end{CodeBlock}
+
+\textbf{\texttt{a\allowbreak{}r\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}} wraps \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}[\allowbreak{}]} as a \texttt{S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} for backward compatibility:
+
+\begin{CodeBlock}
+import { arraySource } from '@flyingrobots/bijou';
+
+const src = arraySource(myNodes);  // SlicedDagSource
+dag(src, { ctx });                 // equivalent to dag(myNodes, { ctx })
+\end{CodeBlock}
+
+\subsection{Fragment Rendering}\label{record-426-fragment-rendering}
+
+Render a subgraph instead of the full DAG. This is critical for large graphs --- show ancestry of a single node, the critical path, or a neighborhood.
+
+\begin{CodeBlock}
+export interface DagSliceOptions {
+  direction?: 'ancestors' | 'descendants' | 'both';  // default: 'both'
+  depth?: number;                                      // max hops from focus (default: Infinity)
+}
+
+// DagSource in → SlicedDagSource out (composable)
+export function dagSlice(source: DagSource, focus: string, opts?: DagSliceOptions): SlicedDagSource;
+
+// DagNode[] in → DagNode[] out (backward compatible)
+export function dagSlice(nodes: DagNode[], focus: string, opts?: DagSliceOptions): DagNode[];
+\end{CodeBlock}
+
+\textbf{Usage:}
+
+\begin{CodeBlock}
+// Full graph
+dag(allNodes);
+
+// Just the ancestors of "Cleanup"
+dag(dagSlice(allNodes, 'cleanup', { direction: 'ancestors' }));
+
+// 2-hop neighborhood around "TEA app shell"
+dag(dagSlice(allNodes, 'tea-shell', { direction: 'both', depth: 2 }));
+
+// Critical path highlighted on full graph
+dag(allNodes, { highlightPath: ['a', 'b', 'd', 'h'], highlightToken: theme.semantic.error });
+\end{CodeBlock}
+
+\textbf{Boundary indicators:} When \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e} cuts edges at the boundary, truncated nodes appear as ghost nodes:
+
+\begin{CodeBlock}
+          ╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+          ╎ ... 3 ancestors      ╎    ← dashed border = truncated
+          ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                    │
+                    ▼
+          ╭────────────────────╮
+          │ TEA app shell      │     ← solid border = in fragment
+          ╰────────────────────╯
+                    │
+          ┌─────────┼─────────┐
+          ▼         ▼         ▼
+  ╭──────────╮╭──────────╮╭──────────╮
+  │ View A   ││ View B   ││ Input    │
+  ╰──────────╯╰──────────╯╰──────────╯
+\end{CodeBlock}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Layout Algorithm: Sugiyama-Lite}\label{record-426-layout-algorithm-sugiyama-lite}
+
+A simplified Sugiyama method optimized for terminal rendering of 5-50 node DAGs. Three phases, \textasciitilde200 lines of TypeScript, zero dependencies.
+
+\subsection{Phase 1: Layer Assignment (Topological BFS)}\label{record-426-phase-1-layer-assignment-topological-bfs}
+
+Assign each node to a horizontal layer (row). Uses longest-path method: push nodes as deep as possible so the graph spreads vertically.
+
+\begin{CodeBlock}
+function assignLayers(nodes: DagNode[]): Map<string, number> {
+  // 1. Build adjacency + compute in-degree
+  // 2. Topological sort (Kahn's algorithm)
+  // 3. For each node in topo order:
+  //    layer[node] = max(layer[predecessors]) + 1
+  //    (roots get layer 0)
+}
+\end{CodeBlock}
+
+\textbf{Complexity:} O(V + E)
+
+\textbf{Why longest-path over network simplex:} For 5-50 nodes the visual difference is minimal. Longest-path is \textasciitilde20 lines; network simplex is \textasciitilde500. Save complexity budget for edge routing.
+
+\subsection{Phase 2: Column Ordering (Barycenter Heuristic)}\label{record-426-phase-2-column-ordering-barycenter-heuristic}
+
+Within each layer, order nodes to minimize edge crossings. For each node, compute the average column position of its parents (barycenter), then sort by that value.
+
+\begin{CodeBlock}
+function orderColumns(layers: string[][], edges: Map<string, string[]>): void {
+  // For each layer (top to bottom):
+  //   For each node in the layer:
+  //     barycenter = average(column indices of parent nodes in previous layer)
+  //   Sort layer by barycenter values
+  //   (Nodes with no parents keep their original order)
+
+  // Optional: second pass bottom-to-top for better results
+}
+\end{CodeBlock}
+
+\textbf{Complexity:} O(V log V) per layer per pass. One top-down pass is sufficient for most DAGs. A second bottom-up pass improves crossing minimization at negligible cost.
+
+\subsection{Phase 3: Rendering (Two-Pass Edge Routing)}\label{record-426-phase-3-rendering-two-pass-edge-routing}
+
+The core insight: \textbf{accumulate edge directions first, then render characters.} Never write edge characters during edge processing --- two edges from the same source share vertical exit segments.
+
+\subsubsection{Grid Setup}\label{record-426-grid-setup}
+
+\begin{CodeBlock}
+ROW_STRIDE = 6 rows per layer:
+  Row 0-2: node box (top border, content, bottom border)
+  Row 3:   vertical exit from box
+  Row 4:   horizontal elbow turn row
+  Row 5:   vertical entry / padding
+
+COL_STRIDE = nodeWidth + 4 (gap between node centers)
+\end{CodeBlock}
+
+\textbf{ROW\_STRIDE must be \textgreater= 6.} At RS=5, the elbow turn row collides with the arrowhead destination. RS=6 gives exactly one buffer row. RS=7 adds a padding row (cleaner but wastes vertical space).
+
+\subsubsection{Pass 1: Accumulate Edge Directions}\label{record-426-pass-1-accumulate-edge-directions}
+
+For each edge, mark cells with direction flags (\texttt{U}, \texttt{D}, \texttt{L}, \texttt{R}). Multiple edges sharing a cell accumulate their directions into a \texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}<\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}>}.
+
+\begin{CodeBlock}
+type Dir = 'U' | 'D' | 'L' | 'R';
+const grid: Set<Dir>[][] = /* 2D array of empty Sets */;
+
+function markEdge(fromCol: number, fromLayer: number, toCol: number, toLayer: number): void {
+  const sRow = fromLayer * RS + 3;   // exit below source box
+  const dRow = toLayer * RS - 1;     // entry above destination box
+  const mid = sRow + 1;              // horizontal turn row
+
+  if (fromCol === toCol) {
+    // Straight vertical: mark D/U for each row sRow..dRow-1, then arrowhead at dRow
+    for (let r = sRow; r < dRow; r++) markDir(r, fromCol, 'D', 'U');
+  } else {
+    // Elbow: vertical exit → horizontal turn → vertical entry
+    markDir(sRow, fromCol, 'D', 'U');          // exit (may merge with straight edges)
+
+    const [minC, maxC] = fromCol < toCol ? [fromCol, toCol] : [toCol, fromCol];
+
+    // Turn at source column
+    markDir(mid, fromCol, fromCol < toCol ? 'R' : 'L', 'U');
+
+    // Horizontal segment
+    for (let c = minC + 1; c < maxC; c++) markDir(mid, c, 'L', 'R');
+
+    // Turn at destination column
+    markDir(mid, toCol, fromCol < toCol ? 'L' : 'R', 'D');
+
+    // Vertical segment down to destination
+    for (let r = mid + 1; r < dRow; r++) markDir(r, toCol, 'D', 'U');
+  }
+  // Arrowhead at dRow
+}
+\end{CodeBlock}
+
+\textbf{Why this works for junctions:} When a node has both a straight-down edge and a right-elbow edge, the exit cell accumulates \texttt{\{\allowbreak{}D\allowbreak{},\allowbreak{} \allowbreak{}U\allowbreak{}\}} from the straight edge and \texttt{\{\allowbreak{}R\allowbreak{},\allowbreak{} \allowbreak{}U\allowbreak{}\}} from the elbow. The union \texttt{\{\allowbreak{}D\allowbreak{},\allowbreak{} \allowbreak{}R\allowbreak{},\allowbreak{} \allowbreak{}U\allowbreak{}\}} maps to \texttt{├} --- the correct junction character. This is emergent behavior, not special-cased.
+
+\subsubsection{Junction Character Lookup}\label{record-426-junction-character-lookup}
+
+Convert accumulated direction sets to Unicode box-drawing characters:
+
+\begin{CodeBlock}
+const JUNCTION: Record<string, string> = {
+  'D': '│',  'U': '│',  'DU': '│',
+  'L': '─',  'R': '─',  'LR': '─',
+  'DR': '╭', 'DL': '╮', 'RU': '╰', 'LU': '╯',
+  'DRU': '├', 'DLU': '┤', 'DLR': '┬', 'LRU': '┴',
+  'DLRU': '┼',
+};
+
+function junctionChar(dirs: Set<Dir>): string {
+  const key = [...dirs].sort().join('');   // canonical: alphabetical (D < L < R < U)
+  return JUNCTION[key] ?? '+';
+}
+\end{CodeBlock}
+
+\subsubsection{Shader-based Serialization (cellAt)}\label{record-426-shader-based-serialization-cellat}
+
+Instead of pre-allocating 2D character/token grids and writing to them in multiple passes, the renderer uses an on-demand \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}t\allowbreak{}(\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{})} function that computes each cell during serialization. Priority order (highest first):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Node box} --- look up spatial index by row, check column bounds, return char + token from pre-rendered \texttt{N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t}
+\item
+  \textbf{Arrowhead} --- check \texttt{g\allowbreak{}.\allowbreak{}a\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}.\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}(\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{})\allowbreak{})}, return \texttt{▼} + token
+\item
+  \textbf{Edge} --- check \texttt{g\allowbreak{}.\allowbreak{}d\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}[\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}]\allowbreak{}?\allowbreak{}.\allowbreak{}[\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}]}, return \texttt{j\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} + token
+\item
+  \textbf{Empty} --- return \texttt{'\allowbreak{} \allowbreak{}'} + null
+\end{enumerate}
+
+This avoids allocating O(rows × cols) grid arrays and eliminates separate write passes for edges, arrows, highlights, and nodes.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Graceful Degradation}\label{record-426-graceful-degradation}
+
+Three rendering paths, following the bijou component pattern:
+
+\subsection{Interactive Mode (TTY)}\label{record-426-interactive-mode-tty}
+
+Full Unicode box-drawing, ANSI colors via \texttt{c\allowbreak{}t\allowbreak{}x\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})}, badges, highlights.
+
+\begin{CodeBlock}
+╭────────────────────╮
+│ Theme bridge    2h │
+╰────────────────────╯
+          │
+          ├───────────────────────╮
+          ▼                       ▼
+╭────────────────────╮  ╭────────────────────╮
+│ Static renderers   │  │ TEA app shell      │
+╰────────────────────╯  ╰────────────────────╯
+\end{CodeBlock}
+
+\subsection{Pipe Mode}\label{record-426-pipe-mode}
+
+Indented adjacency list --- machine-parseable, no ANSI, no box drawing:
+
+\input{diagrams/flows/flow-054}
+
+\subsection{Accessible Mode}\label{record-426-accessible-mode}
+
+Structured text with depth labels for screen readers:
+
+\input{diagrams/flows/flow-055}
+
+\subsection{ASCII Fallback}\label{record-426-ascii-fallback}
+
+When Unicode is unavailable (\texttt{T\allowbreak{}E\allowbreak{}R\allowbreak{}M\allowbreak{}=\allowbreak{}d\allowbreak{}u\allowbreak{}m\allowbreak{}b}, \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}U\allowbreak{}N\allowbreak{}I\allowbreak{}C\allowbreak{}O\allowbreak{}D\allowbreak{}E\allowbreak{}=\allowbreak{}1}), swap the junction table:
+
+\begin{CodeBlock}
+const JUNCTION_ASCII: Record<string, string> = {
+  'D': '|', 'U': '|', 'DU': '|',
+  'L': '-', 'R': '-', 'LR': '-',
+  'DR': '+', 'DL': '+', 'RU': '+', 'LU': '+',
+  'DRU': '+', 'DLU': '+', 'DLR': '+', 'LRU': '+', 'DLRU': '+',
+};
+// Arrowhead: 'v' instead of '▼'
+// Node boxes: +--+ / |  | instead of ╭──╮ / │  │
+\end{CodeBlock}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Width Constraints \& Responsive Behavior}\label{record-426-width-constraints-responsive-behavior}
+
+\subsection{Auto-sizing}\label{record-426-auto-sizing}
+
+\begin{CodeBlock}
+const nodeWidth = options.nodeWidth ?? Math.max(
+  ...nodes.map(n => n.label.length + (n.badge?.length ?? 0) + 4),  // │ label badge │
+  16,  // minimum
+);
+const colStride = nodeWidth + 4;
+const maxNodesPerLayer = Math.max(...layers.map(l => l.length));
+const totalWidth = maxNodesPerLayer * colStride;
+\end{CodeBlock}
+
+\subsection{Terminal Overflow}\label{record-426-terminal-overflow}
+
+When \texttt{t\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}>\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}x\allowbreak{}W\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Shrink node width} --- truncate labels with \texttt{…}
+\item
+  \textbf{Reduce gap} --- minimum gap of 2 between nodes
+\item
+  \textbf{If still too wide} --- switch to vertical (single-column) layout with indentation instead of side-by-side boxes
+\end{enumerate}
+
+\subsection{ANSI-Aware Width}\label{record-426-ansi-aware-width}
+
+All width calculations use \textbf{visible length} (strip ANSI escapes before measuring):
+
+\begin{CodeBlock}
+function visibleLength(str: string): number {
+  return str.replace(/\x1b\[[0-9;]*m/g, '').length;
+}
+\end{CodeBlock}
+
+Apply colors only when writing content into the grid --- never during layout math.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{\texorpdfstring{XYPH Integration: \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}d\allowbreak{}e\allowbreak{}p\allowbreak{}s}}{XYPH Integration: }}\label{record-426-xyph-integration-status---view-deps}
+
+With the \texttt{D\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e} adapter, XYPH's quest graph is never duplicated --- bijou reads directly from the quest store:
+
+\begin{CodeBlock}
+import { dag, dagSlice, type DagSource } from '@flyingrobots/bijou';
+
+// Wrap the quest store as a DagSource — no DagNode[] copy
+const questGraph: DagSource = {
+  has: (id) => snapshot.quests.has(id),
+  label: (id) => snapshot.quests.get(id)!.title.slice(0, 20),
+  children: (id) => snapshot.quests.get(id)!.dependsOn ?? [],
+  parents: (id) => snapshot.quests.get(id)!.dependents ?? [],
+  badge: (id) => `${snapshot.quests.get(id)!.hours}h`,
+  token: (id) => {
+    const q = snapshot.quests.get(id)!;
+    return q.status === 'DONE' ? theme.semantic.success
+         : frontierSet.has(id) ? theme.semantic.primary
+         : theme.semantic.muted;
+  },
+};
+
+// Render a 3-hop neighborhood — never loads the full graph
+const slice = dagSlice(questGraph, 'task:BJU-007', { depth: 3, direction: 'ancestors' });
+console.log(dag(slice, {
+  highlightPath: criticalResult.path,
+  highlightToken: theme.semantic.error,
+}));
+\end{CodeBlock}
+
+\subsection{Reactive DAG in TUI}\label{record-426-reactive-dag-in-tui}
+
+With bijou-tui's TEA runtime + git-warp subscriptions:
+
+\begin{CodeBlock}
+const app: App<Model, Msg> = {
+  init: () => [model, [watchGraph()]],
+
+  update: (msg, model) => {
+    if (msg.type === 'graph-changed') {
+      return [{ ...model, snapshot: rebuildSnapshot(msg.diff) }, []];
+    }
+    return [model, []];
+  },
+
+  view: (model) => {
+    return flex(
+      { direction: 'column', width: model.cols, height: model.rows },
+      { basis: 2, content: tabs([...]) },
+      { flex: 1, content: (w, h) => viewport({
+        width: w, height: h,
+        content: dag(buildDagNodes(model.snapshot), {
+          highlightPath: model.criticalPath,
+          maxWidth: w,
+        }),
+        scrollY: model.scroll.y,
+      })},
+      { basis: 2, content: statusLine(model) },
+    );
+  },
+};
+\end{CodeBlock}
+
+Add a quest in one terminal → the DAG re-renders in the other with the new node slotted and sorted. That's the dream.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Implementation Plan}\label{record-426-implementation-plan}
+
+\subsection{Phase 1: Core Layout Engine (\textasciitilde150 LoC)}\label{record-426-phase-1-core-layout-engine-150-loc}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} --- topological BFS, longest-path
+\item
+  \texttt{o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{}(\allowbreak{})} --- barycenter heuristic (1 top-down + 1 bottom-up pass)
+\item
+  Grid coordinate mapping (\texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}×\allowbreak{} \allowbreak{}R\allowbreak{}S}, \texttt{c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{} \allowbreak{}×\allowbreak{} \allowbreak{}C\allowbreak{}S})
+\end{itemize}
+
+\subsection{Phase 2: Edge Router (\textasciitilde100 LoC)}\label{record-426-phase-2-edge-router-100-loc}
+
+\begin{itemize}
+\tightlist
+\item
+  Direction accumulation (\texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}<\allowbreak{}D\allowbreak{}i\allowbreak{}r\allowbreak{}>} per cell)
+\item
+  Junction character lookup (15-entry table)
+\item
+  Elbow routing (see the illustrated routing stages below)
+\item
+  Arrowhead placement
+\end{itemize}
+
+\input{diagrams/flows/flow-072}
+
+\subsection{Phase 3: Renderer --- Shader-based cellAt (\textasciitilde460 LoC)}\label{record-426-phase-3-renderer-shader-based-cellat-460-loc}
+
+\begin{itemize}
+\tightlist
+\item
+  Node box rendering (label + badge + border) into \texttt{P\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}[\allowbreak{}]} with pre-segmented graphemes
+\item
+  Spatial node index (\texttt{M\allowbreak{}a\allowbreak{}p\allowbreak{}<\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}P\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}[\allowbreak{}]\allowbreak{}>}) for O(1) amortized node lookup
+\item
+  Highlight cell set (\texttt{S\allowbreak{}e\allowbreak{}t\allowbreak{}<\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}>} using \texttt{e\allowbreak{}n\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}A\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}P\allowbreak{}o\allowbreak{}s}) for O(1) edge highlight lookup
+\item
+  On-demand \texttt{c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}t\allowbreak{}(\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{})} query during serialization (priority: node box \textgreater{} arrowhead \textgreater{} edge \textgreater{} empty)
+\item
+  Run-length grouping serializer: consecutive same-token characters grouped into single \texttt{s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}(\allowbreak{})} calls
+\item
+  Three output mode paths (interactive / pipe / accessible)
+\item
+  ASCII fallback junction table
+\end{itemize}
+
+\subsection{Phase 4: Fragment Support (\textasciitilde50 LoC)}\label{record-426-phase-4-fragment-support-50-loc}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} --- BFS/DFS from focus node with depth limit
+\item
+  Ghost node rendering for truncated boundaries (dashed borders)
+\item
+  Edge count annotation (``\ldots{} 3 ancestors'')
+\end{itemize}
+
+\subsection{Phase 5: Width Adaptation (\textasciitilde40 LoC)}\label{record-426-phase-5-width-adaptation-40-loc}
+
+\begin{itemize}
+\tightlist
+\item
+  Auto-sizing from label lengths
+\item
+  the illustrated sequence below
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}e\allowbreak{}n\allowbreak{}g\allowbreak{}t\allowbreak{}h\allowbreak{}(\allowbreak{})} for ANSI-safe width math
+\end{itemize}
+
+\input{diagrams/flows/flow-073}
+
+\subsection{Total: \textasciitilde1014 LoC + tests}\label{record-426-total-1014-loc-tests}
+
+Tests follow bijou's \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} pattern --- one test per output mode, edge cases (empty, single node, diamond, wide fan-out, skip edges spanning multiple layers, cycles rejected with error).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Open Questions}\label{record-426-open-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Horizontal layout (\texttt{d\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}'})} --- useful for pipelines. Same algorithm, rotated 90°. Worth including in v1 or defer?
+\item
+  \textbf{Interactive DAG in bijou-tui} --- cursor navigation over nodes, expand/collapse subtrees, click-to-focus. Separate \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}E\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} TEA component or extend \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} with a stateful wrapper?
+\item
+  \textbf{Maximum practical size} --- at what node count does the ASCII layout become unreadable? Likely \textasciitilde30 nodes in a standard 120-col terminal. Beyond that, should we auto-switch to a condensed format (e.g., collapsed layers)?
+\item
+  \textbf{Edge label support} --- render edge labels on the horizontal segment? (``depends-on'' is implied in XYPH but other users might want labeled edges.)
+\item
+  \textbf{Grouping / clusters} --- render a box around a set of nodes (e.g., all tasks in a campaign)? Adds significant layout complexity.
+\end{enumerate}
+

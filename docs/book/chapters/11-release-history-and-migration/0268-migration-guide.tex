@@ -1,0 +1,73 @@
+\chapter{Migrating to Bijou 4.4.1}\label{record-268}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.4.1/migration-guide.md}\par}\smallskip
+
+\section{No Breaking Changes}\label{record-268-no-breaking-changes}
+
+Bijou 4.4.1 is a backwards-compatible patch release. All existing \texttt{4\allowbreak{}.\allowbreak{}4\allowbreak{}.\allowbreak{}0} code continues to work unchanged.
+
+\section{If You Added a Terminal Background Workaround in 4.4.0}\label{record-268-if-you-added-a-terminal-background-workaround-in-4.4.0}
+
+Some apps worked around the 4.4.0 regression by pre-setting the terminal background before calling \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})}.
+
+\begin{CodeBlock}
+process.stdout.write('\x1b[48;2;45;25;34m');
+await run(app, { ctx });
+\end{CodeBlock}
+
+That prefill should no longer be necessary when you use \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} with a theme that sets \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g}.
+
+Leaving the workaround in place is usually harmless when it matches your theme, but Bijou now renders the framed body background explicitly.
+
+\section{\texorpdfstring{Optional: Move App-Local Theme Toggles Into \texttt{s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s}}{Optional: Move App-Local Theme Toggles Into }}\label{record-268-optional-move-app-local-theme-toggles-into-shellthemes}
+
+If your app currently manages shell theme switching in page-local state, you can now hand that concern to the stock frame:
+
+\begin{CodeBlock}
+let currentCtx = ctx;
+const getCurrentCtx = () => currentCtx;
+const initialModel = {};
+
+const app = createFramedApp({
+  ctx: currentCtx,
+  shellThemes: [
+    { id: 'default', label: 'Default', theme: defaultTheme },
+    { id: 'verdant-plum', label: 'Verdant Plum', theme: plumTheme },
+  ],
+  onShellThemeChange: ({ ctx: nextCtx }) => {
+    currentCtx = nextCtx;
+  },
+  pages: [{
+    id: 'home',
+    title: 'Home',
+    init: () => [initialModel, []],
+    update: (msg, model) => [model, []],
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'main',
+      render: (width, height) => renderHome(getCurrentCtx(), model, width, height),
+    }),
+  }],
+});
+\end{CodeBlock}
+
+The frame will:
+
+\begin{itemize}
+\tightlist
+\item
+  add a stock shell-theme row to the settings drawer when two or more shell themes are available
+\item
+  keep the resolved shell theme in one shared frame-owned place
+\item
+  expose the current selection via \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}d}
+\end{itemize}
+
+If your page renderers already resolve theme data from an explicit \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}, pass that context into \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{} \allowbreak{}\}\allowbreak{})}, mirror \texttt{o\allowbreak{}n\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e} back into your app-owned state, and make your page renderers read the updated context on each render. Apps that rely only on the ambient default context can omit both options; the frame will update that default context when the stock shell theme changes.
+
+You do not need to adopt this API, but it is now the simplest way to keep a landing screen, docs shell, or other frame-owned chrome on one theme source of truth.
+
+\section{Quit Confirm Input Is More Forgiving}\label{record-268-quit-confirm-input-is-more-forgiving}
+
+The stock quit dialog now accepts uppercase \texttt{Y} / \texttt{N} alongside lowercase \texttt{y} / \texttt{n}. No migration work is required.
+

@@ -1,0 +1,56 @@
+\chapter{DX-003 --- Rationalize Table APIs and Public Table Types}\label{record-302}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/DX-003-rationalize-table-apis-and-public-table-types.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-302-idea}
+
+Make the table family feel like one coherent surface instead of a cluster of near-related APIs with mismatched conventions.
+
+\section{Why}\label{record-302-why}
+
+The current table APIs create avoidable friction:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} and \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} use different calling conventions
+\item
+  the rows types are confusing between plain strings and \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\item
+  the common case for ``just show me a table'' is more verbose than it should be
+\end{itemize}
+
+This is exactly the kind of thing users discover by compiler error instead of by intention.
+
+\section{Captured feedback}\label{record-302-captured-feedback}
+
+From \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}p\allowbreak{}-\allowbreak{}t\allowbreak{}t\allowbreak{}d} TUI development:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} vs \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} calling conventions are inconsistent
+\item
+  \texttt{r\allowbreak{}o\allowbreak{}w\allowbreak{}s} typing is confusing around \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}[\allowbreak{}]\allowbreak{}[\allowbreak{}]} vs \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}[\allowbreak{}]\allowbreak{}[\allowbreak{}]}
+\item
+  \texttt{T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l} is not obvious from the public surface
+\item
+  a simple \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}u\allowbreak{}m\allowbreak{}n\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}t\allowbreak{}x\allowbreak{}?\allowbreak{})} style shorthand would help the common case
+\end{itemize}
+
+\section{Likely scope}\label{record-302-likely-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  decide on consistent table-family calling conventions
+\item
+  make public table row/cell typing obvious and documented
+\item
+  consider a simpler high-frequency table helper for the 80\% case
+\item
+  add tests proving the table family feels consistent across plain and navigable flows
+\end{itemize}
+

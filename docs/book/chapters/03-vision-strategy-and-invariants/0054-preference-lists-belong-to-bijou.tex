@@ -1,0 +1,370 @@
+\chapter{Preference Lists Belong to Bijou}\label{record-054}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/preference-lists-belong-to-bijou.md}\par}\smallskip
+
+\emph{Design note for promoting shell settings presentation into canonical Bijou componentry}
+
+\section{Why this exists}\label{record-054-why-this-exists}
+
+The shell settings drawer now looks materially better than it did at first:
+
+\begin{itemize}
+\tightlist
+\item
+  focused rows feel selected instead of merely pointed at
+\item
+  descriptions make preferences legible
+\item
+  narrow drawers can still explain what a row does
+\item
+  choice and toggle rows read differently
+\end{itemize}
+
+That quality is good, but too much of it still lives inside shell-specific rendering code.
+
+That is the wrong long-term direction for \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D}.
+
+If \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} is serious about ``the docs are the demo,'' then the docs shell should strive to use canonical Bijou componentry wherever possible. The title screen can remain a custom proving surface. The settings drawer should not.
+
+The shell should own:
+
+\begin{itemize}
+\tightlist
+\item
+  placement
+\item
+  drawer chrome
+\item
+  input routing
+\item
+  open / close behavior
+\item
+  footer/help discoverability
+\end{itemize}
+
+But the rows themselves should be a standard Bijou visual language, not a pile of bespoke shell drawing rules.
+
+\section{Design-thinking frame}\label{record-054-design-thinking-frame}
+
+\subsection{Primary user}\label{record-054-primary-user}
+
+The primary user is the \textbf{workspace operator}:
+
+\begin{itemize}
+\tightlist
+\item
+  someone navigating settings in a real framed app
+\item
+  someone who expects toggles, choices, and descriptions to read clearly
+\item
+  someone who should not have to mentally decode custom row layouts every time a shell drawer opens
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``What kind of setting is this?''
+\item
+  ``What is currently selected?''
+\item
+  ``What happens if I activate this row?''
+\item
+  ``Why does this row look selected?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-054-secondary-user}
+
+The secondary user is the \textbf{framework builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  someone building on \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  someone who wants polished settings UI without copying DOGFOOD-only row presentation code
+\item
+  someone who wants one canonical vocabulary for settings, preferences, onboarding lists, and maybe later notification review or inspectors
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Can I get this settings-row quality without hand-drawing it myself?''
+\item
+  ``Can the shell depend on stable preference-list components rather than shell-local rendering?''
+\item
+  ``Can the same row family be reused outside settings?''
+\end{itemize}
+
+\section{Problem statement}\label{record-054-problem-statement}
+
+Right now the shell settings drawer is conceptually correct but architecturally inverted:
+
+\begin{itemize}
+\tightlist
+\item
+  the shell owns the right behavior
+\item
+  but the shell also owns too much bespoke row rendering
+\end{itemize}
+
+That makes the shell harder to evolve and weakens the DOGFOOD promise:
+
+\begin{itemize}
+\tightlist
+\item
+  the docs are not proving a canonical preference-list family
+\item
+  shell polish risks becoming trapped inside \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  later surfaces may reinvent nearly identical ``selected preference rows'' instead of reusing a standard component
+\end{itemize}
+
+\section{Product direction}\label{record-054-product-direction}
+
+Bijou should promote the current settings-row presentation into a canonical component family.
+
+Working name:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  optional row helpers for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    toggle
+  \item
+    choice
+  \item
+    info
+  \item
+    action
+  \end{itemize}
+\end{itemize}
+
+The shell settings drawer should then become:
+
+\begin{itemize}
+\tightlist
+\item
+  shell-owned container behavior
+\item
+  canonical Bijou preference-list rendering
+\end{itemize}
+
+That split keeps the shell strong without letting it become a custom UI toolkit inside the UI toolkit.
+
+\section{Principles}\label{record-054-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{DOGFOOD should use canonical componentry} If a shell surface becomes polished and reusable, it should graduate into standard Bijou presentation instead of staying bespoke.
+\item
+  \textbf{The shell owns behavior, not every pixel} Drawer placement, input ownership, dismissal, and discoverability belong to the shell. The row family should belong to Bijou componentry.
+\item
+  \textbf{Preference rows should be semantically legible} A user should be able to distinguish:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    selected row
+  \item
+    row label
+  \item
+    current value
+  \item
+    description
+  \item
+    toggle vs choice vs info
+  \end{itemize}
+\item
+  \textbf{Compact-width truth matters} If the value will collide with the label, the component should adapt honestly by stacking or wrapping rather than truncating into ambiguity.
+\item
+  \textbf{Persistence is not a default framework concern} The component family and shell settings experience should work entirely in memory. Persistence, if added later, should come through an explicit port/adapter, not a hidden framework assumption.
+\end{enumerate}
+
+\section{Proposed component-family scope}\label{record-054-proposed-component-family-scope}
+
+\subsection{In scope}\label{record-054-in-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  canonical preference row rendering
+\item
+  selected-row treatment
+\item
+  value-label placement rules
+\item
+  stacked-value fallback when inline space is too tight
+\item
+  row descriptions
+\item
+  row-kind affordances:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    toggle
+  \item
+    choice
+  \item
+    info
+  \item
+    action
+  \end{itemize}
+\item
+  token-aware theming for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    selected state
+  \item
+    value emphasis
+  \item
+    muted descriptions
+  \end{itemize}
+\end{itemize}
+
+\subsection{Out of scope}\label{record-054-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  persistence of preferences across sessions
+\item
+  arbitrary form controls embedded inside rows
+\item
+  editable text fields inside the first preference-list family
+\item
+  a full application settings persistence framework
+\item
+  replacing every shell surface with a generic list in the same slice
+\end{itemize}
+
+\section{Proposed API direction}\label{record-054-proposed-api-direction}
+
+The exact names can change, but the family should roughly support:
+
+\begin{CodeBlock}
+interface PreferenceRow {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly valueLabel?: string;
+  readonly kind?: 'toggle' | 'choice' | 'info' | 'action';
+  readonly selected?: boolean;
+  readonly checked?: boolean;
+  readonly enabled?: boolean;
+}
+
+interface PreferenceSection {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly PreferenceRow[];
+}
+\end{CodeBlock}
+
+The shell can still keep its current higher-level \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s} model and adapt that model into the canonical row family.
+
+That preserves shell ergonomics while standardizing the actual row rendering.
+
+\section{Why this matters beyond settings}\label{record-054-why-this-matters-beyond-settings}
+
+Once the preference-row family exists, it has clear follow-on value:
+
+\begin{itemize}
+\tightlist
+\item
+  shell settings drawers
+\item
+  onboarding/tutorial step lists
+\item
+  notification review rows
+\item
+  future inspectors or property panels
+\end{itemize}
+
+So this is not just a shell cleanup. It is a design-system promotion step.
+
+\section{Relationship to DOGFOOD}\label{record-054-relationship-to-dogfood}
+
+\texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D} should remain the first proving surface:
+
+\begin{itemize}
+\tightlist
+\item
+  the shell settings drawer is where the current row treatment became credible
+\item
+  DOGFOOD should be the first user of the canonical component family
+\item
+  once that family exists, DOGFOOD stops ``special-casing a nice settings menu'' and starts proving the actual product vocabulary
+\end{itemize}
+
+That is exactly the kind of migration DOGFOOD should encourage.
+
+\section{Relationship to settings persistence}\label{record-054-relationship-to-settings-persistence}
+
+Persistence is intentionally not part of this slice.
+
+Framework stance for now:
+
+\begin{itemize}
+\tightlist
+\item
+  settings can live entirely in memory
+\item
+  the shell can read and write them inside the page/app model
+\item
+  if persistence is needed later, it should come through a port/adapter boundary
+\item
+  Bijou should not assume filesystem, database, browser storage, or any other capability by default
+\end{itemize}
+
+That keeps the framework honest and composable.
+
+\section{Acceptance bar}\label{record-054-acceptance-bar}
+
+This direction is successful when:
+
+\begin{itemize}
+\tightlist
+\item
+  the shell settings drawer no longer hand-draws its own special row treatment
+\item
+  DOGFOOD uses the canonical preference-list family
+\item
+  the selected-row behavior, value placement, and description rhythm remain at least as good as the current bespoke version
+\item
+  persistence is still absent by default and explicitly out of scope
+\end{itemize}
+
+\section{Recommended implementation sequence}\label{record-054-recommended-implementation-sequence}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write failing design-system / shell tests for canonical preference-row rendering.
+\item
+  Build the smallest reusable preference-list surface family.
+\item
+  Migrate the shell settings drawer to use it.
+\item
+  Keep DOGFOOD as the first proving surface.
+\item
+  Only after the row family is stable, consider whether other shell surfaces should adopt it.
+\end{enumerate}
+

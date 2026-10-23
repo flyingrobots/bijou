@@ -1,0 +1,301 @@
+\chapter{RE-003 --- Retain Layout Trees and Layout Invalidation}\label{record-151}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}\par}\smallskip
+
+\emph{Cycle for turning layout from a transient render byproduct into an explicit retained runtime object}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-001-define-runtime-engine-architecture.md}{RE-001 --- Define Runtime Engine Architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}{RE-002 --- Promote First-Class State Machine and View Stack}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-151-why-this-cycle-exists}
+
+RE-001 and RE-002 established that:
+
+\begin{itemize}
+\tightlist
+\item
+  the application owns explicit state
+\item
+  the application owns an explicit view stack
+\end{itemize}
+
+But input routing, viewport ownership, and resize behavior still do not have one retained source of geometric truth.
+
+Today, layout is still too easy to treat as a temporary rendering side effect.
+
+This cycle exists to change that direction by landing a pure retained-layout seam that can answer:
+
+\begin{itemize}
+\tightlist
+\item
+  what layout tree belongs to each active view
+\item
+  which retained layouts are stale
+\item
+  why they became stale
+\item
+  when stale layouts are replaced with newly retained geometry
+\item
+  which layouts should disappear when views leave the stack
+\end{itemize}
+
+This is intentionally smaller than full layout-driven routing. It gives the runtime authoritative layout ownership before \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4} moves input over to it.
+
+\section{Human users / jobs / hills}\label{record-151-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-151-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers evolving the runtime
+\item
+  builders working on modal, drawer, viewport, and pane-heavy apps
+\item
+  shell authors who need layout ownership to stay stable as the visible stack changes
+\end{itemize}
+
+\subsection{Human jobs}\label{record-151-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Retain one layout tree per active view instead of recomputing geometry conceptually from scratch every time input arrives.
+\item
+  Mark layouts stale when resize, content, visibility, or overflow changes invalidate their geometry.
+\item
+  Drop layouts that no longer belong to the active view stack.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-151-human-hill}
+
+A human can point to one runtime object and answer which active views currently own retained geometry, which of those layouts are stale, and why.
+
+\section{Agent users / jobs / hills}\label{record-151-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-151-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents inspecting runtime geometry during debugging
+\item
+  agents generating view-stack tests and layout assertions
+\item
+  agents preparing future routing work that depends on retained geometry
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-151-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read the retained layout tree for a specific view by stable id.
+\item
+  Determine whether a retained layout is still valid or is awaiting recomputation.
+\item
+  Tell whether a layout disappeared because the view was dismissed or because the geometry merely became stale.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-151-agent-hill}
+
+An agent can inspect retained layout state and answer which views have authoritative geometry and which invalidation causes are currently pending without inferring that from rendered frames.
+
+\section{Human playback}\label{record-151-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user is in a workspace root view with one retained layout tree.
+\item
+  The app opens a blocking modal and retains a second layout tree for that view.
+\item
+  The terminal is resized.
+\item
+  Both retained layouts are marked stale with a \texttt{t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}z\allowbreak{}e} invalidation cause.
+\item
+  The runtime recomputes and re-retains the new layout trees.
+\item
+  Their stale flags clear, but their retained version numbers increase.
+\item
+  The modal is dismissed.
+\item
+  The modal layout disappears because its view is no longer in the active stack, while the workspace layout remains retained.
+\end{enumerate}
+
+\section{Agent playback}\label{record-151-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects the runtime while a workspace view and a help overlay are both active.
+\item
+  The retained-layout registry shows one layout for \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e} and one for \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p}.
+\item
+  A content change happens inside the help overlay.
+\item
+  The help layout is marked invalidated for \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e}.
+\item
+  The workspace layout remains valid.
+\item
+  When the help overlay is dismissed, the retained-layout registry drops only the \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p} layout because it is no longer part of the current view stack.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-151-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Implementation outline}\label{record-151-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extend the pure runtime-engine module with first-class retained-layout types.
+\item
+  Define an explicit invalidation-cause vocabulary for geometry changes, including:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    terminal resize
+  \item
+    view-stack change
+  \item
+    content change
+  \item
+    visibility change
+  \item
+    enablement change
+  \item
+    overflow change
+  \end{itemize}
+\item
+  Add pure helpers to:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    create an empty retained-layout registry
+  \item
+    retain or replace a layout tree for a given active view id
+  \item
+    list and look up retained layouts
+  \item
+    mark retained layouts stale with one or more invalidation causes
+  \item
+    drop layouts whose views are no longer present in the active view stack
+  \end{itemize}
+\item
+  Keep the implementation shell-agnostic and avoid routing work in this cycle.
+\item
+  Leave detailed component sizing/anchoring contracts for \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006}.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-151-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving the legend now points at \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}3} as the active cycle and leaves the remaining runtime-engine backlog in place
+\item
+  package-local runtime tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    retained layout trees are stored by active view id
+  \item
+    retained layouts expose versioning and invalidation status
+  \item
+    invalidation causes are explicit and deduplicated
+  \item
+    re-retaining a layout clears invalidation and increments version
+  \item
+    layouts for inactive views are dropped when the view stack changes
+  \end{itemize}
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-151-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  there is already a \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} tree in the core toolkit, so the runtime should reuse that concept instead of inventing a second layout language
+\item
+  the cycle must not drift into full routing or component registration work yet
+\item
+  detailed resize/stretch/shrink rules still need a stronger component-level contract later, so this cycle should retain geometry ownership without pretending every layout rule is solved
+\end{itemize}
+
+\section{Retrospective}\label{record-151-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  a first-class retained-layout registry in the runtime engine
+\item
+  explicit invalidation causes for stale geometry
+\item
+  pure helpers for retaining, invalidating, listing, looking up, and dropping layouts by view ownership
+\item
+  tests proving versioning, invalidation, and view-stack cleanup semantics
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no full input-routing migration yet
+\item
+  no component-level stretch/shrink/anchor contract yet
+\item
+  no framed-shell migration yet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}{RE-004 --- Route Input Through Layouts and Layer Bubbling}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006 --- Formalize Component Layout and Interaction Contracts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}
+\end{itemize}
+

@@ -1,0 +1,5 @@
+Job monitor
+Compile the application. Status: succeeded. Progress: 100 percent.
+Run the tests. Status: failed. Progress: 60 percent. Error: Fixture failure: assertion did not pass
+Selected. Publish the package. Status: running. Progress: 40 percent.
+Up and Down select. Enter starts. C opens cancellation. L opens logs. F filters failures. Q quits.

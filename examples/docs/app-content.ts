@@ -5,7 +5,7 @@ import {
   standardBlockPreviewMarkdown,
 } from './app-standard-block-docs.js';
 import type { ReleaseStoryMarkdownPaths } from './app-release-story.js';
-import { BIJOU_VERSION } from './app-ids.js';
+import { BIJOU_RELEASE_LINE } from './app-release-line.js';
 
 export const GUIDES_START_HERE_TEXT = readMarkdownDoc(
   './content/guides-start-here.md',
@@ -79,8 +79,8 @@ export const RELEASE_OVERVIEW_MARKDOWN_PATHS: ReleaseStoryMarkdownPaths =
     fr: './content/release-overview.fr.md',
   });
 export const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(
-  `../../docs/releases/${BIJOU_VERSION}/whats-new.md`,
+  `../../docs/releases/${BIJOU_RELEASE_LINE}/whats-new.md`,
 );
 export const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(
-  `../../docs/releases/${BIJOU_VERSION}/migration-guide.md`,
+  `../../docs/releases/${BIJOU_RELEASE_LINE}/migration-guide.md`,
 );

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "monitor-interactive",
+    "title": "Job monitor / interactive",
+    "mode": "interactive",
+    "width": 40,
+    "height": 15,
+    "presentation": "Complete deterministic fixture output, wrapped at 40 cells for print.",
+    "cell_sha256": "325f892e0be92cd611e7c4f387b64fae866b9c9e946456629969a3c0eb0c9501",
+    "svg_sha256": "30a53e71c8cb41df90bde47241c2627a340192ff2a8a549f5168948501c21e11",
+    "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+  },
+  {
+    "id": "monitor-static",
+    "title": "Job monitor / static",
+    "mode": "static",
+    "width": 40,
+    "height": 15,
+    "presentation": "Complete deterministic fixture output, wrapped at 40 cells for print.",
+    "cell_sha256": "1bbaeac6988c5362f815ae112ea24a721787df188f015ecf159eca59821760f5",
+    "svg_sha256": "230b19f9b5b266dd67f265089be3a8647b2138c8c1d8ac0485420582ca27dffb",
+    "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+  },
+  {
+    "id": "monitor-pipe",
+    "title": "Job monitor / pipe",
+    "mode": "pipe",
+    "width": 40,
+    "height": 5,
+    "presentation": "Tabs shown as ⇥ for print; raw output is preserved separately.",
+    "cell_sha256": "54afe0ced07a1a6826de5d753d2ff03b99d38e2260b09398061a951a1f47c7f8",
+    "svg_sha256": "c51a2c3e179a04ec64c14560385c554217eeebbac543ecd005d8c1b221f9b442",
+    "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+  },
+  {
+    "id": "monitor-accessible",
+    "title": "Job monitor / accessible",
+    "mode": "accessible",
+    "width": 40,
+    "height": 11,
+    "presentation": "Complete deterministic fixture output, wrapped at 40 cells for print.",
+    "cell_sha256": "1922d3e36ea10e8db058153feb6add4902a3d9b6cb7b90351c70d2e0732202a6",
+    "svg_sha256": "c240877294f6ae0c3facfe51a6bc805ac5c0335409c08a25121af49f0dc2e751",
+    "font": "Recursive Mono, MONO=1, CASL=0; DejaVu Sans symbols"
+  }
+]

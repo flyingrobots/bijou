@@ -1,0 +1,361 @@
+\chapter{DX-048 V8 Runtime Graph And Scene IR Contract}\label{record-144}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-048-v8-runtime-graph-scene-ir-contract.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-048 V8 Runtime Graph And Scene IR Contract
+legend: DX
+lane: release
+priority: high
+github_issue: 457
+status: active
+keywords:
+  - developer-experience
+  - runtime-graph
+  - scene-ir
+  - graphql
+  - blocks
+  - visor
+  - v8.0.0
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Linked Work}\label{record-144-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Goalpost tracker: \href{https://github.com/flyingrobots/bijou/issues/457}{\#457}
+\item
+  First artifact proof: \href{https://github.com/flyingrobots/bijou/issues/458}{\#458}
+\item
+  Packed-cell proof: \href{https://github.com/flyingrobots/bijou/issues/459}{\#459}
+\item
+  Broad source lineage: \href{https://github.com/flyingrobots/bijou/issues/302}{\#302}
+\item
+  VISOR coordination surface: \href{https://github.com/flyingrobots/visor}{flyingrobots/visor}
+\item
+  Prior Bijou proof: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-046-graphql-authored-dogfood-block-fixture.md}{DX-046 GraphQL Authored DOGFOOD Block Fixture}
+\end{itemize}
+
+\section{Decision Summary}\label{record-144-decision-summary}
+
+\texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} proved a constrained path from GraphQL SDL to \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, terminal proof, grouped debug facts, and DOGFOOD product facts. \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} stabilized the demo and release surface enough to stop treating that path as release bookkeeping.
+
+The V8 work starts by freezing the product contract before implementation continues. DX-048 defines the source, artifact, IR, receipt, source-map, lower-mode, debug, capture, and witness boundaries that \#458 and \#459 must consume.
+
+VISOR is the coordination surface for the proof. Bijou remains responsible for the source-side contracts and the terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} proof. Geordi, Wesley, Bunny, WARP TTD, browser renderers, and native renderers may consume or inform the contract later, but they do not define the first Bijou release gate.
+
+\section{Sponsor Human}\label{record-144-sponsor-human}
+
+A maintainer wants V8 to become a stable product contract, not a pile of exciting demos. They should be able to ask, ``what exactly crosses from GraphQL Blocks into Bijou Blocks IR and then into render targets?'' and get a versioned, testable answer.
+
+\section{Sponsor Agent}\label{record-144-sponsor-agent}
+
+An agent needs to trace one product fact from a GraphQL source fixture through artifact fields, scene nodes, terminal cells, lower modes, source maps, debug facts, and receipts without scraping rendered text or guessing ownership.
+
+\section{Hill}\label{record-144-hill}
+
+Given a checked-in DOGFOOD GraphQL fixture, Bijou can produce a deterministic artifact bundle with \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1}, lower-mode witnesses, source maps, receipts, and packed-cell render evidence, and reviewers can replay the full path without any Wesley or Geordi repository changes.
+
+\section{Playback Questions}\label{record-144-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  What is the GraphQL Blocks source model allowed to express?
+\item
+  Which facts belong in the \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact and which belong only in the compiler receipt?
+\item
+  What is the \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} lowering contract and what facts must it preserve?
+\item
+  Who owns receipt and source-map ownership when a source field fans out into multiple scene nodes or terminal cells?
+\item
+  Which lower modes are mandatory for a fixture before V8 calls it product proof?
+\item
+  What debug facts are stable enough for DOGFOOD, VISOR, and future replay tooling to inspect?
+\item
+  What invalid source cases fail before terminal rendering?
+\end{itemize}
+
+\section{Scope}\label{record-144-scope}
+
+This cycle defines the V8 contract and proof boundaries:
+
+\begin{itemize}
+\tightlist
+\item
+  GraphQL Blocks source model:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    fixture identity
+  \item
+    component identity
+  \item
+    field identity
+  \item
+    group identity
+  \item
+    binding and command-intent identity
+  \item
+    i18n key references
+  \item
+    theme token references
+  \item
+    target render profile
+  \end{itemize}
+\item
+  \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1} artifact semantics:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    stable artifact version
+  \item
+    deterministic field and group ordering
+  \item
+    explicit product-fact inventory
+  \item
+    hashable payload shape
+  \item
+    no hidden global registry dependency
+  \end{itemize}
+\item
+  \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1} lowering contract:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    stable scene version
+  \item
+    node identity and role ownership
+  \item
+    text, style, focus, and geometry facts
+  \item
+    lower-mode witness fields
+  \item
+    source-map references back to artifact and source spans
+  \end{itemize}
+\item
+  receipt and source-map ownership:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    source hash
+  \item
+    artifact hash
+  \item
+    scene hash
+  \item
+    packed-cell hash
+  \item
+    dependency and transform list
+  \item
+    failure facts for rejected input
+  \end{itemize}
+\item
+  debug fact contract:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}/\allowbreak{}1} summary facts
+  \item
+    group, field, i18n, token, action, binding, lower-mode, and hash inventory
+  \item
+    deterministic error categories
+  \end{itemize}
+\item
+  DOGFOOD round-trip fixture:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    source fixture checked into the repo
+  \item
+    artifact bundle checked or snapshotted as test evidence
+  \item
+    terminal \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} proof
+  \item
+    lower-mode evidence
+  \item
+    review path documented in DOGFOOD or release-facing docs
+  \end{itemize}
+\end{itemize}
+
+\section{Non-Goals}\label{record-144-non-goals}
+
+This cycle does not:
+
+\begin{itemize}
+\tightlist
+\item
+  implement the \#458 artifact bundle
+\item
+  implement the \#459 packed-cell adapter
+\item
+  migrate every DOGFOOD block to GraphQL
+\item
+  introduce a general GraphQL resolver runtime
+\item
+  require Geordi, Wesley, Bunny, WARP TTD, browser, or native app changes
+\item
+  ship BlockLab, Theme Lab, localization workbench, or operator surfaces
+\item
+  define the final browser or native render target APIs
+\item
+  move all \#302 lineage issues into \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\end{itemize}
+
+\section{Contract Sketch}\label{record-144-contract-sketch}
+
+The minimum accepted artifact bundle should be inspectable as plain facts:
+
+\input{diagrams/flows/flow-012}
+
+Each transition must produce a receipt:
+
+\begin{CodeBlock}
+receipt/1 {
+  fromVersion
+  toVersion
+  sourceHash
+  outputHash
+  dependencyHashes[]
+  transformFacts[]
+  sourceMapRefs[]
+  lowerModeWitnesses[]
+  debugFactRefs[]
+}
+\end{CodeBlock}
+
+The receipt is not a logging nicety. It is the review contract. If a future VISOR, DOGFOOD, WARP TTD, or browser proof cannot name the receipt it consumed, it is not part of the V8 release gate.
+
+\section{Failure Cases}\label{record-144-failure-cases}
+
+The V8 contract must reject:
+
+\begin{itemize}
+\tightlist
+\item
+  duplicate source, field, group, node, binding, or command ids
+\item
+  missing component identity
+\item
+  missing product facts for a DOGFOOD witness
+\item
+  broken i18n key references
+\item
+  broken theme token references
+\item
+  source spans that cannot map back from artifact or scene facts
+\item
+  lower-mode witnesses that omit required role or text facts
+\item
+  packed cells that cannot map to scene nodes
+\item
+  debug summaries that omit hashes or dependency facts
+\end{itemize}
+
+\section{Accessibility Posture}\label{record-144-accessibility-posture}
+
+The contract must preserve lower-mode witnesses. Terminal proof alone is not enough. Every accepted DOGFOOD fixture must expose accessible text and role facts through the artifact or scene receipt so reviewers can inspect a non-TTY representation.
+
+\section{Localization / Directionality Posture}\label{record-144-localization-directionality-posture}
+
+The GraphQL source may reference i18n keys and source-language fallback copy, but it must not smuggle untracked visible copy into the artifact. V8 must keep localization keys visible in debug facts and receipts so DOGFOOD can explain what translated and what fell back.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-144-agent-inspectability-explainability-posture}
+
+Agents must be able to inspect the complete source-to-render chain without executing a full app:
+
+\begin{itemize}
+\tightlist
+\item
+  parse the fixture
+\item
+  read the artifact
+\item
+  read the scene IR
+\item
+  read the receipt list
+\item
+  read the source map
+\item
+  read debug facts
+\item
+  run the terminal proof
+\item
+  compare hashes
+\end{itemize}
+
+This is the line between a demo and a product contract.
+
+\section{Linked Invariants}\label{record-144-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Tests Are the Spec
+\item
+  Runtime Truth Wins
+\item
+  Docs Are the Demo
+\item
+  Work Is Issue-Backed
+\item
+  Release Claims Need Proof
+\item
+  Facts Before Behavior
+\end{itemize}
+
+\section{Implementation Outline}\label{record-144-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Land this design packet and post-release BEARING refresh.
+\item
+  Update \#457 with the contract decision and the \#458 / \#459 pull order.
+\item
+  Add tests that keep ROADMAP, BEARING, and this design aligned.
+\item
+  In \#458, introduce the artifact bundle fixture and receipt shape.
+\item
+  In \#459, validate \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} and adapt it to \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  Only after \#458 and \#459 are stable, promote broader \#302 lineage into V8 implementation scope.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-144-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  WF-130 roadmap tests must require this design packet while \#457 is open.
+\item
+  Artifact bundle tests in \#458 should fail until \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}/\allowbreak{}1}, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, receipts, source maps, and debug facts are emitted together.
+\item
+  Packed-cell tests in \#459 should fail until \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}1} can map cells back to scene nodes and render a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} proof.
+\end{itemize}
+
+\section{Validation Plan}\label{record-144-validation-plan}
+
+\begin{CodeBlock}
+npx vitest run --config vitest.config.ts tests/cycles/WF-130/roadmap-goalpost-policy.part01.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part02.test.ts tests/cycles/WF-130/roadmap-goalpost-policy.part03.test.ts
+npm run docs:inventory
+npm run typecheck:test
+npm run lint
+git diff --check
+\end{CodeBlock}
+
+\section{Closeout Notes}\label{record-144-closeout-notes}
+
+Open. This design is the first V8 pull after \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} shipped.
+

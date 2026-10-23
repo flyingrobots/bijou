@@ -1,0 +1,141 @@
+\chapter{DF-049 Audit multi-field and staged forms family across real surfaces}\label{record-097}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-049 Audit multi-field and staged forms family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - forms
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-097-framing}
+
+\texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})} and \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} are the smallest form blocks that prove Bijou can model related user input as one coherent task. A group keeps related fields in one focused packet. A wizard keeps step boundaries and progress explicit when the task should unfold over time.
+
+This audit verifies the existing \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} DOGFOOD story against real story rendering, component-family doctrine, and mode-aware lowerings. It does not redesign the form runtime; it turns current story truth into executable release proof.
+
+\section{Sponsored Users}\label{record-097-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors composing setup, deploy, checkout, sign-up, and settings flows from first-party blocks.
+\item
+  Docs readers checking how grouped and staged forms behave when borders, color, and interactive focus are unavailable.
+\item
+  Maintainers who need a focused regression tying form-block story metadata, variants, and component-family guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-097-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect the DOGFOOD forms story and understand when to use a single grouped form versus a staged wizard.
+\item
+  A reader can switch both variants through interactive, static, pipe, and accessible profiles while preserving labels, values, summaries, and step state.
+\item
+  A maintainer can run one cycle test that proves form-block story metadata and design-system guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-097-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the family through the \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} story?
+\item
+  Do variants cover both single-step grouped fields and staged wizard progress?
+\item
+  Do rich/static previews preserve visual containment and field rhythm?
+\item
+  Do pipe lowerings preserve sequential prompts, labels, values, summaries, and step intent?
+\item
+  Do accessible lowerings linearize labels and wizard progress without relying on borders, color, or visual grouping?
+\item
+  Do component-family docs still position \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})} and \texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} as related data-collection blocks rather than generic layout containers?
+\end{itemize}
+
+\section{Requirements}\label{record-097-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} story identity and \texttt{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}l\allowbreak{}d\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}s} coverage family id.
+\item
+  Render every grouped/staged form story variant in every canonical story profile.
+\item
+  Treat box drawing as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings field-label-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-097-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}4\allowbreak{}9\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}s\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve form titles, labels, values, summaries, and wizard step state.
+\item
+  Component-family docs retain grouped form, staged flow, progress, summary, and accessibility guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-097-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-049 cycle test that renders the \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the multi-field and staged forms section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-097-drift-check}
+
+No runtime drift was found in this slice. The existing \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} story already distinguishes grouped forms from staged flows, renders boxed field rhythm in interactive/static profiles, lowers to sequential labeled prompts in pipe mode, and linearizes step state in accessible mode.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-097-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-049 playback test tied grouped and staged forms to real mode lowerings.
+\item
+  GREEN: the new cycle test renders both \texttt{d\allowbreak{}e\allowbreak{}p\allowbreak{}l\allowbreak{}o\allowbreak{}y\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p} and \texttt{r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve visual containment and field rhythm.
+\item
+  Pipe previews preserve labels, values, summaries, and wizard step intent without box drawing.
+\item
+  Accessible previews linearize the same facts with explicit current-step language for the wizard variant.
+\end{itemize}
+
+\section{Retrospective}\label{record-097-retrospective}
+
+The forms story did not need runtime changes. The useful release work was codifying the first-blocks contract: grouped and staged forms are semantic data-collection compositions, not string dumps or decorative boxes.
+

@@ -1,0 +1,41 @@
+\chapter{DX-020 --- Layout Localization Pipeline Guide}\label{record-331}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/up-next/DX-020-layout-localization-pipeline-guide.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-331-problem}
+
+The layout/localization path around \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is important to both performance and correctness, but the repo does not yet have a dedicated strategy doc explaining:
+
+\begin{itemize}
+\tightlist
+\item
+  localization vs painting
+\item
+  how offsets accumulate
+\item
+  when layout is recomputed
+\item
+  where retained-layout work would fit
+\end{itemize}
+
+The 2026-04-11 documentation audit called this out as a missing deep guide for advanced users and maintainers.
+
+\section{Desired outcome}\label{record-331-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write a dedicated strategy doc for the layout-localization pipeline.
+\item
+  Explain the recursion model, coordinate spaces, and relationship between localization and paint/output stages.
+\item
+  Link it from the advanced guide and relevant architecture docs.
+\end{enumerate}
+
+\section{Effort}\label{record-331-effort}
+
+Small to medium --- mostly documentation, but it may expose naming or API cleanup opportunities along the way.
+

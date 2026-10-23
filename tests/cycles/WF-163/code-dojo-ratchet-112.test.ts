@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -26,7 +26,7 @@ describe('WF-163 Code Dojo ratchet', () => {
   it('records the complete modern-cycle ownership and review contract', () => {
     const design = read('docs/design/WF-163-respecting-dojo-ratchet-112.md');
     const requiredClaims = [
-      'Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)',
+      'Legend: [WF — Workflow and Delivery]',
       '## Sponsor Human',
       '## Sponsor Agent',
       '## Accessibility And Assistive Posture',

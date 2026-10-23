@@ -1,0 +1,166 @@
+\chapter{RE-031 --- Raytrace Shader Kernel}\label{record-159}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-031-raytrace-shader-kernel.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Sponsor Human}\label{record-159-sponsor-human}
+
+A Bijou app builder creating title screens, procedural previews, or small shader-driven scenes in terminal cells.
+
+\section{Sponsor Agent}\label{record-159-sponsor-agent}
+
+An implementation agent that needs to author terminal ray scenes without copying vector math, camera rays, sphere intersections, and reflection helpers into each app.
+
+\section{Hills}\label{record-159-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can import a tiny raytrace kernel from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} and use it inside \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} shaders without pulling in an external 3D engine.
+\item
+  A builder can keep app-specific material and lighting decisions local while sharing the boring, error-prone geometry math.
+\item
+  An agent can factor a title-screen ray tracer into reusable Bijou helpers without turning Bijou into a full scene graph or renderer.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-159-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can a caller create a look-at camera ray whose center sample points from the camera origin to the target?
+\item
+  Can the kernel report the first positive sphere hit with correct distance, hit point, and surface normal?
+\item
+  Can the kernel compare supported shapes and return the nearest hit?
+\item
+  Can reflection math be reused by app-specific lighting code without the app reimplementing vector operations?
+\end{enumerate}
+
+\section{Requirements}\label{record-159-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Export \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}V\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}3}, \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}R\allowbreak{}a\allowbreak{}y}, \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e}, \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}P\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}e}, \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e}, and \texttt{R\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t} types from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\item
+  Export pure vector helpers for add, subtract, scale, dot, cross, normalize, reflect, and mix-in camera composition.
+\item
+  Provide a \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}A\allowbreak{}t\allowbreak{}R\allowbreak{}a\allowbreak{}y\allowbreak{}(\allowbreak{})} helper that builds a normalized ray from an origin, target, screen coordinate, and focal length.
+\item
+  Provide a \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}O\allowbreak{}r\allowbreak{}b\allowbreak{}i\allowbreak{}t\allowbreak{}C\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}R\allowbreak{}a\allowbreak{}y\allowbreak{}(\allowbreak{})} helper for the common orbiting title screen camera pattern.
+\item
+  Provide \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{})}, \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}P\allowbreak{}l\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{})}, and \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}N\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{})} primitives.
+\item
+  Keep lighting, materials, shadows, and palette decisions out of this cycle.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-159-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Red tests prove camera center direction, sphere hit facts, nearest-hit selection, and reflection behavior.
+\item
+  The implementation lives in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} and is exported from the package root.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} passes.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passes.
+\end{itemize}
+
+\section{Accessibility / Assistive Reading Posture}\label{record-159-accessibility-assistive-reading-posture}
+
+This is a math helper and does not change terminal output by itself. Apps using it remain responsible for plain-text fallbacks and for not relying on decorative motion as the only information channel.
+
+\section{Localization / Directionality Posture}\label{record-159-localization-directionality-posture}
+
+The kernel is independent of prose localization and text direction.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-159-agent-inspectability-explainability-posture}
+
+The helper names should expose the geometric truth directly. Agents should be able to answer whether a title scene uses Bijou's shared hit math or app-local lighting by reading imports and tests.
+
+\section{Linked Invariants}\label{record-159-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-159-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add failing tests for look-at camera rays, sphere hits, nearest hits, and reflection.
+\item
+  Implement a focused raytrace helper module in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\item
+  Re-export the helper from the package root.
+\item
+  Document the intended boundary in the advanced guide and changelog.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-159-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}t\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}y}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{} \allowbreak{}h\allowbreak{}i\allowbreak{}t}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}n\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e\allowbreak{} \allowbreak{}h\allowbreak{}i\allowbreak{}t}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{} \allowbreak{}a\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l}
+\end{itemize}
+
+\section{Drift Check}\label{record-159-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  RED observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} failed because \texttt{.\allowbreak{}/\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s} did not exist and \texttt{r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}A\allowbreak{}t\allowbreak{}R\allowbreak{}a\allowbreak{}y} was not exported.
+\item
+  GREEN observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passed with 7 tests.
+\item
+  Package lint observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} passed.
+\item
+  Root lint observed: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed after the pre-existing local heatmap workspace drift was repaired.
+\item
+  Whitespace drift: \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passed.
+\item
+  Pre-commit lockfile gate: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l} remains blocked by local install-tree drift unrelated to the raytrace helper.
+\end{itemize}
+
+\section{Playback}\label{record-159-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}-\allowbreak{}a\allowbreak{}t\allowbreak{} \allowbreak{}c\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}y} proves the center ray points from camera origin to target.
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}p\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{} \allowbreak{}h\allowbreak{}i\allowbreak{}t} proves sphere distance, point, and normal facts.
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}n\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e\allowbreak{} \allowbreak{}h\allowbreak{}i\allowbreak{}t} proves shape comparison across the supported primitive set.
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{} \allowbreak{}a\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l} proves the reflection helper used by app-owned lighting code.
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}r\allowbreak{}a\allowbreak{}y\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{} \allowbreak{}f\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{} \allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{} \allowbreak{}r\allowbreak{}o\allowbreak{}o\allowbreak{}t} proves package ergonomics for single-import shader authoring.
+\end{enumerate}
+
+\section{Retrospective}\label{record-159-retrospective}
+
+This cycle intentionally stopped at geometry. Bijou now owns the reusable camera and intersection math that canvas shader authors are likely to copy between apps, while app code still owns visual taste: material colors, theme lookups, specular strength, reflections, shadows, and palette decisions. That keeps the helper useful for jedit-style title scenes without turning Bijou into a general-purpose renderer.
+

@@ -1,0 +1,287 @@
+\chapter{DL-002 --- Canonicalize Patterns and Blocks}\label{record-169}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-002-canonicalize-patterns-and-blocks.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Why this cycle exists}\label{record-169-why-this-cycle-exists}
+
+DL-001 captured the doctrine layer.
+
+That was necessary, but it still leaves Bijou with a gap between:
+
+\begin{itemize}
+\tightlist
+\item
+  doctrine
+\item
+  component families
+\item
+  shell/product work
+\end{itemize}
+
+This cycle exists to bridge that gap by making the most proven Bijou interaction language explicit:
+
+\begin{itemize}
+\tightlist
+\item
+  selection treatment
+\item
+  active-region treatment
+\item
+  drawer and panel rhythm
+\item
+  preference-row/value layout
+\item
+  the difference between patterns and future blocks
+\end{itemize}
+
+\section{Scope of this cycle}\label{record-169-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  documenting canonical patterns in the design-system layer
+\item
+  explicitly defining what Bijou means by a block
+\item
+  identifying the first credible block candidates
+\item
+  updating the Design System read order so patterns and blocks are both first-class
+\item
+  spawning the next backlog slice for proving these patterns in shared surfaces
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  shipping a full blocks library
+\item
+  replacing the app frame with a new block system
+\item
+  inventing new shell behavior
+\item
+  reworking notification center polish, which remains parked on the Humane Terminal backlog
+\end{itemize}
+
+\section{Human users}\label{record-169-human-users}
+
+\subsection{Primary human user}\label{record-169-primary-human-user}
+
+A Bijou builder or maintainer trying to turn doctrine into reusable interface decisions.
+
+They need to know:
+
+\begin{itemize}
+\tightlist
+\item
+  which interaction treatments are canonical
+\item
+  what visual language means selection versus focus versus support text
+\item
+  how future blocks should be composed without inventing a parallel design language
+\end{itemize}
+
+\subsection{Human hill}\label{record-169-human-hill}
+
+A builder can point to concrete Bijou patterns and block rules instead of translating abstract doctrine into ad hoc component choices.
+
+\section{Agent users}\label{record-169-agent-users}
+
+\subsection{Primary agent user}\label{record-169-primary-agent-user}
+
+An agent reviewing or generating Bijou UI work.
+
+It needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  identify whether a surface follows canonical selection and spacing rules
+\item
+  distinguish a reusable pattern from a future reusable block
+\item
+  know which next cycle should turn the documented patterns into more shared code
+\end{itemize}
+
+\subsection{Agent hill}\label{record-169-agent-hill}
+
+An agent can evaluate or propose Bijou surfaces against explicit pattern language instead of inferring those rules from scattered shell code.
+
+\section{Human playback}\label{record-169-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer opens the Design System docs.
+\item
+  They can find an explicit explanation of canonical selection treatment, active-region treatment, drawer rhythm, and value-overflow behavior.
+\item
+  They can tell what counts as a block and why blocks come after patterns and components.
+\item
+  They can see the next backlog item for turning those documented patterns into more shared product surfaces.
+\end{enumerate}
+
+\section{Agent playback}\label{record-169-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent reads the DL legend and DL-002 cycle doc.
+\item
+  It can locate the design-system docs that define canonical patterns and block rules.
+\item
+  It can determine whether selection, focus, and spacing treatments are now documented in one place.
+\item
+  It can point to the next backlog item for implementation-oriented follow-through.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-169-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-169-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  background fill should remain the canonical selected-item treatment
+\item
+  structural accents such as gutters should remain the canonical active-region treatment
+\item
+  values should stack or reflow before truncating into ambiguity
+\item
+  blocks should be downstream of doctrine, patterns, and components
+\item
+  notification work remains parked while the design-language bridge is made explicit
+\end{itemize}
+
+\section{Implementation outline}\label{record-169-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DL-002 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write cycle tests that demand:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    canonical pattern language in the design-system docs
+  \item
+    an explicit blocks document
+  \item
+    updated design-system read order
+  \item
+    a spawned follow-on backlog item
+  \end{itemize}
+\item
+  Update the design-system docs so the canonical patterns are written down where builders will actually read them.
+\item
+  Close the cycle with a retrospective and next-step backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-169-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}2\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  the design-system docs explicitly define canonical selection, active-region, spacing, and overflow patterns
+\item
+  the design-system docs explicitly define what a block is and name the first block candidates
+\item
+  the Design Language legend points at DL-002 as the latest completed cycle and spawns the next backlog item
+\end{itemize}
+
+\section{Risks}\label{record-169-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  documenting patterns too vaguely to guide implementation reviews
+\item
+  duplicating doctrine without actually bridging it into builder-facing docs
+\item
+  overcommitting to blocks before the component/pattern vocabulary is stable
+\end{itemize}
+
+\section{Out of scope}\label{record-169-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  implementation of a reusable blocks runtime
+\item
+  service-level notification work
+\item
+  localization adapters or other legend work
+\end{itemize}
+
+\section{Retrospective}\label{record-169-retrospective}
+
+\subsection{What landed}\label{record-169-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  explicit canonical-pattern guidance in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}p\allowbreak{}a\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    selected rows
+  \item
+    active regions
+  \item
+    truthful visible controls
+  \item
+    spacing rhythm
+  \item
+    value-overflow behavior
+  \end{itemize}
+\item
+  a new \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} document that defines what a block is, where it sits in the design-system stack, and which first candidates are credible
+\item
+  updated design-system read order in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-169-drift-from-ideal}
+
+No material drift.
+
+This cycle stayed documentation-first on purpose. It names the canonical patterns and block layer clearly, but it does not yet prove those rules in more shared implementation surfaces.
+
+\subsection{Debt spawned}\label{record-169-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DL-003-prove-canonical-patterns-in-shared-surfaces.md}{DL-003 --- Prove Canonical Patterns in Shared Surfaces}
+\end{itemize}
+

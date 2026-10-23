@@ -1,0 +1,229 @@
+\chapter{WF-166 - V8 Dependency Security Closeout}\label{record-248}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-166-v8-dependency-security-closeout.md}\par}\smallskip
+
+\section{Status}\label{record-248-status}
+
+Implementation proof in progress for issue \href{https://github.com/flyingrobots/bijou/issues/482}{\#482}.
+
+\section{Linked Legend}\label{record-248-linked-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}w\allowbreak{}f} for release workflow readiness.
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}x} for deterministic dependency tooling.
+\item
+  \texttt{l\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}:\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e} for the vulnerable resolved dependency graph.
+\end{itemize}
+
+\section{Sponsors}\label{record-248-sponsors}
+
+\begin{itemize}
+\tightlist
+\item
+  Human sponsor: James Ross.
+\item
+  Agent sponsor: Codex.
+\end{itemize}
+
+\section{Decision Summary}\label{record-248-decision-summary}
+
+Clear every npm advisory from the resolved workspace dependency graph before the \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release-preparation cycle begins. Coordinate the now-insufficient Dependabot pull request \href{https://github.com/flyingrobots/bijou/pull/467}{\#467} inside this issue-backed cycle instead of merging a patch level that remains vulnerable.
+
+\section{Hill}\label{record-248-hill}
+
+Bijou should enter release preparation with a deterministic lockfile that resolves every currently reported package to a patched version, passes the complete Node 20 and Node 22 verification matrix, and produces a zero-advisory \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t} result.
+
+\section{Current Truth}\label{record-248-current-truth}
+
+The shaping snapshot on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{4\allowbreak{}4\allowbreak{}1\allowbreak{}2\allowbreak{}e\allowbreak{}c\allowbreak{}6\allowbreak{}d\allowbreak{}b\allowbreak{}c\allowbreak{}e\allowbreak{}9\allowbreak{}4\allowbreak{}7\allowbreak{}8\allowbreak{}8\allowbreak{}7\allowbreak{}e\allowbreak{}d\allowbreak{}6\allowbreak{}e\allowbreak{}a\allowbreak{}2\allowbreak{}7\allowbreak{}4\allowbreak{}0\allowbreak{}e\allowbreak{}c\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}0\allowbreak{}a\allowbreak{}6\allowbreak{}6\allowbreak{}d\allowbreak{}1\allowbreak{}2\allowbreak{}2\allowbreak{}e} reported seven npm advisories. By the implementation pass on 2026-08-15, \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{4\allowbreak{}9\allowbreak{}6\allowbreak{}7\allowbreak{}1\allowbreak{}5\allowbreak{}1\allowbreak{}0\allowbreak{}2\allowbreak{}4\allowbreak{}9\allowbreak{}f\allowbreak{}c\allowbreak{}7\allowbreak{}9\allowbreak{}e\allowbreak{}d\allowbreak{}2\allowbreak{}5\allowbreak{}b\allowbreak{}4\allowbreak{}e\allowbreak{}8\allowbreak{}f\allowbreak{}5\allowbreak{}7\allowbreak{}9\allowbreak{}6\allowbreak{}b\allowbreak{}4\allowbreak{}7\allowbreak{}d\allowbreak{}2\allowbreak{}a\allowbreak{}d\allowbreak{}2\allowbreak{}e\allowbreak{}1\allowbreak{}1\allowbreak{}d} exposed 18 open Dependabot alerts. The carried lockfile attempt also produced four live \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t} package findings: \texttt{f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}u\allowbreak{}r\allowbreak{}i}, \texttt{h\allowbreak{}o\allowbreak{}n\allowbreak{}o}, \texttt{i\allowbreak{}p\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}d\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s}, and newly disclosed \texttt{n\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}d}.
+
+The refreshed candidate dependency paths and resolved versions are:
+
+\input{diagrams/flows/flow-030}
+
+The executable regression binds the current patched floors:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}h\allowbreak{}o\allowbreak{}n\allowbreak{}o\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}@\allowbreak{}2\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}5} or later;
+\item
+  \texttt{@\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}t\allowbreak{}o\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}/\allowbreak{}s\allowbreak{}d\allowbreak{}k\allowbreak{}@\allowbreak{}1\allowbreak{}.\allowbreak{}3\allowbreak{}0\allowbreak{}.\allowbreak{}0} or later;
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}@\allowbreak{}2\allowbreak{}.\allowbreak{}3\allowbreak{}.\allowbreak{}0} or later;
+\item
+  \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}@\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}9} or later;
+\item
+  \texttt{f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}u\allowbreak{}r\allowbreak{}i\allowbreak{}@\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}5} or later;
+\item
+  \texttt{h\allowbreak{}o\allowbreak{}n\allowbreak{}o\allowbreak{}@\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}2\allowbreak{}.\allowbreak{}3\allowbreak{}4} or later;
+\item
+  \texttt{i\allowbreak{}p\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}d\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}@\allowbreak{}1\allowbreak{}0\allowbreak{}.\allowbreak{}3\allowbreak{}.\allowbreak{}1} or later;
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}d\allowbreak{}@\allowbreak{}3\allowbreak{}.\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}8} or later;
+\item
+  \texttt{p\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}c\allowbreak{}s\allowbreak{}s\allowbreak{}@\allowbreak{}8\allowbreak{}.\allowbreak{}5\allowbreak{}.\allowbreak{}2\allowbreak{}3} or later.
+\end{itemize}
+
+Dependabot pull request \#467 resolves \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}@\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}7}. The newer \texttt{G\allowbreak{}H\allowbreak{}S\allowbreak{}A\allowbreak{}-\allowbreak{}m\allowbreak{}h\allowbreak{}9\allowbreak{}9\allowbreak{}-\allowbreak{}v\allowbreak{}9\allowbreak{}9\allowbreak{}m\allowbreak{}-\allowbreak{}4\allowbreak{}g\allowbreak{}v\allowbreak{}g} advisory includes that version, so the pull request no longer satisfies its security purpose.
+
+\section{Scope}\label{record-248-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Update the deterministic package lock through the package manager.
+\item
+  Resolve \texttt{@\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}t\allowbreak{}o\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}/\allowbreak{}s\allowbreak{}d\allowbreak{}k} to \texttt{1\allowbreak{}.\allowbreak{}3\allowbreak{}0\allowbreak{}.\allowbreak{}0} or later within the existing declared range.
+\item
+  Replace the vulnerable exact Hono override with a compatible patched range so a clean install cannot reintroduce the advisory-bearing line.
+\item
+  Resolve every affected transitive dependency to a patched version.
+\item
+  Preserve the supported Node 20 and Node 22 runtime and test matrix.
+\item
+  Preserve all public package and command behavior.
+\item
+  Record the dependency topology, resolved versions, audit result, and verification evidence.
+\item
+  Supersede \#467 only after the replacement branch proves \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}@\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}9} or later.
+\end{itemize}
+
+\section{Non-Goals}\label{record-248-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No public API or runtime behavior redesign.
+\item
+  No broad dependency modernization beyond the shared security resolution.
+\item
+  No audit suppression, ignore rule, or accepted vulnerable version.
+\item
+  No version bump, release tag, GitHub Release, npm publication, or milestone closure.
+\item
+  No Code Dojo exception removal; the final \texttt{1\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}0} goalpost follows this security cycle.
+\end{itemize}
+
+\section{Dependency And Compatibility Contract}\label{record-248-dependency-and-compatibility-contract}
+
+The change is acceptable only when:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} is reproducible from the declared workspace manifests;
+\item
+  the resolved graph contains no version covered by the current advisories;
+\item
+  the existing \texttt{@\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}t\allowbreak{}o\allowbreak{}c\allowbreak{}o\allowbreak{}l\allowbreak{}/\allowbreak{}s\allowbreak{}d\allowbreak{}k} public usage compiles and its MCP tests pass;
+\item
+  Node 20 and Node 22 repository tests remain green;
+\item
+  the full Code Dojo and DOGFOOD smoke gates remain green;
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}l\allowbreak{}o\allowbreak{}w} exits successfully.
+\end{itemize}
+
+The package-manager lockfile is authoritative for resolved versions. The live npm advisory service is authoritative for the release audit result.
+
+\section{Tests To Write First}\label{record-248-tests-to-write-first}
+
+The deterministic RED proof reads the lockfile and rejects the vulnerable resolved versions named above. It must fail on the merge-base lockfile before the update and pass afterward.
+
+The external advisory proof is:
+
+\begin{CodeBlock}
+npm audit --audit-level=low
+\end{CodeBlock}
+
+The clean-install compatibility and product proof is executed in this order:
+
+\begin{CodeBlock}
+npm ci
+npm audit --audit-level=low
+npm run build
+npm run typecheck:test
+npm run lint
+npm run lint:eslint
+npm run code:size
+npm run test:run
+npm run code-dojo:ci
+npm run smoke:dogfood
+npm run docs:inventory
+npm run docs:design-system:preflight
+npm run verify:interactive-examples
+\end{CodeBlock}
+
+That sequence proves that a clean install from the committed lockfile preserves the repository's supported execution surface. Hosted CI repeats \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} and the full repository test lane on both supported runtimes as the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/.github/workflows/ci.yml}{\texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}(\allowbreak{}2\allowbreak{}0\allowbreak{})} and \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}(\allowbreak{}2\allowbreak{}2\allowbreak{})} matrix jobs}, and runs the two DOGFOOD smoke jobs independently.
+
+\section{Implementation Plan}\label{record-248-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Land this design and tracker/roadmap synchronization.
+\item
+  Add the lockfile security regression and prove it RED.
+\item
+  Run the package-manager security update and inspect the exact lockfile diff.
+\item
+  Prove the lockfile regression and live audit GREEN.
+\item
+  Run focused MCP, package, Node 20/22, Code Dojo, DOGFOOD, and documentation gates.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} and repeat the full gate from the committed lockfile.
+\item
+  Complete documentation upkeep, self-review, hosted review, and Code Lawyer.
+\item
+  Merge the replacement and close \#467 as superseded only after exact-head evidence is green.
+\end{enumerate}
+
+\section{Acceptance Criteria}\label{record-248-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item[$\boxtimes$]
+  Every affected direct and transitive dependency path is documented.
+\item[$\boxtimes$]
+  The deterministic lockfile regression fails on the merge-base graph.
+\item[$\boxtimes$]
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}l\allowbreak{}o\allowbreak{}w} reports zero vulnerabilities.
+\item[$\boxtimes$]
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} resolves patched versions without unrelated package churn.
+\item[$\boxtimes$]
+  A clean \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} reproduces the verified graph.
+\item[$\square$]
+  Full Node 20 and Node 22 tests, typecheck, Code Dojo, DOGFOOD smoke, and documentation gates pass.
+\item[$\square$]
+  PR \#467 is explicitly superseded rather than merged at a still-vulnerable version.
+\item[$\square$]
+  Issue \#482 records the final resolved versions and audit evidence.
+\end{itemize}
+
+\section{Playback Questions}\label{record-248-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the lockfile contain every expected patched version and no affected predecessor?
+\item
+  Does a clean install reproduce the same resolved graph?
+\item
+  Does the MCP package behave identically after its transitive Hono server update?
+\item
+  Does the live audit report zero at the exact reviewed head?
+\item
+  Is every lockfile change explained by an advisory path or deterministic pruning of an orphaned lock entry?
+\end{itemize}
+
+\section{Retrospective}\label{record-248-retrospective}
+
+The security pass had to be refreshed against live advisory truth rather than the original shaping snapshot. The first carried lock attempt still admitted newer \texttt{f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}u\allowbreak{}r\allowbreak{}i}, Hono, and \texttt{i\allowbreak{}p\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}d\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} advisories and predated the \texttt{n\allowbreak{}a\allowbreak{}n\allowbreak{}o\allowbreak{}i\allowbreak{}d} advisory. Its regression could therefore false-green. Raising the executable floors and binding the root Hono override made the clean-install promise real.
+
+\texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}x\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}y} also demonstrated why audit success is not the complete proof: it temporarily pruned the manifest-required SheetJS entry and reported zero vulnerabilities, while \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} correctly rejected the inconsistent lock. Regenerating through \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}y} restored that entry; the repeated clean install, audit, full \texttt{9\allowbreak{}3\allowbreak{}0} file / \texttt{4\allowbreak{},\allowbreak{}1\allowbreak{}0\allowbreak{}4} test suite, DOGFOOD smoke, documentation preflight, and interactive examples then passed. Hosted Node 20/22 evidence, \#467 disposition, and the final \#482 closeout remain merge-bound acceptance steps.
+

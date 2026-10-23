@@ -1,0 +1,44 @@
+\chapter{DX-015 --- Perf Gradient as CI Benchmark}\label{record-320}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-015-perf-gradient-as-ci-benchmark.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-320-idea}
+
+The \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} demo runs in non-interactive mode and produces measurable output. It could be adapted into a CI benchmark that runs for a fixed number of frames and reports:
+
+\begin{itemize}
+\tightlist
+\item
+  Average view() time per frame
+\item
+  Peak heap usage
+\item
+  GC event count
+\item
+  Total frame count in a fixed wall-clock window
+\end{itemize}
+
+A regression would show up as a measurable increase in view() time or heap pressure across commits.
+
+\section{Why}\label{record-320-why}
+
+The perf demo proved that bijou's rendering bottleneck is in the pipeline (differ + encode), not in the app. Any future optimization (RE-008 byte-packed surface, RE-009 differ string fix) needs a benchmark to validate the improvement. Running the benchmark in CI prevents regressions from sneaking in.
+
+\section{Shape}\label{record-320-shape}
+
+A non-interactive test that: 1. Creates a gradient app 2. Feeds it N tick messages 3. Asserts view() time stays below a threshold 4. Reports heap delta
+
+Could live in \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} or as a GitHub Action that posts results as PR comments.
+
+\section{Risks}\label{record-320-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  Terminal rendering in CI is headless --- stdout.write still works but there's no terminal to parse the ANSI. The differ will still run but output goes to /dev/null.
+\item
+  Wall-clock benchmarks are noisy in CI. Use statistical methods (median of N runs) not single-run thresholds.
+\end{itemize}
+

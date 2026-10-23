@@ -1,0 +1,233 @@
+\chapter{WF-006 --- Cut Clean 4.1.0 Release Boundary}\label{record-204}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-006-cut-clean-4-1-0-release-boundary.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor human}\label{record-204-sponsor-human}
+
+A maintainer preparing the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release and needing the short-form release surfaces to match the real \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D} boundary.
+
+\section{Sponsor agent}\label{record-204-sponsor-agent}
+
+An agent that must answer, from repo artifacts alone:
+
+\begin{itemize}
+\tightlist
+\item
+  what the short-form \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release story is
+\item
+  whether \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} is aligned to \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D}
+\item
+  what a front-door README summary should say about \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\end{itemize}
+
+\section{Hill}\label{record-204-hill}
+
+The short-form \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release surfaces now tell the same story as the long-form release docs.
+
+\texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and the long-form \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} docs all point at one coherent release boundary and one coherent release story.
+
+\section{Why this cycle exists}\label{record-204-why-this-cycle-exists}
+
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-004-shape-the-next-release.md}{WF-004} chose \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}, and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md}{WF-005} closed the i18n publish-surface gap.
+
+But the short-form release surfaces were still drifting:
+
+\begin{itemize}
+\tightlist
+\item
+  the root \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} still led with a \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} ``What's New'' section
+\item
+  \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} still treated \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} as a vague bucket instead of an explicit \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D} release slice
+\item
+  the compare links still implied \texttt{v\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} was the previous release
+\item
+  \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} itself never got a dedicated changelog section
+\end{itemize}
+
+That meant the repo had long-form release docs but still lacked an honest short-form release cut.
+
+\section{Human users}\label{record-204-human-users}
+
+\subsection{Primary human user}\label{record-204-primary-human-user}
+
+A maintainer or reviewer checking whether \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is ready to explain and execute.
+
+\subsection{Human hill}\label{record-204-human-hill}
+
+A human can open the README and changelog and get an honest, concise picture of what \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is and how it relates to \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+
+\section{Agent users}\label{record-204-agent-users}
+
+\subsection{Primary agent user}\label{record-204-primary-agent-user}
+
+A release or coding agent preparing notes, migration guidance, or the actual release execution.
+
+\subsection{Agent hill}\label{record-204-agent-hill}
+
+An agent can reconstruct the short-form release story from repo artifacts alone without reverse-engineering commit history or chat memory.
+
+\section{Playback questions}\label{record-204-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} now have a concise \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} front-door summary?
+\item
+  Does \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} explicitly say the current \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} section is the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} slice aligned to \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D}?
+\item
+  Does \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} now include a dedicated \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} section dated \texttt{2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}-\allowbreak{}2\allowbreak{}2} and corrected compare links?
+\item
+  Is \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} promoted into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}, with the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane pruned because no cycle-shaped blockers remain?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-204-accessibility-assistive-reading-posture}
+
+This cycle is text-first. The release boundary must stay legible in raw markdown without requiring a release UI, diff viewer, or GitHub compare page to understand it.
+
+\section{Localization / directionality posture}\label{record-204-localization-directionality-posture}
+
+The short-form release story must stay honest about the new localization surface. It should not bury the i18n packages behind shell/runtime-only language.
+
+\section{Agent inspectability / explainability posture}\label{record-204-agent-inspectability-explainability-posture}
+
+The short-form release boundary must be inspectable through:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  cycle tests
+\end{itemize}
+
+\section{Non-goals}\label{record-204-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  bumping versions or cutting the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} tag
+\item
+  publishing packages
+\item
+  rewriting all historical changelog prose before \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  changing the already-shaped \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} scope
+\end{itemize}
+
+\section{Evidence}\label{record-204-evidence}
+
+\subsection{Before this cycle}\label{record-204-before-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  latest release tag: \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  tag date for \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}: \texttt{2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}-\allowbreak{}2\allowbreak{}2}
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} still led with \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} still used \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]\allowbreak{}:\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}3\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D}
+\item
+  \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} had no dedicated \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} section
+\end{itemize}
+
+\subsection{Boundary decision}\label{record-204-boundary-decision}
+
+The current \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} section is the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release slice. It should stay unreleased until actual release execution, but it must already be aligned to the real \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D} boundary.
+
+\section{Decision}\label{record-204-decision}
+
+\texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} closes the short-form release gap by doing four things:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  make \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} summarize \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} instead of still fronting \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  explicitly mark \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} as the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} slice in the changelog
+\item
+  restore a dedicated historical \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} changelog section and correct the compare links
+\item
+  prune the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane because there are no cycle-shaped release blockers left
+\end{enumerate}
+
+\section{Implementation outline}\label{record-204-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Replace the README's \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} front-door summary with a concise \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} summary and links to the short-form and long-form release docs.
+\item
+  Mark the current \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} changelog section as the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} slice.
+\item
+  Add a compact historical \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} changelog section dated \texttt{2\allowbreak{}0\allowbreak{}2\allowbreak{}6\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}-\allowbreak{}2\allowbreak{}2}.
+\item
+  Correct the changelog compare links so \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} means \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D}.
+\item
+  Promote this cycle into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and prune the now-empty \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} lane.
+\item
+  Add cycle tests that lock the release boundary and lane-pruning behavior.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-204-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a cycle test proving \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} moved into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}
+\item
+  a cycle test proving the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane is gone
+\item
+  a cycle test proving \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} carry the new short-form \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} boundary
+\end{itemize}
+
+\section{Retrospective}\label{record-204-retrospective}
+
+\subsection{What landed}\label{record-204-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  the README now fronts the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release instead of \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  the changelog now states that \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} is the planned \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} slice aligned to \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D}
+\item
+  \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} now has a dedicated historical changelog section and correct compare-link placement
+\item
+  the temporary \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane is gone because the cycle-shaped release backlog is cleared
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-204-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  the remaining \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} work is now operational release execution, not another design/backlog cycle
+\item
+  the changelog will still need the final \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}[\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}]\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}Y\allowbreak{}Y\allowbreak{}Y\allowbreak{}Y\allowbreak{}-\allowbreak{}M\allowbreak{}M\allowbreak{}-\allowbreak{}D\allowbreak{}D} rename during actual release execution
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-204-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  no new cycle-shaped debt; the next work should be release execution or post-\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} backlog
+\end{itemize}
+

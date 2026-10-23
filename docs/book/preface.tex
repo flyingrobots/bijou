@@ -1,0 +1,37 @@
+\chapter*{Preface}\label{preface}
+\addcontentsline{toc}{chapter}{Preface}
+
+A useful terminal application has to keep its promises when its presentation changes. A failed job must still be recognizable without red. A cancellation dialog has to own its keys. A late response must not replace the detail for a different selection. A resize must leave a person a way to finish the task. These are everyday application problems, and they are the questions this book uses to teach Bijou.
+
+We will work through a job monitor. It starts small: three jobs, stable identities and explicit states. We then encounter four environments, keyboard routing, asynchronous work, constrained geometry and the evidence needed to trust each behavior. The application simulates its jobs. That makes races and failures reproducible without requiring the reader to build a process supervisor before learning the interface architecture.
+
+\section*{The route through the book}
+\subsection*{Learn by building}
+
+\hyperref[part-why]{Part I, Why Bijou}, explains the principles and their costs. \hyperref[part-workshops]{Part II, Build the job monitor}, gets the model and its presentations working before following a keypress into a visible frame. \hyperref[part-machinery]{Part III, Understand the machinery}, explains ownership, effects, late results, layout and semantic styling.
+
+\hyperref[part-dependable]{Part IV, Make it dependable}, puts the application under pressure, matches tests to claims and provides a troubleshooting route. \hyperref[part-maintain]{Part V, Ship and maintain it}, establishes the reproducible edition and walks through a maintenance change. The component atlas, renderer gallery, glossary and topic finder form a reference section after the teaching text.
+
+\subsection*{Choose a route that fits your work}
+
+If this is your first Bijou application, read the five Parts in order and run each independent build stage. If you already have an application with an input or asynchronous defect, begin with \hyperref[workshop-03]{the keypress trace}, \hyperref[workshop-04]{the late-result trace} and \hyperref[teaching-troubleshooting]{the troubleshooting chapter}. Component authors should read \hyperref[teaching-layout]{the layout and styling chapter}, then consult the atlas with its version boundary in mind. Framework contributors can use the same teaching route to identify the application contract before following the corresponding archive record.
+
+\section*{A working example, an explicit version}
+\subsection*{Read and run together}
+
+The companion repository is \url{https://github.com/flyingrobots/bijou-job-monitor}. The version page fixes this edition to a published Bijou release and an immutable companion commit. Five independent build stages let readers construct the application through actual source changes. The older checkpoint commands remain reproducible observations of the completed modules. The broken exercises have observable failures and repaired paths. Their purpose is to make a design decision testable before its explanation becomes comfortable vocabulary.
+
+The book's figures and source listings have different jobs. A component specimen shows actual rendered cells. A TikZ trace explains causality or ownership. A listing names the code involved. None of those artifacts, by itself, establishes every behavior of the running application. We will say what each check actually observes.
+
+\section*{The archive has its own place}
+\subsection*{History supports the lesson}
+
+Earlier editions assembled the project's working documents into a large collection. This edition gives the teaching text its own structure. All 426 source documents remain in the companion Design Archive and in the complete edition's historical appendices. They include guides and principles as well as proposals, releases, retrospectives and audits. Every archived record is marked as historical; its original status has not been independently reclassified as a current implementation claim.
+
+Use the archive to examine an argument or follow a decision into its recorded evidence. Use the teaching book and pinned companion to learn the application in this edition. Exact original Markdown remains in the frozen source corpus, while the typeset records preserve the prior edition's illustrated presentation. A published proposal is useful history. Whether its promise holds in a particular release remains a question for that release's code and evidence.
+
+\ifBookArchive
+The historical appendices follow the reference section in this complete edition. Their record identities R1 through R426 match the standalone archive.
+\else
+The separate \textit{Bijou Design Archive} PDF contains those historical appendices. The complete edition combines both volumes without maintaining another copy of their chapter sources.
+\fi

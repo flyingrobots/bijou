@@ -1,0 +1,148 @@
+\chapter{DF-028 Story Capture Matrix}\label{record-089}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-028-story-capture-matrix.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-028 Story Capture Matrix
+legend: DF
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-089-framing}
+
+Bijou's best components are not single screenshots. They have rich, interactive, static, pipe, and accessible renderings, often across multiple variants and widths. Docs and tests need one place to see that matrix without copying examples by hand.
+
+DF-028 adds a pure story capture matrix. The first slice accepts story profiles, variants, and a renderer callback, captures every profile/variant combination, and renders deterministic text. It is intentionally renderer-neutral: callers can use core components, TUI frames, fixtures, or DOGFOOD stories around it.
+
+\section{Sponsored Users}\label{record-089-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintainers auditing multi-mode component stories.
+\item
+  Docs authors promoting regression fixtures into readable examples.
+\item
+  MCP/tooling authors exporting the same capture facts to agents.
+\item
+  Accessibility reviewers comparing lowerings without opening a TUI.
+\end{itemize}
+
+\section{Hills}\label{record-089-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer can capture every variant across interactive, static, pipe, and accessible profiles from one renderer callback.
+\item
+  A reviewer can see missing required modes before accepting a story capture.
+\item
+  A docs surface can render the captured matrix as stable text.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-089-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the helper invoke the renderer once for every profile/variant pair?
+\item
+  Does each capture preserve story id, profile id, variant id, mode, width, and output?
+\item
+  Can callers require specific modes and get deterministic missing-mode output?
+\item
+  Does matrix text group captures by variant and profile?
+\item
+  Can the matrix carry component metadata from DX-025 without owning that metadata contract?
+\item
+  Does \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} export the story capture API from the root barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-089-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}(\allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{})}.
+\item
+  Add \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}C\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{})}.
+\item
+  Support profiles with id, label, mode, and width.
+\item
+  Support variants with id, label, and optional description.
+\item
+  Support optional component metadata.
+\item
+  Support \texttt{r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s} and expose missing modes.
+\item
+  Keep outputs as strings in this slice; surface-specific capture can build on top later.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-089-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  RED tests fail before implementation and pass after.
+\item
+  Captures are deterministic and cover the profile/variant cross product.
+\item
+  Missing required modes are stable and sorted by output-mode order.
+\item
+  Text output is suitable for docs, test failures, and agent reports.
+\item
+  Docs and changelog describe the helper.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-089-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep rendering caller-owned; this helper records and formats the matrix.
+\end{itemize}
+
+\section{Drift Check}\label{record-089-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed renderer-neutral. The helper executes a caller-provided renderer and records string output, leaving surface conversion and runtime/test adapter orchestration to future wrappers.
+\item
+  The matrix can carry DX-025 component metadata but does not validate or own it.
+\item
+  Missing required modes are sorted by Bijou output-mode order.
+\end{itemize}
+
+\section{Playback}\label{record-089-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{c\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}(\allowbreak{})} invokes the renderer once for each profile/variant pair and stores story id, profile id, variant id, mode, width, and output.
+\item
+  \texttt{m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s} reports required modes absent from the supplied profiles.
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}C\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}M\allowbreak{}a\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}x\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} renders profile ids, variant ids, missing modes, and each captured output grouped by variant and profile.
+\item
+  Optional \texttt{m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} lets DOGFOOD/MCP/docs consumers attach the shared component metadata contract without duplicating fields.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports the story capture API from the root barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-089-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  Keeping rendering caller-owned makes the helper useful in core tests, DOGFOOD, TUI fixtures, and MCP payload generation without importing runtime adapters.
+\item
+  The next useful layer is a fixture/story wrapper that supplies profiles and renderer contexts automatically, then writes the matrix into docs artifacts.
+\end{itemize}
+

@@ -1,0 +1,141 @@
+\chapter{DF-064 Audit keybinding help and shell hints family across real surfaces}\label{record-105}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-064 Audit keybinding help and shell hints family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - help
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-105-framing}
+
+Keybinding help is shell infrastructure, not decorative footer copy. The family starts with \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}(\allowbreak{})} as structured shortcut truth, then lowers that truth through full grouped references (\texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}), compact shell hints (\texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}), and filtered views (\texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}).
+
+This audit verifies the existing DOGFOOD \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} story against real story rendering, component-family doctrine, and mode-aware lowerings. It does not redesign keymaps; it turns the current help and hint contract into executable release proof.
+
+\section{Sponsored Users}\label{record-105-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors building keyboard-owned shells that need shortcut discovery without turning the command palette into a help page.
+\item
+  Docs readers checking how compact hints and grouped help survive without borders, color, or rich surface chrome.
+\item
+  Maintainers who need one focused regression tying help story metadata, variants, and component-family guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-105-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and understand when to show a compact shell hint versus a grouped shortcut reference.
+\item
+  A reader can switch both help variants through interactive, static, pipe, and accessible profiles while preserving shortcut grouping and action labels.
+\item
+  A maintainer can run one cycle test that proves help and shell-hint story metadata and design-system guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-105-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the family through the \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} story?
+\item
+  Do variants cover both compact shell hints and grouped shortcut reference?
+\item
+  Do rich/static previews keep structured surface rendering on the Surface path?
+\item
+  Do pipe lowerings keep shortcut summaries and grouped help blocks readable without box chrome?
+\item
+  Do accessible lowerings preserve group names, shortcut keys, action labels, and shell scope in reading order?
+\item
+  Do component-family docs still separate help discovery from command execution and status/event messaging?
+\end{itemize}
+
+\section{Requirements}\label{record-105-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} story identity and \texttt{k\allowbreak{}e\allowbreak{}y\allowbreak{}b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}s} coverage family id.
+\item
+  Render every help story variant in every canonical story profile.
+\item
+  Treat box drawing as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings shortcut-label-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-105-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}4\allowbreak{}/\allowbreak{}k\allowbreak{}e\allowbreak{}y\allowbreak{}b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve compact shell hints, grouped help title, group names, shortcut keys, and action labels.
+\item
+  Component-family docs retain \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}(\allowbreak{})}, help view, short hint, filtered help, shell-scope, pipe, and accessible guidance.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-105-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a DF-064 cycle test that renders the \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} DOGFOOD story through the shared story protocol.
+\item
+  Read-test the keybinding help and shell hints section in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\item
+  Record any drift as follow-on backlog debt instead of widening this audit.
+\end{enumerate}
+
+\section{Drift Check}\label{record-105-drift-check}
+
+No runtime drift was found in this slice. The existing \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}-\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w} story already distinguishes compact shell hints from grouped shortcut reference, renders structured surfaces in interactive/static profiles, and lowers to plain shortcut summaries plus grouped help text in pipe/accessibility modes.
+
+No follow-on backlog item is needed for this slice.
+
+\section{Playback}\label{record-105-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note; no DF-064 playback test tied keybinding help to every canonical profile.
+\item
+  GREEN: the new cycle test renders both \texttt{s\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}h\allowbreak{}i\allowbreak{}n\allowbreak{}t} and \texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve structured visual containment and shortcut rhythm.
+\item
+  Pipe previews preserve shortcut summaries and grouped help blocks without box drawing.
+\item
+  Accessible previews linearize the same shortcut groups and action labels in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-105-retrospective}
+
+The keybinding help family did not need runtime changes. The useful release work was proving that shortcut discovery is structured shell truth, so future blocks can reuse keymaps without rebuilding help text by hand.
+

@@ -1,0 +1,248 @@
+\chapter{LX-021 DOGFOOD String Debt Ratchet}\label{record-197}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-021-dogfood-string-debt-ratchet.md}\par}\smallskip
+
+\section{Status}\label{record-197-status}
+
+Implemented.
+
+\section{Tracker}\label{record-197-tracker}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/415}{\#415}
+\item
+  Pull Request: \href{https://github.com/flyingrobots/bijou/pull/416}{\#416}
+\end{itemize}
+
+\section{Legend}\label{record-197-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  Linked legend: LX, Localization and Bidirectionality
+\item
+  Sponsor human: James Ross
+\item
+  Sponsor agent: Codex
+\end{itemize}
+
+\section{Hill}\label{record-197-hill}
+
+DOGFOOD must stop treating raw visible strings as harmless residue. This cycle removes a material slice from the raw-string baseline by moving selected component story copy behind the existing DOGFOOD localization catalog workflow.
+
+\section{Current Truth}\label{record-197-current-truth}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{a\allowbreak{}a\allowbreak{}b\allowbreak{}7\allowbreak{}9\allowbreak{}2\allowbreak{}e\allowbreak{}d}:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}7\allowbreak{}6\allowbreak{}1}
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} raw-string debt: \texttt{1\allowbreak{},\allowbreak{}6\allowbreak{}3\allowbreak{}1}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s} raw-string debt: \texttt{6\allowbreak{}8\allowbreak{}1}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} raw-string debt: \texttt{2\allowbreak{}5\allowbreak{}8}
+\item
+  missing Markdown localizations: \texttt{7\allowbreak{}8}
+\item
+  aggregate Code Dojo debt: \texttt{9\allowbreak{}5\allowbreak{}1}
+\end{itemize}
+
+Target for this cycle:
+
+\begin{itemize}
+\tightlist
+\item
+  remove at least \texttt{1\allowbreak{}0\allowbreak{}0} DOGFOOD raw-string findings
+\item
+  lower the total raw-string baseline to \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}6\allowbreak{}1} or lower
+\item
+  lower \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} to \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}3\allowbreak{}1} or lower
+\item
+  keep missing Markdown localizations flat at \texttt{7\allowbreak{}8}
+\item
+  keep aggregate Code Dojo debt at \texttt{9\allowbreak{}5\allowbreak{}1} or lower
+\end{itemize}
+
+Implemented counts on this branch before review:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6}
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} raw-string debt: \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}2\allowbreak{}6}
+\item
+  missing Markdown localizations: \texttt{7\allowbreak{}8}
+\item
+  aggregate Code Dojo debt: \texttt{9\allowbreak{}1\allowbreak{}0}
+\item
+  ESLint findings: \texttt{5\allowbreak{}0\allowbreak{}2}
+\item
+  next aggregate Code Dojo target: \texttt{8\allowbreak{}6\allowbreak{}0} or lower
+\end{itemize}
+
+\section{Scope}\label{record-197-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Convert a coherent high-density slice from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Add source rows and current \texttt{e\allowbreak{}n}, \texttt{d\allowbreak{}e}, \texttt{e\allowbreak{}s}, and \texttt{f\allowbreak{}r} values in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}s\allowbreak{}v}.
+\item
+  Regenerate \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}.\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}.
+\item
+  Ratchet \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} to the proven lower total and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} count.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} with the landed counts and next string-debt target.
+\end{itemize}
+
+\section{Non-Goals}\label{record-197-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No full DOGFOOD localization claim.
+\item
+  No Markdown corpus translation in this cycle.
+\item
+  No catalog placeholder rows that satisfy the gate while preserving accidental English for non-English locales.
+\item
+  No Code Dojo baseline increases.
+\item
+  No release-version scope.
+\item
+  No rebase, amend, force push, or draft PR.
+\end{itemize}
+
+\section{Playback Questions}\label{record-197-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did DOGFOOD raw-string debt fall by at least \texttt{1\allowbreak{}0\allowbreak{}0}?
+\item
+  Did every changed catalog key have current rows for all supported locales?
+\item
+  Did \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} own the raw-string reduction instead of shifting debt to another surface?
+\item
+  Did missing Markdown localization debt stay flat?
+\item
+  Did Code Dojo aggregate debt stay at \texttt{9\allowbreak{}5\allowbreak{}1} or lower?
+\end{enumerate}
+
+\section{User Experience Contract}\label{record-197-user-experience-contract}
+
+Converted story copy must still read as the same DOGFOOD demonstration. The localized text may use conservative translations, but it must not replace visible content with placeholder keys or intentionally untranslated fallback rows.
+
+\section{Localization And Directionality Posture}\label{record-197-localization-and-directionality-posture}
+
+This cycle uses the existing DOGFOOD localization port. It does not introduce a new directionality model. Any converted copy should continue to flow through \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t} so locale selection, fallback interpolation, and catalog checks remain centralized.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-197-agent-inspectability-and-explainability-posture}
+
+The PR must make the changed keys easy to audit:
+
+\begin{itemize}
+\tightlist
+\item
+  catalog IDs should be grouped by the story surface they serve
+\item
+  fallback copy should remain adjacent to the rendered usage
+\item
+  final debt counts should be recorded in this design doc or the PR summary
+\end{itemize}
+
+\section{Linked Invariants}\label{record-197-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD i18n source catalog: \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}c\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}.\allowbreak{}c\allowbreak{}s\allowbreak{}v}
+\item
+  DOGFOOD i18n debt baseline: \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  DOGFOOD i18n build: \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-197-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add localization access to the selected component story rendering helpers.
+\item
+  Convert the selected raw literals to \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}L\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}d\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t} calls with stable \texttt{s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}*} catalog IDs.
+\item
+  Add current rows for every new or changed key in the source CSV.
+\item
+  Regenerate runtime catalogs.
+\item
+  Run the DOGFOOD i18n gates, focused story tests, and Code Dojo debt checks.
+\item
+  Ratchet the i18n debt baseline only after the live inventory proves the lower count.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-197-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Add focused tests only if the conversion changes a behavior boundary or story state shape.
+\item
+  For copy-only localization movement, the failing proof is the current \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} inventory against the lower target before the implementation lands.
+\end{itemize}
+
+\section{Validation Plan}\label{record-197-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  focused tests for DOGFOOD/storybook rendering if touched paths expose one
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-197-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD raw-string debt is \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}6\allowbreak{}1} or lower.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} raw-string debt is \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}3\allowbreak{}1} or lower.
+\item
+  Missing Markdown localization debt remains \texttt{7\allowbreak{}8} or lower.
+\item
+  Code Dojo aggregate debt remains \texttt{9\allowbreak{}5\allowbreak{}1} or lower.
+\item
+  Runtime catalogs are regenerated from the source CSV.
+\item
+  Issue \#415 and the pull request are cross-linked.
+\end{itemize}
+

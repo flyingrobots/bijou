@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, resolve } from 'node:path';
@@ -23,6 +24,16 @@ const USER_HOME_SEGMENT = ['/', 'Users', '/'].join('');
 const HOME_SEGMENT = ['/', 'home', '/'].join('');
 const FILE_SCHEME = ['file:', '//'].join('');
 const WINDOWS_ABSOLUTE_PATH = /\b[A-Za-z]:\\/;
+
+// Frozen source and delivery evidence retain original paths. Exact hashes prevent
+// these exceptions from admitting new machine-specific content or mutable code.
+const FROZEN_EVIDENCE = new Map([
+  ['docs/book/source-corpus.json', '7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc'],
+  ['docs/book/build-report.json', 'b799ee9fa864da133b4dad4a66483b5aaaf933a51179349621905ccf4233ec2c'],
+  ['docs/book/reader-delivery.json', '199e7d6c3d7bca303e03bde778f79d848a2e28c7e9985a331c72fa29d1e7adb9'],
+  ['docs/book/history/2026-10-20-before-progressive-build-report.json', 'eed9b35ce2cccffba4c2368cd6a75991f350c3afdfd0a20446867a8796709c46'],
+  ['docs/book/history/2026-10-20-before-progressive-reader-delivery.json', 'f5ebbeb9edd234a3d5fce9d281971030b2ba95fd42def593f6ea974ee4040253'],
+]);
 
 function listTrackedFiles(): string[] {
   return execFileSync('git', ['ls-files', '-z'], { cwd: ROOT, encoding: 'utf8' })
@@ -62,6 +73,12 @@ describe('repo hygiene', () => {
         continue;
       }
       const buffer = readFileSync(absolutePath);
+      const preservedHash = FROZEN_EVIDENCE.get(relativePath);
+      if (preservedHash !== undefined) {
+        expect(createHash('sha256').update(buffer).digest('hex'), relativePath)
+          .toBe(preservedHash);
+        continue;
+      }
       if (isBinaryLike(relativePath, buffer)) {
         continue;
       }

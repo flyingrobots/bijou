@@ -1,0 +1,240 @@
+\chapter{WF-159 Respecting the Dojo Ratchet To 415}\label{record-241}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-159-respecting-dojo-ratchet-415.md}\par}\smallskip
+
+\section{Status}\label{record-241-status}
+
+Implemented.
+
+\section{Tracker}\label{record-241-tracker}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/431}{\#431}
+\item
+  Pull Request: \href{https://github.com/flyingrobots/bijou/pull/432}{\#432}
+\end{itemize}
+
+\section{Legend}\label{record-241-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  Linked legend: WF, Workflow and Delivery
+\item
+  Sponsor human: James Ross
+\item
+  Sponsor agent: Codex
+\end{itemize}
+
+\section{Hill}\label{record-241-hill}
+
+Bijou earns the next Code Dojo checkpoint by removing at least 50 counted standards violations from the landed \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} ceiling without weakening the Respectful Repo: Enter the Code Dojo direction.
+
+\section{Current Truth}\label{record-241-current-truth}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{5\allowbreak{}8\allowbreak{}7\allowbreak{}7\allowbreak{}7\allowbreak{}6\allowbreak{}d\allowbreak{}7}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{4\allowbreak{}6\allowbreak{}5}
+\item
+  ESLint findings: \texttt{5\allowbreak{}7}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}1}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}2}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target: \texttt{4\allowbreak{}1\allowbreak{}5} or lower
+\end{itemize}
+
+Top current ESLint offender clusters:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{9}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{4}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}7\allowbreak{}0\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}p\allowbreak{}o\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}: \texttt{2}
+\end{itemize}
+
+The remaining lint debt is small enough to attempt a full ESLint clearout in this cycle before moving into file/context and code-size debt.
+
+\section{Implementation Notes}\label{record-241-implementation-notes}
+
+WF-159 removes \texttt{5\allowbreak{}1} live type-aware ESLint findings, lowering the ESLint baseline from \texttt{5\allowbreak{}7} to \texttt{6} and the aggregate Code Dojo ceiling from \texttt{4\allowbreak{}6\allowbreak{}5} to \texttt{4\allowbreak{}1\allowbreak{}4}.
+
+Cleanup clusters:
+
+\begin{itemize}
+\tightlist
+\item
+  i18n runtime and localization port: remove unchecked caller-selected generic value claims from the runtime boundary, return unknown catalog data until a caller narrows it, and make interpolation avoid implicit object stringification.
+\item
+  Tests and fixtures: replace scattered non-null assertions, unsafe matcher assignments, malformed active-binding input casts, fuzz fixture casts, and deterministic clock conditionals with typed guards or explicit runtime invocation.
+\item
+  Theme and TUI helpers: make browsable-list render options generic, resolve theme status tokens through map lookups, preserve deprecated helper exports through star re-exports, and avoid unsafe token-graph casts.
+\item
+  Script and parser utilities: validate package metadata JSON, parse design-system headings/fields with checked captures, and keep PR-status helper debt isolated for a later split.
+\end{itemize}
+
+Per the operator's temporary waiver for touched-file size ratchets, existing file/context entries for touched legacy-large files were refreshed to their current measured line/byte counts, and existing code-size ceilings for the touched i18n runtime files were refreshed as well. No new counted file/context, mock-ban, or code-size entries were added.
+
+\section{Scope}\label{record-241-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Select focused cleanup clusters from current ESLint or Code Dojo offenders.
+\item
+  Prefer real type, data-shape, deterministic-test, and control-flow fixes over suppressions or cosmetic baseline churn.
+\item
+  Continue shrinking oversized files when that contributes to the same standards objective.
+\item
+  Keep counted file/context, mock-ban, code-size, and DOGFOOD localization totals flat or lower. If the operator explicitly waives touched-file size ratchets, record any refreshed legacy-large ceilings in this design doc.
+\item
+  Update \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} after the live count is proven lower.
+\end{itemize}
+
+\section{Non-Goals}\label{record-241-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No new file/context, mock-ban, or code-size entries.
+\item
+  No release-version scope.
+\item
+  No broad feature work.
+\item
+  No rebase, amend, force push, or draft PR.
+\end{itemize}
+
+\section{Playback Questions}\label{record-241-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is aggregate Code Dojo debt at \texttt{4\allowbreak{}1\allowbreak{}5} or lower?
+\item
+  Did the implementation remove at least \texttt{5\allowbreak{}0} real counted violations?
+\item
+  Did counted file/context, mock-ban, code-size, and DOGFOOD localization totals stay flat or lower, and were any waived size-ceiling refreshes recorded?
+\item
+  Did focused tests for touched behavior pass?
+\item
+  Did any large-file extraction preserve visible or API behavior?
+\end{enumerate}
+
+\section{Accessibility And Assistive Posture}\label{record-241-accessibility-and-assistive-posture}
+
+This is standards cleanup. Any touched rendered or terminal output must preserve existing text, focus, lower-mode, and screen-reader semantics unless a test explicitly proves an accessibility improvement.
+
+\section{Localization And Directionality Posture}\label{record-241-localization-and-directionality-posture}
+
+Avoid DOGFOOD copy edits unless the slice intentionally updates localization catalogs. If DOGFOOD-facing strings are touched, run the DOGFOOD i18n gates and hold the raw-string and missing-localization ratchets flat or lower.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-241-agent-inspectability-and-explainability-posture}
+
+The selected files, rule deltas, and validation commands must be captured in this design doc or the PR summary so the next agent can audit what changed without re-running broad discovery first.
+
+\section{Linked Invariants}\label{record-241-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Work doctrine: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-241-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Use \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}o\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s} and focused ESLint probes to select enough cleanup to remove at least \texttt{5\allowbreak{}0} findings.
+\item
+  Prioritize zero remaining ESLint findings if the fixes stay behaviorally tight.
+\item
+  Write focused regressions only where cleanup exposes a behavior or module boundary risk.
+\item
+  Ratchet the ESLint baseline and aggregate Code Dojo ceiling after the live count is proven lower.
+\item
+  Update docs and changelog with final counts and the next target.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-241-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Add focused regressions for any behavior-bearing cleanup.
+\item
+  For pure typing cleanup, run focused ESLint and existing tests for the touched package or surface before updating baselines.
+\end{itemize}
+
+\section{Validation Plan}\label{record-241-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Probe candidate files with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}o\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s}.
+\item
+  Run focused raw ESLint on touched files.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}.
+\item
+  Run focused behavior tests for touched surfaces.
+\item
+  Check aggregate debt with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}.
+\item
+  Confirm standards gates with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}.
+\item
+  Validate documentation inventory with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-241-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The selected touched files reduce live findings by at least \texttt{5\allowbreak{}0}.
+\item
+  Aggregate Code Dojo debt is \texttt{4\allowbreak{}1\allowbreak{}4} or lower.
+\item
+  The ESLint baseline records the lower live count.
+\item
+  The Code Dojo exception ledger and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} report the lower ceiling.
+\item
+  The next ratchet target is documented as \texttt{3\allowbreak{}6\allowbreak{}4} or lower.
+\end{itemize}
+

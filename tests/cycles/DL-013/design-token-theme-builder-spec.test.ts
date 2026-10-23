@@ -39,23 +39,6 @@ describe('DL-013 design token and theme builder spec', () => {
     expect(design).toContain('## Retrospective');
   });
 
-  it('puts DL-013 onto the GitHub-backed roadmap', () => {
-    const roadmap = readRepoFile('docs/ROADMAP.md');
-    const closedLineage = sectionBetween(roadmap, '## Closed Lineage', '## Maintenance Rule');
-
-    expect(roadmap).toContain(
-      '| `Beyond` | [Beyond](https://github.com/flyingrobots/bijou/milestone/3) |',
-    );
-    expect(roadmap).toContain('Product Workbench And Sapphire Design Language');
-    expect(roadmap).toContain('Theme Lab and Theme Inspector provenance surfaces backed by token facts');
-    expect(roadmap).toContain('[#311](https://github.com/flyingrobots/bijou/issues/311)');
-    expect(roadmap).toContain('[#315](https://github.com/flyingrobots/bijou/issues/315)');
-    expect(roadmap).toContain('[#317](https://github.com/flyingrobots/bijou/issues/317)');
-    expect(roadmap).toContain('[#318](https://github.com/flyingrobots/bijou/issues/318)');
-    expect(closedLineage).toContain('[#308](https://github.com/flyingrobots/bijou/issues/308)');
-    expect(closedLineage).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
-  });
-
   it('locks the safe-pair contrast matrix follow-up into the design trail', () => {
     expect(existsRepoPath('docs/design/DL-015-theme-safe-pairs-and-contrast-matrices.md')).toBe(true);
 
@@ -72,13 +55,3 @@ describe('DL-013 design token and theme builder spec', () => {
     expect(umbrella).toContain('[#314](https://github.com/flyingrobots/bijou/issues/314)');
   });
 });
-
-function sectionBetween(source: string, start: string, end: string): string {
-  const startIndex = source.indexOf(start);
-  const endIndex = source.indexOf(end, startIndex + start.length);
-
-  expect(startIndex).toBeGreaterThanOrEqual(0);
-  expect(endIndex).toBeGreaterThan(startIndex);
-
-  return source.slice(startIndex, endIndex);
-}

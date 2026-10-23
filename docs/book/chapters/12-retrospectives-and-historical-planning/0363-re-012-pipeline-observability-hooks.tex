@@ -1,0 +1,32 @@
+\chapter{RE-012 --- Pipeline Observability Hooks}\label{record-363}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/RE-012-pipeline-observability-hooks.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-363-idea}
+
+Expose per-stage timing hooks in the render pipeline so apps and middleware can measure Layout, Paint, PostProcess, Diff, and Output phases individually.
+
+\begin{CodeBlock}
+run(app, {
+  configurePipeline(pipeline) {
+    pipeline.onStageComplete((stage, durationMs) => {
+      perfOverlay.recordPhase(stage, durationMs);
+    });
+  },
+});
+\end{CodeBlock}
+
+\section{Why}\label{record-363-why}
+
+The perf-gradient demo proved that 92\% of frame time is spent in the pipeline (diff + ANSI encode + stdout.write), but we could not measure the breakdown from the app side. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} can only append middleware after the default stages --- it cannot wrap them for timing.
+
+This blocks: - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/cool-ideas/DX-006-debug-performance-overlay-component.md}{DX-006} from showing a full phase breakdown - Any app from diagnosing whether their bottleneck is layout, paint, or diff
+
+\section{Shape}\label{record-363-shape}
+
+Either: 1. A callback-based hook (\texttt{o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e}) on the pipeline 2. Timing metadata added to \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} by the pipeline itself 3. A \texttt{w\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}f\allowbreak{}n\allowbreak{})} API that lets middleware run before AND after a stage's default middleware
+
+Option 3 is the most general but also the most complex.
+

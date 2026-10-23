@@ -1,0 +1,212 @@
+\chapter{DX-047 - Blocks App Binding Snippets}\label{record-143}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-047-blocks-app-binding-snippets.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DX-047
+title: Blocks App Binding Snippets
+status: active
+lane: asap
+priority: medium
+github_issue: 342
+legend: DX
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX - Developer Experience}
+
+\section{Decision Summary}\label{record-143-decision-summary}
+
+DOGFOOD's Blocks docs should show how a block becomes application code, not only how a block is described as metadata. For \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, the bounded repair is to add an app-binding walkthrough centered on the existing \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} fixture:
+
+\begin{itemize}
+\tightlist
+\item
+  show the block contract: model, config, data requirement, and command intents
+\item
+  show the application state/update path that owns counter state
+\item
+  show how keyboard actions become command-intent emissions
+\item
+  show how the app renders the block from model-owned state
+\item
+  prove the snippet is not stale by compiling a canonical source file and testing that the rendered docs fence matches it exactly
+\end{itemize}
+
+\section{Sponsored Human}\label{record-143-sponsored-human}
+
+A release-video viewer needs to understand why Blocks are reusable product assemblies rather than screenshots or one-off demos. The Blocks page should let the presenter say ``this is how you wire one into your app'' without leaving DOGFOOD.
+
+\section{Sponsored Agent}\label{record-143-sponsored-agent}
+
+An agent needs a deterministic docs witness that can inspect the Blocks section and verify that the app-binding example names the real API pieces: block config, state ownership, command intents, update routing, render invocation, and lower-mode expectations.
+
+\section{Hill}\label{record-143-hill}
+
+After this cycle, a developer can open DOGFOOD's Blocks section and see a complete, real app-binding snippet for \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}, including the state and command routing that make the block interactive.
+
+\section{Problem}\label{record-143-problem}
+
+Issue \#342 came from the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release-video rehearsal. The Blocks section now has useful catalog and preview surfaces, but it still reads like a product taxonomy. It does not yet answer the practical developer question:
+
+\begin{CodeBlock}
+How do I bind this block to my application's state and commands?
+\end{CodeBlock}
+
+The current ``How to Make Your Own Blocks'' page shows block authoring metadata and a minimal \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} shape. It does not show the application side of the contract: TEA state, update routing, render-time config, and command-intent handling.
+
+\section{Scope}\label{record-143-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a focused app-binding section to the Blocks docs.
+\item
+  Use \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} as the first example because it already proves bounded state, command intents, interaction keys, and lower-mode output in DOGFOOD.
+\item
+  Keep the code snippet small enough to read inside the terminal.
+\item
+  Back the snippet with deterministic tests so API names and command paths do not drift silently.
+\item
+  Update release-facing signposts and changelog entries for \#342.
+\end{itemize}
+
+\section{Non-Goals}\label{record-143-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not redesign BlockLab.
+\item
+  Do not build a code editor or tutorial runner.
+\item
+  Do not pull broad \#302 Runtime Graph / Scene IR product-contract work into this cycle.
+\item
+  Do not add a new production counter block. \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} remains a DOGFOOD fixture.
+\item
+  Do not rewrite the standard block catalog.
+\end{itemize}
+
+\section{User Experience Contract}\label{record-143-user-experience-contract}
+
+The Blocks docs should show both sides of a block contract:
+
+\begin{itemize}
+\tightlist
+\item
+  the reusable block owns metadata, data requirements, command intents, render contract, and lower-mode behavior
+\item
+  the application owns model state, update decisions, host data, and when to invoke the block
+\end{itemize}
+
+The snippet should be readable in DOGFOOD at normal release-video dimensions. It should not require a browser, external docs page, or source-code search to explain the basic integration path.
+
+\section{Playback Questions}\label{record-143-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Can a viewer see where counter state lives?
+\item
+  Can a viewer see which key emits which command intent?
+\item
+  Can a viewer see that the block render input is built from app-owned state?
+\item
+  Can a viewer see how lower modes stay meaningful when interaction is absent?
+\item
+  Can a test fail if the docs remove the binding path or let the snippet drift away from real APIs?
+\end{itemize}
+
+\section{Accessibility / Assistive Posture}\label{record-143-accessibility-assistive-posture}
+
+The binding explanation must be useful as text. Code snippets and prose should not rely on color-only emphasis. The lower-mode note should explain what pipe and accessible output preserve from the interactive block.
+
+\section{Localization / Directionality Posture}\label{record-143-localization-directionality-posture}
+
+This cycle adds English-source documentation copy only. DOGFOOD already labels English-source Markdown under non-English locales; this cycle should preserve that behavior. No new right-to-left layout behavior is introduced.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-143-agent-inspectability-explainability-posture}
+
+Agents should be able to inspect:
+
+\begin{itemize}
+\tightlist
+\item
+  the rendered Blocks docs text
+\item
+  the exact snippet source text
+\item
+  whether the snippet references real exported \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} helpers
+\item
+  whether the snippet names command-intent routing and lower-mode output
+\end{itemize}
+
+The proof should not depend on screenshots.
+
+\section{Linked Invariants}\label{record-143-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Blocks are product-level assemblies, not leaf visual components.
+\item
+  Application state owns business data; block render functions consume explicit inputs.
+\item
+  Command intents describe user intent; applications interpret and apply those intents.
+\item
+  DOGFOOD release claims must be demonstrable inside DOGFOOD.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-143-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a reusable app-binding snippet source for \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} at \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}.\allowbreak{}s\allowbreak{}n\allowbreak{}i\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Render that exact snippet in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}/\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}s\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{}-\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{}-\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}; generated copies must derive from the canonical snippet source.
+\item
+  Add prose explaining app-owned state, command intent routing, render-time config, and lower-mode output.
+\item
+  Add focused tests that render the Blocks guide and assert the app-binding section is visible and legible.
+\item
+  Add compile and source-integrity tests so the snippet cannot drift from the canonical source file or the real helper API.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-143-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  A DOGFOOD Blocks render test fails unless ``How to Make Your Own Blocks'' includes a visible \texttt{C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} app-binding section.
+\item
+  A snippet integrity test fails unless the documented code matches the canonical source file and references the real counter model, config, command-intent, update, and render helpers.
+\item
+  Existing CounterDemoBlock preview and intent-key tests continue to pass.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-143-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Blocks docs include at least one complete app-binding snippet.
+\item
+  The snippet uses real Bijou / DOGFOOD APIs from a canonical source file and is covered by deterministic type and source-integrity proof.
+\item
+  Interactive block docs explain state ownership and command routing.
+\item
+  DOGFOOD renders the snippet legibly in the Blocks section.
+\item
+  The release/video script can explain ``how to use this in your app'' from the Blocks docs alone.
+\item
+  Issue \#342 is closed by the implementation PR.
+\end{itemize}
+
+\section{Retrospective}\label{record-143-retrospective}
+
+To be completed when the PR lands.
+

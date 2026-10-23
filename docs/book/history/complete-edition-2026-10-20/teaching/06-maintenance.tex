@@ -1,0 +1,47 @@
+\chapter{Maintain the promise after release}\label{teaching-maintenance}
+
+\section{Treat the reference edition as a reference}
+\subsection{Keep the starting point available}
+
+The book pins the companion to an immutable commit. Reproduce that commit before making a change. Work on a separate branch and retain the old edition tag. This makes a disagreement about behavior answerable: run the same command against both candidates and compare the observation that matters.
+
+A dependency upgrade is its own change to the environment. Inspect the candidate release's actual exports and migration information, then run the existing evidence against the new lockfile. Do not rename the old tag to make the book appear current. A new edition should record its own commit and explain compatibility differences.
+
+\section{Walk a concrete maintenance change}
+\subsection{The bug: cancellation overwrites completion}
+
+Consider this report: ``I open cancellation confirmation while compile is running. Compile completes before I press Enter. Confirming then makes the job look cancelled.'' This is a temporal defect. A screenshot of either final state will not explain the ordering that produced it.
+
+The pinned companion already contains the regression check and repair for this case. Inspect the test named \texttt{completion during confirmation cannot be turned into cancellation} in \path{test/monitor.test.ts}. It starts a run, opens confirmation, applies a matching completion, then confirms. The expected observations are a successful job, a closed dialog and no cancellation effect.
+
+\subsection{Why the repair belongs in the model}
+
+The production \texttt{confirm-cancel} transition checks the selected job's current state. If confirmation remains open after the job stops running, it closes the dialog without changing the completed job or emitting an abort. This protects callers beyond the keyboard adapter as well as the visible interface.
+
+A repair that only disables a button can miss keyboard input or a delayed event. A repair that cancels on dialog opening changes the promised interaction: Escape would no longer leave the job running. The model repair preserves the original promise while accounting for the later fact.
+
+\subsection{Reproduce the failure on a disposable branch}
+
+As a reader exercise, temporarily remove the non-running guard from that transition. Run \texttt{npm test} and observe the named regression fail. Restore the guard and rerun. The acceptance criterion concerns state and emitted effects under a fixed sequence; it does not depend on making a human press Enter at just the right millisecond.
+
+This exercise deliberately modifies a copy of the example. The printed production file and pinned commit remain the reference. Do not commit the broken variant as a new checkpoint or replace the edition's passing verification record with a result from another tree.
+
+\section{Choose evidence in proportion to the change}
+\subsection{A transition repair}
+
+For the cancellation race, the deterministic state sequence is the central regression. Existing routing and effect tests establish adjacent contracts. A focused interactive check can confirm that the explanation and prompt still make sense. A new renderer benchmark would not establish the repaired temporal property.
+
+\subsection{A dependency upgrade}
+
+An upgrade can affect App messages, Surface behavior, adapters and terminal cleanup. Run typechecking, model/effect tests, controlled rendering checks, CLI output checks and the relevant pseudo-terminal observations. Review the mode outputs for compatibility. Test human workflows where the changed behavior can affect them, and record what was actually observed.
+
+If a newer component promises a richer view, add it only after verifying that it belongs to the target release. The archive and atlas are useful sources of questions; their presence in the publication does not certify the upgrade.
+
+\section{Keep corrections traceable}
+\subsection{An erratum needs a reproducible boundary}
+
+A useful report includes the edition commit, command and environment, the expected result, actual result and smallest known reproduction. Link its fix to the test or observation that establishes the repaired promise. If the explanation was wrong but the code was correct, amend the prose and identify the affected edition.
+
+\subsection{Leave a useful next application}
+
+A real process adapter, complete localization or an integrated inspector can each be a coherent extension. Give one extension an observable outcome, an explicit boundary and a working intermediate result. Preserve the existing modes and ownership contracts as it grows. The application should become more useful with each change, and the next reader should still be able to explain why it works.

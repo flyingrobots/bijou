@@ -1,0 +1,23 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-context-recovery",
+  "task": "Repair two documentation preview regressions exposed by full pre-push validation",
+  "bytesConsumed": 156155,
+  "filesRead": [
+    "scripts/docs-preview-theme.part01.test.ts",
+    "scripts/docs-preview-search.part01.test.ts",
+    "scripts/docs-preview.test-support.ts",
+    "scripts/documentation-corpus.ts",
+    "docs/README.md"
+  ],
+  "filesModified": [
+    "scripts/docs-preview-theme.part01.test.ts",
+    "docs/README.md"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Full pre-push gate: missing theme-tokens.md and missing documentation-map table",
+    "green": "Focused preview suite: 2 files, 6 tests passed"
+  }
+}

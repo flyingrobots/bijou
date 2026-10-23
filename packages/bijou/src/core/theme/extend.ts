@@ -1,10 +1,17 @@
 import type { Theme, TokenValue, GradientStop, BaseStatusKey, BaseUiKey, BaseGradientKey } from './tokens.js';
 
 /**
- * Extend a base theme with additional status, UI, or gradient tokens.
+ * Extend a base theme, overriding or adding tokens in any of its six groups.
  *
  * Merges the extension records into the base theme's corresponding groups,
  * preserving all existing keys and adding new ones.
+ *
+ * `border` and `semantic` are overridable but not extensible with new keys —
+ * unlike `status`, `ui` and `gradient`, their key sets are fixed by `Theme`.
+ * They are reachable here because the shipped presets alias heavily across
+ * groups: `bijou-dark` uses one amber for ten tokens spanning `status`,
+ * `semantic`, `ui` and `border`, so an app that could only replace `status` kept
+ * that amber for every heading, cursor and border without being told.
  *
  * @template S - Additional status keys beyond BaseStatusKey.
  * @template U - Additional UI element keys beyond BaseUiKey.
@@ -22,6 +29,8 @@ export function extendTheme<
   ui?: Partial<Record<U, TokenValue>>;
   gradient?: Partial<Record<G, GradientStop[]>>;
   surface?: Partial<Theme['surface']>;
+  border?: Partial<Theme['border']>;
+  semantic?: Partial<Theme['semantic']>;
 }): Theme<BaseStatusKey | S, BaseUiKey | U, BaseGradientKey | G> {
   return {
     ...base,
@@ -29,6 +38,8 @@ export function extendTheme<
     ui: mergeRecord(base.ui, extensions.ui),
     gradient: mergeRecord(base.gradient, extensions.gradient),
     surface: { ...base.surface, ...extensions.surface },
+    border: { ...base.border, ...extensions.border },
+    semantic: { ...base.semantic, ...extensions.semantic },
   };
 }
 

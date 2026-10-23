@@ -1,10 +1,6 @@
 ---
 title: DL-023 Sapphire Theme System
-legend: DL
-lane: roadmap
-priority: medium
 github_issue: 352
-status: shaping
 keywords:
   - design-language
   - color
@@ -14,7 +10,15 @@ keywords:
   - v9.0.0
 ---
 
-Legend: [DL - Design Language](../legends/DL-design-language.md)
+# DL-023 Sapphire Theme System
+
+This design record retains the campaign reasoning from pre-integration
+commit [`22378d7c`](https://github.com/flyingrobots/bijou/commit/22378d7cdc5024479188c5505262d22a5debd9b0).
+Its baseline descriptions, measurements and proposed phases are historical,
+not a live release report or a second backlog. GitHub issues and milestones
+track current work; the [package guide](../../packages/bijou/README.md#theme-authoring)
+documents the API delivered by this PR. The separate Bijou book and its frozen
+source corpus are unchanged.
 
 ## Linked Work
 
@@ -56,7 +60,7 @@ Three decisions frame the campaign.
 3. **The decision vocabulary already exists and is kept.** The work is
    replacing the sRGB math underneath it, not replacing the model.
 
-## Current Truth
+## Pre-Change Baseline
 
 Bijou already implements most of Design Book's model natively in
 Apache-2.0 code. `createTokenGraph()` is a reactive graph with dependency
@@ -141,7 +145,7 @@ This is empirical proof that role binding must stay mode-dependent — which
 is what the existing `{ light, dark }` definitions and `minContrastWith`
 rules already express. The architecture is correct; the inputs are not.
 
-## Roadmap
+## Recorded Campaign Phases
 
 Six phases. Phase 1 is additive and independently landable; everything
 after it depends on it.
@@ -230,7 +234,7 @@ Phases 1 through 5, plus the design and issue grooming for Phase 6.
 ## Release Disposition
 
 Every linked issue currently sits in `v9.0.0`, which
-[BEARING](../BEARING.md) reserves for Product Workbench and operator
+[BEARING](https://github.com/flyingrobots/bijou/blob/22378d7cdc5024479188c5505262d22a5debd9b0/docs/BEARING.md) reserves for Product Workbench and operator
 surfaces after V8 stabilises the source/artifact/IR contract.
 
 Phase 1 is additive, dependency-free, and touches no V8 surface, so it can

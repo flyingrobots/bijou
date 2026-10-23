@@ -1,0 +1,295 @@
+\chapter{Bijou 8.0.0 Release Evidence}\label{record-262}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/8.0.0/README.md}\par}\smallskip
+
+\textbf{Line status: open.} This packet covers the \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} release line and is opened by its first tag, \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1}. The stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} tag completes it rather than starting a new one --- which is why the residual-risk section below reads as a to-do list rather than a closure record.
+
+Bijou \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} is a \textbf{release candidate}, not a stable release. It exists so downstream consumers can validate two breaking changes --- the \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} detection change and the status-fallback change from \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-052-no-color-is-not-a-capability.md}{\texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}2}} --- against real applications before the stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} tag is cut.
+
+\section{Tracker Transition --- 2026-10-19}\label{record-262-tracker-transition-2026-10-19}
+
+Repository planning mirrors and METHOD doctrine are retired. The RC review matrix below is historical evidence of what was reviewed at publication time. Its references to reviewing direction/roadmap files are superseded by reviewing GitHub issue and milestone scope, plus linked Linear execution items once the migration is connected. This does not close any inherited product witness gap. Stable-release work remains tracked by \#526 and \#527 in the \href{https://github.com/flyingrobots/bijou/milestone/6}{v8.0.0 milestone}.
+
+\section{How to read this packet}\label{record-262-how-to-read-this-packet}
+
+This packet is deliberately explicit about the difference between evidence gathered first-hand during release prep and evidence inherited from the cycles that landed on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} before it.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Verified here} means the command in the ``replay'' column was run on this release-prep branch and its result observed.
+\item
+  \textbf{Inherited} means the goalpost landed through its own reviewed PR with its own CI, and this packet cites that lineage without re-running the goalpost's specific witnesses.
+\end{itemize}
+
+Every \texttt{I\allowbreak{}n\allowbreak{}h\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}d} row is a \textbf{release-law gap that must be closed before the stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} tag}. \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} requires that a second operator can replay each witness from the tag commit, and an inherited citation does not meet that bar. Naming the gap is the honest disposition for a prerelease; carrying it into a GA tag would not be.
+
+\section{Release Summary}\label{record-262-release-summary}
+
+\begin{itemize}
+\tightlist
+\item
+  Version: \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1}
+\item
+  Previous public tag: \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}
+\item
+  Release type: \textbf{prerelease} (release candidate)
+\item
+  npm dist-tag: \textbf{\texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t}} --- not \texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}. \texttt{p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} maps the \texttt{r\allowbreak{}c} channel to \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t} (\texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}0\allowbreak{}2\allowbreak{}.\allowbreak{}t\allowbreak{}s}), verified by \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}t\allowbreak{}s\allowbreak{}x\allowbreak{} \allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{} \allowbreak{}v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} emitting \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{}\_\allowbreak{}d\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}\_\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}n\allowbreak{}e\allowbreak{}x\allowbreak{}t}. An earlier draft of this packet said \texttt{r\allowbreak{}c}, which was an assumption about the name rather than a reading of the mapping; the property that matters --- a prerelease must not land on \texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} --- holds either way, but the tag to verify after publish is \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t}
+\item
+  Release-prep branch: \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1}
+\item
+  Release date: 2026-08-21
+\item
+  Publish surface: npm workspace packages only, lock-step at \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1}
+\item
+  Target milestone: \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} (0 open / 7 closed at prep time)
+\end{itemize}
+
+\section{Tracker And Goalpost Map}\label{record-262-tracker-and-goalpost-map}
+
+Twenty changelog entries accumulated on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} since \texttt{7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}. They group into four substantive goalposts, two workflow closeouts, and a maintenance band.
+
+\subsection{DX-052 --- NO\_COLOR is not a capability signal}\label{record-262-dx-052-no_color-is-not-a-capability-signal}
+
+\begin{itemize}
+\tightlist
+\item
+  Tracker: \href{https://github.com/flyingrobots/bijou/issues/518}{\#518} (closed)
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-052-no-color-is-not-a-capability.md}{\texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}2}}
+\item
+  PR: \href{https://github.com/flyingrobots/bijou/pull/522}{\#522}
+\item
+  Slices: 3 --- \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} branch removal, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{})}/\texttt{i\allowbreak{}n\allowbreak{}k\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}(\allowbreak{})} fallback move, \texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} group coverage
+\item
+  Deterministic proof: \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}/\allowbreak{}t\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{t\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}f\allowbreak{}u\allowbreak{}z\allowbreak{}z\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}e\allowbreak{}n\allowbreak{}v\allowbreak{}i\allowbreak{}r\allowbreak{}o\allowbreak{}n\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}0\allowbreak{}1\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}0\allowbreak{}2\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  Replay: \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}v\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  Witness: the fuzz property asserts the contract directly --- adding \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} to any environment leaves that environment's detected mode unchanged (200 runs across \texttt{'\allowbreak{}'}/\texttt{'\allowbreak{}1\allowbreak{}'}/\texttt{'\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{}'} × TTY × \texttt{C\allowbreak{}I} × \texttt{T\allowbreak{}E\allowbreak{}R\allowbreak{}M}). \texttt{f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} asserts the pair that matters together: \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}=\allowbreak{}=\allowbreak{}=\allowbreak{} \allowbreak{}'\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}'} \textbf{and} \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}=\allowbreak{}=\allowbreak{}=\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e} \textbf{and} \texttt{i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})} undefined, over both \texttt{'\allowbreak{}1\allowbreak{}'} and \texttt{'\allowbreak{}'}.
+\item
+  Evidence status: \textbf{Verified here.} Authored during this session; every listed command was run.
+\item
+  Residual risk: intentional breaking change. A consumer relying on \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} to force single-frame output now gets an interactive monochrome TUI. The documented escape is \texttt{T\allowbreak{}E\allowbreak{}R\allowbreak{}M\allowbreak{}=\allowbreak{}d\allowbreak{}u\allowbreak{}m\allowbreak{}b}, which remains a genuine capability signal, or an explicit \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e}. This is the specific risk the rc exists to expose.
+\end{itemize}
+
+\subsection{DX-050 --- Profunctor Page terminal inspection target}\label{record-262-dx-050-profunctor-page-terminal-inspection-target}
+
+\begin{itemize}
+\tightlist
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-050-profunctor-page-inspection.md}{\texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}0}}
+\item
+  Deterministic proof: per its changelog entry --- \texttt{l\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})} validates the canonical \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}f\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}/\allowbreak{}0} family and emits deterministic \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, target-map, receipt, cell-source-map, and text evidence across six inspection modes
+\item
+  Evidence status: \textbf{Inherited.} Landed on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} through its own reviewed PR and CI before this branch existed. Its specific witnesses were not re-run here.
+\item
+  Residual risk: unsupported browser semantics remain explicit capability residuals; semantic-document sources, application islands, and visible unsupported blocks fail closed. Disposition inherited from the cycle, \textbf{not re-reviewed for this packet}.
+\end{itemize}
+
+\subsection{DX-049 --- VISOR artifact bundle proof}\label{record-262-dx-049-visor-artifact-bundle-proof}
+
+\begin{itemize}
+\tightlist
+\item
+  Tracker: \href{https://github.com/flyingrobots/bijou/issues/458}{\#458}
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-049-visor-artifact-bundle-proof.md}{\texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}4\allowbreak{}9}}
+\item
+  Deterministic proof: \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}G\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}(\allowbreak{})}, \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}A\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{v\allowbreak{}i\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}-\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}b\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}1} types, wrapping the checked-in DOGFOOD GraphQL fixture path
+\item
+  Evidence status: \textbf{Inherited.}
+\item
+  Residual risk: \#459 packed-cell validation and external renderer/debugger work were explicitly out of scope for the cycle.
+\end{itemize}
+
+\subsection{\texorpdfstring{RE-036 --- packed-cell receipt validation and \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} adaptation}{RE-036 --- packed-cell receipt validation and  adaptation}}\label{record-262-re-036-packed-cell-receipt-validation-and-surface-adaptation}
+
+\begin{itemize}
+\tightlist
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-036-packed-bijou-cells-surface-adapter.md}{\texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}6}}
+\item
+  Deterministic proof: \texttt{a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}d\allowbreak{}B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}C\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s\allowbreak{}T\allowbreak{}o\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} copies validated bytes and side-table entries without re-encoding cells
+\item
+  Evidence status: \textbf{Inherited.}
+\end{itemize}
+
+\subsection{WF-166 --- V8 dependency-security closeout}\label{record-262-wf-166-v8-dependency-security-closeout}
+
+\begin{itemize}
+\tightlist
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-166-v8-dependency-security-closeout.md}{\texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}6\allowbreak{}6}}
+\item
+  Deterministic proof: a regression binds the patched dependency floors and the manifest override; a clean \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} reproduces a zero-vulnerability audit
+\item
+  Replay: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}o\allowbreak{}m\allowbreak{}i\allowbreak{}t\allowbreak{}=\allowbreak{}d\allowbreak{}e\allowbreak{}v\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}=\allowbreak{}h\allowbreak{}i\allowbreak{}g\allowbreak{}h}
+\item
+  Evidence status: \textbf{Verified here} for the audit result; the floor-binding regression is inherited.
+\end{itemize}
+
+\subsection{WF-167 --- roadmap milestone authority}\label{record-262-wf-167-roadmap-milestone-authority}
+
+\begin{itemize}
+\tightlist
+\item
+  Design: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-167-roadmap-milestone-authority.md}{\texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}6\allowbreak{}7}}
+\item
+  Evidence status: \textbf{Inherited.}
+\end{itemize}
+
+\subsection{Maintenance band --- Code Dojo ratchets and DOGFOOD documentation}\label{record-262-maintenance-band-code-dojo-ratchets-and-dogfood-documentation}
+
+Eleven entries: WF-165 tranches A--E, the DX-050 Code Dojo prerequisites A and B, the focused ratchet, touched DOGFOOD localization debt, DOGFOOD split-source debt identity, the documentation contract, future-release milestone triage, and the DX-048 V8 Runtime Graph shaping record.
+
+\begin{itemize}
+\tightlist
+\item
+  Deterministic proof: the ratchet baselines under \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/} are the artifact; the gates are the proof
+\item
+  Replay: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  Evidence status: \textbf{Verified here.} The pre-commit and pre-push dojo gates ran on every commit in this lineage and reported \texttt{0\allowbreak{} \allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}1\allowbreak{}5\allowbreak{}0\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}o\allowbreak{}r\allowbreak{} \allowbreak{}1\allowbreak{}2\allowbreak{}0\allowbreak{}0\allowbreak{}0\allowbreak{} \allowbreak{}b\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s}, \texttt{0\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}5\allowbreak{}0\allowbreak{}0\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s}, and \texttt{0\allowbreak{} \allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}E\allowbreak{}S\allowbreak{}L\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}. Two files crossed the 150-line threshold while gaining tests during DX-052 and were brought back under by tightening prose and collapsing two cases into one \texttt{i\allowbreak{}t\allowbreak{}.\allowbreak{}e\allowbreak{}a\allowbreak{}c\allowbreak{}h}, rather than by adding baseline entries.
+\end{itemize}
+
+\subsection{Prerelease gaps found and closed during prep}\label{record-262-prerelease-gaps-found-and-closed-during-prep}
+
+Cutting the first prerelease this tooling has seen exposed four defects, all fixed on the release-prep branch and recorded in \href{https://github.com/flyingrobots/bijou/issues/523}{\#523}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{DOGFOOD crashed on startup.} It resolved release docs as \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}\$\allowbreak{}\{\allowbreak{}B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}\}\allowbreak{}/}, so \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} produced an unhandled \texttt{E\allowbreak{}N\allowbreak{}O\allowbreak{}E\allowbreak{}N\allowbreak{}T} at module load. \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d} reported only \texttt{e\allowbreak{}x\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{} \allowbreak{}1} --- no path, no stack --- so reproducing it meant running the capture entrypoint by hand with the scenario environment reconstructed from the smoke library.
+\item
+  \textbf{The two release gates disagreed} about where release docs live: the readiness gate keys the packet path off the milestone, DOGFOOD keyed it off the exact version. Resolved in favour of the release \emph{line}, which is why this packet lives at \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}/}.
+\item
+  \textbf{The i18n scanner silently stopped counting two documents.} Templating the path with a token the static resolver did not know made the release What's New and migration guide unresolvable, so they left the inventory rather than failing, and measured Markdown debt fell 78 → 72. An unresolvable token reads exactly like a six-point improvement. Fixed by teaching the resolver the token; \textbf{no baseline lowered and no test edited} to accommodate it.
+\item
+  \textbf{A prerelease version string overflows the DOGFOOD release nav.} At 120x40, \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} rendered as \texttt{W\allowbreak{}h\allowbreak{}a\allowbreak{}t\allowbreak{}'\allowbreak{}s\allowbreak{} \allowbreak{}N\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.}. Release guide titles and ids now key off the line, which is also what they describe.
+\item
+  \textbf{\texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} was a silent no-op, and this packet initially claimed it passed.} \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s} is the CLI entry point but was a pure re-export shim; it imported \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}0\allowbreak{}4\allowbreak{}.\allowbreak{}j\allowbreak{}s} for the side effect of \emph{that} module's main guard, which compares \texttt{i\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}u\allowbreak{}r\allowbreak{}l} against \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}v\allowbreak{}[\allowbreak{}1\allowbreak{}]} and therefore never fires when the process starts on the shim. The command exited 0 having validated nothing, written no stdout, and written no \texttt{G\allowbreak{}I\allowbreak{}T\allowbreak{}H\allowbreak{}U\allowbreak{}B\allowbreak{}\_\allowbreak{}O\allowbreak{}U\allowbreak{}T\allowbreak{}P\allowbreak{}U\allowbreak{}T}.
+
+  \texttt{R\allowbreak{}E\allowbreak{}L\allowbreak{}-\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}A\allowbreak{}-\allowbreak{}V\allowbreak{}E\allowbreak{}R\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}-\allowbreak{}L\allowbreak{}O\allowbreak{}C\allowbreak{}K\allowbreak{}S\allowbreak{}T\allowbreak{}E\allowbreak{}P} is the gate the release process assigns to \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, so version-mismatch detection was unenforced: \texttt{-\allowbreak{}-\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}9\allowbreak{}.\allowbreak{}9\allowbreak{}.\allowbreak{}9} against an \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} workspace exited 0. The Release Dry Run surfaced it only indirectly --- its notes job read the missing output as an empty tag and failed with \texttt{g\allowbreak{}h\allowbreak{}:\allowbreak{} \allowbreak{}M\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}\_\allowbreak{}n\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{} \allowbreak{}(\allowbreak{}H\allowbreak{}T\allowbreak{}T\allowbreak{}P\allowbreak{} \allowbreak{}4\allowbreak{}0\allowbreak{}0\allowbreak{})}.
+
+  Every unit test of \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})} passed throughout, because the function was always correct; nothing called it. \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}2\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}-\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}p\allowbreak{}o\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} now invokes the real entry point as a child process, which is the only way to observe this class of defect.
+
+  \textbf{A gate that reports success without running is worse than a missing gate}, and the first version of this row in the matrix above recorded exactly that false pass. It is corrected rather than quietly overwritten.
+\end{enumerate}
+
+One ratchet was tightened rather than loosened: \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e}'s release overview summary interpolated the version mid-sentence, counting as two translatable literals split around an inserted value --- word order a translator cannot rearrange. Moving the value to the end makes it one string, taking total raw-string debt 2317 → 2316 and the surface 7 → 6. Both baselines shrank to match.
+
+\section{Automated Evidence Matrix}\label{record-262-automated-evidence-matrix}
+
+\input{tables/table-071}
+
+\section{Human Review Matrix}\label{record-262-human-review-matrix}
+
+\input{tables/table-072}
+
+Nine surfaces, three reviewed. That ratio is the honest state of this packet and is the reason this is an rc.
+
+\section{Release-Time Registry Snapshot}\label{record-262-release-time-registry-snapshot}
+
+\texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} was tagged from \texttt{4\allowbreak{}3\allowbreak{}7\allowbreak{}d\allowbreak{}8\allowbreak{}1\allowbreak{}b\allowbreak{}b\allowbreak{}d\allowbreak{}0\allowbreak{}3\allowbreak{}5\allowbreak{}4\allowbreak{}6\allowbreak{}3\allowbreak{}b\allowbreak{}a\allowbreak{}4\allowbreak{}b\allowbreak{}b\allowbreak{}d\allowbreak{}6\allowbreak{}9\allowbreak{}0\allowbreak{}1\allowbreak{}e\allowbreak{}3\allowbreak{}9\allowbreak{}4\allowbreak{}6\allowbreak{}7\allowbreak{}f\allowbreak{}1\allowbreak{}e\allowbreak{}4\allowbreak{}7\allowbreak{}b\allowbreak{}f\allowbreak{}1\allowbreak{}d}, which was exactly \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} with a clean worktree. Recorded because the Release Law says never to claim a release succeeded unless the tag, workflows, and registry state were directly verified.
+
+\input{tables/table-073}
+
+Registry verified with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}<\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}>\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}. All ten packages:
+
+\begin{CodeBlock}
+@flyingrobots/bijou                   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-node              latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-tui               latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-tui-app           latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n              latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools        latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools-node   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-i18n-tools-xlsx   latest=7.2.0  next=8.0.0-rc.1
+@flyingrobots/bijou-mcp               latest=7.2.0  next=8.0.0-rc.1
+create-bijou-tui-app                  latest=7.2.0  next=8.0.0-rc.1
+\end{CodeBlock}
+
+\textbf{\texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} remains \texttt{7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} on every package}, which is the property that mattered: a prerelease on \texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} would have become the default install for a bare \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l}.
+
+One verification note worth keeping, because it is a trap for the next operator. An immediate post-publish query reported \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}n\allowbreak{}u\allowbreak{}l\allowbreak{}l} for \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} and a 404 on \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}@\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1}, while that package's publish job had reported success. The job log resolves it: \texttt{+\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}@\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} followed by npm's own \texttt{"\allowbreak{}Y\allowbreak{}o\allowbreak{}u\allowbreak{}r\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{} \allowbreak{}i\allowbreak{}s\allowbreak{} \allowbreak{}b\allowbreak{}e\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}y\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{} \allowbreak{}a\allowbreak{} \allowbreak{}f\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{} \allowbreak{}b\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}e\allowbreak{} \allowbreak{}a\allowbreak{}v\allowbreak{}a\allowbreak{}i\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}.\allowbreak{}"} It was registry propagation, and a re-query confirmed it. Given three genuine ``reported success without doing the work'' defects in this cycle (\#525, \#526, and the dry-run notes job), treating a 404 as a fourth was the natural reading and the wrong one --- \textbf{read the publish log before concluding a publish failed.}
+
+\section{Downstream Validation}\label{record-262-downstream-validation}
+
+\texttt{m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} is the first consumer on \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} and the reason this candidate exists. On upgrade it deleted its local \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- a re-derived output-mode detector that existed solely because \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R} used to force \texttt{'\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}'} --- and repointed its assertions at bijou's own \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e}, keeping them as a downstream regression test of the contract it depends on.
+
+Its whole check suite passes on the candidate: palette audit, construct check across 32 frames, greppable view render, and typecheck.
+
+It also found one real behavioural difference, resolved in bijou's favour. \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} consults \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}I\allowbreak{}s\allowbreak{}T\allowbreak{}T\allowbreak{}Y} only, so a TTY stdout with a piped stdin yields \texttt{'\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}'}; muniment's detector had called that \texttt{'\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}'}, on the grounds that a full-screen app which cannot receive keys is a hang rather than a UI. bijou's reading is better: \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}e} describes output capability, and stdin is enforced separately and loudly by \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t}, which throws \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} with \emph{``raw mode unavailable --- run in an interactive terminal rather than a non-TTY pipeline.''} A loud bootstrap failure beats a silently lowered mode, so the stricter downstream rule was dropped rather than reimplemented.
+
+\section{Deterministic Reproducibility}\label{record-262-deterministic-reproducibility}
+
+Replayable from this commit with no external inputs:
+
+\begin{CodeBlock}
+npm ci
+npm run lint
+npm test
+npx vitest run packages/bijou/src/core/detect packages/bijou/src/core/theme packages/bijou/src/factory.test.ts
+npm run code-dojo:verify
+npm audit --omit=dev --audit-level=high
+\end{CodeBlock}
+
+Normalization notes: the fuzz property in \texttt{t\allowbreak{}t\allowbreak{}y\allowbreak{}.\allowbreak{}f\allowbreak{}u\allowbreak{}z\allowbreak{}z\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} is seeded by \texttt{f\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} defaults and runs 200 cases; it asserts an invariant (mode is unchanged by \texttt{N\allowbreak{}O\allowbreak{}\_\allowbreak{}C\allowbreak{}O\allowbreak{}L\allowbreak{}O\allowbreak{}R}) rather than a fixed value, so it does not require normalization for host colour mode, terminal size, or clock. \texttt{f\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} uses \texttt{m\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e}/\texttt{m\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}I\allowbreak{}O}/\texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e} and therefore does not read the host environment at all.
+
+\section{Package And Registry Verification Plan}\label{record-262-package-and-registry-verification-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Merge the release-prep PR into \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}.
+\item
+  Confirm local \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} is exactly \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n}.
+\item
+  Run the Release Dry Run workflow against the release commit.
+\item
+  Tag \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} on the exact merged \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} commit.
+\item
+  Verify Tag Guard, tag CI, and the publish workflow.
+\item
+  Verify every package reports \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}-\allowbreak{}r\allowbreak{}c\allowbreak{}.\allowbreak{}1} on npm.
+\item
+  \textbf{Confirm the dist-tag is \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t}, not \texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}.} A prerelease published to \texttt{l\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t} would silently upgrade every consumer running a bare \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}. \texttt{n\allowbreak{}e\allowbreak{}x\allowbreak{}t} is what the \texttt{r\allowbreak{}c} channel maps to.
+\end{enumerate}
+
+\section{\texorpdfstring{Open \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{}h\allowbreak{}i\allowbreak{}g\allowbreak{}h} Disposition}{Open  Disposition}}\label{record-262-open-priorityhigh-disposition}
+
+\texttt{R\allowbreak{}E\allowbreak{}L\allowbreak{}-\allowbreak{}G\allowbreak{}H\allowbreak{}-\allowbreak{}P\allowbreak{}R\allowbreak{}I\allowbreak{}O\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}-\allowbreak{}H\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}-\allowbreak{}Z\allowbreak{}E\allowbreak{}R\allowbreak{}O} permits a release with open \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{}h\allowbreak{}i\allowbreak{}g\allowbreak{}h} issues only where this packet names the accepted risk and its owner. Four are open at tag time, and three of them were opened by this cycle --- the release process found its own gates wanting.
+
+\input{tables/table-074}
+
+None of these is hidden, and none is a gate reported as passing that did not run --- which is the failure \#525 was.
+
+\section{Residual Risk}\label{record-262-residual-risk}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Nine of eleven release-law human review gates are unreviewed} (see the matrix). Acceptable for a prerelease whose stated purpose is downstream validation; \textbf{blocking for the stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} tag}.
+\item
+  \textbf{Three product goalposts carry inherited rather than replayed evidence.} DX-050, DX-049, and RE-036 landed with their own review and CI, but their witnesses were not replayed from this commit, which is what \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} requires: \emph{``evidence is complete only when another operator can replay it from the tag commit.''}
+
+  Automated review raised this as a release-law objection --- the Law says no public tag may be created unless every gate is satisfied. The Law's own provision for this case is that \emph{``any accepted residual risk is named with rationale, owner, and a follow-up issue''}, and that hidden accepted failures are not allowed. So: accepted for the prerelease, owner maintainer, follow-up \href{https://github.com/flyingrobots/bijou/issues/527}{\#527}, which also carries the six unreviewed human-review surfaces and is written so that closing it means flipping five rows in this packet from Inherited to Verified here.
+
+  \textbf{The stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} tag must not be created while any row reads Inherited.}
+\item
+  \textbf{The breaking changes are unvalidated against real consumers.} That is the point of the rc. \texttt{m\allowbreak{}u\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t} is the first consumer and will pin this version; \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}a\allowbreak{}s} carries a local \texttt{d\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}C\allowbreak{}l\allowbreak{}i\allowbreak{}T\allowbreak{}u\allowbreak{}i\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} override that is now redundant and can be removed once it moves off \texttt{\textasciicircum{}\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+\item
+  \textbf{The changelog boundary will need consolidating at GA.} Twenty entries now sit under an rc header. The stable \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} header should absorb them rather than leave consumers reading release history split across a prerelease.
+\item
+  \textbf{The lockfile was stale until review caught it.} \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n} rewrote all eleven manifests and left \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} byte-identical to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}, still recording \texttt{7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} for every workspace package and internal pin --- so a clean \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}c\allowbreak{}i} would have resolved from metadata a full major behind the manifests. Regenerated here with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}-\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}y}. Three separate gates failed to notice, filed as \href{https://github.com/flyingrobots/bijou/issues/526}{\#526}: the version script does not touch the lock, the pre-commit ``lockfile consistency'' check runs \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}l\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l} which cannot detect the condition, and \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} validates manifests only. Same family as \href{https://github.com/flyingrobots/bijou/issues/525}{\#525} --- gates that report success without checking what their names promise.
+\item
+  \textbf{DOGFOOD's ``Current Release Story'' guide still describes the v7.2 path} in its summary, catalogs, and body, while the release page now presents v8. Cosmetic for a prerelease, tracked in \#527 for the stable tag.
+\item
+  \textbf{Open \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}:\allowbreak{}h\allowbreak{}i\allowbreak{}g\allowbreak{}h} issue \#473} (\texttt{B\allowbreak{}A\allowbreak{}D\allowbreak{} \allowbreak{}C\allowbreak{}O\allowbreak{}D\allowbreak{}E\allowbreak{}:\allowbreak{} \allowbreak{}m\allowbreak{}a\allowbreak{}k\allowbreak{}e\allowbreak{} \allowbreak{}S\allowbreak{}V\allowbreak{}G\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{} \allowbreak{}t\allowbreak{}o\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}g}) is milestoned \texttt{v\allowbreak{}8\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} and is not release-blocking for \texttt{8\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}. Named here rather than left implicit, per \texttt{R\allowbreak{}E\allowbreak{}L\allowbreak{}-\allowbreak{}G\allowbreak{}H\allowbreak{}-\allowbreak{}P\allowbreak{}R\allowbreak{}I\allowbreak{}O\allowbreak{}R\allowbreak{}I\allowbreak{}T\allowbreak{}Y\allowbreak{}-\allowbreak{}H\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}-\allowbreak{}Z\allowbreak{}E\allowbreak{}R\allowbreak{}O}.
+\item
+  \textbf{Known palette defects ship unchanged.} \href{https://github.com/flyingrobots/bijou/issues/519}{\#519} records that both first-party presets alias one colour across the same ten token paths and that \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}/\texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} collapse to ΔE 0.059 (dark) and 0.064 (light) under protanopia, with \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}'s severity ladder inverted in lightness. \texttt{D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}5\allowbreak{}2} makes this \emph{escapable} --- \texttt{e\allowbreak{}x\allowbreak{}t\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} can now reach every group --- but does not fix it. Consumers relying on the shipped presets for severity distinctions should read \#519.
+\end{enumerate}
+

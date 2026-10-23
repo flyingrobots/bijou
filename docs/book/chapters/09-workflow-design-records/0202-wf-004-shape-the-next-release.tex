@@ -1,0 +1,390 @@
+\chapter{WF-004 --- Shape The Next Release}\label{record-202}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-004-shape-the-next-release.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor human}\label{record-202-sponsor-human}
+
+A maintainer preparing the next public Bijou release.
+
+\section{Sponsor agent}\label{record-202-sponsor-agent}
+
+An agent that must answer, from repo artifacts alone:
+
+\begin{itemize}
+\tightlist
+\item
+  what the next release is
+\item
+  why it has that version number
+\item
+  what is in it
+\item
+  what is deferred
+\item
+  what must be true before tagging
+\end{itemize}
+
+\section{Hill}\label{record-202-hill}
+
+The next Bijou release is a deliberate, inspectable decision rather than an accretion of unreleased work.
+
+\section{Why this cycle exists}\label{record-202-why-this-cycle-exists}
+
+Since \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, Bijou has accumulated a large and mixed wave of work:
+
+\begin{itemize}
+\tightlist
+\item
+  runtime engine architecture and implementation slices
+\item
+  humane shell behavior and shell introspection
+\item
+  DOGFOOD growth into a real proving surface
+\item
+  new localization packages and workflow tooling
+\item
+  design-language doctrine and reusable review surfaces
+\item
+  release, workflow, and repo-signpost hardening
+\end{itemize}
+
+That progress is real, but it created release ambiguity:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} in \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} is not yet a clean \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D} release boundary
+\item
+  the repo had long-form release docs, but they still lived under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}/}
+\item
+  the workspace contains new i18n packages, but the automated npm publish matrix still only covers the older five published packages
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007} is important follow-on architecture work, but the repo had not yet answered whether it is a release blocker
+\end{itemize}
+
+This cycle exists to make those choices explicit.
+
+\section{Human users}\label{record-202-human-users}
+
+\subsection{Primary human user}\label{record-202-primary-human-user}
+
+A maintainer who needs to explain the release to users and execute it without hand-waving.
+
+\subsection{Human hill}\label{record-202-human-hill}
+
+A maintainer can point to repo files and answer:
+
+\begin{itemize}
+\tightlist
+\item
+  why the next release is \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  what is included
+\item
+  what is explicitly deferred
+\item
+  what exact evidence makes the release ready
+\end{itemize}
+
+\section{Agent users}\label{record-202-agent-users}
+
+\subsection{Primary agent user}\label{record-202-primary-agent-user}
+
+A coding or release agent preparing docs, release notes, workflow changes, or migration guidance.
+
+\subsection{Agent hill}\label{record-202-agent-hill}
+
+An agent can recover the next release boundary, version, and readiness criteria from the repo itself without relying on chat memory or vague interpretation of \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]}.
+
+\section{Playback questions}\label{record-202-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  After reading this cycle and the release docs, can a maintainer explain why the next release is \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} instead of a patch or a new major?
+\item
+  Can a maintainer see that \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is explicitly deferred rather than silently assumed to be a blocker?
+\item
+  Can an agent find versioned long-form release docs in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}?
+\item
+  Can a release operator name the unresolved blockers before tagging?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-202-accessibility-assistive-reading-posture}
+
+This cycle is documentation-first. The important requirement is that the release shape remains legible in plain markdown and does not depend on tables, screenshots, or GitHub-specific UI to understand the decision.
+
+\section{Localization / directionality posture}\label{record-202-localization-directionality-posture}
+
+The release includes localization work, so the docs must not pretend that the repo is still English-only by design. The prose remains English for now, but the release shape must explicitly acknowledge the new i18n packages and the publish-matrix gap around them.
+
+\section{Agent inspectability / explainability posture}\label{record-202-agent-inspectability-explainability-posture}
+
+Version choice, scope, deferrals, and readiness criteria must live in repo artifacts:
+
+\begin{itemize}
+\tightlist
+\item
+  this cycle doc
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/release.md}{docs/release.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/PLAN.md}{docs/PLAN.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/BEARING.md}{docs/BEARING.md}
+\end{itemize}
+
+\section{Non-goals}\label{record-202-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  actually tagging or publishing \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  implementing \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7}
+\item
+  fully rewriting changelog history before \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  pretending the release is ready before its blocking gaps are closed
+\end{itemize}
+
+\section{Evidence}\label{record-202-evidence}
+
+\subsection{Release boundary facts}\label{record-202-release-boundary-facts}
+
+\begin{itemize}
+\tightlist
+\item
+  latest release tag: \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  current workspace version: still \texttt{4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  current branch is \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n}
+\item
+  local \texttt{H\allowbreak{}E\allowbreak{}A\allowbreak{}D} can be synced to \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n}
+\end{itemize}
+
+\subsection{Public-surface facts}\label{record-202-public-surface-facts}
+
+\begin{itemize}
+\tightlist
+\item
+  the post-\texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} work is dominated by additive \texttt{f\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}:} style changes across runtime, shell, DOGFOOD, and localization
+\item
+  there is no single clear public API break that obviously demands \texttt{5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  the current publish workflows only publish:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}
+  \item
+    \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}
+  \end{itemize}
+\item
+  the workspace also now contains:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+  \item
+    \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}x\allowbreak{}l\allowbreak{}s\allowbreak{}x}
+  \end{itemize}
+\end{itemize}
+
+\section{Decision}\label{record-202-decision}
+
+\subsection{Target version}\label{record-202-target-version}
+
+The next release should be \textbf{\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}}, stable.
+
+\subsection{\texorpdfstring{Why \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}}{Why }}\label{record-202-why-4.1.0}
+
+\begin{itemize}
+\tightlist
+\item
+  the release has a strong additive feature story across multiple public surfaces
+\item
+  it is much larger than a patch release
+\item
+  it does not present a clear enough breaking boundary to justify \texttt{5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}
+\item
+  it is the first release after \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} that turns Bijou from ``surface toolkit with a framed shell'' into a more coherent application/runtime platform
+\end{itemize}
+
+\subsection{\texorpdfstring{In scope for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}}{In scope for }}\label{record-202-in-scope-for-4.1.0}
+
+\subsubsection{Headline themes}\label{record-202-headline-themes}
+
+\begin{itemize}
+\tightlist
+\item
+  runtime engine work through \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006}
+\item
+  humane shell work through \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md}{HT-004}
+\item
+  typed framed-shell and cleanup-capable command improvements through \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-001-type-framed-app-messages-and-updates-end-to-end.md}{DX-001} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md}{DX-002}
+\item
+  DOGFOOD completion through \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md}{DF-019}
+\item
+  localization packages and localized shell/docs work through \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/LX-008-localize-shell-chrome-and-dogfood.md}{LX-008}
+\end{itemize}
+
+\subsubsection{Supporting but not headline}\label{record-202-supporting-but-not-headline}
+
+\begin{itemize}
+\tightlist
+\item
+  release, workflow, and repo-signpost hardening
+\item
+  System-Style JavaScript doctrine and derived invariants
+\item
+  long-form release documentation
+\end{itemize}
+
+\subsection{\texorpdfstring{Explicitly deferred from \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}}{Explicitly deferred from }}\label{record-202-explicitly-deferred-from-4.1.0}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md}{WF-003}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md}{DF-020}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/DL-009-formalize-layout-and-viewport-rules.md}{DL-009}
+\item
+  the remaining localization follow-ons in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-007-service-oriented-localization-adapters.md}{LX-007} and \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-009-localize-shell-help-notification-and-directional-surfaces.md}{LX-009}
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} decision}{ decision}}\label{record-202-re-007-decision}
+
+\texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is \textbf{not} a blocker for \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+
+It remains an important architectural follow-on, but waiting for it would blur a coherent and already substantial release behind one more runtime slice. \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} should ship the runtime-engine story through \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} and then let \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} become follow-on work for the next line.
+
+\section{Ready when}\label{record-202-ready-when}
+
+\texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is ready to tag only when all of the following are true:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} is reconciled to the actual \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}.\allowbreak{}H\allowbreak{}E\allowbreak{}A\allowbreak{}D} boundary and can become a clean \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release section.
+\item
+  Long-form release docs exist under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}.
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} has a concise ``What's New in v4.1.0'' section.
+\item
+  The i18n publish-surface gap is resolved one of two ways:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    preferred: expand the publish and dry-run matrices to include the new public i18n packages
+  \item
+    fallback: narrow the public \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release promise explicitly and stop presenting those packages as released artifacts
+  \end{itemize}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}p\allowbreak{}r\allowbreak{}e\allowbreak{}f\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} passes.
+\item
+  The GitHub \textbf{Release Dry Run} workflow passes.
+\item
+  The repo is on a clean \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} exactly synced with \texttt{o\allowbreak{}r\allowbreak{}i\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}/\allowbreak{}m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at the moment release execution begins.
+\end{enumerate}
+
+\section{Deliverables landed in this cycle}\label{record-202-deliverables-landed-in-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  a chosen target version: \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  explicit deferral of \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7}
+\item
+  versioned long-form release docs under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  repo signposts updated to carry the release-shaping decision
+\end{itemize}
+
+\section{Tests to write first}\label{record-202-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a cycle test that proves \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}a\allowbreak{}p\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} exists
+\item
+  a cycle test that proves the versioned \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} release-doc directory exists
+\item
+  a cycle test that proves \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is explicitly treated as follow-on rather than silent blocker
+\end{itemize}
+
+\section{Risks}\label{record-202-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  treating the i18n publish-matrix mismatch as a docs footnote instead of a real release blocker
+\item
+  letting \texttt{[\allowbreak{}U\allowbreak{}n\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}]} remain semantically muddy even after shaping the release
+\item
+  accidentally advertising \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} as if it were already part of the target release
+\end{itemize}
+
+\section{Retrospective}\label{record-202-retrospective}
+
+\subsection{What landed}\label{record-202-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  the next release now has a chosen public target: \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}
+\item
+  the repo has versioned long-form release docs for that target
+\item
+  \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is explicitly deferred instead of silently looming over the release
+\item
+  release readiness is now a concrete checklist rather than a vibe
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-202-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} still needs its final \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} cut during actual release execution
+\item
+  at the time this cycle closed, the i18n publish matrix was still a real blocker; \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md}{WF-005} closes that gap in the release automation
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-202-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md}{WF-005 --- Close 4.1.0 i18n Publish-Surface Gap}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-006-cut-clean-4-1-0-release-boundary.md}{WF-006 --- Cut Clean 4.1.0 Release Boundary}
+\end{itemize}
+

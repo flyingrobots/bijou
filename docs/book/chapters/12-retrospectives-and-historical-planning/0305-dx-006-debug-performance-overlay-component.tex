@@ -1,0 +1,69 @@
+\chapter{DX-006 --- Debug Performance Overlay Component}\label{record-305}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-006-debug-performance-overlay-component.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-305-idea}
+
+Ship a first-class \texttt{d\allowbreak{}e\allowbreak{}b\allowbreak{}u\allowbreak{}g\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}(\allowbreak{})} component in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} that any app can composite over its view to see real-time performance instrumentation:
+
+\begin{itemize}
+\tightlist
+\item
+  FPS counter
+\item
+  Frame time (with rolling graph)
+\item
+  Update and view phase timing
+\item
+  Heap used/total, RSS, external memory
+\item
+  GC event count per sample window
+\item
+  Terminal size and cell count
+\item
+  Configurable position (corner anchoring)
+\end{itemize}
+
+\section{Why}\label{record-305-why}
+
+The \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} stress test proved the concept: a self-rendering stats overlay that tracks frame timing, memory, and GC pressure is immediately useful for diagnosing performance issues. But it's hardcoded into the demo. Every app that wants performance visibility has to rebuild this from scratch.
+
+\section{Shape}\label{record-305-shape}
+
+A composable surface component, not a shell/app-frame feature:
+
+\begin{CodeBlock}
+import { debugOverlay } from '@flyingrobots/bijou-tui';
+
+view(model) {
+  const main = renderMyApp(model);
+  return debugOverlay(main, { anchor: 'top-left' });
+}
+\end{CodeBlock}
+
+The overlay composites onto the app's surface. It reads performance data from a shared timing context (similar to the mutable \texttt{p\allowbreak{}h\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}g} object in the perf demo). Apps opt in by wrapping their view --- no framework integration required.
+
+\section{Open questions}\label{record-305-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should the render pipeline expose phase timing natively (layout, paint, diff, output) so the overlay can show the full breakdown? Currently the pipeline isn't observable from the app side.
+\item
+  Should the overlay be tree-shakeable (dev-only) or always available?
+\item
+  Should it support custom metrics (app-defined counters/gauges)?
+\end{itemize}
+
+\section{Related}\label{record-305-related}
+
+\begin{itemize}
+\tightlist
+\item
+  RE-008 byte-packed surface representation (affects rendering perf)
+\item
+  The perf gradient demo (\texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}) as proof of concept
+\end{itemize}
+

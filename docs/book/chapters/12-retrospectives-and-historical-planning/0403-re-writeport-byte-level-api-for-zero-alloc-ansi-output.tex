@@ -1,0 +1,21 @@
+\chapter{WritePort byte-level API for zero-alloc ANSI output}\label{record-403}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/RE_writeport-byte-level-api-for-zero-alloc-ansi-output.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WritePort byte-level API for zero-alloc ANSI output
+lane: retro
+legend: RE
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-403-disposition}
+
+This is already repo truth and no longer belongs in the live backlog. \texttt{W\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}w\allowbreak{}r\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}B\allowbreak{}y\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}(\allowbreak{}b\allowbreak{}u\allowbreak{}f\allowbreak{},\allowbreak{} \allowbreak{}l\allowbreak{}e\allowbreak{}n\allowbreak{})} is part of the public core I/O contract, \texttt{n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}I\allowbreak{}O\allowbreak{}(\allowbreak{})} implements it for \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}t\allowbreak{}d\allowbreak{}o\allowbreak{}u\allowbreak{}t}, and the byte-path differ uses it when available before falling back to string writes. The remaining work in this area is no longer ``add the API,'' but deeper output-path refinements on top of the byte writer that already shipped.
+
+\section{Original Proposal}\label{record-403-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+Extend WritePort to accept Uint8Array bytes alongside strings. The differ could then write ANSI escape sequences directly as bytes into a pre-allocated output buffer, avoiding string construction entirely. V8's rope string optimization makes string += competitive for now, but a byte-level path would eliminate the \textasciitilde365KB/frame of transient string allocation in the gradient worst case. Requires: WritePort.writeBytes(buf: Uint8Array, length: number), differ output buffer as Uint8Array, ANSI SGR sequences written as raw bytes. Discovered during RE-008/RE-009 investigation --- chunks.push+join was slower than +=, so the byte path is the only remaining win.
+

@@ -33,9 +33,24 @@ describe('createThemeAccessors()', () => {
     );
   });
 
-  it('status() falls back to muted for unknown keys', () => {
+  // The fallback target is `semantic.muted`, not `status.muted`. Both carry the
+  // same hex in every shipped preset, so the observable difference is entirely in
+  // the modifiers: `status.muted` adds `strikethrough`, which reads as
+  // "cancelled" and is the wrong thing to say about a key nobody defined.
+  it('status() falls back to semantic.muted for unknown keys', () => {
+    const fallback = acc.status('nonexistent');
+    expect(fallback.hex).toBe(theme.theme.semantic.muted.hex);
+    expect(fallback.modifiers ?? []).toEqual(theme.theme.semantic.muted.modifiers ?? []);
+  });
+
+  it('status() never returns a struck-through token for an unknown key', () => {
+    expect(acc.status('nonexistent').modifiers ?? []).not.toContain('strikethrough');
+  });
+
+  it('status(\'muted\') still returns the real muted token, strikethrough intact', () => {
+    // The token itself is unchanged; only what an unknown key resolves to moved.
     const muted = acc.status('muted');
-    expect(acc.status('nonexistent').hex).toBe(muted.hex);
+    expect(muted.modifiers ?? []).toContain('strikethrough');
   });
 
   it('ui() falls back to semantic.primary for unknown keys', () => {

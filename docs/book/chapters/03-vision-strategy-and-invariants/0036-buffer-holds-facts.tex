@@ -1,0 +1,141 @@
+\chapter{The Buffer Holds Facts}\label{record-036}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/invariants/buffer-holds-facts.md}\par}\smallskip
+
+Buffers, queues, and message channels should carry facts about what happened or what should happen next. They should not carry executable behavior.
+
+\section{Meaning}\label{record-036-meaning}
+
+Good buffered values look like:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{\{\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}\}}
+\item
+  \texttt{\{\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}l\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}i\allowbreak{}n\allowbreak{}f\allowbreak{}o\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}S\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}'\allowbreak{} \allowbreak{}\}}
+\item
+  \texttt{\{\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}p\allowbreak{}u\allowbreak{}s\allowbreak{}h\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}'\allowbreak{},\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{} \allowbreak{}\}}
+\end{itemize}
+
+Bad buffered values look like:
+
+\begin{itemize}
+\tightlist
+\item
+  class instances with \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}(\allowbreak{})} or \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{})} methods
+\item
+  closures that capture ambient state and perform side effects later
+\item
+  ``smart'' objects whose meaning only exists when executed
+\end{itemize}
+
+The rule is simple:
+
+\begin{quote}
+the buffer should hold facts, not code
+\end{quote}
+
+Interpretation belongs at the boundary that owns side effects.
+
+\section{Why}\label{record-036-why}
+
+Fact-shaped buffered values are:
+
+\begin{itemize}
+\tightlist
+\item
+  serializable
+\item
+  inspectable
+\item
+  loggable
+\item
+  replayable
+\item
+  testable without executing host effects
+\end{itemize}
+
+Behavior-shaped buffered values make the system harder to audit because the meaning of the queue is hidden inside arbitrary executable code.
+
+\section{Applies to}\label{record-036-applies-to}
+
+This invariant applies to:
+
+\begin{itemize}
+\tightlist
+\item
+  command buffers
+\item
+  event channels
+\item
+  queued frame actions
+\item
+  cross-thread messages
+\item
+  persisted or replayable runtime logs
+\end{itemize}
+
+It is especially important anywhere we may later want:
+
+\begin{itemize}
+\tightlist
+\item
+  diagnostics
+\item
+  crash replay
+\item
+  deterministic tests
+\item
+  worker transport
+\item
+  post-mortem inspection
+\end{itemize}
+
+\section{Does not mean}\label{record-036-does-not-mean}
+
+This invariant does \textbf{not} mean every internal helper must become data.
+
+It does not apply to:
+
+\begin{itemize}
+\tightlist
+\item
+  direct hot-path loops where no queue/buffer boundary exists
+\item
+  local strategy tables used only as implementation detail
+\item
+  pure helper functions that never become buffered values
+\end{itemize}
+
+The rule is about what crosses a buffered or queued boundary, not about banning functions from the codebase.
+
+\section{Review questions}\label{record-036-review-questions}
+
+When adding a queue or buffered protocol, ask:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Could I print every buffered item as plain data and understand the system?
+\item
+  Could I serialize and replay this later?
+\item
+  Is the side-effect owner explicit and centralized?
+\item
+  Would a new engineer have to execute the object to learn what it means?
+\end{enumerate}
+
+If the answer to the last question is yes, the design is probably violating this invariant.
+
+\section{Protected by}\label{record-036-protected-by}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DX-developer-experience.md}{DX --- Developer Experience}
+\end{itemize}
+

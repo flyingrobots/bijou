@@ -22,13 +22,7 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
   });
 
   it('updates the release signposts to acknowledge the DOGFOOD follow-through and smoke closure', () => {
-    const bearing = readRepoFile('docs/BEARING.md');
     const release = readRepoFile('docs/release.md');
-
-    expect(bearing).toContain('DF-022');
-    expect(bearing).toContain('DF-023');
-    expect(bearing).toContain('DF-024');
-    expect(bearing).toContain('WF-003');
     expect(release).toContain('DF-023');
     expect(release).toContain('DF-024');
     expect(release).toContain('smoke:dogfood');

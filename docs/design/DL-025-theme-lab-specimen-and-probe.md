@@ -1,10 +1,6 @@
 ---
 title: DL-025 Theme Lab Specimen And Probe
-legend: DL
-lane: roadmap
-priority: medium
 github_issue: 315
-status: shaping
 keywords:
   - design-language
   - theme-lab
@@ -14,7 +10,15 @@ keywords:
   - v9.0.0
 ---
 
-Legend: [DL - Design Language](../legends/DL-design-language.md)
+# DL-025 Theme Lab Specimen And Probe
+
+This design record retains the campaign reasoning from pre-integration
+commit [`22378d7c`](https://github.com/flyingrobots/bijou/commit/22378d7cdc5024479188c5505262d22a5debd9b0).
+Its baseline descriptions, measurements and proposed phases are historical,
+not a live release report or a second backlog. GitHub issues and milestones
+track current work; the [package guide](../../packages/bijou/README.md#theme-authoring)
+documents the API delivered by this PR. The separate Bijou book and its frozen
+source corpus are unchanged.
 
 ## Linked Work
 
@@ -38,7 +42,7 @@ chosen colour is a bad idea, and to propose ones that are not.
 Four workstreams. Two are buildable now; two are blocked on perceptual colour
 maths that does not exist yet, and saying otherwise would be dishonest.
 
-## Current Truth
+## Pre-Change Baseline
 
 DL-024 gave the lab a live preview, but that preview is a strip of five
 components chosen to be compact. It answers "do the status roles differ" and

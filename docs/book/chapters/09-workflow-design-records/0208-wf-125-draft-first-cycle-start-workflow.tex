@@ -1,0 +1,147 @@
+\chapter{WF-125 Draft-first cycle start workflow}\label{record-208}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-125-draft-first-cycle-start-workflow.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-125 Draft-first cycle start workflow
+legend: WF
+lane: design
+priority: medium
+keywords:
+  - workflow
+  - method
+  - draft-pr
+  - design-thinking
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-208-framing}
+
+Issue \href{https://github.com/flyingrobots/bijou/issues/279}{\#279} changes the Bijou cycle loop from ``open the pull request at ship time'' to ``open a draft pull request at cycle start.'' The intent is to make issue, branch, design doc, and PR state visible before implementation expands, while keeping the final ready-for-review and merge gates strict.
+
+The work follows a Design Thinking loop:
+
+\begin{itemize}
+\tightlist
+\item
+  observe that cycle work can stay invisible until late implementation
+\item
+  frame draft PRs as early coordination artifacts rather than merge-ready review artifacts
+\item
+  prototype the new loop in Method, Workflow, Contributor, Agent, and issue template docs
+\item
+  prove the policy with a workflow regression that reads those docs
+\end{itemize}
+
+\section{Sponsored Users}\label{record-208-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintainers who need early visibility into the branch and linked artifacts.
+\item
+  Contributors who need one explicit start-of-cycle checklist.
+\item
+  Agents that need a deterministic order for sync, branch, shape, push, draft PR, and work-in-progress labeling.
+\item
+  Reviewers who should see draft context early without treating it as ready.
+\end{itemize}
+
+\section{Hills}\label{record-208-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A contributor can start a cycle by syncing the merge target, creating a \texttt{c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}<\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}\_\allowbreak{}n\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}>} branch, shaping the issue and design doc, committing and pushing that shape, opening a draft PR, and applying \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s}.
+\item
+  A reviewer can distinguish an early draft coordination PR from a ready PR that has passed implementation, validation, and self-review.
+\item
+  A maintainer can run one workflow regression that prevents the docs and issue template from drifting back to the old ``PR only at ship'' loop.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-208-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does every workflow surface say to run \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}e\allowbreak{}t\allowbreak{}c\allowbreak{}h} and sync the merge target before branching?
+\item
+  Does the cycle branch start from the synced target instead of stale local state?
+\item
+  Does the shaping commit include the GitHub Issue and design doc before implementation work begins?
+\item
+  Does a draft PR to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} exist before implementation starts?
+\item
+  Does the issue carry \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s} while the branch or draft PR is actively carrying it?
+\item
+  Does the draft PR move to ready only after implementation, validation, and self-review?
+\end{itemize}
+
+\section{Workflow Contract}\label{record-208-workflow-contract}
+
+\begin{CodeBlock}
+git fetch
+sync merge target branch
+checkout cycle/<cycle_name>
+write or update GitHub Issue
+write docs/design/<cycle>.md
+stage + commit + push shaping artifact
+open draft PR to main
+link issue + design doc + draft PR
+apply work-in-progress to issue
+do RED/GREEN cycle work
+validate + self-review
+mark PR ready for review
+\end{CodeBlock}
+
+\section{Implementation Notes}\label{record-208-implementation-notes}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}G\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d} owns the short agent recovery protocol.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d} owns the doctrine and cycle-state diagram.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d} owns the operator checklist.
+\item
+  \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} owns contributor-facing expectations.
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}I\allowbreak{}S\allowbreak{}S\allowbreak{}U\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}E\allowbreak{}M\allowbreak{}P\allowbreak{}L\allowbreak{}A\allowbreak{}T\allowbreak{}E\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}-\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l} owns the issue-form acceptance text.
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} freezes the contract.
+\end{itemize}
+
+\section{Tests}\label{record-208-tests}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} adds a regression that reads \texttt{A\allowbreak{}G\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{C\allowbreak{}O\allowbreak{}N\allowbreak{}T\allowbreak{}R\allowbreak{}I\allowbreak{}B\allowbreak{}U\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and the Method work-item issue template.
+\item
+  The RED pass failed because \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d} did not contain the new \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}e\allowbreak{}t\allowbreak{}c\allowbreak{}h} and draft-PR cycle-start language.
+\item
+  The GREEN pass updates the docs and normalizes Markdown whitespace in the regression so wrapped prose can still carry exact policy sentences.
+\end{itemize}
+
+\section{Closeout}\label{record-208-closeout}
+
+The cycle is landed when:
+
+\begin{itemize}
+\tightlist
+\item
+  the workflow docs require merge-target sync before branching
+\item
+  the workflow docs require a draft PR to \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at cycle start
+\item
+  the issue template requires issue, design doc, and draft PR links
+\item
+  the draft PR is marked ready only after implementation, validation, and self-review
+\item
+  the WF-001 regression, docs inventory, lint, and whitespace checks pass
+\item
+  the pull request closes \#279
+\end{itemize}
+

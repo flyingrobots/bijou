@@ -1,0 +1,148 @@
+\chapter{DX-025 Component Metadata Contract}\label{record-125}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-025-component-metadata-contract.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-025 Component Metadata Contract
+legend: DX
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-125-framing}
+
+Bijou has component facts scattered across package docs, strategy docs, examples, tests, DOGFOOD stories, and MCP-facing payloads. Those surfaces should not each invent a slightly different idea of what a component is.
+
+DX-025 adds a pure component metadata contract in core. The first slice defines the runtime shape, validates common drift, and renders a deterministic summary. It does not build the story workstation; it gives that workstation, DOGFOOD, MCP docs, and agent workflows one shared object to consume.
+
+\section{Sponsored Users}\label{record-125-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Maintainers curating first-party component docs and examples.
+\item
+  Tool builders generating DOGFOOD pages, MCP payloads, or story indexes.
+\item
+  Third-party authors who want extension metadata without copying internal docs.
+\item
+  Agent workflows that need stable facts about component modes and invariants.
+\end{itemize}
+
+\section{Hills}\label{record-125-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer can describe a component's package, family, modes, args, variants, invariants, docs, examples, and source path in one runtime object.
+\item
+  A tool can validate metadata and get deterministic issue paths for duplicate ids, missing required fields, and empty required lists.
+\item
+  A docs or agent surface can render a compact summary without parsing markdown.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-125-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the contract capture package name, component name, family, modes, docs, args, variants, invariants, examples, and source path?
+\item
+  Does validation reject blank required fields and empty mode lists?
+\item
+  Does validation report duplicate mode names and duplicate ids deterministically?
+\item
+  Can variants and invariants attach semantic facts for mode-lowering checks?
+\item
+  Does a helper throw on invalid metadata for authoring-time guardrails?
+\item
+  Does \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} export the contract and helpers from the root barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-125-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} and related runtime types.
+\item
+  Add \texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{})}.
+\item
+  Add \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{})} for authoring-time validation.
+\item
+  Add \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{})} and \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}R\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}r\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{})}.
+\item
+  Keep the contract pure and package-neutral enough for third-party components.
+\item
+  Reuse \texttt{O\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} and \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}L\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}F\allowbreak{}a\allowbreak{}c\allowbreak{}t} types where metadata touches modes and semantic facts.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-125-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  RED tests fail before implementation and pass after.
+\item
+  Valid metadata reports no issues and produces a stable summary.
+\item
+  Invalid metadata reports deterministic issue paths and messages.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})} throws on invalid metadata.
+\item
+  Docs and changelog describe the metadata contract.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-125-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep validation strict enough to catch drift but not so broad that it becomes a schema language.
+\end{itemize}
+
+\section{Drift Check}\label{record-125-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed on the contract and validation layer. The story workstation and DOGFOOD migration remain follow-up work that can consume this object.
+\item
+  Validation catches required-field drift, empty mode lists, duplicate modes, duplicate arg names, and duplicate ids across variants, invariants, and examples. It does not become a schema language or a docs parser.
+\item
+  Variants and invariants can carry \texttt{M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}L\allowbreak{}o\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}F\allowbreak{}a\allowbreak{}c\allowbreak{}t} records, connecting this contract to DX-026 without coupling metadata to rendered output.
+\end{itemize}
+
+\section{Playback}\label{record-125-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a} captures package name, component name, family, modes, docs, args, variants, invariants, examples, tags, and source path.
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})} returns deterministic issue paths and messages.
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}(\allowbreak{})} throws with the report text when metadata contains errors.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})} renders a compact, stable summary for docs, agents, and MCP payloads.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}M\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}R\allowbreak{}e\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} renders validation output in review-friendly text.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} exports the contract and helpers from the root barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-125-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  This gives DOGFOOD and MCP tooling a shared object without forcing either surface to own the component taxonomy.
+\item
+  Keeping semantic facts attached to variants and invariants should make future story audits and mode-lowering checks cheaper: metadata can describe the intended truth, and render-specific tooling can prove it.
+\end{itemize}
+

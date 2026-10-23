@@ -1,0 +1,29 @@
+\chapter{RE-023 --- Stabilize Render Scheduling in runtime.ts}\label{record-378}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/bad-code/RE-023-stabilize-render-scheduling.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-378-idea}
+
+The current \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} implementation in \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} uses \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{},\allowbreak{} \allowbreak{}0\allowbreak{})} and a \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} boolean. Under heavy input load or rapid async command resolution, this can lead to multiple overlapping render timeouts being scheduled if the boolean is reset at the wrong point in the microtask queue.
+
+Refactor \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} to use a single, stable \texttt{T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}H\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} (or a similar scheduling token) that is explicitly cleared and reset on every request. This ensures that only one render operation is ever pending or in flight at any given time.
+
+\section{Why}\label{record-378-why}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Determinism}: Ensures that the \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} function always operates on the most current model snapshot.
+\item
+  \textbf{Performance}: Prevents redundant rendering work during high-frequency update bursts.
+\item
+  \textbf{Safety}: Neutralizes potential race conditions where front/back buffers might be swapped mid-render.
+\end{enumerate}
+
+\section{Effort}\label{record-378-effort}
+
+Small --- refactor the \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}d} logic to use a persistent \texttt{T\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}H\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} from the context clock.
+

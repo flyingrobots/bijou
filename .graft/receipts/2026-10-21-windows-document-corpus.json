@@ -1,0 +1,21 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-context-recovery",
+  "task": "Repair corpus path canonicalization found by Windows PR CI",
+  "bytesConsumed": 191258,
+  "filesRead": [
+    "scripts/documentation-corpus.ts",
+    "scripts/documentation-corpus.test.ts"
+  ],
+  "filesModified": [
+    "scripts/documentation-corpus.ts",
+    ".gitattributes"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Windows CI job 119189465313 failed loading docs/ARCHITECTURE.md: native path separators rejected as invalid corpus path",
+    "planned_green": "Existing corpus and preview tests locally, full pre-push hooks and exact candidate Windows PR CI"
+  },
+  "preservation": "The same five immutable artifacts retain exact bytes across Git checkout platforms; corpus keys remain canonical forward-slash paths. No archive content is rewritten."
+}

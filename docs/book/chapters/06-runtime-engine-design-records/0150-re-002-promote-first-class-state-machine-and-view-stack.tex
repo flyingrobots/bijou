@@ -1,0 +1,335 @@
+\chapter{RE-002 --- Promote First-Class State Machine and View Stack}\label{record-150}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}\par}\smallskip
+
+\emph{Cycle for turning state machines and view stacks into explicit runtime objects instead of thin shell conventions}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-001-define-runtime-engine-architecture.md}{RE-001 --- Define Runtime Engine Architecture}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-150-why-this-cycle-exists}
+
+RE-001 defined the runtime direction:
+
+\begin{itemize}
+\tightlist
+\item
+  application state and visible views are distinct
+\item
+  views/layers should be first-class runtime objects
+\item
+  view-stack behavior should not be derived ad hoc from shell booleans
+\end{itemize}
+
+This cycle exists to land the first real implementation slice behind that doctrine:
+
+\begin{itemize}
+\tightlist
+\item
+  a first-class state-machine object
+\item
+  a first-class view-stack object
+\item
+  explicit root/base-view behavior
+\item
+  explicit push/pop/replace/clear semantics
+\end{itemize}
+
+This is intentionally smaller than a shell migration. It gives the runtime a reusable foundation before routing, retained-layout invalidation, and command/effect buffering are moved onto it.
+
+\section{Human users / jobs / hills}\label{record-150-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-150-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers evolving the runtime
+\item
+  builders writing layered applications with modals, drawers, and overlays
+\item
+  shell authors who need something more honest than booleans plus branch order
+\end{itemize}
+
+\subsection{Human jobs}\label{record-150-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Represent durable application state separately from ephemeral or layered UI.
+\item
+  Push and dismiss views without pretending those operations are the same as state transitions.
+\item
+  Replace or clear visible views intentionally when a state transition requires it.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-150-human-hill}
+
+The first-class runtime objects are explicit enough that a human can point to one place for ``current app state'' and one place for ``visible view stack'' without hand-waving.
+
+\section{Agent users / jobs / hills}\label{record-150-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-150-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents inspecting runtime objects
+\item
+  agents generating tests against stack/state behavior
+\item
+  agents authoring layered apps on top of Bijou
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-150-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read the current state machine without inferring it from visible shell layers.
+\item
+  Read the current view stack without inferring it from miscellaneous booleans.
+\item
+  Determine whether a top layer can be dismissed, whether it blocks below, and what the root/base view is.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-150-agent-hill}
+
+An agent can inspect the runtime objects and answer ``what state is the app in?'' separately from ``what views are currently visible?'' reliably enough to generate and validate layered behavior.
+
+\section{Human playback}\label{record-150-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user is in an active workspace session.
+\item
+  The app's state machine says \texttt{s\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}.
+\item
+  The view stack contains only the non-dismissible workspace root view.
+\item
+  The app pushes a dismissible blocking confirmation view.
+\item
+  The user dismisses it.
+\item
+  The state machine stays on \texttt{s\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}.
+\item
+  The view stack pops back to only the root view.
+\item
+  Later, the app transitions to \texttt{s\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d} and intentionally clears auxiliary views while replacing the base view with a post-session summary.
+\end{enumerate}
+
+\section{Agent playback}\label{record-150-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects runtime objects before and after a modal opens.
+\item
+  Before:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    state machine current state is \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+  \item
+    view stack contains one root view
+  \end{itemize}
+\item
+  After:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    state machine still reports \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}.\allowbreak{}b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+  \item
+    view stack contains root + modal
+  \end{itemize}
+\item
+  The agent can see that the modal is dismissible and blocking while the root is not dismissible.
+\item
+  When the modal is dismissed, the state machine remains unchanged while the view stack changes.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-150-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Implementation outline}\label{record-150-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a pure runtime module in \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} that exports:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a first-class state-machine type
+  \item
+    a first-class view-layer type
+  \item
+    a first-class view-stack type
+  \end{itemize}
+\item
+  Formalize view-layer semantics:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    stable id
+  \item
+    kind
+  \item
+    dismissible
+  \item
+    blocksBelow
+  \item
+    root/base marker
+  \end{itemize}
+\item
+  Implement pure state-machine helpers:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    create
+  \item
+    transition
+  \end{itemize}
+\item
+  Implement pure view-stack helpers:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    create with a root/base view
+  \item
+    push
+  \item
+    pop top dismissible view
+  \item
+    replace top view
+  \item
+    clear to root
+  \item
+    replace root/base intentionally
+  \end{itemize}
+\item
+  Export the module publicly without migrating the shell yet.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-150-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving the legend, active cycle doc, and remaining backlog slices agree on the first-class runtime-object direction
+\item
+  package-local runtime tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    state-machine transitions track current and previous state
+  \item
+    view stacks require a non-dismissible root/base view
+  \item
+    pushing overlays does not alter state-machine state
+  \item
+    popping never removes the root/base view
+  \item
+    replacing the top view does not rewrite the root/base view
+  \item
+    clearing to root preserves the root/base view
+  \item
+    replacing the root/base view is explicit rather than an accidental pop/replace side effect
+  \end{itemize}
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-150-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  existing shell code already has partial layer concepts that may overlap awkwardly with the new view-layer vocabulary until RE-007
+\item
+  naming needs to stay generic enough for runtime use without becoming too abstract to migrate onto concrete shell objects later
+\item
+  the first slice should stay pure and small; if it tries to absorb input routing or retained layouts now, the cycle will sprawl
+\end{itemize}
+
+\section{Retrospective}\label{record-150-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  a pure first-class state-machine object
+\item
+  a pure first-class view-stack object with explicit root/base semantics
+\item
+  public runtime-engine exports for those objects
+\item
+  tests proving the semantics without shell-specific coupling
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no retained layout implementation yet
+\item
+  no input routing migration yet
+\item
+  no command/effect buffers yet
+\item
+  no framed-shell adoption yet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}{RE-003 --- Retain Layout Trees and Layout Invalidation}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}{RE-004 --- Route Input Through Layouts and Layer Bubbling}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006 --- Formalize Component Layout and Interaction Contracts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}
+\end{itemize}
+

@@ -85,6 +85,22 @@ fake duplication rather than a real second API.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast
   calculation for token-pair tests.
 
+Rule-authored themes retain inspectable authoring definitions.
+`renameRuleAuthoredTheme(theme, name)` creates a renamed theme while preserving
+that provenance; `ruleAuthoredDefinitions(theme)` returns its immutable
+snapshot, or `undefined` for themes without registered authoring data.
+`tokenDefinitionPaths(definitions)` lists authored token paths.
+`collectTokenDependents(definitions, mode)` reports direct consumers;
+`collectTransitiveTokenDependents(definitions, mode)` follows the full chain.
+These maps select the requested adaptive branch, omit unresolved references
+and inspect dependencies without evaluating cyclic token values.
+
+DOGFOOD's Theme Lab uses this provenance to show rules, candidates, scores,
+contrast and direct draft overrides alongside a live component specimen.
+It stacks its panels below the two-column width floor. A direct override is
+reported separately from a value that changed through propagation; this view
+does not claim every edit triggers complete graph-driven recomputation.
+
 ### Mode-Aware Authoring
 - **`renderByMode()`**: Dispatch a component to the current output contract.
 - **`lintModeLowering()`**: Compare explicit semantic facts across output modes.
@@ -150,7 +166,7 @@ fake duplication rather than a real second API.
 - **`ProfunctorPageTargetError`**: Inspect stable `code`, `path`, and `detail`
   fields when the bounded ProjectPage target rejects malformed,
   contradictory, or unsupported input.
-- **[Profunctor Page Inspection reference](../../docs/reference/profunctor-page-inspection.md)**:
+- **[Profunctor Page Inspection reference](../../docs/book/bijou-designs.pdf#page=425)**:
   Review the exact input versions, supported blocks, inspection modes, output
   contracts, diagnostics, and verification commands.
 
@@ -158,7 +174,7 @@ fake duplication rather than a real second API.
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Rendering doctrine, themes, and testing.
-- **[Design System](../../docs/design-system/README.md)**: Foundations, token vocabulary, and component families.
+- **[Design System](../../docs/book/bijou-designs.pdf#page=338)**: Foundations, token vocabulary, and component families.
 
 ---
 Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)

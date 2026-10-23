@@ -1,0 +1,1591 @@
+\chapter{Patterns}\label{record-023}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/patterns.md}\par}\smallskip
+
+This document defines the recurring product patterns that Bijou should support consistently.
+
+These are the decision frameworks behind the component families.
+
+\section{0. Selection, focus, and rhythm}\label{record-023-selection-focus-and-rhythm}
+
+\subsection{The pattern}\label{record-023-the-pattern}
+
+Bijou should make it obvious:
+
+\begin{itemize}
+\tightlist
+\item
+  which item is currently selected
+\item
+  which region currently owns input
+\item
+  which copy is primary versus supporting
+\item
+  how dense content is meant to breathe
+\end{itemize}
+
+These decisions should not be improvised per surface.
+
+\subsection{Canonical rules}\label{record-023-canonical-rules}
+
+\subsubsection{Background fill means current selection}\label{record-023-background-fill-means-current-selection}
+
+Use background fill to indicate the current selected row or item inside a collection.
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  it reads immediately in dense TUIs
+\item
+  it does not depend on one tiny pointer glyph
+\item
+  it survives better than hue-only emphasis when terminals differ
+\end{itemize}
+
+Selection may also use supporting cues such as:
+
+\begin{itemize}
+\tightlist
+\item
+  a leading chevron
+\item
+  bold value text
+\item
+  a stronger border inside the selected row
+\end{itemize}
+
+But those are supporting cues. The canonical selected-item treatment is still background fill.
+
+\subsubsection{Structural accent means active region}\label{record-023-structural-accent-means-active-region}
+
+Use a structural accent such as a gutter, border emphasis, or region frame to show the active region.
+
+Why:
+
+\begin{itemize}
+\tightlist
+\item
+  region focus and row selection are not the same thing
+\item
+  a pane can be active while its selected row changes
+\item
+  a selected row can exist inside an inactive region without stealing shell ownership
+\end{itemize}
+
+The accent should describe ownership of input, not merely visual importance.
+
+\subsubsection{Visible controls are a promise}\label{record-023-visible-controls-are-a-promise}
+
+Follow \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}.
+
+If a region is not active, its controls should not be advertised as though they will work.
+
+When the shell owns focus, shell controls replace pane-local cues.
+
+\subsubsection{One cell of padding matters}\label{record-023-one-cell-of-padding-matters}
+
+Dense TUIs still need rhythm.
+
+Canonical defaults:
+
+\begin{itemize}
+\tightlist
+\item
+  one cell of padding between content and region edges
+\item
+  one blank line between titled sections
+\item
+  one blank line between preference rows or similar stacked interactive rows when the surface can afford it
+\end{itemize}
+
+Do not cram labels, values, and descriptions together when one cell of space would make the surface easier to parse.
+
+\subsubsection{Stack beneath the label before truncating}\label{record-023-stack-beneath-the-label-before-truncating}
+
+When labels and values compete for the same horizontal space:
+
+\begin{itemize}
+\tightlist
+\item
+  wrap or stack first
+\item
+  reflow second
+\item
+  truncate only when the surface truly demands single-line identity
+\end{itemize}
+
+For settings and similar rows, values should stack beneath the label before truncating into ambiguity.
+
+Marquee is an explicit overflow behavior for compact, focused single-line surfaces. It is not the default solution.
+
+\subsubsection{Supporting copy should look supporting}\label{record-023-supporting-copy-should-look-supporting}
+
+Descriptions, helper copy, and secondary explanation should look visibly quieter than primary actions and current values.
+
+Use:
+
+\begin{itemize}
+\tightlist
+\item
+  muted tokens
+\item
+  dim modifiers when needed
+\item
+  more breathing room around primary actions than around support prose
+\end{itemize}
+
+Do not make supporting copy compete with what the user is supposed to act on now.
+
+\subsubsection{Layers should behave like a stack}\label{record-023-layers-should-behave-like-a-stack}
+
+When interactive layers overlap, they should behave in top-down order.
+
+Canonical rules:
+
+\begin{itemize}
+\tightlist
+\item
+  the topmost layer owns input
+\item
+  the topmost layer owns the visible control hints
+\item
+  dismiss actions target the topmost dismissible layer first
+\item
+  underlying regions do not keep advertising controls while covered
+\end{itemize}
+
+This means a palette, drawer, or modal should not merely look on top. It should also be the source of truth for routing and footer/help copy.
+
+\section{1. Status and feedback}\label{record-023-status-and-feedback}
+
+\subsection{The pattern}\label{record-023-the-pattern-1}
+
+Not all feedback should interrupt the user equally. Choose the least disruptive surface that still preserves the needed meaning.
+
+\subsection{Escalation ladder}\label{record-023-escalation-ladder}
+
+\subsubsection{\texorpdfstring{\texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-badge}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the status is compact
+\item
+  it belongs inline with another object
+\item
+  the surrounding content already provides context
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user must act on the information
+\item
+  the message needs explanation
+\item
+  the status must persist as its own block
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-note}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs supporting explanation
+\item
+  the content is informational, not urgent
+\item
+  the message belongs inside a form or guided flow
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  urgency or danger must be communicated
+\item
+  the message should interrupt
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})}}{}}\label{record-023-alert}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the state should remain in the document flow
+\item
+  the message is important enough to deserve its own block
+\item
+  the user should see it while reading or editing nearby content
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the event is brief and transient
+\item
+  it belongs in an activity stream
+\item
+  the app should manage stack/history/lifecycle
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}}{}}\label{record-023-toast}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the event is transient
+\item
+  the app is composing a one-off overlay directly
+\item
+  custom placement matters, but full notification lifecycle does not
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the message must remain in the page content
+\item
+  the app needs stacking, history, routing, or recall
+\item
+  the user needs to review a set of related events later
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  keep the message short and self-contained
+\item
+  do not hide follow-up obligations in a toast body
+\item
+  prefer one clear state statement over mixed status plus instructions plus history
+\end{itemize}
+
+\subsubsection{notifications}\label{record-023-notifications}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the app owns transient messaging as a system
+\item
+  stacking, placement, actions, routing, or history matter
+\item
+  the user may need to reopen or review prior notices
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the message should remain in page content
+\item
+  a single local overlay would do
+\item
+  the user must stop and decide before continuing
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  use notifications for events, not for durable documents
+\item
+  route warnings and errors here when the app owns runtime messaging as a system
+\item
+  actionable notifications should expose one obvious next step, not a mini workflow
+\item
+  if users may need recall, the history/archive surface is part of the feature, not an optional afterthought
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}}{}}\label{record-023-modal}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user must stop and decide
+\item
+  the app needs an explicit review or confirmation surface
+\item
+  background actions should be blocked
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  a lighter inline or overlay treatment would do
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  the title should state the decision or review task clearly
+\item
+  the body should explain the consequence, not repeat generic warning copy
+\item
+  the modal should end in a clear next action or dismissal path
+\item
+  avoid turning a modal into a drawer with extra blocking chrome
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{s\allowbreak{}k\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}}{}}\label{record-023-skeleton}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content shape is known but a short-lived loading gap would otherwise cause layout pop
+\item
+  the user benefits from seeing where content will land
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  honest partial content is already available
+\item
+  the loading state is long-lived enough that explicit progress or retry messaging would be more honest
+\item
+  the placeholder would imply certainty the app does not actually have yet
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}A\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-progressbar-createanimatedprogressbar}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  percent-complete is actually known or can be estimated honestly
+\item
+  the user benefits from determinate progress instead of generic activity
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  completion is unknown and the percentage would be fake
+\item
+  the work is so brief that the bar would only flicker
+\end{itemize}
+
+Loading-screen rule:
+
+\begin{itemize}
+\tightlist
+\item
+  a loading screen should show at most one progress bar
+\item
+  that bar must represent actual loading progress
+\item
+  do not use a progress bar on a title or splash screen unless the screen is truly a loading surface
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{s\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}i\allowbreak{}n\allowbreak{}n\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-spinnerframe-createspinner}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the task is active but indeterminate
+\item
+  the user needs reassurance that work is still happening
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  completion can be expressed honestly as a determinate bar
+\item
+  animation would distract more than it reassures
+\end{itemize}
+
+\section{2. Selection versus action}\label{record-023-selection-versus-action}
+
+This is one of the easiest places for a component library to become fuzzy.
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}}{}}\label{record-023-select}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is choosing one value
+\item
+  the set is short and stable
+\item
+  the result becomes stored state
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the list is large enough that search is the real task
+\item
+  the outcome should trigger an immediate app command instead of persisting a value
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}}{}}\label{record-023-multiselect}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is building a set
+\item
+  multiple simultaneous selections are meaningful
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user should choose exactly one option
+\item
+  the user is really firing commands one at a time instead of building a lasting set
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}}{}}\label{record-023-filter}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is choosing one value from a larger set
+\item
+  search/narrowing is the main task
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the option set is already short and stable enough for \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})}
+\item
+  the result is a command or navigation action rather than stored value state
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-commandpalette-commandpalettesurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the result is an action, navigation, or command
+\item
+  the app wants one global action-discovery surface
+\item
+  the user may benefit from mixed command groups such as actions, navigation, or recent destinations
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  palette entries should read like things the app can do, not field values the app stores
+\item
+  group commands by user intent (\texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}, \texttt{R\allowbreak{}e\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}) instead of raw subsystem names when possible
+\item
+  keep descriptions short enough to scan without turning the palette into a browseable document
+\end{itemize}
+
+Avoid \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is filling out a field value
+\item
+  the result should behave like stored form data
+\item
+  the content is really a browseable record list rather than an action list
+\end{itemize}
+
+\section{3. Comparison versus browsing versus inspection}\label{record-023-comparison-versus-browsing-versus-inspection}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-table}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs comparison across columns
+\item
+  the same attributes matter across many rows
+\item
+  the table should fit the available terminal width and wrap long cells instead of forcing callers to pre-compute column widths
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  hierarchy is the main point
+\item
+  the user needs focused keyboard inspection rather than passive comparison
+\item
+  the item set is effectively one-dimensional and would read more honestly as a list
+\end{itemize}
+
+Variants:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}b\allowbreak{}o\allowbreak{}x\allowbreak{}"} keeps the default Unicode boxed table
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"} renders a portable \texttt{+\allowbreak{}-\allowbreak{}-\allowbreak{}-\allowbreak{}+} grid
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}"} renders a borderless table with a heavy header rule and light row separators
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}l\allowbreak{}e\allowbreak{}"} keeps only the header separator
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}"} renders aligned columns with spaces and no rules
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"} renders a GitHub-flavored Markdown pipe table
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}"} renders two-column field/value reports
+\item
+  \texttt{v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}d\allowbreak{}"} renders psql-style record inspection
+\end{itemize}
+
+Examples:
+
+\begin{CodeBlock}
+box
+┌───────┬────────┐
+│ Name  │ State  │
+├───────┼────────┤
+│ Alice │ active │
+└───────┴────────┘
+
+ruled
+Name   State
+━━━━━  ━━━━━━
+Alice  active
+
+header-rule
+Name   State
+-----  ------
+Alice  active
+
+plain
+Name   State
+Alice  active
+
+markdown
+| Name  | State  |
+|-------|--------|
+| Alice | active |
+
+definition
+Field  Value
+━━━━━  ━━━━━━
+State  active
+
+expanded
+-[ RECORD 1 ]------------
+Name  | Alice
+State | active
+\end{CodeBlock}
+
+Lowering:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e} mode still defaults to TSV
+\item
+  callers can opt into \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}:\allowbreak{} \allowbreak{}"\allowbreak{}c\allowbreak{}s\allowbreak{}v\allowbreak{}"}, \texttt{"\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}"}, or \texttt{"\allowbreak{}a\allowbreak{}s\allowbreak{}c\allowbreak{}i\allowbreak{}i\allowbreak{}-\allowbreak{}g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}"}
+\item
+  visual aligned-column variants use spaces, not tabs; tabs are reserved for TSV serialization
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-tablesurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs the same passive comparison semantics as \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  the surrounding V3 runtime is already composing \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} output
+\item
+  cells may contain surface-native labels or badges
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  direct string output is the final destination
+\item
+  the app needs keyboard-owned row/cell focus semantics
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-navigabletable-navigabletablesurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  table data must be actively traversed
+\item
+  the app wants row/cell focus semantics
+\item
+  comparison across stable columns is still the job even while navigating
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  passive comparison is enough
+\item
+  the output must remain portable through core-only string rendering
+\item
+  the user is really selecting among one-dimensional records instead of comparing attributes
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-browsablelist-browsablelistsurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  items are one-dimensional
+\item
+  descriptions matter
+\item
+  the user is exploring or choosing among records
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  actions/commands are the result rather than records
+\item
+  column comparison is the point
+\item
+  hierarchy/path structure is the point
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-filepicker-filepickersurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is traversing filesystem hierarchy
+\item
+  the current path and directory transitions are part of the job
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content is generic hierarchy rather than actual file/path navigation
+\item
+  actions/commands are the result rather than a selected file or directory
+\end{itemize}
+
+\section{3.5 Viewport masking and scroll ownership}\label{record-023-viewport-masking-and-scroll-ownership}
+
+\subsection{Governing rules}\label{record-023-governing-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is the canonical masking primitive for bounded overflow scrolling in rich TUI composition.
+\item
+  \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} is the explicit text-lowering path when the content is intentionally string-first.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} are specialization layers on top of the viewport primitive, not separate scroll systems.
+\item
+  If a component only needs a clipped window plus scroll state, it should wrap viewport semantics rather than invent a bespoke \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}Y} slicer.
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is the important exception: wrapped comparison rows keep row-aware scroll semantics, so generic line clipping is the wrong abstraction there.
+\item
+  Scroll ownership must stay unified. If keyboard focus, mouse hit-testing, and rendering disagree about the visible window height, the component has a layout bug.
+\item
+  Scrollbars belong to the viewport layer. Components should not fake overflow by moving rows around without giving the user a truthful masked window.
+\end{itemize}
+
+\subsection{Layout rules}\label{record-023-layout-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Components should either fill the rectangle their parent assigns them or be intentionally placed within it by a parent-owned layout helper such as \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Parents own outer whitespace and anchoring. Child components should not silently shrink and leave accidental slack against a pane edge.
+\item
+  When a pane has a fixed header or separator row, the remaining rows should belong to one honest body region rather than an ad hoc mix of body plus invisible slack.
+\item
+  Overflow handling must be explicit: wrap, stack, clip, or viewport. Scrolling content without a matching viewport contract is not an acceptable fallback.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-viewportsurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  an existing \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or layout-backed region just needs a scrollable mask
+\item
+  the app already owns the surrounding chrome and only needs honest overflow scrolling
+\item
+  the component should stay on the structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content is intentionally string-first and the text-lowering path is the actual destination
+\item
+  the component needs domain-specific focus chrome or status semantics that belong in a higher-level wrapper
+\end{itemize}
+
+\section{3.6 Containment and formatted documents}\label{record-023-containment-and-formatted-documents}
+
+\subsection{\texorpdfstring{\texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-box-headerbox}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  a region needs visible containment or a local title
+\item
+  peer panels need to feel like separate working areas
+\item
+  compact metadata belongs in a header rather than in the surrounding prose
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  every subsection would get a border just for visual decoration
+\item
+  the real job is status escalation, not containment
+\item
+  a divider, heading, or simple whitespace would communicate structure more honestly
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}(\allowbreak{})}}{}}\label{record-023-markdown}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content is help, reference, release notes, or bounded prose
+\item
+  lightweight structure such as headings, lists, quotes, links, and code fences materially helps comprehension
+\item
+  the same content should lower honestly across rich, pipe, and accessible modes
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content is so large that it really needs document navigation instead of one rendered block
+\item
+  the prose is user-authored rich content that expects full browser-grade markdown semantics
+\item
+  the app is really laying out UI regions or controls and is trying to use markdown as a layout engine
+\item
+  dense comparison, forms, or command discovery are the real jobs
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})}}{}}\label{record-023-hyperlink}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the destination itself should remain part of the rendered output
+\item
+  terminals with link support can benefit from clickability without hiding where the link goes
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the label is vague or generic
+\item
+  trust depends on seeing the actual destination, but the surrounding content hides it
+\item
+  the interaction is really an app-owned action instead of an external destination
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{k\allowbreak{}b\allowbreak{}d\allowbreak{}(\allowbreak{})}}{}}\label{record-023-kbd}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  a local action needs an inline shortcut cue
+\item
+  the key hint belongs right next to the control, field, or instruction it affects
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs a grouped command reference or shell-level keymap
+\item
+  shortcut chips would start competing with the real content for attention
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} / \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-pagersurface-focusareasurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the scrollable region needs explicit line status, current-position framing, or focus gutter semantics
+\item
+  the pane is part of a larger workspace that needs visible ownership/focus signals
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  a plain masked region is enough and extra chrome would distract from the task
+\end{itemize}
+
+\subsection{Choosing among browseable structures}\label{record-023-choosing-among-browseable-structures}
+
+\begin{itemize}
+\tightlist
+\item
+  Choose \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when rows are essentially labels plus brief descriptions.
+\item
+  Choose \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when the outcome is an action or navigation command.
+\item
+  Choose \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when path traversal is the mental model.
+\item
+  Choose \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when comparison across columns remains the job even while navigating.
+\item
+  Choose \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} directly when the content already exists as a region and just needs bounded overflow masking.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-tree}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the primary relationship is parent/child
+\item
+  the user needs to understand nesting or containment
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  multiple parents or dependency edges matter
+\item
+  the user is really traversing filesystem paths, where \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is more honest
+\item
+  dense row/column comparison would communicate the content more clearly than nesting
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-dag-dagpane}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the primary relationship is dependency or flow
+\item
+  multiple parents or graph edges matter
+\item
+  the user needs to answer questions like ``what does this depend on?'' or ``what does this unblock?''
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  a tree, timeline, or table would answer the question more directly
+\item
+  the graph would mostly act as architecture wallpaper instead of supporting a concrete task
+\item
+  the user really needs a metrics summary or focused fragment instead of the whole graph
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-timeline}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  chronology is the main structure
+\item
+  events should read as a sequence, milestone trail, or audit-oriented progression
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  dependency or causality matters more than ordering
+\item
+  the content is so dense that a table, log, or summary-plus-detail drill-down would be more readable
+\item
+  the user is really comparing attributes across many events rather than following a temporal story
+\end{itemize}
+
+\section{3.7 Expressive branding and decorative emphasis}\label{record-023-expressive-branding-and-decorative-emphasis}
+
+\subsection{\texorpdfstring{\texttt{l\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}R\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}o\allowbreak{}m\allowbreak{}L\allowbreak{}o\allowbreak{}g\allowbreak{}o\allowbreak{}(\allowbreak{})} / \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})}}{ / }}\label{record-023-loadrandomlogo-gradienttext}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the product needs a deliberate branded or celebratory moment
+\item
+  splash surfaces, docs, or demos benefit from a little atmosphere
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  ordinary workspace chrome, navigation, status, or instructions need to stay neutral and legible
+\item
+  the emphasis would compete with the actual task
+\item
+  the color treatment is being asked to carry meaning that should live in text
+\end{itemize}
+
+\section{5. App-authored primitives}\label{record-023-app-authored-primitives}
+
+\subsection{\texorpdfstring{\texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}y\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}(\allowbreak{})}}{}}\label{record-023-renderbymode}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the app needs a domain-specific primitive that the shared component library should not own
+\item
+  the same semantic concept must lower honestly across rich, pipe, and accessible output
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  a shipped Bijou family already matches the job
+\item
+  the branching only exists to chase visual novelty instead of preserving meaning
+\end{itemize}
+
+\section{4. Disclosure and progressive complexity}\label{record-023-disclosure-and-progressive-complexity}
+
+\subsection{\texorpdfstring{\texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}}{}}\label{record-023-accordion}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  content is secondary or optional
+\item
+  one page can hold both summary and detail
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the sections are peer destinations that deserve explicit navigation
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})}}{}}\label{record-023-tabs}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  views are peers
+\item
+  only one view should be foregrounded at a time
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is progressing through steps
+\item
+  hierarchy/path context matters more than peer switching
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}}{}}\label{record-023-stepper}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user is moving through a process
+\item
+  order matters
+\item
+  the current stage should be understandable at a glance
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the views are non-sequential
+\item
+  the user is really switching among peer destinations instead of progressing through a flow
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{b\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}c\allowbreak{}r\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}(\allowbreak{})}}{}}\label{record-023-breadcrumb}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs path context
+\item
+  hierarchy or nesting should stay visible while reading the current location
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  peer destinations are the real model
+\item
+  the path is so deep or unstable that a simpler label plus local navigation would be clearer
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}}{}}\label{record-023-paginator}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the current page or position within a bounded sequence matters
+\item
+  page count should be visible without turning into a full navigation menu
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs rich peer navigation rather than compact progress
+\item
+  the content is an infinite feed or unbounded stream where page counts are misleading
+\end{itemize}
+
+\section{5. Overlay escalation}\label{record-023-overlay-escalation}
+
+Choose overlays by how much they should interrupt and how much context they should retain.
+
+\subsection{Governing rules}\label{record-023-governing-rules-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Overlays are for interruption, review, or supplemental context. They are not substitutes for normal page structure.
+\item
+  Pick the least interruptive overlay that still preserves the meaning and action path.
+\item
+  If users need history, stacking, routing, or recall, move up from \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} to the notification system.
+\item
+  If background input must stop, use \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} rather than trying to make a toast or drawer behave like one.
+\item
+  If the content is long-lived and belongs in the reading flow, use \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} or a normal page region instead of any overlay.
+\item
+  Use structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} content inside overlays when the interrupting layer needs real rows, embedded components, or richer layout. Flatten to plain text only at explicit lowering boundaries.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})}}{}}\label{record-023-tooltip}
+
+\begin{itemize}
+\tightlist
+\item
+  for tiny local explanation attached to nearby content
+\item
+  prefer one or two short lines that clarify a control, label, or state
+\item
+  not for decisions
+\item
+  not for content that needs scrolling, recall, commands, or workflow ownership
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}}{}}\label{record-023-drawer}
+
+\begin{itemize}
+\tightlist
+\item
+  for supplemental context, inspectors, side work
+\item
+  keep the main surface visible
+\item
+  prefer when the user needs reference material while still working in the main task
+\item
+  use panel-scoped drawers when the supplemental context belongs to one workspace region instead of the whole frame
+\item
+  do not turn a drawer into a modal by stuffing it with blocking confirmation copy
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})}}{}}\label{record-023-modal-1}
+
+\begin{itemize}
+\tightlist
+\item
+  for blocking review, choice, or confirmation
+\item
+  background shortcuts and pointer actions should be blocked
+\item
+  use sparingly; interruption must be justified
+\item
+  prefer short review-and-decide tasks over deep browsing or long-lived side work
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}}{}}\label{record-023-toast-1}
+
+\begin{itemize}
+\tightlist
+\item
+  for one transient overlay the app is composing directly
+\item
+  not for stack/history/routing problems
+\item
+  if the same class of event happens repeatedly, stop composing ad hoc toasts and move up to notifications
+\end{itemize}
+
+\subsection{notifications}\label{record-023-notifications-1}
+
+\begin{itemize}
+\tightlist
+\item
+  for events, not documents
+\item
+  use history/archive when recall matters
+\item
+  prefer over repeated ad hoc toasts once app-level messaging becomes systemic
+\item
+  route app-owned warnings and errors here when users may need to revisit them after the initial interruption
+\item
+  keep actions singular and obvious; do not hide multi-step workflows inside notification cards
+\end{itemize}
+
+\section{6. Forms and progression}\label{record-023-forms-and-progression}
+
+\subsection{\texorpdfstring{\texttt{g\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}p\allowbreak{}(\allowbreak{})}}{}}\label{record-023-group}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the form fits one mental step
+\item
+  fields are directly related
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{w\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})}}{}}\label{record-023-wizard}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the flow has stages
+\item
+  branching or transformation matters
+\item
+  the user benefits from progressive disclosure
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}m\allowbreak{}(\allowbreak{})}}{}}\label{record-023-confirm}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the decision is truly binary
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the user needs to compare options or consequences in detail
+\end{itemize}
+
+\section{7. App shell composition}\label{record-023-app-shell-composition}
+
+\subsection{Governing rules}\label{record-023-governing-rules-2}
+
+\begin{itemize}
+\tightlist
+\item
+  The shell exists to frame destinations, workspace state, and global actions. It should not compete with page content for narrative space.
+\item
+  Use shell chrome for orientation, status, and cross-cutting actions. Put explanation and task detail back into the page.
+\item
+  Prefer the simplest workspace that preserves the mental model. Do not use split panes or grids just because the runtime can.
+\item
+  If a region is not meaningfully inspectable, comparable, or supplemental, it probably should not be its own pane.
+\item
+  Keep shell roles distinct:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    status rails communicate concise global state
+  \item
+    help hints teach shortcuts and scope
+  \item
+    command palette surfaces action discovery
+  \item
+    notifications surface events and follow-up
+  \end{itemize}
+\item
+  If one shell element starts doing another shell element's job, the design is drifting.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}{}}\label{record-023-createframedapp}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  the app has multiple views or work areas
+\item
+  shell chrome, palette, overlays, and notifications should be standardized
+\item
+  the frame should own the default hosted runtime path via \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} or \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the app is really just one screen or one prompt loop
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  tabs should represent peer destinations, not unrelated commands
+\item
+  shell notifications and overlays should remain subordinate to the active page task
+\item
+  help text should clarify shell behavior, not restate page content
+\item
+  command palette entries should prefer actions and navigation targets, not field-style data entry or explanatory prose
+\item
+  use drawers for supplemental workspace context and notifications for event messaging; do not overload the status rail with either
+\item
+  prefer the self-running framed-shell path before dropping down to raw \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}(\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{})}
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} and \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ and }}\label{record-023-statusbar-and-statusbarsurface}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  global state, mode, or shortcut context belongs at the shell edge
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the content is explanatory or multi-line
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  keep status text short, global, and low-drama
+\item
+  use \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} when shell chrome is already being composed as a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  keep \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}B\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} for explicit text output or lowering
+\item
+  reserve strong emphasis for mode changes, faults, or focus-critical state
+\item
+  do not turn the status bar into a secondary page body
+\item
+  do not route transient warnings or task-specific explanation here when notifications or in-page content would be more honest
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}(\allowbreak{})} and surface companions}{ /  and surface companions}}\label{record-023-helpshort-helpview-and-surface-companions}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  keyboard ownership is real and shortcut discovery needs a concise hint or grouped reference
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the text would only restate visible controls without clarifying behavior or scope
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  use \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}h\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for shell hints that stay on the structured \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} path
+\item
+  use \texttt{h\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} for grouped shortcut references embedded inside a rich TUI surface or modal
+\item
+  keep the plain string helpers for explicit lowering, pipe output, or textual docs/examples
+\item
+  group by user intent (\texttt{N\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}, \texttt{S\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}) rather than by key shape
+\item
+  help is for shortcut discovery and scope clarification, not for executing commands or replacing a command palette
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}p\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{g\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}(\allowbreak{})}}{ and }}\label{record-023-splitpane-and-grid}
+
+Use when:
+
+\begin{itemize}
+\tightlist
+\item
+  spatial composition helps the user reason about the workspace
+\end{itemize}
+
+Avoid when:
+
+\begin{itemize}
+\tightlist
+\item
+  the layout would be simpler and more legible as a sequential flow
+\end{itemize}
+
+Content guidance:
+
+\begin{itemize}
+\tightlist
+\item
+  use split panes for comparison, side-by-side reference, or inspector-style secondary context
+\item
+  use grids when the user is reading across stable regions, not when one long column would be clearer
+\item
+  label regions by job, not by visual position alone
+\end{itemize}
+
+\section{8. Mouse and multimodal interaction}\label{record-023-mouse-and-multimodal-interaction}
+
+Mouse support in Bijou should follow these rules:
+
+\begin{itemize}
+\tightlist
+\item
+  keyboard is baseline
+\item
+  mouse is enhancement
+\item
+  every click target should mirror an existing keyboard path
+\item
+  overlays consume pointer input before background content
+\item
+  drag is reserved for spatial interactions such as pane resizing
+\end{itemize}
+
+Good early mouse targets:
+
+\begin{itemize}
+\tightlist
+\item
+  tabs
+\item
+  split dividers
+\item
+  notification actions and dismiss buttons
+\item
+  list/table row focus
+\end{itemize}
+
+Bad early mouse targets:
+
+\begin{itemize}
+\tightlist
+\item
+  hover-only critical meaning
+\item
+  interactions that have no keyboard parity
+\end{itemize}
+
+\section{9. Lowering across modes}\label{record-023-lowering-across-modes}
+
+Every pattern should have a graceful lowering story.
+
+\subsection{Examples}\label{record-023-examples}
+
+\section{10. Motion and shader effects}\label{record-023-motion-and-shader-effects}
+
+Motion and shader effects are supporting patterns, not the product itself.
+
+Use them when:
+
+\begin{itemize}
+\tightlist
+\item
+  they clarify transition, progress, focus, or spatial change
+\item
+  the user benefits from seeing continuity rather than a sudden visual jump
+\item
+  the effect reinforces the information architecture instead of competing with it
+\end{itemize}
+
+Avoid them when:
+
+\begin{itemize}
+\tightlist
+\item
+  they are only decorative noise
+\item
+  they make dense work harder to read
+\item
+  the same information would be clearer as stable content, a status change, or a simpler transition
+\end{itemize}
+
+Specific guidance:
+
+\begin{itemize}
+\item
+  use transition shaders to reinforce page or workspace change, not to show off that the renderer can animate
+\item
+  use \texttt{c\allowbreak{}a\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}s\allowbreak{}(\allowbreak{})} for purposeful visual surfaces such as splash, background atmosphere, or dedicated visual moments, not as a default wrapper around ordinary productivity screens
+\item
+  reduced-motion and non-interactive modes must still tell the truth even when the effect disappears entirely
+\item
+  notifications may lower to logs or in-flow alerts
+\item
+  command palette may lower to documented shortcuts or static command lists
+\item
+  navigable inspection views may lower to passive read-only views
+\item
+  modals may lower to step-by-step prompts or inline confirmation blocks
+\end{itemize}
+
+The docs for each family should make that lowering explicit instead of assuming an interactive full-screen terminal.
+

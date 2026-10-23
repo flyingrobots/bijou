@@ -1,0 +1,24 @@
+\color{BookInk}
+\raggedright
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+\fill[BookCoral] (current page.south west) rectangle (current page.north east);
+\end{tikzpicture}
+\vspace*{24mm}
+{\headingfont\fontsize{94}{100}\selectfont Bijou\par}
+\vspace{6mm}
+{\headingfont\fontsize{48}{54}\selectfont \BookTitle\par}
+\vspace{15mm}
+{\large \BookSubtitle\par}
+\vfill
+{\small James Ross\par\medskip
+\ifBookTeaching One application, four environments\par\fi
+\ifBookArchive 426 preserved source records\par\fi
+\medskip 20 October 2026\par}
+\end{titlepage}
+\frontmatter
+\input{copyright}%
+\input{reproducibility}%
+\ifBookTeaching\input{preface}\else\input{archive/preface}\fi
+\input{edition-notes}%
+\tableofcontents
