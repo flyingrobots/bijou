@@ -11,6 +11,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- Raised the MCP SDK and affected runtime dependency floors, refreshed the
+  lockfile, and added a real stdio client/server compatibility check (#536).
+  Fast-uri security cleanup remains tracked by dependency PR #530.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and
