@@ -48,6 +48,9 @@ function collectTokenDefinitionPaths(
  * Edges are mode-sensitive. An adaptive `{ light, dark }` definition depends
  * on whichever branch the requested mode selects, so a light-mode dependents
  * map can legitimately differ from a dark-mode one.
+ * Inspection inputs count too: an excluded candidate's color remains visible
+ * in provenance. An edge does not guarantee that editing its input changes
+ * the selected token value.
  */
 export function collectTokenDependents(
   definitions: TokenDefinitions,

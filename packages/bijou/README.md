@@ -94,6 +94,9 @@ snapshot, or `undefined` for themes without registered authoring data.
 `collectTransitiveTokenDependents(definitions, mode)` follows the full chain.
 These maps select the requested adaptive branch, omit unresolved references
 and inspect dependencies without evaluating cyclic token values.
+They include inspection inputs such as excluded candidates whose colors remain
+visible in provenance; an edge does not promise that every edit changes the
+selected hex value.
 
 DOGFOOD's Theme Lab uses this provenance to show rules, candidates, scores,
 contrast and direct draft overrides alongside a live component specimen.
